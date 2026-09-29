@@ -1,0 +1,548 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Union-Find.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Union-Find - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { padding: 5px 9px; font-variant-numeric: tabular-nums; }
+      table.trace td.num { text-align: center; }
+      table.trace td.add { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.skip { background: #f0f2f6; color: var(--dim); font-weight: 700; }
+      table.trace td.forest { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .mrg { color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Union-Find</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        A tiny structure, two integer arrays, that answers &ldquo;are these two
+        things connected?&rdquo; under a stream of merges. Quick-find and
+        quick-union set up the trade; weighting bounds every tree&rsquo;s height by
+        \(\log_2 N\) through a doubling argument; path compression drives the
+        amortized cost down to the inverse Ackermann function, near-constant for
+        every practical purpose. With code in four languages, the demo, and
+        exercises.
+      </div>
+
+      <p class="lead">
+        <strong>Union-find</strong> is a structure so small it is two integer
+        arrays, yet it answers dynamic-connectivity queries in essentially constant
+        time after a sequence of clever refinements. It is also the exact tool
+        <a href="algo-kruskal.html">Kruskal&rsquo;s algorithm</a> needs to build minimum
+        spanning trees: each cycle check is one query. The design story (find the
+        bottleneck, fix it, repeat) matters as much as the result.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#dc">Dynamic connectivity</a></li>
+          <li><a href="#quick">Quick-find, quick-union, and the trade they make</a></li>
+          <li><a href="#weight">Weighting: keep the trees short</a></li>
+          <li><a href="#compress">Path compression: flatten as you go</a></li>
+          <li><a href="#cost">The cost, and why union-find is everywhere</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="dc">1. Dynamic connectivity</h2>
+      <div class="def">
+        <span class="tag">Definition (dynamic connectivity)</span>
+        Given \(N\) objects and a stream of <strong>connections</strong>, support two
+        operations in any interleaving: <code>unite(p, q)</code> records that \(p\)
+        and \(q\) are connected, and <code>connected(p, q)</code> asks whether they
+        are connected, directly or transitively. Because connection is transitive,
+        the objects partition into <strong>components</strong>, and the question is
+        really &ldquo;are \(p\) and \(q\) in the same component?&rdquo;
+      </div>
+      <p>
+        This abstracts pixels merging into regions, computers joining a network,
+        people connecting in a social graph. The whole implementation hinges on one
+        internal operation, <code>find(p)</code>, which returns a canonical
+        <em>identifier</em> for \(p\)&rsquo;s component; then
+        <code>connected(p, q)</code> is just <code>find(p) == find(q)</code>. (The
+        operation is classically called <em>union</em>, but that is a reserved word
+        in C++, so the method is named <code>unite</code>.) We build the final
+        structure through three strictly-better versions.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="quick">2. Quick-find, quick-union, and the trade they make</h2>
+      <p>
+        <strong>Quick-find</strong> stores a component label <code>id[i]</code> for
+        each element; <code>connected</code> is a single comparison, but
+        <code>unite</code> must sweep the whole array to relabel one component:
+      </p>
+      <pre>  connected(p, q):  id[p] == id[q]              <span class="cm">// O(1)</span>
+  unite(p, q):      for every i with id[i]==id[p]: id[i] = id[q]   <span class="cm">// O(N)</span></pre>
+      <p>
+        With \(O(N)\) per union, building the structure from \(N\) unions is
+        \(O(N^2)\), unusable at scale. <strong>Quick-union</strong> inverts
+        the trade: store <code>parent[i]</code>, making each component a
+        <em>tree</em> whose root is its identifier. Now <code>unite</code> is a
+        single link, but <code>find</code> walks to the root and can be \(O(N)\) if
+        the tree degenerates into a path:
+      </p>
+      <pre>  find(p):     follow parent[] to the root          <span class="cm">// O(tree height)</span>
+  unite(p, q): parent[ find(p) ] = find(q)          <span class="cm">// O(1) link, plus 2 finds</span></pre>
+      <p>
+        We have only moved the cost from union to find. Two refinements,
+        applied together, drive both operations to near-constant.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="weight">3. Weighting: keep the trees short</h2>
+      <p>
+        The tall-tree problem is self-inflicted: linking a big tree under a small one
+        makes everything in the big tree deeper. So do the opposite: always
+        link the <strong>smaller</strong> tree under the <strong>larger</strong>,
+        tracking each tree&rsquo;s size. This is <strong>weighted quick-union</strong>,
+        and it bounds every tree&rsquo;s height by \(\log_2 N\).
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (weighted trees stay shallow)</span>
+        Under union by size, every tree on \(k\) nodes has height at most
+        \(\lfloor \log_2 k \rfloor\); in particular no node is ever deeper than
+        \(\log_2 N\), so <code>find</code> and <code>unite</code> are \(O(\log N)\).
+      </div>
+      <div class="proof">
+        <strong>Proof (a doubling argument).</strong> Track the depth of a single
+        node \(x\). Its depth increases by one exactly when the tree containing \(x\)
+        is linked <em>under</em> another tree; and, by the union-by-size rule,
+        that only happens when \(x\)&rsquo;s tree is the smaller of the two, so the
+        combined tree has size at least twice \(x\)&rsquo;s old tree size. Thus every
+        time \(x\) sinks one level, the size of the tree it belongs to at least
+        doubles. That size starts at \(1\) and can never exceed \(N\), so it can
+        double at most \(\log_2 N\) times; \(x\) sinks at most \(\log_2 N\) levels.
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the three ways a <code>unite</code> can go)</span>
+        Start from ten singletons \(0,\dots,9\), every
+        \(\texttt{parent}[i] = i\) and every \(\texttt{size}[i] = 1\), and read
+        <code>unite(a, b)</code> as: find both roots, compare their sizes, hang
+        the smaller root under the larger (a tie keeps the first argument&rsquo;s
+        root). Each row shows the two roots with their sizes, the branch taken,
+        and the arrays afterwards:
+        <table>
+          <tr><th>operation</th><th>roots (sizes)</th><th>branch</th><th><code>parent</code> after</th><th>changed <code>size</code></th></tr>
+          <tr><td><code>unite(4,3)</code></td><td>\(4\,(1)\), \(3\,(1)\)</td><td>equal sizes: no swap, \(3\) under \(4\)</td><td><code>0 1 2 4 4 5 6 7 8 9</code></td><td>\(\texttt{size}[4]=2\)</td></tr>
+          <tr><td><code>unite(3,8)</code></td><td>\(4\,(2)\), \(8\,(1)\)</td><td>first larger: no swap, \(8\) under \(4\)</td><td><code>0 1 2 4 4 5 6 7 4 9</code></td><td>\(\texttt{size}[4]=3\)</td></tr>
+          <tr><td><code>unite(2,1)</code></td><td>\(2\,(1)\), \(1\,(1)\)</td><td>equal sizes: \(1\) under \(2\)</td><td><code>0 2 2 4 4 5 6 7 4 9</code></td><td>\(\texttt{size}[2]=2\)</td></tr>
+          <tr><td><code>unite(1,8)</code></td><td>\(2\,(2)\), \(4\,(3)\)</td><td>second larger: <em>swap</em>, \(2\) under \(4\)</td><td><code>0 2 4 4 4 5 6 7 4 9</code></td><td>\(\texttt{size}[4]=5\)</td></tr>
+          <tr><td><code>unite(8,1)</code></td><td>\(4\,(5)\), \(4\,(5)\)</td><td>same root: return, nothing changes</td><td><code>0 2 4 4 4 5 6 7 4 9</code></td><td>none</td></tr>
+        </table>
+        The three branches are all here: equal sizes (the tie rule decides),
+        unequal sizes (the swap makes sure the smaller root moves, so
+        \(2\)&rsquo;s two nodes sink one level rather than \(4\)&rsquo;s three),
+        and both arguments already in one component, where <code>unite</code>
+        is a no-op. That last branch is the one
+        <a href="algo-kruskal.html">Kruskal&rsquo;s algorithm</a> reads as
+        &ldquo;this edge would close a cycle&rdquo;. The component
+        \(\{1,2,3,4,8\}\) has \(5\) nodes and height \(2\) (\(1 \to 2 \to 4\)),
+        inside the \(\lfloor \log_2 5 \rfloor = 2\) bound.
+      </div>
+      <p>
+        This is the same doubling argument that bounded the number of resizes in
+        <a href="../hashing/ds-hashing.html">hashing</a> and the height of a heap
+        (<a href="../heaps/ds-heaps-pq.html">Heaps, Priority Queues &amp;
+        Heapsort</a>): its third appearance, and worth recognizing as a standard
+        tool.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="compress">4. Path compression: flatten as you go</h2>
+      <p>
+        The second refinement is nearly free. Every <code>find</code> already walks
+        from a node to the root; on the way back, <em>repoint the visited nodes
+        closer to the root</em>. The one-line version below is <em>path halving</em>
+        (point each node at its grandparent), which flattens the tree
+        as a side effect of ordinary queries, so the structure gets faster the more
+        it is used:
+      </p>
+      <pre>  find(p):
+      while (p != parent[p]) {
+          parent[p] = parent[parent[p]];    <span class="cm">// halve the path</span>
+          p = parent[p];
+      }
+      return p;</pre>
+      <div class="ex">
+        <span class="tag">Example (weighted vs. plain, then compression)</span>
+        Apply <code>unite(4,3)</code>, <code>unite(3,8)</code>,
+        <code>unite(9,4)</code>. Plain quick-union links root under root each time,
+        building a chain of height \(2\): <code>8&larr;3&larr;4</code> with
+        <code>9</code> also under <code>8</code>. Weighted quick-union instead hangs
+        the smaller tree under the larger (ties keep the first root), producing the
+        flat star <code>4&larr;{3, 8, 9}</code> of height \(1\). And a later
+        <code>find</code> on any deep node repoints it straight toward the root, so
+        the next <code>find</code> on it is one hop. Weighting prevents tall trees;
+        compression removes the ones that form anyway.
+      </div>
+      <p>
+        Here is the whole structure, two arrays and three short methods:
+      </p>
+      <div class="code-tabs" data-snippet="graphs/union-find">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Weighted quick-union with path compression. Two arrays: parent[i] (who i
+// points to) and size[i] (tree size, for union by size). Near-constant per op.
+struct UF {
+    vector&lt;int&gt; parent, size;
+    UF(int n) : parent(n), size(n, 1) {
+        for (int i = 0; i &lt; n; i++) parent[i] = i;   // each element its own root
+    }
+    int find(int x) {                        // walk to the root, compressing
+        while (x != parent[x]) {
+            parent[x] = parent[parent[x]];    // path halving: point at grandparent
+            x = parent[x];
+        }
+        return x;
+    }
+    void unite(int a, int b) {               // union by size: smaller under larger
+        int ra = find(a), rb = find(b);
+        if (ra == rb) return;
+        if (size[ra] &lt; size[rb]) swap(ra, rb);
+        parent[rb] = ra;                      // rb (smaller) hangs under ra
+        size[ra] += size[rb];
+    }
+    bool connected(int a, int b) { return find(a) == find(b); }
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Weighted quick-union with path compression. parent[i] = i&#x27;s parent,
+// size[i] = tree size (for union by size). Near-constant amortized per op.
+class UF {
+    int[] parent, size;
+    UF(int n) {
+        parent = new int[n];
+        size = new int[n];
+        for (int i = 0; i &lt; n; i++) { parent[i] = i; size[i] = 1; }
+    }
+    int find(int x) {                        // walk to the root, compressing
+        while (x != parent[x]) {
+            parent[x] = parent[parent[x]];    // path halving: point at grandparent
+            x = parent[x];
+        }
+        return x;
+    }
+    void unite(int a, int b) {               // union by size: smaller under larger
+        int ra = find(a), rb = find(b);
+        if (ra == rb) return;
+        if (size[ra] &lt; size[rb]) { int t = ra; ra = rb; rb = t; }
+        parent[rb] = ra;
+        size[ra] += size[rb];
+    }
+    boolean connected(int a, int b) { return find(a) == find(b); }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Weighted quick-union with path compression. parent[i] = i&#x27;s parent,
+# size[i] = tree size (for union by size). Near-constant amortized per op.
+class UF:
+    def __init__(self, n):
+        self.parent = list(range(n))         # each element its own root
+        self.size = [1] * n
+
+    def find(self, x):                       # walk to the root, compressing
+        while x != self.parent[x]:
+            self.parent[x] = self.parent[self.parent[x]]  # path halving
+            x = self.parent[x]
+        return x
+
+    def unite(self, a, b):                   # union by size: smaller under larger
+        ra, rb = self.find(a), self.find(b)
+        if ra == rb:
+            return
+        if self.size[ra] &lt; self.size[rb]:
+            ra, rb = rb, ra
+        self.parent[rb] = ra
+        self.size[ra] += self.size[rb]
+
+    def connected(self, a, b):
+        return self.find(a) == self.find(b)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Weighted quick-union with path compression. parent[i] = i&#x27;s parent,
+// size[i] = tree size (for union by size). Near-constant amortized per op.
+struct UF {
+    parent: Vec&lt;usize&gt;,
+    size: Vec&lt;usize&gt;,
+}
+impl UF {
+    fn new(n: usize) -&gt; Self {
+        UF { parent: (0..n).collect(), size: vec![1; n] }
+    }
+    fn find(&amp;mut self, mut x: usize) -&gt; usize {   // walk up, compressing
+        while x != self.parent[x] {
+            self.parent[x] = self.parent[self.parent[x]];  // path halving
+            x = self.parent[x];
+        }
+        x
+    }
+    fn unite(&amp;mut self, a: usize, b: usize) {     // union by size
+        let (mut ra, mut rb) = (self.find(a), self.find(b));
+        if ra == rb { return; }
+        if self.size[ra] &lt; self.size[rb] {
+            std::mem::swap(&amp;mut ra, &amp;mut rb);          // smaller under larger
+        }
+        self.parent[rb] = ra;
+        self.size[ra] += self.size[rb];
+    }
+    fn connected(&amp;mut self, a: usize, b: usize) -&gt; bool {
+        self.find(a) == self.find(b)
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/union-find.cpp &middot; code/graphs/union-find.java &middot; code/graphs/union-find.py &middot; code/graphs/union-find.rs</code></p>
+<!--/ct--></div>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">5. The cost, and why union-find is everywhere</h2>
+      <table>
+        <tr><th>implementation</th><th>unite</th><th>find</th></tr>
+        <tr><td>quick-find</td><td>\(O(N)\)</td><td>\(O(1)\)</td></tr>
+        <tr><td>quick-union</td><td>\(O(N)\)</td><td>\(O(N)\)</td></tr>
+        <tr><td>weighted quick-union</td><td>\(O(\log N)\)</td><td>\(O(\log N)\)</td></tr>
+        <tr><td><strong>weighted + path compression</strong></td><td><strong>\(\approx O(1)\)</strong></td><td><strong>\(\approx O(1)\)</strong></td></tr>
+      </table>
+      <p>
+        The final version costs \(O(\alpha(N))\) <em>amortized</em> per operation,
+        where \(\alpha\) is the inverse Ackermann function, a quantity so
+        slow-growing it is at most \(4\) or \(5\) for any \(N\) that could be stored
+        on any computer. For every practical purpose, union and connected are
+        constant time. The design story (find the bottleneck, fix it, repeat)
+        matters as much as the result. Union-find is also the cycle test inside
+        <a href="algo-kruskal.html">Kruskal&rsquo;s algorithm</a>: each accepted edge is a
+        <code>unite</code>, each rejection a <code>connected</code> query.
+      </p>
+      <div class="aside">
+        <span class="tag">The \(\alpha(N)\) bound, and where it comes from</span>
+        The near-constant bound is a genuine <em>amortized</em> result, not a
+        per-operation one: Tarjan proved that union by size (or by rank) together with
+        path compression runs any sequence of \(m\) operations on \(N\) elements in
+        \(O(m\,\alpha(N))\) total time, and that no pointer-based structure can do
+        asymptotically better. A single <code>find</code> can still walk a long path;
+        the compression it performs pays for the next traversals, so the <em>average</em>
+        over the sequence is \(\alpha(N)\). Two implementation notes: <em>union by
+        rank</em> (tree height as the tie-breaker) and <em>union by size</em> both give
+        the bound, and <em>path halving</em> (repointing to the grandparent, our
+        one-line version) achieves the same \(\alpha(N)\) as full compression
+        while walking the path only once. The analysis is subtle; the code is eight
+        lines.
+      </div>
+      <div class="aside">
+        <span class="tag">Union-find vs. a DFS for components</span>
+        A <a href="algo-dfs.html">depth-first search</a> also finds connected components,
+        but it needs the whole
+        graph up front and a fresh traversal per query. Union-find shines when edges
+        <em>arrive online</em> and connectivity queries interleave with them
+        (social links forming, network cables coming up), because each union
+        and each query is near-constant. Same problem, opposite access pattern.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=union-find">Union-find demo</a> (weighted
+        quick-union + path compression). Cell \(i\) shows <code>parent[i]</code>;
+        roots point at themselves. Type <code>4 3</code>, <code>3 8</code>,
+        <code>9 4</code> and press <em>Union</em> to build the star above, then build
+        a taller tree and run <em>Find</em> on a deep element to watch compression
+        flatten it in a single step. The write counter shows how little each
+        operation actually does.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">6. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Starting from singletons \(0,\dots,5\), apply weighted quick-union (ties keep
+          the first root) to <code>unite(0,1)</code>, <code>unite(2,3)</code>,
+          <code>unite(0,3)</code>. Give the final <code>parent</code> array and the
+          height of the resulting tree.
+          <details>
+            <summary>solution</summary>
+            <code>unite(0,1)</code>: sizes equal, so \(1\) hangs under \(0\);
+            \(\texttt{size}[0]=2\). <code>unite(2,3)</code>: \(3\) under \(2\);
+            \(\texttt{size}[2]=2\). <code>unite(0,3)</code>: roots \(0\) (size \(2\))
+            and \(2\) (size \(2\)) tie, so \(2\) hangs under \(0\);
+            \(\texttt{size}[0]=4\). Final <code>parent = [0, 0, 0, 2, 4, 5]</code>,
+            and the tree rooted at \(0\) has \(3\) at depth \(2\) (\(3 \to 2 \to 0\)),
+            so height \(2\), within the \(\lfloor\log_2 4\rfloor = 2\) bound.
+            A subsequent <code>find(3)</code> would compress it to depth \(1\).
+          </details>
+        </li>
+        <li>
+          Explain, using the doubling argument, why union by size guarantees tree
+          height \(\le \log_2 N\) but quick-union without it can reach height
+          \(N-1\).
+          <details>
+            <summary>solution</summary>
+            Under union by size a node sinks a level only when its tree is linked
+            under an at-least-as-large tree, which at least doubles the tree&rsquo;s
+            size; a size bounded by \(N\) doubles at most \(\log_2 N\) times, so depth
+            \(\le \log_2 N\). Plain quick-union may link a large tree under a
+            single-node tree, adding depth without growing size: do this
+            repeatedly (<code>unite(1,0)</code>, <code>unite(2,1)</code>,
+            <code>unite(3,2)</code>, &hellip;) and you build a path of height
+            \(N-1\), making <code>find</code> \(O(N)\).
+          </details>
+        </li>
+        <li>
+          True or false, with justification: &ldquo;Union-find can list the actual
+          path of connections between \(p\) and \(q\) when they are connected.&rdquo;
+          <details>
+            <summary>solution</summary>
+            False. Union-find records only which component each element belongs to
+            (via <code>parent</code> pointers toward an arbitrary root), not which
+            original edges connected them; path compression actively rewrites those
+            pointers, discarding any trace of the connection sequence. To report an
+            actual connecting path you need a graph traversal (BFS or DFS over the
+            stored edges), which is a different tool with a different cost. Union-find
+            answers <em>whether</em>, not <em>how</em>.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Union-Find v1.0 &middot; prepared by
+        Dr. Marcel Gavriliu. Typeset with MathJax; interactive demos in the course
+        library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

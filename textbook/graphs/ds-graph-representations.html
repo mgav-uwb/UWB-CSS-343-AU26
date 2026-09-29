@@ -1,0 +1,671 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Graphs: Vocabulary & Representations.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Graphs: Vocabulary &amp; Representations - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Graphs: Vocabulary &amp; Representations</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        The most general structure in the course: vertices joined by edges. The
+        vocabulary of graphs and digraphs, two counting facts (the handshake
+        lemma and the \(V-1\) edges of a tree), and the two representations
+        (adjacency matrix and adjacency list) with the space and time trade-off
+        that makes the list the default. Introduces the running example graph
+        used across the graph handouts. With exercises.
+      </div>
+
+      <p class="lead">
+        Trees were graphs with a restriction: connected and acyclic, exactly one
+        path between any two nodes. This handout removes the restriction. A
+        <strong>graph</strong> is any set of vertices connected by edges
+        (cycles allowed, multiple paths allowed, disconnected pieces allowed),
+        and that generality is why graphs model road maps, social
+        networks, the web, task dependencies, and circuits alike. The price of
+        the generality is that a search can go in circles, so every graph search
+        carries a <em>visited</em> set; the searches themselves are the subject
+        of the <a href="algo-dfs.html">Depth-First Search</a>,
+        <a href="algo-bfs.html">Breadth-First Search</a>, and
+        <a href="algo-topological-sort.html">Topological Sort</a> handouts. This
+        handout supplies what they all share: the vocabulary, two counting
+        facts, and the representation.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#vocab">Vertices, edges, and vocabulary</a></li>
+          <li><a href="#counting">Counting edges: the handshake lemma and trees</a></li>
+          <li><a href="#repr">Representing a graph</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="vocab">1. Vertices, edges, and vocabulary</h2>
+      <div class="def">
+        <span class="tag">Definition (graph)</span>
+        A <strong>graph</strong> \(G = (V, E)\) is a set \(V\) of
+        <strong>vertices</strong> and a set \(E\) of <strong>edges</strong>, each
+        edge joining a pair of vertices. In an <strong>undirected</strong> graph
+        an edge \(\{u,v\}\) connects \(u\) and \(v\) symmetrically; in a
+        <strong>directed</strong> graph (a <em>digraph</em>) an edge \((u,v)\),
+        written \(u \to v\), goes one way only, and \(u\to v\) does not imply
+        \(v\to u\).
+      </div>
+      <p>
+        Undirected edges model symmetric relations: friendship, two-way
+        roads. Directed edges model one-way relations: web links, one-way
+        streets, &ldquo;must happen before.&rdquo; The distinction matters for
+        every algorithm, and topological sort (the
+        <a href="algo-topological-sort.html"><em>Topological Sort</em></a> handout)
+        only makes sense on a digraph. Here is a small undirected graph used
+        throughout this section:
+      </p>
+      <pre>  0 &mdash;&mdash; 1       V = { 0, 1, 2, 3 }
+  |  / |       E = { 0&ndash;1, 0&ndash;2, 1&ndash;2, 1&ndash;3 }
+  | /  |
+  2    3       4 vertices, 4 edges, a cycle 0&ndash;1&ndash;2&ndash;0</pre>
+      <p>The shared vocabulary for the rest of the unit:</p>
+      <ul>
+        <li><strong>adjacent</strong>: two vertices joined by an edge;</li>
+        <li><strong>degree</strong> of a vertex: the number of edges at it
+          (for a digraph, <em>in-degree</em> and <em>out-degree</em> separately);</li>
+        <li><strong>path</strong>: a sequence of edges leading from one
+          vertex to another; its <em>length</em> is the number of edges;</li>
+        <li><strong>cycle</strong>: a path that returns to its start;</li>
+        <li><strong>connected</strong> (undirected): a path exists between
+          every pair of vertices.</li>
+      </ul>
+
+      <!-- ============================================================ -->
+      <h2 id="counting">2. Counting edges: the handshake lemma and trees</h2>
+      <p>
+        Two counting facts about edges anchor the cost analyses of the graph
+        algorithms, and place trees within the family of graphs.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (handshake)</span>
+        In an undirected graph, \(\displaystyle\sum_{v \in V} \deg(v) = 2\,|E|\).
+        In a digraph, \(\displaystyle\sum_{v} \text{in-deg}(v) =
+        \sum_{v} \text{out-deg}(v) = |E|\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Count the pairs (vertex, edge incident to it) two
+        ways. Grouping by vertex, vertex \(v\) contributes \(\deg(v)\) pairs, for
+        a total of \(\sum_v \deg(v)\). Grouping by edge, each undirected edge has
+        exactly two endpoints and so contributes exactly \(2\) pairs, for a total
+        of \(2|E|\). The two counts are equal. For a digraph, count (vertex,
+        out-edge) pairs: each edge has one tail, so the out-degree sum is \(|E|\);
+        symmetrically for heads and the in-degree sum.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        On the running graph (&sect;3) the total degrees are
+        \(3, 3, 2, 5, 3, 3, 1, 2\), summing to \(22 = 2\cdot 11\). The lemma
+        looks like trivia but it is precisely why
+        &ldquo;scan every vertex&rsquo;s entire neighbor list&rdquo; costs
+        \(V + 2E\), i.e. \(\Theta(V+E)\); it is cashed in for the cost of
+        <a href="algo-dfs.html">DFS</a> and <a href="algo-bfs.html">BFS</a>. (The average
+        degree \(2E/V\) also measures how sparse a graph is.)
+      </p>
+      <h3>How many edges can a graph have?</h3>
+      <p>
+        In a simple undirected graph (no self-loops, no repeated edges), the edge
+        count ranges from \(0\) to one edge per pair of vertices:
+      </p>
+      \[
+        0 \;\le\; |E| \;\le\; \binom{V}{2} = \frac{V(V-1)}{2} = \Theta(V^2).
+      \]
+      <p>
+        A graph is <strong>sparse</strong> when \(|E| = O(V)\) and
+        <strong>dense</strong> when \(|E| = \Theta(V^2)\). Real graphs are almost
+        always sparse: a road intersection meets a handful of streets, a person
+        has hundreds of friends and not billions. This single fact will choose
+        our representation in <a href="#repr">&sect;3</a>.
+      </p>
+      <h3>Trees are the sparsest connected graphs</h3>
+      <div class="thm">
+        <span class="tag">Proposition (trees)</span>
+        A <strong>tree</strong> is a connected acyclic <em>undirected</em> graph.
+        Every tree on \(V\) vertices has exactly \(V - 1\) edges. Moreover, any
+        two of the three properties {connected, acyclic, \(|E| = V-1\)} imply
+        the third.
+      </div>
+      <div class="aside">
+        <span class="tag">Why &ldquo;undirected&rdquo; is load-bearing</span>
+        The directed diamond \(1\to2,\ 1\to3,\ 2\to4,\ 3\to4\) is connected
+        and has <em>no directed cycle</em>, yet it is not a tree: two
+        distinct paths reach vertex \(4\) (it has two &ldquo;parents&rdquo;),
+        it has \(E = V\) edges, and its undirected shadow contains the cycle
+        \(1\)-\(2\)-\(4\)-\(3\)-\(1\). &ldquo;Connected + acyclic
+        \(\Rightarrow\) tree&rdquo; is an <em>undirected</em> theorem. The
+        directed analogue of &ldquo;acyclic&rdquo; is the <strong>DAG</strong>
+        (the <a href="algo-topological-sort.html"><em>Topological Sort</em></a>
+        handout): a strictly bigger family, and the home of topological sort.
+      </div>
+      <div class="proof">
+        <strong>Proof that a tree has \(V-1\) edges (induction on \(V\)).</strong>
+        A tree with \(V \ge 2\) vertices has a <em>leaf</em>, a vertex of degree
+        \(1\): otherwise every vertex has degree \(\ge 2\), and following unused
+        edges out of vertices can never get stuck, so by the pigeonhole argument
+        behind the source lemma of the
+        <a href="algo-topological-sort.html"><em>Topological Sort</em></a> handout a
+        walk must repeat a vertex and expose a
+        cycle, contradicting acyclicity. Remove a leaf and its one edge:
+        the result is still connected and acyclic, a tree on \(V-1\) vertices,
+        which by induction has \(V-2\) edges. Adding the removed edge back gives
+        \(V-1\). The base case \(V=1\) has \(0\) edges. The
+        &ldquo;two-of-three&rdquo; claims follow similarly: adding one edge to a
+        tree creates a cycle, and removing one disconnects it.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        So a tree is the minimum connected graph: drop any edge and it
+        falls apart, add any edge and it gains a cycle. All the tree structures
+        we studied earlier were graphs with these restrictions; this handout
+        works without them. (The fact previews the minimum spanning tree, the
+        subject of <a href="foundation-minimum-spanning-trees.html"><em>Minimum
+        Spanning Trees</em></a>: the cheapest set of edges that keeps a graph
+        connected is necessarily a tree.)
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="repr">3. Representing a graph</h2>
+      <p>Two representations, chosen by whether the graph is dense or sparse.</p>
+      <h3>Adjacency matrix</h3>
+      <p>
+        A \(V \times V\) matrix with \(a[u][v] = 1\) when \(u\)&ndash;\(v\) is an
+        edge and \(0\) otherwise:
+      </p>
+      <pre>       0 1 2 3
+    0 [0 1 1 0]      edge 0&ndash;1?  &rarr; a[0][1] = 1   (O(1) lookup)
+    1 [1 0 1 1]
+    2 [1 1 0 0]
+    3 [0 1 0 0]      space: Theta(V^2)</pre>
+      <p>
+        &ldquo;Is there an edge \(u\)&ndash;\(v\)?&rdquo; is a single array
+        access. The fatal flaw is space: \(\Theta(V^2)\) regardless of how few
+        edges exist. For a social network of a billion people with a few hundred
+        friends each, the matrix is \(10^{18}\) cells, almost all zero:
+        impossible. Matrices suit only small or dense graphs.
+      </p>
+      <h3>Adjacency list</h3>
+      <p>One list of neighbors per vertex:</p>
+      <pre>  0 &rarr; [1, 2]        space: Theta(V + E)
+  1 &rarr; [0, 2, 3]     iterate 1's neighbors: O(deg 1)
+  2 &rarr; [0, 1]        edge query 0&ndash;2: scan 0's list
+  3 &rarr; [1]</pre>
+      <p>
+        The list stores only the edges that exist, so its space is
+        \(\Theta(V+E)\), proportional to the actual graph. Iterating a
+        vertex&rsquo;s neighbors, the inner loop of every search, is
+        \(O(\deg u)\), which is optimal. Its one weakness is the edge query
+        &ldquo;is \(u\)&ndash;\(v\) an edge?&rdquo; (scan a list), but graph
+        algorithms rarely ask that: they iterate neighbors. Hence the
+        adjacency list is the default.
+      </p>
+      <table>
+        <tr><th></th><th>matrix</th><th>list</th></tr>
+        <tr><td>space</td><td>\(\Theta(V^2)\)</td><td><strong>\(\Theta(V+E)\)</strong></td></tr>
+        <tr><td>edge query \(u\)&ndash;\(v\)</td><td><strong>\(O(1)\)</strong></td><td>\(O(\deg u)\)</td></tr>
+        <tr><td>iterate neighbors</td><td>\(O(V)\)</td><td><strong>\(O(\deg u)\)</strong></td></tr>
+        <tr><td>best for</td><td>dense</td><td>sparse</td></tr>
+      </table>
+      <h3>The four operations, step by step</h3>
+      <p>
+        The table above asserts the costs; here they are on the four-vertex graph
+        of <a href="#vocab">&sect;1</a>. Build it one edge at a time, keeping both
+        representations in step. The matrix starts all zero, the lists start
+        empty, and each row shows the state <em>after</em> the insertion.
+      </p>
+      <table>
+        <tr>
+          <th>insert</th><th>matrix rows 0,1,2,3</th>
+          <th>adjacency lists</th><th>work</th>
+        </tr>
+        <tr>
+          <td>add 0&ndash;1</td>
+          <td><span class="mono">0100 1000 0000 0000</span></td>
+          <td><span class="mono">0:[1] 1:[0] 2:[] 3:[]</span></td>
+          <td>2 cell writes</td>
+        </tr>
+        <tr>
+          <td>add 0&ndash;2</td>
+          <td><span class="mono">0110 1000 1000 0000</span></td>
+          <td><span class="mono">0:[1,2] 1:[0] 2:[0] 3:[]</span></td>
+          <td>2 appends</td>
+        </tr>
+        <tr>
+          <td>add 1&ndash;2</td>
+          <td><span class="mono">0110 1010 1100 0000</span></td>
+          <td><span class="mono">0:[1,2] 1:[0,2] 2:[0,1] 3:[]</span></td>
+          <td>2 appends</td>
+        </tr>
+        <tr>
+          <td>add 1&ndash;3</td>
+          <td><span class="mono">0110 1011 1100 0100</span></td>
+          <td><span class="mono">0:[1,2] 1:[0,2,3] 2:[0,1] 3:[1]</span></td>
+          <td>2 appends</td>
+        </tr>
+      </table>
+      <p>
+        Insertion is \(O(1)\) either way: two symmetric cell writes, or two
+        appends at the ends of two lists. The representations part company on the
+        three read operations. Run each on the finished structure:
+      </p>
+      <table>
+        <tr><th>operation</th><th>adjacency matrix</th><th>adjacency list</th></tr>
+        <tr>
+          <td>membership: is 1&ndash;3 an edge? (hit)</td>
+          <td>read <span class="mono">a[1][3]</span> = 1: <strong>1 access</strong>, answer yes</td>
+          <td>scan 1&rsquo;s list <span class="mono">[0,2,3]</span>: 0 no, 2 no, 3 yes:
+            <strong>3 comparisons</strong>, answer yes</td>
+        </tr>
+        <tr>
+          <td>membership: is 0&ndash;3 an edge? (miss)</td>
+          <td>read <span class="mono">a[0][3]</span> = 0: <strong>1 access</strong>, answer no</td>
+          <td>scan 0&rsquo;s list <span class="mono">[1,2]</span>: 1 no, 2 no, list
+            exhausted: <strong>2 comparisons</strong>, answer no. A miss costs the
+            whole list</td>
+        </tr>
+        <tr>
+          <td>iterate the neighbors of 1</td>
+          <td>walk row 1 = <span class="mono">1011</span>, testing all \(V = 4\)
+            cells, emitting 0, 2, 3: <strong>4 reads for 3 neighbors</strong></td>
+          <td>walk the 3 stored entries, emitting 0, 2, 3:
+            <strong>3 reads</strong>, nothing wasted</td>
+        </tr>
+        <tr>
+          <td>degree of 1</td>
+          <td>sum row 1: <strong>4 cell reads</strong> to get 3</td>
+          <td><span class="mono">adj[1].size()</span> = 3: <strong>1 read</strong>,
+            since the list stores its own length</td>
+        </tr>
+      </table>
+      <p>
+        The middle row is the one that decides the representation, because
+        iterating neighbors is the inner loop of every graph search. Sweeping
+        <em>every</em> vertex&rsquo;s neighbors costs the matrix \(V\) cell reads
+        per vertex, so \(V^2\) reads no matter how few edges exist; it costs the
+        list \(\deg(u)\) reads per vertex, and by the handshake lemma
+        (<a href="#counting">&sect;2</a>) those sum to \(2|E|\), here
+        \(2 \cdot 4 = 8\) reads against the matrix&rsquo;s \(16\). That
+        \(V + 2E\) against \(V^2\) is exactly the \(\Theta(V+E)\) cost of
+        <a href="algo-dfs.html">DFS</a> and <a href="algo-bfs.html">BFS</a>.
+      </p>
+
+      <h3>Dense or sparse: the numbers</h3>
+      <p>
+        Fix \(V = 1000\) and vary the edge count. A matrix always holds
+        \(V^2 = 1{,}000{,}000\) cells; a list holds \(V + 2E\) slots, one per
+        vertex plus one per edge endpoint.
+      </p>
+      <table>
+        <tr>
+          <th>graph on \(V = 1000\)</th><th>\(E\)</th><th>matrix cells \(V^2\)</th>
+          <th>list slots \(V + 2E\)</th><th>full neighbor sweep</th>
+        </tr>
+        <tr>
+          <td>road network, average degree 4</td><td>2,000</td>
+          <td>1,000,000</td><td>5,000</td>
+          <td>1,000,000 vs 4,000 reads</td>
+        </tr>
+        <tr>
+          <td>half of all possible edges</td><td>249,750</td>
+          <td>1,000,000</td><td>500,500</td>
+          <td>1,000,000 vs 499,500 reads</td>
+        </tr>
+        <tr>
+          <td>complete graph</td><td>499,500</td>
+          <td>1,000,000</td><td>1,000,000</td>
+          <td>1,000,000 vs 999,000 reads</td>
+        </tr>
+      </table>
+      <p>
+        The break-even is exact: \(V + 2E = V^2\) precisely when
+        \(E = V(V-1)/2\), the complete graph. So the matrix never uses less space
+        than the list on a simple graph, and it matches only when every pair of
+        vertices is joined. On the sparse road network the list is smaller by a
+        factor of \(200\) and its search sweep is faster by a factor of \(250\).
+        What the matrix buys with that space is the \(O(1)\) membership test,
+        which is the trade worth making when \(V\) is small enough that \(V^2\)
+        cells fit comfortably, or when a single bit per cell makes the matrix
+        physically smaller than a list of 32-bit vertex numbers.
+      </p>
+      <p>
+        Since real graphs are sparse and algorithms iterate neighbors, we use the
+        adjacency list throughout. In C++ it is a vector of vectors:
+      </p>
+      <div class="code-tabs" data-snippet="graphs/graph-adt">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">struct Graph {
+    int V;                        // number of vertices
+    vector&lt;vector&lt;int&gt;&gt; adj;      // adj[u] = u&#x27;s neighbors
+    Graph(int n) : V(n), adj(n) {}
+    void addEdge(int u, int v) {
+        adj[u].push_back(v);
+        adj[v].push_back(u);      // omit this line for a digraph
+    }
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>class Graph {
+    int V;                                  // number of vertices
+    List&lt;List&lt;Integer&gt;&gt; adj;                // adj.get(u) = u&#x27;s neighbors
+    Graph(int n) {
+        V = n;
+        adj = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; n; i++) adj.add(new ArrayList&lt;&gt;());
+    }
+    void addEdge(int u, int v) {
+        adj.get(u).add(v);
+        adj.get(v).add(u);                  // omit this line for a digraph
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>class Graph:
+    def __init__(self, n):
+        self.V = n
+        self.adj = [[] for _ in range(n)]   # adj[u] = u&#x27;s neighbors
+
+    def add_edge(self, u, v):
+        self.adj[u].append(v)
+        self.adj[v].append(u)               # omit this line for a digraph</pre>
+<pre class="ct-pane" data-lang="rs" hidden>struct Graph {
+    adj: Vec&lt;Vec&lt;usize&gt;&gt;,               // adj[u] = u&#x27;s neighbors
+}
+impl Graph {
+    fn new(n: usize) -&gt; Self {
+        Graph { adj: vec![Vec::new(); n] }
+    }
+    fn add_edge(&amp;mut self, u: usize, v: usize) {
+        self.adj[u].push(v);
+        self.adj[v].push(u);            // omit this line for a digraph
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/graph-adt.cpp &middot; code/graphs/graph-adt.java &middot; code/graphs/graph-adt.py &middot; code/graphs/graph-adt.rs</code></p>
+<!--/ct--></div>
+      <p>
+        This tiny struct is everything <a href="algo-dfs.html">DFS</a>,
+        <a href="algo-bfs.html">BFS</a>, and
+        <a href="algo-topological-sort.html">topological sort</a> need. One directed
+        graph anchors the worked examples and demos across the graph handouts:
+      </p>
+      <figure id="running">
+        <svg viewBox="0 0 420 300" role="img" aria-label="The running directed acyclic graph. Eight vertices numbered 0 through 7 are drawn as circles spaced evenly around a ring in index order, with 0 at the top and indices increasing clockwise. Eleven arrows show the directed edges, each pointing from a lower to a higher index: 0 points to 1, 0 points to 3, 0 points to 5, 1 points to 2, 1 points to 3, 2 points to 3, 3 points to 4, 3 points to 7, 4 points to 5, 4 points to 7, and 5 points to 6. Vertices 6 and 7 have no outgoing edges.">
+          <defs>
+            <marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#4a5163"/>
+            </marker>
+          </defs>
+          <g stroke="#4a5163" stroke-width="1.8" fill="none" marker-end="url(#ah)">
+            <line x1="230" y1="46" x2="269" y2="62"/>  <!-- 0->1 -->
+            <line x1="218" y1="58" x2="281" y2="209"/>  <!-- 0->3 -->
+            <line x1="202" y1="58" x2="139" y2="209"/>  <!-- 0->5 -->
+            <line x1="298" y1="91" x2="314" y2="130"/>  <!-- 1->2 -->
+            <line x1="289" y1="93" x2="289" y2="207"/>  <!-- 1->3 -->
+            <line x1="314" y1="170" x2="298" y2="209"/>  <!-- 2->3 -->
+            <line x1="269" y1="238" x2="230" y2="254"/>  <!-- 3->4 -->
+            <line x1="274" y1="214" x2="146" y2="86"/>  <!-- 3->7 -->
+            <line x1="190" y1="254" x2="151" y2="238"/>  <!-- 4->5 -->
+            <line x1="202" y1="242" x2="139" y2="91"/>  <!-- 4->7 -->
+            <line x1="122" y1="209" x2="106" y2="170"/>  <!-- 5->6 -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="210" cy="38" r="19"/>  <circle cx="289" cy="71" r="19"/>
+              <circle cx="322" cy="150" r="19"/>  <circle cx="289" cy="229" r="19"/>
+              <circle cx="210" cy="262" r="19"/>  <circle cx="131" cy="229" r="19"/>
+              <circle cx="98" cy="150" r="19"/>  <circle cx="131" cy="71" r="19"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="210" y="43">0</text>  <text x="289" y="76">1</text>
+              <text x="322" y="155">2</text>  <text x="289" y="234">3</text>
+              <text x="210" y="267">4</text>  <text x="131" y="234">5</text>
+              <text x="98" y="155">6</text>  <text x="131" y="76">7</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The running graph: \(V = 8\), \(E = 11\), every edge pointing from a
+          lower to a higher index: a directed acyclic graph. Vertices are
+          spaced evenly around a circle in index order, matching the interactive
+          demo. Adjacency list:
+          \(0\to\{1,3,5\}\), \(1\to\{2,3\}\), \(2\to\{3\}\), \(3\to\{4,7\}\),
+          \(4\to\{5,7\}\), \(5\to\{6\}\).
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=graph">DFS / BFS / topological-sort demo</a>.
+        The searches of the companion handouts all run on this graph; the edge
+        list is editable, so you can watch a search on your own graph. What you
+        trace on paper is exactly what the demo animates.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">4. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          An undirected graph has degree sequence \(4, 3, 3, 2, 2\). How many
+          edges does it have? Could a simple undirected graph have degree sequence
+          \(4, 4, 1, 1\)?
+          <details>
+            <summary>solution</summary>
+            By the handshake lemma \(\sum \deg = 2E\), so
+            \(E = (4+3+3+2+2)/2 = 14/2 = 7\). For \(4,4,1,1\): the sum is \(10\),
+            an even number, so the lemma is satisfied, but a vertex of degree
+            \(4\) needs \(4\) distinct neighbors and there are only \(3\) other
+            vertices: impossible in a <em>simple</em> graph. (The handshake
+            parity test is necessary, not sufficient.)
+          </details>
+        </li>
+        <li>
+          A digraph has \(V\) vertices and \(E\) edges. You must answer many
+          &ldquo;is \(u \to v\) an edge?&rdquo; queries and no neighbor-iteration
+          queries. Which representation do you choose, and how does the answer
+          change if the graph is sparse and you instead iterate neighbors
+          constantly?
+          <details>
+            <summary>solution</summary>
+            For pure edge-existence queries the adjacency <em>matrix</em> answers
+            each in \(O(1)\); if you can afford \(\Theta(V^2)\) space (small or
+            dense graph), it wins. For a sparse graph where the operations iterate
+            neighbors (as DFS, BFS, and topological sort do), the
+            adjacency <em>list</em> wins on both counts: \(\Theta(V+E)\) space and
+            \(O(\deg u)\) neighbor iteration, which is optimal. Representation
+            follows the algorithm&rsquo;s access pattern.
+          </details>
+        </li>
+        <li>
+          A graph has \(V = 10{,}000\) vertices and average degree \(6\). Give
+          the edge count, the matrix cell count, and the list slot count. How
+          many reads does one sweep of every vertex&rsquo;s neighbors cost in
+          each representation? At what edge count do the two space costs meet?
+          <details>
+            <summary>solution</summary>
+            Average degree \(6\) means \(\sum_v \deg(v) = 60{,}000\), so by the
+            handshake lemma \(E = 30{,}000\). The matrix holds
+            \(V^2 = 100{,}000{,}000\) cells; the list holds
+            \(V + 2E = 10{,}000 + 60{,}000 = 70{,}000\) slots, smaller by a
+            factor of about \(1{,}429\). A full sweep reads \(V^2 =
+            100{,}000{,}000\) matrix cells against \(2E = 60{,}000\) list
+            entries, a factor of about \(1{,}667\). The space costs meet when
+            \(V + 2E = V^2\), i.e. \(E = V(V-1)/2 = 49{,}995{,}000\): the
+            complete graph, and roughly \(1{,}667\) times as many edges as this
+            graph has.
+          </details>
+        </li>
+        <li>
+          On the four-vertex graph \(E = \{0\text{-}1, 0\text{-}2, 1\text{-}2,
+          1\text{-}3\}\), count the comparisons an adjacency list needs to answer
+          &ldquo;is \(2\)&ndash;\(3\) an edge?&rdquo; and &ldquo;is
+          \(3\)&ndash;\(2\) an edge?&rdquo; Why do the two counts differ when the
+          answer is the same, and what does that say about which endpoint to
+          scan from?
+          <details>
+            <summary>solution</summary>
+            Scanning from \(2\): its list is <span class="mono">[0,1]</span>, so
+            \(0\) no, \(1\) no, exhausted: \(2\) comparisons, answer no. Scanning
+            from \(3\): its list is <span class="mono">[1]</span>, so \(1\) no,
+            exhausted: \(1\) comparison, answer no. The cost is \(O(\deg u)\) in
+            whichever endpoint you scan, so on an undirected graph the query
+            should start at the endpoint of smaller degree; that costs
+            \(O(\min(\deg u, \deg v))\) rather than \(O(\deg u)\). The matrix
+            reads <span class="mono">a[2][3]</span> or
+            <span class="mono">a[3][2]</span> in one access either way, which is
+            the whole of its advantage.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Graphs: Vocabulary &amp;
+        Representations v1.0 &middot; prepared by Dr. Marcel Gavriliu.
+        Typeset with MathJax; interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

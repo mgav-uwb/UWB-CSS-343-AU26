@@ -1,0 +1,1105 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: LZW Compression.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LZW Compression - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>LZW Compression</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Dictionary coding: compress by naming repeated <em>substrings</em>
+        rather than by shortening individual symbols. The Lempel-Ziv-Welch
+        encoder and decoder in full, with a character-by-character trace of
+        an encode, the matching decode of that same code stream, and the
+        case in which the decoder receives a code it has not yet learned,
+        derived and worked step by step. The trie that makes the encoder run
+        in linear time, the phrase-count bound that explains what LZW can
+        and cannot compress, code width and dictionary resets in practice,
+        and exercises.
+      </div>
+
+      <p class="lead">
+        <a href="../greedy/algo-huffman-coding.html"><em>Huffman
+        coding</em></a> spends its budget one symbol at a time: frequent
+        symbols get short codewords, rare ones long. That is the best any
+        <em>per-symbol</em> code can do, and it is blind to a different and
+        very common kind of redundancy: the same <em>substring</em>
+        occurring again and again. <strong>LZW</strong> (Lempel-Ziv-Welch,
+        published by Terry Welch in 1984 as a refinement of the 1978
+        Lempel-Ziv scheme) attacks that redundancy directly. It builds a
+        dictionary of substrings as it reads, and emits one fixed-width code
+        per <em>substring</em> matched, so a phrase seen for the tenth time
+        costs the same single code as a phrase seen for the second. The
+        dictionary is never transmitted: the decoder rebuilds it from the
+        code stream alone.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#why">Two ways to spend bits</a></li>
+          <li><a href="#encode">The dictionary, and the encoder</a></li>
+          <li><a href="#trace">An encode traced character by character</a></li>
+          <li><a href="#decode">The decoder rebuilds the dictionary</a></li>
+          <li><a href="#tricky">The code that is not there yet</a></li>
+          <li><a href="#trie">The trie as the encoder&rsquo;s dictionary</a></li>
+          <li><a href="#cost">Cost: time, and how many codes come out</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="why">1. Two ways to spend bits</h2>
+      <p>
+        Take the string <code>ABABAB&hellip;AB</code>, \(500\) copies of
+        <code>AB</code>, so \(n = 1000\) characters. Count symbols:
+        <code>A</code> occurs \(500\) times, <code>B</code> occurs \(500\)
+        times. A Huffman code built on those frequencies gives each symbol a
+        one-bit codeword, for \(1000\) bits, and no per-symbol code can do
+        better: the symbol distribution is uniform, so its entropy is exactly
+        \(1\) bit per symbol. Yet the string is obviously compressible. Every
+        bit of its content is in one short phrase and a repeat count. The
+        redundancy is <em>positional</em>, not <em>distributional</em>, and a
+        per-symbol code cannot see it.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (dictionary coding)</span>
+        A <strong>dictionary coder</strong> maintains a set of strings, the
+        <strong>dictionary</strong>, each with an integer <strong>code</strong>.
+        It parses the input into a sequence of <strong>phrases</strong>, each
+        of which is a dictionary entry, and transmits the code of each phrase.
+        Compression comes from phrases longer than one symbol: one code
+        stands for many input symbols. Contrast a per-symbol coder, which
+        emits one codeword per input symbol and can only vary the codeword
+        <em>lengths</em>.
+      </div>
+      <p>
+        LZW is the dictionary coder in which the dictionary is
+        <em>adaptive</em> and <em>implicit</em>. It starts as the alphabet
+        itself, one entry per symbol, and after each emitted code it grows by
+        exactly one entry: the phrase just emitted, extended by one character.
+        Both sides run the same growth rule, so the encoder sends no
+        dictionary and no side information; the code stream is the whole
+        message. On the \(1000\)-character string above, LZW emits \(63\)
+        codes. Even at a wasteful fixed width of \(12\) bits per code that is
+        \(756\) bits against Huffman&rsquo;s \(1000\), and the gap widens with
+        \(n\): at \(n = 10\,000\) the same string needs \(199\) codes
+        against Huffman&rsquo;s \(10\,000\) bits.
+      </p>
+      <p>
+        The two ideas are not rivals so much as different stages, and
+        &sect;<a href="#sits">8</a> returns to that: production compressors run
+        a dictionary stage and then entropy-code its output.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="encode">2. The dictionary, and the encoder</h2>
+      <p>
+        Fix an alphabet of \(R\) symbols. Codes \(0\) through \(R-1\) are
+        permanently assigned to the single-character strings, so the encoder
+        can always emit <em>something</em> for any input. The next code to
+        hand out starts at \(R\) and increases by one with every entry added.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (the LZW parse)</span>
+        The encoder keeps a <strong>current string</strong> \(w\), always a
+        dictionary entry. Reading the input one character \(c\) at a time:
+        <ul>
+          <li>if \(w c\) is in the dictionary, replace \(w\) by \(wc\) and read on
+            (the match grows);</li>
+          <li>otherwise emit the code of \(w\), add \(wc\) to the dictionary
+            under the next free code, and set \(w = c\).</li>
+        </ul>
+        At end of input, emit the code of \(w\). The parse is therefore
+        <strong>greedy longest-match</strong>: each phrase is the longest
+        prefix of the remaining input that is currently a dictionary entry.
+      </div>
+      <p>
+        Three facts about that rule carry the whole algorithm, and each is
+        worth stating before any code is read.
+      </p>
+      <ul>
+        <li><strong>Every emitted code is in the dictionary.</strong> \(w\)
+          is initialised to a single character (an entry by construction) and
+          is only ever replaced by \(wc\) after \(wc\) is confirmed present,
+          or reset to a single character. So a miss can always emit.</li>
+        <li><strong>Each added entry is one character longer than the phrase
+          just emitted.</strong> The entry is \(wc\), where \(w\) is the
+          emitted phrase and \(c\) is the first character of the
+          <em>next</em> phrase. This is the fact the decoder must reproduce,
+          and it is why the decoder runs one entry behind.</li>
+        <li><strong>The dictionary is prefix-closed.</strong> If \(wc\) is
+          added then \(w\) is already present, so every entry&rsquo;s prefixes
+          are entries too. That is exactly the structure a
+          <a href="ds-tries.html">trie</a> stores, and &sect;<a href="#trie">6</a>
+          uses it.</li>
+      </ul>
+      <p>
+        The encoder written directly from the definition, with the dictionary
+        as a map from string to code:
+      </p>
+      <div class="code-tabs" data-snippet="strings/lzw-encode">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// LZW encode. Codes 0..R-1 are the alphabet&#x27;s single characters; every miss
+// emits the current match and learns that match plus one more character.
+vector&lt;int&gt; lzwEncode(const string&amp; text, const string&amp; alphabet) {
+    unordered_map&lt;string, int&gt; table;
+    for (int i = 0; i &lt; (int)alphabet.size(); i++)
+        table[string(1, alphabet[i])] = i;         // singletons: 0..R-1
+    int next = alphabet.size();                    // next code to hand out
+    vector&lt;int&gt; out;
+    if (text.empty()) return out;
+    string w(1, text[0]);                          // current string
+    for (size_t i = 1; i &lt; text.size(); i++) {
+        string wc = w + text[i];
+        if (table.count(wc)) {
+            w = wc;                                // hit: extend the match
+        } else {
+            out.push_back(table[w]);               // miss: emit the match
+            table[wc] = next++;                    //   learn one char more
+            w = string(1, text[i]);                //   restart at c
+        }
+    }
+    out.push_back(table[w]);                       // flush the last match
+    return out;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// LZW encode. Codes 0..R-1 are the alphabet&#x27;s single characters; every miss
+// emits the current match and learns that match plus one more character.
+static List&lt;Integer&gt; lzwEncode(String text, String alphabet) {
+    Map&lt;String, Integer&gt; table = new HashMap&lt;&gt;();
+    for (int i = 0; i &lt; alphabet.length(); i++)
+        table.put(alphabet.substring(i, i + 1), i);   // singletons: 0..R-1
+    int next = alphabet.length();                     // next code to hand out
+    List&lt;Integer&gt; out = new ArrayList&lt;&gt;();
+    if (text.isEmpty()) return out;
+    String w = text.substring(0, 1);                  // current string
+    for (int i = 1; i &lt; text.length(); i++) {
+        String wc = w + text.charAt(i);
+        if (table.containsKey(wc)) {
+            w = wc;                                   // hit: extend the match
+        } else {
+            out.add(table.get(w));                    // miss: emit the match
+            table.put(wc, next++);                    //   learn one char more
+            w = text.substring(i, i + 1);             //   restart at c
+        }
+    }
+    out.add(table.get(w));                            // flush the last match
+    return out;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># LZW encode. Codes 0..R-1 are the alphabet&#x27;s single characters; every miss
+# emits the current match and learns that match plus one more character.
+def lzw_encode(text, alphabet):
+    table = {c: i for i, c in enumerate(alphabet)}   # singletons: 0..R-1
+    nxt = len(alphabet)                              # next code to hand out
+    out = []
+    if not text:
+        return out
+    w = text[0]                                      # current string
+    for c in text[1:]:
+        if w + c in table:
+            w = w + c                                # hit: extend the match
+        else:
+            out.append(table[w])                     # miss: emit the match
+            table[w + c] = nxt                       #   learn one char more
+            nxt += 1
+            w = c                                    #   restart at c
+    out.append(table[w])                             # flush the last match
+    return out</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// LZW encode. Codes 0..R-1 are the alphabet&#x27;s single characters; every miss
+// emits the current match and learns that match plus one more character.
+fn lzw_encode(text: &amp;str, alphabet: &amp;str) -&gt; Vec&lt;usize&gt; {
+    let mut table: HashMap&lt;String, usize&gt; = alphabet
+        .chars().enumerate()
+        .map(|(i, c)| (c.to_string(), i))          // singletons: 0..R-1
+        .collect();
+    let mut next = alphabet.chars().count();       // next code to hand out
+    let mut out = Vec::new();
+    let cs: Vec&lt;char&gt; = text.chars().collect();
+    if cs.is_empty() { return out; }
+    let mut w = cs[0].to_string();                 // current string
+    for &amp;c in &amp;cs[1..] {
+        let wc = format!("{w}{c}");
+        if table.contains_key(&amp;wc) {
+            w = wc;                                // hit: extend the match
+        } else {
+            out.push(table[&amp;w]);                   // miss: emit the match
+            table.insert(wc, next); next += 1;     //   learn one char more
+            w = c.to_string();                     //   restart at c
+        }
+    }
+    out.push(table[&amp;w]);                           // flush the last match
+    out
+}</pre>
+<!--/ct--></div>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">3. An encode traced character by character</h2>
+      <p>
+        Alphabet \(\{\texttt{A}, \texttt{B}, \texttt{R}\}\), so \(R = 3\) with
+        \(\texttt{A} = 0\), \(\texttt{B} = 1\), \(\texttt{R} = 2\), and the
+        next free code starts at \(3\). Input
+        <code>BARBARBARBAR</code> (\(n = 12\)), indexed
+        \(0 \ldots 11\):
+      </p>
+      <pre>  index:  0  1  2  3  4  5  6  7  8  9 10 11
+   char:  B  A  R  B  A  R  B  A  R  B  A  R</pre>
+      <p>
+        Every row below is one character of input. <em>hit</em> rows consume
+        the character into the growing match and emit nothing; <em>miss</em>
+        rows emit one code and add one entry.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (LZW encode, unrolled)</span>
+        <table class="trace">
+          <tr>
+            <th>step</th><th>\(i\)</th><th>\(w\) (current)</th><th>\(c\)</th>
+            <th>\(wc\)</th><th>in dictionary?</th><th>emit</th><th>add</th>
+          </tr>
+          <tr><td>0</td><td>0</td><td class="cell">&ndash;</td><td class="cell">B</td><td class="cell">&ndash;</td><td>start: \(w = \texttt{B}\)</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>1</td><td>1</td><td class="cell">B</td><td class="cell">A</td><td class="cell">BA</td><td class="piv">miss</td><td class="cell">1 (B)</td><td class="cell">BA = 3</td></tr>
+          <tr><td>2</td><td>2</td><td class="cell">A</td><td class="cell">R</td><td class="cell">AR</td><td class="piv">miss</td><td class="cell">0 (A)</td><td class="cell">AR = 4</td></tr>
+          <tr><td>3</td><td>3</td><td class="cell">R</td><td class="cell">B</td><td class="cell">RB</td><td class="piv">miss</td><td class="cell">2 (R)</td><td class="cell">RB = 5</td></tr>
+          <tr><td>4</td><td>4</td><td class="cell">B</td><td class="cell">A</td><td class="cell">BA</td><td class="lt">hit</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>5</td><td>5</td><td class="cell">BA</td><td class="cell">R</td><td class="cell">BAR</td><td class="piv">miss</td><td class="cell">3 (BA)</td><td class="cell">BAR = 6</td></tr>
+          <tr><td>6</td><td>6</td><td class="cell">R</td><td class="cell">B</td><td class="cell">RB</td><td class="lt">hit</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>7</td><td>7</td><td class="cell">RB</td><td class="cell">A</td><td class="cell">RBA</td><td class="piv">miss</td><td class="cell">5 (RB)</td><td class="cell">RBA = 7</td></tr>
+          <tr><td>8</td><td>8</td><td class="cell">A</td><td class="cell">R</td><td class="cell">AR</td><td class="lt">hit</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>9</td><td>9</td><td class="cell">AR</td><td class="cell">B</td><td class="cell">ARB</td><td class="piv">miss</td><td class="cell">4 (AR)</td><td class="cell">ARB = 8</td></tr>
+          <tr><td>10</td><td>10</td><td class="cell">B</td><td class="cell">A</td><td class="cell">BA</td><td class="lt">hit</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>11</td><td>11</td><td class="cell">BA</td><td class="cell">R</td><td class="cell">BAR</td><td class="lt">hit</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>12</td><td>&ndash;</td><td class="cell">BAR</td><td class="cell">&ndash;</td><td class="cell">&ndash;</td><td>end of input: flush</td><td class="cell">6 (BAR)</td><td>&ndash;</td></tr>
+        </table>
+        <p>
+          Output: \(1,\ 0,\ 2,\ 3,\ 5,\ 4,\ 6\). Seven codes for twelve
+          characters. Final dictionary:
+        </p>
+        <table class="trace">
+          <tr><td class="lab">code</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+          <tr><td class="lab">entry</td><td class="cell">A</td><td class="cell">B</td><td class="cell">R</td><td class="cell">BA</td><td class="cell">AR</td><td class="cell">RB</td><td class="cell">BAR</td><td class="cell">RBA</td><td class="cell">ARB</td></tr>
+        </table>
+      </div>
+      <p>
+        The trace exercises all four things a step can be, which is the whole
+        case analysis of the encoder:
+      </p>
+      <ol>
+        <li><strong>Initialisation</strong> (step 0): \(w\) is set to the
+          first character without any lookup or output.</li>
+        <li><strong>Miss with \(|w| = 1\)</strong> (steps 1, 2, 3): a
+          single-character phrase is emitted and a two-character entry is
+          learned. Early input always looks like this, because the dictionary
+          starts with nothing longer than one character.</li>
+        <li><strong>Hit</strong> (steps 4, 6, 8, 10, 11): the match grows and
+          nothing is emitted. Step 11 is a hit on top of a hit, which is how
+          matches longer than two characters arise: the encoder can only learn
+          <code>BAR</code> after it has learned <code>BA</code>, and can only
+          use <code>BAR</code> by matching <code>BA</code> first.</li>
+        <li><strong>Miss with \(|w| &gt; 1\)</strong> (steps 5, 7, 9): a
+          multi-character phrase is emitted, which is where the compression
+          actually happens, and a still longer entry is learned. Note the
+          restart: after emitting, \(w = c\), so the character that caused the
+          miss is <em>not</em> re-read; it becomes the start of the next
+          phrase.</li>
+        <li><strong>Flush</strong> (step 12): input ends with \(w\) nonempty,
+          which it always is, so the last phrase is emitted with no entry
+          added.</li>
+      </ol>
+      <p>
+        Note the growth rate. The first three characters cost three codes; the
+        next nine cost four. Each repetition of <code>BAR</code> lets the
+        encoder match one character further than the previous one did, so on a
+        periodic string the phrase lengths grow by one per phrase, and the
+        code count grows like \(\sqrt{n}\) rather than \(n\).
+        &sect;<a href="#cost">7</a> makes that precise.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="decode">4. The decoder rebuilds the dictionary</h2>
+      <p>
+        The decoder receives \(1,\ 0,\ 2,\ 3,\ 5,\ 4,\ 6\) and nothing else:
+        no dictionary, no lengths, no table sizes. It starts with the same
+        \(R\) singletons and must add the same entries in the same order, or
+        the codes will mean different things on the two sides.
+      </p>
+      <p>
+        It cannot add them at the same time. The encoder adds \(wc\) where
+        \(c\) is the first character of the <em>next</em> phrase, and the
+        decoder does not know the next phrase until the next code arrives. So
+        the decoder holds the previous phrase in a variable \(\mathit{prev}\)
+        and, on receiving a code whose string is \(\mathit{cur}\), adds
+        \(\mathit{prev} + \mathit{cur}[0]\): the entry the encoder added one
+        step ago. The decoder is permanently one entry behind, and
+        &sect;<a href="#tricky">5</a> is the consequence.
+      </p>
+      <div class="code-tabs" data-snippet="strings/lzw-decode">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// LZW decode. table[code] is the entry; appending to the vector hands out the
+// next code automatically. The lone special case: code == table.size(), an
+// entry the encoder made but this side has not built yet (see the next section).
+string lzwDecode(const vector&lt;int&gt;&amp; codes, const string&amp; alphabet) {
+    vector&lt;string&gt; table;
+    for (char c : alphabet) table.push_back(string(1, c));   // singletons
+    if (codes.empty()) return "";
+    string prev = table[codes[0]], out = prev;
+    for (size_t k = 1; k &lt; codes.size(); k++) {
+        int code = codes[k];
+        string cur;
+        if (code &lt; (int)table.size()) cur = table[code];     // known entry
+        else                          cur = prev + prev[0];  // not yet built
+        table.push_back(prev + cur[0]);   // the encoder&#x27;s previous addition
+        out += cur;
+        prev = cur;
+    }
+    return out;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// LZW decode. table.get(code) is the entry; appending hands out the next code
+// automatically. The lone special case: code == table.size(), an entry the
+// encoder made but this side has not built yet (see the next section).
+static String lzwDecode(List&lt;Integer&gt; codes, String alphabet) {
+    List&lt;String&gt; table = new ArrayList&lt;&gt;();
+    for (int i = 0; i &lt; alphabet.length(); i++)
+        table.add(alphabet.substring(i, i + 1));             // singletons
+    if (codes.isEmpty()) return "";
+    String prev = table.get(codes.get(0));
+    StringBuilder out = new StringBuilder(prev);
+    for (int k = 1; k &lt; codes.size(); k++) {
+        int code = codes.get(k);
+        String cur;
+        if (code &lt; table.size()) cur = table.get(code);      // known entry
+        else                     cur = prev + prev.charAt(0);// not yet built
+        table.add(prev + cur.charAt(0));  // the encoder&#x27;s previous addition
+        out.append(cur);
+        prev = cur;
+    }
+    return out.toString();
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># LZW decode. table[code] is the entry; appending hands out the next code
+# automatically. The lone special case: code == len(table), an entry the
+# encoder made but this side has not built yet (see the next section).
+def lzw_decode(codes, alphabet):
+    table = list(alphabet)                       # singletons: 0..R-1
+    if not codes:
+        return ""
+    prev = table[codes[0]]
+    out = [prev]
+    for code in codes[1:]:
+        if code &lt; len(table):
+            cur = table[code]                    # known entry
+        else:
+            cur = prev + prev[0]                 # not yet built
+        table.append(prev + cur[0])   # the encoder&#x27;s previous addition
+        out.append(cur)
+        prev = cur
+    return "".join(out)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// LZW decode. table[code] is the entry; pushing hands out the next code
+// automatically. The lone special case: code == table.len(), an entry the
+// encoder made but this side has not built yet (see the next section).
+fn lzw_decode(codes: &amp;[usize], alphabet: &amp;str) -&gt; String {
+    let mut table: Vec&lt;String&gt; =
+        alphabet.chars().map(|c| c.to_string()).collect();   // singletons
+    if codes.is_empty() { return String::new(); }
+    let mut prev = table[codes[0]].clone();
+    let mut out = prev.clone();
+    for &amp;code in &amp;codes[1..] {
+        let cur = if code &lt; table.len() {
+            table[code].clone()                              // known entry
+        } else {
+            format!("{prev}{}", prev.chars().next().unwrap())// not yet built
+        };
+        let first = cur.chars().next().unwrap();
+        table.push(format!("{prev}{first}"));  // encoder&#x27;s previous addition
+        out.push_str(&amp;cur);
+        prev = cur;
+    }
+    out
+}</pre>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (LZW decode of \(1, 0, 2, 3, 5, 4, 6\))</span>
+        Same alphabet, so the decoder starts with
+        \(\texttt{A} = 0\), \(\texttt{B} = 1\), \(\texttt{R} = 2\) and the next
+        free code at \(3\).
+        <table class="trace">
+          <tr>
+            <th>step</th><th>code</th><th>known?</th><th>\(\mathit{cur}\)</th>
+            <th>add \(\mathit{prev} + \mathit{cur}[0]\)</th><th>output so far</th>
+          </tr>
+          <tr><td>0</td><td>1</td><td class="lt">yes</td><td class="cell">B</td><td>&ndash; (no \(\mathit{prev}\) yet)</td><td class="cell">B</td></tr>
+          <tr><td>1</td><td>0</td><td class="lt">yes</td><td class="cell">A</td><td class="cell">B + A = BA = 3</td><td class="cell">BA</td></tr>
+          <tr><td>2</td><td>2</td><td class="lt">yes</td><td class="cell">R</td><td class="cell">A + R = AR = 4</td><td class="cell">BAR</td></tr>
+          <tr><td>3</td><td>3</td><td class="lt">yes</td><td class="cell">BA</td><td class="cell">R + B = RB = 5</td><td class="cell">BARBA</td></tr>
+          <tr><td>4</td><td>5</td><td class="lt">yes</td><td class="cell">RB</td><td class="cell">BA + R = BAR = 6</td><td class="cell">BARBARB</td></tr>
+          <tr><td>5</td><td>4</td><td class="lt">yes</td><td class="cell">AR</td><td class="cell">RB + A = RBA = 7</td><td class="cell">BARBARBAR</td></tr>
+          <tr><td>6</td><td>6</td><td class="lt">yes</td><td class="cell">BAR</td><td class="cell">AR + B = ARB = 8</td><td class="cell">BARBARBARBAR</td></tr>
+        </table>
+        <p>
+          The output is the original text, and the decoder&rsquo;s final table
+          (entries \(3 \ldots 8\): <code>BA</code>, <code>AR</code>,
+          <code>RB</code>, <code>BAR</code>, <code>RBA</code>,
+          <code>ARB</code>) is exactly the encoder&rsquo;s from
+          &sect;<a href="#trace">3</a>, built in the same order from different
+          information. Watch the lag directly: the encoder learned
+          <code>BAR = 6</code> at its step 5, while the decoder learns it at
+          its step 4, one code <em>after</em> it received the code that
+          triggered that addition. Step 3 shows why the lag is harmless here:
+          code \(3\) arrives after the decoder has just added entry \(3\).
+        </p>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="tricky">5. The code that is not there yet</h2>
+      <p>
+        The decoder is one entry behind, so an obvious question is whether the
+        encoder can ever emit a code the decoder has not yet built. It can,
+        and on repetitive input it does so often. The condition is precise.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (the missing code is always the next one)</span>
+        Suppose the decoder receives a code it does not have. Then that code
+        equals the next code it is about to assign, and the phrase it stands
+        for is exactly \(\mathit{prev} + \mathit{prev}[0]\), where
+        \(\mathit{prev}\) is the previously decoded phrase. Equivalently, the
+        phrase has the form \(c\,S\,c\) for a character \(c\) and a (possibly
+        empty) string \(S\), with \(\mathit{prev} = c\,S\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Write \(p_0, p_1, p_2, \ldots\) for the parsed
+        phrases and \(E_k = p_k + p_{k+1}[0]\) for the entry the encoder adds
+        when it emits \(p_k\). When the encoder emits \(p_k\), its dictionary
+        holds the singletons plus \(E_0, \ldots, E_{k-1}\). The decoder, having
+        processed codes \(0 \ldots k-1\), holds the singletons plus
+        \(E_0, \ldots, E_{k-2}\): it built \(E_{k-2}\) on receiving
+        \(p_{k-1}\), and cannot build \(E_{k-1} = p_{k-1} + p_k[0]\) without
+        \(p_k\). The two dictionaries therefore differ by the single entry
+        \(E_{k-1}\), whose code is the highest the encoder has assigned and
+        hence exactly the next code the decoder will assign. Since every
+        emitted code is in the encoder&rsquo;s dictionary, an unknown code must
+        be that one: \(p_k = E_{k-1} = p_{k-1} + p_k[0]\).
+        Now \(p_k\) begins with \(p_{k-1}\), so \(p_k[0] = p_{k-1}[0]\), giving
+        \(p_k = \mathit{prev} + \mathit{prev}[0]\) with
+        \(\mathit{prev} = p_{k-1}\). Writing \(c = \mathit{prev}[0]\) and
+        \(S\) for the rest of \(\mathit{prev}\), the phrase is \(cSc\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The proof also says <em>when</em> this happens: exactly when the
+        encoder emits a phrase it created on the immediately preceding
+        emission, which requires the input to contain \(cScSc\) at that
+        point. Repetitive input is full of such places, so this is a normal
+        case, not a rare one, and a decoder that omits it is wrong on ordinary
+        data. Here is the smallest interesting instance, manufactured by
+        running the encoder of &sect;<a href="#encode">2</a> on a period-2
+        string.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (manufacturing the case)</span>
+        Alphabet \(\{\texttt{A}, \texttt{B}\}\), \(R = 2\), \(\texttt{A} = 0\),
+        \(\texttt{B} = 1\), next free code \(2\). Input
+        <code>ABABABA</code> (\(n = 7\)).
+        <table class="trace">
+          <tr><th>step</th><th>\(i\)</th><th>\(w\)</th><th>\(c\)</th><th>\(wc\)</th><th>in dictionary?</th><th>emit</th><th>add</th></tr>
+          <tr><td>0</td><td>0</td><td class="cell">&ndash;</td><td class="cell">A</td><td class="cell">&ndash;</td><td>start: \(w = \texttt{A}\)</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>1</td><td>1</td><td class="cell">A</td><td class="cell">B</td><td class="cell">AB</td><td class="piv">miss</td><td class="cell">0 (A)</td><td class="cell">AB = 2</td></tr>
+          <tr><td>2</td><td>2</td><td class="cell">B</td><td class="cell">A</td><td class="cell">BA</td><td class="piv">miss</td><td class="cell">1 (B)</td><td class="cell">BA = 3</td></tr>
+          <tr><td>3</td><td>3</td><td class="cell">A</td><td class="cell">B</td><td class="cell">AB</td><td class="lt">hit</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>4</td><td>4</td><td class="cell">AB</td><td class="cell">A</td><td class="cell">ABA</td><td class="piv">miss</td><td class="cell">2 (AB)</td><td class="cell">ABA = 4</td></tr>
+          <tr><td>5</td><td>5</td><td class="cell">A</td><td class="cell">B</td><td class="cell">AB</td><td class="lt">hit</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>6</td><td>6</td><td class="cell">AB</td><td class="cell">A</td><td class="cell">ABA</td><td class="lt">hit</td><td>&ndash;</td><td>&ndash;</td></tr>
+          <tr><td>7</td><td>&ndash;</td><td class="cell">ABA</td><td class="cell">&ndash;</td><td class="cell">&ndash;</td><td>end of input: flush</td><td class="cell">4 (ABA)</td><td>&ndash;</td></tr>
+        </table>
+        <p>
+          Output: \(0,\ 1,\ 2,\ 4\). The last code, \(4\), names the entry
+          <code>ABA</code> that the encoder created at step 4, and the very
+          next emission uses it. Now decode:
+        </p>
+        <table class="trace">
+          <tr><th>step</th><th>code</th><th>known?</th><th>\(\mathit{cur}\)</th><th>add</th><th>output so far</th></tr>
+          <tr><td>0</td><td>0</td><td class="lt">yes</td><td class="cell">A</td><td>&ndash;</td><td class="cell">A</td></tr>
+          <tr><td>1</td><td>1</td><td class="lt">yes</td><td class="cell">B</td><td class="cell">A + B = AB = 2</td><td class="cell">AB</td></tr>
+          <tr><td>2</td><td>2</td><td class="lt">yes</td><td class="cell">AB</td><td class="cell">B + A = BA = 3</td><td class="cell">ABAB</td></tr>
+          <tr><td>3</td><td>4</td><td class="piv">no: next code is 4</td><td class="cell">AB + A = ABA</td><td class="cell">AB + A = ABA = 4</td><td class="cell">ABABABA</td></tr>
+        </table>
+        <p>
+          At step 3 the decoder holds entries \(0 \ldots 3\) and is about to
+          assign \(4\); the incoming code <em>is</em> \(4\), so the proposition
+          applies. It sets
+          \(\mathit{cur} = \mathit{prev} + \mathit{prev}[0] =
+          \texttt{AB} + \texttt{A} = \texttt{ABA}\), and the entry it then adds,
+          \(\mathit{prev} + \mathit{cur}[0] = \texttt{AB} + \texttt{A}\), is the
+          same string: in this case the manufactured phrase and the new entry
+          coincide, which is another way to see that the code is exactly the
+          next one. Output <code>ABABABA</code>, the original input. Reading
+          the phrase as \(cSc\): \(c = \texttt{A}\), \(S = \texttt{B}\),
+          \(\mathit{prev} = \texttt{AB}\), and the input around that point is
+          \(cScSc = \texttt{ABABA}\).
+        </p>
+      </div>
+      <p>
+        Two practical remarks. First, a decoder that indexes its table without
+        the bounds test does not merely produce wrong output: it reads out of
+        range, so this case has to be handled explicitly rather than by luck.
+        Second, no other code can ever be unknown: by the proposition an
+        incoming code is either already in the table or exactly
+        <code>table.size()</code>, so a code strictly greater than that means
+        the stream is corrupt, and a robust decoder rejects it there.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="trie">6. The trie as the encoder&rsquo;s dictionary</h2>
+      <p>
+        The encoder of &sect;<a href="#encode">2</a> builds the string \(wc\)
+        and hashes it on every input character. Both operations cost
+        \(\Theta(|w|)\), so a long match is re-scanned and re-hashed once per
+        character it grows by: the encoder is \(\Theta(n \cdot L)\) for maximum
+        match length \(L\), not \(\Theta(n)\). The fix uses the fact noted in
+        &sect;<a href="#encode">2</a>: the dictionary is prefix-closed, which
+        is exactly what a <a href="ds-tries.html"><em>trie</em></a> stores.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (the encoder&rsquo;s trie)</span>
+        Each dictionary entry is one node; the node for \(wc\) is the child of
+        the node for \(w\) along the edge labelled \(c\). Node numbers
+        <em>are</em> the codes, so a node stores no string at all. The
+        \(R\) singleton entries are the children of a virtual root.
+        The current string \(w\) is then not a string but a
+        <strong>node</strong>: a hit is one step down an edge, and a miss
+        emits the node&rsquo;s own number, hangs a new child off it, and jumps
+        back to the root&rsquo;s child for \(c\).
+      </div>
+      <p>
+        The loop is the same loop, with the string operations gone. The same
+        shape works in any of the languages above; only the child-map type
+        changes (an array of size \(R\) per node, or a hash table).
+      </p>
+<pre><span class="cm"># LZW encode with the dictionary as a trie: node number == code, so the</span>
+<span class="cm"># current match is one integer and no string is ever built or hashed.</span>
+def lzw_encode_trie(text, alphabet):
+    root = {c: i for i, c in enumerate(alphabet)}   <span class="cm"># root's children</span>
+    kids = [{} for _ in alphabet]                   <span class="cm"># kids[code][char] = code</span>
+    out = []
+    if not text:
+        return out
+    node = root[text[0]]                            <span class="cm"># current match, as a node</span>
+    for c in text[1:]:
+        if c in kids[node]:
+            node = kids[node][c]                    <span class="cm"># hit: one edge down, O(1)</span>
+        else:
+            out.append(node)                        <span class="cm"># miss: the node IS the code</span>
+            kids[node][c] = len(kids)               <span class="cm"># new child, next code</span>
+            kids.append({})
+            node = root[c]                          <span class="cm"># restart at c</span>
+    out.append(node)
+    return out</pre>
+      <p>
+        Run on <code>BARBARBARBAR</code> it produces the same codes
+        \(1, 0, 2, 3, 5, 4, 6\), and the trie it ends with is the
+        &sect;<a href="#trace">3</a> dictionary drawn as a tree (edge labels
+        above the arrows, node numbers after them):
+      </p>
+      <pre>  (root) --A--&gt; 0  --R--&gt; 4 (AR)  --B--&gt; 8 (ARB)
+         --B--&gt; 1  --A--&gt; 3 (BA)  --R--&gt; 6 (BAR)
+         --R--&gt; 2  --B--&gt; 5 (RB)  --A--&gt; 7 (RBA)</pre>
+      <p>
+        Depth is phrase length, so a parse that matches further each time is a
+        tree getting taller.
+      </p>
+      <p>
+        The decoder has the mirror-image problem: storing entry strings
+        explicitly costs the sum of all their lengths, which grows
+        quadratically in the number of entries. The same trick applies in
+        reverse. Store each entry as a pair (parent code, last character); to
+        emit an entry, walk up to the root collecting characters and reverse
+        them. That is \(\Theta(1)\) space per entry and \(\Theta(|p|)\) time
+        per emitted phrase \(p\), so \(\Theta(n)\) overall, and it needs no
+        string concatenation at all. The child maps can be plain arrays of
+        size \(R\) when \(R\) is small, or
+        <a href="../hashing/ds-hashing.html">hash tables</a> keyed by
+        (node, character) when \(R = 256\) and the entry count is in the
+        thousands, which is what production implementations use.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">7. Cost: time, and how many codes come out</h2>
+      <p>
+        Two separate questions: how long the algorithms run, and how much they
+        compress. The first is short; the second needs an argument about how
+        many phrases the input is parsed into.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (linear time, both directions)</span>
+        With the trie dictionary, LZW encodes a length-\(n\) input in
+        \(\Theta(n)\) character operations, and decodes a \(k\)-code stream
+        producing \(n\) characters in \(\Theta(n + k)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Encoding: each input character is consumed by
+        exactly one loop iteration, and each iteration does one child lookup
+        plus, on a miss, one child insertion and one output. Child lookups and
+        insertions are \(\Theta(1)\) with array children (or expected
+        \(\Theta(1)\) hashed), and the number of misses is at most \(n\). No
+        step touches more than one node, because the current match is a node
+        rather than a string: nothing is re-scanned. Decoding: each code
+        triggers one table lookup, one entry construction, and the output of
+        one phrase; summed over all codes the phrase lengths total \(n\), so
+        the output work is \(\Theta(n)\) and the per-code work is
+        \(\Theta(k)\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Neither side needs the whole input in memory: both are streaming, one
+        pass, with working storage proportional to the dictionary. That is a
+        real practical difference from
+        <a href="../greedy/algo-huffman-coding.html">Huffman coding</a>, whose
+        classic form needs a first pass to count frequencies and must ship the
+        code table.
+      </p>
+      <p>
+        Now compression. The output is \(k\) codes, so with fixed-width codes
+        of \(W\) bits the compressed size is \(kW\) bits against \(n \lceil
+        \lg R \rceil\) bits for the raw input. Everything therefore depends on
+        \(k\), the number of phrases the input is parsed into. It can be as
+        bad as \(n\): on an input whose every phrase is one character, LZW
+        emits one code per character and, since \(W &gt; \lceil \lg R \rceil\)
+        always, <em>expands</em> the data. The traced string is small enough to
+        show this happening. <code>BARBARBARBAR</code> is \(12\) symbols over a
+        \(3\)-symbol alphabet, \(24\) bits raw at \(2\) bits each; LZW emits
+        \(7\) codes, and codes must be wide enough for the largest one
+        assigned (\(8\)), so \(4\) bits each: \(28\) bits. Huffman on the same
+        string, with all three symbols equally frequent, gives codeword lengths
+        \(1, 2, 2\) for \(4 \cdot 1 + 4 \cdot 2 + 4 \cdot 2 = 20\) bits. On
+        twelve characters LZW loses to both. It has not had time to learn
+        anything: three of its seven codes were spent populating the
+        dictionary with two-character entries.
+      </p>
+      <p>
+        The good case is the opposite extreme, and it is worth computing
+        exactly.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (a run of one character)</span>
+        On the input \(\texttt{A}^n\), LZW emits \(k\) codes where \(k\) is
+        the least integer with \(k(k+1)/2 \ge n\), so \(k \sim \sqrt{2n}\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The dictionary starts with \(\texttt{A}\). The
+        first phrase is \(\texttt{A}\) and adds \(\texttt{AA}\); by induction,
+        after \(j\) phrases the dictionary contains
+        \(\texttt{A}, \texttt{A}^2, \ldots, \texttt{A}^{j+1}\) and the longest
+        match available is \(\texttt{A}^{j+1}\), so phrase \(j+1\) has length
+        \(j+1\) (truncated only if the input runs out). Phrases
+        \(1, 2, \ldots, k\) therefore cover \(1 + 2 + \cdots + k = k(k+1)/2\)
+        characters, and \(k\) is the least value for which that reaches \(n\).
+        Solving \(k(k+1)/2 = n\) gives \(k \sim \sqrt{2n}\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Checked directly: \(n = 10\) gives \(4\) codes
+        (\(4 \cdot 5/2 = 10\)); \(n = 100\) gives \(14\)
+        (\(14 \cdot 15/2 = 105 \ge 100\), while \(13\) reaches only \(91\));
+        \(n = 1000\) gives \(45\); \(n = 5000\) gives \(100\). The
+        period-2 string of &sect;<a href="#why">1</a> behaves the same way with
+        two interleaved families of phrases, giving about \(2\sqrt{n}\) codes:
+        \(19\) codes at \(n = 100\), \(63\) at \(n = 1000\), \(199\) at
+        \(n = 10\,000\). A per-symbol coder is stuck at \(n\) bits on all of
+        these.
+      </p>
+      <p>
+        Between those extremes, one bound holds for every input and explains
+        why LZW cannot blow up asymptotically.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (phrase-count bound)</span>
+        For any input of length \(n\) over an alphabet of size \(R\), the
+        number of phrases satisfies \(k = O(n / \log_R n)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Every emission except the last adds one
+        dictionary entry, and entries are never removed or duplicated, so all
+        added entries are distinct strings. An emission of a phrase of length
+        \(\ell\) adds an entry of length \(\ell + 1\). There are only
+        \(R^{\ell+1}\) distinct strings of length \(\ell+1\), so at most
+        \(R^{\ell+1}\) emissions can have phrase length \(\ell\). Now
+        \(n = \sum_{\text{emissions}} \ell\) is minimised, for a fixed number
+        \(k\) of emissions, by using the shortest lengths that quota allows:
+        \(R^2\) phrases of length \(1\), then \(R^3\) of length \(2\), and so
+        on. Let \(L\) be the smallest integer with
+        \(\sum_{\ell=1}^{L} R^{\ell+1} \ge k\), so that
+        \(k \le 2R^{L+1}\) and hence \(L = \Omega(\log_R k)\). The emissions
+        of length below \(L/2\) number at most
+        \(\sum_{\ell &lt; L/2} R^{\ell+1} \le 2R^{L/2+1}\), which is below
+        \(k/2\) for all large \(L\) (since \(k \ge R^{L}\) by minimality of
+        \(L\)). So at least \(k/2\) emissions have length at least \(L/2\),
+        giving \(n \ge kL/4 = \Omega(k \log_R k)\), that is
+        \(k = O(n / \log_R k)\). If
+        \(k &lt; n/\log_R n\) the claim already holds; otherwise
+        \(\log_R k \ge \log_R n - \log_R \log_R n = (1 - o(1))\log_R n\),
+        and substituting gives \(k = O(n / \log_R n)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The consequence: with codes of width \(\lceil \lg (R + k) \rceil = O(\log
+        n)\) bits, the output is \(O(k \log n) = O(n \log R)\) bits, the same
+        order as the input. LZW can lose to the raw input by a constant factor
+        on incompressible data, never by more, and the fixed overhead is what
+        the dictionary-reset machinery of the next aside is there to bound.
+      </p>
+      <div class="aside">
+        <span class="tag">In practice: code width and a full dictionary</span>
+        Real implementations must answer two questions the pseudocode ignores.
+        <strong>How wide is a code?</strong> Fixed width is simplest: the Unix
+        <code>compress</code> utility and TIFF use up to \(12\)-bit codes, so
+        with \(R = 256\) singletons and a couple of reserved codes there is
+        room for roughly \(3800\) learned phrases. Fixed width wastes bits
+        early, when only a few hundred entries exist, so the common refinement
+        is <strong>variable width</strong>: start at \(9\) bits and widen to
+        \(10\), \(11\), \(12\) exactly when the next code assigned would not
+        fit. Both sides widen at the same moment, because both know the entry
+        count, so nothing is transmitted to announce it.
+        <strong>What happens when the dictionary fills?</strong> Three
+        answers are in use. <em>Freeze</em>: stop adding entries and keep
+        coding with what you have, which is fine while the input stays
+        statistically similar and degrades when it does not.
+        <em>Reset</em>: clear back to the singletons and start learning again;
+        the GIF and TIFF formats reserve a <strong>clear code</strong> for the
+        encoder to announce this, so the decoder resets in step.
+        <em>Monitor and reset</em>: watch the compression ratio and reset when
+        it starts to fall, which is what <code>compress</code> does. Reserved
+        codes cost dictionary slots, which is why GIF, with a clear code and an
+        end-of-information code, has \(R + 2\) codes spoken for before any
+        phrase is learned.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">8. Where this sits</h2>
+      <p>
+        LZW and <a href="../greedy/algo-huffman-coding.html"><em>Huffman
+        coding</em></a> exploit different redundancies, and modern compressors
+        use both in sequence rather than choosing between them. A typical
+        pipeline runs a dictionary stage that replaces repeats with references,
+        then an entropy stage that codes the references and the leftover
+        literals by frequency. DEFLATE, the algorithm inside gzip, zlib, ZIP
+        and PNG, is exactly that: LZ77-style matching (references back into a
+        sliding window of recent output, as an explicit offset and length)
+        followed by Huffman coding of the literal, length and distance
+        streams. LZW is from the other Lempel-Ziv branch, LZ78, in which the
+        references are into an explicitly built dictionary rather than into the
+        recent past. It is used in GIF, TIFF, the PDF
+        <code>LZWDecode</code> filter and Unix <code>compress</code>. A patent
+        on it (held by Unisys, granted 1985, expired in 2003 and 2004 in
+        various jurisdictions) is the reason PNG and DEFLATE were designed in
+        the 1990s. Current general-purpose compressors (zstd, brotli, LZMA)
+        stay in the LZ77 branch and pair it with stronger entropy coders
+        (arithmetic coding or asymmetric numeral systems) plus context
+        modelling; LZW is not competitive with them on ratio and survives
+        mainly in formats that specified it decades ago.
+      </p>
+      <p>
+        Within this catalog, LZW is the payoff for two other topics. Its
+        encoder dictionary is a <a href="ds-tries.html"><em>trie</em></a> and
+        nothing else, which is what makes the encoder linear; its parse is a
+        <a href="../greedy/paradigm-greedy-method.html"><em>greedy</em></a>
+        longest-match, and, as usual for a greedy rule, the greedy parse is not
+        the parse that minimises the number of phrases, only a cheap one that
+        is good enough and admits a decoder with no lookahead. The repetition
+        LZW cashes in is the same structure that
+        <a href="ds-suffix-arrays.html"><em>suffix arrays</em></a> expose
+        directly through the longest-common-prefix array: a suffix array finds
+        the repeats of a fixed text exactly and offline, while LZW finds them
+        approximately, in one streaming pass, which is the trade a compressor
+        needs.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Over \(\{\texttt{A}, \texttt{T}\}\) with \(\texttt{A} = 0\),
+          \(\texttt{T} = 1\), encode <code>TATATATA</code>, then decode your
+          own output and identify the step at which the decoder meets an
+          unknown code.
+          <details>
+            <summary>solution</summary>
+            Encoding: \(w = \texttt{T}\); miss on <code>TA</code>, emit \(1\),
+            add <code>TA</code>\(=2\), \(w = \texttt{A}\); miss on
+            <code>AT</code>, emit \(0\), add <code>AT</code>\(=3\),
+            \(w = \texttt{T}\); hit <code>TA</code>; miss on <code>TAT</code>,
+            emit \(2\), add <code>TAT</code>\(=4\), \(w = \texttt{T}\); hit
+            <code>TA</code>; hit <code>TAT</code>; miss on <code>TATA</code>,
+            emit \(4\), add <code>TATA</code>\(=5\), \(w = \texttt{A}\); flush
+            \(0\). Output \(1,\ 0,\ 2,\ 4,\ 0\).
+            <table class="trace">
+              <tr><th>step</th><th>code</th><th>known?</th><th>\(\mathit{cur}\)</th><th>add</th><th>output so far</th></tr>
+              <tr><td>0</td><td>1</td><td class="lt">yes</td><td class="cell">T</td><td>&ndash;</td><td class="cell">T</td></tr>
+              <tr><td>1</td><td>0</td><td class="lt">yes</td><td class="cell">A</td><td class="cell">T + A = TA = 2</td><td class="cell">TA</td></tr>
+              <tr><td>2</td><td>2</td><td class="lt">yes</td><td class="cell">TA</td><td class="cell">A + T = AT = 3</td><td class="cell">TATA</td></tr>
+              <tr><td>3</td><td>4</td><td class="piv">no: next code is 4</td><td class="cell">TA + T = TAT</td><td class="cell">TA + T = TAT = 4</td><td class="cell">TATATAT</td></tr>
+              <tr><td>4</td><td>0</td><td class="lt">yes</td><td class="cell">A</td><td class="cell">TAT + A = TATA = 5</td><td class="cell">TATATATA</td></tr>
+            </table>
+            Step 3 is the unknown code, with \(c = \texttt{T}\),
+            \(S = \texttt{A}\), \(\mathit{prev} = \texttt{TA}\), and the input
+            around that point \(cScSc = \texttt{TATAT}\).
+          </details>
+        </li>
+        <li>
+          Prove that a decoder can never receive a code strictly greater than
+          the next one it would assign, and explain what a decoder should do if
+          it does.
+          <details>
+            <summary>solution</summary>
+            Let the decoder be about to assign code \(N\), so it holds entries
+            \(0 \ldots N-1\). By the argument of &sect;<a href="#tricky">5</a>,
+            when the encoder emits the corresponding code its dictionary holds
+            entries \(0 \ldots N\) and no more: the two sides differ by exactly
+            one entry, because the encoder adds exactly one entry per emission
+            and the decoder adds exactly one entry per code received, starting
+            one step later. Every emitted code names an entry in the
+            encoder&rsquo;s dictionary (the current string \(w\) is always an
+            entry), hence is at most \(N\). A code greater than \(N\) is
+            therefore impossible from a correct encoder over the same alphabet:
+            the stream is corrupt, truncated, or was encoded with different
+            parameters (a different alphabet size, a missed clear code). A
+            decoder should reject it rather than index its table, which would
+            be an out-of-range read.
+          </details>
+        </li>
+        <li>
+          The unknown-code case fires when the encoder emits, as phrase
+          \(p_k\), an entry it created while emitting \(p_{k-1}\). Show that
+          this forces the input to contain \(cScSc\) at that position, and
+          give the shortest input over \(\{\texttt{A}, \texttt{B}\}\) that
+          triggers it at all.
+          <details>
+            <summary>solution</summary>
+            If \(p_k\) is the entry created at the previous emission then
+            \(p_k = p_{k-1} + p_k[0]\), so \(p_{k-1}\) is a prefix of \(p_k\)
+            and \(p_k[0] = p_{k-1}[0]\). Write \(c = p_{k-1}[0]\) and
+            \(S\) for the rest of \(p_{k-1}\), so \(p_{k-1} = cS\) and
+            \(p_k = cSc\). The two phrases sit adjacent in the input, so the
+            input contains \(p_{k-1}p_k = cS\,cSc\), that is \(cScSc\): the
+            first repetition supplies the entry, the second uses it. The
+            shortest trigger is therefore \(cScSc\) with \(S\) empty:
+            <code>AAA</code>. Checking it: \(w = \texttt{A}\); miss on
+            <code>AA</code>, emit \(0\), add <code>AA</code>\(=2\); hit
+            <code>AA</code>; flush \(2\). Output \(0,\ 2\), and the decoder
+            meets the unknown code \(2\) on its second code, reconstructing
+            <code>AA</code> for output <code>AAA</code>. No two-character input
+            can trigger it, since the first emission is the only one that
+            creates an entry and there is nothing left to emit it with.
+          </details>
+        </li>
+        <li>
+          Continue the &sect;<a href="#trace">3</a> trace: the input is
+          <code>BARBARBARBARBAR</code> (\(15\) characters,
+          <code>BAR</code> once more). Give the output codes and the entries
+          added, and explain why the same code appears twice.
+          <details>
+            <summary>solution</summary>
+            The first twelve characters run exactly as traced, but the trace
+            no longer ends there: instead of flushing \(w = \texttt{BAR}\), the
+            encoder reads \(i = 12\), \(c = \texttt{B}\), finds
+            <code>BARB</code> absent, emits \(6\) (<code>BAR</code>) and adds
+            <code>BARB</code>\(=9\), setting \(w = \texttt{B}\). Then
+            \(i = 13\), \(c = \texttt{A}\): hit <code>BA</code>. Then
+            \(i = 14\), \(c = \texttt{R}\): hit <code>BAR</code>. Input ends,
+            flush \(6\). Output \(1,\ 0,\ 2,\ 3,\ 5,\ 4,\ 6,\ 6\): eight codes
+            for fifteen characters against seven for twelve. Code \(6\) appears
+            twice because LZW phrases, unlike the entries added, need not be
+            distinct: the encoder matched <code>BAR</code>, could not extend it
+            (<code>BARB</code> was new), emitted it, and matched it again at the
+            end. Decoding this stream needs no special case: when the second
+            \(6\) arrives, entry \(9\) has been assigned, so \(6\) is long
+            known.
+          </details>
+        </li>
+        <li>
+          A file of \(n = 3\) million bytes is encoded with \(R = 256\),
+          fixed \(12\)-bit codes, and no dictionary reset. How many phrases can
+          be learned before the dictionary is full, and what fraction of the
+          file can be encoded with a growing dictionary if the average phrase
+          length at the end is \(6\) bytes? What does the choice between
+          freezing and resetting turn on?
+          <details>
+            <summary>solution</summary>
+            Twelve bits give \(4096\) codes. With \(256\) singletons and, in
+            the GIF and TIFF style, a clear code and an end-of-information
+            code, \(258\) are spoken for, leaving \(3838\) learnable phrases.
+            At an average of \(6\) bytes per phrase near the end, those cover
+            on the order of \(3838 \times 6 \approx 23\,000\) bytes, well under
+            \(1\%\) of a \(3\)-million-byte file; the remaining \(99\%\) is
+            coded with a frozen dictionary. That is the argument for resetting:
+            a dictionary learned from the first \(23\,000\) bytes describes the
+            rest of the file only if the file is statistically uniform
+            throughout. It is also the argument against resetting blindly,
+            since the entries thrown away must be relearned at the cost of one
+            emission each. Monitoring the ratio and resetting only when it
+            degrades is the compromise, and it is why wider codes
+            (\(13\ldots16\) bits, giving \(8192\ldots65\,536\) entries) matter
+            more for large files than the coding details do.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; LZW Compression v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

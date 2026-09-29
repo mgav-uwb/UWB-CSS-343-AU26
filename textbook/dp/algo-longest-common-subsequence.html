@@ -1,0 +1,605 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Longest Common Subsequence.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Longest Common Subsequence - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h2.part { font-size: 23px; margin: 48px 0 8px; padding-top: 22px; border-top: 2px solid var(--line); }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+      <h1>Longest Common Subsequence</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
+      </div>
+      <div class="src">
+        The longest common subsequence (LCS): subsequence versus substring, the
+        prefix-pair recurrence and why it is correct, the worked
+        \(\Theta(mn)\) table for <code>AGCAT</code>/<code>GAC</code>, the
+        traceback that spells the subsequence, complete code, the sanity
+        invariants that catch off-by-one bugs, and where the same table runs in
+        practice (<code>diff</code>, merge tools, sequence alignment). The
+        method itself is the <a href="paradigm-dp-method.html">Dynamic Programming
+        Method</a> handout. With demos and exercises.
+      </div>
+
+      <p class="lead">
+        Dynamic programming solves a problem by trying every choice and caching
+        the overlapping subproblems; the method, its two implementations, and
+        its five-step recipe are the
+        <a href="paradigm-dp-method.html">Dynamic Programming Method</a> handout. The
+        longest common subsequence runs the recipe in two dimensions: the
+        subproblem is a pair of string <em>prefixes</em>, and the table it
+        fills is the one behind every <code>diff</code> you have ever run.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#lcs">Longest common subsequence</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="lcs">1. Longest common subsequence</h2>
+      <p>
+        LCS is the most deployed DP you will meet this term.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (subsequence, LCS)</span>
+        A <strong>subsequence</strong> of a string keeps the characters&rsquo;
+        relative order but may skip any of them: <code>ACT</code> is a subsequence
+        of <code>AGCAT</code>. The <strong>longest common subsequence
+        (LCS)</strong> of two strings \(A\) and \(B\) is a longest string that is a
+        subsequence of <em>both</em>. For \(A = \texttt{AGCAT}\),
+        \(B = \texttt{GAC}\): the LCS has length \(2\): <code>AC</code>
+        (or <code>GC</code>, or <code>GA</code>; length is unique, the string need
+        not be).
+      </div>
+      <div class="aside">
+        <span class="tag">Subsequence &ne; substring</span>
+        A <em>substring</em> is contiguous (<code>GCA</code> in
+        <code>AGCAT</code>); a subsequence may leave gaps (<code>ACT</code> is not
+        a substring of <code>AGCAT</code>, but is a subsequence). LCS is about
+        subsequences, which is precisely why it tolerates insertions: in a file
+        comparison, lines added in the middle should not break the match around
+        them. Longest common <em>substring</em> is a different problem,
+        also solvable by DP, with a different recurrence.
+      </div>
+      <p>
+        Brute force (enumerate all \(2^m\) subsequences of \(A\) and test
+        each against \(B\)) is exponential. The DP subproblem is the LCS of
+        two <em>prefixes</em>:
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (LCS recurrence)</span>
+        Let \(L[i][j]\) be the LCS length of the first \(i\) characters of \(A\)
+        and the first \(j\) of \(B\). Then \(L[i][0] = L[0][j] = 0\), and for
+        \(i, j \ge 1\):
+        \[
+          L[i][j] =
+          \begin{cases}
+            L[i-1][j-1] + 1 &amp; \text{if } A[i{-}1] = B[j{-}1]
+              \quad\text{(match: extend the diagonal)}\\[2pt]
+            \max\bigl(L[i-1][j],\; L[i][j-1]\bigr) &amp; \text{otherwise}
+              \quad\text{(drop one last character)}
+          \end{cases}
+        \]
+      </div>
+      <div class="proof">
+        <strong>Why the recurrence is correct.</strong> Look at the last characters
+        of the two prefixes. If they <em>match</em>, some LCS of the prefixes ends
+        with that character: an LCS that ends elsewhere can be exchanged, match for
+        match, into one that uses it without getting shorter. Pairing the two last
+        characters therefore costs nothing, and what remains is an LCS of both
+        shorter prefixes: the diagonal cell, plus one. If they
+        <em>mismatch</em>, no common subsequence ends with both of them, so at
+        least one of the two last characters is not in the LCS; drop one,
+        \(A\)&rsquo;s (the cell above) or \(B\)&rsquo;s (the cell to the left),
+        and take the better. Every case reduces to a strictly smaller
+        prefix pair, and the empty prefix is the base case: optimal substructure.
+        Overlap is massive (the same prefix pair is reachable along
+        exponentially many drop orders), and caching leaves just
+        \((m{+}1)(n{+}1)\) subproblems at \(O(1)\) each: \(\Theta(mn)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the full table)</span>
+        \(A = \texttt{AGCAT}\) (rows), \(B = \texttt{GAC}\) (columns). Fill row by
+        row, left to right; each cell reads its up, left, and diagonal neighbors,
+        which are already filled. The outlined cells are the traceback path from
+        \(L[5][3]\) back toward \(L[0][0]\); the green cells are the matches it
+        steps through: <code>C</code> then <code>A</code>, spelling the LCS
+        <code>AC</code> reversed.
+        <table class="trace">
+          <tr><th class="lab"></th><th>&ldquo;&rdquo;</th><th>G</th><th>A</th><th>C</th></tr>
+          <tr><td class="lab">&ldquo;&rdquo;</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td></tr>
+          <tr><td class="lab">A</td><td class="cell">0</td><td class="cell">0</td><td class="cell lt">1</td><td class="cell">1</td></tr>
+          <tr><td class="lab">G</td><td class="cell">0</td><td class="cell">1</td><td class="cell scan">1</td><td class="cell">1</td></tr>
+          <tr><td class="lab">C</td><td class="cell">0</td><td class="cell">1</td><td class="cell">1</td><td class="cell lt">2</td></tr>
+          <tr><td class="lab">A</td><td class="cell">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell scan">2</td></tr>
+          <tr><td class="lab">T</td><td class="cell">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell scan">2</td></tr>
+        </table>
+        The bottom-right cell is the answer: \(L[5][3] = 2\). Check a few cells
+        against the recurrence: row <code>C</code>, column <code>C</code> is a
+        match, so it is diagonal \(+\,1 = 1 + 1 = 2\); row <code>A</code> (fourth),
+        column <code>A</code> is a match giving \(1 + 1 = 2\); row <code>T</code>,
+        column <code>C</code> mismatches and takes \(\max(2, 2) = 2\) from up and
+        left.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (every cell, with the case it took)</span>
+        The same \(15\) cells again, this time showing <em>which branch of the
+        recurrence</em> filled each one. The recurrence has two cases, and the
+        mismatch case has three outcomes worth distinguishing (up strictly
+        larger, left strictly larger, a tie): all four appear in this one table.
+        Read it row by row, left to right, the fill order the code uses.
+        <table class="trace">
+          <tr><th class="lab"></th><th>G</th><th>A</th><th>C</th></tr>
+          <tr><td class="lab">A</td>
+            <td class="cell">A&ne;G: max(&uarr;0, &larr;0) = 0</td>
+            <td class="cell lt">A=A: &#8598;0 + 1 = 1</td>
+            <td class="cell">A&ne;C: max(&uarr;0, &larr;1) = 1</td></tr>
+          <tr><td class="lab">G</td>
+            <td class="cell lt">G=G: &#8598;0 + 1 = 1</td>
+            <td class="cell">G&ne;A: max(&uarr;1, &larr;1) = 1</td>
+            <td class="cell">G&ne;C: max(&uarr;1, &larr;1) = 1</td></tr>
+          <tr><td class="lab">C</td>
+            <td class="cell">C&ne;G: max(&uarr;1, &larr;0) = 1</td>
+            <td class="cell">C&ne;A: max(&uarr;1, &larr;1) = 1</td>
+            <td class="cell lt">C=C: &#8598;1 + 1 = 2</td></tr>
+          <tr><td class="lab">A</td>
+            <td class="cell">A&ne;G: max(&uarr;1, &larr;0) = 1</td>
+            <td class="cell lt">A=A: &#8598;1 + 1 = 2</td>
+            <td class="cell">A&ne;C: max(&uarr;2, &larr;2) = 2</td></tr>
+          <tr><td class="lab">T</td>
+            <td class="cell">T&ne;G: max(&uarr;1, &larr;0) = 1</td>
+            <td class="cell">T&ne;A: max(&uarr;2, &larr;1) = 2</td>
+            <td class="cell">T&ne;C: max(&uarr;2, &larr;2) = 2</td></tr>
+        </table>
+        The four outcomes, one instance each:
+        <ul>
+          <li><strong>match, diagonal \(+\,1\)</strong>: row <code>C</code>,
+            column <code>C</code> takes \(1 + 1 = 2\), the only cell in the table
+            that reaches \(2\) by a match;</li>
+          <li><strong>mismatch, up wins</strong>: row <code>T</code>, column
+            <code>A</code> takes \(\max(2, 1) = 2\) from above, because dropping
+            <code>A</code>&rsquo;s <code>T</code> keeps a longer match than
+            dropping <code>B</code>&rsquo;s <code>A</code>;</li>
+          <li><strong>mismatch, left wins</strong>: row <code>A</code> (first),
+            column <code>C</code> takes \(\max(0, 1) = 1\) from the left;</li>
+          <li><strong>mismatch, tie</strong>: row <code>G</code>, column
+            <code>A</code> takes \(\max(1, 1) = 1\), and either neighbor gives the
+            same value, which is why a traceback may break the tie either way and
+            still be right.</li>
+        </ul>
+        Base cases are the whole of row \(0\) and column \(0\): an empty prefix
+        shares nothing with anything, so those cells are \(0\) without consulting
+        the recurrence at all. Every non-base cell above reads only cells already
+        written, which is what makes row-by-row a legal fill order.
+      </div>
+      <div class="code-tabs" data-snippet="dp/lcs">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// LCS table: L[i][j] = LCS length of A&#x27;s first i chars and B&#x27;s first j.
+// Fill row by row -- up, left, and diagonal are ready when a cell needs them.
+// Theta(mn) time and space.
+int lcsLength(const string&amp; A, const string&amp; B, vector&lt;vector&lt;int&gt;&gt;&amp; L) {
+    int m = A.size(), n = B.size();
+    L.assign(m + 1, vector&lt;int&gt;(n + 1, 0)); // row 0 / col 0 = 0: empty prefix
+    for (int i = 1; i &lt;= m; i++)
+        for (int j = 1; j &lt;= n; j++)
+            if (A[i - 1] == B[j - 1])
+                L[i][j] = L[i - 1][j - 1] + 1;             // match: diagonal + 1
+            else
+                L[i][j] = max(L[i - 1][j], L[i][j - 1]);   // drop one: up / left
+    return L[m][n];                         // bottom-right = the answer
+}
+
+// Traceback: walk from L[m][n] toward L[0][0]. The matched characters,
+// reversed, spell one LCS. O(m + n) steps -- needs the whole table.
+string lcsString(const string&amp; A, const string&amp; B,
+                 const vector&lt;vector&lt;int&gt;&gt;&amp; L) {
+    string out;
+    int i = A.size(), j = B.size();
+    while (i &gt; 0 &amp;&amp; j &gt; 0) {
+        if (A[i - 1] == B[j - 1]) {         // match: it&#x27;s in the LCS
+            out += A[i - 1]; i--; j--;      // step diagonally
+        }
+        else if (L[i - 1][j] &gt;= L[i][j - 1]) i--;   // follow the larger
+        else j--;                                   //   of up / left
+    }
+    reverse(out.begin(), out.end());
+    return out;                             // AGCAT / GAC -&gt; &quot;AC&quot;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// LCS table: L[i][j] = LCS length of A&#x27;s first i chars and B&#x27;s first j.
+// Fill row by row -- up, left, and diagonal are ready when a cell needs them.
+// Theta(mn) time and space.
+static int lcsLength(String A, String B, int[][] L) {
+    int m = A.length(), n = B.length();     // L is (m+1) x (n+1), zero-filled:
+    for (int i = 1; i &lt;= m; i++)            //   row 0 / col 0 = empty prefix
+        for (int j = 1; j &lt;= n; j++)
+            if (A.charAt(i - 1) == B.charAt(j - 1))
+                L[i][j] = L[i - 1][j - 1] + 1;             // match: diagonal + 1
+            else
+                L[i][j] = Math.max(L[i - 1][j], L[i][j - 1]); // drop one
+    return L[m][n];                         // bottom-right = the answer
+}
+
+// Traceback: walk from L[m][n] toward L[0][0]. The matched characters,
+// reversed, spell one LCS. O(m + n) steps -- needs the whole table.
+static String lcsString(String A, String B, int[][] L) {
+    StringBuilder out = new StringBuilder();
+    int i = A.length(), j = B.length();
+    while (i &gt; 0 &amp;&amp; j &gt; 0) {
+        if (A.charAt(i - 1) == B.charAt(j - 1)) {   // match: it&#x27;s in the LCS
+            out.append(A.charAt(i - 1)); i--; j--;  // step diagonally
+        }
+        else if (L[i - 1][j] &gt;= L[i][j - 1]) i--;   // follow the larger
+        else j--;                                   //   of up / left
+    }
+    return out.reverse().toString();        // AGCAT / GAC -&gt; &quot;AC&quot;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># LCS table: L[i][j] = LCS length of A&#x27;s first i chars and B&#x27;s first j.
+# Fill row by row -- up, left, and diagonal are ready when a cell needs them.
+# Theta(mn) time and space.
+def lcs_length(A, B):
+    m, n = len(A), len(B)
+    L = [[0] * (n + 1) for _ in range(m + 1)]  # row 0 / col 0 = empty prefix
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if A[i - 1] == B[j - 1]:
+                L[i][j] = L[i - 1][j - 1] + 1            # match: diagonal + 1
+            else:
+                L[i][j] = max(L[i - 1][j], L[i][j - 1])  # drop one: up / left
+    return L                                # L[m][n] = the answer
+
+# Traceback: walk from L[m][n] toward L[0][0]. The matched characters,
+# reversed, spell one LCS. O(m + n) steps -- needs the whole table.
+def lcs_string(A, B, L):
+    out = []
+    i, j = len(A), len(B)
+    while i &gt; 0 and j &gt; 0:
+        if A[i - 1] == B[j - 1]:            # match: it&#x27;s in the LCS
+            out.append(A[i - 1])            # step diagonally
+            i, j = i - 1, j - 1
+        elif L[i - 1][j] &gt;= L[i][j - 1]:    # follow the larger
+            i -= 1                          #   of up / left
+        else:
+            j -= 1
+    return &quot;&quot;.join(reversed(out))           # AGCAT / GAC -&gt; &quot;AC&quot;</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// LCS table: L[i][j] = LCS length of A&#x27;s first i chars and B&#x27;s first j.
+// Fill row by row -- up, left, and diagonal are ready when a cell needs them.
+// Theta(mn) time and space.
+fn lcs_length(a: &amp;[u8], b: &amp;[u8]) -&gt; Vec&lt;Vec&lt;usize&gt;&gt; {
+    let (m, n) = (a.len(), b.len());
+    let mut l = vec![vec![0usize; n + 1]; m + 1]; // row 0 / col 0 = empty prefix
+    for i in 1..=m {
+        for j in 1..=n {
+            l[i][j] = if a[i - 1] == b[j - 1] {
+                l[i - 1][j - 1] + 1                    // match: diagonal + 1
+            } else {
+                l[i - 1][j].max(l[i][j - 1])           // drop one: up / left
+            };
+        }
+    }
+    l                                       // l[m][n] = the answer
+}
+
+// Traceback: walk from L[m][n] toward L[0][0]. The matched characters,
+// reversed, spell one LCS. O(m + n) steps -- needs the whole table.
+fn lcs_string(a: &amp;[u8], b: &amp;[u8], l: &amp;[Vec&lt;usize&gt;]) -&gt; String {
+    let mut out = Vec::new();
+    let (mut i, mut j) = (a.len(), b.len());
+    while i &gt; 0 &amp;&amp; j &gt; 0 {
+        if a[i - 1] == b[j - 1] {           // match: it&#x27;s in the LCS
+            out.push(a[i - 1]); i -= 1; j -= 1;   // step diagonally
+        } else if l[i - 1][j] &gt;= l[i][j - 1] {
+            i -= 1;                         // follow the larger of up / left
+        } else {
+            j -= 1;
+        }
+    }
+    out.reverse();
+    String::from_utf8(out).unwrap()         // AGCAT / GAC -&gt; &quot;AC&quot;
+}</pre>
+<p class="ct-src">source: <code>code/dp/lcs.cpp &middot; code/dp/lcs.java &middot; code/dp/lcs.py &middot; code/dp/lcs.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Walk the traceback on the worked table to see it recover <code>AC</code>:
+        start at \(L[5][3] = 2\). <code>T</code> vs <code>C</code> mismatch, up and
+        left tie at \(2\), follow up; <code>A</code> vs <code>C</code> mismatch,
+        up again; row <code>C</code> vs column <code>C</code> <em>match</em>:
+        emit <code>C</code>, step diagonally; <code>G</code> vs
+        <code>A</code> mismatch, up; row <code>A</code> vs column <code>A</code>
+        <em>match</em>: emit <code>A</code>, step diagonally to row \(0\),
+        stop. Emitted <code>C</code>, <code>A</code>; reversed:
+        <code>AC</code>. Where the traceback breaks a tie differently, it finds a
+        different, equally valid, LCS of the same length. This particular walk
+        happens never to step <em>left</em>: on this instance every mismatch it
+        meets either ties (and the code&rsquo;s \(\ge\) test sends it up) or has a
+        strictly larger cell above. Exercise 1 below contains the missing branch,
+        a mismatch at \((2,2)\) where up holds \(0\) and left holds \(1\), so the
+        walk moves left; the
+        <a href="algo-traceback-space-saving.html">Traceback &amp; Space-Saving</a>
+        handout treats the walk in general.
+      </p>
+      <div class="aside">
+        <span class="tag">A built-in bug detector</span>
+        The LCS table has structure you can check at a glance, and a hand-filled
+        (or coded) table that violates it is wrong somewhere:
+        <ul>
+          <li>values <strong>never decrease</strong> going right or down: a
+            longer prefix can only keep or grow the LCS;</li>
+          <li>adjacent cells differ by <strong>at most \(1\)</strong>:
+            adding one character adds at most one match;</li>
+          <li>the bottom-right cell is a maximum of the whole table.</li>
+        </ul>
+        A value that drops, or jumps by \(2\), pinpoints a recurrence or indexing
+        bug to within a cell; check these invariants on a small example
+        before trusting any LCS code (exercise 2 practices exactly this).
+      </div>
+      <p>
+        Cost, by the <a href="paradigm-dp-method.html#styles">DP cost formula</a>: \((m+1)(n+1)\)
+        cells at \(O(1)\) each, \(\Theta(mn)\) time and space. Since each row
+        depends only on the row above and the current row&rsquo;s left neighbor,
+        the space can drop to two rows, \(\Theta(\min(m,n))\) with the
+        shorter string as columns, but the two-row version can report only
+        the <em>length</em>: the traceback needs the whole table. Decide up front
+        which your application needs (the <a href="paradigm-dp-method.html#recipe">DP recipe</a>, step 5).
+      </p>
+      <div class="aside">
+        <span class="tag">LCS in the wild</span>
+        The same \(\Theta(mn)\) table powers <code>diff</code> and
+        <code>git diff</code> (LCS of <em>lines</em>: unmatched lines are the
+        insertions and deletions shown), merge tools and plagiarism detectors, and,
+        at industrial scale, DNA and protein sequence alignment,
+        where LCS-style tables measure evolutionary similarity. Its close cousin
+        <em>edit distance</em>, the minimum number of single-character edits
+        between two strings, fills an almost identical table and drives
+        spell-checking; it is treated in the
+        <a href="algo-edit-distance.html">Edit Distance</a> handout.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=lcs">LCS demo</a>. Type any two words and
+        press <em>Run LCS</em>: the \((m{+}1)\times(n{+}1)\) table fills cell by
+        cell (diagonal \(+\,1\) on a match, else the max of up and left),
+        and the traceback then walks back from the corner, spelling the
+        subsequence. Enter <code>AGCAT</code> / <code>GAC</code> first and check
+        every cell against the worked table above. Then try the default
+        <code>SUNDAY</code> / <code>SATURDAY</code> (LCS <code>SUDAY</code>,
+        length \(5\); <code>SATURDAY</code> has no <code>N</code>) and the
+        preset CLRS pair <code>ABCBDAB</code> / <code>BDCABA</code> (length
+        \(4\), one LCS is <code>BCBA</code>).
+      </div>
+
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=lcs-tree">The LCS subproblem tree</a> is the recursion this
+        table is an optimization of, and it answers the question the table cannot: <em>why</em>
+        \(\Theta(mn)\) is available at all. A node is a prefix pair \((i,j)\); an edge is the
+        move: <b>↖</b> on a match (worth \(+1\), and only ONE child follows), <b>↑</b> or
+        <b>←</b> on a mismatch, which is the two-way branch that makes the tree grow
+        exponentially. Run <em>Naive</em> then <em>Memoized</em>: the same walk in the same order,
+        differing only in the cache. On <code>AGCAT</code> / <code>GAC</code> that is \(27\)
+        nodes against \(19\) visited over \(16\) distinct pairs, and the bound is the point,
+        since there are never more than \((m{+}1)(n{+}1) = 24\) distinct pairs however wildly the
+        tree branches. A pair <em>is</em> a cell of the table. The green chain is the traceback,
+        and its ↖ edges spell <code>AC</code>.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">2. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Fill the complete LCS table for \(A = \texttt{ABCB}\) (rows),
+          \(B = \texttt{BDCB}\) (columns). Give the LCS length and recover one
+          LCS by traceback.
+          <details>
+            <summary>solution</summary>
+            <pre>        ""  B  D  C  B
+    ""   0  0  0  0  0
+    A    0  0  0  0  0
+    B    0  1  1  1  1
+    C    0  1  1  2  2
+    B    0  1  1  2  3</pre>
+            Length \(L[4][4] = 3\). Traceback from the corner:
+            <code>B</code>/<code>B</code> match: emit <code>B</code>, go
+            diagonal to \((3,3)\); <code>C</code>/<code>C</code> match:
+            emit <code>C</code>, diagonal to \((2,2)\), which is row
+            <code>B</code>, column <code>D</code>: mismatch, and up
+            (\(L[1][2] = 0\)) loses to left (\(L[2][1] = 1\)), so go
+            <em>left</em> to \((2,1)\); <code>B</code>/<code>B</code> match:
+            emit <code>B</code>, diagonal to \((1,0)\), column \(0\):
+            stop. Emitted
+            <code>B</code>, <code>C</code>, <code>B</code>; reversed:
+            <code>BCB</code>, which is indeed a subsequence of both strings.
+          </details>
+        </li>
+        <li>
+          A student fills the LCS table for \(A = \texttt{CAB}\),
+          \(B = \texttt{ACB}\) and gets the table below. Using only the sanity
+          invariants of <a href="#lcs">&sect;1</a> (no re-derivation), point out
+          two cells that <em>cannot</em> be right, then give the correct table.
+          <pre>        ""  A  C  B
+    ""   0  0  0  0
+    C    0  0  1  1
+    A    0  1  0  1
+    B    0  1  1  3</pre>
+          <details>
+            <summary>solution</summary>
+            Row <code>A</code>, column <code>C</code> holds \(0\) but the cell
+            above it holds \(1\): values may never <em>decrease</em> going
+            down. And the corner holds \(3\) while its up and left neighbors hold
+            \(1\): adjacent cells may differ by at most \(1\). Correct
+            table:
+            <pre>        ""  A  C  B
+    ""   0  0  0  0
+    C    0  0  1  1
+    A    0  1  1  1
+    B    0  1  1  2</pre>
+            LCS length \(2\); the traceback yields <code>CB</code> (or
+            <code>AB</code>; both are common subsequences of length
+            \(2\)).
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Longest Common Subsequence v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

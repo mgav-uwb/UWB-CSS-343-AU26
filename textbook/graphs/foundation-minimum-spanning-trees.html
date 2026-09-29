@@ -1,0 +1,557 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Minimum Spanning Trees.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Minimum Spanning Trees - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { padding: 5px 9px; font-variant-numeric: tabular-nums; }
+      table.trace td.num { text-align: center; }
+      table.trace td.add { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.skip { background: #f0f2f6; color: var(--dim); font-weight: 700; }
+      table.trace td.forest { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .mrg { color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Minimum Spanning Trees: The Cut Property</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        The minimum spanning tree: the cheapest set of edges that connects a
+        weighted graph. Defines spanning trees, cuts, and the MST problem; proves
+        the cut property by an exchange argument, the one theorem that licenses
+        greedy edge selection; states its dual, the cycle property, and the generic
+        MST algorithm they support. Introduces the running eight-vertex graph used
+        by the algorithm handouts. With exercises.
+      </div>
+
+      <p class="lead">
+        The <strong>minimum spanning tree</strong> is the cheapest way to wire a
+        weighted graph so everything is connected. One theorem, the <strong>cut
+        property</strong>, stands behind every algorithm that computes it: it says
+        which edges are <em>safe</em> to take greedily, and one exchange argument
+        proves it. This handout sets up the problem and the theorem;
+        <a href="algo-kruskal.html">Kruskal&rsquo;s algorithm</a> and
+        <a href="algo-prim.html">Prim&rsquo;s algorithm</a> put them to work.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#mst">Spanning trees and the MST problem</a></li>
+          <li><a href="#graph">The running graph</a></li>
+          <li><a href="#cut">The cut property</a></li>
+          <li><a href="#algorithms">Computing the MST: the algorithms</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="mst">1. Spanning trees and the MST problem</h2>
+      <div class="def">
+        <span class="tag">Definition (spanning tree, MST)</span>
+        A <strong>spanning tree</strong> of a connected graph is a subset of its
+        edges that connects all \(V\) vertices with no cycle, necessarily
+        exactly \(V-1\) edges. A <strong>minimum spanning tree</strong> (MST) of a
+        connected, edge-weighted, undirected graph is a spanning tree of minimum
+        total edge weight.
+      </div>
+      <p>
+        A spanning tree sits exactly at the connectivity boundary: remove any one of
+        its edges and the graph falls into two pieces; add any one non-tree edge and
+        you close exactly one cycle. (These are the &ldquo;two of three&rdquo; facts
+        about {connected, acyclic, \(V-1\) edges} from the
+        <a href="ds-graph-representations.html">graph representations</a> handout, now
+        load-bearing.)
+        A graph usually has exponentially many spanning trees; the MST is the
+        cheapest.
+      </p>
+      <div class="aside">
+        <span class="tag">The minimum weight is unique even when the tree is not</span>
+        If all edge weights are <em>distinct</em>, the MST is unique. If weights tie,
+        several different edge sets may all be minimal, but every one of them
+        has the <em>same</em> total weight, so &ldquo;the MST weight&rdquo; is always
+        well-defined. The running graph below has all-distinct weights, so its MST is
+        unique.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="graph">2. The running graph</h2>
+      <p>
+        The graph for this handout, and for the Kruskal and Prim traces, is the same
+        eight vertices and eleven weighted edges as in the
+        <a href="ds-graph-representations.html">graph representations</a> and
+        <a href="algo-dijkstra.html">Dijkstra</a> handouts, only now
+        <em>undirected</em> (the arrows
+        are dropped). The question is no longer &ldquo;cheapest routes from a
+        source&rdquo; but &ldquo;cheapest set of edges connecting everything.&rdquo;
+      </p>
+      <figure>
+        <svg viewBox="0 0 420 300" role="img" aria-label="The running undirected weighted graph on eight vertices, the graph-traversal handout's graph with arrows dropped. The vertices 0 through 7 sit in a ring: 0 at the top, then clockwise 1, 2 on the right, 3, 4 at the bottom, 5, 6 on the left, and 7 at the upper left. There are eleven weighted edges. The seven minimum-spanning-tree edges are drawn thick and green: 0 to 1 with weight 4, 1 to 2 with weight 1, 1 to 3 with weight 5, 3 to 4 with weight 2, 4 to 5 with weight 3, 4 to 7 with weight 7, and 5 to 6 with weight 9. The four non-tree edges are thin and gray: 0 to 3 with weight 6, 0 to 5 with weight 20, 2 to 3 with weight 8, and 3 to 7 with weight 11.">
+          <g fill="none">
+            <!-- non-MST edges: thin gray -->
+            <g stroke="#b8bec9" stroke-width="1.6">
+              <line x1="210" y1="38" x2="289" y2="229"/>  <!-- 0-3 -->
+              <line x1="210" y1="38" x2="131" y2="229"/>  <!-- 0-5 -->
+              <line x1="322" y1="150" x2="289" y2="229"/>  <!-- 2-3 -->
+              <line x1="289" y1="229" x2="131" y2="71"/>  <!-- 3-7 -->
+            </g>
+            <!-- MST edges: thick green -->
+            <g stroke="#0a7d4d" stroke-width="2.8">
+              <line x1="210" y1="38" x2="289" y2="71"/>   <!-- 0-1 -->
+              <line x1="289" y1="71" x2="322" y2="150"/>  <!-- 1-2 -->
+              <line x1="289" y1="71" x2="289" y2="229"/>  <!-- 1-3 -->
+              <line x1="289" y1="229" x2="210" y2="262"/>  <!-- 3-4 -->
+              <line x1="210" y1="262" x2="131" y2="229"/>  <!-- 4-5 -->
+              <line x1="210" y1="262" x2="131" y2="71"/>  <!-- 4-7 -->
+              <line x1="131" y1="229" x2="98" y2="150"/>  <!-- 5-6 -->
+            </g>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
+             stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="middle">
+            <g fill="#0a7d4d">
+              <text x="250" y="59">4</text>    <!-- 0-1 -->
+              <text x="306" y="115">1</text>   <!-- 1-2 -->
+              <text x="289" y="154">5</text>   <!-- 1-3 -->
+              <text x="250" y="250">2</text>   <!-- 3-4 -->
+              <text x="170" y="250">3</text>   <!-- 4-5 -->
+              <text x="170" y="171">7</text>   <!-- 4-7 -->
+              <text x="114" y="194">9</text>    <!-- 5-6 -->
+            </g>
+            <g fill="#8a9099">
+              <text x="250" y="138">6</text>   <!-- 0-3 -->
+              <text x="170" y="138">20</text>  <!-- 0-5 -->
+              <text x="306" y="194">8</text>   <!-- 2-3 -->
+              <text x="210" y="154">11</text>  <!-- 3-7 -->
+            </g>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="210" cy="38" r="19"/>  <circle cx="289" cy="71" r="19"/>
+              <circle cx="322" cy="150" r="19"/>  <circle cx="289" cy="229" r="19"/>
+              <circle cx="210" cy="262" r="19"/>  <circle cx="131" cy="229" r="19"/>
+              <circle cx="98" cy="150" r="19"/>  <circle cx="131" cy="71" r="19"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="210" y="43">0</text>  <text x="289" y="76">1</text>
+              <text x="322" y="155">2</text>  <text x="289" y="234">3</text>
+              <text x="210" y="267">4</text>  <text x="131" y="234">5</text>
+              <text x="98" y="155">6</text>  <text x="131" y="76">7</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The running graph, undirected: \(V = 8\), \(E = 11\). The seven green edges
+          are its minimum spanning tree: \(0\text{-}1,\ 1\text{-}2,\
+          1\text{-}3,\ 3\text{-}4,\ 4\text{-}5,\ 4\text{-}7,\ 5\text{-}6\), total
+          weight \(1+2+3+4+5+7+9 = 31\); the four gray edges
+          (\(0\text{-}3,\ 2\text{-}3,\ 3\text{-}7,\ 0\text{-}5\)) are left out.
+          Kruskal and Prim both find exactly this tree.
+        </figcaption>
+      </figure>
+
+      <!-- ============================================================ -->
+      <h2 id="cut">3. The cut property</h2>
+      <p>
+        One theorem stands behind every MST algorithm. A <strong>cut</strong> is a
+        partition of the vertices into two nonempty sets; an edge <strong>crosses</strong>
+        the cut if its endpoints fall on opposite sides.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (cut property)</span>
+        For any cut, a minimum-weight edge crossing it belongs to some MST. (When
+        weights are distinct, the minimum crossing edge belongs to <em>every</em>
+        MST.)
+      </div>
+      <div class="proof">
+        <strong>Proof (exchange argument).</strong> Let \(e\) be a lightest edge
+        crossing a given cut, and suppose some MST \(T\) does not contain \(e\).
+        Adding \(e\) to \(T\) creates exactly one cycle (a fact from the
+        <a href="ds-graph-representations.html">graph representations</a> handout), and that cycle
+        starts and ends on the same side of the cut, so it must cross the cut a
+        second time, by some other edge \(f\). Since \(e\) is a lightest crossing
+        edge, \(w(f) \ge w(e)\). Now form \(T' = T - f + e\): removing \(f\) breaks
+        the cycle, and \(e\) reconnects the two pieces, so \(T'\) is again a spanning
+        tree, and its weight \(w(T') = w(T) - w(f) + w(e) \le w(T)\). But \(T\) was
+        minimum, so \(w(T') = w(T)\): \(T'\) is also an MST, and it contains \(e\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Every MST algorithm is just a disciplined way to pick cuts and take their
+        lightest crossing edge. This exchange argument (add the greedy choice,
+        find the cycle it closes, swap out a no-better edge) is the template
+        for greedy-optimality proofs
+        (<a href="../greedy/paradigm-greedy-method.html">The Greedy Method</a>), and we reuse
+        it in <a href="../greedy/algo-huffman-coding.html">Huffman Coding</a>.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a cut on the running graph)</span>
+        Split the vertices as \(\{0, 1\}\) versus \(\{2,3,4,5,6,7\}\). The crossing
+        edges are \(1\text{-}2\,(1)\), \(1\text{-}3\,(5)\), \(0\text{-}3\,(6)\), and
+        \(0\text{-}5\,(20)\). The lightest is \(1\text{-}2\) at weight \(1\), so it is
+        safe, and indeed it is in the MST. This happens to be the very first
+        edge Kruskal takes.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the exchange step, worked)</span>
+        The proof is a swap; here is that swap performed, on the same cut
+        \(S = \{0,1\}\) with \(e = 1\text{-}2\,(1)\). Take the spanning tree
+        \[
+          T = \{0\text{-}1\,(4),\ 1\text{-}3\,(5),\ 2\text{-}3\,(8),\
+          3\text{-}4\,(2),\ 4\text{-}5\,(3),\ 4\text{-}7\,(7),\ 5\text{-}6\,(9)\},
+          \quad w(T) = 38,
+        \]
+        which is a spanning tree (7 edges, connected, acyclic) but does not
+        contain \(e\).
+        <ol>
+          <li><em>Add \(e\).</em> \(T + e\) has \(8\) edges on \(8\) vertices, so
+            it holds exactly one cycle: \(1\text{-}2,\ 2\text{-}3,\ 3\text{-}1\).</li>
+          <li><em>Find the second crossing.</em> That cycle leaves \(S\) at
+            \(e = 1\text{-}2\) and must come back, so some other edge of it
+            crosses too: \(2\text{-}3\) has both ends outside \(S\), while
+            \(f = 1\text{-}3\) has one end in \(S\). So \(f = 1\text{-}3\),
+            weight \(5\).</li>
+          <li><em>Check the inequality.</em> \(w(f) = 5 \ge w(e) = 1\), as the
+            minimality of \(e\) among crossing edges guarantees.</li>
+          <li><em>Swap.</em> \(T' = T - f + e = \{0\text{-}1,\ 1\text{-}2,\
+            2\text{-}3,\ 3\text{-}4,\ 4\text{-}5,\ 4\text{-}7,\ 5\text{-}6\}\):
+            still \(7\) edges, still connected (\(e\) rejoins the two pieces that
+            deleting \(f\) made), still acyclic. Its weight is
+            \(38 - 5 + 1 = 34 \le 38\).</li>
+        </ol>
+        The swap did not increase the weight, which is the whole content of the
+        theorem: a spanning tree omitting the lightest crossing edge can always be
+        traded for one containing it at no extra cost. Here the trade strictly
+        improved things (\(34 &lt; 38\)), which also proves \(T\) was not an MST.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the equality case, when weights tie)</span>
+        The proof concludes \(w(T') \le w(T)\), with equality exactly when
+        \(w(f) = w(e)\). That needs tied weights, which the running graph does not
+        have, so take the four-cycle with all four weights equal to \(1\):
+<pre>  a &ndash;1&ndash; b        cut S = {a, b}
+  |         |       crossing edges: b&ndash;c (1), d&ndash;a (1)     tied
+  1         1       every 3 of the 4 edges is a spanning tree of weight 3,
+  |         |       so all four spanning trees are MSTs
+  d &ndash;1&ndash; c</pre>
+        Both crossing edges are minimum, so take \(e = d\text{-}a\). The MST
+        \(T = \{a\text{-}b,\ b\text{-}c,\ c\text{-}d\}\), weight \(3\), omits
+        \(e\). Adding \(e\) closes the cycle \(a\text{-}b\text{-}c\text{-}d\text{-}a\),
+        which crosses the cut a second time at \(f = b\text{-}c\), and
+        \(w(f) = 1 = w(e)\). The swap gives
+        \(T' = \{a\text{-}b,\ c\text{-}d,\ d\text{-}a\}\) of weight
+        \(3 - 1 + 1 = 3 = w(T)\): a different MST, and this one contains \(e\).
+        This is why the theorem says a lightest crossing edge is in <em>some</em>
+        MST rather than in every one; with distinct weights the inequality is
+        strict and &ldquo;some&rdquo; strengthens to &ldquo;every.&rdquo;
+      </div>
+
+      <h3>The cycle property (the dual)</h3>
+      <p>
+        The mirror statement is equally useful, and is the same exchange run
+        backwards. The cut property says what to add; the cycle property says what
+        to skip. Kruskal uses both.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (cycle property)</span>
+        If an edge \(f\) is the unique maximum-weight edge on some cycle \(C\),
+        then \(f\) belongs to no MST.
+      </div>
+      <div class="proof">
+        <strong>Proof (the exchange, run backwards).</strong> Suppose some MST
+        \(T\) contains \(f = u\text{-}v\). Deleting \(f\) splits \(T\) into two
+        components; let \(S\) be the one containing \(u\), so \(f\) crosses the cut
+        \((S, V \setminus S)\). The rest of the cycle \(C\) is a path from \(u\) to
+        \(v\); it starts inside \(S\) and ends outside it, so at least one of its
+        edges \(g \ne f\) crosses that same cut. Since \(f\) is the strict maximum
+        on \(C\), \(w(g) &lt; w(f)\). Then \(T - f + g\) reconnects the two components
+        and is again a spanning tree, of weight \(w(T) - w(f) + w(g) &lt; w(T)\),
+        contradicting the minimality of \(T\). So no MST contains \(f\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (every discarded edge, explained)</span>
+        Each of the four gray edges of the running graph is the heaviest edge on
+        some cycle, so the cycle property rules out all four:
+        <table>
+          <tr><th>cycle</th><th>its edges (weights)</th><th>heaviest</th></tr>
+          <tr><td>\(0\text{-}1\text{-}3\text{-}0\)</td>
+            <td>\(0\text{-}1\,(4)\), \(1\text{-}3\,(5)\), \(0\text{-}3\,(6)\)</td>
+            <td>\(0\text{-}3\,(6)\)</td></tr>
+          <tr><td>\(1\text{-}2\text{-}3\text{-}1\)</td>
+            <td>\(1\text{-}2\,(1)\), \(1\text{-}3\,(5)\), \(2\text{-}3\,(8)\)</td>
+            <td>\(2\text{-}3\,(8)\)</td></tr>
+          <tr><td>\(3\text{-}4\text{-}7\text{-}3\)</td>
+            <td>\(3\text{-}4\,(2)\), \(4\text{-}7\,(7)\), \(3\text{-}7\,(11)\)</td>
+            <td>\(3\text{-}7\,(11)\)</td></tr>
+          <tr><td>\(0\text{-}3\text{-}4\text{-}5\text{-}0\)</td>
+            <td>\(0\text{-}3\,(6)\), \(3\text{-}4\,(2)\), \(4\text{-}5\,(3)\),
+              \(0\text{-}5\,(20)\)</td>
+            <td>\(0\text{-}5\,(20)\)</td></tr>
+        </table>
+        Working the exchange on the first row: the spanning tree
+        \(T = \{0\text{-}3\,(6),\ 1\text{-}2\,(1),\ 1\text{-}3\,(5),\
+        3\text{-}4\,(2),\ 4\text{-}5\,(3),\ 4\text{-}7\,(7),\ 5\text{-}6\,(9)\}\)
+        weighs \(33\) and contains \(f = 0\text{-}3\). Deleting \(f\) cuts vertex
+        \(0\) off by itself; the rest of the cycle is the path
+        \(0\text{-}1\text{-}3\), whose edge \(g = 0\text{-}1\,(4)\) crosses that
+        same cut, and \(4 &lt; 6\). Swapping gives a spanning tree of weight
+        \(33 - 6 + 4 = 31\), so \(T\) was not minimum. Eleven edges less these
+        four leaves exactly the seven of <a href="#graph">&sect;2</a>, of weight
+        \(31\).
+      </div>
+      <div class="aside">
+        <span class="tag">One generic algorithm, three instances</span>
+        Cormen&nbsp;et&nbsp;al. present Kruskal and Prim as two settings of a single
+        <strong>generic MST algorithm</strong>: maintain a set of edges \(A\) that is
+        always a subset of some MST, and repeatedly add a <em>safe</em> edge: a
+        minimum-weight edge crossing a cut that \(A\) does not already cross. The cut
+        property is exactly the guarantee that such an edge is safe. The three classic
+        algorithms differ only in which cut they take at each step:
+        <ul>
+          <li><strong>Kruskal</strong>: the cut around the two components its
+            next edge would join (\(A\) is a growing forest);</li>
+          <li><strong>Prim</strong>: the cut of the one growing tree versus
+            everything else;</li>
+          <li><strong>Bor&#367;vka</strong>: <em>every</em> component&rsquo;s
+            cheapest outgoing edge, all added at once each round.</li>
+        </ul>
+        Recognizing the shared skeleton means one theorem, the cut property,
+        proves all three at once.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="algorithms">4. Computing the MST: the algorithms</h2>
+      <p>
+        Two handouts put the cut property to work.
+        <a href="algo-kruskal.html">Kruskal&rsquo;s algorithm</a> considers edges from
+        cheapest to most expensive and accepts each one that joins two so-far-separate
+        pieces; it is exactly a sort plus
+        <a href="ds-union-find.html">union-find</a>.
+        <a href="algo-prim.html">Prim&rsquo;s algorithm</a> grows one tree from a start
+        vertex, always by the lightest edge leaving it, kept in a
+        <a href="../heaps/ds-heaps-pq.html">binary heap</a>. Both find the tree of
+        weight \(31\) on the running graph.
+      </p>
+      <table>
+        <tr><th></th><th>Kruskal</th><th>Prim</th></tr>
+        <tr><td>grows</td><td>a forest (merges)</td><td>one tree</td></tr>
+        <tr><td>picks</td><td>the globally cheapest edge</td><td>the cheapest edge leaving the tree</td></tr>
+        <tr><td>needs</td><td>union-find + a sort</td><td>a priority queue</td></tr>
+        <tr><td>cost</td><td>\(O(E\log V)\)</td><td>\(O(E\log V)\)</td></tr>
+        <tr><td>best for</td><td>sparse / pre-sorted</td><td>dense</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">The third algorithm: Bor&#367;vka (1926)</span>
+        The oldest MST algorithm, and the one that parallelizes best. Each
+        <strong>round</strong>, every current component simultaneously selects its own
+        cheapest outgoing edge and all selected edges are added at once; since every
+        component at least halves in number per round (each merges with at least one
+        neighbor), only \(O(\log V)\) rounds are needed, each an \(\Theta(E)\) scan, for
+        \(O(E\log V)\) overall. Every selected edge is safe by the cut property (it is
+        the lightest edge crossing its component&rsquo;s cut), so correctness is free.
+        Because the components act independently within a round, Bor&#367;vka is the
+        basis of parallel and distributed MST algorithms, and, combined with
+        Prim, of the fastest known near-linear sequential ones.
+      </div>
+      <h3>Algorithms from known structures</h3>
+      <p>
+        None of these algorithms needed a new
+        data structure; they are recombinations of the toolkit:
+      </p>
+      <table>
+        <tr><th>algorithm</th><th>built from</th></tr>
+        <tr><td>Kruskal</td><td><a href="ds-union-find.html">union-find</a> + a sort</td></tr>
+        <tr><td>Prim</td><td>the <a href="../heaps/ds-heaps-pq.html">binary heap</a></td></tr>
+        <tr><td><a href="algo-dijkstra.html">Dijkstra</a></td><td>the same binary heap</td></tr>
+        <tr><td>articulation points (<a href="algo-dfs.html">depth-first search</a>)</td><td>the DFS tree</td></tr>
+      </table>
+      <p>
+        Minimum spanning trees themselves are the workhorse behind cheapest-network
+        design (cabling, roads, pipelines that reach every site) and, with one twist,
+        clustering: build the MST of a set of data points under distance weights, then
+        delete the \(k-1\) heaviest tree edges, and the tree falls into \(k\) clusters:
+        single-linkage clustering, from the same algorithm that wires a
+        network. Elsewhere in the course, the leverage comes from combining known
+        structures, not inventing new ones;
+        <a href="../greedy/paradigm-greedy-method.html">The Greedy Method</a> and
+        <a href="../greedy/algo-huffman-coding.html">Huffman Coding</a> push exactly this
+        idea further.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">5. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          A graph has a unique lightest edge \(e\). Prove \(e\) is in every MST.
+          <details>
+            <summary>solution</summary>
+            Take any cut with \(e\) crossing it, for instance the cut
+            separating one endpoint of \(e\) from the other. Every crossing edge other
+            than \(e\) is strictly heavier (since \(e\) is the unique global minimum),
+            so \(e\) is <em>the</em> minimum crossing edge of that cut, and by the cut
+            property it belongs to every MST. (More generally, the globally lightest
+            edge is always safe to take first, which is exactly Kruskal&rsquo;s opening
+            move.)
+          </details>
+        </li>
+        <li>
+          On the running graph, take the cut \(S = \{0,1,2,3\}\) against
+          \(\{4,5,6,7\}\). List the crossing edges, name the safe one, and then
+          run the exchange on the spanning tree
+          \(T = \{0\text{-}1,\ 1\text{-}2,\ 1\text{-}3,\ 3\text{-}7,\
+          4\text{-}7,\ 4\text{-}5,\ 5\text{-}6\}\), which omits it.
+          <details>
+            <summary>solution</summary>
+            The crossing edges are \(3\text{-}4\,(2)\), \(3\text{-}7\,(11)\), and
+            \(0\text{-}5\,(20)\); every other edge has both ends on one side. The
+            lightest is \(e = 3\text{-}4\,(2)\), so it is safe, and it is indeed in
+            the tree of <a href="#graph">&sect;2</a>. Now the exchange:
+            \(w(T) = 4+1+5+11+7+3+9 = 40\). Adding \(e = 3\text{-}4\) closes the
+            single cycle \(3\text{-}4,\ 4\text{-}7,\ 7\text{-}3\); of its edges,
+            \(4\text{-}7\) lies wholly outside \(S\), so the second crossing edge
+            is \(f = 3\text{-}7\,(11)\), and \(w(f) = 11 \ge w(e) = 2\). Swapping,
+            \(T' = T - f + e\) has weight \(40 - 11 + 2 = 31\): a spanning tree, no
+            heavier, containing \(e\). (It is in fact the MST.)
+          </details>
+        </li>
+        <li>
+          Edge \(4\text{-}7\) has weight \(7\), heavier than \(0\text{-}3\)&rsquo;s
+          \(6\), yet \(4\text{-}7\) is in the MST and \(0\text{-}3\) is not. Justify
+          both facts, one with each property. What does the pair show about judging
+          an edge by its weight alone?
+          <details>
+            <summary>solution</summary>
+            Vertex \(7\) has exactly two incident edges, \(4\text{-}7\,(7)\) and
+            \(3\text{-}7\,(11)\). Take the cut \(\{7\}\) against everything else:
+            those two are the crossing edges, and the lighter is \(4\text{-}7\), so
+            by the cut property \(4\text{-}7\) is in every MST (the weights are
+            distinct). For \(0\text{-}3\): it is the strict maximum on the cycle
+            \(0\text{-}1\,(4),\ 1\text{-}3\,(5),\ 0\text{-}3\,(6)\), so by the cycle
+            property it is in no MST. Weight alone decides nothing: what matters is
+            an edge&rsquo;s weight <em>relative to the alternatives</em> on the cut
+            or cycle it sits on. A heavy edge is kept when it is the only affordable
+            way to reach a vertex, and a light edge is dropped when a cycle already
+            provides a cheaper route.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Minimum Spanning Trees v1.0 &middot;
+        prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive demos in
+        the course library.
+      </footer>
+    </div>
+  </body>
+</html>

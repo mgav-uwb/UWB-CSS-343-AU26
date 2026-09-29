@@ -1,0 +1,763 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Edit Distance.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Distance - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h2.part { font-size: 23px; margin: 48px 0 8px; padding-top: 22px; border-top: 2px solid var(--line); }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+      <h1>Edit Distance</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
+      </div>
+      <div class="src">
+        Edit (Levenshtein) distance: the min-of-three recurrence over prefix
+        pairs, the worked table for <code>kitten</code> \(\to\)
+        <code>sitting</code> (distance \(3\)), the traceback that reads off
+        the edit script, complete code, the metric property, weighted costs and
+        sequence alignment, and the side-by-side comparison with the longest
+        common subsequence. The method itself is the
+        <a href="paradigm-dp-method.html">Dynamic Programming Method</a> handout. With a
+        demo and exercises.
+      </div>
+
+      <p class="lead">
+        The DP recipe is the <a href="paradigm-dp-method.html">Dynamic Programming
+        Method</a> handout; the two-dimensional prefix-pair table it built for
+        the <a href="algo-longest-common-subsequence.html">longest common
+        subsequence</a> here acquires a min-of-three transition. Edit distance
+        is the table behind every spell-checker, and its \(\Theta(mn)\) is
+        truly polynomial, a sharp contrast with knapsack&rsquo;s
+        pseudo-polynomial bound.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#edit">Edit distance</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="edit">1. Edit distance</h2>
+      <div class="def">
+        <span class="tag">Definition (edit distance)</span>
+        The <strong>edit distance</strong> (also <strong>Levenshtein
+        distance</strong>) between strings \(A\) (length \(m\)) and \(B\) (length
+        \(n\)) is the fewest single-character edits (<strong>insert</strong>,
+        <strong>delete</strong>, or <strong>replace</strong>) that transform
+        \(A\) into \(B\).
+      </div>
+      <p>
+        The classic instance: <code>kitten</code> \(\to\) <code>sitting</code> takes
+        three edits: replace <code>k</code>\(\to\)<code>s</code>, replace
+        <code>e</code>\(\to\)<code>i</code>, insert <code>g</code>. Edit distance is
+        the engine behind spell-checkers (nearest dictionary word to a typo),
+        &ldquo;did you mean&hellip;?&rdquo; fuzzy search, record linkage, and,
+        with weighted operations, DNA and protein alignment. Like LCS (the
+        <a href="algo-longest-common-subsequence.html">Longest Common
+        Subsequence</a> handout), the brute force over all edit sequences is
+        exponential; the DP is \(\Theta(mn)\), and truly polynomial (the
+        <a href="algo-knapsack.html#pseudo">0/1 Knapsack</a> handout&rsquo;s
+        pseudo-polynomial contrast).
+      </p>
+      <div class="def">
+        <span class="tag">Definition (edit-distance table)</span>
+        Let \(D[i][j]\) be the edit distance between the first \(i\) characters of
+        \(A\) and the first \(j\) characters of \(B\). If the last characters match,
+        no edit is spent on them; otherwise pay \(1\) for the cheapest of the three
+        operations:
+        \[
+          D[i][j] =
+          \begin{cases}
+            D[i-1][j-1] &amp; \text{if } A[i{-}1] = B[j{-}1] \text{ (match, free)}\\[4pt]
+            1 + \min\bigl(D[i-1][j],\; D[i][j-1],\; D[i-1][j-1]\bigr) &amp; \text{otherwise,}
+          \end{cases}
+        \]
+        where the three candidates are <em>delete</em> \(A[i{-}1]\) (up),
+        <em>insert</em> \(B[j{-}1]\) (left), and <em>replace</em>
+        \(A[i{-}1] \to B[j{-}1]\) (diagonal). Base cases: \(D[i][0] = i\) (turn a
+        length-\(i\) prefix into the empty string by \(i\) deletions) and
+        \(D[0][j] = j\) (build a length-\(j\) prefix by \(j\) insertions). The
+        answer is \(D[m][n]\).
+      </div>
+      <p>
+        The state is again a pair of prefixes (the same 2-D shape as LCS),
+        but the transition reads <em>three</em> neighbors and takes a
+        <em>min</em>. Two cells worked by hand make the fill mechanical:
+      </p>
+      <div class="ex">
+        <span class="tag">Example (two worked cells)</span>
+        \(D[1][1]\), turning <code>"k"</code> into <code>"s"</code>:
+        <pre>  'k' != 's'  &rarr;  1 + min( D[0][1] = 1,     <span class="cm">// delete 'k', then insert 's'</span>
+                           D[1][0] = 1,     <span class="cm">// insert 's', then delete 'k'</span>
+                           D[0][0] = 0 )    <span class="cm">// replace k &rarr; s</span>
+              =  1 + 0  =  1                (one replace)</pre>
+        The delete and insert routes each cost \(2\) in total (the neighbor already
+        holds one edit); the single replace wins. Next, \(D[2][1]\), turning
+        <code>"ki"</code> into <code>"s"</code>: <code>'i'</code> \(\ne\)
+        <code>'s'</code>, so \(1 + \min(D[1][1], D[2][0], D[1][0]) = 1 + \min(1, 2,
+        1) = 2\): for instance replace <code>k</code>\(\to\)<code>s</code>
+        then delete <code>i</code>. Both values appear in the full table below.
+      </div>
+      <figure>
+        <table class="trace">
+          <tr><th class="lab"></th><th>&ldquo;&rdquo;</th><th>s</th><th>i</th><th>t</th><th>t</th><th>i</th><th>n</th><th>g</th></tr>
+          <tr><td class="lab">&ldquo;&rdquo;</td>
+            <td class="cell lt">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell">6</td><td class="cell">7</td></tr>
+          <tr><td class="lab">k</td>
+            <td class="cell">1</td><td class="cell lt">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell">6</td><td class="cell">7</td></tr>
+          <tr><td class="lab">i</td>
+            <td class="cell">2</td><td class="cell">2</td><td class="cell lt">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell">6</td></tr>
+          <tr><td class="lab">t</td>
+            <td class="cell">3</td><td class="cell">3</td><td class="cell">2</td><td class="cell lt">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td></tr>
+          <tr><td class="lab">t</td>
+            <td class="cell">4</td><td class="cell">4</td><td class="cell">3</td><td class="cell">2</td><td class="cell lt">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td></tr>
+          <tr><td class="lab">e</td>
+            <td class="cell">5</td><td class="cell">5</td><td class="cell">4</td><td class="cell">3</td><td class="cell">2</td><td class="cell lt">2</td><td class="cell">3</td><td class="cell">4</td></tr>
+          <tr><td class="lab">n</td>
+            <td class="cell">6</td><td class="cell">6</td><td class="cell">5</td><td class="cell">4</td><td class="cell">3</td><td class="cell">3</td><td class="cell lt">2</td><td class="cell lt piv">3</td></tr>
+        </table>
+        <figcaption>
+          The edit-distance table for <code>kitten</code> \(\to\)
+          <code>sitting</code>. Row and column \(0\) count the edits to and from the
+          empty string; every interior cell reads its up, left, and diagonal
+          neighbors. The answer is \(D[6][7] = 3\), bottom-right. The highlighted
+          cells are the optimal traceback path: diagonal (replace
+          <code>k</code>\(\to\)<code>s</code>, cost \(0{\to}1\)), three free diagonal
+          matches <code>i t t</code>, diagonal (replace
+          <code>e</code>\(\to\)<code>i</code>, \(1{\to}2\)), a free match
+          <code>n</code>, and one left step (insert <code>g</code>, \(2{\to}3\)).
+        </figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Example (the last two rows, cell by cell)</span>
+        <p>
+          The two worked cells above both took the replace branch. Unrolling the
+          final two rows, \(i = 5\) (<code>e</code>) and \(i = 6\)
+          (<code>n</code>), exercises the rest: the free match, and a delete and an
+          insert each winning outright. Every row below reads the three neighbours
+          the recurrence names, takes the smallest, and adds \(1\) unless the
+          characters match. Winning candidates are marked.
+        </p>
+        <table class="trace">
+          <tr>
+            <th class="lab">cell</th><th>chars</th><th>case</th>
+            <th>up<br />\(D[i{-}1][j]\)</th>
+            <th>left<br />\(D[i][j{-}1]\)</th>
+            <th>diag<br />\(D[i{-}1][j{-}1]\)</th>
+            <th>\(D[i][j]\)</th><th>operation taken</th>
+          </tr>
+          <tr><td class="lab">D[5][1]</td><td class="cell">e / s</td><td>differ</td>
+            <td class="cell lt">4</td><td class="cell">5</td><td class="cell lt">4</td>
+            <td class="cell new">5</td><td class="lab">tie: delete e or replace e&rarr;s</td></tr>
+          <tr><td class="lab">D[5][2]</td><td class="cell">e / i</td><td>differ</td>
+            <td class="cell lt">3</td><td class="cell">5</td><td class="cell">4</td>
+            <td class="cell new">4</td><td class="lab">delete e (up)</td></tr>
+          <tr><td class="lab">D[5][3]</td><td class="cell">e / t</td><td>differ</td>
+            <td class="cell lt">2</td><td class="cell">4</td><td class="cell">3</td>
+            <td class="cell new">3</td><td class="lab">delete e (up)</td></tr>
+          <tr><td class="lab">D[5][4]</td><td class="cell">e / t</td><td>differ</td>
+            <td class="cell lt">1</td><td class="cell">3</td><td class="cell">2</td>
+            <td class="cell new">2</td><td class="lab">delete e (up)</td></tr>
+          <tr><td class="lab">D[5][5]</td><td class="cell">e / i</td><td>differ</td>
+            <td class="cell">2</td><td class="cell">2</td><td class="cell lt">1</td>
+            <td class="cell new">2</td><td class="lab">replace e&rarr;i (diag)</td></tr>
+          <tr><td class="lab">D[5][6]</td><td class="cell">e / n</td><td>differ</td>
+            <td class="cell">3</td><td class="cell lt">2</td><td class="cell lt">2</td>
+            <td class="cell new">3</td><td class="lab">tie: insert n or replace e&rarr;n</td></tr>
+          <tr><td class="lab">D[5][7]</td><td class="cell">e / g</td><td>differ</td>
+            <td class="cell">4</td><td class="cell lt">3</td><td class="cell lt">3</td>
+            <td class="cell new">4</td><td class="lab">tie: insert g or replace e&rarr;g</td></tr>
+          <tr><td class="lab">D[6][1]</td><td class="cell">n / s</td><td>differ</td>
+            <td class="cell lt">5</td><td class="cell">6</td><td class="cell lt">5</td>
+            <td class="cell new">6</td><td class="lab">tie: delete n or replace n&rarr;s</td></tr>
+          <tr><td class="lab">D[6][2]</td><td class="cell">n / i</td><td>differ</td>
+            <td class="cell lt">4</td><td class="cell">6</td><td class="cell">5</td>
+            <td class="cell new">5</td><td class="lab">delete n (up)</td></tr>
+          <tr><td class="lab">D[6][3]</td><td class="cell">n / t</td><td>differ</td>
+            <td class="cell lt">3</td><td class="cell">5</td><td class="cell">4</td>
+            <td class="cell new">4</td><td class="lab">delete n (up)</td></tr>
+          <tr><td class="lab">D[6][4]</td><td class="cell">n / t</td><td>differ</td>
+            <td class="cell lt">2</td><td class="cell">4</td><td class="cell">3</td>
+            <td class="cell new">3</td><td class="lab">delete n (up)</td></tr>
+          <tr><td class="lab">D[6][5]</td><td class="cell">n / i</td><td>differ</td>
+            <td class="cell lt">2</td><td class="cell">3</td><td class="cell lt">2</td>
+            <td class="cell new">3</td><td class="lab">tie: delete n or replace n&rarr;i</td></tr>
+          <tr><td class="lab">D[6][6]</td><td class="cell">n / n</td><td>match</td>
+            <td class="cell">3</td><td class="cell">3</td><td class="cell lt">2</td>
+            <td class="cell new">2</td><td class="lab">match n, free (diag, no \(+1\))</td></tr>
+          <tr><td class="lab">D[6][7]</td><td class="cell">n / g</td><td>differ</td>
+            <td class="cell">4</td><td class="cell lt">2</td><td class="cell">3</td>
+            <td class="cell new">3</td><td class="lab">insert g (left)</td></tr>
+        </table>
+        <p>
+          All four behaviours are visible in these fourteen cells:
+        </p>
+        <ul>
+          <li><strong>Delete wins alone</strong> at \(D[5][2]\), \(D[5][3]\),
+            \(D[5][4]\), \(D[6][2]\), \(D[6][3]\), \(D[6][4]\). These are cells deep
+            into a row whose remaining source characters have no counterpart left in
+            the target prefix, so dropping a character of \(A\) is cheapest.</li>
+          <li><strong>Replace wins alone</strong> at \(D[5][5]\): up and left both
+            hold \(2\) while the diagonal holds \(1\), so
+            \(1 + \min(2,2,1) = 2\). This is the
+            <code>e</code>\(\to\)<code>i</code> replace of the final script.</li>
+          <li><strong>Insert wins alone</strong> at \(D[6][7]\): the left neighbour
+            \(D[6][6] = 2\) beats up \(4\) and diagonal \(3\), giving
+            \(1 + 2 = 3\). This is the appended <code>g</code>, and it is the
+            answer cell.</li>
+          <li><strong>The free match</strong> at \(D[6][6]\): <code>n</code> equals
+            <code>n</code>, so the value is copied straight from the diagonal,
+            \(2\), with no \(+1\). Had the characters differed, the mismatch
+            formula would have charged \(1 + \min(3,3,2) = 3\) instead. That
+            saved unit is exactly what the traceback later reports as a match.</li>
+        </ul>
+        <p style="margin-bottom:0">
+          The tie rows show the other structural fact: several neighbours can
+          explain one cell, so several optimal scripts exist. They are ties in
+          <em>value</em> only, and the traceback takes whichever it tests first.
+        </p>
+      </div>
+      <div class="code-tabs" data-snippet="dp/edit-distance">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Edit (Levenshtein) distance. D[i][j] = fewest edits turning the first i
+// characters of a into the first j characters of b. Theta(mn) time and space.
+int editDistance(const string&amp; a, const string&amp; b, vector&lt;vector&lt;int&gt;&gt;&amp; D) {
+    int m = a.size(), n = b.size();
+    D.assign(m + 1, vector&lt;int&gt;(n + 1, 0));
+    for (int i = 0; i &lt;= m; i++) D[i][0] = i;         // base: delete all of a
+    for (int j = 0; j &lt;= n; j++) D[0][j] = j;         // base: insert all of b
+    for (int i = 1; i &lt;= m; i++)
+        for (int j = 1; j &lt;= n; j++)
+            if (a[i-1] == b[j-1])
+                D[i][j] = D[i-1][j-1];                // match: free diagonal
+            else
+                D[i][j] = 1 + min({D[i-1][j],         // delete a[i-1]
+                                   D[i][j-1],         // insert b[j-1]
+                                   D[i-1][j-1]});     // replace a[i-1]-&gt;b[j-1]
+    return D[m][n];
+}
+
+// Traceback: read the edit script off the table, bottom-right to origin. Each
+// step asks which neighbor produced this cell&#x27;s value. O(m + n).
+vector&lt;string&gt; editScript(const string&amp; a, const string&amp; b,
+                          const vector&lt;vector&lt;int&gt;&gt;&amp; D) {
+    vector&lt;string&gt; ops;
+    int i = a.size(), j = b.size();
+    while (i &gt; 0 || j &gt; 0) {
+        if (i &gt; 0 &amp;&amp; j &gt; 0 &amp;&amp; a[i-1] == b[j-1] &amp;&amp; D[i][j] == D[i-1][j-1]) {
+            ops.push_back(string(&quot;match &quot;) + a[i-1]);            // free
+            i--; j--;
+        } else if (i &gt; 0 &amp;&amp; j &gt; 0 &amp;&amp; D[i][j] == D[i-1][j-1] + 1) {
+            ops.push_back(string(&quot;replace &quot;) + a[i-1] + &quot;-&gt;&quot; + b[j-1]);
+            i--; j--;
+        } else if (i &gt; 0 &amp;&amp; D[i][j] == D[i-1][j] + 1) {
+            ops.push_back(string(&quot;delete &quot;) + a[i-1]);
+            i--;
+        } else {
+            ops.push_back(string(&quot;insert &quot;) + b[j-1]);
+            j--;
+        }
+    }
+    reverse(ops.begin(), ops.end());                  // forward order
+    return ops;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Edit (Levenshtein) distance. D[i][j] = fewest edits turning the first i
+// characters of a into the first j characters of b. Theta(mn) time and space.
+static int editDistance(String a, String b, int[][] D) {
+    int m = a.length(), n = b.length();
+    for (int i = 0; i &lt;= m; i++) D[i][0] = i;     // base: delete all of a
+    for (int j = 0; j &lt;= n; j++) D[0][j] = j;     // base: insert all of b
+    for (int i = 1; i &lt;= m; i++)
+        for (int j = 1; j &lt;= n; j++)
+            if (a.charAt(i-1) == b.charAt(j-1))
+                D[i][j] = D[i-1][j-1];            // match: free diagonal
+            else
+                D[i][j] = 1 + Math.min(D[i-1][j],           // delete
+                              Math.min(D[i][j-1],           // insert
+                                       D[i-1][j-1]));       // replace
+    return D[m][n];
+}
+
+// Traceback: read the edit script off the table, bottom-right to origin.
+// Each step asks which neighbor produced this cell&#x27;s value. O(m + n).
+static List&lt;String&gt; editScript(String a, String b, int[][] D) {
+    List&lt;String&gt; ops = new ArrayList&lt;&gt;();
+    int i = a.length(), j = b.length();
+    while (i &gt; 0 || j &gt; 0) {
+        if (i &gt; 0 &amp;&amp; j &gt; 0 &amp;&amp; a.charAt(i-1) == b.charAt(j-1)
+                &amp;&amp; D[i][j] == D[i-1][j-1]) {
+            ops.add(&quot;match &quot; + a.charAt(i-1));    // free
+            i--; j--;
+        } else if (i &gt; 0 &amp;&amp; j &gt; 0 &amp;&amp; D[i][j] == D[i-1][j-1] + 1) {
+            ops.add(&quot;replace &quot; + a.charAt(i-1) + &quot;-&gt;&quot; + b.charAt(j-1));
+            i--; j--;
+        } else if (i &gt; 0 &amp;&amp; D[i][j] == D[i-1][j] + 1) {
+            ops.add(&quot;delete &quot; + a.charAt(i-1));
+            i--;
+        } else {
+            ops.add(&quot;insert &quot; + b.charAt(j-1));
+            j--;
+        }
+    }
+    Collections.reverse(ops);                     // forward order
+    return ops;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Edit (Levenshtein) distance. D[i][j] = fewest edits turning the first i
+# characters of a into the first j characters of b. Theta(mn) time and space.
+def edit_distance(a, b):
+    m, n = len(a), len(b)
+    D = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(m + 1): D[i][0] = i            # base: delete all of a
+    for j in range(n + 1): D[0][j] = j            # base: insert all of b
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if a[i - 1] == b[j - 1]:
+                D[i][j] = D[i - 1][j - 1]         # match: free diagonal
+            else:
+                D[i][j] = 1 + min(D[i - 1][j],    # delete a[i-1]
+                                  D[i][j - 1],    # insert b[j-1]
+                                  D[i - 1][j - 1])  # replace a[i-1]-&gt;b[j-1]
+    return D                                      # D[m][n] is the distance
+
+# Traceback: read the edit script off the table, bottom-right to origin. Each
+# step asks which neighbor produced this cell&#x27;s value. O(m + n).
+def edit_script(a, b, D):
+    ops, i, j = [], len(a), len(b)
+    while i &gt; 0 or j &gt; 0:
+        if i &gt; 0 and j &gt; 0 and a[i-1] == b[j-1] and D[i][j] == D[i-1][j-1]:
+            ops.append(&quot;match &quot; + a[i - 1])       # free
+            i, j = i - 1, j - 1
+        elif i &gt; 0 and j &gt; 0 and D[i][j] == D[i-1][j-1] + 1:
+            ops.append(&quot;replace &quot; + a[i - 1] + &quot;-&gt;&quot; + b[j - 1])
+            i, j = i - 1, j - 1
+        elif i &gt; 0 and D[i][j] == D[i-1][j] + 1:
+            ops.append(&quot;delete &quot; + a[i - 1])
+            i -= 1
+        else:
+            ops.append(&quot;insert &quot; + b[j - 1])
+            j -= 1
+    return ops[::-1]                              # forward order</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Edit (Levenshtein) distance. d[i][j] = fewest edits turning the first i
+// characters of a into the first j characters of b. Theta(mn) time and space.
+fn edit_distance(a: &amp;[u8], b: &amp;[u8]) -&gt; Vec&lt;Vec&lt;usize&gt;&gt; {
+    let (m, n) = (a.len(), b.len());
+    let mut d = vec![vec![0usize; n + 1]; m + 1];
+    for i in 0..=m { d[i][0] = i; }                   // base: delete all of a
+    for j in 0..=n { d[0][j] = j; }                   // base: insert all of b
+    for i in 1..=m {
+        for j in 1..=n {
+            d[i][j] = if a[i - 1] == b[j - 1] {
+                d[i - 1][j - 1]                       // match: free diagonal
+            } else {
+                1 + d[i - 1][j]                       // delete a[i-1]
+                    .min(d[i][j - 1])                 // insert b[j-1]
+                    .min(d[i - 1][j - 1])             // replace a[i-1]-&gt;b[j-1]
+            };
+        }
+    }
+    d                                                 // d[m][n] is the distance
+}
+
+// Traceback: read the edit script off the table, bottom-right to origin.
+// Each step asks which neighbor produced this cell&#x27;s value. O(m + n).
+fn edit_script(a: &amp;[u8], b: &amp;[u8], d: &amp;[Vec&lt;usize&gt;]) -&gt; Vec&lt;String&gt; {
+    let mut ops = Vec::new();
+    let (mut i, mut j) = (a.len(), b.len());
+    while i &gt; 0 || j &gt; 0 {
+        if i &gt; 0 &amp;&amp; j &gt; 0 &amp;&amp; a[i - 1] == b[j - 1] &amp;&amp; d[i][j] == d[i - 1][j - 1] {
+            ops.push(format!(&quot;match {}&quot;, a[i - 1] as char));     // free
+            i -= 1; j -= 1;
+        } else if i &gt; 0 &amp;&amp; j &gt; 0 &amp;&amp; d[i][j] == d[i - 1][j - 1] + 1 {
+            ops.push(format!(&quot;replace {}-&gt;{}&quot;, a[i - 1] as char, b[j - 1] as char));
+            i -= 1; j -= 1;
+        } else if i &gt; 0 &amp;&amp; d[i][j] == d[i - 1][j] + 1 {
+            ops.push(format!(&quot;delete {}&quot;, a[i - 1] as char));
+            i -= 1;
+        } else {
+            ops.push(format!(&quot;insert {}&quot;, b[j - 1] as char));
+            j -= 1;
+        }
+    }
+    ops.reverse();                                    // forward order
+    ops
+}</pre>
+<p class="ct-src">source: <code>code/dp/edit-distance.cpp &middot; code/dp/edit-distance.java &middot; code/dp/edit-distance.py &middot; code/dp/edit-distance.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Structurally this is LCS&rsquo;s double loop with the max-of-two swapped for
+        a min-of-three and the base-case edges filled with \(i\) and \(j\) instead of
+        zeros. The traceback, as always, turns the number into the answer users
+        actually want.
+      </p>
+      <div class="def">
+        <span class="tag">How the traceback works</span>
+        <ol>
+          <li><strong>Start</strong> at the bottom-right cell \(D[M][N]\), which holds
+            the final distance.</li>
+          <li><strong>Look back</strong> at the three cells that could have produced
+            it: the diagonal \((i{-}1, j{-}1)\), up \((i{-}1, j)\), and left
+            \((i, j{-}1)\).</li>
+          <li><strong>Step</strong> to the one that <em>accounts for</em> this
+            cell&rsquo;s value under the recurrence: on a mismatch, a neighbour with
+            \(D[i][j] = 1 + D[\text{neighbour}]\); on a match, the diagonal, taken at
+            cost 0. The rule is <em>not</em> &ldquo;step to the smallest
+            neighbour&rdquo; but &ldquo;step to the one the recurrence used&rdquo;:
+            on a match the free diagonal is always available, since adjacent
+            cells differ by at most 1.</li>
+          <li><strong>Stop</strong> at \((0,0)\), then <strong>reverse</strong> the
+            collected moves: they were gathered backwards, and reversing is what turns
+            &ldquo;how I got here&rdquo; into &ldquo;what to do&rdquo;.</li>
+        </ol>
+        <p style="margin-bottom:0">
+          Each move names an operation: a diagonal on matching characters is a free
+          <em>match</em>, a diagonal on differing characters a <em>replace</em>, an
+          up-step a <em>delete</em> from \(A\), a left-step an <em>insert</em> from
+          \(B\). Where two neighbours both explain a cell there are several optimal
+          scripts and any one is correct: <code>ab</code> \(\to\)
+          <code>ba</code> has distance 2 by three distinct routes.
+        </p>
+      </div>
+      <p>
+        For <code>kitten</code> \(\to\) <code>sitting</code> the optimal script is
+        unique:
+      </p>
+      <pre>  k &rarr; s   replace
+  i &rarr; i   match        t &rarr; t   match        t &rarr; t   match
+  e &rarr; i   replace
+  n &rarr; n   match
+  &epsilon; &rarr; g   insert
+  &rarr;  2 replaces + 1 insert  =  3 edits  =  D[6][7]  &check;</pre>
+      <p>
+        This script, not the count, is what a spell-checker&rsquo;s
+        suggestion ranking, a <code>diff</code> hunk, or a genome aligner outputs.
+      </p>
+      <div class="aside">
+        <span class="tag">Edit distance is a metric</span>
+        With unit costs, edit distance satisfies the metric axioms: \(d(A,A) = 0\),
+        symmetry \(d(A,B) = d(B,A)\) (every edit has an inverse of equal cost), and
+        the triangle inequality \(d(A,C) \le d(A,B) + d(B,C)\) (concatenating two
+        edit scripts transforms \(A\) to \(C\), so the shortest script can only be
+        shorter). Strings therefore live in a genuine <em>metric space</em>, which
+        unlocks metric algorithms and data structures: nearest-neighbor
+        search, clustering, and BK-tree (Burkhard&ndash;Keller tree) indexes that
+        answer &ldquo;every dictionary word within \(2\) edits of this typo&rdquo;
+        without a linear scan. Not every similarity score is a metric; this one is,
+        and the triangle inequality is precisely what the indexes prune with.
+      </div>
+      <h3>LCS and edit distance, side by side</h3>
+      <p>
+        The two 2-D string DPs are close cousins: same prefix-pair state,
+        same three-neighbor reads, opposite objective:
+      </p>
+      <table>
+        <tr><th></th><th><a href="algo-longest-common-subsequence.html">LCS</a></th><th>edit distance</th></tr>
+        <tr><td>goal</td><td><strong>max</strong>imize common length</td><td><strong>min</strong>imize edits</td></tr>
+        <tr><td>match</td><td>diagonal \(+\,1\)</td><td>diagonal, free</td></tr>
+        <tr><td>mismatch</td><td>\(\max(\text{up}, \text{left})\)</td><td>\(1 + \min(\text{up}, \text{left}, \text{diag})\)</td></tr>
+        <tr><td>base cases</td><td>zeros</td><td>\(D[i][0]=i\), \(D[0][j]=j\)</td></tr>
+        <tr><td>cost</td><td>\(\Theta(mn)\)</td><td>\(\Theta(mn)\)</td></tr>
+      </table>
+      <p>
+        They are also numerically linked. If only insert and delete were allowed (no
+        replace), the optimal strategy would be to keep exactly an LCS and edit
+        everything else: \(m + n - 2\cdot\mathrm{LCS}\) edits. Allowing replace can
+        only help (one replace does the work of a delete\(+\)insert pair), so
+        \[
+          \max(m, n) - \mathrm{LCS} \;\le\; \text{edit distance} \;\le\; m + n - 2\cdot\mathrm{LCS}.
+        \]
+        On <code>kitten</code>/<code>sitting</code>: the LCS is
+        <code>ittn</code>, length \(4\) (check it in the
+        <a href="../../lib/demo.html?ds=lcs">LCS demo</a>), giving bounds
+        \(7 - 4 = 3 \le 3 \le 6 + 7 - 8 = 5\); the lower bound is tight here
+        because the optimal script uses replaces wherever possible. If you can fill
+        one of these tables, you can fill the other; they are the &ldquo;same&rdquo;
+        problem viewed as a max versus a min.
+      </p>
+      <div class="aside">
+        <span class="tag">Weighting the edits</span>
+        Nothing in the DP assumes each operation costs \(1\). Replace the constants
+        with per-operation costs (say replace \(= 2\), insert \(=\) delete
+        \(= 1\), to model a typo as cheaper than an omission), or even a
+        per-character-pair cost matrix, and the recurrence, fill order, and traceback
+        are unchanged. That one-line generalization <em>is</em> biological sequence
+        alignment: the Needleman&ndash;Wunsch algorithm is weighted edit distance
+        with a substitution matrix that charges likely mutations less. Same table,
+        different constants, Nobel-grade reach.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=edit-distance">Edit-distance demo</a>. Type any
+        two words (up to 12 letters each) and press <em>Run edit distance</em>: the
+        \((m{+}1)\times(n{+}1)\) table fills cell by cell (free diagonal on a
+        match, else \(1 + \min\) of the three neighbors), and the traceback
+        recovers the shortest edit script from the bottom-right corner. Run the
+        <code>kitten</code>/<code>sitting</code> preset first and match the table and
+        script above (distance \(3\): two replaces and an insert). Then try the
+        <code>intention</code>/<code>execution</code> preset (a Cormen et al.
+        favorite; distance \(5\)), two identical words (distance \(0\); the
+        whole traceback is free diagonal matches), and pairs of your own.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">2. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Fill the edit-distance table for <code>MONDAY</code> \(\to\)
+          <code>SUNDAY</code>, give the distance, and read off an optimal edit
+          script.
+          <details>
+            <summary>solution</summary>
+            <pre>       ""  S  U  N  D  A  Y
+   ""   0  1  2  3  4  5  6
+   M    1  1  2  3  4  5  6
+   O    2  2  2  3  4  5  6
+   N    3  3  3  2  3  4  5
+   D    4  4  4  3  2  3  4
+   A    5  5  5  4  3  2  3
+   Y    6  6  6  5  4  3  2</pre>
+            \(D[6][6] = 2\). The traceback runs down the main diagonal: replace
+            <code>M</code>\(\to\)<code>S</code>, replace
+            <code>O</code>\(\to\)<code>U</code>, then four free matches
+            <code>N D A Y</code>: two edits. (Sanity check with the bound of
+            &sect;1: the LCS is <code>NDAY</code>, length \(4\), so the distance is
+            at least \(\max(6,6) - 4 = 2\), tight here.)
+          </details>
+        </li>
+        <li>
+          A script with no replaces at all: fill the table for <code>abcde</code>
+          \(\to\) <code>ace</code>, give the distance, and read off the script.
+          Which of the three neighbours does every non-trivial step use?
+          <details>
+            <summary>solution</summary>
+            <pre>       ""  a  c  e
+   ""   0  1  2  3
+   a    1  0  1  2
+   b    2  1  1  2
+   c    3  2  1  2
+   d    4  3  2  2
+   e    5  4  3  2</pre>
+            \(D[5][3] = 2\). The script is match <code>a</code>, delete
+            <code>b</code>, match <code>c</code>, delete <code>d</code>, match
+            <code>e</code>: two deletes, no inserts and no replaces. Every paying
+            step is an <em>up</em> step, because \(B\) is a subsequence of \(A\), so
+            an optimal script only removes the extra characters. The bound of
+            &sect;1 confirms it: the LCS is <code>ace</code>, length \(3\), so the
+            distance is at least \(\max(5,3) - 3 = 2\).
+          </details>
+        </li>
+        <li>
+          <code>ab</code> \(\to\) <code>ba</code> was claimed in &sect;1 to have
+          distance \(2\) by three distinct routes. Fill the table and list all three
+          optimal scripts.
+          <details>
+            <summary>solution</summary>
+            <pre>       ""  b  a
+   ""   0  1  2
+   a    1  1  1
+   b    2  1  2</pre>
+            \(D[2][2] = 2\). Cell \(D[2][2]\) has <code>b</code> \(\ne\)
+            <code>a</code> and up \(= D[1][2] = 1\), left \(= D[2][1] = 1\),
+            diagonal \(= D[1][1] = 1\): a three-way tie, so all three branches are
+            optimal and each unfolds into one script.
+            <ul>
+              <li>replace <code>a</code>\(\to\)<code>b</code>, replace
+                <code>b</code>\(\to\)<code>a</code></li>
+              <li>insert <code>b</code>, match <code>a</code>, delete
+                <code>b</code></li>
+              <li>delete <code>a</code>, match <code>b</code>, insert
+                <code>a</code></li>
+            </ul>
+            The traceback in the code above tests match, then replace, then delete,
+            then insert, so it reports the first of the three. Any of them is a
+            correct answer; the distance is what is unique, not the script.
+          </details>
+        </li>
+        <li>
+          Re-fill the <code>kitten</code> \(\to\) <code>sitting</code> table with a
+          replace charged \(2\) and insert and delete still charged \(1\), the
+          weighting of the &ldquo;Weighting the edits&rdquo; aside. What is the new
+          distance, and why does the script change?
+          <details>
+            <summary>solution</summary>
+            <pre>       ""  s  i  t  t  i  n  g
+   ""   0  1  2  3  4  5  6  7
+   k    1  2  3  4  5  6  7  8
+   i    2  3  2  3  4  5  6  7
+   t    3  4  3  2  3  4  5  6
+   t    4  5  4  3  2  3  4  5
+   e    5  6  5  4  3  4  5  6
+   n    6  7  6  5  4  5  4  5</pre>
+            \(D[6][7] = 5\). At cost \(2\) a replace is no cheaper than a delete
+            followed by an insert, so the optimum stops replacing: the script
+            deletes <code>k</code> and inserts <code>s</code>, keeps
+            <code>itt</code>, deletes <code>e</code> and inserts <code>i</code>,
+            keeps <code>n</code>, inserts <code>g</code>. That is \(5\) unit-cost
+            operations, matching the upper bound \(m + n - 2\cdot\mathrm{LCS} =
+            6 + 7 - 8 = 5\) of &sect;1: with replace priced out, edit distance
+            degenerates to the LCS-based insert-and-delete count.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Edit Distance v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

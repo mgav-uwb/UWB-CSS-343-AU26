@@ -1,0 +1,501 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Heapsort.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Heapsort - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Heapsort</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Heapsort sorts an array in place in guaranteed \(\Theta(n\log n)\) time:
+        build a max-heap over the keys in \(\Theta(n)\), then repeatedly swap the
+        maximum to the end of a shrinking heap. It is the only comparison sort
+        that is simultaneously worst-case \(\Theta(n\log n)\) and \(\Theta(1)\) in
+        extra space, which is why introsort falls back on it. With the full code,
+        a worked trace, the cost proof, a link to the interactive demo, and
+        exercises.
+      </div>
+
+      <p class="lead">
+        Heapsort is the binary heap run to exhaustion. All of its machinery lives
+        in <a href="ds-heaps-pq.html"><em>Heaps &amp; Priority Queues</em></a>: the
+        1-based array layout, the <code>sink</code> primitive that restores heap
+        order along one root-to-leaf path, and the \(\Theta(n)\) bottom-up
+        build. This handout assembles those pieces into a sort, proves its
+        \(\Theta(n\log n)\) cost, and places it against mergesort and quicksort.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="heapsort">1. The algorithm: heapify, then sort down</h2>
+      <p>
+        <strong>The problem.</strong> Given \(n\) comparable keys sitting in an
+        array in arbitrary order, rearrange the array into ascending order, using
+        no second array, and with a worst-case running time that no adversarial
+        input can degrade.
+      </p>
+      <p>
+        Selection sort repeatedly finds the maximum of the unsorted part by a
+        \(\Theta(n)\) scan, for \(\Theta(n^2)\) overall. A heap <em>is</em> a
+        find-max machine: replace the scan with <code>delMax</code> and each of the
+        \(n\) rounds drops from \(\Theta(n)\) to \(\Theta(\log n)\). Better yet,
+        <code>delMax</code> already swaps the maximum into the last live slot before
+        shrinking (exactly where a descending selection pass would place it),
+        so the sorted region grows in the same array at no extra cost. That is
+        <strong>heapsort</strong>: heapify, then sort down.
+      </p>
+      <div class="code-tabs" data-snippet="heap/heapsort">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// In-place heapsort of a 1-based array a[1..n] (a[0] unused), ascending.
+// Theta(n log n), Theta(1) extra space, NOT stable. Uses sink from swim-sink.
+void heapsort(int a[], int n) {
+    for (int k = n / 2; k &gt;= 1; k--)   // build-heap bottom-up: Theta(n)
+        sink(a, k, n);                 // every internal node, last to first
+    for (int end = n; end &gt;= 2; end--) {   // sortdown: n-1 delMax steps
+        std::swap(a[1], a[end]);       // park the current max at the boundary
+        sink(a, 1, end - 1);           // re-heapify the shrunken heap a[1..end-1]
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// In-place heapsort of a 1-based array a[1..n] (a[0] unused), ascending.
+// Theta(n log n), Theta(1) extra space, NOT stable. Uses sink from swim-sink.
+static void heapsort(int[] a, int n) {
+    for (int k = n / 2; k &gt;= 1; k--)   // build-heap bottom-up: Theta(n)
+        sink(a, k, n);                 // every internal node, last to first
+    for (int end = n; end &gt;= 2; end--) {   // sortdown: n-1 delMax steps
+        int t = a[1]; a[1] = a[end]; a[end] = t;   // park the max at the boundary
+        sink(a, 1, end - 1);           // re-heapify the shrunken heap a[1..end-1]
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># In-place heapsort of a 1-based list a[1..n] (a[0] unused), ascending.
+# Theta(n log n), Theta(1) extra space, NOT stable. Uses sink from swim-sink.
+def heapsort(a, n):
+    for k in range(n // 2, 0, -1):     # build-heap bottom-up: Theta(n)
+        sink(a, k, n)                  # every internal node, last to first
+    for end in range(n, 1, -1):        # sortdown: n-1 delMax steps
+        a[1], a[end] = a[end], a[1]    # park the current max at the boundary
+        sink(a, 1, end - 1)            # re-heapify the shrunken heap a[1..end-1]</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// In-place heapsort of a 1-based slice a[1..=n] (a[0] unused), ascending.
+// Theta(n log n), Theta(1) extra space, NOT stable. Uses sink from swim-sink.
+fn heapsort(a: &amp;mut [i32], n: usize) {
+    for k in (1..=n / 2).rev() {       // build-heap bottom-up: Theta(n)
+        sink(a, k, n);                 // every internal node, last to first
+    }
+    for end in (2..=n).rev() {         // sortdown: n-1 delMax steps
+        a.swap(1, end);                // park the current max at the boundary
+        sink(a, 1, end - 1);           // re-heapify the shrunken heap a[1..=end-1]
+    }
+}</pre>
+<p class="ct-src">source: <code>code/heap/heapsort.cpp &middot; code/heap/heapsort.java &middot; code/heap/heapsort.py &middot; code/heap/heapsort.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Both loops call one primitive, <code>sink(a, k, n)</code>, defined and
+        proved in
+        <a href="ds-heaps-pq.html#swimsink"><em>Heaps &amp; Priority Queues</em></a>.
+        It is repeated here in pseudocode because every step of the trace below is
+        a step of it, and because its two guards are exactly what make the cases
+        the trace has to show:
+      </p>
+      <pre>  sink(a, k, n):                       <span class="cm">// push a[k] down inside a[1..n]</span>
+      while 2k &le; n:                   <span class="cm">// a[k] has a left child</span>
+          j = 2k                       <span class="cm">// the left child</span>
+          if j &lt; n and a[j] &lt; a[j+1]:   <span class="cm">// a RIGHT child exists and is bigger</span>
+              j = j + 1                <span class="cm">// compare against the LARGER child</span>
+          if a[k] &ge; a[j]:  break       <span class="cm">// a[k] already dominates: stop</span>
+          swap a[k], a[j]              <span class="cm">// demote under the larger child</span>
+          k = j                        <span class="cm">// move down one level</span></pre>
+      <p>
+        The loop guard <code>2k &le; n</code> stops the descent at a leaf; the
+        guard <code>j &lt; n</code> is what distinguishes a node with two children
+        from a node whose left child is the very last live slot; and the
+        <code>break</code> is the early stop. Note that <code>n</code> here is the
+        <em>live</em> heap size, which the sortdown shrinks by one each round: it
+        is the only thing that keeps the sorted tail out of the heap.
+      </p>
+      <p>
+        The first loop is the \(\Theta(n)\) bottom-up build proved in
+        <a href="ds-heaps-pq.html#build"><em>Heaps &amp; Priority Queues</em></a>. The
+        second runs
+        \(n-1\) rounds: swap the root (the current maximum) to the boundary
+        <code>a[end]</code>, exclude it by passing <code>end - 1</code> as the heap
+        size, and sink the new root through the shrunken heap.
+      </p>
+      <div class="thm">
+        <span class="tag">Invariant (sortdown)</span>
+        Before each round, <code>a[1..end]</code> is a heap holding the \(end\)
+        smallest keys and <code>a[end+1..n]</code> holds the remaining keys, sorted
+        and in their final positions.
+      </div>
+      <p>
+        Initialization is the post-heapify state (the whole array is the heap, the
+        tail empty). Each round removes the maximum of the current heap; it is
+        \(\ge\) every key already parked, and it lands immediately to their left, so
+        the sorted tail grows correct by one. At termination (\(end=1\)) the lone
+        remaining key is the smallest, and the array is fully sorted:
+        ascending, even though we used a max-heap, precisely because each maximum is
+        parked at the far right. A min-heap with the same sort-down would produce
+        descending order, a classic gotcha.
+      </p>
+      <p>
+        Every round is one swap plus one sink, but the sink itself can take four
+        distinct shapes, and a full trace should show each: a swap with the
+        <em>larger of two children</em>; a swap with a <em>lone child</em> (when
+        the left-child index equals the live heap size, so the
+        <code>j &lt; n</code> guard skips the larger-child test); an immediate
+        <em>stop with no swap</em> (the promoted key already dominates); and the
+        <em>final two-element round</em>, whose sink runs on a one-key heap and
+        does nothing at all. The trace below, a complete run from the raw array
+        through the build to the sorted result, hits all four.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr>
+            <th class="lab">after</th>
+            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+          </tr>
+          <tr><td class="lab">raw array</td>
+            <td>70</td><td>80</td><td>95</td><td>90</td><td>60</td></tr>
+          <tr><td class="lab">build: sink 2 (80&harr;90)</td>
+            <td>70</td><td class="upd">90</td><td>95</td><td class="upd">80</td><td>60</td></tr>
+          <tr><td class="lab">build: sink 1 (70&harr;95)</td>
+            <td class="upd">95</td><td>90</td><td class="upd">70</td><td>80</td><td>60</td></tr>
+          <tr><td class="lab">park 95, sink (60&harr;90&harr;80)</td>
+            <td class="upd">90</td><td class="upd">80</td><td>70</td><td class="upd">60</td><td class="set">95</td></tr>
+          <tr><td class="lab">park 90, sink (60&harr;80)</td>
+            <td class="upd">80</td><td class="upd">60</td><td>70</td><td class="set">90</td><td class="set">95</td></tr>
+          <tr><td class="lab">park 80, sink (70 &ge; 60)</td>
+            <td class="upd">70</td><td>60</td><td class="set">80</td><td class="set">90</td><td class="set">95</td></tr>
+          <tr><td class="lab">park 70 (one-key heap)</td>
+            <td class="upd">60</td><td class="set">70</td><td class="set">80</td><td class="set">90</td><td class="set">95</td></tr>
+          <tr><td class="lab">done</td>
+            <td class="set">60</td><td class="set">70</td><td class="set">80</td><td class="set">90</td><td class="set">95</td></tr>
+        </table>
+        <figcaption>
+          A complete heapsort of the raw array \([\,70\;80\;95\;90\;60\,]\). The
+          two build rows sink the internal nodes \(2\) then \(1\), yielding the
+          heap \([\,95\;90\;70\;80\;60\,]\). Green cells are the sorted tail, in
+          final position; shaded white-region cells changed on that row. Each of
+          the four sink shapes appears: parking \(95\) promotes \(60\), which
+          swaps with the larger child \(90\) (not \(80\)) and then with its
+          <em>lone</em> child \(80\) (the right child, index \(5\), now lies
+          outside the live heap);
+          parking \(90\) is a single larger-child swap; parking \(80\) promotes
+          \(70\), which already dominates its lone child \(60\), so the sink
+          stops with no swap; and parking \(70\) is the final two-element round,
+          whose sink faces a one-key heap and exits immediately. Result:
+          \([\,60\;70\;80\;90\;95\,]\), ascending, in place.
+        </figcaption>
+      </figure>
+      <div class="thm">
+        <span class="tag">Proposition (heapsort cost)</span>
+        Heapsort sorts \(n\) keys in \(O(n\log n)\) time (\(\Theta(n\log n)\)
+        in the worst case) using \(\Theta(1)\) extra space.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The build is \(\Theta(n)\)
+        (<a href="ds-heaps-pq.html#build"><em>Heaps &amp; Priority Queues</em></a>). The
+        sortdown does \(n-1\) rounds; the round on a heap of size \(m\) sinks the new
+        root through height \(\le \lfloor\log_2 m\rfloor \le \lfloor\log_2 n\rfloor\),
+        so the whole sortdown is \(O(n\log n)\), and with the linear build the total
+        is \(O(n\log n)\). For the matching lower bound, note that after the build the
+        heap&rsquo;s deepest level holds up to \(\lceil n/2\rceil\) keys; on a
+        worst-case input the key promoted to the root each round is small and sinks
+        essentially the full current height, and the first \(n/2\) rounds each sink
+        through a heap of size \(\gt n/2\) and thus height
+        \(\ge \log_2 n - 1\), giving \(\Omega(n\log n)\): heapsort&rsquo;s
+        worst case is \(\Theta(n\log n)\)
+        (<a href="../sorting/foundation-sorting-lower-bound.html"><em>The Sorting Lower
+        Bound</em></a>). Only a constant number of
+        scalar variables are used beyond the input array, so the extra space is
+        \(\Theta(1)\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Heapsort is <em>not</em> stable: parking a maximum at a distant slot reorders
+        equal keys. Three keys are enough to see it happen.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (equal keys come out reversed)</span>
+        Sort \([\,5_a\;5_b\;3\,]\), where \(5_a\) and \(5_b\) are equal keys
+        carrying distinct payloads and \(5_a\) started first. A stable sort must
+        return \(3, 5_a, 5_b\).
+        <pre>  build:      5a 5b 3      <span class="cm">// sink 1: 5a &ge; larger child 5b, no swap; already a heap</span>
+  park 5a:    5b 3 | 5a    <span class="cm">// swap a[1],a[3]; sink 3 in a[1..2]: lone child 5b, swap</span>
+  park 5b:    3 | 5b 5a    <span class="cm">// swap a[1],a[2]; sink in a[1..1]: nothing to do</span></pre>
+        The result is \(3, 5_b, 5_a\): the tie is inverted. The culprit is the
+        first park, which flung \(5_a\) from index \(1\) all the way to index
+        \(3\), jumping it over its equal twin. Any sort that moves keys across
+        long distances rather than between neighbors is exposed to this, which is
+        why quicksort is unstable as well; mergesort avoids it by breaking every
+        tie in favor of the left run. If stability matters, sort
+        \((\text{key}, \text{original index})\) pairs, which makes all keys
+        distinct and costs \(\Theta(n)\) extra space for the indices.
+      </div>
+      <p>
+        Heapsort&rsquo;s niche is clear against its rivals:
+      </p>
+      <table>
+        <tr><th>sort</th><th>worst case</th><th>extra space</th><th>stable</th><th>in practice</th></tr>
+        <tr><td>mergesort</td><td>\(\Theta(n\log n)\)</td><td>\(\Theta(n)\)</td><td>yes</td><td>needs a buffer</td></tr>
+        <tr><td>quicksort</td><td>\(\Theta(n^2)\)</td><td>\(\Theta(\log n)\)</td><td>no</td><td>fastest constants</td></tr>
+        <tr><td><strong>heapsort</strong></td><td>\(\Theta(n\log n)\)</td><td>\(\Theta(1)\)</td><td>no</td><td>the safety net</td></tr>
+      </table>
+      <p>
+        Heapsort is the only one of the three that is simultaneously guaranteed
+        \(\Theta(n\log n)\) <em>and</em> in place. It loses to quicksort on constant
+        factors and cache behavior (its accesses jump around the array by
+        powers of two rather than sweeping linearly), and it is not stable, so
+        it is nobody&rsquo;s default. But it is everybody&rsquo;s fallback: this is
+        exactly why <code>std::sort</code> (introsort) begins with quicksort and
+        switches to heapsort when the recursion goes too deep, buying quicksort&rsquo;s
+        speed with heapsort&rsquo;s worst-case guarantee. Its two rivals have their
+        own handouts, <a href="../sorting/algo-mergesort.html"><em>Mergesort</em></a> and
+        <a href="../sorting/algo-quicksort.html"><em>Quicksort</em></a>.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=heap">Binary-heap demo</a>. Build with
+        <code>HEAPIFY(1..16:RAND)</code> (watch the swaps cluster low:
+        the \(\Theta(n)\) build), then run <em>Sort down</em> (\(n\) sinks of a
+        shrinking heap: the
+        \(\Theta(n\log n)\) part), and see the sorted tail grow rightward in one
+        array. The second phase does the majority of the swaps; the counters make it
+        plain.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">2. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Run two rounds of heapsort sortdown on the heap \([9, 7, 6, 4, 1, 3, 2]\)
+          (\(n=7\)). Show the array after each round and explain why the output ends
+          up ascending.
+          <details>
+            <summary>solution</summary>
+            <em>Round \(end=7\):</em> swap \(a[1]=9\) with \(a[7]=2\) &rArr;
+            \([2,7,6,4,1,3,\mid 9]\); sink \(2\) in \(a[1..6]\): larger child of the
+            root is \(7\), swap &rArr; \([7,2,6,4,1,3\mid 9]\); \(2\) at index \(2\)
+            has larger child \(4\), swap &rArr; \([7,4,6,2,1,3\mid 9]\).
+            <em>Round \(end=6\):</em> swap \(a[1]=7\) with \(a[6]=3\) &rArr;
+            \([3,4,6,2,1\mid 7,9]\); sink \(3\) in \(a[1..5]\): larger child is \(6\),
+            swap &rArr; \([6,4,3,2,1\mid 7,9]\); \(3\) at index \(3\) has no child,
+            stop. After two rounds: \([6,4,3,2,1,7,9]\) with sorted tail \(7, 9\). The
+            order is ascending because each round removes the current maximum and
+            parks it at the right boundary, filling the final positions from largest
+            down to smallest.
+          </details>
+        </li>
+        <li>
+          You build a <em>min</em>-heap and run the identical sortdown loop:
+          swap the root to the current boundary, shrink, sink. Is the output
+          ascending or descending, and what would you change to reverse it?
+          <details>
+            <summary>solution</summary>
+            Descending. Each round now removes the current <em>minimum</em> and parks
+            it at the right end, so the largest keys end up on the left: the array
+            comes out from largest (index \(1\)) to smallest. To get ascending order
+            from a min-heap you would park each extracted minimum at the front instead
+            (growing the sorted region leftward), or simply use a max-heap as in the
+            main text. This direction mismatch is a frequent bug: the sort
+            direction is fixed by the heap&rsquo;s orientation, not by intent.
+          </details>
+        </li>
+        <li>
+          In the main trace, the round that parks \(80\) sinks without a single
+          swap: the promoted \(70\) already dominates. Prove that with distinct
+          keys this can only happen late: every sortdown round on a live heap
+          \(a[1..end]\) with \(end \ge 4\) begins with a swap at the root.
+          <details>
+            <summary>solution</summary>
+            The round moves \(a[end]\) to the root and sinks it through
+            \(a[1..end-1]\). For \(end \ge 4\), the index \(end\) lies inside the
+            subtree rooted at \(2\) or at \(3\), so the promoted key was a proper
+            descendant of \(a[2]\) or of \(a[3]\) and, keys being distinct,
+            strictly smaller than that child of the root. Hence it is smaller
+            than \(\max(a[2], a[3])\), the larger child it is compared against,
+            and the first comparison of the sink swaps. The exception needs
+            \(end \le 3\): at \(end = 3\) the promoted key is the root&rsquo;s
+            own right child, which heap order does not relate to its sibling
+            \(a[2]\), so it may dominate (in the trace, \(70 \ge 60\): no swap);
+            at \(end = 2\) the shrunken heap has one key and the sink loop body
+            never runs at all.
+          </details>
+        </li>
+        <li>
+          A common slip writes <code>sink(a, 1, end)</code> instead of
+          <code>sink(a, 1, end - 1)</code> in the sortdown loop. Run the buggy
+          version on the same input \([\,70\;80\;95\;90\;60\,]\) and say exactly
+          what goes wrong.
+          <details>
+            <summary>solution</summary>
+            The build is unaffected, giving the heap \([\,95\;90\;70\;80\;60\,]\).
+            Round \(end=5\): swap \(95\) to slot \(5\), leaving
+            \([\,60\;90\;70\;80\;95\,]\), then sink \(60\) through
+            <em>\(a[1..5]\)</em>, which still contains the parked \(95\). The
+            \(60\) swaps with \(90\), then at index \(2\) compares its children
+            \(80\) and \(95\) and swaps with \(95\), dragging the maximum back
+            into the live heap: \([\,90\;95\;70\;80\;60\,]\), which is not even
+            heap-ordered. The remaining rounds churn without progress, and the
+            array ends as \([\,95\;90\;70\;80\;60\,]\): the original heap, wholly
+            unsorted. The lesson is that <code>end - 1</code> is not an off-by-one
+            detail but the entire mechanism that removes a key from the heap: the
+            sorted tail exists only because the sink is forbidden to look at it.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Heapsort v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

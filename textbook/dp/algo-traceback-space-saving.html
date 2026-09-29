@@ -1,0 +1,679 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Traceback & Space-Saving.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Traceback &amp; Space-Saving - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h2.part { font-size: 23px; margin: 48px 0 8px; padding-top: 22px; border-top: 2px solid var(--line); }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+      <h1>Traceback &amp; Space-Saving</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
+      </div>
+      <div class="src">
+        The two techniques every optimization DP needs: the traceback, which
+        recovers the actual solution (cuts, characters, items, edits, path)
+        from a filled table of optimal values, and the rolling array, which
+        cuts space from \(\Theta(mn)\) or \(\Theta(nW)\) to one or two
+        rows at the price of that traceback. Also: the loop direction that
+        separates 0/1 from unbounded knapsack, the value-or-solution decision,
+        and Hirschberg&rsquo;s both-at-once composition. The method itself is
+        the <a href="paradigm-dp-method.html">Dynamic Programming Method</a> handout.
+        With complete code and exercises.
+      </div>
+
+      <p class="lead">
+        A filled DP table stores optimal <em>values</em>; applications usually
+        want the solution itself, and memory is often the binding constraint.
+        This handout states in general the two techniques that every
+        optimization DP of the problem handouts
+        (<a href="algo-rod-cutting.html">Rod Cutting</a>,
+        <a href="algo-longest-common-subsequence.html">Longest Common Subsequence</a>,
+        <a href="algo-knapsack.html">0/1 Knapsack</a>,
+        <a href="algo-edit-distance.html">Edit Distance</a>, and
+        <a href="algo-dp-patterns.html">DP Patterns</a>) used piecemeal: the
+        traceback and the rolling array.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#trace">Traceback and space-saving</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">1. Traceback and space-saving</h2>
+      <p>
+        Two techniques appeared in every problem of the DP handouts; they
+        deserve their general statements, because they apply to <em>every</em>
+        optimization DP you will ever write.
+      </p>
+      <h3>The traceback, in general</h3>
+      <div class="thm">
+        <span class="tag">Pattern (traceback)</span>
+        A filled DP table stores optimal <em>values</em>; to recover the optimal
+        <em>solution</em>:
+        <ol>
+          <li>start at the <strong>answer cell</strong>;</li>
+          <li>determine which neighbor (and which decision) <strong>produced</strong>
+            this cell&rsquo;s value, by comparing against each candidate of
+            the recurrence;</li>
+          <li>record the decision and <strong>move</strong> to that neighbor;</li>
+          <li>stop at a base case; <strong>reverse</strong> the recorded decisions.</li>
+        </ol>
+        Cost: \(O(\text{path length})\). Either store the winning choice per cell
+        while filling (extra memory, trivial walk) or recompute it during the walk
+        (no memory, a few comparisons per step); the knapsack and
+        edit-distance code of the <a href="algo-knapsack.html">0/1 Knapsack</a> and
+        <a href="algo-edit-distance.html">Edit Distance</a> handouts both
+        recompute.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (following the arrows, step by step)</span>
+        <p>
+          Take the longest common subsequence of \(A =\) <code>HEAP</code> and
+          \(B =\) <code>HELP</code>. Filling \(L[i][j]\) (the length of the LCS of
+          the first \(i\) and first \(j\) characters) also records, per cell, which
+          candidate won: <span class="mono">&#8598;</span> for a match taken on the
+          diagonal, <span class="mono">&uarr;</span> for &ldquo;the cell above was
+          at least as good,&rdquo; <span class="mono">&larr;</span> for the cell to
+          the left. Row and column \(0\) are base cells and carry no arrow.
+        </p>
+        <table class="trace">
+          <tr><th class="lab"></th><th>&ldquo;&rdquo;</th><th>H</th><th>E</th><th>L</th><th>P</th></tr>
+          <tr><td class="lab">&ldquo;&rdquo;</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td></tr>
+          <tr><td class="lab">H</td>
+            <td class="cell">0</td><td class="cell lt">&#8598;1</td><td class="cell">&larr;1</td><td class="cell">&larr;1</td><td class="cell">&larr;1</td></tr>
+          <tr><td class="lab">E</td>
+            <td class="cell">0</td><td class="cell">&uarr;1</td><td class="cell lt">&#8598;2</td><td class="cell lt">&larr;2</td><td class="cell">&larr;2</td></tr>
+          <tr><td class="lab">A</td>
+            <td class="cell">0</td><td class="cell">&uarr;1</td><td class="cell">&uarr;2</td><td class="cell lt">&uarr;2</td><td class="cell">&uarr;2</td></tr>
+          <tr><td class="lab">P</td>
+            <td class="cell">0</td><td class="cell">&uarr;1</td><td class="cell">&uarr;2</td><td class="cell">&uarr;2</td><td class="cell lt piv">&#8598;3</td></tr>
+        </table>
+        <p>
+          The walk starts at the answer cell \(L[4][4] = 3\) and stops when either
+          index hits \(0\). Each step is shown twice over: the arrow that was
+          stored, and the comparison that recomputes the same decision from the
+          values alone, which is what code that stores no arrows does.
+        </p>
+        <table class="trace">
+          <tr><th class="lab">step</th><th>at</th><th>\(L\)</th><th>chars</th>
+              <th>recomputed test</th><th>arrow</th><th>move to</th>
+              <th>output so far</th></tr>
+          <tr><td class="lab">1</td><td class="cell">(4,4)</td><td class="cell">3</td>
+              <td class="cell">P = P</td>
+              <td class="lab">match, and \(3 = L[3][3] + 1\)</td>
+              <td class="cell">&#8598;</td><td class="cell">(3,3)</td>
+              <td class="cell new">P</td></tr>
+          <tr><td class="lab">2</td><td class="cell">(3,3)</td><td class="cell">2</td>
+              <td class="cell">A &ne; L</td>
+              <td class="lab">\(L[2][3] = 2 = L[3][3]\), up explains it</td>
+              <td class="cell">&uarr;</td><td class="cell">(2,3)</td>
+              <td class="cell">P</td></tr>
+          <tr><td class="lab">3</td><td class="cell">(2,3)</td><td class="cell">2</td>
+              <td class="cell">E &ne; L</td>
+              <td class="lab">\(L[1][3] = 1 \ne 2\), so not up; \(L[2][2] = 2\)</td>
+              <td class="cell">&larr;</td><td class="cell">(2,2)</td>
+              <td class="cell">P</td></tr>
+          <tr><td class="lab">4</td><td class="cell">(2,2)</td><td class="cell">2</td>
+              <td class="cell">E = E</td>
+              <td class="lab">match, and \(2 = L[1][1] + 1\)</td>
+              <td class="cell">&#8598;</td><td class="cell">(1,1)</td>
+              <td class="cell new">EP</td></tr>
+          <tr><td class="lab">5</td><td class="cell">(1,1)</td><td class="cell">1</td>
+              <td class="cell">H = H</td>
+              <td class="lab">match, and \(1 = L[0][0] + 1\)</td>
+              <td class="cell">&#8598;</td><td class="cell">(0,0)</td>
+              <td class="cell new">HEP</td></tr>
+          <tr><td class="lab">6</td><td class="cell">(0,0)</td><td class="cell">0</td>
+              <td class="cell">&ndash;</td>
+              <td class="lab">base cell reached, stop</td>
+              <td class="cell">&ndash;</td><td class="cell">&ndash;</td>
+              <td class="cell lt">HEP</td></tr>
+        </table>
+        <p style="margin-bottom:0">
+          Five steps, three of them emitting a character:
+          <code>HEP</code>, of length \(3 = L[4][4]\), so the walk and the value
+          agree. Three details generalize. A diagonal step is the only one that
+          <em>outputs</em> anything; the other two just reposition, which is why
+          the walk can be longer than the solution it produces. The path is
+          monotone (every step decreases \(i + j\) by \(1\) or \(2\)), so it visits
+          at most \(m + n\) cells: the \(O(\text{path length})\) claim of the
+          pattern. And it visits cells scattered across <em>every</em> row, here
+          rows \(4, 3, 2, 1\), which is the fact the rolling array collides with.
+          Output is built here by prepending, the equivalent of collecting
+          backwards and reversing at the end.
+        </p>
+      </div>
+      <p>
+        The <a href="algo-rod-cutting.html">Rod Cutting</a> and
+        <a href="algo-longest-common-subsequence.html">Longest Common Subsequence</a>
+        handouts traced cuts and characters; the
+        <a href="algo-knapsack.html">0/1 Knapsack</a> handout traced items (the
+        equal-vs-different test against the cell above), the
+        <a href="algo-edit-distance.html">Edit Distance</a> handout an edit script
+        (which of three neighbors explains the value), and the
+        <a href="algo-dp-patterns.html">DP Patterns</a> handout the grid path. Five
+        problems, one pattern, and one universal skeleton around it:
+      </p>
+      <pre>  1. allocate the table; set the BASE cells
+  2. loop over states in dependency ORDER
+  3. each cell = combine(smaller cells)        <span class="cm">// the recurrence</span>
+  4. read the ANSWER cell
+  5. (optional) TRACE BACK for the solution</pre>
+      <p>
+        Every DP in these handouts (Fibonacci, rod cutting, LCS,
+        knapsack, edit distance, grids, intervals, coin change, LIS) is this
+        five-line skeleton with a different state and combine step. The scaffolding
+        never changes; only the recurrence does. That is what makes DP one technique
+        rather than a zoo of tricks.
+      </p>
+      <h3>Space-saving: the rolling array</h3>
+      <p>
+        Look back at the knapsack and edit-distance recurrences: row \(i\) reads
+        only row \(i-1\) (and, to its left, row \(i\) itself). Rows older than the
+        previous one are dead weight, so keep <em>two</em> rows and swap
+        them, or for knapsack even <em>one</em> row updated in place, cutting space
+        from \(\Theta(mn)\) or \(\Theta(nW)\) to \(\Theta(n)\) or \(\Theta(W)\):
+      </p>
+      <div class="code-tabs" data-snippet="dp/space-saving">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// 0/1 knapsack value in Theta(W) space: ONE row, updated RIGHT-TO-LEFT so that
+// K[w - weight[i]] still holds the previous row&#x27;s value (item i not yet used).
+// Iterating forward instead would let item i be taken again -- that variant is
+// exactly the UNBOUNDED knapsack. No table survives, so no traceback.
+int knapsackValue(int n, int W, const vector&lt;int&gt;&amp; value,
+                  const vector&lt;int&gt;&amp; weight) {
+    vector&lt;int&gt; K(W + 1, 0);                          // row 0: no items
+    for (int i = 1; i &lt;= n; i++)
+        for (int w = W; w &gt;= weight[i]; w--)          // BACKWARD: 0/1
+            K[w] = max(K[w], value[i] + K[w - weight[i]]);
+    return K[W];
+}
+
+// Edit-distance value in Theta(n) space: keep TWO rows, the previous and the
+// current, swapping after each row. Same fill, same answer -- no traceback.
+int editDistanceValue(const string&amp; a, const string&amp; b) {
+    int m = a.size(), n = b.size();
+    vector&lt;int&gt; prev(n + 1), cur(n + 1);
+    for (int j = 0; j &lt;= n; j++) prev[j] = j;         // row 0: insert all of b
+    for (int i = 1; i &lt;= m; i++) {
+        cur[0] = i;                                   // column 0: delete all
+        for (int j = 1; j &lt;= n; j++)
+            cur[j] = (a[i-1] == b[j-1])
+                       ? prev[j-1]                    // match: free diagonal
+                       : 1 + min({prev[j],            // delete
+                                  cur[j-1],           // insert
+                                  prev[j-1]});        // replace
+        swap(prev, cur);                              // this row becomes &quot;previous&quot;
+    }
+    return prev[n];                                   // the last computed row
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// 0/1 knapsack value in Theta(W) space: ONE row, updated RIGHT-TO-LEFT so
+// K[w - weight[i]] still holds the previous row&#x27;s value (item i not yet
+// used). Iterating forward would let item i be taken again -- that variant
+// is exactly the UNBOUNDED knapsack. No table survives, so no traceback.
+static int knapsackValue(int n, int W, int[] value, int[] weight) {
+    int[] K = new int[W + 1];                     // row 0: no items
+    for (int i = 1; i &lt;= n; i++)
+        for (int w = W; w &gt;= weight[i]; w--)      // BACKWARD: 0/1
+            K[w] = Math.max(K[w], value[i] + K[w - weight[i]]);
+    return K[W];
+}
+
+// Edit-distance value in Theta(n) space: keep TWO rows, previous and
+// current, swapping after each row. Same fill, same answer -- no traceback.
+static int editDistanceValue(String a, String b) {
+    int m = a.length(), n = b.length();
+    int[] prev = new int[n + 1], cur = new int[n + 1];
+    for (int j = 0; j &lt;= n; j++) prev[j] = j;     // row 0: insert all of b
+    for (int i = 1; i &lt;= m; i++) {
+        cur[0] = i;                               // column 0: delete all
+        for (int j = 1; j &lt;= n; j++)
+            cur[j] = (a.charAt(i-1) == b.charAt(j-1))
+                       ? prev[j-1]                          // match
+                       : 1 + Math.min(prev[j],              // delete
+                             Math.min(cur[j-1],             // insert
+                                      prev[j-1]));          // replace
+        int[] t = prev; prev = cur; cur = t;      // rows swap roles
+    }
+    return prev[n];                               // the last computed row
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># 0/1 knapsack value in Theta(W) space: ONE row, updated RIGHT-TO-LEFT so
+# K[w - weight[i]] still holds the previous row&#x27;s value (item i not yet
+# used). Iterating forward instead would let item i be taken again -- that
+# variant is exactly the UNBOUNDED knapsack. No table, so no traceback.
+def knapsack_value(n, W, value, weight):
+    K = [0] * (W + 1)                             # row 0: no items
+    for i in range(1, n + 1):
+        for w in range(W, weight[i] - 1, -1):     # BACKWARD: 0/1
+            K[w] = max(K[w], value[i] + K[w - weight[i]])
+    return K[W]
+
+# Edit-distance value in Theta(n) space: keep TWO rows, previous and current,
+# swapping after each row. Same fill, same answer -- no traceback.
+def edit_distance_value(a, b):
+    m, n = len(a), len(b)
+    prev = list(range(n + 1))                     # row 0: insert all of b
+    for i in range(1, m + 1):
+        cur = [i] + [0] * n                       # column 0: delete all
+        for j in range(1, n + 1):
+            if a[i - 1] == b[j - 1]:
+                cur[j] = prev[j - 1]              # match: free diagonal
+            else:
+                cur[j] = 1 + min(prev[j],         # delete
+                                 cur[j - 1],      # insert
+                                 prev[j - 1])     # replace
+        prev = cur                                # this row becomes &quot;previous&quot;
+    return prev[n]                                # the last computed row</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// 0/1 knapsack value in Theta(W) space: ONE row, updated RIGHT-TO-LEFT so
+// k[w - weight[i]] still holds the previous row&#x27;s value (item i not yet
+// used). Iterating forward would let item i be taken again -- that variant
+// is exactly the UNBOUNDED knapsack. No table survives, so no traceback.
+fn knapsack_value(n: usize, cap: usize, value: &amp;[i64], weight: &amp;[usize]) -&gt; i64 {
+    let mut k = vec![0i64; cap + 1];                  // row 0: no items
+    for i in 1..=n {
+        for w in (weight[i]..=cap).rev() {            // BACKWARD: 0/1
+            k[w] = k[w].max(value[i] + k[w - weight[i]]);
+        }
+    }
+    k[cap]
+}
+
+// Edit-distance value in Theta(n) space: keep TWO rows, previous and current,
+// swapping after each row. Same fill, same answer -- no traceback.
+fn edit_distance_value(a: &amp;[u8], b: &amp;[u8]) -&gt; usize {
+    let (m, n) = (a.len(), b.len());
+    let mut prev: Vec&lt;usize&gt; = (0..=n).collect();     // row 0: insert all of b
+    let mut cur = vec![0usize; n + 1];
+    for i in 1..=m {
+        cur[0] = i;                                   // column 0: delete all
+        for j in 1..=n {
+            cur[j] = if a[i - 1] == b[j - 1] {
+                prev[j - 1]                           // match: free diagonal
+            } else {
+                1 + prev[j]                           // delete
+                    .min(cur[j - 1])                  // insert
+                    .min(prev[j - 1])                 // replace
+            };
+        }
+        std::mem::swap(&amp;mut prev, &amp;mut cur);          // rows swap roles
+    }
+    prev[n]                                           // the last computed row
+}</pre>
+<p class="ct-src">source: <code>code/dp/space-saving.cpp &middot; code/dp/space-saving.java &middot; code/dp/space-saving.py &middot; code/dp/space-saving.rs</code></p>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (two rows on the table just traced)</span>
+        <p>
+          Run the two-row fill on the very LCS instance of the traceback above,
+          \(A =\) <code>HEAP</code>, \(B =\) <code>HELP</code>. Each row is computed
+          from the previous one exactly as before; the difference is only that the
+          finished row is then dropped.
+        </p>
+        <table class="trace">
+          <tr><th class="lab">after</th><th>&ldquo;&rdquo;</th><th>H</th><th>E</th><th>L</th><th>P</th><th>memory holds</th></tr>
+          <tr><td class="lab">init (row 0)</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td>
+            <td class="lab">row 0</td></tr>
+          <tr><td class="lab">\(i=1\) (H)</td>
+            <td class="cell">0</td><td class="cell">1</td><td class="cell">1</td><td class="cell">1</td><td class="cell">1</td>
+            <td class="lab">rows 0, 1</td></tr>
+          <tr><td class="lab">\(i=2\) (E)</td>
+            <td class="cell">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell">2</td><td class="cell">2</td>
+            <td class="lab">rows 1, 2 (row 0 overwritten)</td></tr>
+          <tr><td class="lab">\(i=3\) (A)</td>
+            <td class="cell">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell">2</td><td class="cell">2</td>
+            <td class="lab">rows 2, 3 (row 1 overwritten)</td></tr>
+          <tr><td class="lab">\(i=4\) (P)</td>
+            <td class="cell">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell">2</td><td class="cell lt">3</td>
+            <td class="lab">rows 3, 4 (row 2 overwritten)</td></tr>
+        </table>
+        <p style="margin-bottom:0">
+          Every number matches the corresponding row of the full table, and the
+          answer \(3\) is identical; the \(5 \times 5 = 25\) stored integers have
+          become \(2 \times 5 = 10\), and
+          for \(m\) rows the saving is the whole factor of \(m\). What is gone is
+          the walk. The traceback above needed \(L[2][2]\) and \(L[1][1]\), both in
+          rows the fill has since reused, so from the surviving rows \(3\) and
+          \(4\) the letters <code>E</code> and <code>H</code> cannot be recovered.
+          The length survives because it lives in one cell; the subsequence does
+          not, because it lives in the whole table.
+        </p>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (one row in place, sweeping backward)</span>
+        <p>
+          Knapsack does better still, because each row reads only cells at
+          <em>smaller</em> capacities in the row above: one array, updated in place.
+          Take capacity \(W = 6\) and three items, \((v, w) = (3, 2)\), \((4, 3)\),
+          \((5, 4)\). Sweeping \(w\) downward, the row after item \(i\) is exactly
+          row \(i\) of the full \((n{+}1) \times (W{+}1)\) table.
+        </p>
+        <table class="trace">
+          <tr><th class="lab">\(w\)</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+          <tr><td class="lab">initial row</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td></tr>
+          <tr><td class="lab">after item 1 (3, 2)</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell">3</td><td class="cell">3</td><td class="cell">3</td><td class="cell">3</td><td class="cell">3</td></tr>
+          <tr><td class="lab">after item 2 (4, 3)</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell">3</td><td class="cell">4</td><td class="cell">4</td><td class="cell">7</td><td class="cell">7</td></tr>
+          <tr><td class="lab">after item 3 (5, 4)</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell">7</td><td class="cell lt">8</td></tr>
+        </table>
+        <p>
+          The answer \(8\) is items \(1\) and \(3\), weight \(2 + 4 = 6\), value
+          \(3 + 5 = 8\). Watch the inner sweep for item \(2\), starting from
+          \([0, 0, 3, 3, 3, 3, 3]\) and running \(w = 6, 5, 4, 3\):
+        </p>
+        <pre>  w=6:  max( K[6]=3,  4 + K[3]=3 )  =  max(3, 7)  =  7
+  w=5:  max( K[5]=3,  4 + K[2]=3 )  =  max(3, 7)  =  7
+  w=4:  max( K[4]=3,  4 + K[1]=0 )  =  max(3, 4)  =  4
+  w=3:  max( K[3]=3,  4 + K[0]=0 )  =  max(3, 4)  =  4
+                                    &rarr;  [0, 0, 3, 4, 4, 7, 7]</pre>
+        <p style="margin-bottom:0">
+          At \(w = 6\) the read of \(K[3]\) returns \(3\), the value from
+          <em>before</em> item \(2\) was considered, because \(w = 3\) is written
+          last. Sweep the same item forward instead, \(w = 3, 4, 5, 6\), and
+          \(K[3]\) becomes \(4\) first, so \(w = 6\) reads
+          \(4 + K[3] = 4 + 4 = 8\) and the row ends \([0, 0, 3, 4, 4, 7, 8]\):
+          item \(2\) packed twice, weight \(3 + 3 = 6\), value \(4 + 4 = 8\). One
+          item, two copies, from reversing a loop.
+        </p>
+      </div>
+      <div class="aside">
+        <span class="tag">The loop direction encodes the variant</span>
+        In the one-row knapsack, the backward sweep is not a stylistic choice;
+        it is the 0/1 semantics. Going right-to-left, \(K[w - w_i]\) has not
+        yet been touched this pass, so it still holds the <em>previous</em>
+        item-row&rsquo;s value: item \(i\) cannot combine with itself. Flip the loop
+        forward and \(K[w - w_i]\) may already include item \(i\), which is
+        precisely the <em>unbounded</em> knapsack. Smallest possible demonstration:
+        a single item of value \(3\), weight \(2\), capacity \(4\). Backward the row
+        ends \([0, 0, 3, 3, 3]\), the item once, value \(3\); forward it ends
+        \([0, 0, 3, 3, 6]\), the item twice, value \(6\). One character of
+        code, a different problem. (A favorite interview probe, for exactly that
+        reason.)
+      </div>
+      <h3>Value or solution: decide up front</h3>
+      <table>
+        <tr><th>you need</th><th>keep</th><th>space</th></tr>
+        <tr><td>just the optimal <strong>value</strong> (a distance, a max)</td><td>rolling row(s)</td><td>\(\Theta(n)\) / \(\Theta(W)\)</td></tr>
+        <tr><td>the actual <strong>solution</strong> (items, edits, path)</td><td>the full table, for the traceback</td><td>\(\Theta(mn)\) / \(\Theta(nW)\)</td></tr>
+      </table>
+      <p>
+        The rolling array destroys the very cells the traceback walks: a
+        genuine functionality trade, not a free optimization. State which side of it
+        an application needs before writing the fill loop. And if recursion feels
+        more natural than loops, the other implementation style (memoization; the
+        <a href="paradigm-dp-method.html#styles">Dynamic Programming Method</a> handout)
+        still
+        applies here: <em>memoize</em> the knapsack recurrence top-down,
+        <code>knap(i, w)</code> checking a \((n{+}1)\times(W{+}1)\) cache before
+        recursing on skip and (if it fits) take, and you get the same
+        \(\Theta(nW)\) bound while computing only the cells actually reachable from
+        \((n, W)\), which can be far fewer. Tabulation&rsquo;s reward is the rolling
+        row; memoization&rsquo;s is writing exactly the recurrence and no fill-order
+        reasoning. Both are &ldquo;the DP.&rdquo;
+      </p>
+      <div class="aside">
+        <span class="tag">Enrichment: both at once (Hirschberg)</span>
+        Remarkably, the trade can be beaten for the string DPs.
+        <strong>Hirschberg&rsquo;s algorithm</strong> recovers the full LCS or edit
+        <em>solution</em> in linear space by composing DP with divide-and-conquer
+        (the <a href="../sorting/paradigm-divide-and-conquer.html">Divide &amp; Conquer</a> handout&rsquo;s paradigm): run the
+        two-row fill forward over the top half of the table and backward over the
+        bottom half to find where the optimal path crosses the middle row
+        (linear space suffices for <em>values</em>), then recurse on the two
+        halves the crossing splits off. Total time stays \(\Theta(mn)\) (the
+        half-tables form a geometric series), space stays \(\Theta(n)\), and the
+        full alignment comes out. This is how genome-scale sequence aligners run in
+        memory that the full table could never fit. Not examinable, but a
+        beautiful example of two paradigms composing.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">2. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Below is the filled LCS table for \(A =\) <code>STACK</code> and
+          \(B =\) <code>TRACKS</code>, with the winning choice stored per cell.
+          Walk the traceback from the answer cell and give the subsequence. How
+          many steps does the walk take, and how many of them emit a character?
+          <pre>          ""    T     R     A     C     K     S
+    ""     0     0     0     0     0     0     0
+    S      0   &uarr;0    &uarr;0    &uarr;0    &uarr;0    &uarr;0    &#8598;1
+    T      0   &#8598;1    &larr;1    &larr;1    &larr;1    &larr;1    &uarr;1
+    A      0   &uarr;1    &uarr;1    &#8598;2    &larr;2    &larr;2    &larr;2
+    C      0   &uarr;1    &uarr;1    &uarr;2    &#8598;3    &larr;3    &larr;3
+    K      0   &uarr;1    &uarr;1    &uarr;2    &uarr;3    &#8598;4    &larr;4</pre>
+          <details>
+            <summary>solution</summary>
+            Start at \(L[5][6] = 4\).
+            <pre>  (5,6) &larr;  no output      &rarr; (5,5)
+  (5,5) &#8598;  emit K         &rarr; (4,4)
+  (4,4) &#8598;  emit C         &rarr; (3,3)
+  (3,3) &#8598;  emit A         &rarr; (2,2)
+  (2,2) &larr;  no output      &rarr; (2,1)
+  (2,1) &#8598;  emit T         &rarr; (1,0)   column 0: stop</pre>
+            Six steps, four of them emitting, giving <code>TACK</code> of length
+            \(4 = L[5][6]\). Two observations. The walk stops on reaching column
+            \(0\), not on reaching \((0,0)\): either index hitting a base edge ends
+            it, and here row \(1\) is never entered. And the match of
+            <code>S</code> at \(L[1][6]\), a perfectly real
+            <span class="mono">&#8598;</span> in the table, is not on the path:
+            using it would force abandoning <code>TACK</code>, since <code>S</code>
+            occurs before the others in \(A\) but after them in \(B\). A stored
+            arrow records what <em>this</em> cell chose, not what is globally
+            reachable, which is exactly why the traceback must be a walk and not a
+            scan.
+          </details>
+        </li>
+        <li>
+          Space optimization, carefully. (a) The two-row LCS trick keeps only the
+          current and previous rows. What is its space, and what capability is
+          lost? (b) Can rod cutting&rsquo;s \(\mathrm{best}[]\) be similarly
+          reduced to \(O(1)\) space, as Fibonacci&rsquo;s was? Justify from the
+          recurrences.
+          <details>
+            <summary>solution</summary>
+            (a) Two rows of the shorter dimension: \(\Theta(\min(m,n))\), with
+            time still \(\Theta(mn)\). Lost: the traceback: recovering the
+            subsequence needs cells from <em>every</em> row, which have been
+            overwritten; only the length survives. (b) No. Fibonacci&rsquo;s
+            recurrence reaches back a <em>fixed</em> distance
+            (\(\mathrm{fib}(i)\) needs only \(i{-}1\) and \(i{-}2\)), so a
+            two-cell window suffices. Rod cutting&rsquo;s
+            \(\mathrm{best}[\ell] = \max_i(\mathrm{price}[i] +
+            \mathrm{best}[\ell - i])\) reaches back to <em>every</em> smaller
+            index, all the way to \(\mathrm{best}[0]\), so all \(\ell\) earlier
+            cells are live at every step: \(\Theta(n)\) space is inherent to this
+            recurrence. The lesson: the space optimization is a property of the
+            <em>dependency pattern</em>, not of DP in general; read it off
+            the recurrence.
+          </details>
+        </li>
+        <li>
+          A classmate &ldquo;simplifies&rdquo; the one-row knapsack of &sect;1 by
+          iterating \(w\) from <code>weight[i]</code> <em>up</em> to \(W\). The code
+          runs and returns plausible numbers. What does it actually compute?
+          Demonstrate on a single item of value \(3\), weight \(2\), with \(W = 4\).
+          <details>
+            <summary>solution</summary>
+            It computes the <em>unbounded</em> knapsack. Sweeping forward,
+            \(K[w - w_i]\) may already have been updated <em>this same pass</em>, so
+            it can already include item \(i\); the item combines with itself.
+            On the single item: forward, \(K[2] = \max(0, 3 + K[0]) = 3\), then
+            \(K[4] = \max(0, 3 + K[2]) = 6\), the item taken twice; final row
+            \([0, 0, 3, 3, 6]\). Backward, \(K[4]\) is computed first from the
+            untouched \(K[2] = 0\), giving \(3\); final row \([0, 0, 3, 3, 3]\),
+            the correct 0/1 answer. The bug is nasty precisely because
+            nothing crashes: the code solves a <em>different problem</em>
+            correctly.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Traceback &amp; Space-Saving v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

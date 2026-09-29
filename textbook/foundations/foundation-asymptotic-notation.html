@@ -1,0 +1,1117 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Asymptotic Notation.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Asymptotic Notation - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22;
+        --dim: #5c6270;
+        --line: #d7dbe3;
+        --bg: #ffffff;
+        --accent: #0a7d4d;
+        --accentbg: #eaf6ef;
+        --box: #f6f8fb;
+        --warn: #9a5b00;
+        --warnbg: #fff5e6;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #eef0f4;
+        color: var(--ink);
+        font:
+          16px/1.62 "Charter",
+          "Iowan Old Style",
+          "Palatino",
+          Georgia,
+          serif;
+      }
+      .page {
+        max-width: 820px;
+        margin: 28px auto;
+        background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002;
+        border-radius: 4px;
+      }
+      h1 {
+        font-size: 27px;
+        line-height: 1.25;
+        margin: 0 0 4px;
+      }
+      .subtitle {
+        color: var(--dim);
+        font-size: 15.5px;
+        margin: 0 0 4px;
+      }
+      .src {
+        color: var(--dim);
+        font-size: 13.5px;
+        font-style: italic;
+        margin: 0 0 26px;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 18px;
+      }
+      h2 {
+        font-size: 20px;
+        margin: 34px 0 10px;
+        padding-top: 6px;
+      }
+      h3 {
+        font-size: 16.5px;
+        margin: 22px 0 6px;
+        color: #2a2d36;
+      }
+      p {
+        margin: 10px 0;
+      }
+      a {
+        color: var(--accent);
+      }
+      code,
+      .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.92em;
+        background: #f1f3f7;
+        border-radius: 4px;
+        padding: 0.5px 4px;
+      }
+      .lead {
+        font-size: 16.5px;
+        color: #33363f;
+      }
+      .def,
+      .thm,
+      .ex,
+      .aside {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 13px 16px;
+        margin: 16px 0;
+        background: var(--box);
+      }
+      .def {
+        border-left: 4px solid var(--accent);
+        background: var(--accentbg);
+      }
+      .thm {
+        border-left: 4px solid #1f5fb0;
+        background: #eef4fc;
+      }
+      .ex {
+        border-left: 4px solid #777;
+        background: #f6f7f9;
+      }
+      .aside {
+        border-left: 4px solid var(--warn);
+        background: var(--warnbg);
+      }
+      .tag {
+        font-variant: small-caps;
+        letter-spacing: 0.4px;
+        font-weight: 700;
+        font-family: system-ui, sans-serif;
+        font-size: 13px;
+        margin-right: 8px;
+      }
+      .def .tag {
+        color: var(--accent);
+      }
+      .thm .tag {
+        color: #1f5fb0;
+      }
+      .ex .tag {
+        color: #555;
+      }
+      .aside .tag {
+        color: var(--warn);
+      }
+      .proof {
+        margin: 10px 0 4px;
+        padding-left: 14px;
+        border-left: 2px solid var(--line);
+        color: #2c2f37;
+      }
+      .proof .qed {
+        float: right;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 14px 0;
+        font-family: system-ui, sans-serif;
+        font-size: 14.5px;
+      }
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 7px 10px;
+        text-align: left;
+      }
+      th {
+        background: #f0f2f6;
+      }
+      figure {
+        margin: 18px 0 6px;
+        text-align: center;
+      }
+      figure img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: #fff;
+        padding: 6px;
+      }
+      figcaption {
+        font-family: system-ui, sans-serif;
+        font-size: 13px;
+        color: var(--dim);
+        margin: 7px auto 0;
+        max-width: 92%;
+      }
+      details {
+        margin: 8px 0 8px 2px;
+        font-size: 15px;
+      }
+      summary {
+        cursor: pointer;
+        color: var(--accent);
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+      }
+      details[open] summary {
+        margin-bottom: 6px;
+      }
+      ul,
+      ol {
+        margin: 8px 0;
+        padding-left: 24px;
+      }
+      li {
+        margin: 5px 0;
+      }
+      footer {
+        margin-top: 40px;
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
+        color: var(--dim);
+        font-size: 13px;
+        font-family: system-ui, sans-serif;
+      }
+      .toc {
+        font-family: system-ui, sans-serif;
+        font-size: 14.5px;
+        background: var(--box);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 18px;
+        margin: 18px 0;
+      }
+      .toc ol {
+        margin: 4px 0;
+        padding-left: 22px;
+      }
+      .toc a {
+        text-decoration: none;
+      }
+      @media print {
+        body {
+          background: #fff;
+        }
+        .page {
+          box-shadow: none;
+          margin: 0;
+          max-width: none;
+        }
+        details {
+          display: block;
+        }
+        details summary {
+          display: none;
+        }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+      <h1>
+        Asymptotic Notation:<br />\(O\), \(\Omega\), \(\Theta\) as Sets of
+        Functions
+      </h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        Course notes. Precise definitions of \(O\), \(\Omega\), \(\Theta\),
+        \(o\), \(\omega\) as sets of functions, the relationships among them,
+        how they apply to algorithms whose cost depends on the input, and
+        exercises with solutions.
+      </div>
+
+      <p class="lead">
+        The single most clarifying idea in this topic is that
+        <strong
+          >each of \(O(g)\), \(\Omega(g)\), \(\Theta(g)\) is a
+          <em>set of functions</em></strong
+        >. A function \(f\) either <em>belongs</em> to the set or it does not.
+        That is a crisp true or false question, settled by exhibiting constants
+        or ruling them out. Everything else follows from this.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#setup">What the notation describes</a></li>
+          <li>
+            <a href="#defs"
+              >The three definitions: \(\Theta\), \(O\), \(\Omega\)</a
+            >
+          </li>
+          <li>
+            <a href="#member"
+              >Membership versus equality: \(f \in O(g)\) or \(f = O(g)\)?</a
+            >
+          </li>
+          <li><a href="#word">On the word “asymptotic”</a></li>
+          <li>
+            <a href="#poly"
+              >Every polynomial of degree \(k\) is in \(\Theta(n^k)\)</a
+            >
+          </li>
+          <li><a href="#thm">The theorem \(\Theta = O \cap \Omega\)</a></li>
+          <li><a href="#cases">Best, average, and worst case</a></li>
+          <li>
+            <a href="#ow">\(o\) and \(\omega\): bounds that are not tight</a>
+          </li>
+          <li><a href="#compare">Comparing functions</a></li>
+          <li><a href="#data">Measuring growth from data</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <h2 id="setup">1. What the notation describes</h2>
+      <p>
+        Asymptotic notation describes
+        <strong>functions</strong> \(f:\mathbb{N}\to\mathbb{R}\), most often a
+        running time or a memory footprint expressed as a function of the input
+        size \(n\). We are interested in the <em>order of growth</em> of \(f\):
+        how \(f\) scales as \(n\) becomes large, ignoring constant factors and
+        the behavior at small \(n\). For large inputs the constant factors and
+        lower order terms are dominated by the growth in \(n\) itself, so
+        discarding them keeps the part of the cost that actually matters and
+        makes the description independent of the machine and the implementation.
+      </p>
+      <div class="aside">
+        <span class="tag">Standing assumption</span> Every function placed
+        inside this notation is assumed
+        <strong>asymptotically nonnegative</strong>, meaning \(f(n)\ge 0\) for
+        all sufficiently large \(n\). Without this assumption the sets defined
+        below can be empty. Running times and memory sizes are nonnegative, so
+        the assumption holds automatically in our setting.
+      </div>
+
+      <h2 id="defs">2. The three definitions: \(\Theta\), \(O\), \(\Omega\)</h2>
+      <p>
+        Fix a reference function \(g\) (for example \(n\), \(n\lg n\), or
+        \(n^2\)). Each notation below names a set of functions defined by an
+        inequality that holds for all sufficiently large \(n\), up to constant
+        factors.
+      </p>
+
+      <div class="def">
+        <span class="tag">Definition (Theta)</span> \[ \Theta(g(n)) = \bigl\{\,
+        f(n) : \exists\, c_1,c_2,n_0 \gt 0 \text{ such that } 0 \le c_1 g(n) \le
+        f(n) \le c_2 g(n)\ \text{ for all } n \ge n_0 \,\bigr\}. \] \(\Theta\)
+        gives a <strong>tight</strong> bound. A function \(f\) is in
+        \(\Theta(g)\) when it is squeezed between two fixed multiples of \(g\)
+        for large \(n\), so \(f\) equals \(g\) to within constant factors.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (Big-O)</span> \[ O(g(n)) = \bigl\{\, f(n)
+        : \exists\, c,n_0 \gt 0 \text{ such that } 0 \le f(n) \le c\,g(n)\
+        \text{ for all } n \ge n_0 \,\bigr\}. \] \(O\) gives an
+        <strong>upper</strong> bound: one constant, one side. It says \(f\)
+        grows no faster than \(g\), to within a constant factor. It does not
+        claim the bound is tight.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (Big-Omega)</span> \[ \Omega(g(n)) =
+        \bigl\{\, f(n) : \exists\, c,n_0 \gt 0 \text{ such that } 0 \le c\,g(n)
+        \le f(n)\ \text{ for all } n \ge n_0 \,\bigr\}. \] \(\Omega\) gives a
+        <strong>lower</strong> bound: \(f\) grows at least as fast as \(g\), to
+        within a constant factor.
+      </div>
+
+      <div class="ex">
+        <span class="tag">Example (membership)</span>
+        \(\tfrac12 n^2 - 3n \in \Theta(n^2)\). We must produce \(c_1,c_2,n_0\)
+        with \(c_1 n^2 \le \tfrac12 n^2 - 3n \le c_2 n^2\) for all \(n\ge n_0\).
+        Dividing by \(n^2\) gives \(c_1 \le \tfrac12 - \tfrac3n \le c_2\). The
+        right inequality holds for all \(n\ge 1\) with \(c_2 = \tfrac12\). The
+        left inequality holds for all \(n\ge 7\) with \(c_1 = \tfrac{1}{14}\).
+        So \(c_1=\tfrac1{14}\), \(c_2=\tfrac12\), \(n_0=7\) work. It is enough
+        that some such constants exist.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (non-membership)</span>
+        \(6n^3 \notin O(n^2)\). Suppose for contradiction that there exist
+        \(c_2,n_0 \gt 0\) with \(6n^3 \le c_2 n^2\) for all \(n\ge n_0\).
+        Dividing by \(n^2\), it follows that \(n \le c_2/6\) for all \(n \ge
+        n_0\). This is a contradiction, since \(c_2\) is constant while \(n\)
+        grows without bound. Therefore \(6n^3\) is not in \(O(n^2)\), and in
+        particular not in \(\Theta(n^2)\).
+      </div>
+
+      <h2 id="member">
+        3. Membership versus equality: \(f \in O(g)\) or \(f = O(g)\)?
+      </h2>
+      <p>
+        Since \(O(g)\) is a <em>set</em> of functions, the precise statement
+        that \(g\) is an asymptotic upper bound for \(f\) is the membership \(f
+        \in O(g)\). This is the form to prefer when you want to be unambiguous,
+        and it is the form used throughout these notes.
+      </p>
+      <p>
+        The form \(f = O(g)\) is a widely used shorthand for the same
+        membership. It is convenient, especially inside a larger formula, but it
+        is a deliberate abuse of the equals sign and behaves differently from
+        ordinary equality in two ways. First, it is read only from left to
+        right: we write \(n = O(n^2)\), but we never write \(O(n^2) = n\).
+        Second, it is not symmetric, so \(f = O(g)\) does not allow swapping the
+        two sides. When asymptotic notation appears inside a formula, as in
+        \(2n^2 + 3n + 1 = 2n^2 + \Theta(n)\), the \(\Theta(n)\) term stands for
+        <em>some</em> function in the set \(\Theta(n)\), here the function
+        \(3n+1\). The short answer to the question in the heading: \(f \in
+        O(g)\) is the literally correct statement, and \(f = O(g)\) is accepted
+        shorthand for it.
+      </p>
+
+      <h2 id="word">4. On the word “asymptotic”</h2>
+      <p>
+        In calculus an <em>asymptote</em> is a line that a curve approaches so
+        that the gap between them tends to zero. The curve \(y = 1/x\)
+        approaches the \(x\)-axis in this sense. One might therefore expect
+        “asymptotic” here to mean that the difference between \(f\) and its
+        bound tends to zero. That is not what these definitions say.
+      </p>
+      <div class="aside">
+        <span class="tag">Reading of the term</span> In this subject,
+        “asymptotic” means only “for all sufficiently large \(n\),” that is, the
+        behavior in the regime where \(n\) is large, always up to constant
+        factors. The definitions control the
+        <strong>ratio</strong> \(f(n)/g(n)\), keeping it between constants or
+        above or below a constant. They say nothing about a vanishing
+        difference. Read “asymptotically” as “once \(n\) is large enough,” not
+        as “approaching arbitrarily closely.”
+      </div>
+      <p>
+        For instance, \(f(n) = 2n^2\) and \(g(n) = n^2\) satisfy \(f \in
+        \Theta(g)\), yet the difference \(f(n) - g(n) = n^2\) grows without
+        bound. The gap does not vanish. What stays controlled is the ratio,
+        which is constantly equal to \(2\). The notation captures sameness of
+        growth rate, not closeness of values.
+      </p>
+
+      <h2 id="poly">
+        5. Every polynomial of degree \(k\) is in \(\Theta(n^k)\)
+      </h2>
+      <div class="thm">
+        <span class="tag">Theorem (polynomials)</span>
+        Let \(p(n) = a_k n^k + a_{k-1}n^{k-1} + \cdots + a_1 n + a_0\) with
+        \(a_k \gt 0\). Then \(p \in \Theta(n^k)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Let \(A = |a_0| + |a_1| + \cdots + |a_{k-1}|\)
+        be the sum of the absolute values of the non-leading coefficients. If
+        \(A = 0\) then \(p(n) = a_k n^k\) and the claim is immediate, so assume
+        \(A \gt 0\). <br /><em>Upper bound.</em> For \(n \ge 1\) and each \(i
+        \le k\) we have \(n^i \le n^k\). Therefore \[ p(n) \le |a_k|n^k +
+        |a_{k-1}|n^{k-1} + \cdots + |a_0| \le \bigl(|a_k| + A\bigr)n^k = (a_k +
+        A)\,n^k . \] <em>Lower bound.</em> For \(n \ge 1\), using \(n^i \le
+        n^{k-1}\) for \(i \le k-1\), \[ p(n) = a_k n^k + \sum_{i=0}^{k-1} a_i
+        n^i \;\ge\; a_k n^k - A\,n^{k-1} = n^{k-1}\bigl(a_k n - A\bigr). \] When
+        \(n \ge 2A/a_k\) we have \(a_k n \ge 2A\), hence \(a_k n - A \ge
+        \tfrac{a_k}{2}n\), and so \(p(n) \ge n^{k-1}\cdot \tfrac{a_k}{2}n =
+        \tfrac{a_k}{2} n^k\). <br />Taking \(c_1 = \tfrac{a_k}{2}\), \(c_2 = a_k
+        + A\), and \(n_0 = \max\!\bigl(1,\, 2A/a_k\bigr)\), we obtain \(0 \le
+        c_1 n^k \le p(n) \le c_2 n^k\) for all \(n \ge n_0\). Therefore \(p \in
+        \Theta(n^k)\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        A constant function is a polynomial of degree \(0\), so any constant is
+        in \(\Theta(n^0) = \Theta(1)\).
+      </p>
+
+      <h2 id="thm">6. The theorem \(\Theta = O \cap \Omega\)</h2>
+      <div class="thm">
+        <span class="tag">Theorem</span>
+        For every function \(g\), \(\;\Theta(g) = O(g) \cap \Omega(g)\).
+        Equivalently, \(f \in \Theta(g)\) if and only if \(f \in O(g)\) and \(f
+        \in \Omega(g)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong>
+        <br /><em>\(\Theta(g) \subseteq O(g)\cap\Omega(g)\).</em> Let \(f \in
+        \Theta(g)\). There exist positive constants \(c_1,c_2,n_0\) with \(0 \le
+        c_1 g(n) \le f(n) \le c_2 g(n)\) for all \(n \ge n_0\). The inequality
+        \(0 \le f(n) \le c_2 g(n)\) shows \(f \in O(g)\). The inequality \(0 \le
+        c_1 g(n) \le f(n)\) shows \(f \in \Omega(g)\). Hence \(f \in
+        O(g)\cap\Omega(g)\). <br /><em
+          >\(O(g)\cap\Omega(g) \subseteq \Theta(g)\).</em
+        >
+        Let \(f \in O(g)\cap\Omega(g)\). Then there are \(c_2,n_2\) with \(f(n)
+        \le c_2 g(n)\) for \(n \ge n_2\), and \(c_1,n_1\) with \(c_1 g(n) \le
+        f(n)\) for \(n \ge n_1\). Put \(n_0 = \max(n_1,n_2)\). For all \(n \ge
+        n_0\) both inequalities hold, so \(0 \le c_1 g(n) \le f(n) \le c_2
+        g(n)\). Hence \(f \in \Theta(g)\). <br />Each set is contained in the
+        other, so they are equal. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        In particular, taking \(g(n) = n^k\), the theorem of §5 shows every
+        degree-\(k\) polynomial lies in \(\Theta(n^k)\), and therefore in both
+        \(O(n^k)\) and \(\Omega(n^k)\).
+      </p>
+
+      <h2 id="cases">7. Best, average, and worst case</h2>
+      <p>
+        The running time of an algorithm is usually <em>not</em> determined by
+        \(n\) alone. Two different inputs of the same size \(n\) can take
+        different amounts of time. So “the running time” is not a single
+        function of \(n\), and we cannot directly place it in \(O\), \(\Omega\),
+        or \(\Theta\), which are defined for functions of \(n\). We resolve this
+        by summarizing the spread of running times with three functions, each of
+        which <em>is</em> a function of \(n\):
+      </p>
+      <ul>
+        <li>
+          the <strong>worst-case</strong> time \(T_{\text{worst}}(n)\), the
+          maximum running time over all inputs of size \(n\);
+        </li>
+        <li>
+          the <strong>best-case</strong> time \(T_{\text{best}}(n)\), the
+          minimum running time over all inputs of size \(n\);
+        </li>
+        <li>
+          the <strong>average-case</strong> time \(T_{\text{avg}}(n)\), the mean
+          running time over inputs of size \(n\) under a stated distribution.
+        </li>
+      </ul>
+      <p>
+        Each of these is a function of \(n\), so each can be described with
+        \(O\), \(\Omega\), or \(\Theta\). Choosing a case selects
+        <em>which function</em> you describe; choosing one of \(O\), \(\Omega\),
+        \(\Theta\) describes that function. The two choices are independent.
+      </p>
+
+      <h3>An example: a simple sort</h3>
+      <p>
+        Consider a sort such as insertion sort, or bubble sort with the standard
+        early stop. On an input that is already in order it does a single linear
+        pass and runs in \(\Theta(n)\) time. On an input in reverse order it
+        does the maximum amount of work and runs in \(\Theta(n^2)\) time. So
+      </p>
+      <table>
+        <tr>
+          <th>quantity</th>
+          <th>best case</th>
+          <th>average case</th>
+          <th>worst case</th>
+        </tr>
+        <tr>
+          <td>running time of the sort</td>
+          <td>\(\Theta(n)\)</td>
+          <td>\(\Theta(n^2)\)</td>
+          <td>\(\Theta(n^2)\)</td>
+        </tr>
+      </table>
+      <p>
+        The average-case entry can be argued in one line. On a uniformly random
+        permutation, each of the \(\binom{n}{2}\) pairs of elements is out of
+        order with probability \(\tfrac12\), so the expected number of
+        <em>inversions</em> (out-of-order pairs, each of which such a sort must
+        undo with one adjacent swap) is
+        \(\tfrac12\binom{n}{2} = \tfrac{n(n-1)}{4} \in \Theta(n^2)\). The average
+        input is quadratically disordered, so the average case shares the worst
+        case&rsquo;s order.
+      </p>
+
+      <h3>Can we say the sort “has a \(\Theta\) order”?</h3>
+      <p>
+        Only relative to a fixed case. The statement “the
+        <em>worst-case</em> running time of the sort is \(\Theta(n^2)\)” is true
+        and tight, because \(T_{\text{worst}}(n)\) really does grow like
+        \(n^2\). The statement “the <em>best-case</em> running time is
+        \(\Theta(n)\)” is true and tight as well. What we cannot do is attach a
+        single \(\Theta\) to the <em>unqualified</em> running time, because
+        across inputs of size \(n\) it ranges from order \(n\) to order \(n^2\);
+        there is no single function that it always equals to within constant
+        factors. The most we can say about the unqualified running time is that
+        it is in \(O(n^2)\), since it is never more than a constant times
+        \(n^2\), and in \(\Omega(n)\), since it is never less than a constant
+        times \(n\). Both of these are as tight as possible.
+      </p>
+      <div class="aside">
+        <span class="tag">Two careful statements</span>
+        <p style="margin-top: 2px">
+          A \(\Theta(n^2)\) bound on the <em>worst-case</em> running time does
+          <strong>not</strong> imply a \(\Theta(n^2)\) bound on the running time
+          for <em>every</em> input. When the input is already sorted, the time
+          is \(\Theta(n)\), not \(\Theta(n^2)\).
+        </p>
+        <p>
+          The unqualified running time therefore lies in both \(O(n^2)\) and
+          \(\Omega(n)\), and these bounds are as tight as possible. The
+          unqualified running time is <strong>not</strong> \(\Omega(n^2)\),
+          because the already-sorted input runs in \(\Theta(n)\) time. Yet it is
+          not contradictory to say that the <em>worst-case</em> running time is
+          \(\Omega(n^2)\), because there is an input (the reversed one) that
+          forces \(\Theta(n^2)\) time. The two statements concern two different
+          functions: the running time on every input, and the worst-case running
+          time \(T_{\text{worst}}(n)\).
+        </p>
+      </div>
+
+      <h2 id="ow">8. \(o\) and \(\omega\): bounds that are not tight</h2>
+      <p>
+        An \(O\) bound may or may not be tight. The bound \(2n^2 \in O(n^2)\) is
+        tight, while \(2n \in O(n^2)\) is not. To say that an upper bound is
+        <em>strictly</em> loose, meaning \(f\) is of strictly smaller order than
+        \(g\), we use little-oh. The definitions resemble those of \(O\) and
+        \(\Omega\), but “for some constant \(c\)” is replaced by “for every
+        constant \(c\).”
+      </p>
+      <div class="def">
+        <span class="tag">Definition (little-oh)</span>
+        \[ o(g(n)) = \bigl\{\, f(n) : \text{for every constant } c \gt 0,\
+        \exists\, n_0 \gt 0 \text{ such that } 0 \le f(n) \lt c\,g(n)\ \text{
+        for all } n \ge n_0 \,\bigr\}. \]
+      </div>
+      <div class="def">
+        <span class="tag">Definition (little-omega)</span>
+        \[ \omega(g(n)) = \bigl\{\, f(n) : \text{for every constant } c \gt 0,\
+        \exists\, n_0 \gt 0 \text{ such that } 0 \le c\,g(n) \lt f(n)\ \text{
+        for all } n \ge n_0 \,\bigr\}. \] Equivalently, \(f \in \omega(g)\) if
+        and only if \(g \in o(f)\).
+      </div>
+      <p>
+        The contrast with \(O\) is exactly the quantifier on \(c\). In \(f \in
+        O(g)\) the bound \(0 \le f(n) \le c\,g(n)\) holds for
+        <em>some</em> constant \(c\). In \(f \in o(g)\) the bound \(0 \le f(n)
+        \lt c\,g(n)\) holds for <em>every</em> constant \(c\). Intuitively, \(f
+        \in o(g)\) means \(f\) becomes insignificant relative to \(g\) as \(n\)
+        grows, and \(f \in \omega(g)\) means \(f\) becomes arbitrarily large
+        relative to \(g\). These match the limits
+      </p>
+      \[ f \in o(g)\ \Rightarrow\ \lim_{n\to\infty}\frac{f(n)}{g(n)} = 0,
+      \qquad\qquad f \in \omega(g)\ \Rightarrow\
+      \lim_{n\to\infty}\frac{f(n)}{g(n)} = \infty, \]
+      <p>
+        when the limit exists. Some authors take the first limit as the
+        definition of \(o\). Examples: \(2n \in o(n^2)\), since the ratio
+        \(2n/n^2 = 2/n\) tends to \(0\); but \(2n^2 \notin o(n^2)\), since the
+        ratio is constantly \(2\), so the required inequality fails for every
+        \(c \le 2\). Likewise \(n^2/2 \in \omega(n)\), since
+        \((n^2/2)/n = n/2\) grows without bound; but \(n^2/2 \notin
+        \omega(n^2)\), since the ratio is constantly \(\tfrac12\), so the
+        inequality fails for every \(c \ge \tfrac12\).
+      </p>
+
+      <h2 id="compare">9. Comparing functions</h2>
+      <p>
+        Many relational properties of real numbers carry over to asymptotic
+        comparisons. Assume \(f\), \(g\), \(h\) are asymptotically positive.
+      </p>
+      <ul>
+        <li>
+          <strong>Transitivity</strong> holds for all five relations. For
+          example, \(f \in O(g)\) and \(g \in O(h)\) imply \(f \in O(h)\), and
+          likewise for \(\Theta\), \(\Omega\), \(o\), \(\omega\).
+        </li>
+        <li>
+          <strong>Reflexivity</strong> holds for \(\Theta\), \(O\), \(\Omega\):
+          \(f \in \Theta(f)\), \(f \in O(f)\), \(f \in \Omega(f)\). It fails for
+          \(o\) and \(\omega\), since \(f \notin o(f)\).
+        </li>
+        <li>
+          <strong>Symmetry</strong> holds only for \(\Theta\): \(f \in
+          \Theta(g)\) if and only if \(g \in \Theta(f)\).
+        </li>
+        <li>
+          <strong>Transpose symmetry</strong> links the upper and lower
+          notations: \(f \in O(g)\) if and only if \(g \in \Omega(f)\), and \(f
+          \in o(g)\) if and only if \(g \in \omega(f)\).
+        </li>
+      </ul>
+      <div class="proof">
+        <strong>Proof (two representatives; the rest follow the same
+        pattern).</strong> <em>Transitivity of \(O\).</em> If \(f(n) \le
+        c\,g(n)\) for all \(n \ge n_1\) and \(g(n) \le c'\,h(n)\) for all \(n
+        \ge n_2\), then \(f(n) \le c\,c'\,h(n)\) for all \(n \ge
+        \max(n_1,n_2)\): the constants multiply, the thresholds combine by
+        taking the maximum, and \(c\,c'\) and \(\max(n_1,n_2)\) witness \(f \in
+        O(h)\). <em>Transpose symmetry of \(O\) and \(\Omega\).</em> The
+        inequality \(0 \le f(n) \le c\,g(n)\) with \(c \gt 0\) is the same
+        statement as \(0 \le \tfrac1c f(n) \le g(n)\), so \(f \in O(g)\) with
+        witnesses \((c, n_0)\) exactly when \(g \in \Omega(f)\) with witnesses
+        \((\tfrac1c, n_0)\). Each remaining property is the same one-line
+        manipulation of the defining inequalities: divide by a positive
+        constant, or chain two inequalities past a shared threshold.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        These properties suggest an analogy between comparing the growth of
+        \(f\) and \(g\) and comparing two real numbers \(a\) and \(b\):
+      </p>
+      <table>
+        <tr>
+          <th>relation</th>
+          <th>is like</th>
+          <th>relation</th>
+          <th>is like</th>
+        </tr>
+        <tr>
+          <td>\(f \in O(g)\)</td>
+          <td>\(a \le b\)</td>
+          <td>\(f \in o(g)\)</td>
+          <td>\(a \lt b\)</td>
+        </tr>
+        <tr>
+          <td>\(f \in \Omega(g)\)</td>
+          <td>\(a \ge b\)</td>
+          <td>\(f \in \omega(g)\)</td>
+          <td>\(a \gt b\)</td>
+        </tr>
+        <tr>
+          <td>\(f \in \Theta(g)\)</td>
+          <td>\(a = b\)</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+      <p>
+        We say \(f\) is asymptotically smaller than \(g\) when \(f \in o(g)\),
+        and asymptotically larger when \(f \in \omega(g)\).
+      </p>
+      <div class="aside">
+        <span class="tag">Where the analogy breaks</span> One property of real
+        numbers does not carry over: <strong>trichotomy</strong>. For real
+        numbers \(a\) and \(b\), exactly one of \(a \lt b\), \(a = b\), \(a \gt
+        b\) holds. For functions, two functions need not be comparable at all.
+        It can happen that neither \(f \in O(g)\) nor \(f \in \Omega(g)\) holds.
+        For example, \(n\) and \(n^{\,1+\sin n}\) cannot be compared, since the
+        exponent \(1+\sin n\) oscillates between \(0\) and \(2\) and takes every
+        value in between. Asymptotic order is a partial order, not a total one.
+      </div>
+
+      <h2 id="data">10. Measuring growth from data</h2>
+      <p>
+        An order of growth can also be <em>estimated from measurements</em>, not
+        only established by proof. The central tool is the log-log plot.
+        Measurement and analysis are complementary: measurement estimates the
+        order and catches mistakes, while analysis proves the bound.
+      </p>
+
+      <h3>The key fact about log-log plots</h3>
+      <div class="thm">
+        <span class="tag">Fact (power laws are lines on log-log)</span>
+        If \(T(n) = c\,n^b\) with \(c \gt 0\), then plotting \(\log T\) against
+        \(\log n\) gives a straight line of slope \(b\) and intercept \(\log
+        c\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Take logarithms of \(T(n) = c\,n^b\): \(\;\log
+        T(n) = \log c + b\,\log n\). Writing \(X = \log n\) and \(Y = \log T\),
+        this is \(Y = (\log c) + b\,X\), the equation of a line with slope
+        \(b\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        So a straight line on log-log axes is the signature of a power law, and
+        its <strong>slope is the exponent</strong>. To estimate the order of a
+        power-law cost, measure it, plot it on log-log axes, and read the slope.
+        The base of the logarithm does not matter, since changing base scales
+        both axes by the same constant and leaves the slope unchanged.
+      </p>
+
+      <h3>How the prototype functions look</h3>
+      <figure>
+        <img
+          src="figs/scalings.svg"
+          alt="Three side-by-side panels plot the same six prototype functions, 1, log n, n, n log n, n squared, and 2 to the n, for n from 0 to 100, with a shared color legend below. In the left panel, on linear axes with the value axis running 0 to 2000, the curve for 2 to the n shoots off the top almost immediately, n squared leaves the frame partway across, and the other four functions are squashed into a nearly flat band along the bottom, indistinguishable from one another. In the middle panel, semi-log axes with a logarithmic y axis from 10 to the 0 up to about 10 to the 8, the curve for 2 to the n becomes a straight line while the power and logarithmic curves bend concave down. In the right panel, log-log axes with both scales logarithmic, the power laws become straight lines, n with slope 1 and n squared with slope 2, n log n is almost a slope-1 line with a slight upward bend, log n flattens toward slope 0, the constant 1 is a horizontal line, and 2 to the n curves upward convexly."
+        />
+        <figcaption>
+          The same six functions on three axis scalings. On linear axes only the
+          fastest growth is visible. Each logarithmic rescaling straightens a
+          different family.
+        </figcaption>
+      </figure>
+      <p>
+        On linear axes only the fastest-growing function is visible; the slower
+        ones are pressed against the axis and cannot be told apart, while the
+        fast ones leave the frame. Linear axes are nearly useless for comparing
+        growth. Two logarithmic rescalings each turn a different family into
+        straight lines.
+      </p>
+      <ul>
+        <li>
+          <strong>Semi-log</strong> (\(\log y\) against linear \(n\)): an
+          exponential \(c\,a^n\) becomes a straight line, since \(\log y = \log
+          c + (\log a)\,n\), with slope \(\log a\). Power laws appear concave
+          down. A straight line on semi-log is the signature of
+          <em>exponential</em> growth.
+        </li>
+        <li>
+          <strong>Log-log</strong> (\(\log y\) against \(\log n\)): a power law
+          \(c\,n^b\) becomes a straight line of slope \(b\), by the fact above.
+          Exponentials curve upward (convex). Logarithms flatten toward slope
+          \(0\). The function \(n\log n\) is nearly a straight line of slope
+          \(1\) that bends upward very slowly, since \(\log(n\log n) = \log n +
+          \log\log n\).
+        </li>
+      </ul>
+      <table>
+        <tr>
+          <th>function</th>
+          <th>semi-log (\(\log y\), linear \(n\))</th>
+          <th>log-log</th>
+        </tr>
+        <tr>
+          <td>\(c\,a^{n}\) (exponential)</td>
+          <td>straight line, slope \(\log a\)</td>
+          <td>convex, curves upward</td>
+        </tr>
+        <tr>
+          <td>\(c\,n^{b}\) (power)</td>
+          <td>concave down</td>
+          <td>straight line, slope \(b\)</td>
+        </tr>
+        <tr>
+          <td>\(c\log n\)</td>
+          <td>concave down</td>
+          <td>concave down, flattening</td>
+        </tr>
+        <tr>
+          <td>\(n\log n\)</td>
+          <td>concave down</td>
+          <td>almost slope \(1\), slight upward bend</td>
+        </tr>
+      </table>
+
+      <h3>Measuring growth empirically: the doubling method</h3>
+      <p>The standard procedure:</p>
+      <ol>
+        <li>
+          Choose sizes on a <strong>geometric</strong> sequence, each double the
+          previous. On a log axis these are evenly spaced.
+        </li>
+        <li>
+          Measure a cost at each size. Prefer a deterministic
+          <strong>operation count</strong> (comparisons, array writes) over
+          wall-clock time, since counts carry no noise from caching, scheduling,
+          or timer resolution. If you must use wall-clock time, repeat each size
+          many times, take the median, and use sizes large enough that fixed
+          overhead and timer granularity are negligible.
+        </li>
+        <li>
+          Plot log-log and read the slope between two well-separated points:
+          \(\;b \approx \dfrac{\log T_2 - \log T_1}{\log n_2 - \log n_1}\).
+        </li>
+      </ol>
+      <figure>
+        <img
+          src="figs/loglog-slope.svg"
+          alt="A log-log plot titled 'slope on log-log = exponent; here b is about 2 (n times 8 gives time times 64)'. The horizontal axis is n on a logarithmic scale from about 10 cubed to 10 to the fifth; the vertical axis is time, also logarithmic, from 10 to the zero to about 10 cubed. Nine measured data points at geometrically spaced sizes fall on a straight line, and a fitted line through them is labeled 'fit: slope b = 2.00' in the legend alongside 'measurements'. Guide marks labeled 'x8' along the horizontal direction and 'x64' along the vertical direction show that moving 8 times to the right along the line rises 64 times, that is 8 squared, confirming the exponent 2."
+        />
+        <figcaption>
+          Measurements of a cost that grows like \(n^2\). On log-log axes they
+          fall on a line of slope \(2\); equivalently, multiplying \(n\) by
+          \(8\) multiplies the cost by \(8^2 = 64\).
+        </figcaption>
+      </figure>
+      <p>
+        An equivalent and convenient shortcut is the
+        <strong>doubling ratio</strong>. For \(T(n) = c\,n^b\),
+      </p>
+      \[ \frac{T(2n)}{T(n)} = \frac{c\,(2n)^b}{c\,n^b} = 2^b . \]
+      <p>
+        So the ratio of successive measurements at doubled sizes tends to
+        \(2^b\): about \(2\) for linear, \(4\) for quadratic, \(8\) for cubic.
+        Taking \(\log_2\) of the ratio gives the exponent directly, \(b =
+        \log_2\!\bigl(T(2n)/T(n)\bigr)\). A ratio that keeps growing instead of
+        settling signals a super-polynomial cost, such as exponential.
+      </p>
+
+      <h3>Choosing the axes and the range</h3>
+      <ul>
+        <li>
+          Use log-log axes for a suspected power law, or semi-log for a
+          suspected exponential. On linear axes an order of growth cannot be
+          read.
+        </li>
+        <li>
+          Space the sizes geometrically so the points spread evenly across the
+          log axis.
+        </li>
+        <li>
+          Use a wide range, several doublings, so the asymptotic slope is
+          visible. At small \(n\) the constant factor and lower-order terms bend
+          the curve, so read the slope from the large-\(n\) end where the
+          leading term dominates.
+        </li>
+        <li>
+          Keep the measurement consistent (same machine, units, and build) so
+          that only \(n\) varies.
+        </li>
+      </ul>
+
+      <h3>Best and worst case in measurements: the special-case trap</h3>
+      <p>
+        The measured cost depends on the input, not on \(n\) alone (§7). If the
+        best and worst cases differ in order, the slope you observe depends on
+        which inputs you feed.
+      </p>
+      <figure>
+        <img
+          src="figs/cases.svg"
+          alt="A log-log plot titled 'same algorithm, three input families' showing insertion-sort comparison counts. The horizontal axis is n on a logarithmic scale with ticks at 10 squared and 10 cubed; the vertical axis is comparisons, logarithmic from about 10 to the first up to 10 to the seventh. Three series of ten points each, at geometrically spaced sizes, form three straight lines. The legend reads 'reversed input (worst): slope about 2', 'random input (average): slope about 2', and 'sorted input (best): slope about 1'. The reversed and random lines rise steeply with slope near 2 and sit close together, reversed slightly above random; the sorted line rises with slope near 1 and falls far below the other two, the gap widening as n grows."
+        />
+        <figcaption>
+          Comparison counts for one sort (insertion sort) on three input
+          families. Reversed (worst) and random (average) give slope about
+          \(2\); sorted (best) gives slope about \(1\). Measuring only sorted
+          inputs would suggest, wrongly, that the sort is \(\Theta(n)\).
+        </figcaption>
+      </figure>
+      <p>
+        The figure shows real comparison counts for insertion sort on three
+        families of inputs. Reversed inputs (the worst case) and random inputs
+        (the average) both give slope near \(2\), revealing the \(n^2\)
+        behavior. Sorted inputs (the best case) give slope near \(1\). If you
+        timed only already-sorted arrays, the straight slope-\(1\) line would
+        lead you to conclude that the sort runs in \(\Theta(n)\) time. The
+        measurement is correct for that input family; the error is mistaking a
+        special case for the general one. Other ways to land on a special case
+        include a generator that produces nearly-sorted or all-equal data, sizes
+        that are all powers of two for an algorithm sensitive to that, and
+        inputs too small to be in the asymptotic regime.
+      </p>
+
+      <h3>How to avoid being misled</h3>
+      <ul>
+        <li>
+          Decide which case you want, then construct inputs for it. For the
+          worst case use known worst inputs (a reversed array for insertion
+          sort). For the average draw many random inputs per size and report the
+          median; for a worst-case sense, report the maximum over trials.
+        </li>
+        <li>
+          Use several trials per size and report the median, since a single
+          timing can be an outlier.
+        </li>
+        <li>
+          Vary the input structure, not only its size, and check that the
+          generator is not accidentally producing a special family.
+        </li>
+        <li>
+          Cross-check: compare the log-log slope against the doubling ratio, and
+          an operation count against wall-clock time. Agreement is reassuring;
+          disagreement points to noise or a special case.
+        </li>
+        <li>
+          Confirm the points actually lie on a line, and read the slope at large
+          \(n\). A curve that bends means the cost is not a pure power law (it
+          may be \(n\log n\), or two regimes, or sizes below the asymptotic
+          range).
+        </li>
+        <li>
+          Remember the limit of the method: a straight log-log line over the
+          tested sizes is <em>evidence</em> for a power law of that slope on
+          that input family, not a <em>proof</em> of the order for all \(n\) or
+          all inputs. Use measurement to estimate and to catch errors, and use
+          analysis to establish the bound.
+        </li>
+      </ul>
+
+      <h2 id="ex">11. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Let \(f\) and \(g\) be asymptotically nonnegative. Prove that
+          \(\max(f(n),g(n)) \in \Theta(f(n)+g(n))\).
+          <details>
+            <summary>solution</summary>
+            For large \(n\) both functions are nonnegative. Then \(\max(f,g) \le
+            f+g\), giving the upper bound with \(c_2 = 1\). Also \(f+g \le
+            2\max(f,g)\), so \(\max(f,g) \ge \tfrac12(f+g)\), giving the lower
+            bound with \(c_1 = \tfrac12\). Hence \(\tfrac12(f+g) \le \max(f,g)
+            \le f+g\), so \(\max(f,g) \in \Theta(f+g)\).
+          </details>
+        </li>
+        <li>
+          Show that for any real constants \(a\) and \(b\) with \(b \gt 0\),
+          \(\;(n+a)^b \in \Theta(n^b)\).
+          <details>
+            <summary>solution</summary>
+            For \(n \ge 2|a|\) we have \(|a| \le n/2\), hence \(\tfrac{n}{2} \le
+            n+a \le \tfrac{3n}{2} \le 2n\), and \(n+a \gt 0\). Raising to the
+            power \(b \gt 0\) preserves the inequalities:
+            \(\bigl(\tfrac{n}{2}\bigr)^b \le (n+a)^b \le (2n)^b\), that is
+            \(2^{-b} n^b \le (n+a)^b \le 2^{b} n^b\). So \(c_1 = 2^{-b}\), \(c_2
+            = 2^{b}\), \(n_0 = 2|a|\) (and at least \(1\)) work, and \((n+a)^b
+            \in \Theta(n^b)\).
+          </details>
+        </li>
+        <li>
+          Explain why “the running time of algorithm \(A\) is at least
+          \(O(n^2)\)” is meaningless.
+          <details>
+            <summary>solution</summary>
+            \(O(n^2)\) is a set of <em>upper</em> bounds. The phrase “at least”
+            asks for a lower bound, but combining it with an upper-bound symbol
+            imposes no constraint: saying a quantity is “at least” bounded above
+            by something rules nothing out. A lower bound is expressed with
+            \(\Omega\), as in “the running time is \(\Omega(n^2)\).”
+          </details>
+        </li>
+        <li>
+          Is \(2^{\,n+1} \in O(2^n)\)? Is \(2^{\,2n} \in O(2^n)\)?
+          <details>
+            <summary>solution</summary>
+            Yes for the first: \(2^{\,n+1} = 2\cdot 2^n \le 2\cdot 2^n\), so \(c
+            = 2\), \(n_0 = 1\) work. No for the second: \(2^{\,2n} = (2^n)^2\).
+            If \(2^{\,2n} \le c\,2^n\) held for all \(n \ge n_0\), then dividing
+            by \(2^n\) gives \(2^n \le c\) for all \(n \ge n_0\), a
+            contradiction since \(c\) is constant. So \(2^{\,2n} \notin
+            O(2^n)\); in fact \(2^{\,2n} \in \omega(2^n)\).
+          </details>
+        </li>
+        <li>
+          Prove \(\Theta(g) = O(g) \cap \Omega(g)\).
+          <details>
+            <summary>solution</summary>
+            This is the theorem of §6; its proof is given there. The upper half
+            of the \(\Theta\) sandwich is exactly the \(O\) condition, the lower
+            half is exactly the \(\Omega\) condition, and taking the maximum of
+            the two thresholds \(n_0\) reassembles the sandwich.
+          </details>
+        </li>
+        <li>
+          Prove that the running time of an algorithm is \(\Theta(g(n))\) if and
+          only if its worst-case running time is \(O(g(n))\) and its best-case
+          running time is \(\Omega(g(n))\).
+          <details>
+            <summary>solution</summary>
+            Here “the running time is \(\Theta(g)\)” means that for every input
+            of size \(n\) the time lies between \(c_1 g(n)\) and \(c_2 g(n)\)
+            for large \(n\). (If.) Suppose the worst-case time satisfies
+            \(T_{\text{worst}}(n) \le c_2 g(n)\) and the best-case time
+            satisfies \(T_{\text{best}}(n) \ge c_1 g(n)\) for large \(n\). Any
+            input of size \(n\) takes time between \(T_{\text{best}}(n)\) and
+            \(T_{\text{worst}}(n)\), hence between \(c_1 g(n)\) and \(c_2
+            g(n)\). So the running time is \(\Theta(g)\). (Only if.) If every
+            input runs in time within \([c_1 g(n), c_2 g(n)]\), then the maximum
+            over inputs satisfies \(T_{\text{worst}}(n) \le c_2 g(n)\), so the
+            worst case is \(O(g)\), and the minimum satisfies
+            \(T_{\text{best}}(n) \ge c_1 g(n)\), so the best case is
+            \(\Omega(g)\).
+          </details>
+        </li>
+        <li>
+          Prove that \(o(g) \cap \omega(g)\) is the empty set.
+          <details>
+            <summary>solution</summary>
+            Suppose \(f \in o(g) \cap \omega(g)\). From \(f \in o(g)\), applying
+            the definition with \(c = 1\), there is \(n_1\) with \(f(n) \lt
+            g(n)\) for all \(n \ge n_1\). From \(f \in \omega(g)\), applying the
+            definition with \(c = 1\), there is \(n_2\) with \(g(n) \lt f(n)\)
+            for all \(n \ge n_2\). For \(n \ge \max(n_1,n_2)\) both \(f(n) \lt
+            g(n)\) and \(g(n) \lt f(n)\) hold, a contradiction. Hence the
+            intersection is empty.
+          </details>
+        </li>
+        <li>
+          Extend the notation to two parameters \(n\) and \(m\) that grow
+          independently. Given \(g(n,m)\), define \[ O(g(n,m)) = \bigl\{ f(n,m)
+          : \exists\, c,n_0,m_0 \gt 0 \text{ such that } 0 \le f(n,m) \le
+          c\,g(n,m) \text{ for all } n \ge n_0 \text{ or } m \ge m_0 \bigr\}. \]
+          Give corresponding definitions for \(\Omega(g(n,m))\) and
+          \(\Theta(g(n,m))\).
+          <details>
+            <summary>solution</summary>
+            \[ \Omega(g(n,m)) = \bigl\{ f(n,m) : \exists\, c,n_0,m_0 \gt 0
+            \text{ such that } 0 \le c\,g(n,m) \le f(n,m) \text{ for all } n \ge
+            n_0 \text{ or } m \ge m_0 \bigr\}, \] \[ \Theta(g(n,m)) = \bigl\{
+            f(n,m) : \exists\, c_1,c_2,n_0,m_0 \gt 0 \text{ such that } 0 \le
+            c_1 g(n,m) \le f(n,m) \le c_2 g(n,m) \text{ for all } n \ge n_0
+            \text{ or } m \ge m_0 \bigr\}. \] Each keeps the one-parameter
+            shape, with the condition required once \(n \ge n_0\) or \(m \ge
+            m_0\).
+          </details>
+        </li>
+        <li>
+          You run the doubling experiment and obtain successive ratios
+          \(T(2n)/T(n)\). What order of growth does each sequence suggest? (a)
+          \(2.05,\ 2.02,\ 2.01\); (b) \(3.9,\ 3.95,\ 3.98\); (c) \(2.4,\ 2.3,\
+          2.2,\ 2.1\) (above \(2\), slowly decreasing toward it).
+          <details>
+            <summary>solution</summary>
+            (a) The ratio tends to \(2 = 2^1\), so \(b = 1\): linear,
+            \(\Theta(n)\). (b) The ratio tends to \(4 = 2^2\), so \(b = 2\):
+            quadratic, \(\Theta(n^2)\). (c) A ratio that sits just above \(2\)
+            and decreases toward it is the signature of \(\Theta(n\log n)\): for
+            \(T = n\log_2 n\), \(T(2n)/T(n) = 2\bigl(1 + 1/\log_2 n\bigr)\),
+            which exceeds \(2\) and decreases toward \(2\) as \(n\) grows.
+          </details>
+        </li>
+        <li>
+          You time a sort and the log-log plot of time against \(n\) is a
+          straight line of slope \(1\) over the sizes you tried. Give two
+          different explanations, and describe one further experiment that
+          distinguishes them.
+          <details>
+            <summary>solution</summary>
+            Either (i) the algorithm genuinely runs in \(\Theta(n)\) time, or
+            (ii) the algorithm is slower in general (for example \(\Theta(n^2)\)
+            in the worst case) but you fed it best-case inputs, such as
+            already-sorted arrays, which run in \(\Theta(n)\). To distinguish,
+            rerun on a different input family of the same sizes, in particular
+            reversed or random inputs. If the slope stays near \(1\), the linear
+            behavior is genuine; if it rises to about \(2\), you were measuring
+            the best case.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures & Algorithms · Asymptotic Notation v2.1 · prepared by Dr.
+        Marcel Gavriliu. Typeset with MathJax.
+      </footer>
+    </div>
+  </body>
+</html>

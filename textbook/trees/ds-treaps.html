@@ -1,0 +1,1307 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Treaps.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Treaps - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom: 2px solid var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Treaps</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        A treap stores in each node a key and a randomly chosen priority, and
+        keeps binary-search-tree order on the keys and max-heap order on the
+        priorities at the same time. Those two constraints pin down exactly one
+        tree shape, and that shape is distributed like a binary search tree
+        built in random insertion order, so search, insert, and delete run in
+        expected \(\Theta(\log n)\) time with no balance bookkeeping at all.
+        With the uniqueness proof, insertion and deletion traced rotation by
+        rotation, the expected-depth argument, split and merge in one pass
+        each, a comparison with the worst-case balanced trees, and exercises.
+      </div>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#two-orders">One tree, two orders</a></li>
+          <li><a href="#unique">The shape is forced</a></li>
+          <li><a href="#insert">Insertion: place, then rotate up</a></li>
+          <li><a href="#delete">Deletion: rotate down, then unlink</a></li>
+          <li><a href="#random">Why random priorities balance the tree</a></li>
+          <li><a href="#splitmerge">Split and merge</a></li>
+          <li><a href="#compare">Treaps among the search trees</a></li>
+          <li><a href="#ex-treap">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <p class="lead">
+        The <a href="ds-avl-trees.html"><em>AVL Trees</em></a> handout keeps a
+        binary search tree (BST) shallow by storing a height in every node,
+        checking a balance factor after every update, and dispatching one of
+        four rotation cases. The treap asks a different question: how little
+        machinery can buy \(\Theta(\log n)\) behavior? Its answer is one random
+        number per node and one comparison per rotation. A
+        <strong>treap</strong> (tree + heap) gives each node a
+        <em>priority</em> drawn at random when the node is created, and
+        maintains two orders at once: BST order on the keys, heap order on the
+        priorities. There are no balance factors, no cases, and no invariant to
+        restore beyond the two orders themselves; the randomness does the
+        balancing, in exactly the sense made precise in
+        <a href="#random">&sect;5</a>: the tree is always shaped as if its keys
+        had been inserted in random order, and such a BST is shallow in
+        expectation. The same idea also yields two operations the
+        rotation-based balanced trees do not offer cheaply: splitting a tree
+        at a key and merging two trees, each in one pass.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="two-orders">1. One tree, two orders</h2>
+      <div class="def">
+        <span class="tag">Definition (treap)</span>
+        A <strong>treap</strong> is a binary tree whose nodes each carry a
+        <em>key</em> and a <em>priority</em>, such that
+        <ul>
+          <li><strong>BST order:</strong> at every node, all keys in the left
+            subtree are smaller and all keys in the right subtree are larger
+            (the search-tree invariant of the
+            <a href="ds-trees-bst.html"><em>Trees &amp; Binary Search
+            Trees</em></a> handout), and</li>
+          <li><strong>heap order:</strong> at every node, the priority is at
+            least as large as its children&rsquo;s priorities (the max-heap
+            invariant of the
+            <a href="../heaps/ds-heaps-pq.html"><em>Heaps &amp; Priority
+            Queues</em></a> handout, on a binary tree rather than an array).</li>
+        </ul>
+        Priorities are chosen uniformly at random when a node is created and
+        never change. We assume all keys distinct and all priorities distinct.
+      </div>
+      <p>
+        We write a node as <span class="mono">key/priority</span>. Here is a
+        treap on seven keys; it is the running example for every trace in this
+        handout. Read the keys left to right: BST order,
+        \(10,20,30,40,50,60,70\). Read the priorities down any path: heap
+        order, each parent&rsquo;s priority larger than its children&rsquo;s
+        (\(90\) over \(70\) and \(80\); \(70\) over \(30\) and \(60\); \(80\)
+        over \(20\) and \(40\)).
+      </p>
+      <figure>
+        <svg viewBox="0 0 460 180" role="img" aria-label="A treap on seven nodes, each labeled key over priority. The root is key 40 with priority 90. Its left child is 20 with priority 70, whose children are 10 with priority 30 and 30 with priority 60. Its right child is 60 with priority 80, whose children are 50 with priority 20 and 70 with priority 40. Keys increase left to right; priorities decrease down every path.">
+          <g stroke="#4a5163" stroke-width="1.6" fill="none">
+            <line x1="230" y1="34" x2="130" y2="94"/>
+            <line x1="230" y1="34" x2="330" y2="94"/>
+            <line x1="130" y1="94" x2="80" y2="152"/>
+            <line x1="130" y1="94" x2="180" y2="152"/>
+            <line x1="330" y1="94" x2="280" y2="152"/>
+            <line x1="330" y1="94" x2="380" y2="152"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.5">
+              <circle cx="230" cy="34" r="15"/>
+              <circle cx="130" cy="94" r="15"/> <circle cx="330" cy="94" r="15"/>
+              <circle cx="80" cy="152" r="15"/> <circle cx="180" cy="152" r="15"/>
+              <circle cx="280" cy="152" r="15"/> <circle cx="380" cy="152" r="15"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="230" y="39">40</text>
+              <text x="130" y="99">20</text> <text x="330" y="99">60</text>
+              <text x="80" y="157">10</text> <text x="180" y="157">30</text>
+              <text x="280" y="157">50</text> <text x="380" y="157">70</text>
+            </g>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#9a5b00" text-anchor="middle">
+            <text x="258" y="26">90</text>
+            <text x="158" y="86">70</text> <text x="358" y="86">80</text>
+            <text x="108" y="144">30</text> <text x="208" y="144">60</text>
+            <text x="308" y="144">20</text> <text x="408" y="144">40</text>
+          </g>
+        </svg>
+        <figcaption>
+          The running-example treap: keys inside the circles (BST order left to
+          right), priorities beside them (heap order top down). In the trace
+          notation used below this tree is
+          \(40/90\,(20/70\,(10/30,\,30/60),\ 60/80\,(50/20,\,70/40))\).
+        </figcaption>
+      </figure>
+      <p>
+        Search ignores priorities entirely: a treap <em>is</em> a BST on its
+        keys, so <code>contains</code> is the ordinary BST search and costs
+        \(\Theta(\text{depth of the key})\). The priorities exist only to
+        control the shape, which is the subject of the next section. A
+        min-heap convention works symmetrically (smallest priority at the
+        root); this handout uses max-heap throughout.
+      </p>
+      <div class="aside">
+        <span class="tag">Origin</span>
+        The structure with arbitrary (not random) priorities is the
+        <em>Cartesian tree</em> (Vuillemin, 1980). Seidel and Aragon
+        (1989; journal version 1996) introduced random priorities and the name
+        <em>treap</em>, and proved the expected-time bounds of &sect;5.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="unique">2. The shape is forced</h2>
+      <p>
+        A plain BST admits many shapes for the same key set; which one you get
+        depends on insertion order. A treap admits exactly one. The pairs
+        alone, with no history, determine the tree, and the proof is a
+        two-line induction driven by one observation: heap order leaves the
+        maximum-priority node nowhere to live but the root.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (unique shape)</span>
+        For every set of \(n\) key/priority pairs with distinct keys and
+        distinct priorities there is <em>exactly one</em> treap containing
+        them.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Strong induction on \(n\). For \(n=0\) the
+        empty tree is the only treap. For \(n\ge 1\), let \((k^*, p^*)\) be
+        the pair with the maximum priority. In any treap on these pairs,
+        \(k^*\) must be the root: any other node at the root would be an
+        ancestor of \(k^*\), and walking down from that root to \(k^*\), heap
+        order forces priorities to be non-increasing, so \(p^*\) would be at
+        most the root&rsquo;s priority; with distinct priorities that
+        contradicts maximality unless \(k^*\) is the root itself. With the
+        root forced, BST order forces the membership of the two subtrees: the
+        pairs with keys \(\lt k^*\) form the left subtree and the pairs with
+        keys \(\gt k^*\) the right, and each subtree is itself a treap on its
+        pairs. By the induction hypothesis each of those two smaller treaps
+        has exactly one shape, so the whole tree does. (The same recursion
+        read as a construction shows a treap <em>exists</em>: put the maximum
+        priority at the root and recurse on the two halves.)
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Uniqueness is the treap&rsquo;s central mechanism, worth pausing on.
+        It says the tree&rsquo;s shape is a pure <em>function of the pairs it
+        contains</em>: insertion order, deletion history, all of it is
+        forgotten. Insert the seven running-example pairs in any of the
+        \(7! = 5040\) possible orders and the algorithm of &sect;3 produces
+        the identical tree drawn above. Contrast the plain BST, where sorted
+        insertion order produces a \(\Theta(n)\) path; a treap cannot be
+        shaped by its input order at all. Whatever balance the priorities
+        imply (&sect;5 shows it is good balance, with high probability) the
+        tree has it permanently, no matter what the adversary does with keys.
+      </p>
+      <p>
+        Uniqueness also gives a way to predict any treap by hand, used to
+        check every trace in this handout: find the maximum priority, make it
+        the root, split the remaining pairs by key, recurse. For the running
+        example: \(90\) is the maximum, so \(40\) is the root; among keys
+        \(\{10,20,30\}\) the maximum priority is \(70\), so \(20\) roots the
+        left subtree; among \(\{50,60,70\}\) it is \(80\), so \(60\) roots the
+        right; the four remaining keys fall into singleton slots. That is
+        exactly the figure of &sect;1.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="insert">3. Insertion: place, then rotate up</h2>
+      <p>
+        Insertion has two phases. Phase one is plain BST insertion: descend by
+        key comparisons and attach the new node as a leaf. That preserves BST
+        order but may break heap order in one place: the new node&rsquo;s
+        random priority may exceed its parent&rsquo;s. Phase two repairs it
+        with rotations, the same \(O(1)\) order-preserving move defined and
+        drawn in the <a href="ds-avl-trees.html"><em>AVL Trees</em></a>
+        handout: while the new node outranks its parent, rotate the parent so
+        the new node rises one level (a right rotation when it is a left
+        child, a left rotation when it is a right child). Each rotation fixes
+        the one violated edge and can create a violation only one level
+        higher, so a single upward pass restores heap order everywhere.
+      </p>
+      <div class="code-tabs" data-snippet="trees/treap-insert">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Treap node, rotations, and insertion. Each node stores a key (BST order)
+// and a priority (max-heap order) drawn at random when the node is created.
+// Insert descends like a plain BST, then rotates the new node up while its
+// priority outranks its parent&#x27;s. Rotations are the AVL rotations.
+struct Node {
+    int   key;
+    int   pri;                       // random heap priority, fixed for life
+    Node* left  = nullptr;
+    Node* right = nullptr;
+    Node(int k, int p) : key(k), pri(p) {}
+};
+Node* rotateRight(Node* y) {         // left child rises; in-order unchanged
+    Node* x = y-&gt;left;  y-&gt;left = x-&gt;right;  x-&gt;right = y;  return x;
+}
+Node* rotateLeft(Node* x) {          // right child rises; the mirror image
+    Node* y = x-&gt;right; x-&gt;right = y-&gt;left;  y-&gt;left = x;   return y;
+}
+Node* insert(Node* t, int key, int pri) {
+    if (!t) return new Node(key, pri);              // BST leaf placement
+    if (key &lt; t-&gt;key) {
+        t-&gt;left = insert(t-&gt;left, key, pri);
+        if (t-&gt;left-&gt;pri &gt; t-&gt;pri) t = rotateRight(t);   // child outranks: lift
+    } else if (key &gt; t-&gt;key) {
+        t-&gt;right = insert(t-&gt;right, key, pri);
+        if (t-&gt;right-&gt;pri &gt; t-&gt;pri) t = rotateLeft(t);
+    }                                               // equal key: already there
+    return t;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Treap node, rotations, and insertion. Each node stores a key (BST order)
+// and a priority (max-heap order) drawn at random when the node is created.
+// Insert descends like a plain BST, then rotates the new node up while its
+// priority outranks its parent&#x27;s. Rotations are the AVL rotations.
+class Node {
+    int key, pri;                    // pri: random heap priority, fixed for life
+    Node left, right;
+    Node(int k, int p) { key = k; pri = p; }
+}
+static Node rotateRight(Node y) {    // left child rises; in-order unchanged
+    Node x = y.left;  y.left = x.right;  x.right = y;  return x;
+}
+static Node rotateLeft(Node x) {     // right child rises; the mirror image
+    Node y = x.right; x.right = y.left;  y.left = x;   return y;
+}
+static Node insert(Node t, int key, int pri) {
+    if (t == null) return new Node(key, pri);       // BST leaf placement
+    if (key &lt; t.key) {
+        t.left = insert(t.left, key, pri);
+        if (t.left.pri &gt; t.pri) t = rotateRight(t); // child outranks: lift it
+    } else if (key &gt; t.key) {
+        t.right = insert(t.right, key, pri);
+        if (t.right.pri &gt; t.pri) t = rotateLeft(t);
+    }                                               // equal key: already there
+    return t;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Treap node, rotations, and insertion. Each node stores a key (BST order)
+# and a priority (max-heap order) drawn at random when the node is created.
+# Insert descends like a plain BST, then rotates the new node up while its
+# priority outranks its parent&#x27;s. Rotations are the AVL rotations.
+class Node:
+    def __init__(self, key, pri):
+        self.key, self.pri = key, pri   # pri: random priority, fixed for life
+        self.left = self.right = None
+
+def rotate_right(y):               # left child rises; in-order unchanged
+    x = y.left; y.left = x.right; x.right = y; return x
+
+def rotate_left(x):                # right child rises; the mirror image
+    y = x.right; x.right = y.left; y.left = x; return y
+
+def insert(t, key, pri):
+    if t is None:                  # BST leaf placement
+        return Node(key, pri)
+    if key &lt; t.key:
+        t.left = insert(t.left, key, pri)
+        if t.left.pri &gt; t.pri:     # child outranks: lift it
+            t = rotate_right(t)
+    elif key &gt; t.key:
+        t.right = insert(t.right, key, pri)
+        if t.right.pri &gt; t.pri:
+            t = rotate_left(t)
+    return t                       # equal key: already there</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Treap node, rotations, and insertion over an owned-subtree link. Each node
+// stores a key (BST order) and a priority (max-heap order) drawn at random at
+// creation. Insert descends like a plain BST, then rotates the new node up
+// while its priority outranks its parent&#x27;s. Rotations are the AVL rotations.
+type Link = Option&lt;Box&lt;Node&gt;&gt;;
+struct Node { key: i32, pri: i32, left: Link, right: Link }  // pri &gt;= 0
+
+fn rotate_right(mut y: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {  // left child rises
+    let mut x = y.left.take().unwrap();
+    y.left = x.right.take();
+    x.right = Some(y);
+    x
+}
+fn rotate_left(mut x: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {   // right child rises; mirror
+    let mut y = x.right.take().unwrap();
+    x.right = y.left.take();
+    y.left = Some(x);
+    y
+}
+fn insert(t: Link, key: i32, pri: i32) -&gt; Link {
+    let Some(mut n) = t else {                     // BST leaf placement
+        return Some(Box::new(Node { key, pri, left: None, right: None }));
+    };
+    if key &lt; n.key {
+        n.left = insert(n.left.take(), key, pri);
+        if n.left.as_ref().unwrap().pri &gt; n.pri {  // child outranks: lift it
+            n = rotate_right(n);
+        }
+    } else if key &gt; n.key {
+        n.right = insert(n.right.take(), key, pri);
+        if n.right.as_ref().unwrap().pri &gt; n.pri {
+            n = rotate_left(n);
+        }
+    }                                              // equal key: already there
+    Some(n)
+}</pre>
+<p class="ct-src">source: <code>code/trees/treap-insert.cpp &middot; code/trees/treap-insert.java &middot; code/trees/treap-insert.py &middot; code/trees/treap-insert.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The recursion checks the child&rsquo;s priority <em>on the way back
+        up</em>, one comparison per level; only the levels the new node
+        actually rises through perform a rotation. Insertion therefore has
+        three behaviors, all visible below: the new node&rsquo;s priority is
+        smaller than its parent&rsquo;s and nothing rotates; the new node is a
+        left child and rises by a right rotation; the new node is a right
+        child and rises by a left rotation. (A fourth case, the key already
+        present, changes nothing.)
+      </p>
+      <h3>Trace: building the running example (no rotations)</h3>
+      <p>
+        Insert the pairs in the order \(40/90\), \(20/70\), \(60/80\),
+        \(10/30\), \(30/60\), \(50/20\), \(70/40\) into an empty treap. Each
+        new node&rsquo;s priority happens to be smaller than its
+        parent&rsquo;s at the moment it lands (\(70\lt 90\), \(80\lt 90\),
+        \(30\lt 70\), \(60\lt 70\), \(20\lt 80\), \(40\lt 80\)), so every
+        insertion is pure BST placement, zero rotations, and the result is the
+        &sect;1 figure. This is the no-rotation case seven times over; by the
+        uniqueness theorem, any other insertion order must reach the same
+        tree, rotating as needed along the way.
+      </p>
+      <h3>Trace: insert \(25/85\), both rotation directions</h3>
+      <p>
+        Now insert key \(25\) with priority \(85\) into the running example.
+        Phase one descends \(40 \to 20 \to 30\) (\(25 \lt 40\), \(25 \gt 20\),
+        \(25 \lt 30\)) and attaches \(25/85\) as the left child of \(30/60\):
+      </p>
+      <pre>                 40/90
+              /        \
+        20/70            60/80
+       /      \         /      \
+   10/30    30/60    50/20    70/40
+            /
+        25/85        <span class="cm">&larr; 85 sits below 60: heap order broken at 30</span></pre>
+      <p>
+        Phase two bubbles \(25/85\) up. It is the <em>left</em> child of
+        \(30/60\) and \(85 \gt 60\), so <code>rotateRight(30)</code>: \(25\)
+        rises, \(30\) becomes its right child.
+      </p>
+      <pre>                 40/90
+              /        \
+        20/70            60/80
+       /      \         /      \
+   10/30    25/85    50/20    70/40
+                \
+              30/60  <span class="cm">&larr; edge 30&ndash;25 fixed, but 85 still below 70: broken at 20</span></pre>
+      <p>
+        Now \(25/85\) is the <em>right</em> child of \(20/70\) and
+        \(85 \gt 70\), so <code>rotateLeft(20)</code>: \(25\) rises again,
+        \(20\) becomes its left child and keeps its own left subtree.
+      </p>
+      <pre>                 40/90
+              /        \
+        25/85            60/80
+       /      \         /      \
+   20/70    30/60    50/20    70/40
+    /
+ 10/30               <span class="cm">&larr; 85 &lt; 90: heap order restored, insertion complete</span></pre>
+      <p>
+        The parent check at \(40\) fails (\(85 \lt 90\)), so the node stops
+        two levels below the root and the recursion unwinds with no further
+        change. One insertion exercised both rotation directions: the rise
+        path was a right child of one ancestor and a left child of the other.
+        Both properties can be confirmed independently: the in-order key
+        sequence is \(10,20,25,30,40,50,60,70\), and running the uniqueness
+        recursion of &sect;2 on the eight pairs (maximum \(90\) at the root;
+        among \(\{10,20,25,30\}\) the maximum priority is \(85\), so \(25\)
+        roots the left subtree; among \(\{10,20\}\) it is \(70\); and so on)
+        reproduces this exact shape.
+      </p>
+      <h3>Cost</h3>
+      <p>
+        Phase one walks one root-to-leaf path: \(\Theta(d)\) comparisons where
+        \(d\) is the depth at which the key lands. Phase two climbs a suffix
+        of the same path, one \(O(1)\) rotation per level risen, so the whole
+        insertion is \(\Theta(d) = O(\text{height})\). Section
+        <a href="#random">5</a> shows the expected depth is \(O(\log n)\),
+        making insertion expected \(O(\log n)\); an aside there sharpens the
+        rotation count itself to fewer than \(2\) expected rotations per
+        insertion.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="delete">4. Deletion: rotate down, then unlink</h2>
+      <p>
+        Deletion runs insertion&rsquo;s film backwards. Find the node by BST
+        search; then, while it still has a child, rotate its
+        <em>larger-priority</em> child above it (right rotation if that child
+        is on the left, left rotation if on the right). Each rotation sinks
+        the doomed node one level and, by lifting the child that outranks the
+        other, keeps heap order intact among all the <em>surviving</em> nodes.
+        When the node reaches a leaf, unlink it. There is no two-children
+        special case to agonize over (compare Hibbard deletion in the
+        <a href="ds-trees-bst.html"><em>Trees &amp; Binary Search
+        Trees</em></a> handout): the rotations dissolve the hard case into a
+        sequence of easy ones.
+      </p>
+      <div class="code-tabs" data-snippet="trees/treap-delete">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Treap deletion: find the key, rotate the larger-priority child above the
+// node until the node is a leaf, then unlink it. Uses the rotations and Node
+// of treap-insert.
+Node* erase(Node* t, int key) {
+    if (!t) return nullptr;                          // key absent: no change
+    if      (key &lt; t-&gt;key) t-&gt;left  = erase(t-&gt;left,  key);
+    else if (key &gt; t-&gt;key) t-&gt;right = erase(t-&gt;right, key);
+    else if (!t-&gt;left &amp;&amp; !t-&gt;right) {                // leaf: unlink
+        delete t; return nullptr;
+    } else if (!t-&gt;right || (t-&gt;left &amp;&amp; t-&gt;left-&gt;pri &gt; t-&gt;right-&gt;pri)) {
+        t = rotateRight(t);          // left child outranks (or is the only child)
+        t-&gt;right = erase(t-&gt;right, key);             // t&#x27;s old root sank right
+    } else {
+        t = rotateLeft(t);           // right child outranks (or is the only child)
+        t-&gt;left = erase(t-&gt;left, key);               // t&#x27;s old root sank left
+    }
+    return t;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Treap deletion: find the key, rotate the larger-priority child above the
+// node until the node is a leaf, then unlink it. Uses the rotations and Node
+// of treap-insert.
+static Node erase(Node t, int key) {
+    if (t == null) return null;                      // key absent: no change
+    if      (key &lt; t.key) t.left  = erase(t.left,  key);
+    else if (key &gt; t.key) t.right = erase(t.right, key);
+    else if (t.left == null &amp;&amp; t.right == null) {    // leaf: unlink
+        return null;
+    } else if (t.right == null || (t.left != null &amp;&amp; t.left.pri &gt; t.right.pri)) {
+        t = rotateRight(t);          // left child outranks (or is the only child)
+        t.right = erase(t.right, key);               // old root sank right
+    } else {
+        t = rotateLeft(t);           // right child outranks (or is the only child)
+        t.left = erase(t.left, key);                 // old root sank left
+    }
+    return t;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Treap deletion: find the key, rotate the larger-priority child above the
+# node until the node is a leaf, then unlink it. Uses the rotations and Node
+# of treap-insert.
+def erase(t, key):
+    if t is None:                     # key absent: no change
+        return None
+    if key &lt; t.key:
+        t.left = erase(t.left, key)
+    elif key &gt; t.key:
+        t.right = erase(t.right, key)
+    elif t.left is None and t.right is None:
+        return None                   # leaf: unlink
+    elif t.right is None or (t.left and t.left.pri &gt; t.right.pri):
+        t = rotate_right(t)           # left child outranks (or is the only child)
+        t.right = erase(t.right, key) # old root sank right
+    else:
+        t = rotate_left(t)            # right child outranks (or is the only child)
+        t.left = erase(t.left, key)   # old root sank left
+    return t</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Treap deletion: find the key, rotate the larger-priority child above the
+// node until the node is a leaf, then unlink it. Uses the rotations and Node
+// of treap-insert (priorities are nonnegative, so -1 stands for &quot;no child&quot;).
+fn erase(t: Link, key: i32) -&gt; Link {
+    let mut n = t?;                                  // key absent: no change
+    if key &lt; n.key { n.left  = erase(n.left.take(),  key); return Some(n); }
+    if key &gt; n.key { n.right = erase(n.right.take(), key); return Some(n); }
+    let lp = n.left.as_ref().map_or(-1, |c| c.pri);
+    let rp = n.right.as_ref().map_or(-1, |c| c.pri);
+    if lp &lt; 0 &amp;&amp; rp &lt; 0 {
+        return None;                                 // leaf: unlink
+    }
+    if lp &gt; rp {
+        let mut top = rotate_right(n);   // left child outranks (or only child)
+        top.right = erase(top.right.take(), key);    // old root sank right
+        Some(top)
+    } else {
+        let mut top = rotate_left(n);    // right child outranks (or only child)
+        top.left = erase(top.left.take(), key);      // old root sank left
+        Some(top)
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/treap-delete.cpp &middot; code/trees/treap-delete.java &middot; code/trees/treap-delete.py &middot; code/trees/treap-delete.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Deletion&rsquo;s cases: the key is absent (no change); the node is a
+        leaf (unlink); two children with the left outranking (right
+        rotation); two children with the right outranking (left rotation);
+        one child (the same comparison, with the absent side treated as
+        priority \(-1\), so the lone child always wins and rises). The
+        following single trace meets every one of the non-trivial cases.
+      </p>
+      <h3>Trace: delete \(40\) from the eight-node treap</h3>
+      <p>
+        Start from the tree at the end of &sect;3 (after inserting
+        \(25/85\)) and delete the root key \(40\). The search finds it
+        immediately; then it rotates down. Step 1: children \(25/85\) and
+        \(60/80\); the left outranks (\(85 \gt 80\)), so
+        <code>rotateRight(40)</code> lifts \(25\) to the root and \(40\) sinks
+        right, picking up \(30/60\) as its new left child:
+      </p>
+      <pre>           25/85
+          /      \
+     20/70        40/90
+      /          /      \
+  10/30      30/60       60/80
+                        /      \
+                    50/20      70/40</pre>
+      <p>
+        Step 2: \(40\)&rsquo;s children are now \(30/60\) and \(60/80\); the
+        right outranks (\(80 \gt 60\)), so <code>rotateLeft(40)</code>:
+      </p>
+      <pre>           25/85
+          /      \
+     20/70        60/80
+      /          /      \
+  10/30      40/90       70/40
+            /      \
+        30/60      50/20</pre>
+      <p>
+        Step 3: children \(30/60\) and \(50/20\); the left outranks
+        (\(60 \gt 20\)), so <code>rotateRight(40)</code>:
+      </p>
+      <pre>           25/85
+          /      \
+     20/70        60/80
+      /          /      \
+  10/30      30/60       70/40
+                  \
+                 40/90
+                     \
+                    50/20</pre>
+      <p>
+        Step 4: \(40\) has only the right child \(50/20\) (absent left counts
+        as \(-1\)), so <code>rotateLeft(40)</code> lifts \(50\) and \(40\)
+        finally reaches a leaf. Step 5: unlink it.
+      </p>
+      <pre>           25/85                          25/85
+          /      \                       /      \
+     20/70        60/80             20/70        60/80
+      /          /      \    &rarr;      /          /      \
+  10/30      30/60       70/40   10/30      30/60       70/40
+                  \                             \
+                 50/20                         50/20
+                 /
+             40/90   <span class="cm">&larr; leaf: unlink</span></pre>
+      <p>
+        Four rotations covering both directions, the one-child case, and the
+        leaf unlink. Note that \(40/90\)&rsquo;s own priority never matters on
+        the way down: heap order is only ever compared between its
+        <em>children</em>, because \(40\) is leaving and the survivors must end
+        up correctly ordered among themselves. The final tree is again
+        checkable by &sect;2: on the remaining seven pairs the maximum
+        priority is \(85\) (root \(25\)); among \(\{10,20\}\) it is \(70\);
+        among \(\{30,50,60,70\}\) it is \(80\) (subtree root \(60\)), then
+        \(60\) among \(\{30,50\}\), then \(20\); and \(70/40\) stands alone.
+        In-order: \(10,20,25,30,50,60,70\). Cost: one search path down plus
+        one rotation per level sunk, so \(\Theta(\text{depth reached})\),
+        which is \(O(\text{height})\), expected \(O(\log n)\) by &sect;5.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="random">5. Why random priorities balance the tree</h2>
+      <p>
+        Everything so far works for <em>any</em> distinct priorities. The
+        performance claim comes from choosing them at random, and it rests on
+        an equivalence: a treap is secretly a BST built in a random order.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (random-order equivalence)</span>
+        A treap on pairs with distinct priorities has exactly the shape of the
+        plain BST obtained by inserting its keys, with <em>no</em> balancing,
+        in order of <em>decreasing priority</em>.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Induction on \(n\), using uniqueness
+        (&sect;2). The first key inserted into an empty BST becomes its root
+        and stays there; inserting in decreasing priority order, that is the
+        maximum-priority key, which is also the treap&rsquo;s root. Every
+        later key is routed by the root into the left or right subtree by key
+        comparison, and BST insertions into one subtree never depend on keys
+        in the other; so the left subtree is a BST on the keys smaller than
+        the root, built in decreasing priority order, and likewise on the
+        right. By the induction hypothesis those match the treap&rsquo;s two
+        subtrees, which by &sect;2 are the treaps on the same pair sets.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        With priorities drawn uniformly at random, every one of the \(n!\)
+        priority rankings of the keys is equally likely, so the treap&rsquo;s
+        shape is distributed exactly like a BST built in a
+        <em>uniformly random insertion order</em>, regardless of the order or
+        the key values the user actually supplies. This is the random BST
+        analyzed in the <a href="ds-trees-bst.html"><em>Trees &amp; Binary
+        Search Trees</em></a> handout, and the treap converts its
+        average-case analysis into a guarantee against adversarial
+        <em>input orders</em>: the user&rsquo;s order cannot influence the
+        shape at all, because the shape is a function of the pairs alone and
+        the priorities are the algorithm&rsquo;s own coin flips. The analysis
+        below reproves the depth bound self-contained, because its key lemma
+        is also the cleanest tool for reasoning about treaps directly.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (who is an ancestor)</span>
+        Let \(x_1 \lt x_2 \lt \dots \lt x_n\) be the keys in sorted order. In
+        the treap, \(x_j\) is an ancestor of \(x_i\) (for \(j \ne i\)) if and
+        only if \(x_j\) has the largest priority among the keys between them
+        inclusive, \(\{x_{\min(i,j)}, \dots, x_{\max(i,j)}\}\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Let \(S\) be that set of consecutive keys and
+        \(m\) its maximum-priority element. Run the top-down construction of
+        &sect;2. As long as the chosen subtree root is a key outside \(S\),
+        all of \(S\) falls on one side of it (the root&rsquo;s key is smaller
+        than all of \(S\) or larger than all of it, since \(S\) is a
+        consecutive run), so \(S\) stays together in one subtree. The first
+        root chosen <em>from</em> \(S\) is the maximum priority present,
+        namely \(m\); at that moment every other member of \(S\), including
+        \(x_i\) and \(x_j\), lands strictly below \(m\). Now compare cases.
+        If \(m = x_j\): then \(x_j\) is an ancestor of \(x_i\), as claimed. If
+        \(m = x_i\): then \(x_i\) is an ancestor of \(x_j\), so \(x_j\) is not
+        an ancestor of \(x_i\). If \(m\) is strictly between them: \(x_i\) and
+        \(x_j\) lie on opposite sides of \(m\)&rsquo;s key, so they are
+        separated into different subtrees and neither is an ancestor of the
+        other. So \(x_j\) is an ancestor of \(x_i\) exactly when \(m = x_j\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (expected depth)</span>
+        With uniformly random priorities, the expected depth of key \(x_i\) is
+        \[
+          \mathbb{E}[\mathrm{depth}(x_i)]
+          \;=\; \sum_{j \ne i} \frac{1}{|i-j|+1}
+          \;=\; H_i + H_{n-i+1} - 2
+          \;\le\; 2H_n - 2 \;\lt\; 2\ln n,
+        \]
+        where \(H_m = 1 + \tfrac12 + \dots + \tfrac1m\) is the harmonic
+        number. Hence every key&rsquo;s expected depth is
+        \(O(\log n)\); numerically \(2\ln n \approx 1.39\log_2 n\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The depth of \(x_i\) is its number of
+        ancestors, a sum of indicator variables over \(j\ne i\). By the lemma,
+        \(x_j\) is an ancestor of \(x_i\) exactly when \(x_j\) holds the
+        maximum priority among the \(|i-j|+1\) consecutive keys from one to
+        the other; since the priorities are uniform and independent, each of
+        those keys is equally likely to hold that maximum, so the probability
+        is \(1/(|i-j|+1)\). By linearity of expectation, the expected depth is
+        the sum of these probabilities. Splitting the sum at \(i\): the keys
+        below contribute \(\tfrac12 + \tfrac13 + \dots + \tfrac1i = H_i - 1\)
+        and the keys above contribute \(H_{n-i+1} - 1\). Both harmonic
+        numbers are at most \(H_n \lt 1 + \ln n\), giving
+        \(2H_n - 2 \lt 2\ln n\). Converting the base,
+        \(2\ln n = (2\ln 2)\log_2 n \approx 1.39\log_2 n\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        For a feel for the numbers: on the running example&rsquo;s seven keys
+        the formula gives expected depths
+        \(1.59,\ 1.95,\ 2.12,\ 2.17,\ 2.12,\ 1.95,\ 1.59\) for
+        \(x_1,\dots,x_7\): middle keys sit slightly deeper than extreme ones,
+        and all are far below the worst-case depth \(6\). At
+        \(n = 10^6\), every search costs an expected
+        \(\lt 2\ln 10^6 \approx 27.6\) comparisons; an AVL tree guarantees at
+        most \(1.44\log_2 10^6 \approx 28.7\) in the worst case. The treap
+        matches the balanced trees&rsquo; typical cost while its
+        <em>maintenance</em> logic is two short functions.
+      </p>
+      <p>
+        Since search, insert, and delete each traverse one root-to-leaf (or
+        root-to-key) path with \(O(1)\) work per level, all three run in
+        expected \(O(\log n)\) time. The expectation is over the
+        algorithm&rsquo;s own random priorities only, never over the input: no
+        key set and no insertion order is bad, only unlucky coin flips, and a
+        fresh operation gets fresh luck. (The <em>height</em>, the maximum of
+        all \(n\) depths, is also \(O(\log n)\) in expectation and with high
+        probability; proving that requires a concentration argument beyond
+        this handout, and the per-key bound above already prices every
+        operation.)
+      </p>
+      <div class="aside">
+        <span class="tag">Fewer than two rotations per insert</span>
+        Insertion&rsquo;s rotation count is not just \(O(\log n)\): it is
+        \(O(1)\) in expectation. The number of rotations equals the number of
+        levels the new node \(x\) rises, and each rotation transfers one
+        former ancestor of \(x\) into \(x\)&rsquo;s subtree, where it becomes
+        part of the right spine of \(x\)&rsquo;s left subtree or the left
+        spine of its right subtree. So the rotation count equals the total
+        length of those two spines when insertion finishes. Seidel and Aragon
+        compute the expected lengths of those spines in a random treap and
+        each is less than \(1\), so an insertion performs fewer than \(2\)
+        rotations on average, matching AVL&rsquo;s at-most-one-or-two but
+        without any case analysis.
+      </div>
+      <div class="aside">
+        <span class="tag">The quicksort connection</span>
+        The uniqueness recursion of &sect;2 (a randomly favored element
+        becomes the root, the rest split into smaller-than and larger-than,
+        recurse) is the recursion tree of quicksort with a uniformly random
+        pivot, key for key. The harmonic sums above are the same sums that
+        price quicksort&rsquo;s expected comparisons in the
+        <a href="../sorting/algo-quicksort.html"><em>Quicksort</em></a>
+        handout, and the \(2\ln n\) expected depth here is the per-element
+        share of quicksort&rsquo;s \(2 n\ln n\) there. A treap is, in this
+        precise sense, a quicksort that never finishes choosing to forget its
+        pivots.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="splitmerge">6. Split and merge</h2>
+      <p>
+        The treap&rsquo;s distinctive operations take whole trees apart and
+        put them together. Rotation-based balanced trees can support these
+        only with substantial extra machinery; in a treap each is a
+        single-pass recursion, and both preserve the treap invariants by
+        construction, so the results are again the unique treaps on their
+        pair sets.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (split, merge)</span>
+        <strong>split</strong>\((T, k)\) destructively divides treap \(T\)
+        into two treaps: \(L\) holding every pair with key \(\lt k\) and
+        \(R\) holding every pair with key \(\ge k\).
+        <strong>merge</strong>\((A, B)\), defined only when every key of
+        \(A\) is smaller than every key of \(B\), combines the two treaps
+        into one treap on all the pairs.
+      </div>
+      <div class="code-tabs" data-snippet="trees/treap-split-merge">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// split: keys &lt; k into the first result, keys &gt;= k into the second. One
+// descent along the search path of k. merge: every key of a must be smaller
+// than every key of b; the larger-priority root wins level by level.
+pair&lt;Node*, Node*&gt; split(Node* t, int k) {
+    if (!t) return {nullptr, nullptr};
+    if (t-&gt;key &lt; k) {                 // t + its left subtree all go left
+        auto [l, r] = split(t-&gt;right, k);   // its right may hold both kinds
+        t-&gt;right = l;
+        return {t, r};
+    }
+    auto [l, r] = split(t-&gt;left, k);  // t + its right subtree all go right
+    t-&gt;left = r;
+    return {l, t};
+}
+Node* merge(Node* a, Node* b) {
+    if (!a) return b;
+    if (!b) return a;
+    if (a-&gt;pri &gt; b-&gt;pri) {            // a&#x27;s root outranks: it is the new root,
+        a-&gt;right = merge(a-&gt;right, b);      // and all of b is to its right
+        return a;
+    }
+    b-&gt;left = merge(a, b-&gt;left);      // b&#x27;s root outranks: mirror case
+    return b;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// split: keys &lt; k into result[0], keys &gt;= k into result[1]. One descent
+// along the search path of k. merge: every key of a must be smaller than
+// every key of b; the larger-priority root wins level by level.
+static Node[] split(Node t, int k) {
+    if (t == null) return new Node[] { null, null };
+    if (t.key &lt; k) {                  // t + its left subtree all go left
+        Node[] p = split(t.right, k); // its right may hold both kinds
+        t.right = p[0];
+        return new Node[] { t, p[1] };
+    }
+    Node[] p = split(t.left, k);      // t + its right subtree all go right
+    t.left = p[1];
+    return new Node[] { p[0], t };
+}
+static Node merge(Node a, Node b) {
+    if (a == null) return b;
+    if (b == null) return a;
+    if (a.pri &gt; b.pri) {              // a&#x27;s root outranks: it is the new root,
+        a.right = merge(a.right, b);  // and all of b is to its right
+        return a;
+    }
+    b.left = merge(a, b.left);        // b&#x27;s root outranks: mirror case
+    return b;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># split: keys &lt; k into the first result, keys &gt;= k into the second. One
+# descent along the search path of k. merge: every key of a must be smaller
+# than every key of b; the larger-priority root wins level by level.
+def split(t, k):
+    if t is None:
+        return None, None
+    if t.key &lt; k:                    # t + its left subtree all go left
+        l, r = split(t.right, k)     # its right may hold both kinds
+        t.right = l
+        return t, r
+    l, r = split(t.left, k)          # t + its right subtree all go right
+    t.left = r
+    return l, t
+
+def merge(a, b):
+    if a is None: return b
+    if b is None: return a
+    if a.pri &gt; b.pri:                # a&#x27;s root outranks: it is the new root,
+        a.right = merge(a.right, b)  # and all of b is to its right
+        return a
+    b.left = merge(a, b.left)        # b&#x27;s root outranks: mirror case
+    return b</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// split: keys &lt; k into the first result, keys &gt;= k into the second. One
+// descent along the search path of k. merge: every key of a must be smaller
+// than every key of b; the larger-priority root wins level by level.
+fn split(t: Link, k: i32) -&gt; (Link, Link) {
+    let Some(mut n) = t else { return (None, None) };
+    if n.key &lt; k {                       // n + its left subtree all go left
+        let (l, r) = split(n.right.take(), k);  // its right may hold both kinds
+        n.right = l;
+        (Some(n), r)
+    } else {                             // n + its right subtree all go right
+        let (l, r) = split(n.left.take(), k);
+        n.left = r;
+        (l, Some(n))
+    }
+}
+fn merge(a: Link, b: Link) -&gt; Link {
+    match (a, b) {
+        (None, t) | (t, None) =&gt; t,
+        (Some(mut x), Some(mut y)) =&gt; {
+            if x.pri &gt; y.pri {           // x outranks: it is the new root,
+                x.right = merge(x.right.take(), Some(y));  // b all to its right
+                Some(x)
+            } else {                     // y outranks: mirror case
+                y.left = merge(Some(x), y.left.take());
+                Some(y)
+            }
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/treap-split-merge.cpp &middot; code/trees/treap-split-merge.java &middot; code/trees/treap-split-merge.py &middot; code/trees/treap-split-merge.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Why split is correct: at each node, the key comparison decides which
+        side of the cut the node <em>and one entire subtree</em> fall on (if
+        \(t.\mathrm{key} \lt k\) then \(t\) and everything in its left subtree
+        are \(\lt k\)); only the other subtree can straddle the cut, so the
+        recursion descends into it alone, following exactly the search path
+        of \(k\). Heap order is never disturbed because every node keeps its
+        surviving children, only losing those cut away to the other side.
+        Why merge is correct: the result&rsquo;s root must be the larger of
+        the two roots&rsquo; priorities (it is the maximum priority overall),
+        and because all of \(A\)&rsquo;s keys precede all of \(B\)&rsquo;s,
+        BST order is maintained by hanging the merged remainder on the
+        winner&rsquo;s inner side. Both recursions move down one level of the
+        result per step, so each costs \(O(\text{height})\), expected
+        \(O(\log n)\).
+      </p>
+      <h3>Trace: split the running example at \(k = 45\)</h3>
+      <p>
+        Split the &sect;1 treap at \(45\). The recursion follows the search
+        path of \(45\): \(40 \to 60 \to 50 \to\) empty.
+      </p>
+      <ol>
+        <li>\(40 \lt 45\): \(40\) and its whole left subtree go to \(L\);
+          split \(40\)&rsquo;s right subtree (rooted \(60\)) for the rest.</li>
+        <li>\(60 \ge 45\): \(60\) and its right subtree (\(70/40\)) go to
+          \(R\); split \(60\)&rsquo;s left subtree (\(50/20\)).</li>
+        <li>\(50 \ge 45\): \(50\) goes to \(R\); split its empty left
+          subtree, which returns two empty trees.</li>
+        <li>Unwind: \(50\)&rsquo;s left stays empty; \(60\)&rsquo;s left
+          becomes \(50/20\); \(40\)&rsquo;s right becomes empty.</li>
+      </ol>
+      <pre>  L:      40/90              R:      60/80
+         /                          /      \
+    20/70                       50/20    70/40
+   /      \
+ 10/30   30/60</pre>
+      <p>
+        Both halves satisfy both orders (in \(L\), \(40\)&rsquo;s right child
+        is simply gone; heap order along remaining edges is untouched), and
+        each is the unique treap on its pairs by the &sect;2 recursion.
+        Merging them back, \(\mathrm{merge}(L, R)\), compares roots
+        \(90 \gt 80\), keeps \(40\) on top, and recurses on
+        \(\mathrm{merge}(\varnothing, R) = R\), reattaching the whole right
+        half in two steps: split and merge are inverses when nothing happens
+        in between.
+      </p>
+      <h3>Trace: merge two subtree-sized treaps</h3>
+      <p>
+        For a merge that genuinely interleaves, take
+        \(A = 20/70\,(10/30,\,30/60)\) and
+        \(B = 60/80\,(50/20,\,70/40)\); every key of \(A\) is below every key
+        of \(B\).
+      </p>
+      <ol>
+        <li>Roots \(20/70\) vs. \(60/80\): \(80\) wins, so \(60\) is the
+          final root and all of \(A\) belongs to its left;
+          recurse \(\mathrm{merge}(A,\ 60.\mathrm{left} = 50/20)\).</li>
+        <li>Roots \(20/70\) vs. \(50/20\): \(70\) wins; \(20\) keeps its left
+          subtree \(10/30\); recurse
+          \(\mathrm{merge}(20.\mathrm{right} = 30/60,\ 50/20)\).</li>
+        <li>Roots \(30/60\) vs. \(50/20\): \(60\) wins; recurse
+          \(\mathrm{merge}(\varnothing,\ 50/20)\), which returns \(50/20\)
+          as \(30\)&rsquo;s right child.</li>
+      </ol>
+      <pre>           60/80
+          /      \
+     20/70        70/40
+    /      \
+  10/30    30/60
+               \
+              50/20</pre>
+      <p>
+        The recursion zig-zagged: it descended \(B\), then \(A\), then \(A\)
+        again, always keeping the larger-priority root on top, and the result
+        is the unique treap on the six pairs (check with &sect;2: maximum
+        \(80\) roots; among \(\{10,20,30,50\}\) the maximum priority is
+        \(70\); then \(60\) among \(\{30,50\}\); then \(20\)).
+      </p>
+      <div class="aside">
+        <span class="tag">What split/merge buys</span>
+        With split and merge as primitives, wholesale operations become
+        one-liners: insert\((k,p)\) is split at \(k\) followed by two merges
+        with a singleton; delete is two splits (isolating \(k\)) and one
+        merge, or equivalently, once the node is found, replacing it by
+        \(\mathrm{merge}(\mathrm{left}, \mathrm{right})\), which performs
+        exactly the rotate-down of &sect;4. Beyond re-deriving the basics:
+        extracting a whole key range \([a, b)\) as its own treap costs two
+        splits; set union, intersection, and difference of two treaps run in
+        \(O(m \log\frac{n}{m})\) expected time by recursive splitting. These
+        are the operations that make the treap a favorite for problems that
+        manipulate ordered sets in bulk rather than one key at a time.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="compare">7. Treaps among the search trees</h2>
+      <p>
+        The treap occupies a deliberate point in the design space mapped by
+        this catalog&rsquo;s tree handouts: it trades the worst-case
+        guarantee of the deterministic balanced trees for radical simplicity
+        and for split/merge, keeping the same expected costs.
+      </p>
+      <table>
+        <tr><th>structure</th><th>search / insert / delete</th><th>guarantee type</th><th>per-node extra</th><th>balancing logic</th></tr>
+        <tr><td><a href="ds-trees-bst.html">plain BST</a></td><td>\(\Theta(n)\) worst</td><td>average over input orders</td><td>none</td><td>none</td></tr>
+        <tr><td><a href="ds-avl-trees.html">AVL tree</a></td><td>\(\Theta(\log n)\) worst</td><td>worst case, every input</td><td>height (an <code>int</code>)</td><td>4 rotation cases</td></tr>
+        <tr><td><a href="ds-red-black-trees.html">red-black tree</a></td><td>\(\Theta(\log n)\) worst</td><td>worst case, every input</td><td>1 color bit</td><td>recoloring + rotation cases</td></tr>
+        <tr><td><strong>treap</strong></td><td>\(\Theta(\log n)\) expected</td><td>expected, over own coin flips</td><td>random priority</td><td>1 comparison per rotation</td></tr>
+      </table>
+      <p>
+        Against the <a href="ds-avl-trees.html"><em>AVL tree</em></a>: AVL
+        promises \(h \le 1.44\log_2 n\) for every input, full stop; the treap
+        promises expected depth \(\lt 1.39\log_2 n\) per key but can, with
+        vanishingly small probability, be deep. When a hard real-time bound
+        is required, the deterministic trees (AVL,
+        <a href="ds-red-black-trees.html">red-black</a>,
+        <a href="ds-two-three-trees.html">2-3</a>/<a href="ds-b-trees.html">B-trees</a>)
+        are the right tool. In exchange the treap needs no balance
+        bookkeeping (nothing to update after rotations, no cases to
+        dispatch), its correctness argument is two short inductions, and
+        split/merge come essentially free, which is why it is a standard
+        choice in practice when expected time suffices. Its defense is also
+        differently aimed: the deterministic trees defeat adversarial inputs
+        by maintenance work, the treap by making the shape independent of the
+        input order altogether.
+      </p>
+      <p>
+        The treap is one of two classic structures that buy ordered-set
+        performance with randomness; the other is the skip list, which
+        randomizes the number of forward links per element in a linked list
+        rather than a tree shape, and reaches the same expected
+        \(O(\log n)\) costs by a similar coin-flip argument. The heap half of
+        the treap&rsquo;s invariant is the subject of the
+        <a href="../heaps/ds-heaps-pq.html"><em>Heaps &amp; Priority
+        Queues</em></a> handout, and its analysis is a sibling of the
+        randomized analyses in the
+        <a href="../sorting/algo-quicksort.html"><em>Quicksort</em></a> and
+        <a href="../hashing/ds-hashing.html"><em>Hashing</em></a> handouts:
+        in all three, the algorithm&rsquo;s own randomness, not an assumption
+        about the input, carries the expectation.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex-treap">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Keys \(1,2,3,4,5\) carry priorities \(40, 10, 90, 60, 20\)
+          respectively. Draw the unique treap, without running any
+          insertions.
+          <details>
+            <summary>solution</summary>
+            Use the &sect;2 recursion. Maximum priority \(90\): key \(3\) is
+            the root. Left pairs \(\{1/40,\,2/10\}\): maximum \(40\), so
+            \(1\) roots the left subtree with \(2/10\) as its right child
+            (since \(2 \gt 1\)). Right pairs \(\{4/60,\,5/20\}\): maximum
+            \(60\), so \(4\) with \(5/20\) as its right child. Result:
+            \(3/90\,(1/40\,(\cdot,\,2/10),\ 4/60\,(\cdot,\,5/20))\). Note the
+            two right-leaning arms: uniqueness does not mean balance; balance
+            is only what random priorities deliver in expectation.
+          </details>
+        </li>
+        <li>
+          Insert key \(45\) with priority \(95\) into the running-example
+          treap of &sect;1. Give every rotation in order, with its direction,
+          and the final tree.
+          <details>
+            <summary>solution</summary>
+            BST placement descends \(40 \to 60 \to 50\) and attaches
+            \(45/95\) as the left child of \(50/20\). Bubble up:
+            (1) left child of \(50\), \(95 \gt 20\):
+            <code>rotateRight(50)</code>, so \(50\) becomes \(45\)&rsquo;s
+            right child; (2) now left child of \(60\), \(95 \gt 80\):
+            <code>rotateRight(60)</code>, so \(60\) becomes \(45\)&rsquo;s
+            right child with \(50/20\) as \(60\)&rsquo;s left child (the
+            middle subtree swings over); (3) now right child of \(40\),
+            \(95 \gt 90\): <code>rotateLeft(40)</code>, and \(45\) is the new
+            root. Final tree:
+            \(45/95\,(40/90\,(20/70\,(10/30,\,30/60),\,\cdot),\
+            60/80\,(50/20,\,70/40))\). Three rotations, both directions, and
+            the new node rose all the way to the root: exactly what a
+            maximal priority forces, since &sect;2 allows the maximum
+            priority nowhere else.
+          </details>
+        </li>
+        <li>
+          Delete key \(60\) from the running-example treap of &sect;1. Show
+          each rotate-down step with the comparison that chose its direction.
+          <details>
+            <summary>solution</summary>
+            \(60\)&rsquo;s children are \(50/20\) and \(70/40\); the right
+            outranks (\(40 \gt 20\)), so <code>rotateLeft(60)</code>: \(70\)
+            rises, and \(60\) keeps \(50/20\) as its left child (\(70/40\) had
+            no left subtree to hand over). Now \(60\) has only the left child
+            \(50/20\) (absent right counts as \(-1\), \(20 \gt -1\)), so
+            <code>rotateRight(60)</code>: \(50\) rises and \(60\) is a leaf
+            (\(50\) had no right subtree). Unlink it. Final tree:
+            \(40/90\,(20/70\,(10/30,\,30/60),\ 70/40\,(50/20,\,\cdot))\).
+            Check by &sect;2: among \(\{50,70\}\) the maximum priority is
+            \(40\), so \(70\) roots the right subtree with \(50/20\) to its
+            left. The trace covered the right-outranks case, the one-child
+            case, and the leaf unlink.
+          </details>
+        </li>
+        <li>
+          Split the running-example treap of &sect;1 at \(k = 25\), giving
+          both resulting treaps.
+          <details>
+            <summary>solution</summary>
+            Follow the search path of \(25\). At \(40\): \(40 \ge 25\), so
+            \(40\) and its right subtree go to \(R\); recurse into the left
+            subtree. At \(20\): \(20 \lt 25\), so \(20\) and its left child
+            \(10/30\) go to \(L\); recurse into \(20\)&rsquo;s right subtree.
+            At \(30\): \(30 \ge 25\), so \(30\) goes to \(R\); its empty left
+            subtree splits into two empty trees. Unwinding: \(20\)&rsquo;s
+            right becomes empty, \(40\)&rsquo;s left becomes \(30/60\).
+            Result: \(L = 20/70\,(10/30,\,\cdot)\) and
+            \(R = 40/90\,(30/60,\ 60/80\,(50/20,\,70/40))\). The subtle step
+            is the middle one: \(30/60\) started inside \(20\)&rsquo;s
+            subtree on the \(L\) side of the path but belongs to \(R\), and
+            the unwind re-hangs it as \(40\)&rsquo;s left child, where BST
+            order (\(25 \le 30 \lt 40\)) and heap order (\(60 \lt 90\)) both
+            hold.
+          </details>
+        </li>
+        <li>
+          Keys \(x_1 \lt \dots \lt x_{10}\) get uniformly random priorities.
+          (a) What is the probability that \(x_7\) is an ancestor of \(x_3\)?
+          That \(x_3\) is an ancestor of \(x_7\)? (b) What is the expected
+          depth of \(x_1\)? (\(H_{10} \approx 2.929\).)
+          <details>
+            <summary>solution</summary>
+            (a) By the ancestor lemma, \(x_7\) is an ancestor of \(x_3\) iff
+            \(x_7\) holds the maximum priority among the five keys
+            \(x_3,\dots,x_7\): probability \(1/5\). Symmetrically
+            \(P(x_3 \text{ ancestor of } x_7) = 1/5\) as well; the two events
+            are disjoint (never both), and with probability \(3/5\) some
+            middle key separates them. (b)
+            \(\mathbb{E}[\mathrm{depth}(x_1)] = H_1 + H_{10} - 2 = H_{10} - 1
+            \approx 1.93\): the smallest key is shallow in expectation
+            because every potential ancestor \(x_j\) must beat all \(j\) keys
+            \(x_1,\dots,x_j\), which gets harder with distance. Compare the
+            middle keys, whose expectation approaches \(2H_n\)-ish sums from
+            both sides.
+          </details>
+        </li>
+        <li>
+          <code>merge</code> requires every key of \(A\) to be smaller than
+          every key of \(B\). Show concretely what goes wrong without it:
+          merge \(A\) consisting of the single node \(30/90\) with \(B\)
+          consisting of the single node \(20/50\), and state which invariant
+          the output violates and why merge cannot notice.
+          <details>
+            <summary>solution</summary>
+            \(90 \gt 50\), so \(30\) becomes the root and merge recurses on
+            \(\mathrm{merge}(\varnothing,\ 20/50)\), which returns \(20/50\)
+            and hangs it as \(30\)&rsquo;s <em>right</em> child. The output
+            has \(20\) in the right subtree of \(30\): BST order violated.
+            Merge cannot notice because it never compares keys at all; it
+            compares only priorities, and its correctness argument uses the
+            precondition to know that hanging all of \(B\) on the
+            winner&rsquo;s inner side keeps key order. The precondition is
+            what licenses skipping the key comparisons, and it is why merge
+            is \(O(\log n)\) rather than \(\Omega(n)\): a general union of
+            overlapping treaps must interleave keys and costs more (see the
+            split/merge aside in &sect;6 for the set-union bound).
+          </details>
+        </li>
+        <li>
+          This handout assumed distinct priorities. Suppose two keys draw
+          equal priorities. Which theorem breaks, and how do implementations
+          deal with the possibility?
+          <details>
+            <summary>solution</summary>
+            Uniqueness (&sect;2) breaks: its proof forces the strictly
+            largest priority to the root, and with a tie either tied node
+            (if the tie is at the top of some subtree&rsquo;s priorities) can
+            legally sit above the other, so two shapes satisfy both orders.
+            The operations still work (heap order with \(\ge\) is
+            maintained), but the shape becomes order-dependent again in the
+            tied spots, and the ancestor lemma&rsquo;s clean
+            \(1/(|i-j|+1)\) probability picks up tie terms. In practice:
+            draw priorities from a range so large (for instance \(64\)-bit
+            random integers) that a collision among \(n\) keys is
+            negligibly likely, break ties deterministically (say by key), or
+            redraw on collision. Any of the three restores the analysis
+            up to a vanishing error term.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Treaps v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

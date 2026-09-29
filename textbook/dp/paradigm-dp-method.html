@@ -1,0 +1,1055 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: The Dynamic Programming Method.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Dynamic Programming Method - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h2.part { font-size: 23px; margin: 48px 0 8px; padding-top: 22px; border-top: 2px solid var(--line); }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+      <h1>The Dynamic Programming Method</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Design paradigm.
+      </div>
+      <div class="src">
+        Dynamic programming, the method: recursion that <em>remembers</em>; the
+        two hallmarks that license it (overlapping subproblems and optimal
+        substructure); the two implementations (memoization and tabulation)
+        with the one-line cost formula; the five-step design recipe; and
+        Fibonacci, the paradigm&rsquo;s canonical example, where \(177\) calls
+        become \(19\), then \(10\) additions. A closing capstone condenses
+        every DP problem into one reference table and places DP beside greedy
+        and divide-and-conquer. The problems themselves live in their own
+        handouts, linked throughout. With worked tables, complete code, links
+        to the demos, and exercises.
+      </div>
+
+      <p class="lead">
+        Greedy algorithms commit to one locally-best choice and hope; when that
+        hope has no proof, the honest strategy is to try <em>every</em> choice,
+        and the reason that isn&rsquo;t hopeless is that the resulting
+        subproblems repeat. Solve each one once, remember it, and exponential
+        recursions collapse to polynomial tables. That is dynamic programming.
+        This handout is the method in general; the problem handouts
+        (<a href="algo-rod-cutting.html">Rod Cutting</a>,
+        <a href="algo-longest-common-subsequence.html">Longest Common Subsequence</a>,
+        <a href="algo-knapsack.html">0/1 Knapsack</a>,
+        <a href="algo-edit-distance.html">Edit Distance</a>,
+        <a href="algo-dp-patterns.html">DP Patterns</a>, and
+        <a href="algo-traceback-space-saving.html">Traceback &amp; Space-Saving</a>)
+        work it through, problem by problem. The method&rsquo;s mirror image is
+        the <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout,
+        and the two together are a decision procedure for optimization
+        problems.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#idea">Recursion + remembering: what dynamic programming is</a></li>
+          <li><a href="#styles">Memoization and tabulation</a></li>
+          <li><a href="#recipe">The DP recipe</a></li>
+          <li><a href="#fib">Fibonacci: the whole arc</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+          <li><a href="#capstone">Dynamic programming in one table: the design-paradigm capstone</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="idea">1. Recursion + remembering: what dynamic programming is</h2>
+      <div class="def">
+        <span class="tag">Definition (dynamic programming)</span>
+        <strong>Dynamic programming (DP)</strong> solves a problem by combining the
+        answers to <em>overlapping</em> subproblems, storing each subproblem&rsquo;s
+        answer so that it is computed <strong>once</strong> and reused everywhere it
+        is needed. In one line: <em>DP = recursion + remembering</em>.
+      </div>
+      <p>
+        A plain recursion often re-solves the same subproblem an exponential number
+        of times; the entire blow-up is <em>recomputation</em>. DP eliminates
+        it: compute each distinct subproblem once, cache the answer, and every later
+        request is a constant-time lookup. Two conditions license the method, and
+        both must hold.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (the two hallmarks)</span>
+        A problem is a DP problem when it has both
+        <ol>
+          <li><strong>overlapping subproblems</strong>: the recursion needs
+            the <em>same</em> subproblem many times, so caching pays off; and</li>
+          <li><strong>optimal substructure</strong>: an optimal solution is
+            built from optimal solutions to its subproblems, so a recurrence over
+            cached sub-answers is <em>correct</em>.</li>
+        </ol>
+      </div>
+      <p>
+        Overlap is what makes the cache worth having: in the Fibonacci recursion,
+        \(\mathrm{fib}(3)\) is needed by <em>both</em> \(\mathrm{fib}(4)\) and
+        \(\mathrm{fib}(5)\); in rod cutting (the <a href="algo-rod-cutting.html">Rod Cutting</a> handout), the best
+        way to cut a length-\(3\) remainder is asked for after a \(1\)-cut
+        <em>and</em> after a \(2\)-cut. The same subproblem has many
+        &ldquo;parents,&rdquo; so computing it once and sharing the result saves all
+        the repeats. If instead every subproblem had a single parent (a tree
+        of all-distinct nodes rather than a directed acyclic graph), a cache
+        would store answers nobody ever asks for again. That is exactly
+        divide-and-conquer&rsquo;s territory: mergesort&rsquo;s two halves share no
+        work, and memoizing it buys nothing. Optimal substructure you have met
+        before (it is the property behind greedy proofs and shortest paths),
+        and it is what lets the recurrence build the optimum out of cached
+        sub-optima. Overlap is the new ingredient.
+      </p>
+      <div class="aside">
+        <span class="tag">Why &ldquo;dynamic programming&rdquo;?</span>
+        Richard Bellman coined the name in the 1950s, and neither word means what it
+        seems to. &ldquo;Programming&rdquo; is the operations-research sense of
+        tabular <em>planning</em> (as in &ldquo;linear programming&rdquo;), not
+        writing code; &ldquo;dynamic&rdquo; refers to multistage decisions over time;
+        by Bellman&rsquo;s own account, it was chosen partly because it
+        sounded impressive to research sponsors. The name is opaque; the idea
+        (remember your subproblems) is simple. Our primary source for
+        this material is Jeff Erickson&rsquo;s <em>Algorithms</em>, Ch.&nbsp;3, with
+        Cormen, Leiserson, Rivest &amp; Stein (CLRS) Ch.&nbsp;14 as an optional
+        reference; DP is not in Sedgewick at all.
+      </div>
+      <p>
+        The three great design paradigms of this course now sit side by side, and
+        recognizing which one a problem wants is half of algorithm design:
+      </p>
+      <table>
+        <tr><th>paradigm</th><th>idea</th><th>when it applies</th></tr>
+        <tr><td><strong>divide-and-conquer</strong> (the <a href="../sorting/paradigm-divide-and-conquer.html">Divide &amp; Conquer</a> handout)</td>
+          <td>split into <em>independent</em> subproblems, recurse, combine</td>
+          <td>subproblems do not overlap</td></tr>
+        <tr><td><strong>greedy</strong> (the <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout)</td>
+          <td>commit to one <em>locally-best</em> choice, never reconsider</td>
+          <td>the choice is provably safe (exchange argument)</td></tr>
+        <tr><td><strong>dynamic programming</strong></td>
+          <td>try <em>all</em> choices, cache the overlapping subproblems</td>
+          <td>overlap + optimal substructure</td></tr>
+      </table>
+      <p>
+        DP is greedy without the leap of faith: where greedy gambles that one
+        locally-best choice is always safe, DP tries every choice at each step and
+        lets the cached subproblem answers sort out the winner. That is why DP
+        solves the problems where greedy has a counterexample (the
+        \(\{1,3,4\}\) coin system, the 0/1 knapsack) at the price of
+        computing many more subproblems. Two things keep that price down: the
+        subproblems <strong>overlap</strong>, so there are only polynomially many
+        <em>distinct</em> ones, and <strong>caching</strong> solves each distinct
+        one exactly once. The total is therefore (number of distinct subproblems)
+        &times; (work per subproblem): for coin change \(\Theta(ak)\) and
+        for 0/1 knapsack \(\Theta(nW)\), which is polynomial in the numeric
+        capacity but <em>not</em> in the size of the input that writes it down:
+        the pseudo-polynomial fine print, in the table below and in the
+        <a href="algo-knapsack.html#pseudo">0/1 Knapsack</a> handout.
+        The practical test is to draw the recursion tree: <em>repeated</em> nodes
+        mean DP; all-distinct nodes mean divide-and-conquer; and if one branch
+        provably suffices, greedy. Often you try greedy first and fall back to DP
+        the moment you find a counterexample.
+      </p>
+
+      <div class="aside">
+        <span class="tag">First sighting: coin change and Bellman&ndash;Ford</span>
+        You may have met DP before it had a name. Change-making is one first sighting:
+        greedy fails on denominations \(\{1,3,4\}\), but
+        \(\texttt{best}[0]=0\), \(\texttt{best}[n] = 1 +
+        \min(\texttt{best}[n{-}1], \texttt{best}[n{-}3],
+        \texttt{best}[n{-}4])\) solves every amount exactly: a
+        one-dimensional table, each subproblem computed once. And
+        Bellman&ndash;Ford (the <a href="../graphs/algo-dijkstra.html">Dijkstra&rsquo;s Algorithm</a> handout) is a
+        dynamic program in all but name: round \(i\) solves the subproblem
+        &ldquo;shortest paths using at most \(i\) edges&rdquo; from the
+        round-\((i{-}1)\) answers. Both are the same move: when greedy has no
+        license, try every option and remember the subproblems.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        Two demos make the recomputation itself countable, which is the only claim this section
+        rests on. <a href="../../lib/demo.html?ds=fib-race">Fibonacci race</a> runs naive, memoized
+        and two-variable Fibonacci in lockstep: at \(n = 10\) they need \(177\), \(19\) and
+        \(10\) steps, and the naive panel's <em>times</em> row ends as the Fibonacci numbers
+        themselves. <a href="../../lib/demo.html?ds=rodcut-race">Rod cutting race</a> (the
+        <a href="algo-rod-cutting.html">Rod Cutting</a> handout) does the same for a
+        problem with choices: without a table, exactly \(2^n\) calls; with one,
+        \(n(n+1)/2\) candidates. At \(n = 12\) that is \(4096\) against \(78\), and both
+        panels return the same optimum.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="styles">2. Memoization and tabulation</h2>
+      <p>
+        There are two ways to implement the &ldquo;remember&rdquo; in
+        recursion-plus-remembering, and every DP you will ever write is one of them.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (memoization, top-down)</span>
+        <strong>Memoization</strong> keeps the natural recursion and adds a
+        <strong>cache</strong>: before computing, check whether the answer is
+        already stored; after computing, store it.
+        <pre>  solve(x):
+      if x in memo: return memo[x]      <span class="cm">// remember</span>
+      result = ... solve(smaller) ...   <span class="cm">// the natural recursion</span>
+      memo[x] = result
+      return result</pre>
+        The recursion tree is unchanged, but each distinct node is computed once;
+        every repeat is an \(O(1)\) cache hit that cuts off a whole subtree.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (tabulation, bottom-up)</span>
+        <strong>Tabulation</strong> replaces the recursion with a loop that fills a
+        <strong>table</strong> of subproblem answers in <strong>dependency
+        order</strong>, smallest subproblems first:
+        <pre>  for subproblems from SMALLEST to largest:
+      table[x] = ... table[smaller] ...   <span class="cm">// already computed</span>
+  return table[goal]</pre>
+        No recursion and no call stack, but <em>you</em> must work out an
+        evaluation order in which every cell&rsquo;s dependencies are filled before
+        the cell itself, whereas memoization discovers that order automatically.
+      </div>
+      <p>
+        Either way, the cost analysis is the same one-line product, and it is the
+        single most useful fact in this handout:
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (the DP cost formula)</span>
+        Once every subproblem is computed at most once,
+        \[
+          \text{time} \;=\; (\#\text{ distinct subproblems}) \times
+          (\text{work to combine one from its sub-answers}),
+        \]
+        and space is the number of stored subproblems (often reducible: the
+        <a href="#fib">Fibonacci</a> arc of &sect;4 and the rolling array of the
+        <a href="algo-traceback-space-saving.html">Traceback &amp; Space-Saving</a>
+        handout).
+      </div>
+      <p>
+        Fibonacci has \(n\) subproblems at \(O(1)\) each: \(\Theta(n)\), down from
+        \(\Theta(\varphi^n)\). Rod cutting has \(n\) subproblems, each a max over
+        \(O(n)\) choices: \(\Theta(n^2)\), down from exponential. The longest
+        common subsequence has \(m \cdot n\) subproblems at \(O(1)\) each:
+        \(\Theta(mn)\). The speedup is exactly the recomputation you avoid:
+        more overlap means more avoided repeats and a bigger win, while zero
+        overlap (divide-and-conquer) means caching does nothing but waste memory.
+      </p>
+      <table>
+        <tr><th></th><th>memoization</th><th>tabulation</th></tr>
+        <tr><td>direction</td><td><strong>top-down</strong></td><td><strong>bottom-up</strong></td></tr>
+        <tr><td>structure</td><td>recursion + cache</td><td>loop + table</td></tr>
+        <tr><td>computes</td><td>only the subproblems actually reached</td><td>usually all of them</td></tr>
+        <tr><td>evaluation order</td><td>automatic (the recursion finds it)</td><td>you choose it</td></tr>
+        <tr><td>overheads</td><td>call stack (can overflow when deep)</td><td>none; predictable memory access</td></tr>
+        <tr><td>space tricks</td><td>awkward</td><td>natural (keep only live rows)</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Which to use</span>
+        Same answers, same asymptotic cost; pick by convenience.
+        <strong>Memoize first</strong>: keeping the natural recursion and adding a
+        cache is the least error-prone way to get a <em>correct</em> DP, and it
+        computes only the subproblems that are actually needed. <strong>Switch to
+        tabulation</strong> when the recursion overhead matters, when the recursion
+        depth would overflow the stack, or when you want the
+        &ldquo;keep only the last two rows&rdquo; space optimization that only the
+        bottom-up form makes natural. Neither is &ldquo;the&rdquo; dynamic
+        programming; they are two implementations of the same table.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        The same recurrence, filled top-down and bottom-up:
+        <a href="../../lib/demo.html?ds=fib">Fibonacci</a> runs <em>Naive fib</em>,
+        <em>Memo fib</em> and <em>2 vars</em> one at a time, so the counters can be compared at
+        the same \(n\), and the two-variable table visibly never grows past two cells, which
+        is the space optimization tabulation makes natural.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="recipe">3. The DP recipe</h2>
+      <p>
+        Three examples, one process. Every DP you will design this term (and
+        most you will ever design) answers the same five questions, in
+        order. This recipe, not any particular example, is the transferable skill.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (the DP recipe)</span>
+        <ol>
+          <li><strong>Subproblem.</strong> State <em>exactly</em> what
+            \(dp[i]\) (or \(dp[i][j]\)) means.</li>
+          <li><strong>Recurrence.</strong> Express each subproblem in terms of
+            strictly smaller ones, usually by casing on the <em>last</em>
+            decision.</li>
+          <li><strong>Base cases.</strong> The subproblems small enough to answer
+            directly.</li>
+          <li><strong>Order.</strong> Evaluate so every dependency is computed
+            first (automatic if memoizing; your job if tabulating).</li>
+          <li><strong>Answer.</strong> Which cell holds it, plus a
+            traceback, if the solution and not just its value is wanted.</li>
+        </ol>
+      </div>
+      <p>
+        Applied to three problems (Fibonacci in &sect;4 below; the others in the
+        <a href="algo-rod-cutting.html">Rod Cutting</a> and
+        <a href="algo-longest-common-subsequence.html">Longest Common
+        Subsequence</a> handouts):
+      </p>
+      <table>
+        <tr><th>step</th><th>Fibonacci</th><th>rod cutting</th><th>LCS</th></tr>
+        <tr><td>subproblem</td><td>\(\mathrm{fib}(i)\)</td>
+          <td>\(\mathrm{best}[\ell]\): max revenue, length \(\ell\)</td>
+          <td>\(L[i][j]\): LCS length of the two prefixes</td></tr>
+        <tr><td>recurrence</td><td>\(\mathrm{fib}(i{-}1) + \mathrm{fib}(i{-}2)\)</td>
+          <td>max over first cuts \(i\)</td>
+          <td>match? diagonal \(+\,1\) : \(\max\)(up, left)</td></tr>
+        <tr><td>base cases</td><td>\(\mathrm{fib}(0){=}0\), \(\mathrm{fib}(1){=}1\)</td>
+          <td>\(\mathrm{best}[0] = 0\)</td>
+          <td>empty prefix \(\to 0\)</td></tr>
+        <tr><td>order</td><td>\(i\) ascending</td><td>\(\ell\) ascending</td>
+          <td>row by row, left to right</td></tr>
+        <tr><td>answer</td><td>\(\mathrm{fib}(n)\)</td>
+          <td>\(\mathrm{best}[n]\) (+ cuts via \(\mathrm{cut}[]\))</td>
+          <td>\(L[m][n]\) (+ traceback)</td></tr>
+        <tr><td>cost</td><td>\(n \times O(1) = \Theta(n)\)</td>
+          <td>\(n \times O(n) = \Theta(n^2)\)</td>
+          <td>\(mn \times O(1) = \Theta(mn)\)</td></tr>
+      </table>
+      <h3>Step 1 is the hard one</h3>
+      <p>
+        Defining the subproblem is where DP problems are won or lost. A precise
+        definition (&ldquo;\(\mathrm{best}[\ell]\) is the maximum revenue
+        obtainable from a rod of length exactly \(\ell\)&rdquo;) makes the
+        recurrence nearly write itself; a vague one (&ldquo;\(dp[i]\) is something
+        about the first \(i\) items&rdquo;) leads nowhere, because the recurrence
+        cannot <em>close</em>: it needs information the state does not carry. The
+        professional vocabulary for this is <strong>state</strong> (one
+        subproblem, one table cell) and <strong>transition</strong> (the
+        recurrence linking states), and the whole of DP design is: choose the
+        state, then the transition. The complexity then reads off as
+        \((\#\text{states}) \times (\text{transition cost})\), the
+        cost formula of <a href="#styles">&sect;2</a> restated.
+      </p>
+      <p>
+        For step 2, the reliable trigger is the <strong>last decision</strong>:
+        the last first-cut in rod cutting, whether the last two characters pair in
+        LCS, whether the last item goes in the knapsack. Each possible last
+        decision leaves a smaller subproblem; combine over the choices with
+        \(\max\), \(\min\), or \(+\) as the goal demands. And a small pattern
+        library speeds up step 1 itself; most DP tables have one of a few
+        shapes:
+      </p>
+      <table>
+        <tr><th>shape</th><th>subproblem</th><th>examples</th></tr>
+        <tr><td><strong>1-D</strong></td><td>\(dp[i]\) over a prefix or length</td>
+          <td>Fibonacci, rod cutting, coin change</td></tr>
+        <tr><td><strong>2-D grid</strong></td><td>\(dp[i][j]\) over two indices</td>
+          <td>LCS; <a href="algo-edit-distance.html">edit distance</a> and
+            <a href="algo-knapsack.html">0/1 knapsack</a></td></tr>
+        <tr><td><strong>interval</strong></td><td>\(dp[i][j]\) over a range \(i..j\)</td>
+          <td>matrix-chain ordering, optimal binary search trees</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Common DP mistakes</span>
+        <ul>
+          <li><strong>A vague subproblem</strong>: the recurrence
+            won&rsquo;t close because the state is missing information. Fix the
+            definition, not the code.</li>
+          <li><strong>Wrong fill order</strong> (tabulation only): reading a
+            cell before it is written. Memoization is immune, which is one reason
+            to prototype top-down.</li>
+          <li><strong>Missing or misplaced base cases</strong>: off-by-one
+            at row \(0\) / column \(0\) is the classic LCS bug; the sanity
+            invariants in the <a href="algo-longest-common-subsequence.html">Longest
+            Common Subsequence</a> handout catch it.</li>
+          <li><strong>Memoizing a non-DP</strong>: if the subproblems never
+            repeat (mergesort&rsquo;s halves), the cache is pure overhead. Check
+            for overlap before reaching for DP.</li>
+        </ul>
+      </div>
+      <p>
+        When to reach for DP, in one breath: an <em>optimum over exponentially
+        many choices</em>, whose choices generate <em>overlapping
+        subproblems</em>, where <em>greedy is not provably safe</em>. Then:
+        subproblem, recurrence, cache, and the exponential collapses to a
+        polynomial. The <a href="algo-knapsack.html">0/1 Knapsack</a> and
+        <a href="algo-edit-distance.html">Edit Distance</a> handouts run this recipe
+        on two problems where greedy fails outright (see the
+        <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout) and
+        close the arc: the problems that defeated greedy fall to DP.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        One demo per row of the recipe, in the order the recipe asks its questions.
+        <a href="../../lib/demo.html?ds=rodcut">Rod cutting</a> (the
+        <a href="algo-rod-cutting.html">Rod Cutting</a> handout) is the smallest problem with a
+        genuine <em>choice</em>: a max over every first cut, and a <code>cut[]</code> row whose
+        only purpose is the traceback (step 5).
+        <a href="../../lib/demo.html?ds=lcs">LCS</a> (the
+        <a href="algo-longest-common-subsequence.html">Longest Common Subsequence</a>
+        handout) is the same recipe in two dimensions, on any two
+        words you type. Both animate the <em>state</em> being computed and the states it reads,
+        which is what &ldquo;transition&rdquo; means when you see it rather than define it.
+      </div>
+      <!-- ============================================================ -->
+      <h2 id="fib">4. Fibonacci: the whole arc</h2>
+      <p>
+        The Fibonacci numbers \(0, 1, 1, 2, 3, 5, 8, 13, \dots\), each the
+        sum of the previous two, are the cleanest possible stage for the DP
+        idea, because the naive recursion is obviously correct and spectacularly
+        wasteful. Straight from the definition:
+      </p>
+      <pre>  long fib(int n) {
+      if (n &lt; 2) return n;              <span class="cm">// fib(0) = 0, fib(1) = 1</span>
+      return fib(n - 1) + fib(n - 2);
+  }</pre>
+      <p>
+        Correct, but trace the calls for \(n = 5\) and the overlap is
+        everywhere:
+      </p>
+      <figure>
+        <svg viewBox="0 0 470 268" role="img" aria-label="The call tree of naive fib(5): fifteen nodes in five levels. The root f(5) calls f(4) and f(3); f(4) calls f(3) and f(2); each f(3) calls f(2) and f(1); each f(2) calls f(1) and f(0). The two f(3) nodes are shaded blue and the three f(2) nodes are shaded orange to show the repeats: fib(3) is computed twice and fib(2) three times, though only six distinct subproblems f(0) through f(5) exist among the fifteen calls.">
+          <g stroke="#b9c0d0" stroke-width="1.4" fill="none">
+            <line x1="230" y1="42" x2="130" y2="76"/>
+            <line x1="230" y1="42" x2="330" y2="76"/>
+            <line x1="130" y1="96" x2="70"  y2="130"/>
+            <line x1="130" y1="96" x2="185" y2="130"/>
+            <line x1="330" y1="96" x2="290" y2="130"/>
+            <line x1="330" y1="96" x2="382" y2="130"/>
+            <line x1="70"  y1="150" x2="44"  y2="184"/>
+            <line x1="70"  y1="150" x2="104" y2="184"/>
+            <line x1="185" y1="150" x2="156" y2="184"/>
+            <line x1="185" y1="150" x2="214" y2="184"/>
+            <line x1="290" y1="150" x2="262" y2="184"/>
+            <line x1="290" y1="150" x2="318" y2="184"/>
+            <line x1="44"  y1="204" x2="22"  y2="238"/>
+            <line x1="44"  y1="204" x2="74"  y2="238"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12.5" font-weight="600" text-anchor="middle">
+            <g fill="#f0f2f6" stroke="#8a9099" stroke-width="1.2">
+              <rect x="211" y="22"  width="38" height="20" rx="5"/>
+              <rect x="111" y="76"  width="38" height="20" rx="5"/>
+              <rect x="85"  y="184" width="38" height="20" rx="5"/>
+              <rect x="137" y="184" width="38" height="20" rx="5"/>
+              <rect x="195" y="184" width="38" height="20" rx="5"/>
+              <rect x="243" y="184" width="38" height="20" rx="5"/>
+              <rect x="299" y="184" width="38" height="20" rx="5"/>
+              <rect x="363" y="130" width="38" height="20" rx="5"/>
+              <rect x="3"   y="238" width="38" height="20" rx="5"/>
+              <rect x="55"  y="238" width="38" height="20" rx="5"/>
+            </g>
+            <g fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4">
+              <rect x="311" y="76"  width="38" height="20" rx="5"/>
+              <rect x="51"  y="130" width="38" height="20" rx="5"/>
+            </g>
+            <g fill="#fff5e6" stroke="#9a5b00" stroke-width="1.4">
+              <rect x="166" y="130" width="38" height="20" rx="5"/>
+              <rect x="271" y="130" width="38" height="20" rx="5"/>
+              <rect x="25"  y="184" width="38" height="20" rx="5"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="230" y="37">f(5)</text>
+              <text x="130" y="91">f(4)</text> <text x="330" y="91">f(3)</text>
+              <text x="70"  y="145">f(3)</text> <text x="185" y="145">f(2)</text>
+              <text x="290" y="145">f(2)</text> <text x="382" y="145">f(1)</text>
+              <text x="44"  y="199">f(2)</text> <text x="104" y="199">f(1)</text>
+              <text x="156" y="199">f(1)</text> <text x="214" y="199">f(0)</text>
+              <text x="262" y="199">f(1)</text> <text x="318" y="199">f(0)</text>
+              <text x="22"  y="253">f(1)</text> <text x="74"  y="253">f(0)</text>
+            </g>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" text-anchor="start">
+            <text x="358" y="200" fill="#1f5fb0">f(3) &times; 2</text>
+            <text x="358" y="220" fill="#9a5b00">f(2) &times; 3</text>
+            <text x="358" y="240" fill="#8a9099">15 calls,</text>
+            <text x="358" y="257" fill="#8a9099">6 distinct</text>
+          </g>
+        </svg>
+        <figcaption>
+          The call tree of naive \(\mathrm{fib}(5)\): \(15\) calls to compute a
+          number with only \(6\) distinct subproblems
+          \(\mathrm{fib}(0), \dots, \mathrm{fib}(5)\). The blue \(\mathrm{fib}(3)\)
+          is computed twice, the orange \(\mathrm{fib}(2)\) three times, and
+          the duplication compounds with depth. Everything outside one copy of each
+          subproblem is pure recomputation.
+        </figcaption>
+      </figure>
+      <div class="thm">
+        <span class="tag">Proposition (the naive call count, exactly)</span>
+        Naive \(\mathrm{fib}(n)\) makes exactly
+        \[
+          \mathrm{calls}(n) \;=\; 2\,\mathrm{fib}(n+1) - 1
+        \]
+        calls; the call tree grows at the same golden-ratio rate
+        \(\Theta(\varphi^n)\), \(\varphi = \tfrac{1+\sqrt5}{2} \approx 1.618\), as
+        the value it computes.
+      </div>
+      <div class="proof">
+        <strong>Proof (induction).</strong> Each call is one node of the tree, so
+        \(\mathrm{calls}(n) = \mathrm{calls}(n-1) + \mathrm{calls}(n-2) + 1\) for
+        \(n \ge 2\), with \(\mathrm{calls}(0) = \mathrm{calls}(1) = 1\). Check the
+        formula at the base: \(2\,\mathrm{fib}(1) - 1 = 1\) and
+        \(2\,\mathrm{fib}(2) - 1 = 1\). Inductive step: assuming it for \(n-1\) and
+        \(n-2\),
+        \[
+          \mathrm{calls}(n) = \bigl(2\,\mathrm{fib}(n) - 1\bigr) +
+          \bigl(2\,\mathrm{fib}(n-1) - 1\bigr) + 1 = 2\,\mathrm{fib}(n+1) - 1 .
+        \]
+        The same argument shows \(\mathrm{fib}(k)\) is computed exactly
+        \(\mathrm{fib}(n-k+1)\) times for \(1 \le k \le n\): the repeat
+        counts are themselves Fibonacci numbers, the recursion tree measuring
+        itself. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Concretely: \(\mathrm{fib}(10)\) takes
+        \(2\,\mathrm{fib}(11) - 1 = 2 \cdot 89 - 1 = 177\) calls;
+        \(\mathrm{fib}(40)\) takes \(331{,}160{,}281 \approx 3.3\times10^{8}\);
+        \(\mathrm{fib}(50)\) takes \(\approx 4.1\times10^{10}\): forty
+        billion calls for a value fifty additions would deliver. Here is where
+        every one of the \(177\) calls at \(n = 10\) goes:
+      </p>
+      <figure>
+        <table class="trace">
+          <tr><th class="lab">k</th>
+            <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+          <tr><td class="lab">times fib(k) computed</td>
+            <td class="cell">34</td><td class="cell piv">55</td><td class="cell piv">34</td><td class="cell">21</td><td class="cell">13</td><td class="cell">8</td><td class="cell">5</td><td class="cell">3</td><td class="cell">2</td><td class="cell">1</td><td class="cell">1</td></tr>
+        </table>
+        <figcaption>
+          Naive \(\mathrm{fib}(10)\): how often each subproblem is recomputed
+          (total \(= 177\) calls). Only \(11\) computations were necessary; the
+          other \(166\) are waste. Note \(\mathrm{fib}(1)\) is computed \(55\)
+          times and \(\mathrm{fib}(2)\) \(34\) times: \(\mathrm{fib}(k)\) is
+          computed \(\mathrm{fib}(n-k+1)\) times, so the row itself is the
+          Fibonacci sequence read backwards.
+        </figcaption>
+      </figure>
+      <h3>Memoized: exponential to linear</h3>
+      <p>
+        Now add the cache. The recursion is unchanged; a table
+        <code>memo[]</code> remembers every value already computed:
+      </p>
+      <div class="code-tabs" data-snippet="dp/fib_memo">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Memoized Fibonacci: the natural recursion plus a cache. Each fib(k) is
+// computed once; every later request is an O(1) hit. Theta(n) time and space.
+long fibMemo(int n, vector&lt;long&gt;&amp; memo) {
+    if (n &lt; 2) return n;                  // base cases: fib(0)=0, fib(1)=1
+    if (memo[n] != 0) return memo[n];     // remember: cache hit, subtree skipped
+    memo[n] = fibMemo(n - 1, memo)        // computed at most once per n ...
+            + fibMemo(n - 2, memo);
+    return memo[n];                       // ... then stored for every caller
+}
+
+long fib(int n) {
+    vector&lt;long&gt; memo(n + 1, 0);          // 0 = &quot;not yet computed&quot;
+    return fibMemo(n, memo);
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Memoized Fibonacci: the natural recursion plus a cache. Each fib(k) is
+// computed once; every later request is an O(1) hit. Theta(n) time and space.
+static long fibMemo(int n, long[] memo) {
+    if (n &lt; 2) return n;                  // base cases: fib(0)=0, fib(1)=1
+    if (memo[n] != 0) return memo[n];     // remember: cache hit, subtree skipped
+    memo[n] = fibMemo(n - 1, memo)        // computed at most once per n ...
+            + fibMemo(n - 2, memo);
+    return memo[n];                       // ... then stored for every caller
+}
+
+static long fib(int n) {
+    long[] memo = new long[n + 1];        // 0 = &quot;not yet computed&quot;
+    return fibMemo(n, memo);
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Memoized Fibonacci: the natural recursion plus a cache. Each fib(k) is
+# computed once; every later request is an O(1) hit. Theta(n) time and space.
+def fib_memo(n, memo):
+    if n &lt; 2:                             # base cases: fib(0)=0, fib(1)=1
+        return n
+    if n in memo:                         # remember: cache hit, subtree skipped
+        return memo[n]
+    memo[n] = fib_memo(n - 1, memo) \
+            + fib_memo(n - 2, memo)       # computed at most once per n ...
+    return memo[n]                        # ... then stored for every caller
+
+def fib(n):
+    return fib_memo(n, {})                # dict cache: absent = not yet computed</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Memoized Fibonacci: the natural recursion plus a cache. Each fib(k) is
+// computed once; every later request is an O(1) hit. Theta(n) time and space.
+fn fib_memo(n: usize, memo: &amp;mut Vec&lt;u64&gt;) -&gt; u64 {
+    if n &lt; 2 { return n as u64; }         // base cases: fib(0)=0, fib(1)=1
+    if memo[n] != 0 { return memo[n]; }   // remember: cache hit, subtree skipped
+    memo[n] = fib_memo(n - 1, memo)       // computed at most once per n ...
+            + fib_memo(n - 2, memo);
+    memo[n]                               // ... then stored for every caller
+}
+
+fn fib(n: usize) -&gt; u64 {
+    let mut memo = vec![0u64; n + 1];     // 0 = &quot;not yet computed&quot;
+    fib_memo(n, &amp;mut memo)
+}</pre>
+<p class="ct-src">source: <code>code/dp/fib_memo.cpp &middot; code/dp/fib_memo.java &middot; code/dp/fib_memo.py &middot; code/dp/fib_memo.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The three added lines collapse the tree. There are now \(n + 1\) distinct
+        subproblems, each combined from its two sub-answers in \(O(1)\), so the
+        cost formula gives \(\Theta(n)\) time. For \(n = 10\) that is \(19\) calls
+        in total (\(2n - 1\): each of \(\mathrm{fib}(2), \dots, \mathrm{fib}(10)\)
+        spawns two calls, and \(7\) of those \(19\) are cache hits that return
+        immediately, with \(3\) more landing on a base case), against \(177\)
+        naive calls, of which \(166\) were recomputation.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (memoized fib(5), every call traced)</span>
+        The complete call sequence at \(n = 5\), in order. The code recurses on
+        \(n-1\) before \(n-2\), so the descent runs all the way down and computes
+        \(\mathrm{fib}(2)\) first; every \(n-2\) child thereafter finds its answer
+        already cached:
+        <table class="trace">
+          <tr><th>step</th><th class="lab">call</th><th>what happens</th><th>memo written</th></tr>
+          <tr><td class="num">1</td><td class="lab">fib(5)</td><td>not cached: recurse</td><td class="cell"></td></tr>
+          <tr><td class="num">2</td><td class="lab">fib(4)</td><td>not cached: recurse</td><td class="cell"></td></tr>
+          <tr><td class="num">3</td><td class="lab">fib(3)</td><td>not cached: recurse</td><td class="cell"></td></tr>
+          <tr><td class="num">4</td><td class="lab">fib(2)</td><td>not cached: recurse</td><td class="cell"></td></tr>
+          <tr><td class="num">5</td><td class="lab">fib(1)</td><td>base case, returns 1</td><td class="cell"></td></tr>
+          <tr><td class="num">6</td><td class="lab">fib(0)</td><td>base case, returns 0</td><td class="cell">memo[2] = 1</td></tr>
+          <tr><td class="num">7</td><td class="lab">fib(1)</td><td>base case, returns 1</td><td class="cell">memo[3] = 2</td></tr>
+          <tr><td class="num">8</td><td class="lab">fib(2)</td><td class="lt">cache hit, returns 1</td><td class="cell">memo[4] = 3</td></tr>
+          <tr><td class="num">9</td><td class="lab">fib(3)</td><td class="lt">cache hit, returns 2</td><td class="cell">memo[5] = 5</td></tr>
+        </table>
+        Nine calls (\(2n - 1\)): four computed once each
+        (\(\mathrm{fib}(2)\) through \(\mathrm{fib}(5)\)), three base-case
+        returns, two cache hits. Compare the naive call tree in the figure above,
+        which makes \(15\) calls for the same \(n\): the hit at step \(8\) stands
+        in for the whole \(3\)-call subtree of the second \(\mathrm{fib}(2)\), and
+        the hit at step \(9\) for the \(5\)-call subtree of the second
+        \(\mathrm{fib}(3)\); \(9 + 2 + 4 = 15\), so the two hits account for
+        exactly the calls saved.
+      </div>
+      <h3>Tabulated: and then to constant space</h3>
+      <p>
+        Bottom-up, the same table fills left to right, and once it does, a
+        further prize appears: \(\mathrm{fib}(i)\) needs only the previous
+        <em>two</em> values, so the whole table can shrink to two variables.
+      </p>
+      <div class="code-tabs" data-snippet="dp/fib_tab">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Tabulated Fibonacci: fill fib(0..n) smallest-first -- every dependency is
+// already in the table when a cell needs it. Theta(n) time, Theta(n) space.
+long fibTab(int n) {
+    vector&lt;long&gt; t(n + 2);
+    t[0] = 0; t[1] = 1;                   // base cases seed the table
+    for (int i = 2; i &lt;= n; i++)
+        t[i] = t[i - 1] + t[i - 2];       // dependencies already filled
+    return t[n];
+}
+
+// Two variables: each value needs only the previous TWO, so keep just those.
+// Theta(n) time, Theta(1) space -- the optimization tabulation makes natural.
+long fibTwoVar(int n) {
+    long a = 0, b = 1;                    // invariant: a = fib(i), b = fib(i+1)
+    for (int i = 0; i &lt; n; i++) {
+        long c = a + b;                   // one addition per step
+        a = b; b = c;                     // slide the two-cell window right
+    }
+    return a;                             // after n steps, a = fib(n)
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Tabulated Fibonacci: fill fib(0..n) smallest-first -- every dependency is
+// already in the table when a cell needs it. Theta(n) time, Theta(n) space.
+static long fibTab(int n) {
+    long[] t = new long[n + 2];
+    t[0] = 0; t[1] = 1;                   // base cases seed the table
+    for (int i = 2; i &lt;= n; i++)
+        t[i] = t[i - 1] + t[i - 2];       // dependencies already filled
+    return t[n];
+}
+
+// Two variables: each value needs only the previous TWO, so keep just those.
+// Theta(n) time, Theta(1) space -- the optimization tabulation makes natural.
+static long fibTwoVar(int n) {
+    long a = 0, b = 1;                    // invariant: a = fib(i), b = fib(i+1)
+    for (int i = 0; i &lt; n; i++) {
+        long c = a + b;                   // one addition per step
+        a = b; b = c;                     // slide the two-cell window right
+    }
+    return a;                             // after n steps, a = fib(n)
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Tabulated Fibonacci: fill fib(0..n) smallest-first -- every dependency is
+# already in the table when a cell needs it. Theta(n) time, Theta(n) space.
+def fib_tab(n):
+    t = [0] * (n + 2)
+    t[0], t[1] = 0, 1                     # base cases seed the table
+    for i in range(2, n + 1):
+        t[i] = t[i - 1] + t[i - 2]        # dependencies already filled
+    return t[n]
+
+# Two variables: each value needs only the previous TWO, so keep just those.
+# Theta(n) time, Theta(1) space -- the optimization tabulation makes natural.
+def fib_two_var(n):
+    a, b = 0, 1                           # invariant: a = fib(i), b = fib(i+1)
+    for _ in range(n):
+        a, b = b, a + b                   # one addition; slide the window right
+    return a                              # after n steps, a = fib(n)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Tabulated Fibonacci: fill fib(0..n) smallest-first -- every dependency is
+// already in the table when a cell needs it. Theta(n) time, Theta(n) space.
+fn fib_tab(n: usize) -&gt; u64 {
+    let mut t = vec![0u64; n + 2];
+    t[1] = 1;                             // base cases seed the table
+    for i in 2..=n {
+        t[i] = t[i - 1] + t[i - 2];       // dependencies already filled
+    }
+    t[n]
+}
+
+// Two variables: each value needs only the previous TWO, so keep just those.
+// Theta(n) time, Theta(1) space -- the optimization tabulation makes natural.
+fn fib_two_var(n: usize) -&gt; u64 {
+    let (mut a, mut b) = (0u64, 1u64);    // invariant: a = fib(i), b = fib(i+1)
+    for _ in 0..n {
+        let c = a + b;                    // one addition per step
+        a = b; b = c;                     // slide the two-cell window right
+    }
+    a                                     // after n steps, a = fib(n)
+}</pre>
+<p class="ct-src">source: <code>code/dp/fib_tab.cpp &middot; code/dp/fib_tab.java &middot; code/dp/fib_tab.py &middot; code/dp/fib_tab.rs</code></p>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (tabulated fib(10), every write traced)</span>
+        The same recurrence bottom-up. Two writes seed the base cases, then one
+        write per iteration, each reading two cells that the loop has already
+        filled. No recursion, no cache misses, and the dependency order is the
+        loop&rsquo;s own ascending \(i\):
+        <table class="trace">
+          <tr><th>step</th><th class="lab">write</th><th>reads</th><th>value</th></tr>
+          <tr><td class="num">1</td><td class="lab">t[0]</td><td>base case</td><td class="cell">0</td></tr>
+          <tr><td class="num">2</td><td class="lab">t[1]</td><td>base case</td><td class="cell">1</td></tr>
+          <tr><td class="num">3</td><td class="lab">t[2]</td><td>t[1] + t[0] = 1 + 0</td><td class="cell">1</td></tr>
+          <tr><td class="num">4</td><td class="lab">t[3]</td><td>t[2] + t[1] = 1 + 1</td><td class="cell">2</td></tr>
+          <tr><td class="num">5</td><td class="lab">t[4]</td><td>t[3] + t[2] = 2 + 1</td><td class="cell">3</td></tr>
+          <tr><td class="num">6</td><td class="lab">t[5]</td><td>t[4] + t[3] = 3 + 2</td><td class="cell">5</td></tr>
+          <tr><td class="num">7</td><td class="lab">t[6]</td><td>t[5] + t[4] = 5 + 3</td><td class="cell">8</td></tr>
+          <tr><td class="num">8</td><td class="lab">t[7]</td><td>t[6] + t[5] = 8 + 5</td><td class="cell">13</td></tr>
+          <tr><td class="num">9</td><td class="lab">t[8]</td><td>t[7] + t[6] = 13 + 8</td><td class="cell">21</td></tr>
+          <tr><td class="num">10</td><td class="lab">t[9]</td><td>t[8] + t[7] = 21 + 13</td><td class="cell">34</td></tr>
+          <tr><td class="num">11</td><td class="lab">t[10]</td><td>t[9] + t[8] = 34 + 21</td><td class="cell lt">55</td></tr>
+        </table>
+        Eleven cells written, nine additions, and the answer is the last cell:
+        \(\mathrm{fib}(10) = 55\). Memoization reached the same \(11\) values
+        through \(19\) calls, \(7\) of which were cache hits; tabulation pays no
+        call overhead but writes every cell whether or not the answer needs it.
+        Now shrink the table. The two-variable loop keeps only the window
+        \((a, b) = (\mathrm{fib}(i), \mathrm{fib}(i{+}1))\) and slides it right;
+        the row below is the entire memory of the computation at each step:
+        <table class="trace">
+          <tr><th class="lab">after step \(i\)</th>
+            <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+          <tr><td class="lab">a = fib(i)</td>
+            <td class="cell">0</td><td class="cell">1</td><td class="cell">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">5</td><td class="cell">8</td><td class="cell">13</td><td class="cell">21</td><td class="cell">34</td><td class="cell lt">55</td></tr>
+          <tr><td class="lab">b = fib(i+1)</td>
+            <td class="cell">1</td><td class="cell">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">5</td><td class="cell">8</td><td class="cell">13</td><td class="cell">21</td><td class="cell">34</td><td class="cell">55</td><td class="cell">89</td></tr>
+        </table>
+        Ten iterations, one addition each, two live values at all times. The
+        invariant \(a = \mathrm{fib}(i)\) holds at column \(i\) by construction:
+        it is true at \(i = 0\), and the assignment
+        \((a, b) \leftarrow (b, a + b)\) turns
+        \((\mathrm{fib}(i), \mathrm{fib}(i{+}1))\) into
+        \((\mathrm{fib}(i{+}1), \mathrm{fib}(i{+}2))\). At \(i = 10\),
+        \(a = 55\).
+      </div>
+      <p>
+        The whole arc in one table: four implementations of the
+        <em>same</em> recurrence, each strictly better than the last:
+      </p>
+      <table>
+        <tr><th>version</th><th>time</th><th>space</th><th>at \(n = 10\)</th></tr>
+        <tr><td>naive recursion</td><td>\(\Theta(\varphi^n)\)</td><td>\(\Theta(n)\) stack</td><td>\(177\) calls</td></tr>
+        <tr><td>memoized (top-down)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(19\) calls (\(7\) cache hits)</td></tr>
+        <tr><td>tabulated (bottom-up)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(11\) cells written</td></tr>
+        <tr><td>tabulated, two variables</td><td>\(\Theta(n)\)</td><td>\(\Theta(1)\)</td><td>\(10\) additions</td></tr>
+      </table>
+      <p>
+        This arc (exponential recursion \(\to\) cache it \(\to\) linear
+        \(\to\) shrink the space) is the template you will follow on every
+        DP problem in this course.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=fib">Fibonacci demo</a>. Type \(n\)
+        (\(2\)&ndash;\(16\)) and run each version in turn (<em>Naive
+        fib</em>, <em>Memo fib</em>, <em>2 vars</em>) and compare the
+        counters. At \(n = 10\): \(177\) calls versus \(19\) versus \(10\)
+        additions. The <em>times</em> row under the naive run counts each
+        subproblem&rsquo;s recomputations; check it against the trace table
+        above (\(34, 55, 34, 21, \dots\)), and notice the counts are Fibonacci
+        numbers themselves.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=fib-race">Fibonacci race</a>: all three
+        versions at the same \(n\), one basic step per tick, in lockstep. The
+        two-variable lane finishes first (watch its table: it never grows past
+        <em>two</em> cells: \(\Theta(1)\) space, visibly), memoization right
+        behind at \(2n - 1\) calls, while the naive lane keeps recomputing values
+        it already knew. Then press &#9193; \(1024\times\) to sweep the naive
+        counter to its \(2\,\mathrm{fib}(n{+}1) - 1\) total. For \(n = 10\) the
+        three step counts are \(10 \cdot 19 \cdot 177\); try \(n = 16\) for
+        \(16 \cdot 31 \cdot 3193\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">5. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          For each, say whether memoization would help, and why: (a) mergesort;
+          (b) naive Fibonacci; (c) binary search.
+          <details>
+            <summary>solution</summary>
+            (a) No. Mergesort&rsquo;s two halves are disjoint subarrays:
+            the recursion tree&rsquo;s nodes are all <em>distinct</em>
+            subproblems, so a cache stores answers that are never requested
+            again: divide-and-conquer, not DP. (b) Yes, the poster child:
+            \(\mathrm{fib}(k)\) is requested by many parents, and caching
+            collapses \(\Theta(\varphi^n)\) to \(\Theta(n)\). (c) No. Binary
+            search makes a <em>single</em> recursive call per level: there
+            is only one path, \(\Theta(\log n)\) subproblems, each visited once;
+            nothing repeats, nothing to cache.
+          </details>
+        </li>
+        <li>
+          Using \(\mathrm{calls}(n) = \mathrm{calls}(n-1) + \mathrm{calls}(n-2)
+          + 1\) with \(\mathrm{calls}(0) = \mathrm{calls}(1) = 1\), compute
+          \(\mathrm{calls}(6)\) by unrolling, and confirm it against the closed
+          form \(2\,\mathrm{fib}(n+1) - 1\).
+          <details>
+            <summary>solution</summary>
+            Unroll: \(\mathrm{calls}(2) = 1 + 1 + 1 = 3\);
+            \(\mathrm{calls}(3) = 3 + 1 + 1 = 5\);
+            \(\mathrm{calls}(4) = 5 + 3 + 1 = 9\);
+            \(\mathrm{calls}(5) = 9 + 5 + 1 = 15\);
+            \(\mathrm{calls}(6) = 15 + 9 + 1 = 25\). Closed form:
+            \(\mathrm{fib}(7) = 13\), so \(2 \cdot 13 - 1 = 25\). &check;
+            (Meanwhile memoized \(\mathrm{fib}(6)\) makes \(2 \cdot 6 - 1 = 11\)
+            calls, and the two-variable version does \(6\) additions.)
+          </details>
+        </li>
+      </ol>
+      <!-- ============================================================ -->
+      <h2 id="capstone">6. Dynamic programming in one table: the design-paradigm capstone</h2>
+      <p>
+        The method, condensed into one reference table: every problem of the DP
+        handouts, with its state and transition. Read the columns and the
+        shapes repeat: the whole skill is matching a new problem to its row.
+        Each problem&rsquo;s full treatment is in its own handout, linked from
+        its row; Fibonacci&rsquo;s is <a href="#fib">&sect;4</a> above.
+      </p>
+      <table>
+        <tr><th>problem</th><th>state</th><th>transition</th><th>cost</th></tr>
+        <tr><td><a href="#fib">Fibonacci</a></td><td>\(dp[i]\)</td><td>sum of 2 previous</td><td>\(\Theta(n)\)</td></tr>
+        <tr><td><a href="algo-rod-cutting.html">rod cutting</a></td><td>\(dp[\mathit{len}]\)</td><td>max over first cut</td><td>\(\Theta(n^2)\)</td></tr>
+        <tr><td><a href="algo-longest-common-subsequence.html">LCS</a></td><td>\(dp[i][j]\)</td><td>match: diag\(+1\); else max(up, left)</td><td>\(\Theta(mn)\)</td></tr>
+        <tr><td><a href="algo-knapsack.html">0/1 knapsack</a></td><td>\(dp[i][w]\)</td><td>max(skip, take)</td><td>\(\Theta(nW)\) <em>(pseudo-poly)</em></td></tr>
+        <tr><td><a href="algo-edit-distance.html">edit distance</a></td><td>\(dp[i][j]\)</td><td>match: diag; else \(1+\)min of 3</td><td>\(\Theta(mn)\)</td></tr>
+        <tr><td><a href="algo-dp-patterns.html">grid path (min / count)</a></td><td>\(dp[i][j]\)</td><td>min / sum of up, left</td><td>\(\Theta(mn)\)</td></tr>
+        <tr><td><a href="algo-dp-patterns.html#oned">coin change</a></td><td>\(dp[a]\)</td><td>min over last coin</td><td>\(\Theta(a k)\) (pseudo-poly)</td></tr>
+        <tr><td><a href="algo-dp-patterns.html#oned">LIS</a></td><td>\(dp[i]\) (ending at \(i\))</td><td>max over smaller predecessors</td><td>\(\Theta(n^2)\)</td></tr>
+        <tr><td><a href="algo-dp-patterns.html#grid">matrix chain / optimal BST</a></td><td>\(dp[i][j]\) (range)</td><td>min over splits \(k\)</td><td>\(\Theta(n^3)\)</td></tr>
+      </table>
+      <p>
+        When a DP will not come together, the fault is almost always the state, and
+        the fixes are mechanical:
+      </p>
+      <ul>
+        <li><strong>cannot write the recurrence?</strong> The subproblem is wrong:
+          redefine the state (<a href="algo-dp-patterns.html#oned">LIS</a>&rsquo;s &ldquo;ending at \(i\)&rdquo; was
+          exactly such a redefinition);</li>
+        <li><strong>the recurrence needs a value the state does not carry?</strong>
+          Add a dimension (knapsack added remaining capacity);</li>
+        <li><strong>still exponential?</strong> The subproblems are not overlapping;
+          it may not be a DP problem at all (reconsider divide-and-conquer
+          or greedy);</li>
+        <li><strong>correct but too slow or too big?</strong> Tighten the state, or
+          apply the rolling array.</li>
+      </ul>
+      <p>
+        The design paradigms now assemble into one decision procedure
+        for optimization problems. Try, in order:
+        <strong>greedy</strong> (the <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout):
+        one locally-best choice, fastest, but only with a proof (exchange
+        argument) that the choice is safe; <strong>divide-and-conquer</strong>
+        (the <a href="../sorting/paradigm-divide-and-conquer.html">Divide &amp; Conquer</a> handout): when the subproblems
+        are <em>independent</em>, so there is nothing to cache;
+        <strong>dynamic programming</strong> (this handout): when the subproblems <em>overlap</em> and
+        greedy has a counterexample; and <strong>brute force</strong> last. The
+        recognition test is the recursion tree: repeated nodes mean DP, all-distinct
+        nodes mean divide-and-conquer, and a provably safe single branch means
+        greedy. DP&rsquo;s difficulty concentrates in one step, defining the
+        state, and everything after it is mechanical; the payoff runs from
+        <code>git diff</code> and spell-checkers through resource allocation to
+        genome alignment.
+      </p>
+
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        The harder problems, on the same machinery:
+        <a href="../../lib/demo.html?ds=knapsack">0/1 knapsack</a> (take-or-skip, with the item
+        traceback) and <a href="../../lib/demo.html?ds=edit-distance">edit distance</a> (the
+        min-of-three table and the edit script it recovers). Every demo in the library is listed
+        on the <a href="../../lib/demo.html">explorer</a>.
+      </div>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; The Dynamic Programming Method v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

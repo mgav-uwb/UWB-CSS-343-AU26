@@ -1,0 +1,939 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Bloom Filters.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bloom Filters - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22;
+        --dim: #5c6270;
+        --line: #d7dbe3;
+        --bg: #ffffff;
+        --accent: #0a7d4d;
+        --accentbg: #eaf6ef;
+        --box: #f6f8fb;
+        --warn: #9a5b00;
+        --warnbg: #fff5e6;
+        --demo: #6b40d8;
+        --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #eef0f4;
+        color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px;
+        margin: 28px auto;
+        background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002;
+        border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic;
+        margin: 0 0 26px; border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.92em; background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 13px; line-height: 1.5; background: #f6f8fb;
+        border: 1px solid var(--line); border-left: 3px solid #b9c0d0;
+        border-radius: 6px; padding: 12px 14px; margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); }
+      .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; }
+      .aside .tag { color: var(--warn); }
+      .proof {
+        margin: 10px 0 4px; padding-left: 14px;
+        border-left: 2px solid var(--line); color: #2c2f37;
+      }
+      .proof .qed { float: right; }
+      table {
+        border-collapse: collapse; width: 100%; margin: 14px 0;
+        font-family: system-ui, sans-serif; font-size: 14.5px;
+      }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption {
+        font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim);
+        margin: 7px auto 0; max-width: 92%;
+      }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary {
+        cursor: pointer; color: var(--accent);
+        font-family: system-ui, sans-serif; font-size: 14px;
+      }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; }
+      li { margin: 5px 0; }
+      footer {
+        margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px;
+        color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif;
+      }
+      .toc {
+        font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box);
+        border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0;
+      }
+      .toc ol { margin: 4px 0; padding-left: 22px; }
+      .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; }
+        details summary { display: none; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Bloom Filters</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        Set membership in a few bits per key: the one-sided error contract
+        (false positives allowed, false negatives never), the bit array with
+        \(k\) hash functions, insert and query traced bit by bit on a 16-slot
+        filter (a true positive, a true negative, and a false positive built
+        from other keys&rsquo; bits), why deletion is impossible and how
+        counting filters restore it, the false-positive probability
+        \((1-e^{-kn/m})^k\) derived and tabulated, the optimal number of hash
+        functions, and where the space-for-certainty trade pays. With worked
+        examples, proofs, and exercises.
+      </div>
+
+      <p class="lead">
+        A hash table answers &ldquo;is key \(x\) in the set?&rdquo; exactly,
+        but to do so it must store the keys: comparing is how it confirms a
+        hit, so the keys themselves have to be there to compare against. That
+        storage is the cost. A set of a billion 64-bit keys is at least
+        8&nbsp;GB before any table overhead. A <strong>Bloom filter</strong>
+        asks what happens if we throw the keys away and keep only a few hash
+        <em>bits</em> per key. The answer: membership in about 10 bits per key,
+        regardless of key size, at the price of a new kind of answer. The filter
+        never says &ldquo;yes&rdquo;; it says <em>definitely not</em> or
+        <em>maybe</em>, and the &ldquo;maybe&rdquo; is wrong a tunable
+        percent of the time. This handout is about that contract: how the
+        structure works, why one error direction is impossible, and how to
+        compute and control the other.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#contract">Membership with one-sided error</a></li>
+          <li><a href="#structure">The structure: \(m\) bits, \(k\) hash functions</a></li>
+          <li><a href="#trace">A filter traced bit by bit</a></li>
+          <li><a href="#delete">Why deletion is impossible</a></li>
+          <li><a href="#prob">The false-positive probability</a></li>
+          <li><a href="#optk">Choosing \(k\): the optimal number of hashes</a></li>
+          <li><a href="#cost">Cost, and where the trade is worth it</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="contract">1. Membership with one-sided error</h2>
+      <p>
+        The question a Bloom filter answers is the plain membership query:
+        given a key \(x\), is \(x\) in the set \(S\) of keys inserted so far?
+        What is new is the shape of the answer.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (one-sided error)</span>
+        A membership structure has <strong>one-sided error</strong> when its
+        two answers carry different guarantees:
+        <ul>
+          <li><strong>&ldquo;no&rdquo;</strong> is certain: the key was never
+            inserted (no <em>false negatives</em>);</li>
+          <li><strong>&ldquo;maybe&rdquo;</strong> is probabilistic: the key
+            was inserted, <em>or</em> the structure has confused it with the
+            keys that were (a <em>false positive</em>, occurring with some
+            probability \(p\)).</li>
+        </ul>
+        A Bloom filter delivers exactly this contract, with \(p\) set by how
+        much space you give it.
+      </div>
+      <p>
+        An answer like that sounds weak until you notice how many systems ask
+        membership questions where the two errors have wildly different prices,
+        and the cheap error is exactly the one the filter permits. The pattern:
+        a fast, small filter sits in front of a slow, exact store. A
+        &ldquo;no&rdquo; from the filter skips the expensive step entirely and
+        is always safe to trust; a &ldquo;maybe&rdquo; falls through to the
+        exact check, which quietly absorbs the false positives.
+      </p>
+      <ul>
+        <li><strong>A database in front of its disk.</strong> Log-structured
+          storage engines (LevelDB, RocksDB, Cassandra, HBase) keep a Bloom
+          filter in memory for each on-disk table file. A lookup consults the
+          filters first; &ldquo;definitely not here&rdquo; skips the disk read.
+          A false positive costs one wasted read; a false negative would lose
+          data, and the filter cannot make one.</li>
+        <li><strong>A browser in front of the network.</strong> A compact
+          filter of known-malicious URL prefixes ships inside the browser.
+          Most pages get &ldquo;definitely not on the list&rdquo; locally and
+          load at once; the rare &ldquo;maybe&rdquo; triggers a round-trip to
+          the real list.</li>
+        <li><strong>A cache deciding what to admit.</strong> Admission
+          policies ask &ldquo;have I seen this item recently?&rdquo; A filter
+          answers in nanoseconds from a few megabytes; a stray
+          &ldquo;maybe&rdquo; merely admits one item early.</li>
+        <li><strong>A password checker in front of a blocklist.</strong>
+          &ldquo;Is this password on the leaked list?&rdquo; A false positive
+          asks a user to pick a different password; harmless. A false negative
+          would wave a leaked password through; the filter cannot do it.</li>
+      </ul>
+      <p>
+        The common thread: the filter is worth it when a false positive costs a
+        little extra work and a false negative would be a correctness bug.
+        Where both answers must be exact (does this username exist? is this
+        seat taken?) a Bloom filter is the wrong tool; use a hash table
+        (<a href="ds-hashing.html"><em>Hashing</em></a>) and pay for the keys.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="structure">2. The structure: \(m\) bits, \(k\) hash functions</h2>
+      <div class="def">
+        <span class="tag">Definition (Bloom filter)</span>
+        A <strong>Bloom filter</strong> is a bit array \(B[0..m-1]\), initially
+        all \(0\), together with \(k\) hash functions
+        \(g_0, g_1, \dots, g_{k-1}\), each mapping keys to positions
+        \(\{0, \dots, m-1\}\). The operations:
+        <ul>
+          <li><strong>insert(\(x\))</strong>: set the \(k\) bits
+            \(B[g_0(x)], B[g_1(x)], \dots, B[g_{k-1}(x)]\) to \(1\).</li>
+          <li><strong>query(\(x\))</strong>: if <em>every</em> one of those
+            \(k\) bits is \(1\), answer &ldquo;maybe&rdquo;; if <em>any</em> is
+            \(0\), answer &ldquo;definitely not.&rdquo;</li>
+        </ul>
+        There is no delete (<a href="#delete">&sect;4</a>).
+      </div>
+      <p>
+        That is the entire structure: no keys, no pointers, no buckets, just
+        \(m\) bits and \(k\) ways of pointing into them. Each inserted key
+        stamps its \(k\)-bit signature into the array; a query checks whether
+        the signature is fully stamped. The two answers inherit their
+        guarantees directly:
+      </p>
+      <ul>
+        <li><strong>No false negatives.</strong> Inserting \(x\) sets all
+          \(k\) of \(x\)&rsquo;s bits, and no operation ever clears a bit, so
+          if \(x\) was inserted its bits are all still \(1\) and every later
+          query answers &ldquo;maybe.&rdquo; (This is a theorem, and its whole
+          proof is the monotonicity of the bits; exercise 6 asks you to write
+          it out.)</li>
+        <li><strong>False positives possible.</strong> A key that was never
+          inserted can find all \(k\) of its bits set anyway, each one turned
+          on by some <em>other</em> key whose signature happens to overlap.
+          The denser the array, the likelier the accident;
+          <a href="#prob">&sect;5</a> computes the probability.</li>
+      </ul>
+      <p>
+        The \(k\) hash functions must be deterministic, fast, and spread keys
+        uniformly, the same requirements as for a hash table
+        (<a href="ds-hashing.html"><em>Hashing</em></a> covers them). In
+        practice nobody implements \(k\) independent hashes; two suffice.
+        Compute two base hashes \(h_1(x)\) and \(h_2(x)\) and derive the
+        \(k\) positions by <em>double hashing</em>:
+        \[ g_i(x) \;=\; \bigl(h_1(x) + i \cdot h_2(x)\bigr) \bmod m,
+           \qquad i = 0, 1, \dots, k-1. \]
+        This costs two hash evaluations instead of \(k\) and, for filter
+        purposes, distributes as well as \(k\) independent hashes.
+      </p>
+      <div class="code-tabs" data-snippet="hashing/bloom">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Bloom filter: m bits, k positions per key derived from two base
+// hashes by double hashing: g_i(x) = (h1(x) + i*h2(x)) mod m.
+struct BloomFilter {
+    vector&lt;bool&gt; bits;                    // m bits, all initially false
+    int m, k;
+    BloomFilter(int m, int k) : bits(m, false), m(m), k(k) {}
+
+    void insert(const Key&amp; x) {
+        size_t a = h1(x), b = h2(x);
+        for (int i = 0; i &lt; k; i++)
+            bits[(a + i * b) % m] = true;   // set all k bits
+    }
+    bool query(const Key&amp; x) const {        // false = DEFINITELY absent
+        size_t a = h1(x), b = h2(x);
+        for (int i = 0; i &lt; k; i++)
+            if (!bits[(a + i * b) % m])
+                return false;               // one 0 bit proves absence
+        return true;                        // "maybe": all k bits set
+    }
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Bloom filter: m bits, k positions per key derived from two base
+// hashes by double hashing: g_i(x) = (h1(x) + i*h2(x)) mod m.
+class BloomFilter {
+    private final boolean[] bits;         // m bits, all initially false
+    private final int m, k;
+    BloomFilter(int m, int k) { bits = new boolean[m]; this.m = m; this.k = k; }
+
+    void insert(Key x) {
+        int a = h1(x), b = h2(x);
+        for (int i = 0; i &lt; k; i++)
+            bits[(a + i * b) % m] = true;   // set all k bits
+    }
+    boolean query(Key x) {                  // false = DEFINITELY absent
+        int a = h1(x), b = h2(x);
+        for (int i = 0; i &lt; k; i++)
+            if (!bits[(a + i * b) % m])
+                return false;               // one 0 bit proves absence
+        return true;                        // "maybe": all k bits set
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Bloom filter: m bits, k positions per key derived from two base
+# hashes by double hashing: g_i(x) = (h1(x) + i*h2(x)) mod m.
+class BloomFilter:
+    def __init__(self, m, k):
+        self.m, self.k = m, k
+        self.bits = [False] * m           # m bits, all initially False
+
+    def _positions(self, x):
+        a, b = h1(x), h2(x)               # two base hashes
+        return [(a + i * b) % self.m for i in range(self.k)]
+
+    def insert(self, x):
+        for p in self._positions(x):
+            self.bits[p] = True           # set all k bits
+
+    def query(self, x):                   # False = DEFINITELY absent
+        return all(self.bits[p] for p in self._positions(x))</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Bloom filter: m bits, k positions per key derived from two base
+// hashes by double hashing: g_i(x) = (h1(x) + i*h2(x)) mod m.
+struct BloomFilter { bits: Vec&lt;bool&gt;, m: usize, k: usize }
+
+impl BloomFilter {
+    fn new(m: usize, k: usize) -&gt; Self {
+        BloomFilter { bits: vec![false; m], m, k }
+    }
+    fn insert(&amp;mut self, x: &amp;Key) {
+        let (a, b) = (h1(x), h2(x));
+        for i in 0..self.k {
+            self.bits[(a + i * b) % self.m] = true;  // set all k bits
+        }
+    }
+    fn query(&amp;self, x: &amp;Key) -&gt; bool {    // false = DEFINITELY absent
+        let (a, b) = (h1(x), h2(x));
+        (0..self.k).all(|i| self.bits[(a + i * b) % self.m])
+    }
+}</pre>
+<p class="ct-src">source: <code>code/hashing/bloom.cpp &middot; code/hashing/bloom.java &middot; code/hashing/bloom.py &middot; code/hashing/bloom.rs</code></p>
+<!--/ct--></div>
+      <p class="note">
+        The <code>query</code> loop exits at the first \(0\) bit: proving
+        absence can take as little as one probe, while &ldquo;maybe&rdquo;
+        always costs all \(k\). The trace below shows both.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">3. A filter traced bit by bit</h2>
+      <p>
+        Take \(m = 16\) and \(k = 3\), with integer keys and the two base
+        hashes
+      </p>
+      \[
+        h_1(x) = x \bmod 16, \qquad h_2(x) = 1 + (x \bmod 15),
+      \]
+      <p>
+        so the three positions of key \(x\) are
+        \(g_i(x) = (h_1(x) + i\,h_2(x)) \bmod 16\) for \(i = 0, 1, 2\). (The
+        \(1 +\) keeps the stride \(h_2\) nonzero, so the three positions do not
+        all coincide; exercise 3 pokes at the one remaining wrinkle.) We insert
+        the three keys \(42, 77, 103\) and then run three queries.
+      </p>
+
+      <h3>Insert 42</h3>
+      <pre>  h1(42) = 42 mod 16 = 10        h2(42) = 1 + (42 mod 15) = 1 + 12 = 13
+
+  i=0:  (10 + 0*13) mod 16 = 10        set bit 10
+  i=1:  (10 + 1*13) mod 16 = 23 mod 16 =  7   set bit 7
+  i=2:  (10 + 2*13) mod 16 = 36 mod 16 =  4   set bit 4
+
+  index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+  bits:   0  0  0  0  1  0  0  1  0  0  1  0  0  0  0  0</pre>
+
+      <h3>Insert 77</h3>
+      <pre>  h1(77) = 77 mod 16 = 13        h2(77) = 1 + (77 mod 15) = 1 + 2 = 3
+
+  i=0:  (13 + 0*3) mod 16 = 13         set bit 13
+  i=1:  (13 + 1*3) mod 16 = 16 mod 16 =  0    set bit 0
+  i=2:  (13 + 2*3) mod 16 = 19 mod 16 =  3    set bit 3
+
+  index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+  bits:   1  0  0  1  1  0  0  1  0  0  1  0  0  1  0  0</pre>
+
+      <h3>Insert 103: setting a bit that is already set</h3>
+      <pre>  h1(103) = 103 mod 16 = 7       h2(103) = 1 + (103 mod 15) = 1 + 13 = 14
+
+  i=0:  (7 + 0*14) mod 16 = 7          bit 7 ALREADY 1 (42 set it); stays 1
+  i=1:  (7 + 1*14) mod 16 = 21 mod 16 = 5    set bit 5
+  i=2:  (7 + 2*14) mod 16 = 35 mod 16 = 3    bit 3 ALREADY 1 (77 set it); stays 1
+
+  index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+  bits:   1  0  0  1  1  1  0  1  0  0  1  0  0  1  0  0</pre>
+      <p>
+        The third insert lands on two bits that other keys already set: bit
+        \(7\) belongs to both \(42\) and \(103\) now, bit \(3\) to both \(77\)
+        and \(103\). Setting an already-set bit changes nothing, and nothing
+        records <em>who</em> set a bit or <em>how many</em> keys rely on it.
+        That anonymity is what makes the filter small, and it is also, in
+        <a href="#delete">&sect;4</a>, what makes deletion impossible. Nine
+        stamped positions, two overlaps: \(7\) of the \(16\) bits are now
+        \(1\).
+      </p>
+
+      <h3>Query 77: a true positive</h3>
+      <pre>  positions of 77: g = [13, 0, 3]     (computed above)
+
+  i=0:  bit 13 = 1   keep going
+  i=1:  bit  0 = 1   keep going
+  i=2:  bit  3 = 1   all three set
+
+  answer: MAYBE      (correct: 77 was inserted)</pre>
+
+      <h3>Query 6: a true negative, decided in one probe</h3>
+      <pre>  h1(6) = 6      h2(6) = 1 + 6 = 7      positions: [6, 13, 4]
+
+  i=0:  bit 6 = 0    STOP
+
+  answer: DEFINITELY NOT     (correct: 6 was never inserted)</pre>
+      <p>
+        One zero bit is a proof: had \(6\) ever been inserted, bit \(6\) would
+        be \(1\). The query never looks at positions \(13\) and \(4\) (both of
+        which happen to be \(1\); it does not matter).
+      </p>
+
+      <h3>Query 20: a false positive, assembled from other keys&rsquo; bits</h3>
+      <pre>  h1(20) = 20 mod 16 = 4      h2(20) = 1 + (20 mod 15) = 1 + 5 = 6
+  positions: g0 = 4,  g1 = (4+6) mod 16 = 10,  g2 = (4+12) mod 16 = 0
+
+  i=0:  bit  4 = 1   ... set by insert 42   keep going
+  i=1:  bit 10 = 1   ... set by insert 42   keep going
+  i=2:  bit  0 = 1   ... set by insert 77   all three set
+
+  answer: MAYBE      (WRONG: 20 was never inserted)</pre>
+      <p>
+        This is the false positive anatomized. No single inserted key covers
+        \(20\)&rsquo;s signature; the accident is a collage, two bits borrowed
+        from \(42\) and one from \(77\). The filter cannot tell a signature
+        stamped by one insert from one assembled by coincidence, because bits
+        carry no owner. Nothing malfunctioned: every step followed the
+        definition, and the definition simply permits this outcome. How often?
+        For <em>this</em> filter, with \(7\) of \(16\) bits set, a uniformly
+        hashed absent key is accepted with probability about
+        \((7/16)^3 \approx 0.084\), and a sweep of all keys up to \(10^5\)
+        confirms it: \(8.3\%\) of absent keys come back &ldquo;maybe.&rdquo;
+        The general formula is next-but-one; deletion first.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="delete">4. Why deletion is impossible</h2>
+      <p>
+        The obvious delete would clear the key&rsquo;s \(k\) bits. Watch it
+        fail on the running filter. Delete \(103\) by clearing its positions
+        \(7, 5, 3\):
+      </p>
+      <pre>  index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+  before: 1  0  0  1  1  1  0  1  0  0  1  0  0  1  0  0
+  after:  1  0  0  0  1  0  0  0  0  0  1  0  0  1  0  0
+                    ^        ^        ^
+                    cleared  cleared  cleared
+
+  query 42:  positions [10, 7, 4]:  bit 7 = 0  ->  "definitely not"   WRONG
+  query 77:  positions [13, 0, 3]:  bit 3 = 0  ->  "definitely not"   WRONG</pre>
+      <p>
+        Bits \(7\) and \(3\) were <em>shared</em>: \(42\) needs bit \(7\) and
+        \(77\) needs bit \(3\), and clearing them manufactures two false
+        negatives, the one error the structure promised never to make. The
+        promise of &sect;2 rested entirely on bits never being cleared; delete
+        breaks exactly that. Nor is there a clever fix within the bit array:
+        a bit does not record how many keys stamped it, so no local
+        examination can tell a safe clear (no other key uses this bit) from a
+        catastrophic one. Deletion does not merely cost extra here, as it did
+        with open addressing&rsquo;s tombstones in
+        <a href="ds-hashing.html"><em>Hashing</em></a>; it is unimplementable
+        without changing the structure. A Bloom filter grows monotonically
+        until it is thrown away and rebuilt, which is how the database engines
+        of &sect;1 use it: one filter per immutable file, discarded with the
+        file.
+      </p>
+      <div class="aside">
+        <span class="tag">The counting-filter fix</span>
+        Replace each bit with a small <strong>counter</strong> (4 bits is the
+        customary width). Insert increments the key&rsquo;s \(k\) counters;
+        delete decrements them; query asks whether all \(k\) counters are
+        nonzero. Now bit \(7\) in the trace above would hold the count \(2\)
+        (stamped by \(42\) and \(103\)), and deleting \(103\) would decrement
+        it to \(1\): still nonzero, and \(42\) survives. The costs: the array
+        is \(4\times\) larger for the same \(m\), a counter can
+        <em>overflow</em> (with 4 bits, \(16\) keys on one counter; rare under
+        uniform hashing, and implementations pin an overflowed counter at its
+        maximum, giving up its deletability rather than its correctness), and
+        deleting a key that was <em>never inserted</em> silently corrupts the
+        filter by driving someone else&rsquo;s counters toward zero. One-sided
+        error is only preserved when deletes are honest.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="prob">5. The false-positive probability</h2>
+      <p>
+        Insert \(n\) keys into \(m\) bits with \(k\) hashes and query an
+        absent key. How likely is &ldquo;maybe&rdquo;? Assume uniform hashing:
+        every hash position is uniform on \(\{0,\dots,m-1\}\) and independent
+        across hashes and keys (the same idealization as for hash tables, and
+        the same caveat: the analysis is only as good as the hash functions).
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (false-positive rate)</span>
+        After \(n\) inserts, the probability that a fixed absent key queries
+        as &ldquo;maybe&rdquo; is approximately
+        \[ p \;\approx\; \Bigl(1 - e^{-kn/m}\Bigr)^{\!k}. \]
+      </div>
+      <div class="proof">
+        <strong>Derivation.</strong> The \(n\) inserts perform \(kn\)
+        independent bit-settings in total. Fix one bit. A single setting
+        misses it with probability \(1 - \frac1m\), so after all \(kn\)
+        settings the bit is still \(0\) with probability
+        \[ \Bigl(1 - \frac1m\Bigr)^{kn}
+           = \Bigl[\Bigl(1 - \frac1m\Bigr)^{m}\Bigr]^{kn/m}
+           \;\approx\; e^{-kn/m}, \]
+        using \((1 - \frac1m)^m \to e^{-1}\), the same approximation that
+        priced the birthday phenomenon in
+        <a href="ds-hashing.html"><em>Hashing</em></a>. So any fixed bit is
+        \(1\) with probability about \(1 - e^{-kn/m}\). The absent key is
+        accepted exactly when all \(k\) of <em>its</em> positions hold a
+        \(1\); treating those \(k\) events as independent multiplies the
+        probabilities and gives \(p \approx (1 - e^{-kn/m})^k\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p class="note">
+        Two approximations were waved in: \(e^{-kn/m}\) for the exact
+        \((1-\frac1m)^{kn}\), and independence of the \(k\) &ldquo;my bit is
+        set&rdquo; events (they are mildly correlated through the shared count
+        of set bits). Both errors vanish as \(m\) grows and are already small
+        at modest sizes; the exact analysis is graduate-level bookkeeping, and
+        the formula above is the one everyone sizes filters with.
+      </p>
+      <p>
+        Sanity-check it against the traced filter: \(m = 16\), \(n = 3\),
+        \(k = 3\), so \(kn/m = 9/16\) and
+        \(e^{-9/16} \approx 0.5698\), giving
+        \(p \approx (1 - 0.5698)^3 = (0.4302)^3 \approx 0.080\). The measured
+        rate on the actual filter was \(0.083\): the formula is honest even at
+        sixteen bits. Now read it as a design tool. The quantity that matters
+        is \(m/n\), <em>bits per key</em>: fix the budget and every added key
+        costs the same slice of it.
+      </p>
+      <table>
+        <tr><th>\(k\) (with \(m=16\), \(n=3\))</th><th>\(1 - e^{-kn/m}\)</th><th>\(p = (1-e^{-kn/m})^k\)</th></tr>
+        <tr><td>1</td><td>0.171</td><td>0.171</td></tr>
+        <tr><td>2</td><td>0.313</td><td>0.098</td></tr>
+        <tr><td>3</td><td>0.430</td><td>0.080</td></tr>
+        <tr><td>4</td><td>0.528</td><td><strong>0.078</strong></td></tr>
+        <tr><td>5</td><td>0.608</td><td>0.083</td></tr>
+        <tr><td>6</td><td>0.675</td><td>0.095</td></tr>
+      </table>
+      <p>
+        The column tells a story with a twist: more hashes first help, then
+        hurt. Each extra hash gives an absent key one more bit that must be
+        set (good: another chance to catch it), but also stamps one more bit
+        per insert, filling the array faster (bad: every bit is likelier to be
+        set). The two forces balance at an interior optimum, here around
+        \(k = 4\), and finding it in general is the next section.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="optk">6. Choosing \(k\): the optimal number of hashes</h2>
+      <div class="thm">
+        <span class="tag">Theorem (optimal \(k\))</span>
+        For fixed \(m\) and \(n\), the false-positive rate
+        \(p(k) = (1 - e^{-kn/m})^k\) is minimized at
+        \[ k^\* \;=\; \frac{m}{n}\,\ln 2 \;\approx\; 0.693\,\frac mn, \]
+        at which point each fraction \(e^{-k^\*n/m} = \tfrac12\) (the array is
+        half zeros, half ones) and
+        \[ p_{\min} \;=\; \Bigl(\tfrac12\Bigr)^{k^\*}
+           \;=\; 2^{-\,(m/n)\ln 2} \;\approx\; (0.6185)^{\,m/n}. \]
+      </div>
+      <div class="proof">
+        <strong>Proof sketch.</strong> Write \(c = n/m\) and minimize
+        \(\ln p(k) = k \ln\bigl(1 - e^{-ck}\bigr)\). Substitute
+        \(u = e^{-ck}\), so \(k = -\frac{\ln u}{c}\) and
+        \[ \ln p \;=\; -\frac1c\,\ln u \,\ln(1-u), \qquad 0 < u < 1. \]
+        The function \(\ln u \ln(1-u)\) is symmetric under
+        \(u \leftrightarrow 1-u\), positive on \((0,1)\), and vanishes at both
+        endpoints; it attains its maximum at the fixed point of the symmetry,
+        \(u = \tfrac12\) (differentiating and using the symmetry makes this
+        precise: the derivative at \(u=\frac12\) is zero, and it is the only
+        interior critical point). Maximizing \(\ln u\ln(1-u)\) minimizes
+        \(\ln p\), so the optimum is \(e^{-ck} = \tfrac12\), that is,
+        \(k^\* = \frac{\ln 2}{c} = \frac mn \ln 2\). Substituting back:
+        each of the \(k^\*\) factors of \(p\) equals \(\tfrac12\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The half-full array is the memorable part: the optimal filter is the
+        one whose bit array carries maximum entropy, one bit of information
+        per bit of storage. Fuller wastes queries&rsquo; discriminating power;
+        emptier wastes space. Since \(k\) must be an integer, round \(k^\*\)
+        and take the neighbor with the smaller \(p\); the curve is flat near
+        the optimum, so the rounding costs little (the table in &sect;5 shows
+        it: \(k = 3, 4, 5\) all land within \(7\%\) of each other around
+        \(k^\* = \frac{16}{3}\ln 2 \approx 3.70\)). The design table, one row
+        per space budget:
+      </p>
+      <table>
+        <tr><th>bits per key \(m/n\)</th><th>\(k^\* = \frac mn \ln 2\)</th><th>best integer \(k\)</th><th>\(p\) at that \(k\)</th></tr>
+        <tr><td>4</td><td>2.77</td><td>3</td><td>0.147</td></tr>
+        <tr><td>8</td><td>5.55</td><td>6</td><td>0.0216</td></tr>
+        <tr><td>10</td><td>6.93</td><td>7</td><td>0.0082</td></tr>
+        <tr><td>12</td><td>8.32</td><td>8</td><td>0.0031</td></tr>
+        <tr><td>16</td><td>11.09</td><td>11</td><td>0.00046</td></tr>
+      </table>
+      <p>
+        Each additional \(\approx 1.44\) bits per key multiplies \(p\) by
+        \(\tfrac12\) (that is \(p \approx 0.6185^{m/n}\) read backwards:
+        \(0.6185^{1.44} \approx \tfrac12\)). The working engineer&rsquo;s
+        summary: <strong>about 10 bits per key buys a 1% false-positive
+        rate</strong>, with \(k = 7\) hashes, whatever the keys are and however
+        large each one is. Sizing a filter runs the theorem in reverse: given
+        \(n\) and a target \(p\), take
+        \(m = -\,n \ln p / (\ln 2)^2\) and \(k = -\log_2 p\)
+        (exercise 5 does one).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">7. Cost, and where the trade is worth it</h2>
+      <table>
+        <tr><th>operation</th><th>cost</th><th>notes</th></tr>
+        <tr><td>insert</td><td>\(\Theta(k)\)</td><td>two base hashes, \(k\) bit-sets; no resizing, no collisions to resolve</td></tr>
+        <tr><td>query</td><td>\(O(k)\)</td><td>exits at the first \(0\) bit; a &ldquo;maybe&rdquo; costs exactly \(k\) probes</td></tr>
+        <tr><td>delete</td><td>not supported</td><td>counting filter: same costs, \(4\times\) the space</td></tr>
+        <tr><td>space</td><td>\(m\) bits</td><td>\(\approx 10\,n\) bits at \(p = 1\%\); independent of key size</td></tr>
+      </table>
+      <p>
+        The costs need almost no argument, which is itself the point: with
+        \(k\) fixed by the design, insert and query are constant-time by
+        construction, not in expectation. There are no collisions to resolve,
+        because the structure never distinguishes keys well enough for
+        distinctness to be an issue; &ldquo;collisions&rdquo; are not a
+        failure mode but the accepted, priced-in source of false positives.
+        Compare the ledger against the exact alternative:
+      </p>
+      <table>
+        <tr><th></th><th>hash set</th><th>Bloom filter</th></tr>
+        <tr><td>answers</td><td>yes / no, both exact</td><td>maybe / <strong>no</strong> (only &ldquo;no&rdquo; exact)</td></tr>
+        <tr><td>space per key</td><td>the key itself + table overhead (a 64-bit key: \(\ge 64\) bits, typically \(2\)&ndash;\(4\times\) more)</td><td>\(\approx 10\) bits at \(p=1\%\), <em>any</em> key size</td></tr>
+        <tr><td>lookup</td><td>\(\Theta(1)\) expected</td><td>\(\Theta(k)\) worst case</td></tr>
+        <tr><td>delete / iterate / retrieve keys</td><td>yes</td><td>no; keys are gone</td></tr>
+      </table>
+      <p>
+        For 64-bit keys at \(p = 1\%\) the filter is \(6\times\) smaller than
+        even a zero-overhead array of the bare keys, and the ratio grows
+        without bound for strings: a filter of million-character URLs costs
+        the same \(10\) bits per URL as a filter of small integers, because no
+        key material is stored at all. That is the trade in one sentence:
+        <em>space independent of key size, bought by accepting a tunable
+        false-positive rate and giving up deletion, iteration, and the keys
+        themselves.</em> The systems in &sect;1 are precisely the ones for
+        which every clause of that sentence is acceptable, and the exact
+        stores behind them absorb the rest.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">8. Where this sits</h2>
+      <p>
+        The prerequisite is <a href="ds-hashing.html"><em>Hashing</em></a>:
+        hash-function quality, the uniform-hashing idealization, and the
+        \((1-\frac1m)^{\cdot} \approx e^{-\cdot/m}\) approximation all come
+        from there, and the Bloom filter is what remains of a hash table when
+        the keys are deleted from the design. Where a problem needs exact
+        answers with ordered queries, the balanced-tree handouts (for
+        instance <a href="../trees/ds-avl-trees.html"><em>AVL Trees</em></a>)
+        occupy the opposite corner: maximum structure retained, maximum space
+        paid. The Bloom filter is also the entry point to a family of
+        <em>sketches</em>, small lossy summaries with quantified error: a
+        companion handout on the count-min sketch applies the same
+        &ldquo;few hashes into a small array&rdquo; recipe to
+        <em>frequency estimation</em> (how many times has \(x\) appeared?)
+        rather than membership.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Continue the traced filter of <a href="#trace">&sect;3</a> (final
+          bit array <code>1001110100100100</code>, bits \(0,3,4,5,7,10,13\)
+          set): insert the key \(12\). Compute \(h_1, h_2\), the three
+          positions, and the resulting bit array.
+          <details>
+            <summary>solution</summary>
+            \(h_1(12) = 12\), \(h_2(12) = 1 + 12 = 13\). Positions:
+            \(g_0 = 12\); \(g_1 = (12+13) \bmod 16 = 25 \bmod 16 = 9\);
+            \(g_2 = (12+26) \bmod 16 = 38 \bmod 16 = 6\). All three bits were
+            \(0\), so the insert sets three fresh bits and the array becomes
+            <code>1001111101110100</code> (bits \(0,3,4,5,6,7,9,10,12,13\)
+            set: ten of sixteen).
+          </details>
+        </li>
+        <li>
+          In &sect;3, the query for key \(6\) answered &ldquo;definitely
+          not.&rdquo; Re-run that query after the insert of \(12\) from
+          exercise 1. What happens, and what general fact about Bloom filters
+          does the change illustrate?
+          <details>
+            <summary>solution</summary>
+            The positions of \(6\) are \([6, 13, 4]\). Bit \(6\) was the
+            zero that proved absence; the insert of \(12\) set it. Now bit
+            \(6 = 1\), bit \(13 = 1\) (from \(77\)), bit \(4 = 1\) (from
+            \(42\)): all set, so the query answers &ldquo;maybe,&rdquo; a
+            false positive. Nothing about \(6\) changed; the filter around it
+            filled in. This is the general fact that the false-positive rate
+            is not a constant of the structure but a function of \(n\): every
+            insert can only raise it (bits only turn on), which is why
+            \(p \approx (1-e^{-kn/m})^k\) contains \(n\), and why a filter
+            sized for \(n\) keys degrades when fed more.
+          </details>
+        </li>
+        <li>
+          Compute the three positions of the key \(37\) in the &sect;3 filter.
+          Something is off about them; identify it, explain which choice in
+          the construction allows it, and determine whether it threatens the
+          filter&rsquo;s one-sided-error guarantee.
+          <details>
+            <summary>solution</summary>
+            \(h_1(37) = 37 \bmod 16 = 5\), \(h_2(37) = 1 + (37 \bmod 15) = 8\).
+            Positions: \(g_0 = 5\), \(g_1 = 13\),
+            \(g_2 = (5 + 16) \bmod 16 = 5\): the first and third
+            <em>coincide</em>, because the stride \(8\) satisfies
+            \(2 \cdot 8 \equiv 0 \pmod{16}\). The double-hashing scheme only
+            guarantees distinct positions when the stride is coprime to
+            \(m\); \(h_2 = 8\) shares the factor \(8\) with \(m = 16\).
+            The guarantee survives: correctness (&sect;2) needs only
+            &ldquo;insert sets bits, query checks the same bits, bits are
+            never cleared,&rdquo; none of which requires the positions to be
+            distinct. The cost is statistical: key \(37\) effectively probes
+            \(2\) distinct bits instead of \(3\), so <em>this key</em> is
+            easier to falsely accept (and indeed bits \(5\) and \(13\) are
+            both set, so \(37\) queries as &ldquo;maybe&rdquo; here). Real
+            implementations pick \(m\) prime, or force \(h_2\) odd with
+            \(m\) a power of two, to keep every stride coprime to \(m\).
+          </details>
+        </li>
+        <li>
+          A colleague proposes deleting \(103\) from the &sect;3 filter by
+          clearing bits \(7, 5, 3\). List every key of the set
+          \(\{42, 77\}\) that this breaks, exhibit the broken query
+          step by step, and name the error class produced.
+          <details>
+            <summary>solution</summary>
+            Both break. Query \(42\): positions \([10, 7, 4]\); bit \(7\)
+            was cleared, so the loop stops at \(i=1\) with &ldquo;definitely
+            not,&rdquo; though \(42\) was inserted. Query \(77\): positions
+            \([13, 0, 3]\); bits \(13\) and \(0\) pass, bit \(3\) was
+            cleared: &ldquo;definitely not,&rdquo; also wrong. These are
+            false negatives, the error class a Bloom filter is defined never
+            to produce; the shared bits (\(7\) with \(42\), \(3\) with
+            \(77\)) are invisible to the delete because bits carry no count.
+            A counting filter stores that count and decrements instead of
+            clearing: bit \(7\)&rsquo;s counter would go \(2 \to 1\) and both
+            queries survive.
+          </details>
+        </li>
+        <li>
+          Size a filter: \(n = 1000\) keys, target false-positive rate
+          \(p = 1\%\). Give \(m\) (in bits and bytes) and \(k\), and verify
+          your \(p\) by plugging back into the formula. Then compare the
+          space with a plain array of the raw keys, taking them as 64-bit
+          integers.
+          <details>
+            <summary>solution</summary>
+            \(m = -n \ln p / (\ln 2)^2 = 1000 \times 4.605 / 0.4805
+            \approx 9585\) bits \(\approx 1.2\) KB; bits per key
+            \(m/n \approx 9.59\). \(k = -\log_2 p = \log_2 100 \approx 6.64\),
+            round to \(k = 7\). Check:
+            \(p = (1 - e^{-7/9.585})^7 \approx (1 - e^{-0.730})^7 \approx
+            0.0100\). The raw keys alone occupy
+            \(1000 \times 64 = 64{,}000\) bits \(= 8\) KB, so the filter is
+            about \(6.7\times\) smaller than even a zero-overhead exact
+            store, before any hash-table overhead, and the ratio would grow
+            with longer keys.
+          </details>
+        </li>
+        <li>
+          Prove the no-false-negatives guarantee: if <code>insert(x)</code>
+          was executed, every later <code>query(x)</code> answers
+          &ldquo;maybe.&rdquo; State exactly which property of the operation
+          set the proof depends on, and exhibit the (already seen) operation
+          that would destroy it.
+          <details>
+            <summary>solution</summary>
+            <code>insert(x)</code> sets \(B[g_i(x)] = 1\) for all
+            \(i = 0,\dots,k-1\). The only operations are insert and query:
+            query writes nothing, and insert only ever assigns \(1\). Hence
+            the predicate &ldquo;\(B[j] = 1\)&rdquo; is <em>monotone</em>:
+            once true it stays true forever. In particular each
+            \(B[g_i(x)]\), true when <code>insert(x)</code> returns, is still
+            true at any later <code>query(x)</code>, whose all-bits-set test
+            therefore passes and answers &ldquo;maybe.&rdquo; The proof uses
+            nothing about the hash functions (not even determinism across
+            <em>different</em> keys, only that \(x\)&rsquo;s own positions are
+            recomputed identically, which determinism supplies). The
+            destroying operation is any bit-clearing delete, as in exercise
+            4: it breaks monotonicity, and the guarantee falls with it.
+          </details>
+        </li>
+        <li>
+          Keep \(n = 3\) and \(k = 3\) but double the array to \(m = 32\).
+          Compute the new predicted false-positive rate and compare with the
+          \(m = 16\) value \(p \approx 0.080\). Doubling the space more than
+          halved \(p\); explain the mechanism.
+          <details>
+            <summary>solution</summary>
+            \(kn/m = 9/32 = 0.281\), so
+            \(p = (1 - e^{-0.281})^3 = (0.245)^3 \approx 0.0147\): doubling
+            \(m\) cut \(p\) by a factor of \(5.4\), not \(2\). The mechanism
+            is the exponent \(k\): halving the fill \(kn/m\) roughly halves
+            the per-bit probability \(1 - e^{-kn/m}\) (from \(0.430\) to
+            \(0.245\) here), and the false positive needs <em>all three</em>
+            of its bits set, so the improvement compounds three times:
+            \((0.57)^3 \approx 0.18 \approx 1/5.4\). Space works on \(p\)
+            through a \(k\)-th power; that is the same compounding read in
+            &sect;6 as &ldquo;every \(1.44\) bits per key halves
+            \(p\)&rdquo; at optimal \(k\).
+          </details>
+        </li>
+        <li>
+          Two Bloom filters \(F_A\) and \(F_B\) use the same \(m\) and the
+          same hash functions, built over key sets \(A\) and \(B\). Show that
+          the bitwise OR of their arrays is <em>exactly</em> the filter that
+          would have been built over \(A \cup B\). Then explain why the
+          bitwise AND is <em>not</em> exactly the filter of \(A \cap B\)
+          (which side of the equality fails, and what it costs).
+          <details>
+            <summary>solution</summary>
+            <strong>OR:</strong> bit \(j\) of the filter of \(A \cup B\) is
+            \(1\) iff some key of \(A \cup B\) has a position at \(j\), iff
+            some key of \(A\) does or some key of \(B\) does, iff bit \(j\)
+            is \(1\) in \(F_A\) or in \(F_B\). The arrays are equal bit for
+            bit (this is why the database engines of &sect;1 can merge
+            filters when they merge files). <strong>AND:</strong> one
+            direction holds: every key of \(A \cap B\) was inserted into
+            both, so its bits are set in both and survive the AND; the
+            AND-filter never falsely rejects a member of the intersection.
+            The failure is the other containment: a bit can be \(1\) in
+            \(F_A\) because of a key \(a \in A\setminus B\) and \(1\) in
+            \(F_B\) because of a different key \(b \in B\setminus A\), so
+            the AND keeps a bit that no key of \(A \cap B\) set. The
+            AND-array can therefore strictly contain the array of the true
+            intersection filter, and its false-positive rate is
+            correspondingly higher than a filter built from \(A \cap B\)
+            directly. One-sided error is preserved; only the rate suffers.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Bloom Filters v1.0 &middot;
+        prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<!-- CSS 343 handout - Computing Environment / CSS Linux Lab. Self-contained.
+     Adopted & modernized from the SP26 "Computing Environment" page. Open through
+     the course server or any browser. No external dependencies. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Computing Environment (CSS Linux Lab) - CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:48px clamp(20px,6vw,64px) 64px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:27px;line-height:1.25;margin:0 0 4px}
+  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 4px}
+  .src{color:var(--dim);font-size:13.5px;font-style:italic;margin:0 0 26px;border-bottom:1px solid var(--line);padding-bottom:18px}
+  h2{font-size:20px;margin:34px 0 10px;padding-top:6px}
+  h3{font-size:16.5px;margin:22px 0 6px;color:#2a2d36}
+  p{margin:10px 0}
+  a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.92em;
+       background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;
+      font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13.5px;line-height:1.55}
+  pre .c{color:var(--dim)}
+  .lead{font-size:16.5px;color:#33363f}
+  .def,.ex,.aside{border:1px solid var(--line);border-radius:8px;padding:13px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .ex{border-left:4px solid #777;background:#f6f7f9}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;
+       font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .ex .tag{color:#555} .aside .tag{color:var(--warn)}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-family:system-ui,sans-serif;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#f0f2f6}
+  td code{background:#eef1f6}
+  ul,ol{margin:8px 0;padding-left:24px} li{margin:5px 0}
+  footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);
+         font-size:13px;font-family:system-ui,sans-serif}
+  .toc{font-family:system-ui,sans-serif;font-size:14.5px;background:var(--box);border:1px solid var(--line);
+       border-radius:8px;padding:12px 18px;margin:18px 0}
+  .toc ol{margin:4px 0;padding-left:22px} .toc a{text-decoration:none}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Computing Environment:<br>The CSS Linux Lab &amp; How to Use It</h1>
+  <div class="subtitle">CSS 343 - Data Structures, Algorithms &amp; Discrete Mathematics II. Required setup. Practical guide.</div>
+  <div class="src">How to reach the school's Linux lab, transfer files, and compile &amp; run C++ there - including the rule for compiling <strong>template classes</strong>, and how to check for memory leaks with Valgrind. Every programming assignment is graded on this environment.</div>
+
+  <p class="lead">C and C++ programs are <strong>OS-dependent</strong>: code that builds and runs on your laptop can behave differently - or fail to compile - on another system. To keep grading fair and reproducible, this course standardizes on <strong>Linux</strong>. You may write code in any editor or IDE you like, but <strong>all submitted code must compile and run on the CSS Linux lab</strong> with <code>g++ -std=c++17</code>, because that is where we grade it.</p>
+
+  <div class="aside"><span class="tag">The one rule that costs the most points</span>
+    "It compiles on my machine" is <strong>not</strong> enough. Before every submission, do a final build and test on a <code>csslab</code> machine. If your code does not compile there, you receive <strong>0 for correctness</strong> (see the assignment rubric).
+  </div>
+
+  <div class="toc">
+    <strong>Contents</strong>
+    <ol>
+      <li><a href="#machines">The lab machines</a></li>
+      <li><a href="#connect">Connecting from your computer</a></li>
+      <li><a href="#transfer">Transferring files</a></li>
+      <li><a href="#compile">Compiling &amp; running C++ (incl. templates)</a></li>
+      <li><a href="#valgrind">Checking for memory leaks (Valgrind)</a></li>
+      <li><a href="#commands">Essential Linux commands</a></li>
+      <li><a href="#walkthrough">First session: a quick walkthrough</a></li>
+      <li><a href="#alternatives">Alternatives &amp; help</a></li>
+    </ol>
+  </div>
+
+  <h2 id="machines">1. The lab machines</h2>
+  <p>The CSS Linux lab is a set of shared servers you log into remotely. Use any one of:</p>
+  <div class="def"><span class="tag">Connection details</span>
+    <strong>Hosts:</strong> <code>csslab1.uwb.edu</code>, <code>csslab2.uwb.edu</code>, &hellip;, <code>csslab12.uwb.edu</code> (pick any; if one is busy, try another).<br>
+    <strong>Username:</strong> your <strong>UW NetID</strong> &nbsp;&middot;&nbsp; <strong>Password:</strong> your UW NetID password &nbsp;&middot;&nbsp; <strong>Port:</strong> <code>22</code> (SSH).
+  </div>
+  <p>Access details and account help live on the <a href="https://csswiki.uwb.edu/">CSS Wiki</a>.</p>
+  <div class="aside"><span class="tag">Off campus?</span>
+    Connect to the UW VPN first - <a href="https://itconnect.uw.edu/tools-services-support/networks-connectivity/husky-onnet/">Husky OnNet</a> - then log into the lab as usual. On campus (or already on the UW network) you can skip the VPN.
+  </div>
+
+  <h2 id="connect">2. Connecting from your computer</h2>
+  <p>You connect with <strong>SSH</strong> (Secure Shell), which gives you a terminal on the lab machine. Every modern OS ships with an <code>ssh</code> command built in - no extra software required.</p>
+
+  <h3>macOS / Linux</h3>
+  <p>Open <strong>Terminal</strong> and run:</p>
+  <pre><span class="c"># replace "netid" with your UW NetID</span>
+ssh netid@csslab1.uwb.edu</pre>
+  <p>The first time you connect to a host it asks you to confirm a fingerprint - type <code>yes</code>. Then enter your UW NetID password (the cursor does not move as you type - that's normal). To leave, type <code>exit</code>.</p>
+
+  <h3>Windows</h3>
+  <p>Windows 10/11 also has <code>ssh</code> built in. Open <strong>Windows Terminal</strong> (or PowerShell) and run the same command:</p>
+  <pre>ssh netid@csslab1.uwb.edu</pre>
+  <p>If you prefer a graphical client, <a href="https://mobaxterm.mobatek.net/">MobaXterm</a> (terminal + file transfer in one) or <a href="https://www.putty.org/">PuTTY</a> (terminal) both work; set Host = <code>csslab1.uwb.edu</code>, Port = <code>22</code>.</p>
+
+  <h2 id="transfer">3. Transferring files</h2>
+  <p>Two good workflows - pick whichever you prefer:</p>
+
+  <h3>Command line: <code>scp</code> (works on Mac, Linux, Windows)</h3>
+  <p>Run these from a terminal on <em>your</em> computer (not the lab):</p>
+  <pre><span class="c"># copy files UP to the lab (into ~/css343/pa1/)</span>
+scp NDLList.h NDLList.cpp CDLList.h CDLList.cpp driver.cpp netid@csslab1.uwb.edu:~/css343/pa1/
+
+<span class="c"># copy a whole folder up</span>
+scp -r pa1 netid@csslab1.uwb.edu:~/css343/
+
+<span class="c"># copy a result back DOWN to the current folder</span>
+scp netid@csslab1.uwb.edu:~/css343/pa1/result.txt .</pre>
+
+  <h3>Graphical clients</h3>
+  <p><a href="https://filezilla-project.org/">FileZilla</a> (all platforms), <strong>WinSCP</strong> (Windows), or <strong>MobaXterm</strong> let you drag and drop. Use protocol <strong>SFTP</strong>, Host <code>csslab1.uwb.edu</code>, Port <code>22</code>, and your UW NetID credentials.</p>
+  <div class="aside"><span class="tag">Typical loop</span>
+    Edit locally in your IDE &rarr; <code>scp</code> the files up &rarr; build &amp; test on the lab. Or skip the round-trip and edit directly over SSH with <code>nano</code> (beginner-friendly) or <code>vim</code>.
+  </div>
+
+  <h2 id="compile">4. Compiling &amp; running C++</h2>
+  <p>The compiler is <strong>g++</strong>. This course builds with the C++17 standard:</p>
+  <pre><span class="c"># one source file with main()</span>
+g++ -std=c++17 main.cpp -o main
+./main</pre>
+  <p>Always pass <code>-std=c++17</code> and name your program with <code>-o</code> (rather than relying on the default <code>a.out</code>). If a program has <strong>several <code>.cpp</code> files and exactly one <code>main()</code></strong>, compile them together:</p>
+  <pre>g++ -std=c++17 *.cpp -o prog     <span class="c"># or list them explicitly</span>
+./prog</pre>
+
+  <h3>Template classes - the rule to memorize</h3>
+  <p>A template's full definition must be visible to the compiler at the point where it is instantiated. The course convention (and what the assignments require) is: put the template's implementation in a <code>.cpp</code>, and <strong><code>#include</code> that <code>.cpp</code> at the bottom of its header</strong>. Then you compile <strong>only the file that contains <code>main()</code></strong> - never the template <code>.cpp</code> on its own.</p>
+  <div class="def"><span class="tag">Template compile rule</span>
+    Header ends with the implementation: <code>List.h</code> &rarr; last line <code>#include "List.cpp"</code>.<br>
+    Compile <strong>only the driver</strong> (the file with <code>main()</code>). Do <strong>not</strong> put the template <code>.cpp</code> on the <code>g++</code> line.
+  </div>
+  <div class="ex"><span class="tag">Example</span>
+    Files: <code>List.h</code> (class spec; last line <code>#include "List.cpp"</code>), <code>List.cpp</code> (the template implementation), and <code>driver.cpp</code> (your <code>main()</code>, which does <code>#include "List.h"</code>). Build and run:
+    <pre>g++ -std=c++17 driver.cpp -o driver
+./driver</pre>
+    Compiling <code>List.cpp</code> by itself, or adding it to the <code>g++</code> line, causes duplicate-definition / linker errors. Compile the driver only.
+  </div>
+  <p>Two flags you'll want on assignments: <code>-O2</code> turns on optimization (use it for timing experiments such as the doubling experiment), and <code>-g</code> adds debug symbols (use it with Valgrind and debuggers).</p>
+
+  <h2 id="valgrind">5. Checking for memory leaks (Valgrind)</h2>
+  <p>Assignments that use <code>new</code>/<code>delete</code> are graded for leaks with <strong>Valgrind</strong>, which is installed on the lab. Build with <code>-g</code>, then run your program under it:</p>
+  <pre>g++ -std=c++17 -g driver.cpp -o driver
+valgrind --leak-check=full ./driver</pre>
+  <p>A clean run ends with <code>All heap blocks were freed -- no leaks are possible</code> and <code>ERROR SUMMARY: 0 errors</code>. Anything else means your destructor, <code>clear()</code>, copy constructor, or assignment operator is not releasing everything it allocated. For how to read the full report - direct vs. indirect loss, and the <code>file:line</code> that pinpoints the leak - see the <a href="guide-valgrind.html">Valgrind handout</a>.</p>
+  <div class="aside"><span class="tag">Faster alternative while developing</span>
+    The sanitizers catch many of the same bugs with less output: <code>g++ -std=c++17 -fsanitize=address,undefined -g driver.cpp -o driver &amp;&amp; ./driver</code>. Still do a final Valgrind check, since that is what grading uses.
+  </div>
+
+  <h2 id="commands">6. Essential Linux commands</h2>
+  <p>Enough to get around and build your code. Run <code>man <em>command</em></code> for the full manual on any of them.</p>
+  <table>
+    <tr><th>Command</th><th>What it does</th></tr>
+    <tr><td><code>pwd</code></td><td>print the current directory (where am I?)</td></tr>
+    <tr><td><code>ls</code> &nbsp;/&nbsp; <code>ls -l</code></td><td>list files in the current directory / with details</td></tr>
+    <tr><td><code>cd <em>dir</em></code> &nbsp;/&nbsp; <code>cd ..</code></td><td>change into <em>dir</em> / go up one level</td></tr>
+    <tr><td><code>mkdir <em>dir</em></code></td><td>make a new directory</td></tr>
+    <tr><td><code>cp <em>a b</em></code> &nbsp;/&nbsp; <code>mv <em>a b</em></code></td><td>copy / move (or rename) a file</td></tr>
+    <tr><td><code>rm <em>file</em></code> &nbsp;/&nbsp; <code>rm -r <em>dir</em></code></td><td>remove a file / a directory and its contents (no undo - be careful)</td></tr>
+    <tr><td><code>cat <em>file</em></code> &nbsp;/&nbsp; <code>less <em>file</em></code></td><td>print a file / page through it (<code>q</code> to quit)</td></tr>
+    <tr><td><code>nano <em>file</em></code></td><td>edit a file in the terminal (<code>Ctrl-O</code> save, <code>Ctrl-X</code> exit)</td></tr>
+    <tr><td><code>g++ &hellip;</code> &nbsp;/&nbsp; <code>./prog</code></td><td>compile / run your program</td></tr>
+    <tr><td><code>./prog &gt; out.txt</code></td><td>redirect a program's output into a file</td></tr>
+    <tr><td><code>exit</code></td><td>log out of the lab</td></tr>
+  </table>
+
+  <h2 id="walkthrough">7. First session: a quick walkthrough</h2>
+  <p>Try this end-to-end once so the workflow is familiar before an assignment is due.</p>
+  <pre><span class="c"># 1. log in (off campus: connect Husky OnNet first)</span>
+ssh netid@csslab1.uwb.edu
+
+<span class="c"># 2. make a place to work and go there</span>
+mkdir -p css343/lab0
+cd css343/lab0
+
+<span class="c"># 3. create a tiny program (nano opens an editor; paste, then Ctrl-O, Enter, Ctrl-X)</span>
+nano hello.cpp
+
+<span class="c"># 4. build and run it</span>
+g++ -std=c++17 hello.cpp -o hello
+./hello</pre>
+  <p>A minimal <code>hello.cpp</code>:</p>
+  <pre>#include &lt;iostream&gt;
+int main() { std::cout &lt;&lt; "Hello from the CSS lab\n"; }</pre>
+  <p>To practice the template build: put a <code>List.h</code> (ending in <code>#include "List.cpp"</code>), a <code>List.cpp</code>, and a <code>driver.cpp</code> in a folder, then compile <strong>only</strong> the driver: <code>g++ -std=c++17 driver.cpp -o driver &amp;&amp; ./driver</code>. (Ask yourself: <em>why</em> is only <code>driver.cpp</code> on the command line, and not <code>List.cpp</code>? That is the template rule from &sect;4.)</p>
+
+  <h2 id="alternatives">8. Alternatives &amp; help</h2>
+  <ul>
+    <li><strong>Online quick tests -</strong> <a href="https://replit.com/">Replit</a> is handy for trying small snippets (a few free repls). Fine for experimentation, but your <strong>final build and test must be on the CSS lab</strong>, since that is the grading environment.</li>
+    <li><strong>Toolchain notes -</strong> the <a href="https://csswiki.uwb.edu/c-toolchain/">CSS Wiki C-Toolchain page</a> covers compiler/toolchain details.</li>
+    <li><strong>Windows / remote lab desktops -</strong> UW Bothell's <a href="https://remoteaccess.labstats.com/university-of-washington-bothell">remote lab access</a> lists available lab machines.</li>
+    <li><strong>Docker</strong> images for the CSS labs are <em>no longer available</em> (as of Jan 2025) - use SSH to the <code>csslab</code> hosts.</li>
+    <li><strong>Stuck on access?</strong> Start with the <a href="https://csswiki.uwb.edu/">CSS Wiki</a>; for account/VPN issues, UW-IT support; for course-specific build questions, the instructor or a lab assistant.</li>
+  </ul>
+
+  <footer>
+    CSS 343 &middot; handout v1.0 &middot; prepared by Dr. Marcel Gavriliu. Adopted &amp; modernized from the SP26 Computing Environment page.
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,892 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Amortized Analysis.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Amortized Analysis - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Amortized Analysis</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        How to bound the cost of a <em>sequence</em> of operations when
+        individual operations are occasionally expensive. The precise
+        difference between a worst-case bound per operation and an amortized
+        bound; the three standard methods (aggregate, accounting, potential),
+        each defined and each worked in full on the doubling dynamic array; the
+        binary counter as a second complete example; where the course text
+        already relies on amortized bounds; exercises with solutions.
+      </div>
+
+      <p class="lead">
+        A dynamic array almost always appends in constant time, but once in a
+        while an append must copy the entire array first. A worst-case bound
+        per operation must charge every append for that copy: \(\Theta(n)\)
+        each. Yet a run of \(N\) appends demonstrably performs fewer than
+        \(3N\) element writes in total. The per-operation worst case is
+        correct and useless; the quantity that matches reality is the cost of
+        the whole <em>sequence</em>. Amortized analysis makes that quantity
+        precise, and gives three interchangeable techniques for computing it:
+        add everything up (<strong>aggregate</strong>), prepay with credits
+        (<strong>accounting</strong>), or measure stored work with a function
+        of the state (<strong>potential</strong>).
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#defs">Worst case per operation versus amortized</a></li>
+          <li><a href="#array">The running example: a doubling array</a></li>
+          <li><a href="#aggregate">Method 1: the aggregate method</a></li>
+          <li><a href="#banker">Method 2: the accounting (banker&rsquo;s) method</a></li>
+          <li><a href="#potential">Method 3: the potential method</a></li>
+          <li><a href="#counter">Second example: the binary counter</a></li>
+          <li><a href="#sits">Where the course text uses amortized bounds</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="defs">1. Worst case per operation versus amortized</h2>
+      <p>
+        The cost of an operation is measured in a fixed cost model, as in
+        <a href="foundation-time-analysis.html">the Analysis of Algorithms:
+        Time reading</a>; in this handout the basic operation is an element
+        write (for arrays) or a bit flip (for counters). Two different
+        guarantees can then be stated about an operation that is executed many
+        times.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (worst-case cost per operation)</span>
+        An operation has worst-case cost \(f(n)\) if <em>every single
+        execution</em> of it, from every reachable state of size \(n\), costs
+        at most \(f(n)\). The bound must hold for each execution in isolation.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (amortized cost)</span>
+        Fix a data structure and its operations. An assignment of an
+        <strong>amortized cost</strong> \(\hat c_i\) to the \(i\)-th operation
+        is <em>valid</em> if for <em>every</em> sequence of \(N\) operations
+        starting from the initial state, the actual costs \(c_i\) satisfy
+        \[ \sum_{i=1}^{N} c_i \;\le\; \sum_{i=1}^{N} \hat c_i . \]
+        We then say the operation runs in amortized \(O(\hat c)\) time. The
+        inequality must hold for every prefix of every sequence, not merely in
+        the limit.
+      </div>
+      <p>
+        The two guarantees differ in scope. A worst-case bound per operation
+        controls each execution separately; an amortized bound controls only
+        the running total, and permits an individual operation to be expensive
+        provided enough cheap operations precede it. Every worst-case bound
+        per operation is also a valid amortized bound (sum both sides), but
+        not conversely: an amortized \(O(1)\) operation may occasionally cost
+        \(\Theta(n)\).
+      </p>
+      <div class="aside">
+        <span class="tag">Amortized is not average-case</span>
+        No probability is involved. An average-case bound assumes a
+        distribution over inputs and can be violated by an unlucky input. An
+        amortized bound is a worst-case statement about sequences: it holds
+        for <em>every</em> sequence of operations, including the one an
+        adversary picks. What is being averaged is the cost across the
+        operations of one worst-case sequence, not across random inputs.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="array">2. The running example: a doubling array</h2>
+      <p>
+        A <strong>dynamic array</strong> stores \(n\) elements in a contiguous
+        block of <em>capacity</em> \(\mathrm{cap} \ge n\). Append writes into
+        the next free slot; when the block is full (\(n = \mathrm{cap}\)), a
+        new block of capacity \(\max(1,\,2\,\mathrm{cap})\) is allocated, all
+        \(n\) elements are copied over, and the append proceeds. The array
+        starts empty with capacity \(0\). The cost of one append is the number
+        of element writes it performs: the copies (if any) plus \(1\) for the
+        new element.
+      </p>
+
+      <div class="code-tabs" data-snippet="complexity/dynamic-array">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Doubling dynamic array. cost counts element writes: copies + the new write.
+struct DynArray {
+    vector&lt;int&gt; a;              // backing store; a.size() is the capacity
+    int  n    = 0;              // elements in use
+    long cost = 0;              // element writes (the cost model here)
+    void append(int x) {
+        if (n == (int)a.size()) {              // full: double, copy n elements
+            vector&lt;int&gt; b(max(1, 2 * n));
+            for (int i = 0; i &lt; n; i++) { b[i] = a[i]; cost++; }
+            a = move(b);
+        }
+        a[n++] = x; cost++;                    // the write itself
+    }
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Doubling dynamic array. cost counts element writes: copies + the new write.
+static class DynArray {
+    int[] a = new int[0];       // backing store; a.length is the capacity
+    int  n    = 0;              // elements in use
+    long cost = 0;              // element writes (the cost model here)
+    void append(int x) {
+        if (n == a.length) {                   // full: double, copy n elements
+            int[] b = new int[Math.max(1, 2 * n)];
+            for (int i = 0; i &lt; n; i++) { b[i] = a[i]; cost++; }
+            a = b;
+        }
+        a[n++] = x; cost++;                    // the write itself
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Doubling dynamic array. cost counts element writes: copies + the new write.
+class DynArray:
+    def __init__(self):
+        self.a = []             # backing store; len(a) is the capacity
+        self.n = 0              # elements in use
+        self.cost = 0           # element writes (the cost model here)
+
+    def append(self, x):
+        if self.n == len(self.a):              # full: double, copy n elements
+            b = [None] * max(1, 2 * self.n)
+            for i in range(self.n):
+                b[i] = self.a[i]
+                self.cost += 1
+            self.a = b
+        self.a[self.n] = x                     # the write itself
+        self.n += 1
+        self.cost += 1</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Doubling dynamic array. cost counts element writes: copies + the new write.
+struct DynArray { a: Vec&lt;i64&gt;, n: usize, cost: u64 }
+impl DynArray {
+    fn append(&amp;mut self, x: i64) {
+        if self.n == self.a.len() {            // full: double, copy n elements
+            let mut b = vec![0; 1.max(2 * self.n)];
+            for i in 0..self.n { b[i] = self.a[i]; self.cost += 1; }
+            self.a = b;
+        }
+        self.a[self.n] = x; self.n += 1; self.cost += 1;  // the write itself
+    }
+}</pre>
+<p class="ct-src">source: <code>code/complexity/dynamic-array.cpp &middot; code/complexity/dynamic-array.java &middot; code/complexity/dynamic-array.py &middot; code/complexity/dynamic-array.rs</code></p>
+<!--/ct--></div>
+
+      <p>
+        The worst-case cost per append is easy and discouraging: the append
+        that finds \(n = \mathrm{cap}\) copies all \(n\) elements, so a single
+        append costs \(n + 1\) writes, which is \(\Theta(n)\). That bound is
+        attained, so it cannot be improved per operation. The three methods
+        below all prove the same sharper statement: the amortized cost of
+        append is at most \(3\) writes.
+      </p>
+      <p>
+        One append sequence serves for all three analyses: \(N = 13\) appends
+        into an initially empty array. Expansions occur on appends 1, 2, 3, 5,
+        and 9, the appends that find the array full at sizes 0, 1, 2, 4, 8.
+        (Every trace table in this handout was generated by executing the code
+        above and printing the counters.)
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="aggregate">3. Method 1: the aggregate method</h2>
+      <div class="def">
+        <span class="tag">Definition (aggregate method)</span>
+        Compute \(T(N)\), the maximum total cost of any sequence of \(N\)
+        operations, directly, by summation. Then assign every operation the
+        same amortized cost \(\hat c = T(N)/N\). Validity is immediate: the
+        actual total is at most \(T(N) = N \cdot \hat c\).
+      </div>
+      <p>
+        Here is the 13-append sequence with the actual copy counts. Expansion
+        rows are highlighted; <em>cost</em> is copies \(+\) 1.
+      </p>
+      <table class="trace">
+        <tr><th>append #</th><th>cap before</th><th>copies</th><th>cost</th><th>cumulative cost</th><th>n after</th><th>cap after</th></tr>
+        <tr><td>1</td><td>0</td><td class="upd">0</td><td class="upd">1</td><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td>2</td><td>1</td><td class="upd">1</td><td class="upd">2</td><td>3</td><td>2</td><td>2</td></tr>
+        <tr><td>3</td><td>2</td><td class="upd">2</td><td class="upd">3</td><td>6</td><td>3</td><td>4</td></tr>
+        <tr><td>4</td><td>4</td><td>0</td><td>1</td><td>7</td><td>4</td><td>4</td></tr>
+        <tr><td>5</td><td>4</td><td class="upd">4</td><td class="upd">5</td><td>12</td><td>5</td><td>8</td></tr>
+        <tr><td>6</td><td>8</td><td>0</td><td>1</td><td>13</td><td>6</td><td>8</td></tr>
+        <tr><td>7</td><td>8</td><td>0</td><td>1</td><td>14</td><td>7</td><td>8</td></tr>
+        <tr><td>8</td><td>8</td><td>0</td><td>1</td><td>15</td><td>8</td><td>8</td></tr>
+        <tr><td>9</td><td>8</td><td class="upd">8</td><td class="upd">9</td><td>24</td><td>9</td><td>16</td></tr>
+        <tr><td>10</td><td>16</td><td>0</td><td>1</td><td>25</td><td>10</td><td>16</td></tr>
+        <tr><td>11</td><td>16</td><td>0</td><td>1</td><td>26</td><td>11</td><td>16</td></tr>
+        <tr><td>12</td><td>16</td><td>0</td><td>1</td><td>27</td><td>12</td><td>16</td></tr>
+        <tr><td>13</td><td>16</td><td>0</td><td>1</td><td>28</td><td>13</td><td>16</td></tr>
+      </table>
+      <p>
+        The 13 appends perform \(13\) new-element writes plus
+        \(1+2+4+8 = 15\) copies, \(28\) writes in total, an average of
+        \(28/13 \approx 2.15\) per append. Extending the same sequence to
+        \(N = 17\) picks up the expansion at size 16: copies
+        \(1+2+4+8+16 = 31\), total \(17 + 31 = 48\) writes, average
+        \(48/17 \approx 2.82\). The average creeps toward \(3\) right after an
+        expansion and drifts down between expansions, but never reaches \(3\).
+        That is the general fact:
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (aggregate bound for doubling)</span>
+        Starting from an empty array of capacity \(0\), any sequence of
+        \(N \ge 1\) appends performs fewer than \(3N\) element writes. Hence
+        append runs in amortized \(O(1)\), with amortized cost at most \(3\)
+        writes.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Each append writes its own element once:
+        \(N\) writes. Copies occur only during expansions, and the expansion
+        triggered when the array holds \(m\) elements copies exactly \(m\)
+        elements. Expansions are triggered precisely at the sizes
+        \(m = 0, 1, 2, 4, \ldots, 2^j, \ldots\); during \(N\) appends the
+        largest size at which an expansion can trigger is at most \(N-1\).
+        Writing \(J = \lfloor \lg (N-1) \rfloor\) (for \(N \ge 2\)), the total
+        number of copies is at most
+        \[ \sum_{j=0}^{J} 2^{\,j} \;=\; 2^{\,J+1} - 1 \;\le\; 2(N-1) - 1
+        \;\lt\; 2N, \]
+        using \(2^{J} \le N-1\). For \(N = 1\) there are no copies. Total
+        writes \(\lt N + 2N = 3N\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The aggregate method is the bluntest of the three: it produces one
+        uniform amortized cost for all operations and gives no way to charge
+        different operation types differently. Its strength is that nothing
+        needs to be invented; the sum is computed and divided. When operations
+        of several kinds interact (as in the multipop stack of exercise 3), the
+        other two methods are usually easier to apply.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="banker">4. Method 2: the accounting (banker&rsquo;s) method</h2>
+      <div class="def">
+        <span class="tag">Definition (accounting method)</span>
+        Charge each operation a fixed <em>amortized</em> price \(\hat c_i\),
+        possibly different per operation type. The operation pays its actual
+        cost \(c_i\) from the charge; any surplus \(\hat c_i - c_i\) is
+        deposited as <strong>credit</strong> in a bank (often attached to
+        specific parts of the structure), and any deficit is withdrawn from
+        the bank. The assignment is valid provided the bank balance never goes
+        negative, for then over every prefix
+        \(\sum c_i \le \sum \hat c_i\).
+      </div>
+      <p>
+        For the doubling array, charge <strong>3 writes per append</strong>
+        and spend them as follows:
+      </p>
+      <ul>
+        <li>\(1\) write pays for writing the new element itself;</li>
+        <li>\(1\) credit is stored <em>on the new element</em>, prepaying the
+          copy that will move it during the next expansion;</li>
+        <li>\(1\) credit is stored on one <em>veteran</em> element in the
+          older half of the array, an element that was copied by the previous
+          expansion and whose own credit is therefore already spent.</li>
+      </ul>
+      <p>
+        After an expansion to capacity \(2m\), the next \(m\) appends fill the
+        top half; each deposits \(2\) credits, one for itself and one for one
+        of the \(m\) veterans in the bottom half. When the array reaches size
+        \(2m\) and the next expansion must copy \(2m\) elements, every element
+        holds exactly one credit, and the \(2m\) credits pay for the \(2m\)
+        copies. Here is the same 13-append sequence with the bank balance,
+        charging 3 per append (deposit \(= 3 - \text{cost}\)):
+      </p>
+      <table class="trace">
+        <tr><th>append #</th><th>cost</th><th>charged</th><th>deposit / withdrawal</th><th>bank after</th></tr>
+        <tr><td>1</td><td class="upd">1</td><td>3</td><td>+2</td><td>2</td></tr>
+        <tr><td>2</td><td class="upd">2</td><td>3</td><td>+1</td><td>3</td></tr>
+        <tr><td>3</td><td class="upd">3</td><td>3</td><td>0</td><td>3</td></tr>
+        <tr><td>4</td><td>1</td><td>3</td><td>+2</td><td>5</td></tr>
+        <tr><td>5</td><td class="upd">5</td><td>3</td><td>&minus;2</td><td>3</td></tr>
+        <tr><td>6</td><td>1</td><td>3</td><td>+2</td><td>5</td></tr>
+        <tr><td>7</td><td>1</td><td>3</td><td>+2</td><td>7</td></tr>
+        <tr><td>8</td><td>1</td><td>3</td><td>+2</td><td>9</td></tr>
+        <tr><td>9</td><td class="upd">9</td><td>3</td><td>&minus;6</td><td>3</td></tr>
+        <tr><td>10</td><td>1</td><td>3</td><td>+2</td><td>5</td></tr>
+        <tr><td>11</td><td>1</td><td>3</td><td>+2</td><td>7</td></tr>
+        <tr><td>12</td><td>1</td><td>3</td><td>+2</td><td>9</td></tr>
+        <tr><td>13</td><td>1</td><td>3</td><td>+2</td><td>11</td></tr>
+      </table>
+      <p>
+        The balance never goes negative, which is what validates the charge of
+        \(3\). The pattern in the last column is exact and worth proving: the
+        balance returns to precisely \(3\) after every expansion.
+      </p>
+      <div class="thm">
+        <span class="tag">Claim (bank balance)</span>
+        Immediately after any append that triggered an expansion, the bank
+        balance is exactly \(3\). Consequently the balance is never negative.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> By induction over expansions. Append 1
+        (capacity \(0 \to 1\)) costs \(1\) and leaves balance \(2\); append 2
+        (capacity \(1 \to 2\)) costs \(2\) and leaves \(2 + 3 - 2 = 3\), the
+        base case. Suppose the balance is \(3\) just after the expansion to
+        capacity \(2m\), at which point the array holds \(m + 1\) elements.
+        The next \(m - 1\) appends are cheap (cost \(1\), deposit \(2\)), so
+        the balance grows to \(3 + 2(m-1) = 2m + 1\) as the array fills to
+        \(2m\). The following append triggers the expansion to \(4m\), costing
+        \(2m + 1\) writes, and leaves \((2m + 1) + 3 - (2m + 1) = 3\). Between
+        those two moments the balance only grows, so it stays positive
+        throughout. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        In the table: after the expansion to capacity 8 (append 5,
+        \(m = 4\)), the balance climbs \(5, 7, 9 = 2m + 1\) over appends 6-8,
+        and append 9, which costs exactly \(2m + 1 = 9\), drops it back to
+        \(3\).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="potential">5. Method 3: the potential method</h2>
+      <p>
+        The accounting method stores prepaid work as credits scattered over
+        the structure. The potential method stores the same information as a
+        single number computed <em>from the state itself</em>: no bookkeeping
+        travels with the data; the state is the bank.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (potential method)</span>
+        Choose a <strong>potential function</strong> \(\Phi\) mapping each
+        reachable state \(D\) to a real number, with \(\Phi(D_0) = 0\) for the
+        initial state and \(\Phi(D) \ge 0\) for every reachable state. Define
+        the amortized cost of the \(i\)-th operation, which takes state
+        \(D_{i-1}\) to \(D_i\) at actual cost \(c_i\), as
+        \[ \hat c_i \;=\; c_i + \Phi(D_i) - \Phi(D_{i-1}). \]
+      </div>
+      <div class="thm">
+        <span class="tag">Lemma (validity of the potential method)</span>
+        With \(\Phi\) as above, \(\sum_{i=1}^{N} c_i \le \sum_{i=1}^{N}
+        \hat c_i\) for every sequence of \(N\) operations, so the \(\hat c_i\)
+        are valid amortized costs.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The sum telescopes:
+        \[ \sum_{i=1}^{N} \hat c_i
+           = \sum_{i=1}^{N} \bigl( c_i + \Phi(D_i) - \Phi(D_{i-1}) \bigr)
+           = \Phi(D_N) - \Phi(D_0) + \sum_{i=1}^{N} c_i
+           \;\ge\; \sum_{i=1}^{N} c_i, \]
+        since \(\Phi(D_N) \ge 0 = \Phi(D_0)\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Intuitively, \(\Phi\) is stored work: a cheap operation that pushes
+        the structure toward its next expensive moment raises \(\Phi\)
+        (amortized cost above actual), and the expensive operation releases
+        the stored potential (\(\Delta\Phi\) large and negative), cancelling
+        its actual cost. For the doubling array, take
+        \[ \Phi \;=\; 2n - \mathrm{cap}. \]
+        \(\Phi = 0\) for the initial empty state, and \(\Phi \ge 0\) always,
+        because a doubling array is at least half full: right after an
+        expansion \(n = \tfrac{\mathrm{cap}}{2} + 1\), and appends only
+        increase \(n\). Two cases, plus the special first append:
+      </p>
+      <ul>
+        <li><strong>Append without expansion.</strong> Actual cost \(1\);
+          \(n\) rises by 1, \(\mathrm{cap}\) unchanged, so
+          \(\Delta\Phi = 2\). Amortized \(= 1 + 2 = 3\).</li>
+        <li><strong>Append with expansion</strong> at \(n = \mathrm{cap} = m
+          \ge 1\). Actual cost \(m + 1\). Before: \(\Phi = 2m - m = m\).
+          After: \(n = m+1\), \(\mathrm{cap} = 2m\), so
+          \(\Phi = 2(m+1) - 2m = 2\), giving \(\Delta\Phi = 2 - m\).
+          Amortized \(= (m + 1) + (2 - m) = 3\).</li>
+        <li><strong>First append</strong> (capacity \(0 \to 1\)). Actual cost
+          \(1\); \(\Phi: 0 \to 2\cdot 1 - 1 = 1\). Amortized
+          \(= 1 + 1 = 2\).</li>
+      </ul>
+      <p>
+        Every append has amortized cost at most \(3\), reproving the theorem
+        of the aggregate section without summing anything. The same 13-append
+        sequence, with \(\Phi\) computed at every step:
+      </p>
+      <table class="trace">
+        <tr><th>append #</th><th>n before</th><th>cap before</th><th>cost</th><th>cap after</th><th>\(\Phi\) before</th><th>\(\Phi\) after</th><th>\(\Delta\Phi\)</th><th>amortized</th></tr>
+        <tr><td>1</td><td>0</td><td>0</td><td class="upd">1</td><td>1</td><td>0</td><td>1</td><td>+1</td><td class="set">2</td></tr>
+        <tr><td>2</td><td>1</td><td>1</td><td class="upd">2</td><td>2</td><td>1</td><td>2</td><td>+1</td><td class="set">3</td></tr>
+        <tr><td>3</td><td>2</td><td>2</td><td class="upd">3</td><td>4</td><td>2</td><td>2</td><td>0</td><td class="set">3</td></tr>
+        <tr><td>4</td><td>3</td><td>4</td><td>1</td><td>4</td><td>2</td><td>4</td><td>+2</td><td class="set">3</td></tr>
+        <tr><td>5</td><td>4</td><td>4</td><td class="upd">5</td><td>8</td><td>4</td><td>2</td><td>&minus;2</td><td class="set">3</td></tr>
+        <tr><td>6</td><td>5</td><td>8</td><td>1</td><td>8</td><td>2</td><td>4</td><td>+2</td><td class="set">3</td></tr>
+        <tr><td>7</td><td>6</td><td>8</td><td>1</td><td>8</td><td>4</td><td>6</td><td>+2</td><td class="set">3</td></tr>
+        <tr><td>8</td><td>7</td><td>8</td><td>1</td><td>8</td><td>6</td><td>8</td><td>+2</td><td class="set">3</td></tr>
+        <tr><td>9</td><td>8</td><td>8</td><td class="upd">9</td><td>16</td><td>8</td><td>2</td><td>&minus;6</td><td class="set">3</td></tr>
+        <tr><td>10</td><td>9</td><td>16</td><td>1</td><td>16</td><td>2</td><td>4</td><td>+2</td><td class="set">3</td></tr>
+        <tr><td>11</td><td>10</td><td>16</td><td>1</td><td>16</td><td>4</td><td>6</td><td>+2</td><td class="set">3</td></tr>
+        <tr><td>12</td><td>11</td><td>16</td><td>1</td><td>16</td><td>6</td><td>8</td><td>+2</td><td class="set">3</td></tr>
+        <tr><td>13</td><td>12</td><td>16</td><td>1</td><td>16</td><td>8</td><td>10</td><td>+2</td><td class="set">3</td></tr>
+      </table>
+      <p>
+        Reading the expansion rows: at append 9 the potential has climbed to
+        \(8\) over the four cheap appends 6-8 (and the state left by 5), and
+        the expansion spends \(6\) of it, so an operation that actually costs
+        \(9\) writes has amortized cost \(3\). Note also the cumulative
+        check: actual total \(28\), amortized total
+        \(2 + 12 \cdot 3 = 38\), and indeed \(38 - 28 = 10 = \Phi(D_{13}) -
+        \Phi(D_0)\), exactly the potential left in the final state.
+      </p>
+      <div class="aside">
+        <span class="tag">The three methods are one argument</span>
+        The bank balance of the accounting table and the potential column
+        differ by a bookkeeping constant: compare bank \(2, 3, 3, 5, 3, 5, 7,
+        9, 3, \ldots\) with \(\Phi\)-after \(1, 2, 2, 4, 2, 4, 6, 8, 2,
+        \ldots\). A credit scheme <em>is</em> a potential function (the total
+        credit in the bank), and a potential function is a credit scheme with
+        the ledger replaced by a formula. The aggregate method is the same sum
+        with the intermediate balance never written down. Choosing among them
+        is a matter of which is easiest to state for the structure at hand.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="counter">6. Second example: the binary counter</h2>
+      <p>
+        A \(k\)-bit binary counter supports one operation,
+        <code>increment</code>, whose cost is the number of <strong>bit
+        flips</strong> it performs. Increment clears the trailing block of 1
+        bits and sets the first 0 bit:
+      </p>
+
+      <div class="code-tabs" data-snippet="complexity/binary-counter">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Binary counter as a bit array, bit[0] least significant.
+// cost counts bit flips: the trailing 1s cleared, plus the one bit set.
+void increment(vector&lt;int&gt;&amp; bit, long&amp; cost) {
+    size_t i = 0;
+    while (i &lt; bit.size() &amp;&amp; bit[i] == 1) {
+        bit[i] = 0; cost++; i++;         // clear a trailing 1
+    }
+    if (i &lt; bit.size()) { bit[i] = 1; cost++; }   // set the first 0
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Binary counter as a bit array, bit[0] least significant.
+// cost counts bit flips: the trailing 1s cleared, plus the one bit set.
+static long increment(int[] bit, long cost) {
+    int i = 0;
+    while (i &lt; bit.length &amp;&amp; bit[i] == 1) {
+        bit[i] = 0; cost++; i++;         // clear a trailing 1
+    }
+    if (i &lt; bit.length) { bit[i] = 1; cost++; }   // set the first 0
+    return cost;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Binary counter as a bit list, bit[0] least significant.
+# cost counts bit flips: the trailing 1s cleared, plus the one bit set.
+def increment(bit, cost):
+    i = 0
+    while i &lt; len(bit) and bit[i] == 1:
+        bit[i] = 0; cost += 1; i += 1    # clear a trailing 1
+    if i &lt; len(bit):
+        bit[i] = 1; cost += 1            # set the first 0
+    return cost</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Binary counter as a bit vector, bit[0] least significant.
+// cost counts bit flips: the trailing 1s cleared, plus the one bit set.
+fn increment(bit: &amp;mut [u8], cost: &amp;mut u64) {
+    let mut i = 0;
+    while i &lt; bit.len() &amp;&amp; bit[i] == 1 {
+        bit[i] = 0; *cost += 1; i += 1;  // clear a trailing 1
+    }
+    if i &lt; bit.len() { bit[i] = 1; *cost += 1; }  // set the first 0
+}</pre>
+<p class="ct-src">source: <code>code/complexity/binary-counter.cpp &middot; code/complexity/binary-counter.java &middot; code/complexity/binary-counter.py &middot; code/complexity/binary-counter.rs</code></p>
+<!--/ct--></div>
+
+      <p>
+        An increment that finds \(t\) trailing 1 bits flips \(t + 1\) bits, so
+        the worst-case cost per operation is \(\Theta(k)\) (incrementing
+        \(0111\ldots1\)). The amortized cost is \(2\). The trace: 16
+        increments from zero, with the potential \(\Phi = \) number of 1 bits.
+        Amortized cost is actual \(+\; \Delta\Phi\).
+      </p>
+      <table class="trace">
+        <tr><th>increment #</th><th>bits after</th><th>trailing 1s before</th><th>cost</th><th>cumulative</th><th>\(\Phi\) before</th><th>\(\Phi\) after</th><th>\(\Delta\Phi\)</th><th>amortized</th></tr>
+        <tr><td>1</td><td class="lab"><code>00001</code></td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>+1</td><td class="set">2</td></tr>
+        <tr><td>2</td><td class="lab"><code>00010</code></td><td>1</td><td class="upd">2</td><td>3</td><td>1</td><td>1</td><td>0</td><td class="set">2</td></tr>
+        <tr><td>3</td><td class="lab"><code>00011</code></td><td>0</td><td>1</td><td>4</td><td>1</td><td>2</td><td>+1</td><td class="set">2</td></tr>
+        <tr><td>4</td><td class="lab"><code>00100</code></td><td>2</td><td class="upd">3</td><td>7</td><td>2</td><td>1</td><td>&minus;1</td><td class="set">2</td></tr>
+        <tr><td>5</td><td class="lab"><code>00101</code></td><td>0</td><td>1</td><td>8</td><td>1</td><td>2</td><td>+1</td><td class="set">2</td></tr>
+        <tr><td>6</td><td class="lab"><code>00110</code></td><td>1</td><td class="upd">2</td><td>10</td><td>2</td><td>2</td><td>0</td><td class="set">2</td></tr>
+        <tr><td>7</td><td class="lab"><code>00111</code></td><td>0</td><td>1</td><td>11</td><td>2</td><td>3</td><td>+1</td><td class="set">2</td></tr>
+        <tr><td>8</td><td class="lab"><code>01000</code></td><td>3</td><td class="upd">4</td><td>15</td><td>3</td><td>1</td><td>&minus;2</td><td class="set">2</td></tr>
+        <tr><td>9</td><td class="lab"><code>01001</code></td><td>0</td><td>1</td><td>16</td><td>1</td><td>2</td><td>+1</td><td class="set">2</td></tr>
+        <tr><td>10</td><td class="lab"><code>01010</code></td><td>1</td><td class="upd">2</td><td>18</td><td>2</td><td>2</td><td>0</td><td class="set">2</td></tr>
+        <tr><td>11</td><td class="lab"><code>01011</code></td><td>0</td><td>1</td><td>19</td><td>2</td><td>3</td><td>+1</td><td class="set">2</td></tr>
+        <tr><td>12</td><td class="lab"><code>01100</code></td><td>2</td><td class="upd">3</td><td>22</td><td>3</td><td>2</td><td>&minus;1</td><td class="set">2</td></tr>
+        <tr><td>13</td><td class="lab"><code>01101</code></td><td>0</td><td>1</td><td>23</td><td>2</td><td>3</td><td>+1</td><td class="set">2</td></tr>
+        <tr><td>14</td><td class="lab"><code>01110</code></td><td>1</td><td class="upd">2</td><td>25</td><td>3</td><td>3</td><td>0</td><td class="set">2</td></tr>
+        <tr><td>15</td><td class="lab"><code>01111</code></td><td>0</td><td>1</td><td>26</td><td>3</td><td>4</td><td>+1</td><td class="set">2</td></tr>
+        <tr><td>16</td><td class="lab"><code>10000</code></td><td>4</td><td class="upd">5</td><td>31</td><td>4</td><td>1</td><td>&minus;3</td><td class="set">2</td></tr>
+      </table>
+      <p>All three methods, briefly, on this table:</p>
+      <ul>
+        <li>
+          <strong>Aggregate.</strong> Count flips per bit position instead of
+          per increment. Bit \(j\) flips exactly
+          \(\lfloor n / 2^{\,j} \rfloor\) times during \(n\) increments (it
+          flips on every \(2^{\,j}\)-th increment). For \(n = 16\): bit 0
+          flips 16 times, bit 1 flips 8, then 4, 2, 1; total
+          \(16+8+4+2+1 = 31\), matching the cumulative column. In general
+          \[ \sum_{j \ge 0} \Bigl\lfloor \frac{n}{2^{\,j}} \Bigr\rfloor
+             \;\lt\; n \sum_{j \ge 0} 2^{-j} \;=\; 2n, \]
+          so \(n\) increments cost fewer than \(2n\) flips: amortized cost
+          below \(2\).
+        </li>
+        <li>
+          <strong>Accounting.</strong> Charge \(2\) per increment: \(1\) pays
+          the single \(0 \to 1\) flip the increment performs, and \(1\) is
+          left as a coin on that freshly set bit. Invariant: every 1 bit
+          carries one coin (induction: increments preserve it). Each
+          \(1 \to 0\) flip is paid by the coin on the bit being cleared, so
+          the clearing loop is free at the counter and the balance (the
+          number of 1 bits) never goes negative.
+        </li>
+        <li>
+          <strong>Potential.</strong> \(\Phi = \) number of 1 bits;
+          \(\Phi(D_0) = 0\), \(\Phi \ge 0\). An increment with \(t\) trailing
+          1s costs \(t + 1\) and changes \(\Phi\) by \(1 - t\) (it clears
+          \(t\) ones and sets one). Amortized \(= (t+1) + (1-t) = 2\),
+          for every increment; the table confirms it row by row. Cumulative
+          check: amortized total \(32\), actual total \(31\), difference
+          \(1 = \Phi(D_{16})\).
+        </li>
+      </ul>
+      <div class="aside">
+        <span class="tag">When amortized bounds do not apply</span>
+        An amortized bound covers sequences from the <em>initial state</em>
+        of the structure. It says nothing about the cost of one operation
+        performed on an adversarially prepared state in isolation, and it can
+        fail entirely when an added operation lets an adversary undo the
+        progress the potential measures: adding <code>decrement</code> to the
+        counter destroys the amortized \(O(1)\) bound (exercise 4), and
+        shrinking the array too eagerly destroys the append bound
+        (exercise 5). A latency-critical system may also care that the
+        occasional \(\Theta(n)\) append happens at all, even though the
+        average is constant; amortized bounds say nothing about the spike,
+        only about the total.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">7. Where the course text uses amortized bounds</h2>
+      <p>
+        Two handouts in this catalog state amortized results whose proofs are
+        instances of the methods above. The
+        <a href="../graphs/ds-union-find.html">Union-Find reading</a> proves
+        near-constant cost for <code>find</code> and <code>union</code> with
+        path compression and union by size: the compression step can be
+        expensive on one call, but it flattens the tree and thereby prepays
+        future calls; the resulting bound of \(O(\alpha(N))\) amortized per
+        operation (with \(\alpha\) the inverse Ackermann function) is a
+        genuine amortized statement, not a per-operation one. The
+        <a href="../hashing/ds-hashing.html">Hashing reading</a> keeps a hash
+        table&rsquo;s load factor bounded by resizing to a larger table and
+        rehashing every key; its proposition that inserts remain amortized
+        \(\Theta(1)\) is exactly the doubling-array argument of this handout
+        with &ldquo;copy an element&rdquo; replaced by &ldquo;rehash a
+        key.&rdquo; The same doubling argument is what standard library
+        growable arrays (C++ <code>vector</code>, Java
+        <code>ArrayList</code>, Python <code>list</code>) rely on for
+        constant amortized append. The surrounding machinery, cost models and
+        order-of-growth notation, is developed in
+        <a href="foundation-time-analysis.html">Analysis of Algorithms:
+        Time</a> and
+        <a href="foundation-asymptotic-notation.html">Asymptotic
+        Notation</a>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          <strong>Tripling.</strong> Change the growth rule to
+          \(\mathrm{cap} \to \max(1,\,3\,\mathrm{cap})\). Find a potential
+          function that yields a constant amortized cost for append, and state
+          the constant.
+          <details>
+            <summary>solution</summary>
+            Take \(\Phi = \tfrac{3n - \mathrm{cap}}{2}\). Initially \(\Phi =
+            0\), and \(\Phi \ge 0\) because a tripling array is always at
+            least one-third full. Append without expansion: cost \(1\),
+            \(\Delta\Phi = \tfrac32\), amortized \(\tfrac52\). Append with
+            expansion at \(n = \mathrm{cap} = m\): cost \(m + 1\); before,
+            \(\Phi = \tfrac{3m - m}{2} = m\); after, \(\Phi =
+            \tfrac{3(m+1) - 3m}{2} = \tfrac32\); amortized \(= (m+1) +
+            \tfrac32 - m = \tfrac52\). (First append: cost 1, \(\Phi: 0 \to
+            1\), amortized \(2\).) So the amortized cost is \(\tfrac52\)
+            writes: a bigger growth factor copies less often, at the price of
+            more slack space. (Numerically: over all \(N \le 5000\) the
+            worst average cost is \(2.499\ldots\), and the per-operation
+            amortized costs computed from this \(\Phi\) are exactly \(2\) and
+            \(2.5\).)
+          </details>
+        </li>
+        <li>
+          <strong>Additive growth fails.</strong> Change the growth rule to
+          \(\mathrm{cap} \to \mathrm{cap} + 1\). Compute the exact total cost
+          of \(N\) appends and conclude the amortized cost per append.
+          <details>
+            <summary>solution</summary>
+            Now every append finds the array full and copies all \(n\)
+            existing elements. Append \(i\) costs \((i - 1) + 1 = i\) writes,
+            so the total is \[ \sum_{i=1}^{N} i \;=\; N + \frac{N(N-1)}{2}, \]
+            counting the \(N\) fresh writes plus \(0+1+\cdots+(N-1)\) copies.
+            For \(N = 16\) that is \(16 + 120 = 136\) writes (verified by
+            running the code), against \(43\) for doubling
+            (\(16 + 1 + 2 + 4 + 8 + \ldots\): the doubling total for 16
+            appends is \(16 + 15 = 31\) writes before the expansion at size
+            16, 47 with it at \(N = 17\)). The total is \(\Theta(N^2)\), so
+            the amortized cost is \(\Theta(N)\): no constant amortized bound
+            exists. Growing by any fixed <em>increment</em> gives the same
+            \(\Theta(N)\) amortized cost; a constant amortized cost requires
+            growing by a constant <em>factor</em>.
+          </details>
+        </li>
+        <li>
+          <strong>Multipop stack.</strong> A stack supports
+          <code>push</code> (cost 1), <code>pop</code> (cost 1), and
+          <code>multipop(k)</code>, which pops \(\min(k, \text{size})\)
+          elements at cost equal to the number popped (at least 1). Show that
+          all three run in amortized \(O(1)\), by the accounting method and by
+          a potential function.
+          <details>
+            <summary>solution</summary>
+            <em>Accounting.</em> Charge <code>push</code> 2: one pays the
+            push, one coin stays on the pushed element. Charge
+            <code>pop</code> and <code>multipop</code> 1 each: every element
+            removed pays for its own removal with the coin it carries, and the
+            charged 1 covers the case of popping from an empty (or exhausted)
+            stack. Every element on the stack carries one coin (invariant, by
+            induction), so the bank never goes negative; a
+            <code>multipop</code> that removes \(m\) elements costs \(m\) but
+            withdraws \(m\) prepaid coins.
+            <em>Potential.</em> \(\Phi = \) stack size; \(\Phi(D_0) = 0\),
+            \(\Phi \ge 0\). Push: \(1 + 1 = 2\). Pop: \(1 - 1 = 0\), plus the
+            constant, at most \(1\). Multipop removing \(m\): cost
+            \(\max(m,1)\), \(\Delta\Phi = -m\), amortized \(\le 1\). So any
+            \(n\) operations cost at most \(2n\) (verified over random
+            operation sequences). The aggregate view: each element is pushed
+            once and popped at most once, so total cost \(\le 2 \cdot
+            \#\text{pushes} + \#\text{ops}\).
+          </details>
+        </li>
+        <li>
+          <strong>Decrement breaks the counter.</strong> Add a
+          <code>decrement</code> operation (subtract 1, cost = bit flips) to
+          the binary counter. Exhibit a sequence of \(n\) operations on a
+          \(k\)-bit counter that costs \(\Theta(nk)\), and explain why no
+          potential function can restore an amortized \(O(1)\) bound.
+          <details>
+            <summary>solution</summary>
+            Bring the counter to \(2^k - 1 = 0111\ldots1\) and then alternate
+            increment, decrement, increment, decrement, \(\ldots\). Each
+            increment carries through \(k\) trailing ones
+            (\(0111\ldots1 \to 1000\ldots0\), \(k+1\) flips) and each
+            decrement borrows through \(k\) trailing zeros
+            (\(1000\ldots0 \to 0111\ldots1\), \(k+1\) flips). For \(k = 10\),
+            running this oscillation for 1000 operations gives an average of
+            exactly \(11 = k+1\) flips per operation (verified). No potential
+            function helps: the state returns to \(0111\ldots1\) after every
+            increment-decrement pair, so over the pair
+            \(\Delta\Phi = 0\) and the amortized cost of the pair equals its
+            actual cost, \(2(k+1)\). Any valid amortized costs must therefore
+            average at least \(k + 1\) per operation on this sequence;
+            amortization cannot beat a sequence that keeps revisiting the
+            same expensive state.
+          </details>
+        </li>
+        <li>
+          <strong>Shrinking too eagerly.</strong> To avoid wasting space,
+          suppose the array also supports <code>remove</code> (delete the last
+          element, cost 1) and halves its capacity, copying the \(n\)
+          survivors, as soon as \(n\) drops to \(\mathrm{cap}/2\). Exhibit a
+          sequence on which append and remove cost \(\Theta(n)\) amortized,
+          and state the standard fix.
+          <details>
+            <summary>solution</summary>
+            Fill the array so that \(n = \mathrm{cap} = 8\), then alternate
+            append, remove, append, remove, \(\ldots\). The append expands to
+            capacity 16 (9 writes); the remove drops \(n\) back to
+            \(8 = 16/2\) and immediately shrinks, copying 8 elements
+            (9 writes with the deletion). Every operation in the oscillation
+            costs 9; around \(n = 16\) every operation costs 17, around
+            \(n = 32\) it costs 33 (all verified by running the rule):
+            \(\Theta(n)\) per operation with no cheap operations in between,
+            so the amortized cost is \(\Theta(n)\). The fix is to leave a gap
+            between the triggers: double when full, but halve only when
+            \(n\) drops to \(\mathrm{cap}/4\). Then after any resize the array
+            is exactly half full, and \(\Theta(n)\) operations must intervene
+            before either trigger can fire again; the potential
+            \(\Phi = |2n - \mathrm{cap}|\) gives constant amortized cost for
+            both operations. (Numerically, random append/remove sequences
+            under the quarter rule average about \(1.04\) writes per
+            operation.)
+          </details>
+        </li>
+        <li>
+          <strong>Reading the bank.</strong> For the doubling array with the
+          3-per-append charge, give closed forms, in terms of the current size
+          \(n\) and capacity, for the bank balance at every moment after the
+          second append, and check them against the table of the accounting
+          section.
+          <details>
+            <summary>solution</summary>
+            From the claim proved in the accounting section, the balance is
+            exactly \(3\) immediately after each expansion, when \(n =
+            \tfrac{\mathrm{cap}}{2} + 1\). Each subsequent cheap append adds
+            \(2\), so while \(\tfrac{\mathrm{cap}}{2} \lt n \le \mathrm{cap}\)
+            the balance is \[ 3 + 2\Bigl(n - \frac{\mathrm{cap}}{2} -
+            1\Bigr) \;=\; 2n - \mathrm{cap} + 1 \;=\; \Phi + 1, \] one more
+            than the potential of the potential section. Check against the
+            table: after append 4 (\(n=4\), cap 4): \(8 - 4 + 1 = 5\);
+            after append 8 (\(n=8\), cap 8): \(16 - 8 + 1 = 9\); after append
+            13 (\(n=13\), cap 16): \(26 - 16 + 1 = 11\). All match. The
+            constant \(1\) is the surplus deposited by the very first append,
+            which cost \(1\) against a charge of \(3\) but raised \(\Phi\) by
+            only \(1\).
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Amortized Analysis v1.0 &middot;
+        prepared by Dr. Marcel Gavriliu. Typeset with MathJax.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1652 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Splay Trees.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Splay Trees - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom: 2px solid var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      h2.part {
+        font-size: 22.5px; margin: 46px 0 10px; padding: 10px 14px;
+        background: var(--box); border: 1px solid var(--line);
+        border-left: 4px solid var(--accent); border-radius: 8px;
+      }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Splay Trees</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        A splay tree is a binary search tree that stores no balance
+        information at all and rebalances itself as a side effect of being
+        used: every access rotates the touched node to the root by a specific
+        sequence of double rotations. The three step cases (zig, zig-zig,
+        zig-zag) are given individually with before/after trees, then combined
+        in a fully unrolled splay of a node at depth 5. Search, insert and
+        delete are each one or two splays plus \(O(1)\) pointer work. The cost
+        argument is amortized: the sum-of-log-subtree-sizes potential gives
+        \(3\log_2 n + 1\) amortized per operation, while a single operation can
+        still cost \(\Theta(n)\). Closes with the working-set and scanning
+        behavior that makes splay trees act like a self-tuning cache, a
+        comparison against AVL and red-black trees, and exercises with
+        solutions.
+      </div>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#idea">Self-adjusting search trees</a></li>
+          <li><a href="#cases">The splay operation: three step cases</a></li>
+          <li><a href="#unrolled">A full splay, unrolled</a></li>
+          <li><a href="#ops">Search, insert and delete</a></li>
+          <li><a href="#nofield">Why no balance field is stored</a></li>
+          <li><a href="#amortized">The amortized \(O(\log n)\) bound</a></li>
+          <li><a href="#workingset">Working sets and caching behavior</a></li>
+          <li><a href="#compare">Splay trees among the search trees</a></li>
+          <li><a href="#ex-splay">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <p class="lead">
+        A plain <a href="ds-trees-bst.html">binary search tree</a> degrades to a
+        list on sorted input. The <a href="ds-avl-trees.html">AVL tree</a> and
+        the <a href="ds-red-black-trees.html">red-black tree</a> answer that by
+        storing balance information in every node and repairing it after every
+        update. The <strong>splay tree</strong>, due to Sleator and Tarjan
+        (1985), answers it differently: store nothing, check nothing, and
+        instead <em>restructure on every access</em>, moving the node just
+        touched to the root along a path that halves the depth of everything
+        beneath it. Individual operations can be slow; any long enough sequence
+        of them cannot be.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="idea">1. Self-adjusting search trees</h2>
+      <p>
+        The balanced trees answer the question &ldquo;how do I stop the tree
+        from ever getting tall?&rdquo; They answer it with an invariant (AVL:
+        sibling heights differ by at most one; red-black: equal black height),
+        per-node state to check that invariant, and repair code that runs after
+        every update. The state costs memory in every node, and the repair code
+        runs whether or not the access pattern would ever have caused trouble.
+      </p>
+      <p>
+        Splay trees ask a different question: &ldquo;how do I stop a
+        <em>sequence</em> of operations from being expensive?&rdquo; A single
+        operation is allowed to cost \(\Theta(n)\). What is guaranteed is that
+        \(m\) operations on a tree of at most \(n\) keys cost
+        \(O((m+n)\log n)\) in total, so the cost <em>per operation, averaged
+        over the sequence</em>, is \(O(\log n)\). This is an amortized
+        guarantee in the exact sense of the
+        <a href="../foundations/foundation-amortized-analysis.html"><em>Amortized
+        Analysis</em></a> handout: no probability, no assumption about the
+        input, just an accounting identity over the whole run.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (splay tree)</span>
+        A <strong>splay tree</strong> is a binary search tree with no auxiliary
+        balance data, in which every operation that touches a node \(x\)
+        finishes by <strong>splaying</strong> \(x\): repeatedly applying a
+        constant-time restructuring step at \(x\) until \(x\) is the root. The
+        BST ordering invariant (all keys in the left subtree less than the node,
+        all keys in the right subtree greater) is the only invariant the
+        structure maintains.
+      </div>
+      <p>
+        The mechanism is <strong>rotation</strong>, the same order-preserving
+        \(O(1)\) pointer move used by the
+        <a href="ds-avl-trees.html"><em>AVL Trees</em></a> and
+        <a href="ds-treaps.html"><em>Treaps</em></a> handouts. Rotating \(x\)
+        above its parent lifts \(x\) one level and pushes the parent down one
+        level, leaving the in-order key sequence unchanged. What is new here is
+        not the rotation but <em>which rotations, in which order</em>: naively
+        rotating \(x\) up one level at a time is not good enough, and the whole
+        content of the structure is the specific pairing rule of &sect;2.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cases">2. The splay operation: three step cases</h2>
+      <p>
+        Let \(x\) be the node to move to the root, \(p\) its parent, and \(g\)
+        its grandparent. Splaying repeats a single step until \(x\) is the root.
+        Exactly one of three cases applies at each step, decided by whether
+        \(g\) exists and, if it does, whether \(x\) and \(p\) are children on
+        the <em>same</em> side or on <em>opposite</em> sides:
+      </p>
+      <table>
+        <tr><th>case</th><th>when it applies</th><th>what it does</th><th>rotations</th></tr>
+        <tr><td><strong>zig</strong></td><td>\(p\) is the root (no \(g\))</td><td>one rotation of \(x\) above \(p\)</td><td>1</td></tr>
+        <tr><td><strong>zig-zig</strong></td><td>\(x,p\) are both left children, or both right children</td><td>rotate \(p\) above \(g\) <em>first</em>, then \(x\) above \(p\)</td><td>2</td></tr>
+        <tr><td><strong>zig-zag</strong></td><td>\(x\) is a left child and \(p\) a right child, or the reverse</td><td>rotate \(x\) above \(p\), then \(x\) above \(g\)</td><td>2</td></tr>
+      </table>
+      <p>
+        Each case, and its mirror image, is drawn below with the four hanging
+        subtrees named \(A, B, C, D\) so that the in-order sequence can be read
+        off and compared. Since the zig case has only two nodes it has only
+        three subtrees, \(A, B, C\).
+      </p>
+
+      <h3>Case 1: zig (\(x\) is a child of the root)</h3>
+      <p>
+        This is a single rotation, and it happens at most once per splay: only
+        when \(x\) starts at an odd depth does it run, and then only as the very
+        last step.
+      </p>
+      <pre>        p                             x
+      /   \        zig at x       /   \
+     x     C       <span class="cm">------&gt;</span>       A     p
+   /   \                              /   \
+  A     B                            B     C
+
+in-order before:  A x B p C          in-order after:  A x B p C</pre>
+      <p>
+        The mirror image (\(x\) the right child of the root) is the same picture
+        reflected: \(p(A, x(B,C))\) becomes \(x(p(A,B), C)\).
+      </p>
+      <div class="ex">
+        <span class="tag">Concrete zig</span>
+        In \(40(20(10,30),\,60)\), splay \(20\). Here \(p=40\) is the root, so
+        one zig applies with \(A=10\), \(B=30\), \(C=60\):
+<pre>              40                             20
+      /___________\       <span class="cm">--- zig --&gt;</span>    /___________\
+      20          60                     10          40
+  /_______\                                      /_______\
+  10      30                                     30      60</pre>
+        In-order is \(10,20,30,40,60\) before and after.
+      </div>
+
+      <h3>Case 2: zig-zig (\(x\) and \(p\) on the same side)</h3>
+      <p>
+        This is the case that makes splay trees work, and the order of the two
+        rotations is the point. The <em>grandparent</em> is rotated first: \(p\)
+        goes above \(g\), and only then does \(x\) go above \(p\). The result
+        turns a three-node chain into a chain of the <em>other</em> handedness
+        with \(x\) on top, which is what folds a long path in half rather than
+        merely reversing it.
+      </p>
+      <pre>          g                                   x
+        /   \                               /   \
+       p     D      zig-zig at x           A     p
+     /   \          <span class="cm">--------------&gt;</span>              /   \
+    x     C                                     B     g
+  /   \                                             /   \
+ A     B                                           C     D
+
+step (a) rotate p above g       step (b) rotate x above p
+       p                                x
+     /   \                            /   \
+    x     g                          A     p
+  /  \   /  \                             /  \
+ A    B C    D                           B    g
+                                             /  \
+                                            C    D
+
+in-order before: A x B p C g D        in-order after: A x B p C g D</pre>
+      <p>
+        Note where the depths land. \(A\) rises from depth 3 to depth 1 and
+        \(B\) from 3 to 2, while \(C\) drops from 2 to 3 and \(D\) from 1 to 3.
+        The deep side of the chain, the side the search path came down, is the
+        side that gains, and it gains by roughly halving: this is the step that
+        folds a long path instead of merely rotating its top off.
+      </p>
+      <div class="ex">
+        <span class="tag">Concrete zig-zig</span>
+        In \(60(40(20(10,30),\,50),\,70)\), splay \(20\). Both \(20\) and its
+        parent \(40\) are left children, so one zig-zig applies with \(g=60\),
+        \(p=40\), \(x=20\), \(A=10\), \(B=30\), \(C=50\), \(D=70\):
+<pre>                      60                                 20
+              /___________\       <span class="cm">--- zig-zig --&gt;</span>    /___________\
+              40          70                         10          40
+      /___________\                                          /___________\
+      20          50                                         30          60
+  /_______\                                                          /_______\
+  10      30                                                         50      70</pre>
+        In-order is \(10,20,30,40,50,60,70\) before and after; the shape matches
+        the generic picture with those substitutions.
+      </div>
+
+      <h3>Case 3: zig-zag (\(x\) and \(p\) on opposite sides)</h3>
+      <p>
+        Here \(x\) is rotated twice, first above \(p\) and then above \(g\).
+        The two rotations point in opposite directions, and the effect is to
+        pull \(x\) up between the two: \(p\) and \(g\) become its children.
+      </p>
+      <pre>        g                                 x
+      /   \                             /   \
+     p     D       zig-zag at x        p     g
+   /   \           <span class="cm">-------------&gt;</span>    / \   / \
+  A     x                             A   B C   D
+      /   \
+     B     C
+
+step (a) rotate x above p       step (b) rotate x above g
+        g                               x
+      /   \                           /   \
+     x     D                         p     g
+   /   \                            / \   / \
+  p     C                          A   B C   D
+ / \
+A   B
+
+in-order before: A p B x C g D      in-order after: A p B x C g D</pre>
+      <p>
+        A zig-zag is exactly the AVL &ldquo;double rotation&rdquo; applied to a
+        left-right (or right-left) configuration. It is perfectly balancing
+        locally: all four subtrees end at the same depth 2.
+      </p>
+      <div class="ex">
+        <span class="tag">Concrete zig-zag</span>
+        In \(60(20(10,\,40(30,50)),\,70)\), splay \(40\). \(40\) is a right
+        child, its parent \(20\) is a left child, so one zig-zag applies with
+        \(g=60\), \(p=20\), \(x=40\), \(A=10\), \(B=30\), \(C=50\), \(D=70\):
+<pre>                      60                                         40
+      /___________________\       <span class="cm">--- zig-zag --&gt;</span>        /_______________\
+      20                  70                             20              60
+  /___________\                                      /_______\       /_______\
+  10          40                                     10      30      50      70
+          /_______\
+          30      50</pre>
+        In-order is \(10,20,30,40,50,60,70\) before and after.
+      </div>
+
+      <div class="aside">
+        <span class="tag">Why not just rotate \(x\) up one level at a time?</span>
+        The obvious algorithm, <em>move-to-root</em>, applies single rotations
+        all the way up, ignoring the grandparent. It also brings \(x\) to the
+        root and it also preserves order, but it does not give the amortized
+        bound, and the reason is visible on a path. Take the right path
+        \(1\to2\to\cdots\to8\) (height \(7\)) and pull \(8\) to the root:
+<pre>splay(8):  zig-zig, zig-zig, zig-zig, zig     move-to-root(8): 7 single rotations
+       8                                              8
+     /                                              /
+     1                                              1
+      \                                              \
+       3                                              2
+     /   \                                             \
+     2     5                                            3
+         /   \                                           \
+         4     7                                          4
+             /                                             \
+             6                                              5
+                                                             \
+                                                              6
+                                                               \
+                                                                7
+
+  height 5                                      height 7, still a path</pre>
+        Splaying folded the path: the seven remaining nodes ended at depths
+        \(1,2,3,3,4,4,5\) instead of \(1,2,3,4,5,6,7\). Move-to-root merely moved
+        \(8\) off the top of an otherwise untouched path, so the <em>next</em>
+        access to the deepest key costs just as much again. Repeating that
+        pattern gives \(\Theta(n)\) per access forever, which is why the
+        grandparent-first pairing in zig-zig is not a stylistic choice.
+      </div>
+
+      <div class="code-tabs" data-snippet="trees/splay-core">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Splay tree core: node, rotation, and the splay loop. No balance field:
+// the node carries a key, two children, and a parent pointer, nothing else.
+struct Node {
+    int key;
+    Node *left = nullptr, *right = nullptr, *parent = nullptr;
+    explicit Node(int k) : key(k) {}
+};
+
+static void attachLeft (Node* x, Node* c) { x-&gt;left  = c; if (c) c-&gt;parent = x; }
+static void attachRight(Node* x, Node* c) { x-&gt;right = c; if (c) c-&gt;parent = x; }
+
+// Rotate x above its parent. In-order is unchanged; x rises one level.
+static void rotate(Node* x) {
+    Node* p = x-&gt;parent;
+    Node* g = p-&gt;parent;
+    if (p-&gt;left == x) { attachLeft (p, x-&gt;right); attachRight(x, p); }
+    else              { attachRight(p, x-&gt;left ); attachLeft (x, p); }
+    x-&gt;parent = g;
+    if (g) { if (g-&gt;left == p) g-&gt;left = x; else g-&gt;right = x; }
+}
+
+// Move x to the root, two levels at a time where possible.
+Node* splay(Node* x) {
+    while (x-&gt;parent) {
+        Node* p = x-&gt;parent;
+        Node* g = p-&gt;parent;
+        if (!g) {                                   // ZIG
+            rotate(x);
+        } else if ((g-&gt;left == p) == (p-&gt;left == x)) {  // ZIG-ZIG: same side
+            rotate(p);                              // grandparent first!
+            rotate(x);
+        } else {                                    // ZIG-ZAG: opposite sides
+            rotate(x);
+            rotate(x);
+        }
+    }
+    return x;                                       // x is now the root
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Splay tree core: node, rotation, and the splay loop. No balance field:
+// the node carries a key, two children, and a parent pointer, nothing else.
+static class Node {
+    int key; Node left, right, parent;
+    Node(int k) { key = k; }
+}
+
+static void attachLeft (Node x, Node c) { x.left  = c; if (c != null) c.parent = x; }
+static void attachRight(Node x, Node c) { x.right = c; if (c != null) c.parent = x; }
+
+// Rotate x above its parent. In-order is unchanged; x rises one level.
+static void rotate(Node x) {
+    Node p = x.parent, g = p.parent;
+    if (p.left == x) { attachLeft (p, x.right); attachRight(x, p); }
+    else             { attachRight(p, x.left ); attachLeft (x, p); }
+    x.parent = g;
+    if (g != null) { if (g.left == p) g.left = x; else g.right = x; }
+}
+
+// Move x to the root, two levels at a time where possible.
+static Node splay(Node x) {
+    while (x.parent != null) {
+        Node p = x.parent, g = p.parent;
+        if (g == null) {                            // ZIG
+            rotate(x);
+        } else if ((g.left == p) == (p.left == x)) { // ZIG-ZIG: same side
+            rotate(p);                              // grandparent first!
+            rotate(x);
+        } else {                                    // ZIG-ZAG: opposite sides
+            rotate(x);
+            rotate(x);
+        }
+    }
+    return x;                                       // x is now the root
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Splay tree core: node, rotation, and the splay loop. No balance field:
+# the node carries a key, two children, and a parent pointer, nothing else.
+class Node:
+    __slots__ = ("key", "left", "right", "parent")
+    def __init__(self, key):
+        self.key = key
+        self.left = self.right = self.parent = None
+
+def attach_left(x, c):
+    x.left = c
+    if c: c.parent = x
+
+def attach_right(x, c):
+    x.right = c
+    if c: c.parent = x
+
+def rotate(x):                       # x rises one level; in-order unchanged
+    p = x.parent
+    g = p.parent
+    if p.left is x:
+        attach_left(p, x.right); attach_right(x, p)
+    else:
+        attach_right(p, x.left);  attach_left(x, p)
+    x.parent = g
+    if g:
+        if g.left is p: g.left = x
+        else:           g.right = x
+
+def splay(x):                        # move x to the root, two levels at a time
+    while x.parent is not None:
+        p = x.parent
+        g = p.parent
+        if g is None:                                  # ZIG
+            rotate(x)
+        elif (g.left is p) == (p.left is x):           # ZIG-ZIG: same side
+            rotate(p)                                  # grandparent first!
+            rotate(x)
+        else:                                          # ZIG-ZAG: opposite sides
+            rotate(x)
+            rotate(x)
+    return x                                           # x is now the root</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Splay tree core in an arena: nodes live in a Vec and links are indices, so
+// the parent pointers cost no borrow-checker gymnastics. No balance field.
+type Ix = usize;
+const NIL: Ix = usize::MAX;
+
+struct Node { key: i32, left: Ix, right: Ix, parent: Ix }
+struct Tree { a: Vec&lt;Node&gt;, root: Ix }
+
+impl Tree {
+    fn new_node(&amp;mut self, key: i32) -&gt; Ix {
+        self.a.push(Node { key, left: NIL, right: NIL, parent: NIL });
+        self.a.len() - 1
+    }
+    fn set_left(&amp;mut self, x: Ix, c: Ix) {
+        self.a[x].left = c;
+        if c != NIL { self.a[c].parent = x; }
+    }
+    fn set_right(&amp;mut self, x: Ix, c: Ix) {
+        self.a[x].right = c;
+        if c != NIL { self.a[c].parent = x; }
+    }
+
+    // Rotate x above its parent. In-order is unchanged; x rises one level.
+    fn rotate(&amp;mut self, x: Ix) {
+        let p = self.a[x].parent;
+        let g = self.a[p].parent;
+        if self.a[p].left == x {
+            let b = self.a[x].right; self.set_left(p, b);  self.set_right(x, p);
+        } else {
+            let b = self.a[x].left;  self.set_right(p, b); self.set_left(x, p);
+        }
+        self.a[x].parent = g;
+        if g != NIL {
+            if self.a[g].left == p { self.a[g].left = x; } else { self.a[g].right = x; }
+        }
+    }
+
+    // Move x to the root, two levels at a time where possible.
+    fn splay(&amp;mut self, x: Ix) {
+        while self.a[x].parent != NIL {
+            let p = self.a[x].parent;
+            let g = self.a[p].parent;
+            if g == NIL {                                     // ZIG
+                self.rotate(x);
+            } else if (self.a[g].left == p) == (self.a[p].left == x) {
+                self.rotate(p);                               // ZIG-ZIG, g first!
+                self.rotate(x);
+            } else {                                          // ZIG-ZAG
+                self.rotate(x);
+                self.rotate(x);
+            }
+        }
+        self.root = x;
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/splay-core.cpp &middot; code/trees/splay-core.java &middot; code/trees/splay-core.py &middot; code/trees/splay-core.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The loop condition is <code>x.parent != null</code>, so the number of
+        steps is \(\lceil d/2 \rceil\) where \(d\) is the starting depth of
+        \(x\): the double steps consume two levels each and a single zig
+        consumes the last one when \(d\) is odd. Each step is \(O(1)\), so one
+        splay costs \(\Theta(d)\), the same order as the search that found
+        \(x\).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="unrolled">3. A full splay, unrolled</h2>
+      <p>
+        Take the binary search tree on the thirteen keys
+        \(10, 20, \dots, 130\) shown below, and splay the key \(40\), which
+        sits at depth \(5\). The access path from the root is
+        \(120 \to 100 \to 80 \to 20 \to 60 \to 40\), taking the directions
+        left, left, left, right, left. Splaying reads that path
+        <em>from the bottom</em> in pairs, so it will fire one of each case.
+      </p>
+      <pre>                                              120
+                                      /___________\
+                                      100         130
+                              /___________\
+                              80          110
+      /___________________________\
+      20                          90
+  /___________________\
+  10                  60
+              /___________\
+              40          70
+          /_______\
+          30      50
+
+height 6; 40 is at depth 5; in-order 10,20,...,130</pre>
+      <p>
+        <strong>Which case fires when.</strong> Working up from \(40\):
+      </p>
+      <ul>
+        <li>\(40\) is the <em>left</em> child of \(60\), and \(60\) is the
+        <em>right</em> child of \(20\): opposite sides, so <strong>zig-zag</strong>.</li>
+        <li>After that step \(40\) is the left child of \(80\), and \(80\) is
+        the left child of \(100\): same side, so <strong>zig-zig</strong>.</li>
+        <li>After that step \(40\) is the left child of the root \(120\): no
+        grandparent, so <strong>zig</strong>.</li>
+      </ul>
+
+      <h3>Step 1: zig-zag on \((40, 60, 20)\)</h3>
+      <p>
+        \(g=20\), \(p=60\), \(x=40\). Rotate \(40\) above \(60\), then \(40\)
+        above \(20\). \(40\)&rsquo;s left subtree \(30\) goes to \(20\), its
+        right subtree \(50\) goes to \(60\), and \(20\) and \(60\) become
+        \(40\)&rsquo;s children:
+      </p>
+      <pre>                                              120
+                                      /___________\
+                                      100         130
+                              /___________\
+                              80          110
+              /___________________\
+              40                  90
+      /_______________\
+      20              60
+  /_______\       /_______\
+  10      30      50      70
+
+height 5; 40 is now at depth 3</pre>
+      <h3>Step 2: zig-zig on \((40, 80, 100)\)</h3>
+      <p>
+        \(g=100\), \(p=80\), \(x=40\), all three on the left spine. Rotate
+        \(80\) above \(100\) first, then \(40\) above \(80\). \(40\)&rsquo;s
+        right subtree (rooted at \(60\)) is handed to \(80\), and \(80\)
+        picks up \(100\) as its right child, which in turn keeps \(90\) and
+        \(110\):
+      </p>
+      <pre>                                              120
+              /___________________________________\
+              40                                  130
+      /_______________________\
+      20                      80
+  /_______\           /_______________\
+  10      30          60              100
+                  /_______\       /_______\
+                  50      70      90      110
+
+height 4; 40 is now at depth 1</pre>
+      <h3>Step 3: zig on \((40, 120)\)</h3>
+      <p>
+        \(40\) is a child of the root, so a single rotation finishes the splay.
+        \(40\)&rsquo;s right subtree (rooted at \(80\)) is handed to \(120\):
+      </p>
+      <pre>              40
+      /_______________________________________\
+      20                                      120
+  /_______\                   /___________________\
+  10      30                  80                  130
+                      /_______________\
+                      60              100
+                  /_______\       /_______\
+                  50      70      90      110
+
+height 4; 40 is the root; in-order still 10,20,...,130</pre>
+      <p>
+        Five rotations in three steps. Compare the depth of every key before
+        and after:
+      </p>
+      <table class="trace">
+        <tr><th class="lab">key</th><th>10</th><th>20</th><th>30</th><th>40</th><th>50</th><th>60</th><th>70</th><th>80</th><th>90</th><th>100</th><th>110</th><th>120</th><th>130</th></tr>
+        <tr><td class="lab">depth before</td><td>4</td><td>3</td><td>6</td><td class="upd">5</td><td>6</td><td>4</td><td>5</td><td>2</td><td>3</td><td>1</td><td>2</td><td>0</td><td>1</td></tr>
+        <tr><td class="lab">depth after</td><td>2</td><td>1</td><td>2</td><td class="set">0</td><td>4</td><td>3</td><td>4</td><td>2</td><td>4</td><td>3</td><td>4</td><td>1</td><td>2</td></tr>
+      </table>
+      <p>
+        The tree got shorter (height \(6 \to 4\)) and, more to the point, every
+        node on the access path got shallower: \(40\) from 5 to 0, \(20\) from
+        3 to 1, \(60\) from 4 to 3, \(80\) from 2 to 2, \(100\) from 1 to 3,
+        \(120\) from 0 to 1. The two ancestors that got <em>deeper</em>
+        (\(100\), \(120\)) are exactly the ones that were cheap to reach
+        before. That trade is what the potential function in &sect;6 turns into
+        a bound.
+      </p>
+      <p class="note">
+        The tree in this section, all three step diagrams and every depth in
+        the table were produced by executing a reference splay implementation;
+        the in-order sequence \(10,20,\dots,130\) is unchanged at each of the
+        three intermediate stages, which is the correctness check a rotation
+        must pass.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ops">4. Search, insert and delete</h2>
+      <p>
+        Every operation is &ldquo;do the plain BST thing, then splay
+        something.&rdquo; That last clause is not optional: without it the
+        amortized bound is lost, because the tree never repays the cost of a
+        deep access.
+      </p>
+
+      <h3>Search</h3>
+      <p>
+        Descend by key comparisons as in a plain BST. If the key is found,
+        splay that node. <em>If the key is not found</em>, splay the last node
+        visited (the leaf-ward end of the search path, which is the
+        predecessor or successor of the missing key). Splaying on failure
+        matters: an unsuccessful search still paid for a deep descent, and it
+        must still restructure to pay it back.
+      </p>
+      <div class="ex">
+        <span class="tag">Trace: an unsuccessful search for 45</span>
+        In the &sect;3 tree, searching for \(45\) walks
+        \(120 \to 100 \to 80 \to 20 \to 60 \to 40 \to 50\) (at \(40\) we go
+        right because \(45 \gt 40\); at \(50\) we would go left, but \(50\) has
+        no left child, so the search fails there). The last node visited is
+        \(50\), at depth \(6\), so we splay \(50\). Its path from the root is
+        left, left, left, right, left, right, so the cases from the bottom are
+        zig-zag \((50,40,60)\), zig-zag \((50,20,80)\), zig-zig \((50,100,120)\):
+<pre>                  50
+      /_______________________________\
+      20                              100
+  /___________\               /_______________\
+  10          40              80              120
+          /____       /___________\       /_______\
+          30          60          90      110     130
+                      ____\
+                          70
+
+height 4; 50 (the failed search's neighbour) is the root</pre>
+        The key \(45\) is still absent, but a re-search for \(45\) now costs two
+        comparisons instead of seven, which is the behavior that makes repeated
+        near-misses cheap.
+      </div>
+
+      <h3>Insert</h3>
+      <p>
+        Descend as in a plain BST and attach the new node as a leaf, then splay
+        the new node to the root. (If the key is already present, splay the
+        existing node and change nothing else.)
+      </p>
+      <div class="ex">
+        <span class="tag">Trace: insert 45</span>
+        Into the &sect;3 tree. BST placement walks the same path as the failed
+        search above and attaches \(45\) as the <em>left</em> child of \(50\),
+        at depth \(7\). Splaying it runs zig-zag \((45,50,40)\), zig-zag
+        \((45,60,20)\), zig-zig \((45,80,100)\), zig \((45,120)\): four steps,
+        seven rotations.
+<pre>                  45
+      /___________________________________________\
+      20                                          120
+  /___________\                   /___________________\
+  10          40                  80                  130
+          /____           /_______________\
+          30              60              100
+                      /_______\       /_______\
+                      50      70      90      110
+
+height 4; in-order 10,20,30,40,45,50,...,130</pre>
+      </div>
+
+      <h3>Delete</h3>
+      <p>
+        Splay the node to be deleted to the root. It now has a left subtree
+        \(L\) (all keys smaller) and a right subtree \(R\) (all keys larger).
+        Detach both and discard the root. If \(L\) is empty, \(R\) is the whole
+        answer. Otherwise <strong>join</strong> them: splay the maximum of
+        \(L\) to \(L\)&rsquo;s root; being the maximum it has no right child,
+        so \(R\) can simply be hung there.
+      </p>
+      <p>
+        The two-children case that needs a successor hunt in
+        <a href="ds-trees-bst.html">Hibbard deletion</a> disappears: splaying
+        creates the empty slot the join needs, rather than searching for a node
+        to move into it.
+      </p>
+      <div class="ex">
+        <span class="tag">Trace: delete 40</span>
+        From the &sect;3 tree. Step 1 is the splay of &sect;3, which puts \(40\)
+        at the root. Step 2 detaches its two subtrees:
+<pre>L = 20(10, 30)          R = 120( 80(60(50,70), 100(90,110)), 130 )</pre>
+        Step 3 splays the maximum of \(L\), which is \(30\), to \(L\)&rsquo;s
+        root. \(30\) is the right child of \(20\), which is the root of \(L\),
+        so this is a single <strong>zig</strong>:
+<pre>      20                                 30
+  /_______\       <span class="cm">--- zig --&gt;</span>        /____
+  10      30                         20
+                                 /____
+                                 10       <span class="cm">&larr; 30 has no right child, by construction</span></pre>
+        Step 4 hangs \(R\) on \(30\)&rsquo;s empty right link:
+<pre>          30
+      /___________________________________\
+      20                                  120
+  /____                   /___________________\
+  10                      80                  130
+                  /_______________\
+                  60              100
+              /_______\       /_______\
+              50      70      90      110
+
+in-order 10,20,30,50,60,...,130 (40 gone); height 4</pre>
+        Deletion cost two splays plus \(O(1)\) pointer work. If the key had been
+        absent, step 1&rsquo;s splay would have left a neighbour at the root and
+        the operation would stop there.
+      </div>
+
+      <div class="code-tabs" data-snippet="trees/splay-ops">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Search, insert, delete. Each is plain BST work followed by a splay.
+// `root` is passed and returned because every operation moves it.
+
+// Descend to key, or to the last node on its search path; splay that node.
+// Returns the new root; *found reports whether the key was present.
+Node* search(Node* root, int key, bool* found) {
+    if (!root) { *found = false; return nullptr; }
+    Node* cur = root; Node* last = root;
+    while (cur) {
+        last = cur;
+        if (key == cur-&gt;key) break;
+        cur = (key &lt; cur-&gt;key) ? cur-&gt;left : cur-&gt;right;
+    }
+    *found = (last-&gt;key == key);
+    return splay(last);                 // splay even on failure
+}
+
+Node* insert(Node* root, int key) {
+    if (!root) return new Node(key);
+    Node* cur = root; Node* par = nullptr;
+    while (cur) {
+        par = cur;
+        if (key == cur-&gt;key) return splay(cur);   // already present
+        cur = (key &lt; cur-&gt;key) ? cur-&gt;left : cur-&gt;right;
+    }
+    Node* n = new Node(key);            // attach as a leaf, then lift it
+    if (key &lt; par-&gt;key) attachLeft(par, n); else attachRight(par, n);
+    return splay(n);
+}
+
+Node* remove(Node* root, int key) {
+    bool found; root = search(root, key, &amp;found);
+    if (!found) return root;            // absent: the splay already happened
+    Node* L = root-&gt;left; Node* R = root-&gt;right;
+    if (L) L-&gt;parent = nullptr;
+    if (R) R-&gt;parent = nullptr;
+    delete root;
+    if (!L) return R;
+    Node* m = L; while (m-&gt;right) m = m-&gt;right;  // max of L
+    L = splay(m);                       // now L-&gt;right is null
+    attachRight(L, R);
+    return L;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Search, insert, delete. Each is plain BST work followed by a splay.
+// `root` is passed and returned because every operation moves it.
+
+static boolean lastFound;               // set by search()
+
+// Descend to key, or to the last node on its search path; splay that node.
+static Node search(Node root, int key) {
+    if (root == null) { lastFound = false; return null; }
+    Node cur = root, last = root;
+    while (cur != null) {
+        last = cur;
+        if (key == cur.key) break;
+        cur = (key &lt; cur.key) ? cur.left : cur.right;
+    }
+    lastFound = (last.key == key);
+    return splay(last);                 // splay even on failure
+}
+
+static Node insert(Node root, int key) {
+    if (root == null) return new Node(key);
+    Node cur = root, par = null;
+    while (cur != null) {
+        par = cur;
+        if (key == cur.key) return splay(cur);    // already present
+        cur = (key &lt; cur.key) ? cur.left : cur.right;
+    }
+    Node n = new Node(key);             // attach as a leaf, then lift it
+    if (key &lt; par.key) attachLeft(par, n); else attachRight(par, n);
+    return splay(n);
+}
+
+static Node remove(Node root, int key) {
+    root = search(root, key);
+    if (!lastFound) return root;        // absent: the splay already happened
+    Node L = root.left, R = root.right;
+    if (L != null) L.parent = null;
+    if (R != null) R.parent = null;
+    if (L == null) return R;
+    Node m = L; while (m.right != null) m = m.right;   // max of L
+    L = splay(m);                       // now L.right is null
+    attachRight(L, R);
+    return L;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Search, insert, delete. Each is plain BST work followed by a splay.
+# `root` is passed and returned because every operation moves it.
+
+def search(root, key):
+    """Return (new_root, found). Splays the last node on the search path."""
+    if root is None:
+        return None, False
+    cur = last = root
+    while cur is not None:
+        last = cur
+        if key == cur.key: break
+        cur = cur.left if key &lt; cur.key else cur.right
+    return splay(last), last.key == key      # splay even on failure
+
+def insert(root, key):
+    if root is None:
+        return Node(key)
+    cur, par = root, None
+    while cur is not None:
+        par = cur
+        if key == cur.key:
+            return splay(cur)                # already present
+        cur = cur.left if key &lt; cur.key else cur.right
+    n = Node(key)                            # attach as a leaf, then lift it
+    if key &lt; par.key: attach_left(par, n)
+    else:             attach_right(par, n)
+    return splay(n)
+
+def delete(root, key):
+    root, found = search(root, key)
+    if not found:
+        return root                          # the splay already happened
+    L, R = root.left, root.right
+    if L: L.parent = None
+    if R: R.parent = None
+    if L is None:
+        return R
+    m = L
+    while m.right: m = m.right               # max of L
+    L = splay(m)                             # now L.right is None
+    attach_right(L, R)
+    return L</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Search, insert, delete on the arena tree. Each is plain BST work
+// followed by a splay; self.root is updated by splay().
+impl Tree {
+    // Descend to key, or to the last node on its search path; splay it.
+    fn search(&amp;mut self, key: i32) -&gt; bool {
+        if self.root == NIL { return false; }
+        let (mut cur, mut last) = (self.root, self.root);
+        while cur != NIL {
+            last = cur;
+            if key == self.a[cur].key { break; }
+            cur = if key &lt; self.a[cur].key { self.a[cur].left } else { self.a[cur].right };
+        }
+        self.splay(last);                      // splay even on failure
+        self.a[last].key == key
+    }
+
+    fn insert(&amp;mut self, key: i32) {
+        if self.root == NIL { self.root = self.new_node(key); return; }
+        let (mut cur, mut par) = (self.root, NIL);
+        while cur != NIL {
+            par = cur;
+            if key == self.a[cur].key { self.splay(cur); return; }
+            cur = if key &lt; self.a[cur].key { self.a[cur].left } else { self.a[cur].right };
+        }
+        let n = self.new_node(key);            // attach as a leaf, then lift it
+        if key &lt; self.a[par].key { self.set_left(par, n) } else { self.set_right(par, n) }
+        self.splay(n);
+    }
+
+    fn remove(&amp;mut self, key: i32) {
+        if !self.search(key) { return; }       // absent: splay already happened
+        let r = self.root;
+        let (l, rr) = (self.a[r].left, self.a[r].right);
+        if l  != NIL { self.a[l ].parent = NIL; }
+        if rr != NIL { self.a[rr].parent = NIL; }
+        if l == NIL { self.root = rr; return; }
+        self.root = l;
+        let mut m = l;                          // max of L
+        while self.a[m].right != NIL { m = self.a[m].right; }
+        self.splay(m);                          // now m has no right child
+        self.set_right(m, rr);
+        self.root = m;
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/splay-ops.cpp &middot; code/trees/splay-ops.java &middot; code/trees/splay-ops.py &middot; code/trees/splay-ops.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Every operation costs \(\Theta(d)\) where \(d\) is the depth reached:
+        the descent is \(d\) comparisons and the splay is \(\lceil d/2\rceil\)
+        constant-time steps. Deletion is two splays, so at most twice that.
+        Nothing here bounds \(d\); the bound comes from &sect;6, and it is a
+        bound on the sum over a sequence, not on any one \(d\).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="nofield">5. Why no balance field is stored</h2>
+      <p>
+        The balanced trees store data whose only purpose is to answer
+        &ldquo;is the invariant still true here?&rdquo;: an AVL node keeps a
+        height or a two-bit balance factor, a red-black node keeps a colour
+        bit, a <a href="ds-treaps.html">treap</a> node keeps a random priority.
+        A splay node keeps a key, two child pointers, and (for the bottom-up
+        formulation above) a parent pointer. There is nothing to initialise,
+        nothing to recompute after a rotation, and nothing that can be
+        corrupted into an inconsistent state.
+      </p>
+      <p>
+        Three consequences follow.
+      </p>
+      <ul>
+        <li>
+          <strong>Space.</strong> An AVL node needs an extra integer field
+          (or, packed, two bits that in practice still cost a whole word of
+          alignment). Over \(n\) nodes that is real memory. A splay node has no
+          such field at all. The parent pointer used above is a convenience,
+          not a requirement: the top-down formulation of splaying builds the
+          two halves of the result as it descends and needs no parent pointers,
+          giving a node identical in size to a plain BST node.
+        </li>
+        <li>
+          <strong>Code size and case count.</strong> There is one rebalancing
+          routine, <code>splay</code>, with three cases, and it is the same
+          routine for search, insert and delete. Red-black insertion plus
+          deletion is a noticeably larger body of case analysis, and every case
+          also has to fix up the stored colours.
+        </li>
+        <li>
+          <strong>No invariant to violate.</strong> Correctness of a splay tree
+          rests only on the BST ordering property, which rotations preserve by
+          construction. Every intermediate tree in &sect;3 is a legal splay tree.
+          By contrast, an AVL tree in the middle of a fix-up is temporarily not
+          an AVL tree, and code that observes it there sees a broken structure.
+        </li>
+      </ul>
+      <p>
+        The price is paid in the guarantee. Because no invariant is enforced,
+        nothing prevents a splay tree from being a path. Insert \(1,2,\dots,n\)
+        in ascending order into an initially empty splay tree: each new key is
+        larger than everything present, so it attaches as the rightmost leaf and
+        is then splayed to the root with the whole tree hanging to its left. The
+        result for \(n = 8\) is a left path of height \(7\):
+      </p>
+      <pre>                              8
+                          /____
+                          7
+                      /____
+                      6
+                  /____
+                  5
+              /____
+              4
+          /____
+          3
+      /____
+      2
+  /____
+  1</pre>
+      <p>
+        Searching for \(1\) in that tree touches all \(8\) nodes. That is the
+        worst case and it is genuinely \(\Theta(n)\): a splay tree makes no
+        promise about any single operation. What &sect;6 shows is that the
+        <em>next</em> operations cannot all be that bad, because this one just
+        paid for a large amount of restructuring.
+      </p>
+      <div class="aside">
+        <span class="tag">Why writes on every read can be a problem</span>
+        A splay tree mutates on <code>search</code>. Two consequences are
+        practical rather than asymptotic: a splay tree cannot be shared by
+        concurrent readers without a writer&rsquo;s lock (a red-black tree can),
+        and a read-mostly workload on a splay tree dirties cache lines and, in a
+        persistent or memory-mapped setting, dirties pages. This is the main
+        reason standard libraries ship red-black trees rather than splay trees
+        for their general-purpose ordered maps.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="amortized">6. The amortized \(O(\log n)\) bound</h2>
+      <p>
+        The analysis is the potential method of the
+        <a href="../foundations/foundation-amortized-analysis.html#potential"><em>Amortized
+        Analysis</em></a> handout: choose a function \(\Phi\) from tree states
+        to non-negative reals, and define the amortized cost of an operation as
+        its actual cost plus the change in potential,
+        \(\hat{c} = c + \Phi_{\text{after}} - \Phi_{\text{before}}\). Summing
+        over a sequence telescopes:
+        \(\sum c_i = \sum \hat{c}_i + \Phi_0 - \Phi_m \le \sum \hat{c}_i +
+        \Phi_0\) whenever \(\Phi \ge 0\). So a bound on every \(\hat{c}_i\)
+        plus a bound on \(\Phi_0\) bounds the total actual cost.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (size, rank, potential)</span>
+        For a node \(x\), let \(s(x)\) be the number of nodes in the subtree
+        rooted at \(x\) (counting \(x\)), and let the <strong>rank</strong> be
+        \(r(x) = \log_2 s(x)\). The potential of a tree \(T\) is
+        \[ \Phi(T) \;=\; \sum_{x \in T} r(x) \;=\; \sum_{x \in T} \log_2 s(x). \]
+        Every \(s(x) \ge 1\), so every \(r(x) \ge 0\) and \(\Phi \ge 0\); and
+        every \(s(x) \le n\), so \(\Phi \le n\log_2 n\).
+      </div>
+      <p>
+        Read \(\Phi\) as &ldquo;how lopsided the tree is.&rdquo; A path of
+        \(n\) nodes has subtree sizes \(1,2,\dots,n\), giving
+        \(\Phi = \sum_{k=1}^n \log_2 k = \log_2(n!) \approx n\log_2 n - 1.44n\),
+        near the maximum. A perfectly balanced tree has most subtrees small and
+        \(\Phi\) close to \(n\). Deep trees are stored-up work; splaying spends
+        that store.
+      </p>
+      <p>
+        Everything rests on one inequality, which is where the specific shapes
+        of &sect;2 enter the algebra.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (concavity of \(\log\))</span>
+        For any \(a, b &gt; 0\),
+        \(\;\log_2 a + \log_2 b \le 2\log_2\!\left(\frac{a+b}{2}\right)
+        = 2\log_2(a+b) - 2.\)
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> By the arithmetic-geometric mean inequality,
+        \(\sqrt{ab} \le (a+b)/2\). Both sides are positive, and \(\log_2\) is
+        increasing, so \(\tfrac12(\log_2 a + \log_2 b) = \log_2\sqrt{ab}
+        \le \log_2\frac{a+b}{2}\). Double both sides.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Write \(r\) for ranks before a step and \(r'\) for ranks after it. The
+        next lemma bounds one splay step; the theorem then telescopes over the
+        steps of a whole splay.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (one splay step)</span>
+        Let a splay step move \(x\) up. Its amortized cost (rotations performed,
+        plus \(\Delta\Phi\)) satisfies
+        \[ \hat{c}_{\text{step}} \;\le\; 3\bigl(r'(x) - r(x)\bigr) + [\,\text{step is a zig}\,], \]
+        where the bracket is \(1\) for a zig and \(0\) for a zig-zig or zig-zag.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Only \(x\), \(p\) and \(g\) change subtree size,
+        so \(\Delta\Phi\) involves only their ranks.
+        <br /><br />
+        <em>zig-zig.</em> Actual cost \(2\). Since \(x\) ends where \(g\) began,
+        \(r'(x) = r(g)\), so
+        \[ \hat{c} = 2 + \bigl(r'(x)+r'(p)+r'(g)\bigr) - \bigl(r(x)+r(p)+r(g)\bigr)
+                   = 2 + r'(p) + r'(g) - r(x) - r(p). \]
+        After the step \(p\) is a child of \(x\), so \(r'(p) \le r'(x)\); before
+        it \(x\) was a child of \(p\), so \(r(p) \ge r(x)\). Hence
+        \(\hat{c} \le 2 + r'(x) + r'(g) - 2r(x)\). It therefore suffices to show
+        \(2 + r'(g) + r(x) \le 2r'(x)\), because then
+        \(\hat{c} \le 2 + r'(x) + r'(g) - 2r(x) \le 3r'(x) - 3r(x)\). Look at the
+        &sect;2 picture: after the step, \(x\)&rsquo;s subtree contains
+        \(x\) itself, \(x\)&rsquo;s old subtree (\(A, B\) and \(x\)) and
+        \(g\)&rsquo;s new subtree (\(C, D\) and \(g\)), which are disjoint, so
+        \(s(x) + s'(g) \le s'(x)\). By the concavity lemma with \(a = s(x)\),
+        \(b = s'(g)\),
+        \[ r(x) + r'(g) \;\le\; 2\log_2\bigl(s(x)+s'(g)\bigr) - 2
+                        \;\le\; 2\log_2 s'(x) - 2 \;=\; 2r'(x) - 2, \]
+        which is the required inequality.
+        <br /><br />
+        <em>zig-zag.</em> Actual cost \(2\), and again \(r'(x) = r(g)\), so
+        \(\hat{c} = 2 + r'(p) + r'(g) - r(x) - r(p) \le 2 + r'(p) + r'(g) - 2r(x)\)
+        using \(r(p) \ge r(x)\). After the step \(p\) and \(g\) are the two
+        children of \(x\), so their subtrees are disjoint and
+        \(s'(p) + s'(g) \le s'(x)\); the concavity lemma gives
+        \(r'(p) + r'(g) \le 2r'(x) - 2\). Hence
+        \(\hat{c} \le 2\bigl(r'(x) - r(x)\bigr) \le 3\bigl(r'(x)-r(x)\bigr)\),
+        the last step because \(r'(x) \ge r(x)\).
+        <br /><br />
+        <em>zig.</em> Actual cost \(1\). Only \(x\) and \(p\) change, and after
+        the step \(p\) is a child of \(x\) so \(r'(p) \le r(p)\). Thus
+        \(\hat{c} = 1 + r'(x) + r'(p) - r(x) - r(p) \le 1 + r'(x) - r(x)
+        \le 1 + 3\bigl(r'(x) - r(x)\bigr)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (access lemma)</span>
+        Splaying a node \(x\) in a tree with root \(t\) has amortized cost at
+        most \(3\bigl(r(t) - r(x)\bigr) + 1 \le 3\log_2 n + 1\), where the ranks
+        are taken before the splay.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Let the splay consist of steps
+        \(1, \dots, k\), and let \(r_i(x)\) be \(x\)&rsquo;s rank after step
+        \(i\), with \(r_0(x) = r(x)\) and \(r_k(x) = r(t)\) (after the last step
+        \(x\) is the root, so its subtree is the whole tree). Summing the step
+        lemma,
+        \[ \sum_{i=1}^{k} \hat{c}_i \;\le\; \sum_{i=1}^{k} 3\bigl(r_i(x)-r_{i-1}(x)\bigr) + 1
+          \;=\; 3\bigl(r_k(x) - r_0(x)\bigr) + 1 \;=\; 3\bigl(r(t)-r(x)\bigr)+1, \]
+        the sum telescoping and the \(+1\) appearing at most once because at most
+        one step of a splay is a zig (a zig requires \(x\) to be a child of the
+        root, which happens only at the end). Finally \(r(t) = \log_2 n\) and
+        \(r(x) \ge 0\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Corollary (sequence cost)</span>
+        A sequence of \(m\) splay-tree operations on a tree that never holds
+        more than \(n\) keys costs \(O\bigl((m+n)\log n\bigr)\) time in total,
+        that is \(O(\log n)\) amortized per operation.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> An operation performs at most two splays plus
+        \(O(1)\) other work. Its actual cost is proportional to the depth
+        \(d\) it descends to, and the splay that follows performs exactly \(d\)
+        rotations, so the operation&rsquo;s actual cost is at most a constant
+        times the actual cost the access lemma charges, plus \(O(1)\). Its
+        amortized cost is therefore at most
+        \(c \cdot 2(3\log_2 n + 1) + O(1) = O(\log n)\). Telescoping the potential over
+        the sequence, \(\sum_i c_i = \sum_i \hat{c}_i + \Phi_0 - \Phi_m\).
+        Now \(\Phi_m \ge 0\) and \(\Phi_0 \le n\log_2 n\), so
+        \(\sum_i c_i \le m \cdot O(\log n) + n\log_2 n = O((m+n)\log n)\).
+        <span class="qed">&#8718;</span>
+      </div>
+
+      <h3>The bookkeeping on the &sect;3 splay</h3>
+      <p>
+        The potential is not a metaphor; it is arithmetic on the actual tree.
+        For the thirteen-node tree of &sect;3 the subtree sizes are
+        \(s(120)=13,\; s(100)=11,\; s(80)=9,\; s(20)=7,\; s(60)=5,\;
+        s(40)=3\) along the access path and \(1\) at each of the seven leaves,
+        with \(s(90)=s(110)=s(130)=1\). Summing \(\log_2 s(x)\) gives
+        \(\Phi_{\text{before}} = 17.044\). After the splay the sizes are
+        \(s(40)=13,\; s(120)=9,\; s(80)=7,\; s(20)=3,\; s(60)=3,\; s(100)=3\)
+        and \(1\) elsewhere, giving \(\Phi_{\text{after}} = 14.433\).
+      </p>
+      <table class="trace">
+        <tr><th class="lab">quantity</th><th>value</th></tr>
+        <tr><td class="lab">actual cost (rotations)</td><td>5</td></tr>
+        <tr><td class="lab">\(\Phi_{\text{before}}\)</td><td>17.044</td></tr>
+        <tr><td class="lab">\(\Phi_{\text{after}}\)</td><td>14.433</td></tr>
+        <tr><td class="lab">\(\Delta\Phi\)</td><td>\(-2.611\)</td></tr>
+        <tr><td class="lab">amortized cost \(= 5 + \Delta\Phi\)</td><td class="set">2.389</td></tr>
+        <tr><td class="lab">access-lemma bound \(3(\log_2 13 - \log_2 3) + 1\)</td><td>7.346</td></tr>
+      </table>
+      <p>
+        Five rotations were performed but only \(2.389\) units are charged,
+        because the splay left the tree \(2.611\) units less lopsided: the work
+        was partly paid for out of potential that earlier operations had built
+        up. The charge is comfortably inside the guaranteed bound of \(7.346\).
+      </p>
+      <div class="aside">
+        <span class="tag">Where the constant 3 comes from</span>
+        The \(3\) is not tight; it is the smallest constant that makes all three
+        cases fit one formula. The zig-zag case alone gives \(2(r'(x)-r(x))\),
+        and the zig-zig case is the one that needs \(3\). Tighter bounds are
+        known for restricted access patterns: the sequential-access result of
+        &sect;7 has a small constant and no \(\log n\) factor at all.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="workingset">7. Working sets and caching behavior</h2>
+      <p>
+        The \(O(\log n)\) amortized bound is the floor, not the ceiling of what
+        splaying gives. Because the structure reshapes itself around what is
+        actually accessed, its cost adapts to the access pattern in ways a
+        fixed-shape balanced tree cannot. Three results make this precise; all
+        three follow from the same potential technique with a weighted rank
+        \(r(x) = \log_2\bigl(\sum_{y \in \text{subtree}(x)} w(y)\bigr)\) in place
+        of the unweighted one.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (static optimality, Sleator-Tarjan)</span>
+        Suppose key \(i\) is accessed \(q_i \ge 1\) times in a sequence of
+        \(m\) accesses. The total time a splay tree spends is
+        \(O\bigl(m + \sum_i q_i \log_2 (m/q_i)\bigr)\).
+      </div>
+      <p>
+        The quantity \(\sum_i q_i \log_2(m/q_i)\) is \(m\) times the empirical
+        entropy of the access distribution, and it is exactly (to within a
+        constant factor) the cost of the <em>best possible fixed</em> binary
+        search tree for that distribution: the optimal BST that one would build
+        knowing all the frequencies in advance. A splay tree matches it without
+        being told the frequencies, and without storing any of them.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (working set, Sleator-Tarjan)</span>
+        Let \(t_j\) be the number of <em>distinct</em> keys accessed since the
+        previous access to the key accessed at time \(j\) (or \(n\) if this is
+        its first access). The total time for \(m\) accesses is
+        \(O\bigl(n\log n + m + \sum_{j=1}^{m} \log_2 (t_j+2)\bigr)\).
+      </div>
+      <p>
+        This is the caching statement. The cost of an access depends on how many
+        <em>other</em> keys have been touched since that key was last used, not
+        on \(n\). A key re-accessed after \(t\) distinct others costs
+        \(O(\log t)\), so a program working inside a small hot set pays
+        logarithmically in the size of the hot set, whatever the size of the
+        tree. This is a least-recently-used cache behavior obtained without any
+        cache: the splaying <em>is</em> the eviction policy, in that a key not
+        touched for a long time sinks as other keys are pulled over it.
+      </p>
+      <div class="ex">
+        <span class="tag">Measured: a 90/10 access pattern</span>
+        A splay tree holding \(n = 1024\) keys, built by inserting
+        \(1,2,\dots,1024\) in ascending order (so the starting tree is a path of
+        height \(1023\)). Then \(20{,}000\) accesses, each with probability
+        \(0.9\) drawn uniformly from a hot set of ten keys and with probability
+        \(0.1\) uniformly from all \(1024\):
+        <table class="trace">
+          <tr><th class="lab">access pattern</th><th>average nodes touched per access</th></tr>
+          <tr><td class="lab">skewed run, overall</td><td class="set">4.95</td></tr>
+          <tr><td class="lab">&nbsp;&nbsp;its hot accesses only</td><td>3.85</td></tr>
+          <tr><td class="lab">&nbsp;&nbsp;its cold accesses only</td><td>14.96</td></tr>
+          <tr><td class="lab">uniform accesses, same tree</td><td>12.52</td></tr>
+          <tr><td class="lab">\(\log_2 1024\) for reference</td><td>10.00</td></tr>
+        </table>
+        The skewed run costs about two-fifths of what the uniform one does, and
+        well under \(\log_2 n\), because a hot key averages \(3.85\) nodes
+        touched: it sits within about three levels of the root, close to
+        \(\log_2 10 \approx 3.3\), which is the size of the hot set and not of
+        the tree. Cold accesses are correspondingly dearer than uniform ones
+        (\(14.96\)), since the cold keys have been pushed down; they are only
+        \(10\%\) of the traffic. A balanced tree would pay about
+        \(\log_2 1024 = 10\) on every row, hot and cold alike, because its shape
+        does not depend on which keys are hot.
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (sequential access / scanning, Tarjan)</span>
+        Starting from <em>any</em> splay tree on \(n\) keys, accessing all
+        \(n\) keys once in ascending order costs \(O(n)\) total, that is
+        \(O(1)\) amortized per access rather than \(O(\log n)\).
+      </div>
+      <div class="ex">
+        <span class="tag">Measured: the ascending sweep</span>
+        Build the tree by splay-inserting \(1,2,\dots,n\) (a left path of
+        height \(n-1\), the worst possible starting shape), then access
+        \(1, 2, \dots, n\) in order, counting nodes touched:
+        <table class="trace">
+          <tr><th class="lab">\(n\)</th><th>8</th><th>16</th><th>32</th><th>64</th><th>128</th><th>256</th><th>1024</th><th>4096</th></tr>
+          <tr><td class="lab">total nodes touched</td><td>30</td><td>70</td><td>152</td><td>320</td><td>662</td><td>1352</td><td>5502</td><td>22140</td></tr>
+          <tr><td class="lab">nodes touched per access</td><td>3.75</td><td>4.38</td><td>4.75</td><td>5.00</td><td>5.17</td><td>5.28</td><td class="set">5.37</td><td class="set">5.41</td></tr>
+          <tr><td class="lab">rotations per access</td><td>2.75</td><td>3.38</td><td>3.75</td><td>4.00</td><td>4.17</td><td>4.28</td><td>4.37</td><td>4.41</td></tr>
+          <tr><td class="lab">\(\log_2 n\)</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>10</td><td>12</td></tr>
+        </table>
+        (Nodes touched is depth plus one per access; rotations is depth, so the
+        two rows differ by exactly \(1\).) Both per-access figures flatten,
+        near \(5.4\) and \(4.4\), while \(\log_2 n\) keeps growing: the total is
+        linear, not \(n\log n\). Tarjan&rsquo;s original proof gives \(O(n)\)
+        with a large constant and later work has brought the proved constant
+        down to roughly what is measured here.
+      </div>
+      <div class="aside">
+        <span class="tag">Dynamic optimality</span>
+        Sleator and Tarjan conjectured something stronger than any of the
+        above: that a splay tree is within a constant factor of the cost of the
+        <em>best possible</em> binary search tree algorithm for the given access
+        sequence, even one that knows the whole sequence in advance and may
+        rotate at will. This is the <strong>dynamic optimality conjecture</strong>,
+        and after four decades it is still open. The best known general result
+        is that certain structures (Tango trees among them) are within
+        \(O(\log\log n)\) of optimal; whether splay trees themselves are within
+        \(O(1)\) is unknown.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="compare">8. Splay trees among the search trees</h2>
+      <p>
+        This catalog&rsquo;s balanced search trees differ in what kind of
+        promise they make and what they spend to keep it.
+      </p>
+      <table>
+        <tr><th>structure</th><th>search / insert / delete</th><th>guarantee type</th><th>per-node extra</th><th>mutates on read?</th></tr>
+        <tr><td><a href="ds-trees-bst.html">plain BST</a></td><td>\(\Theta(n)\) worst</td><td>average over input orders</td><td>none</td><td>no</td></tr>
+        <tr><td><a href="ds-avl-trees.html">AVL tree</a></td><td>\(\Theta(\log n)\) worst</td><td>worst case, every operation</td><td>height (an <code>int</code>)</td><td>no</td></tr>
+        <tr><td><a href="ds-red-black-trees.html">red-black tree</a></td><td>\(\Theta(\log n)\) worst</td><td>worst case, every operation</td><td>1 colour bit</td><td>no</td></tr>
+        <tr><td><a href="ds-treaps.html">treap</a></td><td>\(\Theta(\log n)\) expected</td><td>expected, over own coin flips</td><td>random priority</td><td>no</td></tr>
+        <tr><td><strong>splay tree</strong></td><td>\(\Theta(n)\) worst, \(O(\log n)\) amortized</td><td>amortized, over the whole sequence</td><td>none</td><td><strong>yes</strong></td></tr>
+      </table>
+      <p>
+        Against the <a href="ds-avl-trees.html"><em>AVL tree</em></a>: AVL
+        guarantees \(h \le 1.44\log_2 n\) at all times and never exceeds
+        \(O(\log n)\) on any single operation, which is what a hard real-time
+        deadline needs. A splay tree can spend \(\Theta(n)\) on one operation
+        and is therefore unusable under such a deadline, but it stores no height
+        field, needs no rebalance case analysis, and beats AVL on skewed access
+        patterns by the margin measured in &sect;7. AVL is also the more
+        aggressively balanced of the two on random access, so for a
+        read-heavy uniform workload with no locality it will win on comparisons.
+      </p>
+      <p>
+        Against the <a href="ds-red-black-trees.html"><em>red-black tree</em></a>:
+        red-black keeps a looser bound (\(2\log_2 n\)) than AVL in exchange for
+        fewer restructuring operations per update, and it is the structure
+        standard libraries ship precisely because it never mutates on a read and
+        so supports concurrent readers and read-only pages. The splay tree
+        occupies the opposite corner of the same trade: the least stored state
+        of all these structures and the best adaptivity, at the cost of writing
+        on every read and giving up the per-operation guarantee. Both are worth
+        knowing as the two ends of the &ldquo;how much do you pay to maintain an
+        invariant?&rdquo; spectrum.
+      </p>
+      <p>
+        Two other neighbours are worth naming. The
+        <a href="ds-treaps.html"><em>treap</em></a> also drops the explicit
+        invariant, but replaces it with randomness rather than with
+        restructuring-on-access, giving an <em>expected</em> rather than an
+        amortized bound; a treap&rsquo;s shape is independent of the access
+        pattern, which is exactly the property splaying gives up in order to
+        adapt. The <a href="ds-skip-lists.html"><em>skip list</em></a> reaches
+        the same expected \(O(\log n)\) with coin flips over a linked list
+        instead of a tree. For external storage neither applies and the
+        <a href="ds-b-trees.html"><em>B-tree</em></a> (with its in-memory
+        ancestor the <a href="ds-two-three-trees.html"><em>2-3 tree</em></a>) is
+        the right shape, because there the cost model counts blocks, not
+        comparisons. The amortized reasoning used here is developed on its own
+        in the
+        <a href="../foundations/foundation-amortized-analysis.html"><em>Amortized
+        Analysis</em></a> handout, alongside the other standard applications of
+        the potential method, and the asymptotic vocabulary it uses is fixed in
+        <a href="../foundations/foundation-asymptotic-notation.html"><em>Asymptotic
+        Notation</em></a>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex-splay">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Name the case that fires at each step of splaying \(x\), given that
+          the path from the root down to \(x\) takes the directions
+          right, right, left, right, left (so \(x\) is at depth 5). How many
+          rotations does the splay perform?
+          <details>
+            <summary>solution</summary>
+            Splaying reads the path from the bottom in pairs. The last two
+            directions are right then left, opposite sides:
+            <strong>zig-zag</strong>. The previous pair is right then left
+            again: <strong>zig-zag</strong>. One direction is left over at the
+            top, so the last step is a <strong>zig</strong>. Three steps,
+            \(2+2+1 = 5\) rotations. In general a node at depth \(d\) needs
+            \(\lceil d/2 \rceil\) steps and exactly \(d\) rotations, since each
+            rotation lifts \(x\) one level.
+          </details>
+        </li>
+        <li>
+          Splay the key \(30\) in the tree
+          \(50\bigl(20(10,\,40(30,\,45)),\;60\bigr)\). Give the case of each
+          step and the final tree.
+          <details>
+            <summary>solution</summary>
+            \(30\) is at depth 3, reached by left, right, left. Bottom pair is
+            right then left, opposite sides, so step 1 is a
+            <strong>zig-zag</strong> on \((x,p,g) = (30, 40, 20)\): \(30\) rises
+            between them, giving \(20(10,\cdot)\) and \(40(\cdot,45)\) as its
+            children, so the subtree becomes \(30(20(10,\cdot),\,40(\cdot,45))\)
+            hanging as \(50\)&rsquo;s left child. Now \(30\) is a child of the
+            root, so step 2 is a <strong>zig</strong>: \(30\) rises, handing its
+            right subtree \(40(\cdot,45)\) to \(50\) as \(50\)&rsquo;s left
+            child. Final tree:
+            \(30\bigl(20(10,\cdot),\;50(40(\cdot,45),\,60)\bigr)\). In-order is
+            \(10,20,30,40,45,50,60\) before and after, the height is \(3\) both
+            times, and \(30\) has moved from depth 3 to depth 0. Two steps,
+            three rotations. (A splay does not have to shorten the tree; what it
+            guarantees is that the accessed node reaches the root and that the
+            potential does not rise by more than the access lemma allows.)
+          </details>
+        </li>
+        <li>
+          A splay tree contains \(10, 20, \dots, 130\) in the shape of &sect;3.
+          You search for \(35\), which is absent. Which node gets splayed, and
+          why does splaying on an unsuccessful search matter?
+          <details>
+            <summary>solution</summary>
+            The search walks \(120 \to 100 \to 80 \to 20 \to 60 \to 40 \to 30\)
+            (at \(40\) we go left because \(35 \lt 40\), reaching \(30\); at
+            \(30\) we would go right, but \(30\) has no right child, so the
+            search fails). The last node visited is \(30\), at depth \(6\), and
+            it is splayed. It matters because the amortized argument charges the
+            descent, which cost 7 node visits, against the drop in potential
+            that the splay produces. If the algorithm skipped the splay on
+            failure, an adversary could repeat the same failed deep search
+            forever at \(\Theta(n)\) each time, with no restructuring ever
+            occurring and the potential never falling: the access lemma would
+            not apply, because it bounds the cost of a splay, not of a bare
+            descent.
+          </details>
+        </li>
+        <li>
+          Show that a splay tree can be forced into a path of height \(n-1\),
+          and that a single subsequent operation on it can cost \(\Theta(n)\).
+          Reconcile this with the \(O(\log n)\) amortized bound.
+          <details>
+            <summary>solution</summary>
+            Insert \(1, 2, \dots, n\) in ascending order into an empty tree.
+            Each new key exceeds every key present, so BST placement attaches it
+            as the rightmost leaf and the splay lifts it to the root with the
+            entire existing tree as its left child. Inductively the result is a
+            left path \(n(n{-}1(\cdots(2(1))))\) of height \(n-1\), verified
+            above for \(n=8\). Searching for \(1\) then visits all \(n\) nodes,
+            so that operation costs \(\Theta(n)\). No contradiction arises: the
+            amortized bound is a statement about a sum. The path has
+            \(\Phi = \log_2(n!) \approx n\log_2 n - 1.44n\), close to the maximum
+            possible, and the expensive search collapses it, releasing
+            \(\Theta(n)\) units of potential which pay for the \(\Theta(n)\)
+            rotations. The bookkeeping identity
+            \(\sum c_i = \sum \hat{c}_i + \Phi_0 - \Phi_m\) permits any single
+            \(c_i\) to be large so long as the potential paid for it, and the
+            \(n\log_2 n\) term in the corollary is exactly the budget for such
+            events.
+          </details>
+        </li>
+        <li>
+          The splay step for the zig-zig case rotates the grandparent first.
+          Suppose instead it rotated \(x\) twice (that is, treated zig-zig like
+          zig-zag). Draw the result on the generic
+          \(g(p(x(A,B),C),D)\) configuration and compare it with the correct
+          zig-zig result. Then explain, using the path of &sect;2, why the
+          difference is asymptotic and not cosmetic.
+          <details>
+            <summary>solution</summary>
+            Rotating \(x\) above \(p\) gives \(g(x(A,\,p(B,C)),\,D)\); rotating
+            \(x\) above \(g\) gives \(x\bigl(A,\;g(p(B,C),\,D)\bigr)\). The
+            correct zig-zig result is \(x\bigl(A,\;p(B,\,g(C,D))\bigr)\). Both
+            put \(x\) at the root and both preserve the in-order sequence
+            \(A\,x\,B\,p\,C\,g\,D\), so on one triple the difference looks
+            cosmetic. It is not, because the two behave oppositely when the
+            configuration repeats down a long path. On the right path
+            \(1 \to 2 \to \cdots \to 8\), splaying \(8\) with the correct
+            zig-zig produces a tree of height \(5\) in which the remaining nodes
+            sit at depths \(1,2,3,3,4,4,5\): the path was folded roughly in
+            half. Applying single rotations only (which is what the wrong
+            version degenerates to on a straight path) leaves
+            \(8\) at the root above an <em>untouched</em> path
+            \(1 \to 2 \to \cdots \to 7\) of height \(7\), so accessing the
+            deepest key again costs \(\Theta(n)\), and repeating that access
+            costs \(\Theta(n)\) every time. Only the grandparent-first order
+            makes the halving happen, and the halving is what the concavity
+            inequality \(s(x)+s'(g) \le s'(x)\) in the zig-zig proof records.
+          </details>
+        </li>
+        <li>
+          Compute the potential \(\Phi = \sum_x \log_2 s(x)\) of the two trees
+          \(T_1 = 30(20(10,\cdot),\,40(\cdot,50))\) and
+          \(T_2 = 50(40(30(20(10,\cdot),\cdot),\cdot),\cdot)\), both on the five
+          keys \(10,20,30,40,50\). Which is larger, and what does the difference
+          mean operationally?
+          <details>
+            <summary>solution</summary>
+            \(T_1\): sizes are \(s(30)=5\), \(s(20)=2\), \(s(40)=2\),
+            \(s(10)=s(50)=1\), so
+            \(\Phi = \log_2 5 + 2\log_2 2 = 2.3219 + 2 = 4.3219\).
+            \(T_2\) is a path: sizes \(5,4,3,2,1\), so
+            \(\Phi = \log_2 5 + \log_2 4 + \log_2 3 + \log_2 2
+            = 2.3219 + 2 + 1.5850 + 1 = 6.9069\). The path has the larger
+            potential, by \(2.585\). Operationally, \(T_2\) is carrying about
+            \(2.6\) units of prepaid work: an access to its deepest key
+            \(10\) will perform many rotations, but the potential released as
+            the path collapses covers most of them, so the amortized charge
+            stays small. Potential is stored-up imbalance, and a balanced tree
+            has almost none to spend, which is consistent with its never needing
+            to.
+          </details>
+        </li>
+        <li>
+          Delete \(120\) from the final tree of &sect;3, namely
+          \(40\bigl(20(10,30),\;120(80(60(50,70),\,100(90,110)),\,130)\bigr)\).
+          Give each splay and the resulting tree.
+          <details>
+            <summary>solution</summary>
+            Splay \(120\) first. It is the right child of the root \(40\), so
+            one <strong>zig</strong> suffices: \(120\) rises, and its left
+            subtree (rooted at \(80\)) becomes \(40\)&rsquo;s right child. The
+            tree is now
+            \(120\bigl(40(20(10,30),\,80(60(50,70),\,100(90,110))),\,130\bigr)\).
+            Detach: \(L = 40(20(10,30),\,80(60(50,70),100(90,110)))\) and
+            \(R = 130\); discard the root. Splay the maximum of \(L\), which is
+            \(110\), at depth 3 in \(L\) reached by right, right, right: the
+            bottom pair is on the same side, so one <strong>zig-zig</strong> on
+            \((x,p,g) = (110,100,80)\) lifts \(110\) to depth 1 and leaves
+            \(100\bigl(80(60(50,70),\,90),\,\cdot\bigr)\) as its left subtree;
+            then a <strong>zig</strong> on \((110,40)\) makes \(110\) the root
+            of \(L\), handing \(40\) its old left part. \(L\) becomes
+            \(110\bigl(40(20(10,30),\;100(80(60(50,70),90),\cdot)),\;\cdot\bigr)\),
+            whose root has no right child, as the join requires. Hang \(R\)
+            there: the final tree is
+            \(110\bigl(40(20(10,30),\,100(80(60(50,70),90),\cdot)),\;130\bigr)\).
+            In-order is \(10,20,\dots,110,130\): \(120\) is gone and everything
+            else is in place. One rotation in the first splay, three in the
+            second.
+          </details>
+        </li>
+        <li>
+          A workload accesses \(10\) hot keys \(90\%\) of the time out of a tree
+          of \(1024\) keys. Estimate the average access cost for a splay tree
+          and for an AVL tree, and say which theorem justifies the splay
+          estimate.
+          <details>
+            <summary>solution</summary>
+            An AVL tree pays \(\Theta(\log_2 1024) = \Theta(10)\) on every
+            access, hot or cold, because its shape does not depend on the access
+            frequencies. A splay tree pays roughly \(\log_2 10 \approx 3.3\) on
+            a hot access (the hot keys stay near the root, since the number of
+            distinct other keys touched between two hot accesses is small) and
+            \(O(\log_2 1024)\) on a cold one, for an average near
+            \(0.9 \times 3.3 + 0.1 \times 10 \approx 4.0\). The measurement in
+            &sect;7 gives \(4.95\) overall against \(12.52\) for a uniform
+            pattern on the same tree. The estimate is a little low because the
+            cold accesses cost more than \(10\), not less: pushing the hot keys
+            up pushes everything else down, measured at \(14.96\). The
+            working-set theorem is what
+            justifies it: the cost of an access is \(O(\log(t+1))\) where \(t\)
+            counts the <em>distinct</em> keys touched since that key was last
+            accessed, which for a hot key is about the size of the hot set, not
+            of the tree. Static optimality gives the same conclusion through the
+            entropy of the distribution.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Splay Trees v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

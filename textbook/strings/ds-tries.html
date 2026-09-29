@@ -1,0 +1,1556 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Tries & Ternary Search Trees.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tries &amp; Ternary Search Trees - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Tries &amp; Ternary Search Trees</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        Keys with exploitable structure: when keys are strings, a trie stores
+        them along paths of characters, so search and insert cost the key
+        <em>length</em> (independent of how many keys are stored) and prefix
+        queries (autocomplete, longest-prefix match) come free. R-way tries,
+        their space cost, and the two fixes (compressed tries and ternary
+        search tries). With worked traces, full implementations, links to the
+        demos, and exercises.
+      </div>
+
+      <p class="lead">
+        Every symbol table so far has treated its keys as opaque: a binary
+        search tree <em>compares</em> whole keys, a hash table <em>hashes</em>
+        whole keys. This handout&rsquo;s keys are <strong>strings</strong>, and
+        strings have internal structure (characters) that both of
+        those tools ignore. A <strong>trie</strong>
+        stores keys by their character path, so a lookup costs the key&rsquo;s
+        <em>length</em> \(L\), no matter whether the table holds a hundred keys
+        or a billion, and the structure answers prefix queries
+        (&ldquo;everything starting with <code>sh</code>&rdquo;) that a hash
+        table cannot approach. One idea runs through the whole handout:
+        a string is not an opaque key, and the structures that look inside
+        it win.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#why">String keys: what comparing and hashing miss</a></li>
+          <li><a href="#trie">R-way tries</a></li>
+          <li><a href="#space">Saving space: compressed tries and TSTs</a></li>
+          <li><a href="#prefix">Prefix operations: autocomplete and longest-prefix</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="why">1. String keys: what comparing and hashing miss</h2>
+      <p>
+        Store \(n\) string keys, each of length up to \(L\), in the symbol
+        tables of the earlier handouts and count the character work. A balanced
+        binary search tree (BST, <a href="../trees/ds-trees-bst.html"><em>Trees &amp; Binary Search Trees</em></a>)
+        does \(O(\log n)\) key comparisons per search, but each
+        comparison walks the two strings character by character, up to \(L\)
+        steps, so a search really costs \(O(L \log n)\). A hash table
+        (<a href="../hashing/ds-hashing.html"><em>Hashing</em></a>) does better: the polynomial
+        string hash reads every character once, so a lookup is \(\Theta(L)\), but the price of that speed is that hashing deliberately
+        <em>scatters</em> the keys, so the table is unordered and completely
+        blind to prefixes. Neither tool can answer &ldquo;list every key
+        starting with <code>sh</code>&rdquo; without scanning everything.
+      </p>
+      <pre>  BST:   O(log n) COMPARES, each up to L chars  &rarr;  O(L log n)
+  hash:  O(1) probes, but hashes the WHOLE key  &rarr;  &Theta;(L), no order, no prefixes</pre>
+      <p>
+        Both treat a string as one atomic value. The trie&rsquo;s idea is to
+        stop doing that: use the <em>characters themselves</em> as the search
+        path. The result is \(\Theta(L)\) search, matching the hash
+        table&rsquo;s bound, while keeping the keys ordered <em>and</em>
+        physically grouped by shared prefix, which is exactly the property the
+        prefix operations of <a href="#prefix">&sect;4</a> exploit. The
+        <a href="foundation-substring-search.html"><em>Substring Search: The Problem &amp;
+        Baselines</em></a> handout applies the same &ldquo;look inside the
+        string&rdquo; principle to a different problem: finding a pattern
+        inside a text.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="trie">2. R-way tries</h2>
+      <div class="def">
+        <span class="tag">Definition (trie)</span>
+        A <strong>trie</strong> (from re<em>trie</em>val; pronounced
+        &ldquo;try&rdquo;) is a tree that stores string keys along
+        <strong>paths of characters</strong> from the root: each edge is
+        labeled with one character, and each node carries an
+        <strong>is-word flag</strong> marking whether some stored key ends
+        there. A key is present exactly when its character path exists
+        <em>and</em> the node it ends on is word-marked: &ldquo;ends
+        on&rdquo; meaning the node reached after the key&rsquo;s last character,
+        which is <em>not</em> necessarily a leaf. In an
+        <strong>R-way trie</strong> each node holds an array of \(R\) child
+        pointers, one per character of the alphabet (\(R = 26\) for lowercase
+        letters, \(R = 256\) for bytes).
+      </div>
+      <p>
+        Keys that share a prefix share the corresponding nodes: storing
+        <code>she</code> and <code>sea</code> creates one <code>s</code> node
+        with two children, not two separate paths. Here is the trie holding
+        \(\{\)<code>she</code>, <code>sea</code>, <code>sells</code>\(\}\):
+      </p>
+      <figure>
+        <svg viewBox="0 0 380 322" role="img" aria-label="A trie holding the keys she, sea, and sells. The root has a single child s. The s node has two children: e on the left and h on the right. Under e are two children: a, which is word-marked and completes the key sea, and l, which continues down through a second l to a word-marked s, completing sells. Under h is a word-marked e completing she. Word-marked nodes are drawn with a doubled green ring.">
+          <g stroke="#b9c0d0" stroke-width="1.5" fill="none">
+            <line x1="190" y1="30" x2="190" y2="82"/>
+            <line x1="190" y1="82" x2="120" y2="134"/>
+            <line x1="190" y1="82" x2="260" y2="134"/>
+            <line x1="120" y1="134" x2="70" y2="186"/>
+            <line x1="120" y1="134" x2="160" y2="186"/>
+            <line x1="260" y1="134" x2="260" y2="186"/>
+            <line x1="160" y1="186" x2="160" y2="238"/>
+            <line x1="160" y1="238" x2="160" y2="290"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+            <circle cx="190" cy="30" r="13" fill="#f0f2f6" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="190" y="35" fill="#8a9099" font-size="12">&#8709;</text>
+            <circle cx="190" cy="82" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="190" y="87" fill="#1a1c22">s</text>
+            <circle cx="120" cy="134" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="120" y="139" fill="#1a1c22">e</text>
+            <circle cx="260" cy="134" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="260" y="139" fill="#1a1c22">h</text>
+            <circle cx="70" cy="186" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+            <circle cx="70" cy="186" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+            <text x="70" y="191" fill="#0a7d4d">a</text>
+            <circle cx="160" cy="186" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="160" y="191" fill="#1a1c22">l</text>
+            <circle cx="260" cy="186" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+            <circle cx="260" cy="186" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+            <text x="260" y="191" fill="#0a7d4d">e</text>
+            <circle cx="160" cy="238" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="160" y="243" fill="#1a1c22">l</text>
+            <circle cx="160" cy="290" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+            <circle cx="160" cy="290" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+            <text x="160" y="295" fill="#0a7d4d">s</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12.5" font-style="italic" fill="#8a9099">
+            <text x="46" y="190" text-anchor="end">sea</text>
+            <text x="284" y="190" text-anchor="start">she</text>
+            <text x="184" y="294" text-anchor="start">sells</text>
+          </g>
+        </svg>
+        <figcaption>
+          The trie holding \(\{\)<code>she</code>, <code>sea</code>,
+          <code>sells</code>\(\}\). Each node stores one character of a path;
+          a doubled green ring marks &ldquo;a key ends here.&rdquo;
+          <code>she</code> is the path s&ndash;h&ndash;e, <code>sea</code> is
+          s&ndash;e&ndash;a, <code>sells</code> is s&ndash;e&ndash;l&ndash;l&ndash;s;
+          all three share the single <code>s</code> node, and <code>sea</code>
+          and <code>sells</code> also share the <code>e</code>.
+        </figcaption>
+      </figure>
+      <h3>Search and insert are the same walk</h3>
+      <p>
+        <strong>Search</strong> follows <code>next[c]</code> for each character
+        of the key in turn. If a needed child is missing, the walk
+        <em>falls off</em> the trie and the key is absent. If the walk survives
+        to the end of the key, the key is present <em>iff the node it ends on is
+        word-marked</em>: the path might exist only as a prefix of a
+        longer key. <strong>Insert</strong> is the identical walk, except that
+        it <em>creates</em> each missing node along the way and sets the
+        is-word flag on the node the key ends on. Neither operation ever compares two keys;
+        the structure has encoded all the comparisons. Following a character is
+        a single array index (<code>t = t-&gt;next[c]</code>), so
+        both operations cost \(\Theta(L)\) for a key of length \(L\),
+        independent of \(n\).
+      </p>
+      <div class="code-tabs" data-snippet="strings/trie">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// R-way trie: each node has one child slot per alphabet character plus an
+// is-word flag. Operations walk ONE character per step: Theta(L) for a key of
+// length L, independent of how many keys are stored.
+const int R = 26;                          // alphabet: lowercase a..z
+
+struct Node {
+    Node* next[R] = {};                    // one slot per possible character
+    bool  isWord = false;
+};
+
+// search: follow next[c] for each character. Fall off -&gt; absent; reach the
+// end -&gt; present iff the node it ENDS ON is word-marked (not necessarily a leaf).
+bool search(Node* t, const string&amp; key) {
+    for (char ch : key) {
+        int c = ch - &#x27;a&#x27;;
+        if (!t-&gt;next[c]) return false;     // fell off: no such path
+        t = t-&gt;next[c];
+    }
+    return t-&gt;isWord;                      // path exists: is it a word?
+}
+
+// insert: the same walk, creating only the MISSING nodes; mark the last one.
+void insert(Node* t, const string&amp; key) {
+    for (char ch : key) {
+        int c = ch - &#x27;a&#x27;;
+        if (!t-&gt;next[c]) t-&gt;next[c] = new Node();   // create the missing suffix
+        t = t-&gt;next[c];
+    }
+    t-&gt;isWord = true;                      // mark: a key ends here
+}
+
+// collect: emit every key stored in the subtree under t (DFS, in order).
+void collect(Node* t, string&amp; path, vector&lt;string&gt;&amp; out) {
+    if (t-&gt;isWord) out.push_back(path);    // a stored key ends here
+    for (int c = 0; c &lt; R; c++)
+        if (t-&gt;next[c]) {
+            path.push_back(&#x27;a&#x27; + c);       // extend the path by this character
+            collect(t-&gt;next[c], path, out);
+            path.pop_back();
+        }
+}
+
+// keysWithPrefix (autocomplete): walk down the prefix, then collect the
+// subtree below it. Theta(prefix length + output size).
+vector&lt;string&gt; keysWithPrefix(Node* t, const string&amp; prefix) {
+    for (char ch : prefix) {               // 1. walk down the prefix path
+        if (!t-&gt;next[ch - &#x27;a&#x27;]) return {}; // no key has this prefix
+        t = t-&gt;next[ch - &#x27;a&#x27;];
+    }
+    vector&lt;string&gt; out;
+    string path = prefix;
+    collect(t, path, out);                 // 2. gather the whole subtree below
+    return out;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// R-way trie: each node has one child slot per alphabet character plus an
+// is-word flag. Operations walk ONE character per step: Theta(L) for a key of
+// length L, independent of how many keys are stored.
+static final int R = 26;                   // alphabet: lowercase a..z
+
+static class Node {
+    Node[] next = new Node[R];             // one slot per possible character
+    boolean isWord = false;
+}
+
+// search: follow next[c] for each character. Fall off -&gt; absent; reach the
+// end -&gt; present iff the node it ENDS ON is word-marked (not necessarily a leaf).
+static boolean search(Node t, String key) {
+    for (char ch : key.toCharArray()) {
+        int c = ch - &#x27;a&#x27;;
+        if (t.next[c] == null) return false;   // fell off: no such path
+        t = t.next[c];
+    }
+    return t.isWord;                       // path exists: is it a word?
+}
+
+// insert: the same walk, creating only the MISSING nodes; mark the last one.
+static void insert(Node t, String key) {
+    for (char ch : key.toCharArray()) {
+        int c = ch - &#x27;a&#x27;;
+        if (t.next[c] == null) t.next[c] = new Node();  // create missing suffix
+        t = t.next[c];
+    }
+    t.isWord = true;                       // mark: a key ends here
+}
+
+// collect: emit every key stored in the subtree under t (DFS, in order).
+static void collect(Node t, StringBuilder path, List&lt;String&gt; out) {
+    if (t.isWord) out.add(path.toString());    // a stored key ends here
+    for (int c = 0; c &lt; R; c++)
+        if (t.next[c] != null) {
+            path.append((char) (&#x27;a&#x27; + c)); // extend the path by this character
+            collect(t.next[c], path, out);
+            path.deleteCharAt(path.length() - 1);
+        }
+}
+
+// keysWithPrefix (autocomplete): walk down the prefix, then collect the
+// subtree below it. Theta(prefix length + output size).
+static List&lt;String&gt; keysWithPrefix(Node t, String prefix) {
+    for (char ch : prefix.toCharArray()) { // 1. walk down the prefix path
+        if (t.next[ch - &#x27;a&#x27;] == null) return List.of();  // no key has it
+        t = t.next[ch - &#x27;a&#x27;];
+    }
+    List&lt;String&gt; out = new ArrayList&lt;&gt;();
+    collect(t, new StringBuilder(prefix), out);  // 2. gather the subtree below
+    return out;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># R-way trie: each node has one child slot per alphabet character plus an
+# is-word flag. Operations walk ONE character per step: Theta(L) for a key of
+# length L, independent of how many keys are stored.
+R = 26                                     # alphabet: lowercase a..z
+
+class Node:
+    def __init__(self):
+        self.next = [None] * R             # one slot per possible character
+        self.is_word = False
+
+# search: follow next[c] for each character. Fall off -&gt; absent; reach the
+# end -&gt; present iff the node it ENDS ON is word-marked (not necessarily a leaf).
+def search(t, key):
+    for ch in key:
+        c = ord(ch) - ord(&#x27;a&#x27;)
+        if t.next[c] is None:              # fell off: no such path
+            return False
+        t = t.next[c]
+    return t.is_word                       # path exists: is it a word?
+
+# insert: the same walk, creating only the MISSING nodes; mark the last one.
+def insert(t, key):
+    for ch in key:
+        c = ord(ch) - ord(&#x27;a&#x27;)
+        if t.next[c] is None:              # create the missing suffix
+            t.next[c] = Node()
+        t = t.next[c]
+    t.is_word = True                       # mark: a key ends here
+
+# collect: emit every key stored in the subtree under t (DFS, in order).
+def collect(t, path, out):
+    if t.is_word:                          # a stored key ends here
+        out.append(path)
+    for c in range(R):
+        if t.next[c] is not None:          # extend the path by this character
+            collect(t.next[c], path + chr(ord(&#x27;a&#x27;) + c), out)
+
+# keysWithPrefix (autocomplete): walk down the prefix, then collect the
+# subtree below it. Theta(prefix length + output size).
+def keys_with_prefix(t, prefix):
+    for ch in prefix:                      # 1. walk down the prefix path
+        c = ord(ch) - ord(&#x27;a&#x27;)
+        if t.next[c] is None:              # no key has this prefix
+            return []
+        t = t.next[c]
+    out = []
+    collect(t, prefix, out)                # 2. gather the whole subtree below
+    return out</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// R-way trie: each node has one child slot per alphabet character plus an
+// is-word flag. Operations walk ONE character per step: O(L) for a key of
+// length L, independent of how many keys are stored.
+const R: usize = 26;                       // alphabet: lowercase a..z
+
+struct Node {
+    next: Vec&lt;Option&lt;Box&lt;Node&gt;&gt;&gt;,          // one slot per possible character
+    is_word: bool,
+}
+
+fn new_node() -&gt; Box&lt;Node&gt; {
+    Box::new(Node { next: (0..R).map(|_| None).collect(), is_word: false })
+}
+
+// search: follow next[c] for each character. Fall off -&gt; absent; reach the
+// end -&gt; present iff the node it ENDS ON is word-marked (not necessarily a leaf).
+fn search(mut t: &amp;Node, key: &amp;str) -&gt; bool {
+    for ch in key.bytes() {
+        match &amp;t.next[(ch - b&#x27;a&#x27;) as usize] {
+            None =&gt; return false,          // fell off: no such path
+            Some(kid) =&gt; t = kid,
+        }
+    }
+    t.is_word                              // path exists: is it a word?
+}
+
+// insert: the same walk, creating only the MISSING nodes; mark the last one.
+fn insert(mut t: &amp;mut Node, key: &amp;str) {
+    for ch in key.bytes() {
+        let c = (ch - b&#x27;a&#x27;) as usize;
+        t = t.next[c].get_or_insert_with(new_node);   // create missing suffix
+    }
+    t.is_word = true;                      // mark: a key ends here
+}
+
+// collect: emit every key stored in the subtree under t (DFS, in order).
+fn collect(t: &amp;Node, path: &amp;mut String, out: &amp;mut Vec&lt;String&gt;) {
+    if t.is_word {                         // a stored key ends here
+        out.push(path.clone());
+    }
+    for c in 0..R {
+        if let Some(kid) = &amp;t.next[c] {
+            path.push((b&#x27;a&#x27; + c as u8) as char);   // extend by this character
+            collect(kid, path, out);
+            path.pop();
+        }
+    }
+}
+
+// keysWithPrefix (autocomplete): walk down the prefix, then collect the
+// subtree below it. O(prefix length + output size).
+fn keys_with_prefix(mut t: &amp;Node, prefix: &amp;str) -&gt; Vec&lt;String&gt; {
+    for ch in prefix.bytes() {             // 1. walk down the prefix path
+        match &amp;t.next[(ch - b&#x27;a&#x27;) as usize] {
+            None =&gt; return vec![],         // no key has this prefix
+            Some(kid) =&gt; t = kid,
+        }
+    }
+    let mut out = Vec::new();
+    collect(t, &amp;mut prefix.to_string(), &amp;mut out); // 2. gather the subtree
+    out
+}</pre>
+<p class="ct-src">source: <code>code/strings/trie.cpp &middot; code/strings/trie.java &middot; code/strings/trie.py &middot; code/strings/trie.rs</code></p>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (a worked search, and the is-word subtlety)</span>
+        Take the trie holding \(\{\)<code>she</code>, <code>shell</code>,
+        <code>shells</code>\(\}\) and search for <code>shell</code>:
+        <pre>  search "shell":  s &rarr; h &rarr; e &rarr; l &rarr; l     (follow 5 characters)
+                   the node it ends on is word-marked &rarr; FOUND
+  search "shel":   s &rarr; h &rarr; e &rarr; l           (the path exists&hellip;)
+                   &hellip;but its node is NOT word-marked &rarr; not a key</pre>
+        <code>shel</code> is a perfectly good <em>path</em> (it lies on
+        the way to <code>shell</code> and <code>shells</code>), but no
+        stored key ends there, so the flag correctly rejects it. Returning
+        &ldquo;did I reach the end of the path&rdquo; instead of
+        <code>isWord</code> is the classic trie-implementation bug.
+        <p>
+          All three keys here lie on a <em>single</em> root-to-leaf path, which
+          makes the converse just as visible: the nodes for <code>she</code> and
+          <code>shell</code> are word-marked <em>and have children</em>. So the
+          two facts are independent, and both matter:
+        </p>
+        <ul>
+          <li>a node on a path need not be a key: <code>shel</code>;</li>
+          <li>a key need not sit at a leaf: <code>she</code>, whose node
+            has an <code>l</code> child.</li>
+        </ul>
+        <p>
+          That second one is why <code>isWord</code> is a stored bit rather than
+          a computed test: if every key ended at a leaf you could just ask
+          &ldquo;does this node have no children?&rdquo; and drop the flag. It
+          also fixes the vocabulary: &ldquo;the node the key ends
+          on&rdquo; is right, &ldquo;the final node&rdquo; or &ldquo;the
+          leaf&rdquo; is not. Only one direction does hold unconditionally:
+          every leaf <em>is</em> word-marked, since nothing but an inserted key
+          would have created it.
+        </p>
+        <p style="margin-bottom:0">
+          And note the cost: five character steps for <code>shell</code>,
+          whether the trie holds these three keys or three million: adding keys never slows a search, only longer <em>keys</em> do.
+        </p>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a worked insert)</span>
+        Insert <code>sea</code> into a trie holding \(\{\)<code>she</code>,
+        <code>shell</code>\(\}\):
+        <pre>  s:  exists (shared with she/shell)  &rarr; follow it
+  e:  's' has no 'e' child            &rarr; CREATE a node
+  a:  create a node, mark it a word
+
+  "sea" and "she" now share exactly one node: 's'</pre>
+        Insert allocates only the <em>missing suffix</em> of its key (here two nodes) and reuses every shared-prefix node already
+        present. That reuse is what keeps a trie compact on dictionary-like key
+        sets full of common prefixes, and it is why insert, like search,
+        touches at most \(L\) nodes.
+      </div>
+      <p>
+        Between them, the two walks have five endings, and a correct
+        implementation is one that produces the right answer in each. A
+        <strong>search</strong> ends in one of three ways: it
+        <em>falls off</em> at a missing child (absent), it survives to a node
+        that is word-marked (present), or it survives to a node that is
+        <em>not</em> word-marked (absent, the key is only a prefix of stored
+        keys). An <strong>insert</strong> ends in one of two: the walk finds
+        every node it needs and only sets a flag (the key is a prefix of a
+        stored key, allocating nothing), or it falls off at some depth and
+        creates a fresh branch from there down (allocating one node per
+        remaining character, none of them shared). The table below plays all
+        five out on the trie drawn above,
+        \(\{\)<code>she</code>, <code>sea</code>, <code>sells</code>\(\}\):
+      </p>
+      <div class="ex">
+        <span class="tag">Example (all five endings, on one trie)</span>
+        <table class="trace">
+          <tr><th class="lab">operation</th><th>the walk</th><th>ending</th><th>result</th></tr>
+          <tr><td class="lab">search <code>she</code></td>
+            <td>s &rarr; h &rarr; e</td>
+            <td class="lt">3 steps, node word-marked</td><td>present</td></tr>
+          <tr><td class="lab">search <code>sell</code></td>
+            <td>s &rarr; e &rarr; l &rarr; l</td>
+            <td class="piv">4 steps, node <em>not</em> word-marked</td><td>absent</td></tr>
+          <tr><td class="lab">search <code>shed</code></td>
+            <td>s &rarr; h &rarr; e &rarr; <em>no <code>d</code> child</em></td>
+            <td class="piv">falls off on the 4th character</td><td>absent</td></tr>
+          <tr><td class="lab">search <code>cat</code></td>
+            <td><em>no <code>c</code> child at the root</em></td>
+            <td class="piv">falls off on the 1st character</td><td>absent</td></tr>
+          <tr><td class="lab">insert <code>sell</code></td>
+            <td>s &rarr; e &rarr; l &rarr; l</td>
+            <td class="lt">nothing missing: set the flag</td><td>0 nodes allocated</td></tr>
+          <tr><td class="lab">insert <code>shed</code></td>
+            <td>s &rarr; h &rarr; e, then create <code>d</code></td>
+            <td class="lt">falls off at the last character</td><td>1 node allocated</td></tr>
+          <tr><td class="lab">insert <code>by</code></td>
+            <td>create <code>b</code>, create <code>y</code></td>
+            <td class="lt">falls off at the first character</td><td>2 nodes allocated</td></tr>
+        </table>
+        The two rows worth staring at are the pair
+        <code>sell</code>/<code>shed</code>. <em>Searching</em> for
+        <code>sell</code> and <em>inserting</em> <code>sell</code> take the
+        identical four steps and touch the identical four nodes; the only
+        difference is that insert writes the flag the search read. And a
+        search that falls off is cheaper than the key is long:
+        <code>cat</code> costs one step, no matter how many keys the trie
+        holds, which is why a miss on a random word is nearly free.
+        After all three inserts the trie holds \(6\) keys in \(11\) nodes,
+        and no node was ever copied or moved: shared prefixes are shared
+        structure, not duplicated text.
+      </div>
+      <h3>The cost, and the catch</h3>
+      <table>
+        <tr><th>operation</th><th>cost</th></tr>
+        <tr><td>search / insert / delete</td><td>\(\Theta(L)\): the key&rsquo;s length</td></tr>
+        <tr><td>search miss</td><td>often \(&lt; L\): the walk falls off at the first missing child</td></tr>
+        <tr><td>space</td><td>up to \(\Theta(R \cdot N \cdot L)\) pointers for \(N\) keys</td></tr>
+      </table>
+      <p>
+        The headline is the first row: cost bounded by key length,
+        <em>independent of the number of keys</em>. A miss is often cheaper
+        still: searching a trie of English words for
+        <code>xylophone</code> falls off at the first or second character. The
+        catch is the third row: every R-way node reserves \(R\) child pointers
+        whether it uses them or not, and deep in a trie most nodes have one or
+        two children, leaving the other \(24\) (or \(254\)) slots null. For
+        \(R = 256\) the waste dominates the data. Fixing that space cost
+        without giving up the \(\Theta(L)\) walk is the subject of
+        <a href="#space">&sect;3</a>.
+      </p>
+      <div class="aside">
+        <span class="tag">Deletion, and shared structure</span>
+        Deleting a key takes two steps: <strong>unmark</strong> the node it ends
+        on (<code>isWord = false</code>), then <strong>prune</strong> bottom-up: a node with no children that is not itself a word is useless,
+        so remove it and reconsider its parent, stopping at the first node
+        still needed. The care is in the stopping: never remove a node
+        <em>shared</em> by other keys. Deleting <code>shell</code> from
+        \(\{\)<code>shell</code>, <code>shells</code>\(\}\) only clears a flag: every node on its path is still on <code>shells</code>&rsquo;s
+        path. This shared-structure trap is deletion&rsquo;s version of the
+        is-word subtlety. The pruning step is also what preserves the invariant
+        noted above, that every leaf is word-marked: an unmarked childless node
+        is precisely what pruning removes, so it never survives to become a
+        leaf.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (three deletions, three stop conditions)</span>
+        Start from the trie holding \(\{\)<code>she</code>,
+        <code>shell</code>, <code>shells</code>\(\}\), whose keys lie on one
+        path of six nodes (s, h, e, l, l, s) with the 3rd, 5th and 6th
+        word-marked. Delete all three keys, in this order, letting each
+        deletion see the previous one&rsquo;s result:
+        <pre>  delete "she"     unmark node e (depth 3)
+                   e has a child (l)          &rarr; STOP.  freed: 0
+
+  delete "shells"  unmark node s (depth 6)
+                   s childless, unmarked      &rarr; free it
+                   parent l (depth 5) IS a word ("shell") &rarr; STOP.  freed: 1
+
+  delete "shell"   unmark node l (depth 5)
+                   l childless, unmarked      &rarr; free it
+                   l (depth 4) childless, unmarked  &rarr; free it
+                   e (depth 3) childless, unmarked now ("she" was deleted) &rarr; free
+                   h (depth 2) childless, unmarked  &rarr; free it
+                   s (depth 1) childless, unmarked  &rarr; free it
+                   the root                   &rarr; STOP.  freed: 5</pre>
+        <p>
+          Each deletion stops for a different reason, and those are the only
+          three reasons there are: the node still has <strong>children</strong>
+          (other keys run through it), the node is itself a
+          <strong>word</strong> (another key ends there), or the walk has
+          reached the <strong>root</strong>, which is never removed. Note the
+          order dependence in the last case: deleting <code>shell</code> frees
+          five nodes only because <code>she</code> is already gone. Had the
+          three deletions run in the reverse order, the same three keys would
+          have been removed with the frees distributed differently
+          (\(1\), then \(2\), then \(3\)), and the trie would be equally empty
+          at the end. What is <em>not</em> order-dependent: no deletion ever
+          removes a node another key needs, because both stop conditions are
+          checked before the node is freed.
+        </p>
+        <p style="margin-bottom:0">
+          The first deletion is the case worth naming twice, because it looks
+          like a bug and is not: deleting <code>she</code> changes exactly one
+          bit and frees nothing. The key is gone (a search for it now reads an
+          unmarked node and returns absent) while every node of its path
+          survives, in service of the two longer keys.
+        </p>
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=trie">Trie demo</a>. The build inserts
+        <code>she, sells, sea, shells, shell</code> one word at a time; watch shared prefixes being reused as the five keys need only \(11\)
+        nodes (with \(5\) of them word-marked, shown with a trailing
+        &bull;). Then <strong>Search</strong> <code>shells</code> (walks the
+        shared path to a word-marked node) versus <code>shel</code> (the path
+        exists, the flag does not: the subtlety live). <strong>Insert</strong>
+        <code>sun</code> and watch only the missing suffix appear: the
+        <code>alloc</code> counter tells you exactly how many nodes were new.
+        Then run the aside above live: <strong>Delete</strong>
+        <code>shells</code> unmarks its &bull; and frees exactly one node,
+        because pruning stops at <code>shell</code>, itself a stored word
+        (the <code>free</code> counter reads \(1\)); <strong>Delete</strong>
+        <code>she</code> frees nothing at all: its node just loses the
+        &bull;, since <code>shell</code> and <code>shells</code> still pass
+        through it. In the no-sharing preset (<code>cat, dog, fox</code>),
+        deleting <code>cat</code> prunes the whole branch back to the root.
+        Every operation&rsquo;s counters total the key&rsquo;s length, no
+        matter how many words the trie holds.
+      </div>
+      <div class="aside">
+        <span class="tag">You have already met a trie</span>
+        The Huffman code tree
+        (<a href="../greedy/algo-huffman-coding.html"><em>Huffman Coding</em></a>) is a binary trie over
+        the alphabet \(\{0, 1\}\): each codeword is a root-to-leaf path of
+        bits. Prefix-freeness (no codeword is a prefix of another) is precisely the statement that every &ldquo;word&rdquo; in
+        that trie is a <em>leaf</em>, which is why decoding can walk bits until
+        it hits a leaf and never needs a separator. Same structure, alphabet of
+        size \(2\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="space">3. Saving space: compressed tries and TSTs</h2>
+      <p>
+        Two standard fixes attack the \(R\)-pointers-per-node cost from
+        different directions: store <em>fewer nodes</em>, or store
+        <em>cheaper nodes</em>.
+      </p>
+      <h3>Compressed tries (radix trees)</h3>
+      <p>
+        Deep in a trie, long runs of single-child nodes are common: the
+        tail of any key that shares nothing beyond its prefix. A
+        <strong>compressed trie</strong> (also <em>radix tree</em>) collapses
+        every such chain into one edge labeled with the whole substring:
+      </p>
+      <pre>  {she, shells}          root &#9472;&#9472;"she"&#9472;&#9472;&#9654; &#9679; &#9472;&#9472;"lls"&#9472;&#9472;&#9654; &#9679;
+                         3 nodes counting the root, not 6 characters' worth
+
+  add "shore" and the "she" edge must SPLIT, because keys now diverge there:
+
+                         root &#9472;&#9472;"sh"&#9472;&#9472;&#9654; &#9898; &#9472;&#9472;"e"&#9472;&#9472;&#9654;   &#9679; &#9472;&#9472;"lls"&#9472;&#9472;&#9654; &#9679;
+                                             &#9492;&#9472;"ore"&#9472;&#9472;&#9654; &#9679;
+                         5 nodes      (&#9679; = a key ends here, &#9898; = a branch)</pre>
+      <p>
+        Nodes now exist only where keys <em>branch</em> or <em>end</em>. That is
+        not a rule imposed from outside, it is forced: a node with one child and
+        no key ending at it would have a chain through it, and the whole point is
+        that such a chain gets merged into its parent edge. The consequence is
+        the bound worth remembering: <strong>at most \(2n-1\) nodes for
+        \(n\) keys</strong>, since a tree whose internal nodes all have at least
+        two children has fewer internal nodes than leaves. The node count is
+        governed by the number of <em>keys</em>, not by their length.
+      </p>
+      <div class="aside">
+        <span class="tag">Two things the compression changes, and one name to keep straight</span>
+        <ul>
+          <li><strong>A search must match a whole edge label.</strong> In an
+            R-way trie every step consumes exactly one character, so a miss shows
+            up as a missing child. Here a miss can happen <em>inside</em> an
+            edge: looking up <code>shy</code> above follows <code>"sh"</code>,
+            then finds an edge labelled <code>"ore"</code> whose first character
+            already disagrees. Comparing only the first character of each label
+            is the classic bug: it would accept <code>shy</code> as
+            <code>shore</code>.</li>
+          <li><strong>An insert may have to split an edge</strong>, which a plain
+            trie never does. When the new key and an existing label agree on a
+            proper prefix, that edge is cut at the divergence point, a new
+            branch node goes in the middle, and the old child hangs off the
+            remainder: exactly what happened to <code>"she"</code> when
+            <code>"shore"</code> arrived. If the new key <em>ends</em> at the
+            split, the new node is simply marked; no leaf is added.</li>
+          <li><strong>The names.</strong> &ldquo;Compressed trie&rdquo; and
+            &ldquo;radix tree&rdquo; are the same idea as above, over whatever
+            alphabet you like. <strong>PATRICIA</strong> (Morrison, 1968; <em>Practical Algorithm To Retrieve Information Coded In
+            Alphanumeric</em>) is the same compression applied to <em>bit</em>
+            strings, where each node stores the bit index to test next rather
+            than a substring. In modern usage the three names are thrown around
+            interchangeably; what matters is the shared idea, path compression,
+            and it is why these structures sit inside IP (Internet Protocol)
+            routing tables and many key&ndash;value stores.</li>
+        </ul>
+      </div>
+      <p>
+        Search and insert, with the edge split written out. The two loops that
+        matter are the whole-label comparison and the longest-common-prefix scan
+        that decides where to cut:
+      </p>
+      <div class="code-tabs" data-snippet="strings/radix">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Compressed trie (radix tree). A node exists only where keys BRANCH or END,
+// so the node count is bounded by the number of KEYS, not by their length.
+// Each edge carries a whole substring, filed under its first character.
+struct RadNode {
+    bool isWord = false;
+    map&lt;char, pair&lt;string, RadNode*&gt;&gt; kids;    // first char -&gt; (edge label, child)
+};
+
+RadNode* leaf() { RadNode* n = new RadNode(); n-&gt;isWord = true; return n; }
+
+// Search must match a WHOLE edge label. Falling off mid-edge is a miss, which
+// is the difference from an R-way trie: there, every step is one character.
+bool search(RadNode* t, const string&amp; key) {
+    size_t i = 0;
+    while (i &lt; key.size()) {
+        auto it = t-&gt;kids.find(key[i]);
+        if (it == t-&gt;kids.end()) return false;
+        const string&amp; label = it-&gt;second.first;
+        // a mismatch INSIDE an edge is a miss, not just a missing child
+        if (key.compare(i, label.size(), label) != 0) return false;
+        i += label.size();
+        t = it-&gt;second.second;
+    }
+    return t-&gt;isWord;
+}
+
+// Insert walks the same way, but where the key and an edge label agree on only
+// a PREFIX it must SPLIT that edge -- the one operation a plain trie never needs.
+void insert(RadNode* t, const string&amp; key, size_t i) {
+    if (i == key.size()) { t-&gt;isWord = true; return; }
+    char c = key[i];
+    auto it = t-&gt;kids.find(c);
+    if (it == t-&gt;kids.end()) {                           // no edge starts with c
+        t-&gt;kids[c] = { key.substr(i), leaf() };
+        return;
+    }
+    string label = it-&gt;second.first;
+    RadNode* child = it-&gt;second.second;
+    size_t j = 0;                                        // longest common prefix
+    while (j &lt; label.size() &amp;&amp; i + j &lt; key.size() &amp;&amp; label[j] == key[i + j]) j++;
+    // the whole label matched -- descend and keep going
+    if (j == label.size()) { insert(child, key, i + j); return; }
+    RadNode* mid = new RadNode();                        // SPLIT the edge at j
+    t-&gt;kids[c] = { label.substr(0, j), mid };
+    mid-&gt;kids[label[j]] = { label.substr(j), child };
+    if (i + j == key.size()) mid-&gt;isWord = true;   // key ends AT the split
+    else {
+        mid-&gt;kids[key[i + j]] = { key.substr(i + j), leaf() };
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java">// Compressed trie (radix tree). A node exists only where keys BRANCH or END,
+// so the node count is bounded by the number of KEYS, not by their length.
+// Each edge carries a whole substring, filed under its first character.
+static class RadNode {
+    boolean isWord;
+    // first char -&gt; {edge label, child}
+    TreeMap&lt;Character, Object[]&gt; kids = new TreeMap&lt;&gt;();
+}
+
+// Search must match a WHOLE edge label. Falling off mid-edge is a miss, which
+// is the difference from an R-way trie: there, every step is one character.
+static boolean search(RadNode t, String key) {
+    int i = 0;
+    while (i &lt; key.length()) {
+        Object[] e = t.kids.get(key.charAt(i));
+        if (e == null) return false;
+        String label = (String) e[0];
+        if (i + label.length() &gt; key.length()
+            || !key.startsWith(label, i)) return false;  // mismatch INSIDE an edge
+        i += label.length();
+        t = (RadNode) e[1];
+    }
+    return t.isWord;
+}
+
+// Insert walks the same way, but where the key and an edge label agree on only
+// a PREFIX it must SPLIT that edge -- the one operation a plain trie never needs.
+static void insert(RadNode t, String key, int i) {
+    if (i == key.length()) { t.isWord = true; return; }
+    char c = key.charAt(i);
+    Object[] e = t.kids.get(c);
+    if (e == null) {                                     // no edge starts with c
+        RadNode leaf = new RadNode(); leaf.isWord = true;
+        t.kids.put(c, new Object[]{ key.substring(i), leaf });
+        return;
+    }
+    String label = (String) e[0];
+    RadNode child = (RadNode) e[1];
+    int j = 0;                                           // longest common prefix
+    while (j &lt; label.length() &amp;&amp; i + j &lt; key.length()
+           &amp;&amp; label.charAt(j) == key.charAt(i + j)) j++;
+    // the whole label matched -- descend and keep going
+    if (j == label.length()) { insert(child, key, i + j); return; }
+    RadNode mid = new RadNode();                         // SPLIT the edge at j
+    t.kids.put(c, new Object[]{ label.substring(0, j), mid });
+    mid.kids.put(label.charAt(j), new Object[]{ label.substring(j), child });
+    if (i + j == key.length()) mid.isWord = true;  // key ends AT the split
+    else {
+        RadNode leaf = new RadNode(); leaf.isWord = true;
+        mid.kids.put(key.charAt(i + j), new Object[]{key.substring(i + j), leaf});
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py"># Compressed trie (radix tree). A node exists only where keys BRANCH or END,
+# so the node count is bounded by the number of KEYS, not by their length.
+# Each edge carries a whole substring, filed under its first character.
+class RadNode:
+    def __init__(self):
+        self.is_word = False
+        self.kids = {}                  # first char -&gt; [edge label, child]
+
+# Search must match a WHOLE edge label. Falling off mid-edge is a miss, which
+# is the difference from an R-way trie: there, every step is one character.
+def search(t, key):
+    i = 0
+    while i &lt; len(key):
+        e = t.kids.get(key[i])
+        if e is None: return False
+        label, child = e
+        if key[i:i + len(label)] != label: return False   # mismatch INSIDE an edge
+        i += len(label)
+        t = child
+    return t.is_word
+
+# Insert walks the same way, but where the key and an edge label agree on only
+# a PREFIX it must SPLIT that edge -- the one operation a plain trie never needs.
+def insert(t, key, i):
+    if i == len(key): t.is_word = True; return
+    c = key[i]
+    if c not in t.kids:                                   # no edge starts with c
+        leaf = RadNode(); leaf.is_word = True
+        t.kids[c] = [key[i:], leaf]
+        return
+    label, child = t.kids[c]
+    j = 0                                                 # longest common prefix
+    while j &lt; len(label) and i + j &lt; len(key) and label[j] == key[i + j]: j += 1
+    if j == len(label):                                   # whole label matched
+        insert(child, key, i + j); return
+    mid = RadNode()                                       # SPLIT the edge at j
+    t.kids[c] = [label[:j], mid]
+    mid.kids[label[j]] = [label[j:], child]
+    if i + j == len(key): mid.is_word = True       # key ends AT the split
+    else:
+        leaf = RadNode(); leaf.is_word = True
+        mid.kids[key[i + j]] = [key[i + j:], leaf]</pre>
+<pre class="ct-pane" data-lang="rs">// Compressed trie (radix tree). A node exists only where keys BRANCH or END,
+// so the node count is bounded by the number of KEYS, not by their length.
+// Each edge carries a whole substring, filed under its first character.
+#[derive(Default)]
+struct RadNode {
+    is_word: bool,
+    // first byte -&gt; (edge label, child)
+    kids: BTreeMap&lt;u8, (String, Box&lt;RadNode&gt;)&gt;,
+}
+
+// Search must match a WHOLE edge label. Falling off mid-edge is a miss, which
+// is the difference from an R-way trie: there, every step is one character.
+fn search(root: &amp;RadNode, key: &amp;str) -&gt; bool {
+    let (kb, mut t, mut i) = (key.as_bytes(), root, 0usize);
+    while i &lt; kb.len() {
+        let e = match t.kids.get(&amp;kb[i]) { Some(e) =&gt; e, None =&gt; return false };
+        let lb = e.0.as_bytes();
+        // a mismatch INSIDE an edge is a miss, not just a missing child
+        if i + lb.len() &gt; kb.len() || &amp;kb[i..i + lb.len()] != lb {
+            return false;
+        }
+        i += lb.len();
+        t = &amp;e.1;
+    }
+    t.is_word
+}
+
+// Insert walks the same way, but where the key and an edge label agree on only
+// a PREFIX it must SPLIT that edge -- the one operation a plain trie never needs.
+fn insert(t: &amp;mut RadNode, key: &amp;str, i: usize) {
+    let kb = key.as_bytes();
+    if i == kb.len() { t.is_word = true; return; }
+    let c = kb[i];
+    if !t.kids.contains_key(&amp;c) {                        // no edge starts with c
+        let leaf = Box::new(RadNode { is_word: true, ..Default::default() });
+        t.kids.insert(c, (key[i..].to_string(), leaf));
+        return;
+    }
+    let label = t.kids[&amp;c].0.clone();
+    let lb = label.as_bytes();
+    let mut j = 0usize;                                  // longest common prefix
+    while j &lt; lb.len() &amp;&amp; i + j &lt; kb.len() &amp;&amp; lb[j] == kb[i + j] { j += 1; }
+    if j == lb.len() {                                   // whole label matched
+        insert(&amp;mut t.kids.get_mut(&amp;c).unwrap().1, key, i + j);
+        return;
+    }
+    let (_, child) = t.kids.remove(&amp;c).unwrap();         // SPLIT the edge at j
+    let mut mid = Box::new(RadNode::default());
+    mid.kids.insert(lb[j], (label[j..].to_string(), child));
+    if i + j == kb.len() { mid.is_word = true; }   // key ends AT the split
+    else {
+        let leaf = Box::new(RadNode { is_word: true, ..Default::default() });
+        mid.kids.insert(kb[i + j], (key[i + j..].to_string(), leaf));
+    }
+    t.kids.insert(c, (label[..j].to_string(), mid));
+}</pre>
+<!--/ct--></div>
+
+      <h3>Ternary search tries</h3>
+      <div class="def">
+        <span class="tag">Definition (ternary search trie)</span>
+        A <strong>ternary search trie (TST)</strong> replaces each R-way
+        node&rsquo;s child <em>array</em> with a small binary search tree over
+        only the characters actually used at that position. Each node of that
+        BST stores one character \(c\) and <strong>three</strong> links:
+        <code>left</code> (query character \(&lt; c\)), <code>right</code>
+        (\(&gt; c\)), and <code>mid</code> (\(= c\); advance to the
+        key&rsquo;s next character), plus the usual is-word flag.
+      </div>
+      <div class="aside">
+        <span class="tag">Is it a <em>binary</em> search tree or a <em>ternary</em> tree?</span>
+        Both, at different levels, and the two answers do not compete.
+        <strong>Structurally a TST is one ternary tree</strong>: all three links
+        point to another node of the same kind, which is exactly what
+        &ldquo;ternary&rdquo; names. The BST language describes what two of those
+        links <em>do</em>, not a different kind of object. Read the links by what
+        they change:
+        <ul>
+          <li><code>left</code>/<code>right</code>: keep the character
+            position <em>fixed</em>, searching among the characters used there.
+            That little BST is what replaces the array.</li>
+          <li><code>mid</code>: <em>advances</em> one position. It points
+            at the <strong>root of the next position&rsquo;s BST</strong>, so the
+            following characters hang under it.</li>
+        </ul>
+        <p>
+          So the array lookup becomes two steps: BST-search on
+          <code>left</code>/<code>right</code> for \(c\), then follow that
+          node&rsquo;s <code>mid</code>. That pair is what <code>next[c]</code>
+          used to do in one array index, and only <code>mid</code> consumes a
+          character. Keep the two axes apart and everything about TSTs follows:
+          <strong>within one character position you are in a BST; crossing to the
+          next position you are in a trie.</strong> Hence ternary search
+          <em>trie</em>: &ldquo;ternary&rdquo; counts a node&rsquo;s links,
+          it does not describe the search over the characters at a position.
+        </p>
+        <p>
+          One more granularity trap: a single R-way node does <em>not</em> become
+          a single TST node. It becomes a whole little BST, with one TST node per
+          character actually used at that position: \(k\) characters used
+          means \(k\) nodes of three pointers each, in place of one array of
+          \(R\).
+        </p>
+        <p style="margin-bottom:0">
+          Concretely, on \(\{\)<code>she</code>, <code>sells</code>,
+          <code>sea</code>, <code>shells</code>, <code>by</code>, <code>the</code>,
+          <code>shore</code>\(\}\) (19 nodes in total), following a
+          prefix and then one <code>mid</code> link lands on exactly the
+          characters that may come next:
+        </p>
+        <pre>  position 0 (the root's own BST)   {b, s, t}   every first character
+  after "s"    -> one mid link  ->  {e, h}
+  after "sh"   -> one mid link  ->  {e, o}      she/shells vs shore
+  after "she"  -> one mid link  ->  {l}</pre>
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=tst">TST demo</a>, built on these exact keys.
+        Every node prints its <strong>character position</strong> underneath, so
+        the nodes sharing a number are one BST and an <code>=</code> edge is
+        visibly the only thing that changes it. Run <strong>What follows?</strong>
+        on <code>sh</code> to highlight the BST that <code>mid</code> lands on
+        (<code>{e, o}</code> above), then <strong>Search</strong>
+        <code>shore</code> and watch the caption alternate between &ldquo;still
+        position \(d\)&rdquo; for a left/right step and &ldquo;follow MID &rarr;
+        position \(d{+}1\)&rdquo; for a match. <strong>Search</strong>
+        <code>shel</code> for the is-word subtlety again, and compare the whole
+        thing with <a href="../../lib/demo.html?ds=trie">the R-way trie</a> on the
+        same keys.
+      </div>
+      <pre>  struct Node {
+      char c;
+      Node *left, *mid, *right;   <span class="cm">// &lt; c,   == c (next char),   &gt; c</span>
+      bool isWord;
+  };</pre>
+      <div class="code-tabs" data-snippet="strings/tst">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Ternary search trie. ONE character per node and three links, so a node is
+// three pointers instead of an R-slot array. left/right search among the
+// characters used at THIS position (that is the little BST); mid ADVANCES one
+// position, landing on the root of the next position's BST -- which is where
+// the following characters live. Only mid consumes a character.
+struct TstNode {
+    char c;
+    TstNode *left, *mid, *right;
+    bool isWord;
+    TstNode(char ch) : c(ch), left(0), mid(0), right(0), isWord(false) {}
+};
+
+// put -- the same walk as get, creating what is missing. Keys are non-empty.
+TstNode* put(TstNode* x, const string&amp; key, size_t d) {
+    char c = key[d];
+    if (!x) x = new TstNode(c);
+    if      (c &lt; x-&gt;c)            x-&gt;left  = put(x-&gt;left,  key, d);
+    else if (c &gt; x-&gt;c)            x-&gt;right = put(x-&gt;right, key, d);
+    else if (d + 1 &lt; key.size())  x-&gt;mid   = put(x-&gt;mid,   key, d + 1);
+    else                         x-&gt;isWord = true;      // the node the key ends on
+    return x;
+}
+
+bool get(TstNode* x, const string&amp; key) {
+    size_t d = 0;
+    while (x) {
+        char c = key[d];
+        if      (c &lt; x-&gt;c)           x = x-&gt;left;        // still position d
+        else if (c &gt; x-&gt;c)           x = x-&gt;right;       // still position d
+        else if (d + 1 &lt; key.size()) { x = x-&gt;mid; d++; }// the only character step
+        else return x-&gt;isWord;      // path exists -- but does a key END here?
+    }
+    return false;                   // fell off the tree
+}</pre>
+<pre class="ct-pane" data-lang="java">// Ternary search trie. ONE character per node and three links, so a node is
+// three pointers instead of an R-slot array. left/right search among the
+// characters used at THIS position (that is the little BST); mid ADVANCES one
+// position, landing on the root of the next position's BST -- which is where
+// the following characters live. Only mid consumes a character.
+static class TstNode {
+    char c;
+    TstNode left, mid, right;
+    boolean isWord;
+    TstNode(char ch) { c = ch; }
+}
+
+// put -- the same walk as get, creating what is missing. Keys are non-empty.
+static TstNode put(TstNode x, String key, int d) {
+    char c = key.charAt(d);
+    if (x == null) x = new TstNode(c);
+    if      (c &lt; x.c)              x.left  = put(x.left,  key, d);
+    else if (c &gt; x.c)              x.right = put(x.right, key, d);
+    else if (d + 1 &lt; key.length()) x.mid   = put(x.mid,   key, d + 1);
+    else                          x.isWord = true;      // the node the key ends on
+    return x;
+}
+
+static boolean get(TstNode x, String key) {
+    int d = 0;
+    while (x != null) {
+        char c = key.charAt(d);
+        if      (c &lt; x.c)              x = x.left;        // still position d
+        else if (c &gt; x.c)              x = x.right;       // still position d
+        else if (d + 1 &lt; key.length()) { x = x.mid; d++; }// the only char step
+        else return x.isWord;       // path exists -- but does a key END here?
+    }
+    return false;                   // fell off the tree
+}</pre>
+<pre class="ct-pane" data-lang="py"># Ternary search trie. ONE character per node and three links, so a node is
+# three pointers instead of an R-slot array. left/right search among the
+# characters used at THIS position (that is the little BST); mid ADVANCES one
+# position, landing on the root of the next position's BST -- which is where
+# the following characters live. Only mid consumes a character.
+class TstNode:
+    def __init__(self, c):
+        self.c = c
+        self.left = self.mid = self.right = None
+        self.is_word = False
+
+# put -- the same walk as get, creating what is missing. Keys are non-empty.
+def put(x, key, d):
+    c = key[d]
+    if x is None: x = TstNode(c)
+    if   c &lt; x.c:            x.left  = put(x.left,  key, d)
+    elif c &gt; x.c:            x.right = put(x.right, key, d)
+    elif d + 1 &lt; len(key):   x.mid   = put(x.mid,   key, d + 1)
+    else:                    x.is_word = True       # the node the key ends on
+    return x
+
+def get(x, key):
+    d = 0
+    while x:
+        c = key[d]
+        if   c &lt; x.c:          x = x.left            # still position d
+        elif c &gt; x.c:          x = x.right           # still position d
+        elif d + 1 &lt; len(key): x, d = x.mid, d + 1   # the only character step
+        else: return x.is_word  # path exists -- but does a key END here?
+    return False                # fell off the tree</pre>
+<pre class="ct-pane" data-lang="rs">// Ternary search trie. ONE character per node and three links, so a node is
+// three pointers instead of an R-slot array. left/right search among the
+// characters used at THIS position (that is the little BST); mid ADVANCES one
+// position, landing on the root of the next position's BST -- which is where
+// the following characters live. Only mid consumes a character.
+struct TstNode {
+    c: u8,
+    left: Option&lt;Box&lt;TstNode&gt;&gt;,
+    mid: Option&lt;Box&lt;TstNode&gt;&gt;,
+    right: Option&lt;Box&lt;TstNode&gt;&gt;,
+    is_word: bool,
+}
+
+impl TstNode {
+    fn new(c: u8) -&gt; Self {
+        TstNode { c, left: None, mid: None, right: None, is_word: false }
+    }
+}
+
+// put -- the same walk as get, creating what is missing. Keys are non-empty.
+fn put(x: Option&lt;Box&lt;TstNode&gt;&gt;, key: &amp;[u8], d: usize) -&gt; Option&lt;Box&lt;TstNode&gt;&gt; {
+    let c = key[d];
+    let mut n = x.unwrap_or_else(|| Box::new(TstNode::new(c)));
+    if c &lt; n.c            { n.left  = put(n.left.take(),  key, d); }
+    else if c &gt; n.c       { n.right = put(n.right.take(), key, d); }
+    else if d + 1 &lt; key.len() { n.mid = put(n.mid.take(), key, d + 1); }
+    else                 { n.is_word = true; }          // the node the key ends on
+    Some(n)
+}
+
+fn get(root: &amp;Option&lt;Box&lt;TstNode&gt;&gt;, key: &amp;[u8]) -&gt; bool {
+    let (mut x, mut d) = (root, 0usize);
+    while let Some(n) = x {
+        let c = key[d];
+        if c &lt; n.c            { x = &amp;n.left; }            // still position d
+        else if c &gt; n.c       { x = &amp;n.right; }           // still position d
+        else if d + 1 &lt; key.len() { x = &amp;n.mid; d += 1; } // the only char step
+        else { return n.is_word; }  // path exists -- but does a key END here?
+    }
+    false                           // fell off the tree
+}</pre>
+<!--/ct--></div>
+      <p>
+        A lookup, at each position of the key, walks <code>left</code>/<code>right</code>
+        links to find the current character among the node&rsquo;s siblings (a little BST search over the characters used there) and
+        only on an exact character match descends <code>mid</code> and advances
+        the query. Only <code>mid</code> edges consume characters, and the key
+        takes \(L\) of them; each is preceded by an \(O(\log R)\) sibling
+        search. Worst case \(\Theta(L \log R)\), and in practice close to
+        \(\Theta(L)\), because most nodes have very few children. In exchange,
+        a node is three pointers instead of \(R\): no null-slot waste at
+        all. TSTs are Sedgewick&rsquo;s default string symbol table: trie-like
+        speed at BST-like space, the practical choice once the alphabet is
+        large.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a TST lookup, link by link)</span>
+        The keys \(\{\)<code>she</code>, <code>sells</code>, <code>sea</code>,
+        <code>shells</code>, <code>by</code>, <code>the</code>,
+        <code>shore</code>\(\}\), inserted in that order by the
+        <code>put</code> above, give a root <code>s</code> whose
+        <code>left</code> is <code>b</code> and whose <code>right</code> is
+        <code>t</code> (the position-0 BST \(\{b, s, t\}\)), and whose
+        <code>mid</code> leads to the position-1 BST \(\{e, h\}\), rooted at
+        <code>h</code> with <code>e</code> to its left. Search
+        <code>shore</code>. The column \(d\) is the position in the key, and
+        it changes only on a <code>mid</code> step:
+        <table class="trace">
+          <tr><th class="lab">step</th><th>d</th><th>key[d]</th><th>node c</th><th>test</th><th>link taken</th></tr>
+          <tr><td class="lab">1</td><td>0</td><td class="cell">s</td><td class="cell">s</td><td>equal</td><td class="lt">mid: d becomes 1</td></tr>
+          <tr><td class="lab">2</td><td>1</td><td class="cell">h</td><td class="cell">h</td><td>equal</td><td class="lt">mid: d becomes 2</td></tr>
+          <tr><td class="lab">3</td><td>2</td><td class="cell">o</td><td class="cell">e</td><td>o &gt; e</td><td class="piv">right: d stays 2</td></tr>
+          <tr><td class="lab">4</td><td>2</td><td class="cell">o</td><td class="cell">o</td><td>equal</td><td class="lt">mid: d becomes 3</td></tr>
+          <tr><td class="lab">5</td><td>3</td><td class="cell">r</td><td class="cell">r</td><td>equal</td><td class="lt">mid: d becomes 4</td></tr>
+          <tr><td class="lab">6</td><td>4</td><td class="cell">e</td><td class="cell">e</td><td>equal, last character</td><td class="lt">stop: isWord is true, present</td></tr>
+        </table>
+        <p>
+          Six node visits for a five-character key: five <code>mid</code> steps
+          (one per character, the trie axis) and one <code>right</code> step
+          (the BST axis, spent choosing between the <code>e</code> of
+          <code>she</code>/<code>shells</code> and the <code>o</code> of
+          <code>shore</code>). Searching <code>sea</code> uses the other
+          sibling link twice: at \(d = 1\), <code>e</code> \(&lt;\)
+          <code>h</code> takes <code>left</code>, then <code>mid</code> to
+          \(d = 2\), where <code>a</code> \(&lt;\) <code>l</code> takes
+          <code>left</code> again, landing on a word-marked
+          <code>a</code>. Five visits for three characters.
+        </p>
+        <p style="margin-bottom:0">
+          The two failing endings are the R-way trie&rsquo;s, unchanged.
+          <code>shel</code> walks four <code>mid</code> steps and stops on the
+          <code>l</code> at \(d = 3\): the path exists, the node is not
+          word-marked, so absent. <code>sup</code> matches <code>s</code>,
+          takes <code>mid</code> to \(d = 1\), and there <code>u</code>
+          \(&gt;\) <code>h</code> asks for a <code>right</code> link that is
+          null: the walk falls off after two node visits, without reading the
+          key&rsquo;s third character. As in the R-way trie, a miss usually
+          costs less than a hit.
+        </p>
+      </div>
+      <h3>Where that leaves the symbol-table decision</h3>
+      <table>
+        <tr><th></th><th>trie / TST</th><th>hash table</th><th>balanced BST</th></tr>
+        <tr><td>search cost</td><td><strong>\(\Theta(L)\)</strong></td><td>\(\Theta(L)\) to hash</td><td>\(\Theta(L \log n)\)</td></tr>
+        <tr><td>ordered iteration</td><td><strong>yes</strong></td><td>no</td><td>yes</td></tr>
+        <tr><td>prefix queries</td><td><strong>yes</strong></td><td>no</td><td>no</td></tr>
+        <tr><td>space</td><td>high (R-way) / moderate (TST)</td><td>moderate</td><td>moderate</td></tr>
+      </table>
+      <p>
+        This extends the hash-versus-tree decision of
+        <a href="../hashing/ds-hashing.html"><em>Hashing</em></a> with a third column. A hash
+        table also reads all \(L\) characters (to hash them) and remains the
+        simplest choice for plain membership. The trie&rsquo;s
+        <em>unique</em> powers are the two things hashing destroys by design:
+        order, and prefix locality. If the workload ever asks
+        &ldquo;what starts with&hellip;&rdquo; or &ldquo;what is the longest
+        stored prefix of&hellip;&rdquo; (the operations of the next
+        section), the trie is the only tool on the table that answers
+        without a full scan.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="prefix">4. Prefix operations: autocomplete and longest-prefix</h2>
+      <p>
+        The trie&rsquo;s structure already groups keys by shared prefix:
+        <em>all keys with prefix \(P\) are exactly the subtree under
+        \(P\)&rsquo;s node</em>. No extra index, no sorting: the tree
+        <em>is</em> the prefix index. Two operations fall out of that
+        observation for free, and they are the reason to choose a trie at all.
+      </p>
+      <h3>keysWithPrefix: autocomplete</h3>
+      <p>
+        To find every key starting with a prefix: <strong>walk</strong> the
+        trie down the prefix path, then <strong>collect</strong> every
+        word-marked node in the subtree below, by depth-first traversal (the
+        <code>keysWithPrefix</code>/<code>collect</code> pair in
+        <a href="#trie">&sect;2</a>&rsquo;s code). In a hash table the keys
+        sharing a prefix are scattered across buckets with no way to enumerate
+        them short of scanning every key; in the trie they are literally one
+        subtree.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (keysWithPrefix, worked)</span>
+        Trie holding \(\{\)<code>she</code>, <code>shell</code>,
+        <code>shells</code>, <code>sea</code>\(\}\); query prefix
+        <code>she</code>:
+        <pre>  1. walk s &rarr; h &rarr; e            (reach the "she" node)
+  2. DFS the subtree below it, emitting word-marked nodes:
+     she (marked itself), shell, shells
+  &rarr; { she, shell, shells }     ("sea" branched off at 's', never visited)</pre>
+        The cost is \(\Theta(\text{prefix length} + \text{output size})\):
+        the walk touches three nodes, and the collection touches only the keys
+        that actually share the prefix. That output-sensitivity is why
+        autocomplete feels instant even over huge dictionaries.
+      </div>
+      <figure>
+        <svg viewBox="0 0 470 372" role="img" aria-label="The trie holding she, sells, sea, shells, and shells' five keys, with the query keysWithPrefix of s h highlighted. The walk from the root through s to h is outlined in purple; the subtree below the h node, containing e (word she), l, l (word shell), and s (word shells), is filled green. The keys sea and sells hang under the e child of s, outside the highlighted subtree.">
+          <g stroke="#b9c0d0" stroke-width="1.5" fill="none">
+            <line x1="235" y1="28" x2="235" y2="78"/>
+            <line x1="235" y1="78" x2="140" y2="130"/>
+            <line x1="140" y1="130" x2="85" y2="182"/>
+            <line x1="140" y1="130" x2="195" y2="182"/>
+            <line x1="195" y1="182" x2="195" y2="234"/>
+            <line x1="195" y1="234" x2="195" y2="286"/>
+          </g>
+          <g stroke="#6b40d8" stroke-width="2.2" fill="none">
+            <line x1="235" y1="78" x2="330" y2="130"/>
+          </g>
+          <g stroke="#0a7d4d" stroke-width="1.8" fill="none">
+            <line x1="330" y1="130" x2="330" y2="182"/>
+            <line x1="330" y1="182" x2="330" y2="234"/>
+            <line x1="330" y1="234" x2="330" y2="286"/>
+            <line x1="330" y1="286" x2="330" y2="338"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+            <circle cx="235" cy="28" r="13" fill="#f0f2f6" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="235" y="33" fill="#8a9099" font-size="12">&#8709;</text>
+            <circle cx="235" cy="78" r="14" fill="#fff" stroke="#6b40d8" stroke-width="2.2"/>
+            <text x="235" y="83" fill="#6b40d8">s</text>
+            <circle cx="140" cy="130" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="140" y="135" fill="#1a1c22">e</text>
+            <circle cx="330" cy="130" r="14" fill="#fff" stroke="#6b40d8" stroke-width="2.2"/>
+            <text x="330" y="135" fill="#6b40d8">h</text>
+            <circle cx="85" cy="182" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+            <circle cx="85" cy="182" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+            <text x="85" y="187" fill="#0a7d4d">a</text>
+            <circle cx="195" cy="182" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="195" y="187" fill="#1a1c22">l</text>
+            <circle cx="330" cy="182" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+            <circle cx="330" cy="182" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+            <text x="330" y="187" fill="#0a7d4d">e</text>
+            <circle cx="195" cy="234" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
+            <text x="195" y="239" fill="#1a1c22">l</text>
+            <circle cx="330" cy="234" r="14" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+            <text x="330" y="239" fill="#1a1c22">l</text>
+            <circle cx="195" cy="286" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+            <circle cx="195" cy="286" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+            <text x="195" y="291" fill="#0a7d4d">s</text>
+            <circle cx="330" cy="286" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+            <circle cx="330" cy="286" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+            <text x="330" y="291" fill="#0a7d4d">l</text>
+            <circle cx="330" cy="338" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+            <circle cx="330" cy="338" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+            <text x="330" y="343" fill="#0a7d4d">s</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12.5" font-style="italic" fill="#8a9099">
+            <text x="61" y="186" text-anchor="end">sea</text>
+            <text x="219" y="290" text-anchor="start">sells</text>
+            <text x="354" y="186" text-anchor="start">she</text>
+            <text x="354" y="290" text-anchor="start">shell</text>
+            <text x="354" y="342" text-anchor="start">shells</text>
+          </g>
+        </svg>
+        <figcaption>
+          <code>keysWithPrefix("sh")</code> on the demo trie (keys
+          <code>she, sells, sea, shells, shell</code>). The purple outline is
+          the walk down the prefix path s&ndash;h; the green subtree below it
+          contains exactly the answer \(\{\)<code>she</code>,
+          <code>shell</code>, <code>shells</code>\(\}\). The
+          <code>sea</code>/<code>sells</code> branch is never visited.
+        </figcaption>
+      </figure>
+      <h3>longestPrefixOf</h3>
+      <p>
+        The mirror-image query: the longest <em>stored key</em> that is a
+        prefix <em>of the query</em>. Walk the query string down the trie,
+        remembering the most recent word-marked node passed; when the walk
+        falls off or the query ends, the last remembered word is the answer: a single \(\Theta(L)\) descent.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (longestPrefixOf, worked)</span>
+        Keys \(\{\)<code>she</code>, <code>shells</code>\(\}\); query
+        <code>shellsort</code>:
+        <pre>  s h e     &rarr; passed "she", a word     (remember "she")
+  l l s     &rarr; passed "shells", a word  (remember it; longer)
+  o         &rarr; no child &rarr; stop
+  &rarr; longestPrefixOf("shellsort") = "shells"</pre>
+        This is exactly IP <em>longest-prefix match</em>: a router stores
+        network prefixes in a (Patricia) trie, walks a destination address bit
+        by bit, and forwards along the most specific (longest) matching prefix it passed. It is also how word segmenters and lexers
+        peel the longest recognized token off the front of the input.
+      </div>
+      <h3>From prefix queries to real autocomplete</h3>
+      <p>
+        Production autocomplete is <code>keysWithPrefix</code> plus a
+        <em>ranking</em>: store a weight (frequency, recency) at each
+        word-marked node, and while collecting the subtree keep only the top
+        few completions by weight: a small heap
+        (<a href="../heaps/ds-heaps-pq.html"><em>Heaps &amp; Priority Queues</em></a>) does it in one pass. That
+        is why suggestions arrive curated rather than alphabetical: the trie
+        supplies the candidate set in \(\Theta(\text{prefix} + \text{output})\),
+        and the weights supply the intelligence. The branching structure
+        supports approximate matching too: a wildcard character
+        (<code>c?t</code>) means &ldquo;try <em>every</em> child at this
+        position,&rdquo; and a bounded edit-distance search
+        (&ldquo;did you mean?&rdquo;) explores paths within an edit budget: the same tree, searched more forgivingly.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=trie">Trie demo</a>, again: now the
+        <strong>Prefix</strong> operation. Type <code>sh</code>: the walk
+        highlights the prefix path one character at a time, and on its
+        <em>closing</em> frame the status line reports both queries at once: <code>longestPrefixOf("sh")</code> (none; <code>sh</code> passes
+        no word-marked node) and
+        <code>keysWithPrefix("sh") = {she, shell, shells}</code>, the
+        subtree of the figure above. Let the animation finish, or press
+        <strong>&#9197;</strong> to jump to that last frame: the intermediate
+        frames narrate the walk, and only the final one carries the answers.
+        Try <code>she</code> (now the longest prefix is <code>she</code> itself)
+        and <code>sea</code>. Load the
+        <em>shared prefixes</em> preset (<code>to, tea, ted, ten, in,
+        inn</code>) and query <code>te</code> for a three-way autocomplete.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">5. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Insert <code>to</code>, <code>tea</code>, <code>ten</code> into an
+          empty R-way trie. How many nodes does it have (besides the root)?
+          Which are word-marked? Is a search for <code>te</code> successful?
+          <details>
+            <summary>solution</summary>
+            Five nodes: <code>t</code> with children <code>o</code> and
+            <code>e</code>, and <code>e</code> with children <code>a</code>
+            and <code>n</code> (paths t&ndash;o, t&ndash;e&ndash;a,
+            t&ndash;e&ndash;n). The three word-marked nodes are the ends
+            <code>o</code>, <code>a</code>, <code>n</code>; <code>t</code> and
+            <code>e</code> are shared, unmarked path nodes. Searching
+            <code>te</code> walks a perfectly valid path, but its final
+            node is not word-marked, so the search correctly fails: a
+            reachable path is not a stored key.
+          </details>
+        </li>
+        <li>
+          A trie holds \(\{\)<code>to</code>, <code>tea</code>,
+          <code>ted</code>, <code>ten</code>, <code>in</code>,
+          <code>inn</code>\(\}\). Compute
+          <code>keysWithPrefix("te")</code> and
+          <code>longestPrefixOf("innards")</code>, and state each
+          operation&rsquo;s cost in general.
+          <details>
+            <summary>solution</summary>
+            <code>keysWithPrefix("te")</code>: walk t&ndash;e, then collect
+            the subtree: \(\{\)<code>tea</code>, <code>ted</code>,
+            <code>ten</code>\(\}\) (neither <code>to</code> nor the
+            <code>in</code> branch is visited). Cost:
+            \(\Theta(\text{prefix length} + \text{output size})\).
+            <code>longestPrefixOf("innards")</code>: walk
+            i&nbsp;&rarr;&nbsp;n (passing the word <code>in</code>, remember
+            it) &rarr;&nbsp;n (passing <code>inn</code>, remember it; longer) &rarr;&nbsp;<code>a</code> has no child &rarr; stop and
+            return the last word passed: <code>inn</code>. Cost: one descent,
+            \(\Theta(\text{query length})\) at most.
+          </details>
+        </li>
+        <li>
+          From a trie holding \(\{\)<code>she</code>, <code>shell</code>,
+          <code>shells</code>\(\}\), delete <code>shell</code>, then delete
+          <code>shells</code>. Describe exactly what each deletion changes.
+          <details>
+            <summary>solution</summary>
+            Deleting <code>shell</code> only clears the is-word flag on its
+            final <code>l</code> node: that node still has a child (the
+            <code>s</code> of <code>shells</code>), so nothing can be pruned: every node on the path is still shared. Deleting
+            <code>shells</code> then unmarks its final <code>s</code> node and
+            prunes bottom-up: the <code>s</code> (childless, unmarked) goes,
+            then the second <code>l</code> (now childless, and its mark was
+            cleared by the first deletion), then the first <code>l</code>
+            (childless, unmarked), three nodes removed, and
+            pruning stops at <code>e</code>, which is word-marked
+            (<code>she</code> survives). Forgetting the stop condition and
+            pruning into shared/marked nodes is the classic deletion bug.
+            You can run this pair live in the
+            <a href="../../lib/demo.html?ds=trie">trie demo</a>: build
+            <code>she, shell, shells</code>, then <strong>Delete</strong>
+            <code>shell</code> and <code>shells</code> in that order: the <code>free</code> counter reads \(0\), then \(3\).
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Tries &amp; Ternary Search Trees v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

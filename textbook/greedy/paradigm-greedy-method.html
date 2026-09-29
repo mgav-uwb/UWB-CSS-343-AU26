@@ -1,0 +1,695 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: The Greedy Method.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Greedy Method - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { padding: 5px 9px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>The Greedy Method</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Design paradigm.
+      </div>
+      <div class="src">
+        The greedy method in general: what it is (make the locally best choice
+        and never reconsider), the change-making pair that shows the same rule
+        succeeding and failing, the two properties that license it
+        (greedy-choice and optimal substructure), the exchange argument that
+        proves them, the classic failure cases, and where greedy sits among the
+        design paradigms. The course&rsquo;s specific greedy algorithms live in
+        their own handouts:
+        <a href="../graphs/algo-dijkstra.html">Dijkstra&rsquo;s Algorithm</a>,
+        <a href="../graphs/algo-prim.html">Prim&rsquo;s Algorithm</a>,
+        <a href="../graphs/algo-kruskal.html">Kruskal&rsquo;s Algorithm</a>,
+        <a href="algo-interval-scheduling.html">Interval Scheduling</a>, and
+        <a href="algo-huffman-coding.html">Huffman Coding</a>.
+      </div>
+
+      <p class="lead">
+        Three of this course&rsquo;s algorithms (Dijkstra, Prim, and
+        Kruskal) share one strategy: build the answer one committed choice
+        at a time, always taking whatever looks best right now. This handout is
+        about that strategy in general: the fastest one there is
+        <em>when it is correct</em>, and the whole subtlety is that a locally
+        best choice is not always part of a globally best solution. We define
+        the method, watch one rule succeed and fail on nearly identical inputs,
+        name the two properties that license it, learn the one proof technique
+        (the exchange argument) that establishes them, and place greedy among
+        its alternatives.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#method">What a greedy algorithm is</a></li>
+          <li><a href="#coins">The same rule, opposite fates</a></li>
+          <li><a href="#license">The two licensing ingredients</a></li>
+          <li><a href="#exchange">The exchange argument</a></li>
+          <li><a href="#rooms">The same events, a different question</a></li>
+          <li><a href="#fails">Where greed fails</a></li>
+          <li><a href="#course">Greedy in this course</a></li>
+          <li><a href="#paradigms">Greedy among the paradigms</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="method">1. What a greedy algorithm is</h2>
+      <div class="def">
+        <span class="tag">Definition (greedy algorithm)</span>
+        A <strong>greedy algorithm</strong> builds a solution incrementally: at
+        each step it makes the choice that looks best <em>right now</em>, by
+        some fixed rule, commits to it irrevocably, and reduces the
+        problem by that choice. No backtracking, no lookahead.
+      </div>
+      <pre>  greedy(problem):
+      while not solved:
+          x = the locally BEST choice available
+          commit to x               <span class="cm">// never undone</span>
+          shrink the problem</pre>
+      <p>
+        Every greedy algorithm is this loop; the art is entirely in the
+        <em>choice rule</em> and its <em>proof</em>. The irrevocability is what
+        makes greedy fast (one pass, no search tree) and also what
+        makes it risky, because a locally best choice can foreclose a globally
+        better one. Whether it does depends on the <em>problem</em>, not the
+        strategy.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="coins">2. The same rule, opposite fates</h2>
+      <p>
+        The sharpest way to see that greed&rsquo;s correctness belongs to the
+        problem is a rule that succeeds and fails on inputs that differ only in
+        their numbers. <strong>Making change</strong> with the fewest coins,
+        rule: <em>take the largest coin that fits, repeat</em>.
+      </p>
+      <p>
+        The state is a single number, the amount still owed. Each step subtracts
+        the largest denomination that does not exceed it. Run the rule on
+        \(41\)&cent; with US denominations \(\{25, 10, 5, 1\}\):
+      </p>
+      <table class="trace">
+        <tr><th>step</th><th>amount owed</th><th>largest coin that fits</th>
+          <th>coin taken</th><th>amount after</th></tr>
+        <tr><td class="num">1</td><td class="num">41</td><td class="num">25</td>
+          <td class="new">25</td><td class="num">16</td></tr>
+        <tr><td class="num">2</td><td class="num">16</td><td class="num">10</td>
+          <td class="new">10</td><td class="num">6</td></tr>
+        <tr><td class="num">3</td><td class="num">6</td><td class="num">5</td>
+          <td class="new">5</td><td class="num">1</td></tr>
+        <tr><td class="num">4</td><td class="num">1</td><td class="num">1</td>
+          <td class="new">1</td><td class="num">0</td></tr>
+      </table>
+      <p>
+        Four coins, \(25 + 10 + 5 + 1\), and four is the minimum: since
+        \(41 \equiv 1 \pmod 5\) and only the penny is not a multiple of \(5\),
+        any solution uses at least one penny, and the remaining \(40\) needs at
+        least three coins because no two coins from \(\{5,10,25\}\) sum to
+        \(40\) (the largest such sum is \(50\), and \(25{+}25\), \(25{+}10\),
+        \(25{+}5\), \(10{+}10\) and below all miss). So \(1 + 3 = 4\) coins,
+        which is what greedy paid. For US denominations the rule is optimal at
+        <em>every</em> amount, not just this one.
+      </p>
+      <p>
+        Now change nothing but the denominations. With \(\{1, 3, 4\}\), make
+        \(6\):
+      </p>
+      <table class="trace">
+        <tr><th>step</th><th>amount owed</th><th>largest coin that fits</th>
+          <th>coin taken</th><th>amount after</th></tr>
+        <tr><td class="num">1</td><td class="num">6</td><td class="num">4</td>
+          <td class="new">4</td><td class="num">2</td></tr>
+        <tr><td class="num">2</td><td class="num">2</td><td class="num">1</td>
+          <td class="new">1</td><td class="num">1</td></tr>
+        <tr><td class="num">3</td><td class="num">1</td><td class="num">1</td>
+          <td class="new">1</td><td class="num">0</td></tr>
+      </table>
+      <p>
+        Greedy pays \(4 + 1 + 1\): three coins. It is not optimal, and the
+        instance is small enough to settle by hand. Every way to write \(6\)
+        over \(\{1,3,4\}\) is fixed by how many \(4\)s and how many \(3\)s it
+        uses, the rest being \(1\)s, so there are exactly four:
+      </p>
+      <table class="trace">
+        <tr><th>4s</th><th>3s</th><th>1s</th><th>representation</th>
+          <th>coins</th><th></th></tr>
+        <tr><td class="num">1</td><td class="num">0</td><td class="num">2</td>
+          <td>\(4 + 1 + 1\)</td><td class="num">3</td><td>what greedy returns</td></tr>
+        <tr><td class="num">0</td><td class="num">2</td><td class="num">0</td>
+          <td>\(3 + 3\)</td><td class="num"><span class="two">2</span></td>
+          <td>the optimum</td></tr>
+        <tr><td class="num">0</td><td class="num">1</td><td class="num">3</td>
+          <td>\(3 + 1 + 1 + 1\)</td><td class="num">4</td><td></td></tr>
+        <tr><td class="num">0</td><td class="num">0</td><td class="num">6</td>
+          <td>\(1 + 1 + 1 + 1 + 1 + 1\)</td><td class="num">6</td><td></td></tr>
+      </table>
+      <p>
+        The optimum is \(3 + 3\), two coins, and it opens with a coin the rule
+        would never pick: at step 1 the \(4\) fits, so \(3\) never gets
+        considered. Taking the \(4\) leaves \(2\), an amount that
+        \(\{1,3,4\}\) can only pay in \(1\)s. Greedy&rsquo;s first move is
+        exactly the move that costs it.
+      </p>
+      <p>
+        Nor is \(6\) a lone accident. Comparing the rule against the true
+        minimum at every amount up to \(10\) (the minimum computed by trying all
+        representations) shows greedy correct until \(6\) and wrong again at
+        \(10\):
+      </p>
+      <table class="trace">
+        <tr><th>amount \(n\)</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+          <th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+        <tr><th>greedy coins</th><td class="num">1</td><td class="num">2</td>
+          <td class="num">1</td><td class="num">1</td><td class="num">2</td>
+          <td class="num"><span class="two">3</span></td><td class="num">2</td>
+          <td class="num">2</td><td class="num">3</td>
+          <td class="num"><span class="two">4</span></td></tr>
+        <tr><th>minimum coins</th><td class="num">1</td><td class="num">2</td>
+          <td class="num">1</td><td class="num">1</td><td class="num">2</td>
+          <td class="num">2</td><td class="num">2</td><td class="num">2</td>
+          <td class="num">3</td><td class="num">3</td></tr>
+      </table>
+      <p>
+        At \(10\) greedy pays \(4 + 4 + 1 + 1\) while \(4 + 3 + 3\) does it in
+        three, the same mistake one \(4\) later.
+      </p>
+      <p>
+        The rule is identical in both runs; only the denominations changed. For
+        US denominations the rule is provably optimal for every amount; for
+        \(\{1,3,4\}\) grabbing the 4 forces two 1s, while the optimum starts
+        with a choice that did <em>not</em> look best. Nothing on the surface
+        distinguishes the two cases. The lesson is blunt: every greedy algorithm
+        needs either a <em>proof</em> that it is optimal or a counterexample
+        that kills it; a hunch about one instance does not transfer.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="license">3. The two licensing ingredients</h2>
+      <div class="def">
+        <span class="tag">Definition (the two ingredients)</span>
+        A greedy algorithm is correct exactly when its problem has both:
+        <ul>
+          <li><strong>the greedy-choice property</strong>: some globally
+            optimal solution contains the locally best (greedy) choice, so
+            committing to it is safe; and</li>
+          <li><strong>optimal substructure</strong>: after the greedy
+            choice, what remains is a smaller instance of the same problem, and
+            an optimal solution to it combines with the greedy choice to give a
+            global optimum.</li>
+        </ul>
+      </div>
+      <p>
+        The two are different guarantees, and it is worth not confusing them.
+        Optimal substructure is common: shortest paths, knapsack, and
+        edit distance all have it, which is why dynamic programming (the
+        <a href="../dp/paradigm-dp-method.html">Dynamic Programming Method</a> handout)
+        applies to them. The <em>greedy-choice property</em> is the rarer,
+        stronger condition that you can fix the locally best choice and never
+        regret it. A problem with optimal substructure but no greedy-choice
+        property is precisely where greed fails and dynamic programming takes
+        over; \(\{1,3,4\}\) change-making is exactly such a problem.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="exchange">4. The exchange argument</h2>
+      <p>
+        The greedy-choice property is almost always proved the same way:
+        the same <strong>exchange argument</strong> that proves the MST cut
+        property (the
+        <a href="../graphs/foundation-minimum-spanning-trees.html"><em>Minimum Spanning Trees</em></a>
+        handout).
+      </p>
+      <div class="thm">
+        <span class="tag">Proof template (exchange argument)</span>
+        Let \(g\) be the greedy choice. Take any optimal solution \(O\) that
+        does <em>not</em> use \(g\). Exhibit an element of \(O\) that can be
+        swapped for \(g\), and show the result is still feasible and no worse
+        than \(O\). Then an optimal solution containing \(g\) exists, so
+        \(g\) is safe.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (activity selection)</span>
+        Given activities each with a start and finish time, choose the most that
+        can share <em>one</em> room without overlapping. Take intervals to be
+        <strong>half-open</strong> \([s, f)\), so an activity finishing at
+        \(5\) and one starting at \(5\) do <em>not</em> conflict; with closed
+        intervals every number below changes. Five requests:
+      </div>
+
+      <pre>   t     1  2  3  4  5  6  7  8  9  10 11
+   a     ============                    TAKE   (room free at 5)
+   b        ============                 skip   (starts 2 &lt; 5)
+   c           ============              skip   (starts 3 &lt; 5)
+   d                       ======        TAKE   (starts 7 &ge; 5)
+   e                          =========  skip   (starts 8 &lt; 9)</pre>
+
+      <p>
+        The greedy rule is <em>always take the compatible activity that finishes
+        earliest</em>. Sorted by finish time the order is \(a(5), b(6), c(7),
+        d(9), e(11)\): take \(a\); \(b\) and \(c\) start before \(5\) and
+        are dropped for good; \(d\) starts at \(7 \ge 5\) and is taken;
+        \(e\) starts at \(8 &lt; 9\) and is dropped. Two activities, \(a\)
+        and \(d\); three of the five requests are refused.
+      </p>
+
+      <div class="def">
+        <span class="tag">Why earliest-finish is optimal</span>
+        By exchange: let \(g\) finish earliest overall, and let \(O\) be any
+        optimal schedule; its first activity finishes no earlier than \(g\), so
+        replacing it with \(g\) keeps the schedule feasible (\(g\) frees the
+        room soonest) and the same size. The activities starting after \(g\)
+        form a smaller instance (optimal substructure), and
+        induction finishes the proof. Sort by finish time and sweep once:
+        \(O(n\log n)\).
+      </div>
+
+      <h3>The exchange carried out on the five activities</h3>
+      <p>
+        The template is abstract; on a fixed instance it is a finite check. Write
+        the five requests as half-open intervals: \(a = [1,5)\), \(b = [2,6)\),
+        \(c = [3,7)\), \(d = [7,9)\), \(e = [8,11)\). Two activities are
+        compatible when one finishes at or before the other starts, which makes
+        \(a, b, c\) pairwise conflicting (they all cover \(t = 3\)) and \(d, e\)
+        conflicting (both cover \(t = 8\)). So a feasible schedule holds at most
+        one of \(\{a,b,c\}\) and at most one of \(\{d,e\}\): the maximum size is
+        \(2\), and there are exactly six optimal schedules, one per pair.
+      </p>
+      <p>
+        The greedy choice is \(g = a\), the activity finishing earliest
+        (\(f(a) = 5\), against \(6, 7, 9, 11\)). Four of the six optima do not
+        contain \(a\). For each, the exchange removes its first activity and
+        inserts \(a\):
+      </p>
+      <table class="trace">
+        <tr><th>optimal \(O\) without \(g\)</th><th>first activity \(o_1\)</th>
+          <th>\(f(o_1) \ge f(a) = 5\)?</th><th>after swapping in \(a\)</th>
+          <th>still feasible?</th><th>size</th></tr>
+        <tr><td>\(\{b, d\}\)</td><td>\(b = [2,6)\)</td><td>\(6 \ge 5\) &#10003;</td>
+          <td>\(\{a, d\}\)</td><td>\(f(a) = 5 \le 7 = s(d)\) &#10003;</td>
+          <td class="num">2 &rarr; 2</td></tr>
+        <tr><td>\(\{b, e\}\)</td><td>\(b = [2,6)\)</td><td>\(6 \ge 5\) &#10003;</td>
+          <td>\(\{a, e\}\)</td><td>\(f(a) = 5 \le 8 = s(e)\) &#10003;</td>
+          <td class="num">2 &rarr; 2</td></tr>
+        <tr><td>\(\{c, d\}\)</td><td>\(c = [3,7)\)</td><td>\(7 \ge 5\) &#10003;</td>
+          <td>\(\{a, d\}\)</td><td>\(f(a) = 5 \le 7 = s(d)\) &#10003;</td>
+          <td class="num">2 &rarr; 2</td></tr>
+        <tr><td>\(\{c, e\}\)</td><td>\(c = [3,7)\)</td><td>\(7 \ge 5\) &#10003;</td>
+          <td>\(\{a, e\}\)</td><td>\(f(a) = 5 \le 8 = s(e)\) &#10003;</td>
+          <td class="num">2 &rarr; 2</td></tr>
+      </table>
+      <p>
+        Every row is a legal swap that loses nothing, which is the
+        greedy-choice property on this instance: an optimal schedule containing
+        \(a\) exists (two of them, \(\{a,d\}\) and \(\{a,e\}\)). Note what the
+        column labelled \(f(o_1) \ge f(a)\) is doing: \(a\) finishes earliest of
+        all five activities, so it finishes no later than whatever \(O\) starts
+        with, and therefore every later member of \(O\), which already started at
+        or after \(f(o_1)\), also starts at or after \(f(a)\). Nothing about the
+        instance is used beyond that inequality, which is why the same swap
+        works in general.
+      </p>
+      <p>
+        Optimal substructure then closes the argument. Having committed to
+        \(a\), the leftover problem is the activities starting at or after
+        \(f(a) = 5\), namely \(d = [7,9)\) and \(e = [8,11)\), and it is an
+        activity-selection instance like any other. Its optimum is \(1\)
+        (\(d\) and \(e\) conflict), so the whole optimum is
+        \(1 + 1 = 2\), matching the exhaustive count. The greedy&rsquo;s own run
+        takes \(a\), then \(d\) as the earliest finisher among the survivors:
+        \(\{a, d\}\), size \(2\).
+      </p>
+      <div class="aside">
+        <span class="tag">What the exchange does not claim</span>
+        It does not claim the greedy schedule is <em>the</em> optimum, only that
+        it is <em>an</em> optimum. Six optimal schedules exist here and greedy
+        returns one of them. It also does not claim the swapped-in choice is
+        strictly better: every row above is \(2 \to 2\). &ldquo;No worse&rdquo;
+        is all an exchange argument ever needs, and asking for strict
+        improvement would make the template false.
+      </div>
+      <p>
+        The full algorithm, its code, a ten-request trace and the alternative
+        <em>stays-ahead</em> proof of the same theorem are in the
+        <a href="algo-interval-scheduling.html">Interval Scheduling</a> handout,
+        which uses the same half-open convention.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="rooms">5. The same events, a different question</h2>
+      <p>
+        Activity selection maximizes how many requests fit in <em>one</em> room
+        and refuses the rest. Change one word (honour <em>every</em>
+        request, using as few rooms as possible, one activity per room at a
+        time) and it becomes <strong>interval partitioning</strong>. Same five
+        intervals as above, and the answers differ:
+      </p>
+
+      <pre>   t     1  2  3  4  5  6  7  8  9  10 11
+   a     ============
+   b        ============
+   c           ============
+   d                       ======
+   e                          =========
+   count 1  2  3  3  2  1  1  2  1  1</pre>
+
+      <p>
+        The <code>count</code> row is how many bars a vertical line crosses at
+        each instant. Its peak is \(3\), at \(t = 3\) and \(t = 4\), where
+        \(a\), \(b\) and \(c\) are all live. So this instance needs
+        \(3\) rooms while only \(2\) of its activities fit in one: two
+        different questions about one picture.
+      </p>
+
+      <div class="def">
+        <span class="tag">Why 3 is optimal: a matching bound, not an exchange</span>
+        <strong>Lower bound.</strong> If \(k\) intervals share an instant they
+        pairwise conflict, so no two of them can share a room and every schedule
+        uses at least \(k\) rooms. Here the maximum overlap is \(3\), so
+        \(\text{rooms} \ge 3\).<br>
+        <strong>Upper bound.</strong> The greedy processes intervals in
+        <em>start</em> order and puts each in any room that has come free,
+        opening a new room only when all are busy:
+        \(a \to R_1\), \(b \to R_2\), \(c \to R_3\), then \(d \to R_1\)
+        (free since \(5\)) and \(e \to R_2\) (free since \(6\)):
+        \(3\) rooms. It can never beat the bound either: at the moment it opens
+        room number \(m\), the other \(m-1\) rooms are busy with intervals
+        that all overlap the one being placed, so \(m\) intervals are live at
+        that instant and the maximum overlap is at least \(m\).<br>
+        The two bounds meet, so the greedy and the number \(3\) are both
+        optimal. Notice this proof is <em>not</em> an exchange argument: when a
+        problem has an obvious lower bound, showing the greedy attains it is
+        usually the shorter road.
+      </div>
+
+      <p>
+        Both greedies are in the course&rsquo;s <code>intervals</code>
+        demo, which runs either rule on the same editable set of intervals,
+        handy for checking that the two answers really do come apart. The
+        partitioning algorithm itself, with the priority queue that finds the
+        earliest-freed room and a full room-by-room trace, is in
+        <a href="algo-interval-scheduling.html#partition">Interval Scheduling</a>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="fails">6. Where greed fails</h2>
+      <div class="aside">
+        <span class="tag">The 0/1 knapsack</span>
+        A bag carries at most \(W\) kilos; item \(i\) has value \(v_i\) and
+        weight \(w_i\). Choose a <em>subset</em> \(S\) of the items to pack:
+        \[ \text{maximize} \ \sum_{i \in S} v_i \quad \text{subject to}
+           \ \sum_{i \in S} w_i \le W. \]
+        Each item is all-or-nothing: take it (\(1\)) or leave it
+        (\(0\)), which is what the name <em>0/1</em> records: the decision
+        variable per item is binary. Two neighbours differ only in that
+        variable&rsquo;s range. <em>Fractional</em> knapsack lets it be any value
+        in \([0,1]\) (take \(40\%\) of an item), and <em>unbounded</em>
+        knapsack lets it be any non-negative integer (unlimited copies). The
+        natural greedy (take items by value-to-weight ratio, highest first)
+        can be far from optimal. Three items and \(W = 50\) break it:
+        <pre>   item   value  weight  ratio
+     A      60      10     6      greedy: A, then B  &rarr; 160
+     B     100      20     5              20 capacity wasted
+     C     120      30     4      best:   B + C      &rarr; 220</pre>
+        Greedy takes \(A\) (the densest), then \(B\), filling \(30\) of the
+        \(50\) units for value \(160\), and now \(C\) no longer fits.
+        But \(B + C\) weighs exactly \(50\) and is worth \(220\). The
+        failure is structural rather than a silly rule: committing to \(A\)
+        consumes capacity the optimum spends better, and nothing later can undo
+        it. <em>No</em> optimal solution contains \(A\), so the greedy-choice
+        property fails outright.
+        <br><br>
+        The natural response is to blame the rule and pick another, and on
+        this instance that works, since sorting by <em>value</em> or by
+        <em>weight</em> takes \(C\) then \(B\) and reaches \(220\). But no
+        rule survives a second instance. Take \(W = 10\) with
+        \(X = (10, 10)\), \(Y = (6, 5)\), \(Z = (6, 5)\), where the optimum
+        is \(Y + Z = 12\):
+        <table>
+          <tr><th>rule</th><th>instance 1 (opt 220)</th><th>instance 2 (opt 12)</th></tr>
+          <tr><td>highest value &middot; heaviest first</td><td>220 &#10003;</td><td>10 &#10007;</td></tr>
+          <tr><td>best value/weight &middot; lightest first</td><td>160 &#10007;</td><td>12 &#10003;</td></tr>
+        </table>
+        Each rule is optimal on one instance and wrong on the other, on three
+        items apiece. The conclusion is stronger than &ldquo;the ratio rule is
+        bad&rdquo;: <em>no</em> fixed priority order can work, because whichever
+        one you propose, an instance can be built to defeat it. That is what the
+        missing greedy-choice property means in practice (there is no
+        locally-best choice that is always safe), and it is why this
+        problem needs dynamic programming
+        (the <a href="../dp/algo-knapsack.html">Knapsack</a>
+        handout), which computes over all
+        choices instead of committing to one.
+        Tellingly, the <em>fractional</em> knapsack (where you may take
+        part of an item) <em>is</em> greedy-solvable: the fraction is
+        exactly what lets the exchange argument go through without waste. On the
+        same three items the ratio rule takes \(A\), \(B\), and \(20/30\) of
+        \(C\), reaching \(160 + 80 = 240\), above the \(0/1\) optimum
+        of \(220\), because the wasted capacity is gone. A small change to the
+        problem flips which technique applies.
+      </div>
+      <div class="aside">
+        <span class="tag">When is greedy <em>always</em> optimal? Matroids</span>
+        There is a precise answer to &ldquo;which problems is greedy right
+        for,&rdquo; and it is one of the deeper ideas in Cormen&nbsp;et&nbsp;al.
+        A <strong>matroid</strong> is a ground set with a family of
+        &ldquo;independent&rdquo; subsets closed downward and satisfying an
+        exchange axiom (if one independent set is larger than another, some
+        element of the larger can be added to the smaller keeping it
+        independent). The theorem: the greedy algorithm (sort elements by
+        weight, take each that keeps the set independent) finds a
+        maximum-weight independent set <em>for every weighting</em> if and only
+        if the structure is a matroid. Minimum spanning trees are the canonical
+        case: the forests of a graph form the <em>graphic matroid</em>, and
+        Kruskal is exactly this greedy (which is why it needed no
+        problem-specific cleverness, only the cut property). The \(0/1\)
+        knapsack&rsquo;s feasible sets are <em>not</em> a matroid, which is the
+        structural reason greedy fails on it. Huffman is a greedy that lies
+        outside the matroid frame, so it needs its own exchange proof: a
+        reminder that matroids explain many greedy successes but not all.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="course">7. Greedy in this course</h2>
+      <table>
+        <tr><th>algorithm</th><th>the greedy choice</th><th>proof of safety</th><th>treated in</th></tr>
+        <tr><td><strong>Dijkstra</strong></td><td>settle the nearest unsettled vertex</td>
+          <td>the boundary chain (weights \(\ge 0\))</td>
+          <td><a href="../graphs/algo-dijkstra.html">Dijkstra&rsquo;s Algorithm</a></td></tr>
+        <tr><td><strong>Prim</strong></td><td>add the lightest edge leaving the tree</td>
+          <td>the cut property</td>
+          <td><a href="../graphs/algo-prim.html">Prim&rsquo;s Algorithm</a></td></tr>
+        <tr><td><strong>Kruskal</strong></td><td>take the cheapest edge that avoids a cycle</td>
+          <td>the cut property</td>
+          <td><a href="../graphs/algo-kruskal.html">Kruskal&rsquo;s Algorithm</a></td></tr>
+        <tr><td><strong>Huffman</strong></td><td>merge the two least-frequent symbols</td>
+          <td>its own exchange lemma</td>
+          <td><a href="algo-huffman-coding.html">Huffman Coding</a></td></tr>
+      </table>
+      <p>
+        The practical method for a <em>new</em> problem: first try to
+        <em>break</em> a proposed greedy rule with a small counterexample
+        (usually faster than a proof, and it settles the matter); if it survives
+        real effort, prove it with an exchange argument plus optimal
+        substructure. Scheduling, selection, and encoding problems with a clean
+        ordering are greedy candidates; problems where committing to the local
+        best can foreclose a better whole are dynamic-programming territory.
+        Never ship a greedy you have neither proved nor stress-tested.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="paradigms">8. Greedy among the paradigms</h2>
+      <table>
+        <tr><th>paradigm</th><th>idea</th><th>when it applies</th></tr>
+        <tr><td><strong>brute force</strong></td>
+          <td>try every solution, keep the best</td>
+          <td>always correct; usually exponential</td></tr>
+        <tr><td><strong>greedy</strong></td>
+          <td>commit to one <em>locally-best</em> choice, never reconsider</td>
+          <td>the choice is provably safe (exchange argument)</td></tr>
+        <tr><td><strong>divide-and-conquer</strong>
+          (<a href="../sorting/paradigm-divide-and-conquer.html">handout</a>)</td>
+          <td>split into <em>independent</em> subproblems, recurse, combine</td>
+          <td>subproblems do not overlap</td></tr>
+        <tr><td><strong>dynamic programming</strong>
+          (<a href="../dp/paradigm-dp-method.html">handout</a>)</td>
+          <td>try <em>all</em> choices, cache the overlapping subproblems</td>
+          <td>overlap + optimal substructure</td></tr>
+      </table>
+      <p>
+        Dynamic programming is greedy without the leap of faith: where greedy
+        gambles that one locally-best choice is always safe, DP tries every
+        choice at each step and lets cached subproblem answers sort out the
+        winner, which is why it solves the problems where greedy has a
+        counterexample. For \(\{1,3,4\}\) change-making,
+        \(\texttt{best}[n] = 1 + \min(\texttt{best}[n{-}1],
+        \texttt{best}[n{-}3], \texttt{best}[n{-}4])\) recovers the optimal
+        \(3+3\) that greedy missed. The
+        <a href="../dp/paradigm-dp-method.html">Dynamic Programming Method</a> handout is
+        this handout&rsquo;s mirror image, and the two together are the
+        decision procedure for optimization problems.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Using the greedy &ldquo;largest coin first&rdquo; rule with
+          denominations \(\{1, 5, 8\}\), make \(10\)&cent;. What does
+          greedy return, what is the optimum, and which greedy ingredient fails?
+          <details>
+            <summary>solution</summary>
+            Greedy takes \(8\), then \(1 + 1\): three coins. The optimum is
+            \(5 + 5\): two coins. Greedy fails because the greedy-choice
+            property does not hold for these denominations: committing to
+            the largest coin \(8\) forecloses the better all-\(5\)s solution,
+            so no exchange argument can go through. (This coin system is not
+            &ldquo;canonical.&rdquo;) The problem still has optimal substructure,
+            which is why dynamic programming solves coin change in general.
+          </details>
+        </li>
+        <li>
+          Activities with (start, finish) times: \(A(0,10)\), \(B(1,2)\),
+          \(C(3,4)\), \(D(5,6)\). Run the earliest-<em>finish</em> greedy.
+          Which activities are chosen? Then run the plausible-sounding
+          earliest-<em>start</em> rule. What goes wrong, and what does the
+          contrast tell you about greedy choice rules?
+          <details>
+            <summary>solution</summary>
+            Earliest-finish sorts \(B(1,2), C(3,4), D(5,6), A(0,10)\) and takes
+            \(B\), then \(C\) (starts \(3 \ge 2\)), then \(D\) (starts
+            \(5 \ge 4\)): three activities, which is optimal.
+            Earliest-start takes \(A(0,10)\) first; it overlaps everything, so
+            the schedule ends at <em>one</em> activity. Both rules are
+            &ldquo;greedy&rdquo;; only one has the greedy-choice property (the
+            exchange argument works for earliest-finish, and \(A\) is a
+            counterexample that kills earliest-start). The lesson: greedy is a
+            family of rules, and the proof certifies a <em>specific</em> choice
+            rule, not the strategy.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; The Greedy Method v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+  </body>
+</html>

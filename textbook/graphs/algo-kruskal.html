@@ -1,0 +1,526 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Kruskal's Algorithm.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kruskal's Algorithm - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { padding: 5px 9px; font-variant-numeric: tabular-nums; }
+      table.trace td.num { text-align: center; }
+      table.trace td.add { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.skip { background: #f0f2f6; color: var(--dim); font-weight: 700; }
+      table.trace td.forest { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .mrg { color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Kruskal&rsquo;s Algorithm</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (greedy).
+      </div>
+      <div class="src">
+        Kruskal&rsquo;s minimum-spanning-tree algorithm: sort the edges cheapest
+        first, then accept each edge whose endpoints are not yet connected, a
+        union-find query per edge. A full trace on the running graph, the forest
+        view of the same run, the proof that every accepted edge is safe by the cut
+        property, and the \(O(E\log V)\) analysis. With the demo and exercises.
+      </div>
+
+      <p class="lead">
+        <strong>Kruskal&rsquo;s algorithm</strong> computes a minimum spanning tree
+        as a sort followed by a near-linear pass. Its cycle test is exactly a
+        <a href="ds-union-find.html">union-find</a> query, and every edge it accepts is
+        licensed by the cut property of the
+        <a href="foundation-minimum-spanning-trees.html">Minimum Spanning Trees</a> handout;
+        this handout supplies the algorithm, the trace, and the analysis.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#algo">Cheapest edge first</a></li>
+          <li><a href="#trace">The run on the running graph</a></li>
+          <li><a href="#analysis">Correctness and cost</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="algo">1. Cheapest edge first</h2>
+      <p>
+        <strong>Kruskal&rsquo;s algorithm</strong> considers edges from cheapest to
+        most expensive and accepts each one that connects two so-far-separate pieces,
+        skipping any edge whose endpoints are already connected (it would close a
+        cycle). After \(V-1\) acceptances the tree spans everything.
+      </p>
+      <p>
+        The one non-trivial step is the test &ldquo;would this edge form a
+        cycle?&rdquo;, which is exactly &ldquo;are its endpoints already in the
+        same component?&rdquo;, a union-find query. The
+        <a href="ds-union-find.html">Union-Find</a> handout builds the structure that
+        makes each check near-constant.
+      </p>
+      <div class="code-tabs" data-snippet="graphs/kruskal">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Kruskal: sort edges cheapest-first, then add each edge whose endpoints are not
+// yet connected (union-find is the cycle check). Stop after V-1 edges.
+struct Edge { int u, v; long w; };
+
+vector&lt;Edge&gt; kruskal(int V, vector&lt;Edge&gt; edges) {
+    sort(edges.begin(), edges.end(),
+         [](const Edge&amp; a, const Edge&amp; b) { return a.w &lt; b.w; });
+    UF uf(V);                                    // from union-find.cpp
+    vector&lt;Edge&gt; mst;
+    for (const Edge&amp; e : edges) {
+        if (uf.connected(e.u, e.v)) continue;    // cycle: skip (cycle property)
+        mst.push_back(e);                        // safe: take it (cut property)
+        uf.unite(e.u, e.v);
+        if ((int)mst.size() == V - 1) break;     // spanning tree complete
+    }
+    return mst;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Kruskal: sort edges cheapest-first, then add each edge whose endpoints are not
+// yet connected. Stop after V-1 edges.
+class Edge {
+    int u, v; long w;
+    Edge(int u, int v, long w) { this.u = u; this.v = v; this.w = w; }
+}
+
+List&lt;Edge&gt; kruskal(int V, List&lt;Edge&gt; edges) {
+    edges.sort((a, b) -&gt; Long.compare(a.w, b.w));
+    UF uf = new UF(V);                           // from union-find.java
+    List&lt;Edge&gt; mst = new ArrayList&lt;&gt;();
+    for (Edge e : edges) {
+        if (uf.connected(e.u, e.v)) continue;    // cycle: skip (cycle property)
+        mst.add(e);                              // safe: take it (cut property)
+        uf.unite(e.u, e.v);
+        if (mst.size() == V - 1) break;          // spanning tree complete
+    }
+    return mst;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Kruskal: sort edges cheapest-first, then add each edge whose endpoints are not
+# yet connected. Each edge is a tuple (w, u, v). Stop after V-1 edges.
+def kruskal(V, edges):
+    uf = UF(V)                               # from union-find.py
+    mst = []
+    for w, u, v in sorted(edges):            # sorts by weight (first tuple field)
+        if uf.connected(u, v):               # cycle: skip (cycle property)
+            continue
+        mst.append((w, u, v))                # safe: take it (cut property)
+        uf.unite(u, v)
+        if len(mst) == V - 1:                # spanning tree complete
+            break
+    return mst</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Kruskal: sort edges cheapest-first, then add each edge whose endpoints are not
+// yet connected. Each edge is (weight, u, v). Stop after V-1 edges.
+fn kruskal(v: usize, mut edges: Vec&lt;(i64, usize, usize)&gt;)
+    -&gt; Vec&lt;(i64, usize, usize)&gt;
+{
+    edges.sort();                            // tuples sort by weight first
+    let mut uf = UF::new(v);                 // from union-find.rs
+    let mut mst = Vec::new();
+    for (w, a, b) in edges {
+        if uf.connected(a, b) { continue; }  // cycle: skip (cycle property)
+        mst.push((w, a, b));                 // safe: take it (cut property)
+        uf.unite(a, b);
+        if mst.len() == v - 1 { break; }     // spanning tree complete
+    }
+    mst
+}</pre>
+<p class="ct-src">source: <code>code/graphs/kruskal.cpp &middot; code/graphs/kruskal.java &middot; code/graphs/kruskal.py &middot; code/graphs/kruskal.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Kruskal maintains a <strong>forest</strong> that merges: it starts with \(V\)
+        one-vertex trees, and every accepted edge fuses two of them, so the graph goes
+        from \(V\) components down to \(1\) over exactly \(V-1\) acceptances. That
+        forest <em>is</em> the union-find structure: each <code>unite</code> a
+        merge, each <code>connected</code> a &ldquo;same tree?&rdquo; question.
+      </p>
+      <h3>The cases the loop can take</h3>
+      <p>
+        The body of the loop is small, so the whole algorithm is four branches.
+        Every one of them shows up in the traces of <a href="#trace">&sect;2</a>:
+      </p>
+      <ol>
+        <li><strong>Accept.</strong> <code>connected(u,v)</code> is false, so the
+          edge joins two different components and is taken. The merge comes in
+          three flavors, and the run below has all three: two singletons fuse
+          (\(1\text{-}2\)), a singleton joins a bigger component
+          (\(4\text{-}5\)), or two multi-vertex components fuse
+          (\(1\text{-}3\)).</li>
+        <li><strong>Reject by cycle.</strong> <code>connected(u,v)</code> is true:
+          the endpoints already share a component, so the edge would close a cycle
+          and is skipped (\(0\text{-}3\) and \(2\text{-}3\) below).</li>
+        <li><strong>Early stop.</strong> The acceptance that brings the count to
+          \(V-1\) breaks the loop, leaving the remaining, heavier, edges
+          unexamined.</li>
+        <li><strong>Edges exhausted first.</strong> On a disconnected graph the
+          loop runs out of edges before reaching \(V-1\) acceptances; what comes
+          out is a minimum spanning <em>forest</em>, one minimum tree per connected
+          component.</li>
+      </ol>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">2. The run on the running graph</h2>
+      <p>
+        The trace below uses the running graph of the
+        <a href="foundation-minimum-spanning-trees.html#graph">Minimum Spanning Trees</a>
+        handout: eight vertices, eleven edges with all-distinct weights, and a
+        unique MST of total weight \(31\).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (the full run)</span>
+        On the running graph, edges sorted ascending (all weights distinct):
+        <pre>  1: 1-2   2: 3-4   3: 4-5   4: 0-1   5: 1-3   6: 0-3
+  7: 4-7   8: 2-3   9: 5-6   11: 3-7   20: 0-5
+
+  1-2 (1)  ADD    total  1
+  3-4 (2)  ADD    total  3
+  4-5 (3)  ADD    total  6     {3,4,5} formed
+  0-1 (4)  ADD    total 10     {0,1} formed
+  1-3 (5)  ADD    total 15     merges {0,1,2} and {3,4,5}
+  0-3 (6)  SKIP:  0 and 3 already connected (cycle 0-1-3)
+  4-7 (7)  ADD    total 22
+  2-3 (8)  SKIP:  2 and 3 already connected
+  5-6 (9)  ADD    total 31     7 edges = V-1 &rArr; STOP
+  3-7 (11)              never examined: the loop already broke
+  0-5 (20)              never examined</pre>
+        The skips <em>are</em> the algorithm. When \(0\text{-}3\) is examined,
+        \(0\) and \(3\) already share a component (through \(0\text{-}1\),
+        \(1\text{-}2\), \(1\text{-}3\)), so it is rejected by the
+        <a href="foundation-minimum-spanning-trees.html#cut">cycle property</a>;
+        likewise \(2\text{-}3\). The early stop at seven edges means the two heaviest
+        edges (\(11\) and \(20\)) are never even looked at. Total weight \(31\).
+        <br><span class="note">(Note \(1\text{-}2\) and \(3\text{-}4\), the two
+        lightest edges, are accepted first even though they lie in different parts of
+        the graph; Kruskal grows several fragments at once, unlike
+        <a href="algo-prim.html">Prim</a>.)</span>
+      </div>
+      <p>
+        The same run, seen as the <em>union-find forest coalescing</em>: the
+        real state the algorithm maintains. Each accepted edge (green) is a
+        <code>connected(u,v)</code> query that returned false, followed by a
+        <code>unite</code> that merges two components; each skip (gray) is a query
+        that returned true. The component count falls from \(8\) to \(1\) over exactly
+        seven merges.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr><th>edge</th><th>w</th><th>connected?</th><th>action</th><th>forest (non-trivial components)</th></tr>
+          <tr><td class="num">&ndash;</td><td class="num">&ndash;</td><td>&ndash;</td><td>start</td><td class="forest">0 &middot; 1 &middot; 2 &middot; 3 &middot; 4 &middot; 5 &middot; 6 &middot; 7&nbsp;&nbsp;(8 singletons)</td></tr>
+          <tr><td class="num">1-2</td><td class="num">1</td><td>no</td><td class="add">ADD</td><td class="forest"><span class="mrg">{1 2}</span></td></tr>
+          <tr><td class="num">3-4</td><td class="num">2</td><td>no</td><td class="add">ADD</td><td class="forest">{1 2} &nbsp;<span class="mrg">{3 4}</span></td></tr>
+          <tr><td class="num">4-5</td><td class="num">3</td><td>no</td><td class="add">ADD</td><td class="forest">{1 2} &nbsp;<span class="mrg">{3 4 5}</span></td></tr>
+          <tr><td class="num">0-1</td><td class="num">4</td><td>no</td><td class="add">ADD</td><td class="forest"><span class="mrg">{0 1 2}</span> &nbsp;{3 4 5}</td></tr>
+          <tr><td class="num">1-3</td><td class="num">5</td><td>no</td><td class="add">ADD</td><td class="forest"><span class="mrg">{0 1 2 3 4 5}</span></td></tr>
+          <tr><td class="num">0-3</td><td class="num">6</td><td>yes</td><td class="skip">skip</td><td class="forest">{0 1 2 3 4 5}&nbsp;&nbsp;(cycle 0-1-3)</td></tr>
+          <tr><td class="num">4-7</td><td class="num">7</td><td>no</td><td class="add">ADD</td><td class="forest"><span class="mrg">{0 1 2 3 4 5 7}</span></td></tr>
+          <tr><td class="num">2-3</td><td class="num">8</td><td>yes</td><td class="skip">skip</td><td class="forest">{0 1 2 3 4 5 7}&nbsp;&nbsp;(cycle)</td></tr>
+          <tr><td class="num">5-6</td><td class="num">9</td><td>no</td><td class="add">ADD</td><td class="forest"><span class="mrg">{0 1 2 3 4 5 6 7}</span>&nbsp;&nbsp;&check; spanning</td></tr>
+          <tr><td class="num">3-7</td><td class="num">11</td><td>&ndash;</td><td class="skip">not examined</td><td class="forest">|mst| = 7 = V-1, so the loop broke</td></tr>
+          <tr><td class="num">0-5</td><td class="num">20</td><td>&ndash;</td><td class="skip">not examined</td><td class="forest">&nbsp;</td></tr>
+        </table>
+        <figcaption>
+          Kruskal as union-find. Singleton components are shown once, then only the
+          groups that have merged; the highlighted set is the one that changed that
+          step. Seven ADDs merge the eight singletons into one tree of weight \(31\);
+          the two skips are edges whose endpoints were already connected. The edges of
+          weight \(11\) and \(20\) are never reached: the seventh ADD completes
+          the tree first.
+        </figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Example (the fourth branch: a disconnected graph)</span>
+        The run above ended by the break at \(V-1\) edges. The other exit is
+        running out of edges, which happens exactly when the graph is
+        disconnected. Take five vertices and four edges:
+<pre>  0 &ndash;1&ndash; 1 &ndash;2&ndash; 2     3 &ndash;3&ndash; 4     V = 5, E = 4
+   \____4____/                    two components: {0,1,2} and {3,4}
+
+  sorted: 0-1 (1)   1-2 (2)   3-4 (3)   0-2 (4)
+
+  0-1 (1)  ADD    total 1    {0 1}  2  3  4
+  1-2 (2)  ADD    total 3    {0 1 2}  3  4
+  3-4 (3)  ADD    total 6    {0 1 2}  {3 4}
+  0-2 (4)  SKIP:  0 and 2 already connected (cycle 0-1-2)
+  edge list exhausted with 3 edges &lt; V-1 = 4  &rArr; STOP</pre>
+        The loop never breaks; it falls out the bottom. With \(3\) accepted edges
+        for \(5\) vertices, the result is not a spanning tree but a minimum
+        spanning <strong>forest</strong>: the MST of \(\{0,1,2\}\) (weight \(3\))
+        plus the MST of \(\{3,4\}\) (weight \(3\)), total \(6\). Since a
+        disconnected graph has no spanning tree at all, that is the correct answer,
+        and it comes out of the same loop with no extra code. The count of accepted
+        edges reports the structure: \(V - |{\rm accepted}| = 5 - 3 = 2\) is the
+        number of connected components.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="analysis">3. Correctness and cost</h2>
+      <div class="thm">
+        <span class="tag">Proposition (Kruskal is correct)</span>
+        Every edge Kruskal accepts is a minimum crossing edge of some cut, hence in
+        an MST by the <a href="foundation-minimum-spanning-trees.html#cut">cut property</a>; so
+        Kruskal outputs an MST.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Suppose Kruskal accepts \(e = (u,v)\), and let \(C\)
+        be \(u\)&rsquo;s component at that moment. Since \(u\) and \(v\) were not yet
+        connected, \(v \notin C\), so \(e\) crosses the cut \((C, \text{rest})\). We
+        claim \(e\) is a <em>lightest</em> crossing edge. Any crossing edge \(f\) with
+        \(w(f) &lt; w(e)\) would have been processed earlier (edges come in weight
+        order), and by then it was either accepted or skipped, and in both
+        cases its two endpoints ended up in the same component. But a crossing edge
+        has one endpoint in \(C\) and one outside, i.e. in <em>different</em>
+        components, a contradiction. So no lighter crossing edge exists; \(e\) is a
+        minimum crossing edge and, by the cut property, safe. Accepting \(V-1\) safe
+        edges yields a spanning tree that is an MST. <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (Kruskal cost)</span>
+        Kruskal runs in \(O(E\log E) = O(E\log V)\) time.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Sorting the \(E\) edges costs \(O(E\log E)\). The
+        single pass performs \(O(E)\) union-find operations, each near-constant, for
+        \(O(E\,\alpha(V))\) total. The sort dominates, and since \(E \le V^2\),
+        \(\log E \le \log V^2 = 2\log V\), so \(O(E\log E) = O(E\log V)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Kruskal is, in one phrase, a sort followed by a near-linear pass. If the
+        edges arrive already sorted (or the weights are small integers that admit
+        radix sort), it approaches linear time, a reason to reach for it on
+        sparse graphs and pre-sorted input.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=kruskal">Kruskal demo</a>. Edges appear
+        cheapest-first; an edge is drawn bold when its endpoints have different
+        union-find roots (accepted) and faded when they share one (skipped, a cycle).
+        The second row shows the union-find forest merging. Run it to reach total
+        \(31\), then raise \(1\text{-}3\)&rsquo;s weight above \(6\) and re-run: the
+        merge now routes through \(0\text{-}3\) instead, and you watch the cut
+        property pick a different safe edge.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">4. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          In Kruskal on the running graph, the edge \(0\text{-}3\) (weight \(6\)) is
+          skipped. Name the cycle it would have closed and the two MST properties that
+          justify skipping it.
+          <details>
+            <summary>solution</summary>
+            By the time \(0\text{-}3\) is examined, \(0\) and \(3\) are already
+            connected through \(0\text{-}1\), \(1\text{-}3\), so adding \(0\text{-}3\)
+            would close the cycle \(0\text{-}1\text{-}3\text{-}0\). It is safe to skip
+            by the <em>cycle property</em>: among the cycle&rsquo;s edges
+            (\(0\text{-}1{=}4\), \(1\text{-}3{=}5\), \(0\text{-}3{=}6\)) it is the
+            heaviest, so it is in no MST. Equivalently, the union-find query
+            <code>connected(0,3)</code> returns true, which is Kruskal&rsquo;s
+            implementation of the same test.
+          </details>
+        </li>
+        <li>
+          You are handed the edges of a large sparse graph already sorted by weight,
+          and told weights are small integers. Which MST algorithm do you choose, and
+          what is its running time here?
+          <details>
+            <summary>solution</summary>
+            Kruskal. Its only expensive step is the sort, and the input is already
+            sorted (or radix-sortable in \(O(E)\) for small integer weights), so the
+            algorithm reduces to a single near-linear union-find pass:
+            \(O(E\,\alpha(V)) \approx O(E)\). Prim would still pay the heap&rsquo;s
+            \(\log V\) factor per edge, so on pre-sorted sparse input Kruskal is the
+            better fit.
+          </details>
+        </li>
+        <li>
+          Run Kruskal on the four-cycle \(a\text{-}b,\ b\text{-}c,\ c\text{-}d,\
+          d\text{-}a\) with every weight equal to \(1\). Which edges are accepted,
+          which are skipped, and does the answer depend on how the sort breaks the
+          ties?
+          <details>
+            <summary>solution</summary>
+            The sort may present the four tied edges in any order. Whatever that
+            order, the first three examined are all accepted: three edges of a
+            four-cycle never close a cycle. At the third acceptance the count
+            reaches \(V-1 = 3\) and the loop breaks, so the fourth edge is never
+            even examined (had it been, it would have been skipped as a cycle). So
+            the output edge set <em>does</em> depend on the tie-breaking, four
+            different answers are possible, but every one has weight \(3\). That is
+            the equality case of the cut property: with ties, a lightest crossing
+            edge is in <em>some</em> MST, not necessarily in every one, and all
+            MSTs still share the same total weight.
+          </details>
+        </li>
+        <li>
+          Show that the number of edges Kruskal accepts is always \(V - c\), where
+          \(c\) is the number of connected components of the input graph. What does
+          this give you if you run Kruskal purely to count components?
+          <details>
+            <summary>solution</summary>
+            The union-find structure starts with \(V\) components. A skip changes
+            nothing; an acceptance merges two components into one, dropping the
+            count by exactly \(1\). So after \(k\) acceptances the count is
+            \(V - k\). The loop stops in one of two ways. If it breaks at
+            \(k = V-1\), the count is \(1\) and the graph is connected, so
+            \(c = 1 = V - k\). If instead the edge list is exhausted, every edge
+            has been examined, so two vertices share a union-find component exactly
+            when the graph connects them; the union-find components are then the
+            graph&rsquo;s connected components and \(V - k = c\). Either way
+            \(k = V - c\). Run with all weights equal and you have a
+            connected-components algorithm: the accepted edges form a spanning
+            forest, and \(V\) minus their number is the component count.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Kruskal&rsquo;s Algorithm v1.0 &middot;
+        prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive demos in
+        the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

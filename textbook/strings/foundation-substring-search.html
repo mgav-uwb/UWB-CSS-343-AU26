@@ -1,0 +1,491 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Substring Search: The Problem & Baselines.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Substring Search: The Problem &amp; Baselines - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Substring Search: The Problem &amp; Baselines</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        Finding a pattern inside a text: the substring-search problem, and
+        the brute-force baseline with its quadratic worst case unrolled
+        alignment by alignment. Closes with the family table, naming
+        Knuth&ndash;Morris&ndash;Pratt, Boyer&ndash;Moore and
+        Rabin&ndash;Karp (each covered in its own handout), and the toolkit
+        for choosing among them. With two worked traces, full
+        implementations, and exercises.
+      </div>
+
+      <p class="lead">
+        A trie (<a href="ds-tries.html"><em>Tries &amp; Ternary Search
+        Trees</em></a>) exploits the character structure of string
+        <em>keys</em>; substring search applies the same
+        look-inside-the-string principle to a different problem: finding a
+        pattern <em>inside</em> a text. This handout states the problem and
+        works the brute-force baseline, locating the waste in it; the fast
+        searchers,
+        <a href="algo-kmp.html"><em>Knuth&ndash;Morris&ndash;Pratt</em></a>,
+        <a href="algo-boyer-moore.html"><em>Boyer&ndash;Moore</em></a> and
+        <a href="algo-rabin-karp.html"><em>Rabin&ndash;Karp</em></a>, each have
+        a handout of their own.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#brute">The problem, and brute force</a></li>
+          <li><a href="#rk">Rabin&ndash;Karp: hashing the windows</a></li>
+          <li><a href="#toolkit">The wider family, and the string toolkit</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="brute">1. The problem, and brute force</h2>
+      <div class="def">
+        <span class="tag">Definition (substring search)</span>
+        Given a <strong>text</strong> of length \(n\) and a
+        <strong>pattern</strong> of length \(m\) (usually \(m \ll n\)), find
+        the index of the first occurrence of the pattern as a contiguous
+        substring of the text (or report that none exists).
+      </div>
+      <p>
+        This is <code>text.indexOf(pattern)</code>, <code>grep</code>,
+        find-in-editor, DNA motif search: one of the most-executed
+        operations in computing. The running example:
+      </p>
+      <pre>  text:     A B A B A B C A B A B A B C A B      (n = 16)
+  pattern:      A B A B C                        (m = 5)
+  &rarr; first match at index 2   (text[2..6] = ABABC)</pre>
+      <h3>Brute force: try every alignment</h3>
+      <p>
+        The obvious algorithm tries the pattern at every start position
+        \(i = 0, 1, \dots, n-m\): compare left to right, and on any mismatch
+        <strong>slide the pattern by one</strong> and restart the comparison.
+      </p>
+      <div class="code-tabs" data-snippet="strings/brute-search">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Brute-force substring search: try the pattern at EVERY start position; on a
+// mismatch, slide by ONE and restart the comparison. Worst case Theta(nm):
+// text characters get re-examined after a partial match.
+int bruteSearch(const string&amp; t, const string&amp; p) {
+    int n = t.size(), m = p.size();
+    for (int i = 0; i &lt;= n - m; i++) {     // each start position
+        int j = 0;
+        while (j &lt; m &amp;&amp; t[i + j] == p[j]) j++;   // compare left to right
+        if (j == m) return i;              // all m matched: found at i
+    }
+    return -1;                             // no occurrence
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Brute-force substring search: try the pattern at EVERY start position; on a
+// mismatch, slide by ONE and restart the comparison. Worst case Theta(nm):
+// text characters get re-examined after a partial match.
+static int bruteSearch(String t, String p) {
+    int n = t.length(), m = p.length();
+    for (int i = 0; i &lt;= n - m; i++) {     // each start position
+        int j = 0;
+        while (j &lt; m &amp;&amp; t.charAt(i + j) == p.charAt(j)) j++;  // left to right
+        if (j == m) return i;              // all m matched: found at i
+    }
+    return -1;                             // no occurrence
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Brute-force substring search: try the pattern at EVERY start position; on a
+# mismatch, slide by ONE and restart the comparison. Worst case Theta(nm):
+# text characters get re-examined after a partial match.
+def brute_search(t, p):
+    n, m = len(t), len(p)
+    for i in range(n - m + 1):             # each start position
+        j = 0
+        while j &lt; m and t[i + j] == p[j]:  # compare left to right
+            j += 1
+        if j == m:                         # all m matched: found at i
+            return i
+    return -1                              # no occurrence</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Brute-force substring search: try the pattern at EVERY start position; on a
+// mismatch, slide by ONE and restart the comparison. Worst case O(nm):
+// text characters get re-examined after a partial match.
+fn brute_search(t: &amp;str, p: &amp;str) -&gt; i32 {
+    let (t, p) = (t.as_bytes(), p.as_bytes());
+    let (n, m) = (t.len(), p.len());
+    if m &gt; n { return -1; }
+    for i in 0..=(n - m) {                 // each start position
+        let mut j = 0;
+        while j &lt; m &amp;&amp; t[i + j] == p[j] { j += 1; }   // compare left to right
+        if j == m { return i as i32; }     // all m matched: found at i
+    }
+    -1                                     // no occurrence
+}</pre>
+<p class="ct-src">source: <code>code/strings/brute-search.cpp &middot; code/strings/brute-search.java &middot; code/strings/brute-search.py &middot; code/strings/brute-search.rs</code></p>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (brute force, worked)</span>
+        Search for <code>ABABC</code> in <code>ABCABABC</code>. Each row is one
+        alignment of the pattern; <span style="color:#0a7d4d;font-weight:700">green</span>
+        cells are compared-and-matched, the
+        <span style="color:#9a5b00;font-weight:700">amber</span> cell is the
+        comparison that failed:
+        <table class="trace">
+          <tr><th class="lab">text &rarr;</th><th>A</th><th>B</th><th>C</th><th>A</th><th>B</th><th>A</th><th>B</th><th>C</th><th>compares</th></tr>
+          <tr><td class="lab">shift 0</td>
+            <td class="cell lt">A</td><td class="cell lt">B</td><td class="cell piv">A</td><td class="cell">B</td><td class="cell">C</td><td></td><td></td><td></td><td>3</td></tr>
+          <tr><td class="lab">shift 1</td>
+            <td></td><td class="cell piv">A</td><td class="cell">B</td><td class="cell">A</td><td class="cell">B</td><td class="cell">C</td><td></td><td></td><td>1</td></tr>
+          <tr><td class="lab">shift 2</td>
+            <td></td><td></td><td class="cell piv">A</td><td class="cell">B</td><td class="cell">A</td><td class="cell">B</td><td class="cell">C</td><td></td><td>1</td></tr>
+          <tr><td class="lab">shift 3</td>
+            <td></td><td></td><td></td><td class="cell lt">A</td><td class="cell lt">B</td><td class="cell lt">A</td><td class="cell lt">B</td><td class="cell lt">C</td><td>5</td></tr>
+        </table>
+        Shift 0 matches <code>AB</code>, then <code>A</code> falls on the
+        text&rsquo;s <code>C</code>; shifts 1 and 2 die on their first
+        comparison; shift 3 matches all five: found at index \(3\),
+        \(10\) comparisons in all. Note the waste at shift 0&nbsp;&rarr;&nbsp;1:
+        having matched <code>AB</code>, brute force forgets it and re-reads
+        <code>text[1]</code> from scratch.
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (brute-force cost)</span>
+        Brute force makes at most \((n-m+1)\,m = \Theta(nm)\) character
+        comparisons, and the bound is achieved: on text
+        \(\texttt{AA}\cdots\texttt{A}\) (all \(n\) characters
+        <code>A</code>) with pattern \(\texttt{AA}\cdots\texttt{AB}\)
+        (\(m-1\) <code>A</code>s then a <code>B</code>), every one of the
+        \(n-m+1\) alignments matches \(m-1\) characters before failing on the
+        last, costing \(m\) comparisons each.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the worst case, unrolled)</span>
+        The bound is easiest to believe when every alignment is written out.
+        Text <code>AAAAAAAAAAAB</code> (\(n = 12\): eleven <code>A</code>s then
+        a <code>B</code>) and pattern <code>AAAB</code> (\(m = 4\)). Colours as
+        above: <span style="color:#0a7d4d;font-weight:700">green</span> matched,
+        <span style="color:#9a5b00;font-weight:700">amber</span> mismatched.
+        <table class="trace">
+          <tr><th class="lab">text &rarr;</th><th>A</th><th>A</th><th>A</th><th>A</th><th>A</th><th>A</th><th>A</th><th>A</th><th>A</th><th>A</th><th>A</th><th>B</th><th>cmp</th><th>total</th></tr>
+          <tr><td class="lab">shift 0</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell piv">B</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>4</td><td>4</td></tr>
+          <tr><td class="lab">shift 1</td><td></td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell piv">B</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>4</td><td>8</td></tr>
+          <tr><td class="lab">shift 2</td><td></td><td></td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell piv">B</td><td></td><td></td><td></td><td></td><td></td><td></td><td>4</td><td>12</td></tr>
+          <tr><td class="lab">shift 3</td><td></td><td></td><td></td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell piv">B</td><td></td><td></td><td></td><td></td><td></td><td>4</td><td>16</td></tr>
+          <tr><td class="lab">shift 4</td><td></td><td></td><td></td><td></td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell piv">B</td><td></td><td></td><td></td><td></td><td>4</td><td>20</td></tr>
+          <tr><td class="lab">shift 5</td><td></td><td></td><td></td><td></td><td></td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell piv">B</td><td></td><td></td><td></td><td>4</td><td>24</td></tr>
+          <tr><td class="lab">shift 6</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell piv">B</td><td></td><td></td><td>4</td><td>28</td></tr>
+          <tr><td class="lab">shift 7</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell piv">B</td><td></td><td>4</td><td>32</td></tr>
+          <tr><td class="lab">shift 8</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">A</td><td class="cell lt">B</td><td>4</td><td>36</td></tr>
+        </table>
+        <p>
+          Every alignment except the last matches three <code>A</code>s and
+          then fails, its <code>B</code> landing on one of the text&rsquo;s
+          <code>A</code>s: four comparisons to advance one position. Shift 8
+          matches all four: found at index \(8\), after
+          \((n-m+1)\,m = 9 \times 4 = 36\) comparisons for a twelve-character
+          text. Nothing about the text changes between alignments, and brute
+          force rediscovers that fact nine times.
+        </p>
+      </div>
+      <p>
+        The deep inefficiency is not the sliding but the
+        <em>re-examining</em>: after a partial match, brute force throws away
+        everything it learned about the text and reads the same characters
+        again. <a href="algo-kmp.html">Knuth&ndash;Morris&ndash;Pratt</a>&rsquo;s insight is that a partial
+        match already tells you exactly how far the pattern can safely jump.
+      </p>
+      <div class="aside">
+        <span class="tag">When brute force is the right call</span>
+        Do not over-engineer. On typical natural-language text, a mismatch
+        occurs within the first character or two of most alignments, so brute
+        force runs nearly linearly, which is why simple library
+        <code>find</code> routines are essentially brute force (or
+        <a href="algo-boyer-moore.html">Boyer&ndash;Moore</a>) and are fine in practice. Reach for the fancier
+        algorithms when the input is long and repetitive (DNA, binary data),
+        adversarial, streamed, or searched so often that pattern preprocessing
+        amortizes. Match the tool to the workload.
+      </div>
+
+            <!-- ============================================================ -->
+      <h2 id="rk">2. Rabin&ndash;Karp: hashing the windows</h2>
+      <p>
+        One more classic belongs with the baselines, and it is
+        <a href="../hashing/ds-hashing.html"><em>Hashing</em></a> applied to
+        substrings. <strong>Rabin&ndash;Karp</strong> hashes the pattern once,
+        then slides a length-\(m\) window across the text carrying a
+        <strong>rolling hash</strong> that updates in \(O(1)\) per shift, so all
+        \(n-m+1\) windows are fingerprinted in \(\Theta(n)\) rather than
+        \(\Theta(nm)\); characters are compared only where a window&rsquo;s
+        hash equals the pattern&rsquo;s, since equal hashes do not prove equal
+        strings. That gives \(\Theta(n+m)\) expected time, and one property no
+        other family member has: hash <em>many</em> patterns into a set and a
+        single pass finds them all.
+        <a href="algo-rabin-karp.html"><em>Rabin&ndash;Karp</em></a> has the
+        rolling update derived and traced, the Monte Carlo and Las Vegas
+        variants, and the collision analysis.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="toolkit">3. The wider family, and the string toolkit</h2>
+      <p>
+        Two algorithms sharpen the baselines into the standard tools, and each
+        has a handout of its own.
+        <a href="algo-kmp.html"><em>Knuth&ndash;Morris&ndash;Pratt</em></a>
+        precomputes the pattern&rsquo;s self-overlap structure (its failure
+        function) so that a mismatch never sends the text pointer backward:
+        \(\Theta(n+m)\), guaranteed, on every input, and the scan runs
+        happily on a stream it cannot rewind.
+        <a href="algo-boyer-moore.html"><em>Boyer&ndash;Moore</em></a> compares each
+        alignment right to left and uses the mismatched text character to leap
+        ahead, typically examining fewer than \(n\) characters. The family in
+        one table:
+      </p>
+      <table>
+        <tr><th>algorithm</th><th>preprocess</th><th>search</th><th>idea</th></tr>
+        <tr><td>brute force</td><td>none</td><td>\(\Theta(nm)\) worst</td><td>try every alignment</td></tr>
+        <tr><td><a href="algo-kmp.html">Knuth&ndash;Morris&ndash;Pratt</a></td><td>\(\Theta(m)\)</td><td><strong>\(\Theta(n+m)\) guaranteed</strong></td><td>failure function; text pointer never backs up</td></tr>
+        <tr><td><a href="algo-boyer-moore.html">Boyer&ndash;Moore</a></td><td>\(\Theta(m+R)\)</td><td><strong>sublinear</strong> typical</td><td>right-to-left compare; skip on the bad character</td></tr>
+        <tr><td><a href="algo-rabin-karp.html">Rabin&ndash;Karp</a></td><td>\(\Theta(m)\)</td><td>\(\Theta(n)\) expected</td><td>rolling hash per window; verify on hash hits</td></tr>
+      </table>
+      <p>
+        The common thread: every fast searcher <strong>preprocesses the
+        pattern</strong> (failure function, skip tables, hash) and then reads the huge text once (or less). The asymmetry is the
+        point: \(m\) is small and the pattern is reused, so work invested
+        there is amortized across the \(n\)-character scan; it is the same
+        precompute-to-answer-fast principle as a hash table&rsquo;s function
+        or a dynamic-programming table, applied to search.
+      </p>
+
+      <p>
+        The string toolkit in one table: every row answers
+        &ldquo;my keys/data are strings; which structure exploits that?&rdquo;:
+      </p>
+      <table>
+        <tr><th>need</th><th>tool</th><th>cost</th></tr>
+        <tr><td>string keys with <strong>prefix</strong> queries / order</td><td><a href="ds-tries.html">trie / TST</a></td><td>\(\Theta(L)\)</td></tr>
+        <tr><td>exact string lookup, no order needed</td><td>hash table</td><td>\(\Theta(L)\)</td></tr>
+        <tr><td>find a pattern, <strong>guaranteed linear</strong> / streaming</td><td><a href="algo-kmp.html">KMP</a></td><td>\(\Theta(n+m)\)</td></tr>
+        <tr><td>find a pattern, fastest in practice</td><td><a href="algo-boyer-moore.html">Boyer&ndash;Moore</a></td><td>sublinear typical</td></tr>
+        <tr><td>find <strong>many</strong> patterns in one pass</td><td><a href="algo-rabin-karp.html">Rabin&ndash;Karp</a></td><td>\(\Theta(n)\) expected</td></tr>
+      </table>
+      <p>
+        These algorithms are among the most-run code on Earth: every search
+        box and spell-checker (tries), every router forwarding decision
+        (longest-prefix match), every <code>grep</code> and find-in-file
+        (Boyer&ndash;Moore), every genome alignment and packet-inspecting
+        firewall (huge repetitive texts, where the linear guarantee is the
+        difference between feasible and not), every compiler&rsquo;s lexer
+        (tries and automata over tokens). And the string handouts share one
+        lesson: a string is not an opaque key. Its
+        <em>characters</em> gave the <a href="ds-tries.html">trie</a> a search cost independent of \(n\);
+        its <em>self-overlaps</em> gave <a href="algo-kmp.html">KMP</a> a scan that never backs up.
+        <a href="algo-regex-automata.html"><em>Regular Expressions &amp; Automata</em></a> pushes the second
+        idea to its natural limit: from searching for one fixed string to
+        matching a whole <em>language</em> of them: regular
+        expressions, and the finite automata that run them, starting from
+        exactly the DFA that KMP already built for a one-string language.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">4. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Exactly how many character comparisons does brute force make
+          searching for \(\texttt{A}^{m-1}\texttt{B}\) (that is, \(m-1\)
+          <code>A</code>s then <code>B</code>) in the text
+          \(\texttt{A}^{n-1}\texttt{B}\)? Evaluate at \(n = 12\),
+          \(m = 4\), and compare with <a href="algo-kmp.html">KMP</a>&rsquo;s guarantee.
+          <details>
+            <summary>solution</summary>
+            Every alignment \(i = 0, \dots, n-m\) compares \(m-1\) matching
+            <code>A</code>s and then one more character (a mismatching
+            <code>A</code> under <code>B</code> at every alignment except the
+            last, where the <code>B</code> matches and the search ends):
+            \(m\) comparisons per alignment, \((n-m+1)\,m\) in all. At
+            \(n = 12, m = 4\): \(9 \times 4 = 36\) comparisons, matching at
+            index \(8\), the <a href="../../lib/demo.html?ds=string-search">race demo</a>&rsquo;s adversarial pair. KMP&rsquo;s
+            scan is bounded by \(2n\) (each comparison either advances \(i\)
+            or strictly increases the alignment \(i - j\)); on this instance
+            it makes \(20\).
+          </details>
+        </li>
+        <li>
+          A firewall must scan an unbounded, non-seekable network stream for a
+          fixed 64-byte signature, with a hard guarantee that scanning keeps up
+          with line rate. Which algorithm fits, and why do the other three
+          family members fail at least one requirement?
+          <details>
+            <summary>solution</summary>
+            <a href="algo-kmp.html">KMP</a>. Its text pointer never decreases, so it reads each streamed
+            byte exactly once with \(O(1)\) work amortized (at most \(2n\)
+            comparisons total) and \(\Theta(m)\) memory for the failure
+            function: both requirements met. Brute force re-examines
+            earlier text characters after a partial match (needs buffering
+            <em>and</em> loses the linear guarantee: \(\Theta(nm)\) on
+            repetitive traffic). <a href="algo-boyer-moore.html">Boyer&ndash;Moore</a> compares right to left
+            inside a sliding window, so it needs an \(m\)-byte lookahead
+            buffer (workable), but its bad-character heuristic alone has a
+            \(\Theta(nm)\) worst case: an adversary can craft traffic
+            that breaks the line-rate guarantee. <a href="algo-rabin-karp.html">Rabin&ndash;Karp</a> streams
+            fine, but its \(\Theta(n)\) is <em>expected</em>: hash-collision
+            verifications re-read window bytes, so the hard guarantee again
+            fails against adversarial input (though it becomes the right
+            answer the moment there are <em>many</em> signatures at once).
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Substring Search: The Problem &amp; Baselines v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1993 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Regular Expressions & Automata.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Regular Expressions &amp; Automata - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Regular Expressions &amp; Automata</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        A regular expression is a pattern that describes a <em>language</em> (a whole set of strings) using concatenation, <code>|</code> (or),
+        <code>*</code> (closure), and parentheses. A finite automaton is a machine
+        that recognizes such a language, and the two are equivalent: Thompson&rsquo;s
+        construction turns any regex into a nondeterministic finite automaton (NFA)
+        with \(\varepsilon\)-transitions in linear time, and tracking the <em>set</em>
+        of reachable states runs that automaton in guaranteed \(O(mn)\) time.
+        Kleene&rsquo;s theorem says the correspondence is exact. Companion reading:
+        Sedgewick&nbsp;&amp;&nbsp;Wayne &sect;5.4. With worked machines, verified
+        simulation traces, links to the demos, and exercises.
+      </div>
+
+      <p class="lead">
+        The <a href="foundation-substring-search.html">substring-search handout</a> searched a text for one
+        <em>fixed</em> pattern. This handout generalizes the pattern itself: a
+        <strong>regular expression</strong> describes not one string but a whole
+        <em>set</em> of strings (all binary numerals, all valid phone numbers,
+        all strings ending in <code>B</code>), and the matching question becomes
+        &ldquo;is this string <em>in the set</em>?&rdquo; The beautiful result is that
+        every such pattern can be compiled into a <strong>machine</strong>: a finite
+        automaton that reads the string once and answers yes or no. We build that
+        machine (Thompson&rsquo;s construction), run it (by tracking a set of states: graph reachability from the <a href="../graphs/algo-dfs.html">DFS handout</a>,
+        reused), and close with Kleene&rsquo;s theorem, which says the pattern and the
+        machine have exactly the same expressive power. Pattern in, machine out: theory meets practice.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#regex">Regular expressions and the languages they describe</a></li>
+          <li><a href="#automata">Finite automata: machines that recognize languages</a></li>
+          <li><a href="#build">Thompson&rsquo;s construction: from regex to NFA</a></li>
+          <li><a href="#simulate">Simulating the NFA: track a set of states</a></li>
+          <li><a href="#kleene">Kleene&rsquo;s theorem and the limits of regularity</a></li>
+          <li><a href="#practice">Choosing an engine in practice</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="regex">1. Regular expressions and the languages they describe</h2>
+      <div class="def">
+        <span class="tag">Definition (regular expression; language)</span>
+        A <strong>regular expression</strong> (regex) over an alphabet is a pattern
+        built from single characters and four operations:
+        <strong>concatenation</strong> (<code>AB</code>: an <code>A</code>
+        then a <code>B</code>), <strong>or</strong> (<code>A|B</code>: an
+        <code>A</code> or a <code>B</code>), <strong>closure</strong>
+        (<code>A*</code>: zero or more <code>A</code>&rsquo;s), and
+        <strong>grouping</strong> (<code>(&hellip;)</code>). A regex denotes a
+        <strong>language</strong> \(L\) (the set of all strings it matches), and a string <strong>matches</strong> the regex if and only if it is
+        <em>in</em> that language.
+      </div>
+      <p>
+        You use regexes daily (<code>grep</code>, editor find, input
+        validation), and the four operations generate everything:
+      </p>
+      <pre>  AB       matches exactly &quot;AB&quot;
+  A|B      matches &quot;A&quot; or &quot;B&quot;
+  A*       matches &quot;&quot;, &quot;A&quot;, &quot;AA&quot;, &quot;AAA&quot;, &hellip;
+  (AB)*    matches &quot;&quot;, &quot;AB&quot;, &quot;ABAB&quot;, &hellip;</pre>
+      <p>
+        Thinking in terms of the set of accepted strings (not the
+        character-by-character syntax) is what connects regexes to automata,
+        which are membership testers for these sets:
+      </p>
+      <pre>  L(A*B)     = { B, AB, AAB, AAAB, &hellip; }    (any run of A&#x27;s, then a B)
+  L((A|B)C)  = { AC, BC }
+  L((0|1)*)  = every binary string (any length, including &quot;&quot;)
+  L(A(B|C)*D) = A, then any mix of B&#x27;s and C&#x27;s, then D</pre>
+      <p>
+        The reading skill is to decompose at the outermost operator first: break the regex at its top-level <code>|</code> and <code>*</code>, then
+        recurse into the groups. That recursive structure is exactly what the
+        machine construction of &sect;3 will follow.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (does it match?)</span>
+        Which of <code>&quot;ABAB&quot;</code>, <code>&quot;ABA&quot;</code>, and
+        <code>&quot;&quot;</code> does <code>(AB)*</code> match?
+        <code>&quot;ABAB&quot;</code> is two copies of <code>AB</code>: match. <code>&quot;ABA&quot;</code> has a dangling <code>A</code> that no
+        whole number of copies covers: no match. And the empty string
+        <em>matches</em>, because <code>*</code> allows <em>zero</em> copies, the case students forget. Read <code>*</code> as &ldquo;any number,
+        including none.&rdquo;
+      </div>
+      <div class="ex">
+        <span class="tag">Example (write the regex)</span>
+        Over the alphabet \(\{\texttt{A},\texttt{B}\}\), describe all strings that
+        <em>end in</em> <code>B</code>. Answer: <code>(A|B)*B</code>, anything, then one final <code>B</code>. Check it against boundary strings:
+        <code>&quot;B&quot;</code> matches (the star contributes zero characters),
+        <code>&quot;AB&quot;</code> and <code>&quot;AABB&quot;</code> match;
+        <code>&quot;BA&quot;</code> fails (ends in <code>A</code>) and
+        <code>&quot;&quot;</code> fails (there must be at least the final
+        <code>B</code>). The common wrong answer is <code>A*B</code>: it
+        describes &ldquo;<code>A</code>&rsquo;s then a <code>B</code>,&rdquo; which
+        rejects <code>&quot;BAB&quot;</code> even though that string does end in
+        <code>B</code>. Testing a proposed pattern against the empty string, single
+        characters, and one deliberately tricky case is exactly how you should
+        test real-world regexes too.
+      </div>
+      <div class="aside">
+        <span class="tag">Precedence: the #1 source of regex bugs</span>
+        Binding tightest to loosest: <code>*</code>, then concatenation, then
+        <code>|</code>. So <code>AB|C = (AB)|C</code>, <code>A|BC = A|(BC)</code>,
+        and <code>AB* = A(B*)</code>, which is <em>not</em>
+        <code>(AB)*</code>: the first is one <code>A</code> followed by any number
+        of <code>B</code>&rsquo;s, the second any number of <code>AB</code> pairs.
+        When in doubt, parenthesize. This is the same operator-precedence discipline
+        as arithmetic expressions, and the machine builder in &sect;3 will use a
+        stack to respect it, exactly as an expression evaluator does.
+      </div>
+      <div class="aside">
+        <span class="tag">Everything else is sugar</span>
+        The rest of practical regex syntax is shorthand over the four
+        operations. Here <strong>\(\varepsilon\) is the <em>empty
+        string</em></strong>: zero characters, the theory-book name for
+        <code>&quot;&quot;</code>, and the same \(\varepsilon\) that labels
+        the free moves of &sect;2&rsquo;s automata:
+        <pre>  A+     =  AA*             one or more
+  A?     =  (A|&epsilon;)           optional: an A, or nothing at all
+  A{3}   =  AAA             exactly 3 copies
+  A{1,2} =  (A|AA)          between 1 and 2 copies
+  [abc]  =  (a|b|c)         any ONE of a, b, c
+  [a-z]  =  any one of a..z &middot; [^ab] = any one char EXCEPT a, b
+  \d     =  [0123456789]    one digit   &middot;   .  = any one character
+  \(     =  a literal (     \ turns an operator into a plain character</pre>
+        (Inside brackets <code>^</code> negates; outside them, as the end of
+        this aside explains, it anchors.)
+        Because it is all sugar, machinery for the four core operations
+        handles every regex. Two practical symbols are <em>not</em> sugar,
+        because they change what &ldquo;match&rdquo; means rather than
+        describing strings: <code>^</code> anchors the match to the start of
+        the text, <code>$</code> to the end. In the theory of this section a
+        regex always describes <em>whole</em> strings; a practical engine
+        instead <em>searches</em> for the pattern anywhere inside the text,
+        and <code>^&hellip;$</code> turns that back into whole-string
+        matching. A validator should anchor (or call a whole-string primitive
+        such as Python&rsquo;s <code>re.fullmatch</code>): without anchors,
+        <code>\d{3}</code> happily &ldquo;validates&rdquo;
+        <code>abc123xyz</code> by finding the <code>123</code> inside it.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a real pattern, decoded and boundary-checked)</span>
+        The phone validator
+        <code>\(?\d{3}\)?[- ]?\d{3}-?\d{4}</code> matches
+        <code>(206)&nbsp;555-1234</code>, <code>206-555-1234</code>, and
+        <code>2065551234</code>. Piece by piece:
+        <pre>  \(?     an optional literal (      \( is ONE token; ? applies to it
+  \d{3}   exactly three digits
+  \)?     an optional literal )
+  [- ]?   an optional dash OR space
+  \d{3}   three digits
+  -?      an optional dash (no space allowed here)
+  \d{4}   four digits</pre>
+        The piece that trips readers is <code>\(?</code>: the backslash binds
+        first, making <code>\(</code> a single ordinary-character token, and
+        <em>then</em> <code>?</code> makes that token optional. It desugars
+        to <code>( ( | &epsilon; )</code>, a choice between a literal
+        parenthesis and nothing, and has nothing to do with grouping. Now
+        boundary-check the pattern the way &sect;1&rsquo;s exercise taught.
+        Does it match <code>(206-555&nbsp;1234</code>? Walk it:
+        <code>\(?</code> takes <code>(</code>, <code>\d{3}</code> takes
+        <code>206</code>, <code>\)?</code> matches nothing,
+        <code>[- ]?</code> takes the dash, and <code>\d{3}</code> takes
+        <code>555</code>. Then <code>-?</code> cannot take a <em>space</em>,
+        so <code>\d{4}</code> faces <code>&nbsp;1234</code> and fails.
+        <strong>No match</strong>: the two separators are not symmetric, and
+        only the first allows a space. Next try
+        <code>(206-5551234</code>: it <strong>does</strong> match, unbalanced
+        parenthesis and all, because <code>\(?</code> and <code>\)?</code>
+        are independent choices. That case is worth pausing on. A simple
+        regex can accept strings it was never meant to accept, and nothing
+        warns you; the only defense is writing the pattern that says what you
+        mean. Here that is a choice between the two paren forms at the top:
+        <code>(\(\d{3}\)|\d{3})[- ]?\d{3}-?\d{4}</code>. Test a pattern
+        against near-misses in <em>both</em> directions: strings that should
+        fail, and strings that should not pass. One more step for a real
+        validator: <em>anchor</em> it, <code>^&hellip;$</code>, so the engine
+        cannot &ldquo;validate&rdquo; a phone number it merely found inside a
+        longer string. The example also shows the readability tax: regexes
+        get cryptic fast, which is why understanding the underlying automaton
+        matters.
+      </div>
+      <div class="aside">
+        <span class="tag">DNA again: a genome marker</span>
+        One more application, from Sedgewick, over the DNA alphabet: the
+        <strong>genome marker</strong> <code>gcg(cgg|agg)*ctg</code>, a
+        <code>gcg</code>, then any number of <code>cgg</code>/<code>agg</code>
+        codon blocks, then <code>ctg</code>. It matches
+        <code>gcgaggaggcggcggctg</code> (blocks
+        <code>agg&middot;agg&middot;cgg&middot;cgg</code>) and, because
+        <code>*</code> allows zero blocks, the bare <code>gcgctg</code>;
+        it rejects <code>gcgagctg</code>, whose middle is no whole number of
+        blocks. The <a href="foundation-substring-search.html">substring-search handout</a>&rsquo;s
+        DNA search looked for one <em>fixed</em> string; a regex describes a
+        whole <em>family</em> of strings, which is what motif-finding tools
+        actually match.
+      </div>
+      <h3>Regular languages, and what a regex cannot say</h3>
+      <div class="def">
+        <span class="tag">Definition (regular language)</span>
+        The languages describable by regular expressions are the
+        <strong>regular languages</strong>, a fundamental class in the theory
+        of computation. Regular: \(L(\texttt{A*B})\), \(L(\texttt{(AB)*})\),
+        &ldquo;an even number of <code>A</code>&rsquo;s.&rdquo; <em>Not</em> regular:
+        balanced parentheses; \(\texttt{A}^n\texttt{B}^n\) (\(n\) <code>A</code>&rsquo;s
+        followed by exactly \(n\) <code>B</code>&rsquo;s).
+      </div>
+      <p>
+        Why the ceiling? To match \(\texttt{A}^n\texttt{B}^n\) you must
+        <em>count</em> \(n\), and (as &sect;2 makes precise) a finite automaton has
+        <em>finite</em> memory: no fixed number of states can count to
+        arbitrary \(n\). The pumping lemma turns this intuition into a proof.
+        Anything with unbounded counting or nesting (balanced brackets,
+        HTML tags, arithmetic expressions) is inherently beyond regex and
+        needs more machinery (a stack, a grammar; &sect;5 places these on the
+        ladder). The famous advice &ldquo;don&rsquo;t parse HTML with a regex&rdquo;
+        is this theorem in disguise. Knowing the <em>limits</em> of regex is as
+        important as knowing its power.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="automata">2. Finite automata: machines that recognize languages</h2>
+      <div class="def">
+        <span class="tag">Definition (finite automaton)</span>
+        A <strong>finite automaton</strong> is a machine with a fixed set of
+        <strong>states</strong>, a <strong>start state</strong>, one or more
+        <strong>accept states</strong>, and <strong>transitions</strong> that say
+        &ldquo;in state \(s\), reading character \(c\), go to state \(t\).&rdquo;
+        It reads a string character by character, following transitions; if it ends
+        in an accept state, it <strong>accepts</strong> the string, otherwise it
+        <strong>rejects</strong>. The set of strings it accepts is the language it
+        <strong>recognizes</strong>.
+      </div>
+      <p>
+        This is the simplest computer, and it is the machine counterpart to a
+        regex: one describes a language, the other decides membership in it. A
+        concrete example first, in the easy <em>deterministic</em> flavor.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a DFA for <code>(0|1)*0</code>)</span>
+        A <strong>deterministic finite automaton</strong> (DFA) has exactly
+        <em>one</em> transition per (state, character) pair. This two-state DFA
+        recognizes binary strings ending in <code>0</code>: the same
+        &ldquo;ends in&hellip;&rdquo; language you wrote a regex for in &sect;1, one
+        alphabet over:
+      </div>
+      <figure>
+        <svg viewBox="0 0 480 190" role="img" aria-label="A two-state deterministic finite automaton. State A, marked start, has a self-loop labeled 1 and an arrow labeled 0 to state B. State B, drawn with a double circle to mark it accepting, has a self-loop labeled 0 and an arrow labeled 1 back to A.">
+          <defs>
+            <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
+            </marker>
+          </defs>
+          <g stroke="#5c6270" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+            <line x1="70" y1="95" x2="124" y2="95"/>
+            <path d="M 141,75 C 128,38 172,38 159,75"/>
+            <path d="M 321,75 C 308,38 352,38 339,75"/>
+            <path d="M 171,86 C 220,64 260,64 309,86"/>
+            <path d="M 309,104 C 260,126 220,126 171,104"/>
+          </g>
+          <g fill="#fff" stroke="#1a1c22" stroke-width="1.6">
+            <circle cx="150" cy="95" r="22"/>
+            <circle cx="330" cy="95" r="22"/>
+            <circle cx="330" cy="95" r="16.5"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1c22">
+            <text x="150" y="100">A</text>
+            <text x="330" y="100">B</text>
+          </g>
+          <g font-family="SF Mono, Menlo, monospace" font-size="13.5" font-weight="700" text-anchor="middle" fill="#0a7d4d">
+            <text x="150" y="32">1</text>
+            <text x="330" y="32">0</text>
+            <text x="240" y="60">0</text>
+            <text x="240" y="141">1</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="11.5" text-anchor="middle" fill="#5c6270">
+            <text x="150" y="137">start</text>
+            <text x="330" y="137">accept</text>
+          </g>
+        </svg>
+        <figcaption>
+          A DFA recognizing \(L(\texttt{(0|1)*0})\), binary strings ending in
+          \(\texttt{0}\). State \(A\) means &ldquo;the input so far does not end in
+          0,&rdquo; state \(B\) (double circle = accepting) means &ldquo;it
+          does&rdquo;: the state <em>is</em> the machine&rsquo;s entire
+          memory, one bit here. Exactly one arrow per (state, character): running it
+          is a pointer walk.
+        </figcaption>
+      </figure>
+      <p>
+        Run <code>&quot;110&quot;</code>: \(A \xrightarrow{1} A \xrightarrow{1} A
+        \xrightarrow{0} B\): accept. Run <code>&quot;0110&quot;</code>:
+        \(A \xrightarrow{0} B \xrightarrow{1} A \xrightarrow{1} A \xrightarrow{0} B\): accept. Run <code>&quot;111&quot;</code>: \(A \to A \to A \to A\): reject. And the empty string never leaves \(A\): reject (it
+        does not end in <code>0</code>). Each step follows exactly one arrow, so a
+        DFA processes an \(n\)-character string in \(O(n)\), and the invariant
+        &ldquo;state \(B\) \(\iff\) the input so far ends in <code>0</code>&rdquo;
+        is the correctness argument, a loop invariant like every other one this
+        course. It is also the finite-memory point of &sect;1 made concrete: two
+        states can remember &ldquo;ends in 0 or not,&rdquo; but no fixed number of
+        states can remember an unbounded count.
+      </p>
+      <h3>Nondeterminism and \(\varepsilon\)-transitions</h3>
+      <div class="def">
+        <span class="tag">Definition (NFA; \(\varepsilon\)-transition)</span>
+        A <strong>nondeterministic finite automaton</strong> (NFA) may have
+        <em>several</em> transitions (or none) for a (state,
+        character) pair, plus <strong>\(\varepsilon\)-transitions</strong>: moves
+        between states that consume <em>no</em> input (&ldquo;free&rdquo; moves,
+        after \(\varepsilon\), the empty string). An NFA <strong>accepts</strong> a
+        string if <em>some</em> sequence of choices consumes the whole string and
+        ends in an accept state.
+      </div>
+      <p>
+        &ldquo;Nondeterministic&rdquo; does not mean random. Picture the machine
+        cloning itself to pursue every option in parallel: at any moment it occupies
+        a <em>set</em> of states, not one, and it accepts if <em>any</em> clone
+        ends accepting. That picture is not just intuition: &sect;4 turns
+        &ldquo;track the set of states&rdquo; into the actual, deterministic
+        algorithm that runs an NFA on a real computer. The
+        \(\varepsilon\)-transitions, meanwhile, are the construction&rsquo;s
+        superpower: they let you glue small machines together, offer a choice
+        (<code>|</code>), loop back (<code>*</code>), without reading a
+        character.
+      </p>
+      <p>
+        Why tolerate the extra complexity? Because each flavor is easy where the
+        other is hard:
+      </p>
+      <table>
+        <tr><th></th><th>NFA</th><th>DFA</th></tr>
+        <tr><td>build from a length-\(m\) regex</td><td><strong>easy</strong>, \(O(m)\) states (&sect;3)</td><td>can need \(2^m\) states</td></tr>
+        <tr><td>run on a length-\(n\) text</td><td>\(O(mn)\) (track a set, &sect;4)</td><td><strong>\(O(n)\)</strong> (follow one arrow)</td></tr>
+        <tr><td>\(\varepsilon\)-transitions</td><td>yes</td><td>no</td></tr>
+      </table>
+      <p>
+        Build small <em>or</em> run fast: the classic space/time trade.
+        Sedgewick&rsquo;s route, and this handout&rsquo;s, is to build the
+        (small) NFA and simulate it. The other choice, paying the
+        <em>determinization</em> cost up front to earn the \(O(n)\) scan, is
+        weighed in &sect;6. Either way, one bridge makes everything cohere:
+        the automaton is a <em>membership tester</em> for the regex&rsquo;s
+        language:</p>
+      <pre>  the NFA ACCEPTS a string   &hArr;   the string is IN the regex&#x27;s language
+  &quot;does it match?&quot;  =  &quot;does the NFA accept?&quot;</pre>
+
+      <!-- ============================================================ -->
+      <h2 id="build">3. Thompson&rsquo;s construction: from regex to NFA</h2>
+      <p>
+        <strong>Thompson&rsquo;s construction</strong> turns any regex into an NFA
+        <em>compositionally</em>: each of the four operations has a fixed little
+        machine (a <em>gadget</em>) with a single entry and a single
+        exit, and gadgets plug together with \(\varepsilon\)-transitions, following
+        the regex&rsquo;s recursive structure. Because every piece has one way in
+        and one way out, they compose without special cases: the same
+        discipline as a recursive-descent parser or an expression-tree evaluation.
+      </p>
+      <h3>The atom: a single character</h3>
+      <figure>
+        <svg viewBox="0 0 360 100" role="img" aria-label="The single-character gadget: a start state, one solid arrow labeled A, and an accepting state drawn as a double circle.">
+          <defs>
+            <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
+            </marker>
+          </defs>
+          <g stroke="#5c6270" stroke-width="1.6" fill="none" marker-end="url(#arrB)">
+            <line x1="30" y1="50" x2="70" y2="50"/>
+            <line x1="112" y1="50" x2="230" y2="50"/>
+          </g>
+          <g fill="#fff" stroke="#1a1c22" stroke-width="1.6">
+            <circle cx="92" cy="50" r="18"/>
+            <circle cx="252" cy="50" r="18"/>
+            <circle cx="252" cy="50" r="13"/>
+          </g>
+          <text x="170" y="40" font-family="SF Mono, Menlo, monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#0a7d4d">A</text>
+        </svg>
+        <figcaption>
+          The gadget for a single character <code>A</code>: two states, one
+          transition on <code>A</code>. It accepts exactly the one-character string
+          <code>&quot;A&quot;</code>: the atom everything else is built from.
+        </figcaption>
+      </figure>
+      <h3>Concatenation <code>AB</code>: a series connection</h3>
+      <figure>
+        <svg viewBox="0 0 560 110" role="img" aria-label="The concatenation gadget: a box labeled NFA for A, then a dashed epsilon arrow into a box labeled NFA for B.">
+          <defs>
+            <marker id="arrC" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
+            </marker>
+          </defs>
+          <g stroke="#5c6270" stroke-width="1.6" fill="none" marker-end="url(#arrC)">
+            <line x1="20" y1="55" x2="54" y2="55"/>
+            <line x1="210" y1="55" x2="318" y2="55" stroke-dasharray="5 4"/>
+            <line x1="474" y1="55" x2="530" y2="55"/>
+          </g>
+          <g fill="#f6f8fb" stroke="#1a1c22" stroke-width="1.5">
+            <rect x="58" y="33" width="150" height="44" rx="10"/>
+            <rect x="322" y="33" width="150" height="44" rx="10"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="600" text-anchor="middle" fill="#1a1c22">
+            <text x="133" y="60">NFA for A</text>
+            <text x="397" y="60">NFA for B</text>
+          </g>
+          <text x="264" y="43" font-family="system-ui, sans-serif" font-size="14" font-style="italic" text-anchor="middle" fill="#9a5b00">&epsilon;</text>
+        </svg>
+        <figcaption>
+          Concatenation: wire \(A\)&rsquo;s accept to \(B\)&rsquo;s start with an
+          \(\varepsilon\)-transition (dashed). A string matches <code>AB</code> iff
+          a prefix drives the \(A\)-machine to accept and the rest drives the
+          \(B\)-machine: exactly what &ldquo;reach \(A\)&rsquo;s accept, then
+          start \(B\) for free&rdquo; enforces.
+        </figcaption>
+      </figure>
+      <h3>Or <code>A|B</code>: a parallel connection</h3>
+      <figure>
+        <svg viewBox="0 0 620 210" role="img" aria-label="The alternation gadget: a fresh start state with dashed epsilon arrows branching up into a box labeled NFA for A and down into a box labeled NFA for B; both boxes send dashed epsilon arrows into a fresh accepting state drawn as a double circle.">
+          <defs>
+            <marker id="arrD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
+            </marker>
+          </defs>
+          <g stroke="#5c6270" stroke-width="1.6" fill="none" marker-end="url(#arrD)">
+            <line x1="10" y1="105" x2="38" y2="105"/>
+            <g stroke-dasharray="5 4">
+              <line x1="74" y1="93" x2="176" y2="55"/>
+              <line x1="74" y1="117" x2="176" y2="155"/>
+              <line x1="342" y1="55" x2="518" y2="96"/>
+              <line x1="342" y1="155" x2="518" y2="114"/>
+            </g>
+          </g>
+          <g fill="#f6f8fb" stroke="#1a1c22" stroke-width="1.5">
+            <rect x="180" y="28" width="160" height="44" rx="10"/>
+            <rect x="180" y="138" width="160" height="44" rx="10"/>
+          </g>
+          <g fill="#fff" stroke="#1a1c22" stroke-width="1.6">
+            <circle cx="60" cy="105" r="18"/>
+            <circle cx="540" cy="105" r="18"/>
+            <circle cx="540" cy="105" r="13"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="600" text-anchor="middle" fill="#1a1c22">
+            <text x="260" y="55">NFA for A</text>
+            <text x="260" y="165">NFA for B</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-style="italic" text-anchor="middle" fill="#9a5b00">
+            <text x="115" y="60">&epsilon;</text>
+            <text x="115" y="152">&epsilon;</text>
+            <text x="440" y="62">&epsilon;</text>
+            <text x="440" y="148">&epsilon;</text>
+          </g>
+        </svg>
+        <figcaption>
+          Alternation: a fresh start state \(\varepsilon\)-branches into
+          <em>both</em> machines, and both accepts \(\varepsilon\)-merge into a
+          fresh accept. A string matches <code>A|B</code> iff it drives <em>one</em>
+          branch to accept; and after the free moves the machine is in both
+          branches at once. This is where &ldquo;in a set of states&rdquo; begins.
+        </figcaption>
+      </figure>
+      <h3>Closure <code>A*</code>: skip it, or loop it</h3>
+      <figure>
+        <svg viewBox="0 0 620 220" role="img" aria-label="The closure gadget: start state, dashed epsilon arrow into a box labeled NFA for A, dashed epsilon arrow to an accepting double-circle state. A long dashed epsilon arc goes over the box directly from start to accept (the skip), and a dashed epsilon arc below the box loops from its exit back to its entry (the repeat).">
+          <defs>
+            <marker id="arrE" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
+            </marker>
+          </defs>
+          <g stroke="#5c6270" stroke-width="1.6" fill="none" marker-end="url(#arrE)">
+            <line x1="14" y1="120" x2="48" y2="120"/>
+            <g stroke-dasharray="5 4">
+              <line x1="90" y1="120" x2="186" y2="120"/>
+              <line x1="352" y1="120" x2="518" y2="120"/>
+              <path d="M 78,101 C 160,20 420,20 534,100"/>
+              <path d="M 340,144 C 320,196 220,196 200,144"/>
+            </g>
+          </g>
+          <g fill="#f6f8fb" stroke="#1a1c22" stroke-width="1.5">
+            <rect x="190" y="98" width="160" height="44" rx="10"/>
+          </g>
+          <g fill="#fff" stroke="#1a1c22" stroke-width="1.6">
+            <circle cx="70" cy="120" r="18"/>
+            <circle cx="540" cy="120" r="18"/>
+            <circle cx="540" cy="120" r="13"/>
+          </g>
+          <text x="270" y="125" font-family="system-ui, sans-serif" font-size="13.5" font-weight="600" text-anchor="middle" fill="#1a1c22">NFA for A</text>
+          <g font-family="system-ui, sans-serif" font-size="14" font-style="italic" text-anchor="middle" fill="#9a5b00">
+            <text x="139" y="108">&epsilon;</text>
+            <text x="435" y="108">&epsilon;</text>
+            <text x="300" y="34">&epsilon;</text>
+            <text x="270" y="196">&epsilon;</text>
+          </g>
+        </svg>
+        <figcaption>
+          Closure, the clever one. Two \(\varepsilon\)-moves do all the work: the
+          top arc <em>skips</em> \(A\) entirely (matching the empty string: zero copies), and the bottom arc loops \(A\)&rsquo;s accept back to its
+          start (another copy). Together they generate &ldquo;zero or more&rdquo;: a finite machine, revisited, encoding unbounded repetition.
+        </figcaption>
+      </figure>
+      <p>
+        Four operators, four wirings, each preserving the single-entry/single-exit
+        invariant, so they nest freely, and building an NFA from a regex is
+        just applying them along the parse. Note the skip edge in the closure
+        gadget: it is the machine-level face of &ldquo;<code>(AB)*</code> matches
+        the empty string&rdquo; from &sect;1.
+      </p>
+      <h3>Sedgewick&rsquo;s encoding: one state per character</h3>
+      <p>
+        The implementation insight that fits the whole construction in a page:
+        don&rsquo;t allocate gadget states: <em>reuse the regex string
+        itself</em>.
+      </p>
+      <div class="def">
+        <span class="tag">Encoding invariant</span>
+        For a regex <code>re</code> of length \(m\), the NFA has states
+        \(0, 1, \dots, m\), where state \(m\) is the accept state and state \(i\)
+        &ldquo;is&rdquo; the character <code>re[i]</code>:
+        <ul>
+          <li>a <strong>letter</strong> state consumes its own character, stepping
+            \(i \xrightarrow{\texttt{re}[i]} i+1\), and
+            <strong>the only way to consume input is \(i \to i+1\)</strong>;</li>
+          <li>a <strong>metacharacter</strong> state (<code>(</code>,
+            <code>)</code>, <code>|</code>, <code>*</code>) never consumes input: it has only \(\varepsilon\)-edges.</li>
+        </ul>
+        The whole machine is the regex string plus an \(\varepsilon\)-digraph: nothing else.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (warm-up: build <code>A*B</code>)</span>
+        <pre>  re:  A   *   B         states 0 1 2 3   (3 = accept)
+
+  i=0 &#x27;A&#x27;, next is &#x27;*&#x27; &rarr;  &epsilon; 0&rarr;1  (skip the A)
+                          match edge 0 &#x2500;A&rarr; 1
+  i=1 &#x27;*&#x27;              &rarr;  &epsilon; 1&rarr;2  (fall through the &#x27;*&#x27;)
+                          &epsilon; 1&rarr;0  (repeat the A)
+  i=2 &#x27;B&#x27;              &rarr;  match edge 2 &#x2500;B&rarr; 3
+
+  &epsilon;-edges: 0&rarr;1, 1&rarr;0, 1&rarr;2      match edges: 0&#x2500;A&rarr;1, 2&#x2500;B&rarr;3</pre>
+        Each state&rsquo;s <em>out</em>-edges are listed beside it: this is
+        the adjacency list that &sect;4&rsquo;s \(\varepsilon\)-closure
+        will graph-search. The star
+        wires two \(\varepsilon\)-edges around its operand: \(0 \to 1\)
+        skips the <code>A</code> (zero copies; it leaves state \(0\), so it
+        is listed there) and \(1 \to 0\) loops back for more copies (listed
+        under state \(1\)), whose other edge falls through to the
+        <code>B</code>. Three \(\varepsilon\)-edges, two match edges, four
+        states: Thompson&rsquo;s gadgets, compressed onto the string. This exact machine
+        (same state numbers, same edges) is the one the in-class activity
+        (ICA&nbsp;17) hands you.
+      </div>
+      <figure>
+        <svg viewBox="0 0 660 230" role="img" aria-label="The four-state NFA for the regex A star B. States 0 through 3 sit on a line; state 0 is the character A, state 1 the star, state 2 the character B, state 3 the accept state drawn as a double circle. Solid arrows: 0 to 1 labeled A, and 2 to 3 labeled B. Dashed epsilon arcs above: 0 to 1 (skip) and 1 to 2 (fall through); a dashed epsilon arc below from 1 back to 0 (repeat).">
+          <defs>
+            <marker id="arrF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
+            </marker>
+          </defs>
+          <g stroke="#5c6270" stroke-width="1.6" fill="none" marker-end="url(#arrF)">
+            <line x1="40" y1="130" x2="86" y2="130"/>
+            <line x1="132" y1="130" x2="234" y2="130"/>
+            <line x1="432" y1="130" x2="534" y2="130"/>
+            <g stroke-dasharray="5 4">
+              <path d="M 118,112 C 155,52 215,52 252,112"/>
+              <path d="M 268,112 C 305,52 365,52 402,112"/>
+              <path d="M 244,144 C 210,200 160,200 128,146"/>
+            </g>
+          </g>
+          <g fill="#fff" stroke="#1a1c22" stroke-width="1.6">
+            <circle cx="110" cy="130" r="20"/>
+            <circle cx="260" cy="130" r="20"/>
+            <circle cx="410" cy="130" r="20"/>
+            <circle cx="560" cy="130" r="20"/>
+            <circle cx="560" cy="130" r="15"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1c22">
+            <text x="110" y="135">0</text>
+            <text x="260" y="135">1</text>
+            <text x="410" y="135">2</text>
+            <text x="560" y="135">3</text>
+          </g>
+          <g font-family="SF Mono, Menlo, monospace" font-size="14.5" font-weight="700" text-anchor="middle" fill="#1a1c22">
+            <text x="110" y="178">A</text>
+            <text x="260" y="178">*</text>
+            <text x="410" y="178">B</text>
+          </g>
+          <text x="560" y="176" font-family="system-ui, sans-serif" font-size="11.5" text-anchor="middle" fill="#5c6270">accept</text>
+          <g font-family="SF Mono, Menlo, monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#0a7d4d">
+            <text x="184" y="119">A</text>
+            <text x="484" y="119">B</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-style="italic" text-anchor="middle" fill="#9a5b00">
+            <text x="185" y="58">&epsilon;</text>
+            <text x="335" y="58">&epsilon;</text>
+            <text x="186" y="196">&epsilon;</text>
+          </g>
+        </svg>
+        <figcaption>
+          The <code>A*B</code> machine under Sedgewick&rsquo;s encoding. Each state
+          is one character of the regex (shown beneath it); solid edges consume
+          their character, dashed edges are free \(\varepsilon\)-moves. The arcs
+          above are the star&rsquo;s <em>skip</em> (\(0\to1\)) and the
+          <em>fall-through</em> (\(1\to2\)); the arc below is the star&rsquo;s
+          <em>repeat</em> (\(1\to0\)).
+        </figcaption>
+      </figure>
+      <h3>Where do the \(\varepsilon\)-edges go? A stack, and an outer wrap</h3>
+      <p>
+        Each operator needs to know its <em>operands</em>, which requires parsing, and Sedgewick does it in one left-to-right scan with a
+        <strong>stack</strong>, exactly like evaluating an arithmetic expression:
+      </p>
+      <pre>  &#x27;(&#x27; or &#x27;|&#x27;  &rarr;  push its index
+  &#x27;)&#x27;         &rarr;  pop; if a &#x27;|&#x27; comes off, wire the alternation:
+                   &epsilon; from the &#x27;(&#x27; to just after the &#x27;|&#x27;   (enter branch 2)
+                   &epsilon; from the &#x27;|&#x27; to the &#x27;)&#x27;             (skip to the join)
+                       addEdge(lp, or+1);   addEdge(or, i);
+  &#x27;*&#x27; after an atom or group starting at lp:
+                   &epsilon; lp&rarr;star  (skip)   and   &epsilon; star&rarr;lp  (repeat)
+                       addEdge(lp, i+1);   addEdge(i+1, lp);
+  &#x27;(&#x27;, &#x27;*&#x27;, &#x27;)&#x27;  &rarr;  &epsilon; i&rarr;i+1  (fall through the metacharacter)
+                       addEdge(i, i+1);
+  first of all:    wrap the regex in implicit parens: &quot;A|B&quot; &rarr; &quot;(A|B)&quot;</pre>
+      <p>
+        Those five <code>addEdge</code> calls are the <em>entire</em>
+        construction, and they are what ICA&nbsp;17&rsquo;s
+        <code>buildNFA</code> extra credit asks you to write.
+      </p>
+      <p>
+        The <strong>outer wrap</strong> is a real implementation detail worth
+        understanding: a top-level <code>|</code> or <code>*</code> needs an
+        enclosing group to anchor its \(\varepsilon\)-edges: without it,
+        <code>A|B</code> has no <code>(</code> to pop when the <code>)</code> logic
+        fires. So the machine actually built for <code>A*B</code> is the machine for
+        <code>(A*B)</code>: six states instead of four, the letters shifted up by
+        one, and structural \(\varepsilon\)-edges \(0\to1\) and \(4\to5\) at the
+        ends. The demos (and the code below) build the wrapped machine; the worked
+        figures above drop the wrap for clarity, and every state number simply
+        shifts by one.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (one operator at a time, wrapped and complete)</span>
+        Three regexes, each isolating a single gadget, built to the last
+        edge. Read them as the encoding&rsquo;s version of the three figures
+        above.
+        <pre>  CONCATENATION  re = ( A B C )      states 0..5   (5 = accept)
+      i=0 &#x27;(&#x27;  &rarr; &epsilon; 0&rarr;1        i=1 &#x27;A&#x27; &rarr; 1 &#x2500;A&rarr; 2
+      i=2 &#x27;B&#x27;  &rarr; 2 &#x2500;B&rarr; 3         i=3 &#x27;C&#x27; &rarr; 3 &#x2500;C&rarr; 4
+      i=4 &#x27;)&#x27;  &rarr; &epsilon; 4&rarr;5
+      &epsilon;-edges: 0&rarr;1, 4&rarr;5   match: 1&#x2500;A&rarr;2, 2&#x2500;B&rarr;3, 3&#x2500;C&rarr;4
+      start closure {0,1}: only state 1 is armed, and only an A moves it.
+
+  UNION          re = ( A | B )      states 0..5   (5 = accept)
+      i=0 &#x27;(&#x27;  &rarr; &epsilon; 0&rarr;1        i=1 &#x27;A&#x27; &rarr; 1 &#x2500;A&rarr; 2
+      i=2 &#x27;|&#x27;  &rarr; push 2 (silent)    i=3 &#x27;B&#x27; &rarr; 3 &#x2500;B&rarr; 4
+      i=4 &#x27;)&#x27;  &rarr; pop &#x27;|&#x27;(2), pop &#x27;(&#x27;(0):  &epsilon; 0&rarr;3 (fork), &epsilon; 2&rarr;4 (join)
+                 then &epsilon; 4&rarr;5
+      &epsilon;-edges: 0&rarr;1, 0&rarr;3, 2&rarr;4, 4&rarr;5   match: 1&#x2500;A&rarr;2, 3&#x2500;B&rarr;4
+      start closure {0,1,3}: BOTH letters armed at once.
+
+  CLOSURE        re = ( A * )        states 0..4   (4 = accept)
+      i=0 &#x27;(&#x27;  &rarr; &epsilon; 0&rarr;1
+      i=1 &#x27;A&#x27;, next is &#x27;*&#x27; &rarr; &epsilon; 1&rarr;2 (skip), &epsilon; 2&rarr;1 (repeat), 1 &#x2500;A&rarr; 2
+      i=2 &#x27;*&#x27;  &rarr; &epsilon; 2&rarr;3        i=3 &#x27;)&#x27; &rarr; &epsilon; 3&rarr;4
+      &epsilon;-edges: 0&rarr;1, 1&rarr;2, 2&rarr;1, 2&rarr;3, 3&rarr;4   match: 1&#x2500;A&rarr;2
+      start closure {0,1,2,3,4}: contains the accept state 4 before
+      any input, which is exactly &quot;A* matches the empty string&quot;.</pre>
+        <p style="margin-bottom:0">
+          Concatenation is the operator that costs <em>nothing</em>: the two
+          letters are adjacent in the string, so state \(2\) is already both
+          the exit of <code>A</code> and the entry of <code>B</code>, and the
+          \(\varepsilon\)-edge the gadget picture draws between them is
+          absorbed by the numbering. That is the whole saving of the encoding.
+          Union spends two edges, to fork and to join; closure spends two, to
+          skip and to repeat, and its start closure reaching the accept state
+          is the empty-string case falling out of the wiring rather than being
+          special-cased. Running <code>A|B</code> on <code>&quot;B&quot;</code>
+          reads the fork: from \(\{0,1,3\}\) the <code>B</code> advances state
+          \(3\) to \(\{4\}\), the closure adds \(5\), and \(5\) is the accept
+          state.
+        </p>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the scan, with the stack: when each edge appears)</span>
+        The print book draws this as twelve little machines growing row by
+        row; here it is as a table, for the wrapped
+        <code>((A*B|AC)D)</code>. The stack holds the positions of
+        <code>(</code> and <code>|</code>:
+        <pre>   i  re[i]   stack     edges added at this step
+   0   (      [0]       &epsilon; 0&rarr;1  (fall through)
+   1   (      [0,1]     &epsilon; 1&rarr;2  (fall through)
+   2   A      [0,1]     &epsilon; 2&rarr;3, &epsilon; 3&rarr;2  (lookahead sees the &#x27;*&#x27;)  &middot;  2 &#x2500;A&rarr; 3
+   3   *      [0,1]     &epsilon; 3&rarr;4  (fall through)
+   4   B      [0,1]     4 &#x2500;B&rarr; 5
+   5   |      [0,1,5]   nothing yet: pushed, wired at the &#x27;)&#x27;
+   6   A      [0,1,5]   6 &#x2500;A&rarr; 7
+   7   C      [0,1,5]   7 &#x2500;C&rarr; 8
+   8   )      [0]       pop &#x27;|&#x27;(5) and &#x27;(&#x27;(1): &epsilon; 1&rarr;6, &epsilon; 5&rarr;8;  then &epsilon; 8&rarr;9
+   9   D      [0]       9 &#x2500;D&rarr; 10
+  10   )      []        &epsilon; 10&rarr;11  (fall through)</pre>
+        Two timings are worth noticing. The star pair arrives <em>early</em>,
+        at \(i=2\), by lookahead: the scan sees the coming <code>*</code>
+        and wires skip and repeat around the atom that just ended. The
+        <code>|</code> is the opposite: <em>silent</em> when scanned, it only
+        pushes its position, and both of its \(\varepsilon\)-edges (the
+        fork \(1\to6\) and the join \(5\to8\)) materialize when the
+        <code>)</code> pops it at \(i=8\). The stack never holds more than
+        the nesting depth: \(O(1)\) work per character, which is the
+        Proposition below.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (Sedgewick&rsquo;s running example <code>(A*B|AC)D</code>: the complete state list)</span>
+        The construction&rsquo;s full-size example, and the machine the demo
+        builds by default. Wrapped, the regex is <code>((A*B|AC)D)</code>:
+        states \(0..11\), state \(11\) the accept. Every state with its
+        out-edges:
+        <pre>  re:  ( ( A * B | A C ) D )      states 0..11   (11 = accept)
+
+  i=0  &#x27;(&#x27;   &rarr;  &epsilon; 0&rarr;1    (fall through)
+  i=1  &#x27;(&#x27;   &rarr;  &epsilon; 1&rarr;2    (fall through)
+                &epsilon; 1&rarr;6    (enter the right branch; wired at the &#x27;)&#x27;)
+  i=2  &#x27;A&#x27;, next is &#x27;*&#x27;
+             &rarr;  &epsilon; 2&rarr;3    (skip the A)
+                match edge 2 &#x2500;A&rarr; 3
+  i=3  &#x27;*&#x27;   &rarr;  &epsilon; 3&rarr;4    (fall through the &#x27;*&#x27;)
+                &epsilon; 3&rarr;2    (repeat the A)
+  i=4  &#x27;B&#x27;   &rarr;  match edge 4 &#x2500;B&rarr; 5
+  i=5  &#x27;|&#x27;   &rarr;  &epsilon; 5&rarr;8    (left branch done: skip to the &#x27;)&#x27;)
+  i=6  &#x27;A&#x27;   &rarr;  match edge 6 &#x2500;A&rarr; 7
+  i=7  &#x27;C&#x27;   &rarr;  match edge 7 &#x2500;C&rarr; 8
+  i=8  &#x27;)&#x27;   &rarr;  &epsilon; 8&rarr;9    (fall through)
+  i=9  &#x27;D&#x27;   &rarr;  match edge 9 &#x2500;D&rarr; 10
+  i=10 &#x27;)&#x27;   &rarr;  &epsilon; 10&rarr;11  (fall through: accept)
+
+  &epsilon;-edges (9): 0&rarr;1, 1&rarr;2, 1&rarr;6, 2&rarr;3, 3&rarr;2, 3&rarr;4, 5&rarr;8, 8&rarr;9, 10&rarr;11
+  match  (5):  2&#x2500;A&rarr;3, 4&#x2500;B&rarr;5, 6&#x2500;A&rarr;7, 7&#x2500;C&rarr;8, 9&#x2500;D&rarr;10</pre>
+        The states with <em>two</em> out-edges are exactly where
+        nondeterminism lives: state \(1\) forks into the two alternatives
+        (its jump to \(6\) is wired when the scan reaches the
+        <code>)</code>), state \(2\) can consume an <code>A</code> or skip
+        it, and state \(3\) falls through or loops back. Everything else
+        has a single obligatory edge. These two-edge states are what makes
+        the <em>set</em> of states in &sect;4 grow past one; the figure below
+        draws the same machine.
+      </div>
+      <figure>
+        <svg viewBox="0 0 920 270" role="img" aria-label="The twelve-state NFA for the wrapped regex ((A*B|AC)D). Twelve states 0 to 11 sit on a line; each shows its regex character beneath: two open parens, A, star, B, bar, A, C, close paren, D, close paren, and the accept state 11. Solid arrows on the line consume characters: 2 to 3 on A, 4 to 5 on B, 6 to 7 on A, 7 to 8 on C, 9 to 10 on D. Dashed epsilon arcs above connect 0-1, 1-2, 2-3, 3-4, 8-9, 10-11 (short), 1 to 6 (the alternation branch, long) and 5 to 8 (the bar skipping to the close paren). One dashed arc below runs from 3 back to 2, the star's repeat.">
+          <defs>
+            <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
+            </marker>
+          </defs>
+          <g stroke="#5c6270" stroke-width="1.5" fill="none" marker-end="url(#arrG)">
+            <line x1="14" y1="160" x2="49" y2="160"/>
+            <line x1="228" y1="160" x2="260" y2="160"/>
+            <line x1="368" y1="160" x2="400" y2="160"/>
+            <line x1="508" y1="160" x2="540" y2="160"/>
+            <line x1="578" y1="160" x2="610" y2="160"/>
+            <line x1="718" y1="160" x2="750" y2="160"/>
+            <g stroke-dasharray="5 4">
+              <path d="M 78,146 C 98,110 112,110 132,146"/>
+              <path d="M 152,148 C 168,112 182,112 202,146"/>
+              <path d="M 218,146 C 238,110 252,110 272,146"/>
+              <path d="M 288,146 C 308,110 322,110 342,146"/>
+              <path d="M 638,148 C 658,112 672,112 692,146"/>
+              <path d="M 778,146 C 798,110 812,110 832,146"/>
+              <path d="M 136,142 C 220,38 400,38 486,141"/>
+              <path d="M 425,144 C 480,74 570,74 625,144"/>
+              <path d="M 273,174 C 265,250 225,250 217,176"/>
+            </g>
+          </g>
+          <g fill="#fff" stroke="#1a1c22" stroke-width="1.5">
+            <circle cx="70" cy="160" r="17"/>
+            <circle cx="140" cy="160" r="17"/>
+            <circle cx="210" cy="160" r="17"/>
+            <circle cx="280" cy="160" r="17"/>
+            <circle cx="350" cy="160" r="17"/>
+            <circle cx="420" cy="160" r="17"/>
+            <circle cx="490" cy="160" r="17"/>
+            <circle cx="560" cy="160" r="17"/>
+            <circle cx="630" cy="160" r="17"/>
+            <circle cx="700" cy="160" r="17"/>
+            <circle cx="770" cy="160" r="17"/>
+            <circle cx="840" cy="160" r="17"/>
+            <circle cx="840" cy="160" r="12.5"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="700" text-anchor="middle" fill="#1a1c22">
+            <text x="70" y="165">0</text><text x="140" y="165">1</text>
+            <text x="210" y="165">2</text><text x="280" y="165">3</text>
+            <text x="350" y="165">4</text><text x="420" y="165">5</text>
+            <text x="490" y="165">6</text><text x="560" y="165">7</text>
+            <text x="630" y="165">8</text><text x="700" y="165">9</text>
+            <text x="770" y="165">10</text><text x="840" y="165">11</text>
+          </g>
+          <g font-family="SF Mono, Menlo, monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1c22">
+            <text x="70" y="207">(</text><text x="140" y="207">(</text>
+            <text x="210" y="207">A</text><text x="280" y="207">*</text>
+            <text x="350" y="207">B</text><text x="420" y="207">|</text>
+            <text x="490" y="207">A</text><text x="560" y="207">C</text>
+            <text x="630" y="207">)</text><text x="700" y="207">D</text>
+            <text x="770" y="207">)</text>
+          </g>
+          <text x="840" y="205" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle" fill="#5c6270">accept</text>
+          <g font-family="SF Mono, Menlo, monospace" font-size="13" font-weight="700" text-anchor="middle" fill="#0a7d4d">
+            <text x="245" y="150">A</text>
+            <text x="385" y="150">B</text>
+            <text x="525" y="150">A</text>
+            <text x="595" y="150">C</text>
+            <text x="735" y="150">D</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-style="italic" text-anchor="middle" fill="#9a5b00">
+            <text x="315" y="48">&epsilon;</text>
+            <text x="525" y="82">&epsilon;</text>
+            <text x="245" y="242">&epsilon;</text>
+          </g>
+        </svg>
+        <figcaption>
+          The full machine for <code>(A*B|AC)D</code> as the demo builds it: the
+          wrapped regex <code>((A*B|AC)D)</code>, \(12\) states, \(9\)
+          \(\varepsilon\)-edges (dashed), \(5\) match edges (solid, labeled). The
+          long arc \(1\to6\) is the <code>(</code> branching into the second
+          alternative; \(5\to8\) is the <code>|</code> skipping to the
+          <code>)</code>; \(2\leftrightarrow3\) is the star&rsquo;s skip/repeat
+          pair; the six short arcs are structural fall-throughs.
+        </figcaption>
+      </figure>
+      <div class="thm">
+        <span class="tag">Proposition (the construction is linear)</span>
+        A regex of (wrapped) length \(m\) yields an NFA with \(m+1\) states and
+        \(O(m)\) edges, built in \(\Theta(m)\) time.
+      </div>
+      <div class="proof">
+        <strong>Proof (count edges per character).</strong> Each letter contributes
+        exactly one match edge. Each <code>(</code>, <code>)</code>, and
+        <code>*</code> contributes one fall-through \(\varepsilon\)-edge; each
+        <code>*</code> adds its skip/repeat pair; each <code>|</code> adds its
+        branch-in/skip-out pair. So every character contributes at most one match
+        edge and at most three \(\varepsilon\)-edges, and the single left-to-right
+        scan does \(O(1)\) stack work per character. Check against the machine
+        above, <code>((A*B|AC)D)</code>: \(9\) \(\varepsilon\)-edges
+        \(= 5\) fall-throughs (from <code>(&nbsp;(&nbsp;*&nbsp;)&nbsp;)</code>)
+        \(+\ 2\) for the star \(+\ 2\) for the <code>|</code>, plus \(5\) match
+        edges from the \(5\) letters: exactly the tally the demo reports.
+        Contrast \(2^m\): that is what determinizing can cost (&sect;5); the NFA
+        itself never blows up. <span class="qed">&#8718;</span>
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=nfa-build">Regex&nbsp;&rarr;&nbsp;NFA
+        construction demo</a>. Type a regex over letters and <code>( ) | *</code> (up to 12
+        characters, balanced parens) and press <em>Build</em>: the construction
+        replays edge by edge; states laid out one per character, then each
+        \(\varepsilon\)-edge with the rule that added it, then the match edges.
+        Build <code>A*B</code> first and compare with the worked figure (the
+        implicit wrap shifts every state up by one and adds the two end
+        fall-throughs); then build the default <code>(A*B|AC)D</code> and check the
+        finish message against the proposition&rsquo;s tally: 12 states, 9
+        \(\varepsilon\)-edges, 5 match edges.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="simulate">4. Simulating the NFA: track a set of states</h2>
+      <p>
+        An NFA is easy to build and awkward to run: it makes
+        <em>choices</em>. The resolution is the idea from &sect;2: instead of
+        guessing which branch to take, follow <em>all</em> branches at once by
+        maintaining the set of states the machine could possibly be in. That turns
+        nondeterminism into bookkeeping:
+      </p>
+      <div class="ex">
+        <span class="tag">Example (why not just guess?)</span>
+        Sedgewick calls these <em>stalling sequences</em>. Commit to single
+        choices on <code>((A*B|AC)D)</code> and watch them die:
+        <pre>  input AAABD, guess the RIGHT branch:
+      0 &rarr;&epsilon; 1 &rarr;&epsilon; 6 &#x2500;A&rarr; 7        stuck: state 7 wants C, the input has A
+
+  input AAAAC (the star loop is forced; nothing to guess):
+      &hellip; 2 &#x2500;A&rarr; 3 &rarr;&epsilon; 2 &#x2500;A&rarr; 3 &hellip; &rarr;&epsilon; 4    stuck: state 4 wants B</pre>
+        A wrong guess strands the machine in a state with no usable edge, and
+        nothing tells you <em>at guessing time</em> which choice is wrong: the
+        input decides, later. Backtracking (undo and try the other branch)
+        restores correctness at a possibly exponential price (see the engines
+        aside below). The algorithm here refuses to guess at all: it keeps
+        every viable state alive at once and lets the input kill the wrong
+        ones.
+      </div>
+      <pre>  states = &epsilon;-closure({ start })
+  for each character c of the text:
+      next   = { i+1 : i &isin; states and re[i] == c }     <span class="cm">// advance</span>
+      states = &epsilon;-closure(next)                          <span class="cm">// close</span>
+  accept  iff  the accept state &isin; states</pre>
+      <p>
+        Two phases per character: <strong>advance</strong> every letter state
+        whose character matches (its one \(i \to i+1\) edge; the encoding invariant
+        doing its job), then <strong>\(\varepsilon\)-close</strong> to add the free
+        moves. No backtracking, no exponential guessing.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (\(\varepsilon\)-closure)</span>
+        The <strong>\(\varepsilon\)-closure</strong> of a set \(S\) of states is
+        \(S\) together with every state reachable from \(S\) by following
+        \(\varepsilon\)-edges, a <strong>graph-reachability</strong>
+        computation: a depth-first or breadth-first search over the
+        \(\varepsilon\)-digraph, seeded with \(S\). This is the graph search of
+        the <a href="../graphs/algo-dfs.html">DFS handout</a>, reused on the
+        automaton.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (\(\varepsilon\)-closure, worked)</span>
+        On the <code>A*B</code> machine (\(\varepsilon\)-edges \(0\to1\),
+        \(1\to0\), \(1\to2\)), compute \(\varepsilon\)-closure(\(\{0\}\)):
+        <pre>  expand 0:  0&rarr;1                 add 1
+  expand 1:  1&rarr;0 (already seen),  1&rarr;2   add 2
+  expand 2:  no &epsilon;-edges
+  &rarr; {0, 1, 2}</pre>
+        Read the result: before consuming <em>anything</em>, the machine is
+        simultaneously ready to match an <code>A</code> (state 0) <em>and</em> to
+        match the <code>B</code> directly (state 2): the skip edge has
+        already opened both the zero-<code>A</code>&rsquo;s and the
+        some-<code>A</code>&rsquo;s futures. This exact set is ICA&nbsp;17&rsquo;s
+        first test.
+      </div>
+      <p>
+        Here is the entire engine: construction, closure, and the
+        set-of-states loop. It is a graph search per character, built from pieces
+        you already own:
+      </p>
+      <div class="code-tabs" data-snippet="regex/nfa">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Regex -&gt; NFA (Sedgewick&#x27;s one-state-per-character encoding) + set-of-states
+// simulation. Syntax: letters, concatenation, | (one per group), *, ( ).
+struct NFA {
+    string re;                    // wrapped regex: &quot;(&quot; + pattern + &quot;)&quot;
+    int m;                        // re.length(); state m is the accept state
+    vector&lt;vector&lt;int&gt;&gt; eps;      // eps[u] = the e-edge out-neighbors of u
+
+    NFA(const string&amp; pattern) {
+        re = &quot;(&quot; + pattern + &quot;)&quot;; // implicit wrap anchors a top-level | or *
+        m = re.size();
+        eps.assign(m + 1, {});
+        vector&lt;int&gt; ops;          // stack of &#x27;(&#x27; and &#x27;|&#x27; positions
+        for (int i = 0; i &lt; m; i++) {
+            int lp = i;           // left end of the atom/group ending at i
+            if (re[i] == &#x27;(&#x27; || re[i] == &#x27;|&#x27;) ops.push_back(i);
+            else if (re[i] == &#x27;)&#x27;) {
+                int orPos = ops.back(); ops.pop_back();
+                if (re[orPos] == &#x27;|&#x27;) {           // wire the alternation
+                    lp = ops.back(); ops.pop_back();
+                    eps[lp].push_back(orPos + 1); // &#x27;(&#x27; skips into branch 2
+                    eps[orPos].push_back(i);      // &#x27;|&#x27; skips to the &#x27;)&#x27;
+                } else lp = orPos;                // plain group: lp = the &#x27;(&#x27;
+            }
+            if (i &lt; m - 1 &amp;&amp; re[i + 1] == &#x27;*&#x27;) {  // closure around lp..i
+                eps[lp].push_back(i + 1);         //   skip the operand
+                eps[i + 1].push_back(lp);         //   repeat the operand
+            }
+            if (re[i] == &#x27;(&#x27; || re[i] == &#x27;*&#x27; || re[i] == &#x27;)&#x27;)
+                eps[i].push_back(i + 1);          // fall through the meta char
+        }
+    }
+
+    // e-closure(S): DFS over the e-digraph -- all states reachable for free
+    set&lt;int&gt; closure(const set&lt;int&gt;&amp; s) const {
+        set&lt;int&gt; seen = s;
+        vector&lt;int&gt; stack(s.begin(), s.end());
+        while (!stack.empty()) {
+            int u = stack.back(); stack.pop_back();
+            for (int v : eps[u])
+                if (seen.insert(v).second) stack.push_back(v);
+        }
+        return seen;
+    }
+
+    // does the NFA accept text? -- track the reachable-state set: O(mn)
+    bool matches(const string&amp; text) const {
+        set&lt;int&gt; pc = closure({0});               // states reachable on &quot;&quot;
+        for (char c : text) {
+            set&lt;int&gt; next;
+            for (int u : pc)                      // advance every letter state
+                if (u &lt; m &amp;&amp; re[u] == c) next.insert(u + 1);
+            pc = closure(next);                   // then close over e-edges
+            if (pc.empty()) return false;         // dead: nothing can revive
+        }
+        return pc.count(m) &gt; 0;                   // accept state in final set?
+    }
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Regex -&gt; NFA (Sedgewick&#x27;s one-state-per-character encoding) + set-of-states
+// simulation. Syntax: letters, concatenation, | (one per group), *, ( ).
+class NFA {
+    final String re;              // wrapped regex: &quot;(&quot; + pattern + &quot;)&quot;
+    final int m;                  // re.length(); state m is the accept state
+    final List&lt;List&lt;Integer&gt;&gt; eps = new ArrayList&lt;&gt;();
+
+    NFA(String pattern) {
+        re = &quot;(&quot; + pattern + &quot;)&quot;; // implicit wrap anchors a top-level | or *
+        m = re.length();
+        for (int i = 0; i &lt;= m; i++) eps.add(new ArrayList&lt;&gt;());
+        Deque&lt;Integer&gt; ops = new ArrayDeque&lt;&gt;();  // &#x27;(&#x27; and &#x27;|&#x27; positions
+        for (int i = 0; i &lt; m; i++) {
+            int lp = i;           // left end of the atom/group ending at i
+            char c = re.charAt(i);
+            if (c == &#x27;(&#x27; || c == &#x27;|&#x27;) ops.push(i);
+            else if (c == &#x27;)&#x27;) {
+                int orPos = ops.pop();
+                if (re.charAt(orPos) == &#x27;|&#x27;) {    // wire the alternation
+                    lp = ops.pop();
+                    eps.get(lp).add(orPos + 1);   // &#x27;(&#x27; skips into branch 2
+                    eps.get(orPos).add(i);        // &#x27;|&#x27; skips to the &#x27;)&#x27;
+                } else lp = orPos;                // plain group: lp = the &#x27;(&#x27;
+            }
+            if (i &lt; m - 1 &amp;&amp; re.charAt(i + 1) == &#x27;*&#x27;) {  // closure lp..i
+                eps.get(lp).add(i + 1);           //   skip the operand
+                eps.get(i + 1).add(lp);           //   repeat the operand
+            }
+            if (c == &#x27;(&#x27; || c == &#x27;*&#x27; || c == &#x27;)&#x27;)
+                eps.get(i).add(i + 1);            // fall through the meta char
+        }
+    }
+
+    // e-closure(S): DFS over the e-digraph -- all states reachable for free
+    Set&lt;Integer&gt; closure(Set&lt;Integer&gt; s) {
+        Set&lt;Integer&gt; seen = new TreeSet&lt;&gt;(s);
+        Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;(s);
+        while (!stack.isEmpty()) {
+            int u = stack.pop();
+            for (int v : eps.get(u))
+                if (seen.add(v)) stack.push(v);
+        }
+        return seen;
+    }
+
+    // does the NFA accept text? -- track the reachable-state set: O(mn)
+    boolean matches(String text) {
+        Set&lt;Integer&gt; pc = closure(new TreeSet&lt;&gt;(Set.of(0)));
+        for (char c : text.toCharArray()) {
+            Set&lt;Integer&gt; next = new TreeSet&lt;&gt;();
+            for (int u : pc)                      // advance every letter state
+                if (u &lt; m &amp;&amp; re.charAt(u) == c) next.add(u + 1);
+            pc = closure(next);                   // then close over e-edges
+            if (pc.isEmpty()) return false;       // dead: nothing can revive
+        }
+        return pc.contains(m);                    // accept state in final set?
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Regex -&gt; NFA (Sedgewick&#x27;s one-state-per-character encoding) + set-of-states
+# simulation. Syntax: letters, concatenation, | (one per group), *, ( ).
+class NFA:
+    def __init__(self, pattern):
+        self.re = &quot;(&quot; + pattern + &quot;)&quot;   # implicit wrap anchors top-level | or *
+        self.m = len(self.re)           # state m is the accept state
+        self.eps = [[] for _ in range(self.m + 1)]
+        ops = []                        # stack of &#x27;(&#x27; and &#x27;|&#x27; positions
+        for i, c in enumerate(self.re):
+            lp = i                      # left end of the atom/group ending at i
+            if c in &quot;(|&quot;:
+                ops.append(i)
+            elif c == &quot;)&quot;:
+                orpos = ops.pop()
+                if self.re[orpos] == &quot;|&quot;:          # wire the alternation
+                    lp = ops.pop()
+                    self.eps[lp].append(orpos + 1) # &#x27;(&#x27; skips into branch 2
+                    self.eps[orpos].append(i)      # &#x27;|&#x27; skips to the &#x27;)&#x27;
+                else:
+                    lp = orpos                     # plain group: lp = the &#x27;(&#x27;
+            if i &lt; self.m - 1 and self.re[i + 1] == &quot;*&quot;:   # closure lp..i
+                self.eps[lp].append(i + 1)         # skip the operand
+                self.eps[i + 1].append(lp)         # repeat the operand
+            if c in &quot;(*)&quot;:
+                self.eps[i].append(i + 1)          # fall through the meta char
+
+    def closure(self, s):
+        &quot;&quot;&quot;e-closure(S): DFS over the e-digraph -- all states reachable free.&quot;&quot;&quot;
+        seen, stack = set(s), list(s)
+        while stack:
+            u = stack.pop()
+            for v in self.eps[u]:
+                if v not in seen:
+                    seen.add(v)
+                    stack.append(v)
+        return seen
+
+    def matches(self, text):
+        &quot;&quot;&quot;Does the NFA accept text? Track the reachable-state set: O(mn).&quot;&quot;&quot;
+        pc = self.closure({0})                     # states reachable on &quot;&quot;
+        for c in text:
+            nxt = {u + 1 for u in pc               # advance every letter state
+                   if u &lt; self.m and self.re[u] == c}
+            pc = self.closure(nxt)                 # then close over e-edges
+            if not pc:
+                return False                       # dead: nothing can revive
+        return self.m in pc                        # accept state in final set?</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Regex -&gt; NFA (Sedgewick&#x27;s one-state-per-character encoding) + set-of-states
+// simulation. Syntax: letters, concatenation, | (one per group), *, ( ).
+struct Nfa {
+    re: Vec&lt;char&gt;,           // wrapped regex: &quot;(&quot; + pattern + &quot;)&quot;
+    m: usize,                // re.len(); state m is the accept state
+    eps: Vec&lt;Vec&lt;usize&gt;&gt;,    // eps[u] = the e-edge out-neighbors of u
+}
+
+impl Nfa {
+    fn new(pattern: &amp;str) -&gt; Nfa {
+        let re: Vec&lt;char&gt; = format!(&quot;({})&quot;, pattern).chars().collect();
+        let m = re.len();
+        let mut eps = vec![Vec::new(); m + 1];
+        let mut ops: Vec&lt;usize&gt; = Vec::new();   // &#x27;(&#x27; and &#x27;|&#x27; positions
+        for i in 0..m {
+            let mut lp = i;  // left end of the atom/group ending at i
+            match re[i] {
+                &#x27;(&#x27; | &#x27;|&#x27; =&gt; ops.push(i),
+                &#x27;)&#x27; =&gt; {
+                    let or = ops.pop().unwrap();
+                    if re[or] == &#x27;|&#x27; {           // wire the alternation
+                        lp = ops.pop().unwrap();
+                        eps[lp].push(or + 1);    // &#x27;(&#x27; skips into branch 2
+                        eps[or].push(i);         // &#x27;|&#x27; skips to the &#x27;)&#x27;
+                    } else { lp = or; }          // plain group: lp = the &#x27;(&#x27;
+                }
+                _ =&gt; {}
+            }
+            if i + 1 &lt; m &amp;&amp; re[i + 1] == &#x27;*&#x27; {   // closure around lp..i
+                eps[lp].push(i + 1);             //   skip the operand
+                eps[i + 1].push(lp);             //   repeat the operand
+            }
+            if matches!(re[i], &#x27;(&#x27; | &#x27;*&#x27; | &#x27;)&#x27;) {
+                eps[i].push(i + 1);              // fall through the meta char
+            }
+        }
+        Nfa { re, m, eps }
+    }
+
+    // e-closure(S): DFS over the e-digraph -- all states reachable for free
+    fn closure(&amp;self, s: &amp;BTreeSet&lt;usize&gt;) -&gt; BTreeSet&lt;usize&gt; {
+        let mut seen = s.clone();
+        let mut stack: Vec&lt;usize&gt; = s.iter().copied().collect();
+        while let Some(u) = stack.pop() {
+            for &amp;v in &amp;self.eps[u] {
+                if seen.insert(v) { stack.push(v); }
+            }
+        }
+        seen
+    }
+
+    // does the NFA accept text? -- track the reachable-state set: O(mn)
+    fn matches(&amp;self, text: &amp;str) -&gt; bool {
+        let mut pc = self.closure(&amp;BTreeSet::from([0]));
+        for c in text.chars() {
+            let next: BTreeSet&lt;usize&gt; = pc.iter()
+                .filter(|&amp;&amp;u| u &lt; self.m &amp;&amp; self.re[u] == c)  // letter states
+                .map(|&amp;u| u + 1)                             // ... advance
+                .collect();
+            pc = self.closure(&amp;next);            // then close over e-edges
+            if pc.is_empty() { return false; }   // dead: nothing can revive
+        }
+        pc.contains(&amp;self.m)                     // accept state in final set?
+    }
+}</pre>
+<p class="ct-src">source: <code>code/regex/nfa.cpp &middot; code/regex/nfa.java &middot; code/regex/nfa.py &middot; code/regex/nfa.rs</code></p>
+<!--/ct--></div>
+      <h3>Worked traces on <code>A*B</code></h3>
+      <p>
+        Run the four-state <code>A*B</code> machine (match edges
+        \(0\,\xrightarrow{\texttt{A}}\,1\) and \(2\,\xrightarrow{\texttt{B}}\,3\);
+        accept state \(3\)) on an accepting and a rejecting string. Every state set
+        below is machine-verified against the engine above.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr><th class="lab">A*B on &quot;AAB&quot;</th><th>advance on the char</th><th>after &epsilon;-closure</th></tr>
+          <tr><td class="lab">start</td><td>&middot;</td><td class="cell lt">{0,1,2}</td></tr>
+          <tr><td class="lab">read A</td><td class="cell">0 matches A &rarr; {1}</td><td class="cell lt">{0,1,2}</td></tr>
+          <tr><td class="lab">read A</td><td class="cell">0 matches A &rarr; {1}</td><td class="cell lt">{0,1,2}</td></tr>
+          <tr><td class="lab">read B</td><td class="cell">2 matches B &rarr; {3}</td><td class="cell lt">{3}</td></tr>
+          <tr><td class="lab">verdict</td><td colspan="2">3 = accept &isin; {3} &rarr; <strong>ACCEPT</strong></td></tr>
+        </table>
+        <table class="trace">
+          <tr><th class="lab">A*B on &quot;AC&quot;</th><th>advance on the char</th><th>after &epsilon;-closure</th></tr>
+          <tr><td class="lab">start</td><td>&middot;</td><td class="cell lt">{0,1,2}</td></tr>
+          <tr><td class="lab">read A</td><td class="cell">0 matches A &rarr; {1}</td><td class="cell lt">{0,1,2}</td></tr>
+          <tr><td class="lab">read C</td><td class="cell piv">nobody matches C &rarr; { }</td><td class="cell piv">{ } (dead)</td></tr>
+          <tr><td class="lab">verdict</td><td colspan="2">empty set can never recover &rarr; <strong>REJECT</strong></td></tr>
+        </table>
+        <figcaption>
+          Left column: which states&rsquo; match edges fire. Right: the active set
+          after re-closing over \(\varepsilon\)-edges. Each <code>A</code> is
+          consumed by state 0, and the closure immediately re-arms both futures
+          \(\{0,1,2\}\): the star&rsquo;s loop in action. On
+          <code>&quot;AC&quot;</code> the <code>C</code> matches nobody; an empty
+          set has no states, hence no edges, hence no future: reject,
+          detected early.
+        </figcaption>
+      </figure>
+      <p>
+        Two more one-step traces test real understanding.
+        <code>&quot;B&quot;</code>: the start closure \(\{0,1,2\}\) already contains
+        state 2, so the <code>B</code> advances to \(\{3\}\): <strong>accept</strong>, with zero <code>A</code>&rsquo;s: the skip edge made
+        concrete, the same subtlety as &ldquo;<code>(AB)*</code> matches the empty
+        string&rdquo; in &sect;1. <code>&quot;BA&quot;</code>: after the
+        <code>B</code> the set is \(\{3\}\), and the accept state matches nothing; the <code>A</code> empties the set: <strong>reject</strong>.
+        Acceptance is checked <em>after the last character</em>, not on first touch;
+        reaching the accept state early only helps if the input ends there.
+      </p>
+      <h3>The full machine, both branches</h3>
+      <p>
+        The same simulation on the wrapped 12-state <code>(A*B|AC)D</code> machine
+        of &sect;3 shows nondeterminism earning its keep: one start set
+        covers both alternatives, and the input decides which branch survives:
+      </p>
+      <figure>
+        <table class="trace">
+          <tr><th class="lab">(A*B|AC)D on&hellip;</th><th>&quot;AAABD&quot;: active set</th><th>&quot;ACD&quot;: active set</th><th>&quot;AAD&quot;: active set</th></tr>
+          <tr><td class="lab">start</td><td class="cell">{0,1,2,3,4,6}</td><td class="cell">{0,1,2,3,4,6}</td><td class="cell">{0,1,2,3,4,6}</td></tr>
+          <tr><td class="lab">read A</td><td class="cell">{2,3,4,7}</td><td class="cell">{2,3,4,7}</td><td class="cell">{2,3,4,7}</td></tr>
+          <tr><td class="lab">read A / C / A</td><td class="cell">{2,3,4}</td><td class="cell">{8,9}</td><td class="cell">{2,3,4}</td></tr>
+          <tr><td class="lab">read A / D / D</td><td class="cell">{2,3,4}</td><td class="cell lt">{10,11}</td><td class="cell piv">{ } (dead)</td></tr>
+          <tr><td class="lab">read B</td><td class="cell">{5,8,9}</td><td class="cell">&middot;</td><td class="cell">&middot;</td></tr>
+          <tr><td class="lab">read D</td><td class="cell lt">{10,11}</td><td class="cell">&middot;</td><td class="cell">&middot;</td></tr>
+          <tr><td class="lab">verdict</td><td><strong>ACCEPT</strong> (left branch)</td><td><strong>ACCEPT</strong> (right branch)</td><td><strong>REJECT</strong></td></tr>
+        </table>
+        <figcaption>
+          Three runs, column per input (each column reads top to bottom; rows share
+          a step index, so the middle rows name the character each run reads).
+          The start closure \(\{0,1,2,3,4,6\}\) is ready to match the left
+          branch&rsquo;s <code>A</code> (state 2), its <code>B</code> directly
+          (state 4: zero <code>A</code>&rsquo;s), or the right
+          branch&rsquo;s <code>A</code> (state 6). After one <code>A</code> both
+          branches are still alive (\(\{2,3,4,7\}\)); the second character commits:
+          another <code>A</code> keeps only the star loop, a <code>C</code> jumps
+          to the right branch&rsquo;s exit. <code>&quot;AAD&quot;</code> dies
+          because after <code>AA</code> only the left branch&rsquo;s
+          \(\{2,3,4\}\) remains and <code>D</code> matches none of them. Accept
+          state: \(11\).
+        </figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Example (two of those cells, expanded into their two phases)</span>
+        The table above prints only the closed sets. Here are the two phases
+        behind two of its cells, on the \(\varepsilon\)-edges of &sect;3
+        (\(0\to1\), \(1\to2\), \(1\to6\), \(2\to3\), \(3\to2\), \(3\to4\),
+        \(5\to8\), \(8\to9\), \(10\to11\)), with the closure run as the
+        graph search it is:
+        <pre>  THE START SET  &epsilon;-closure({0})
+      expand 0:  0&rarr;1                      add 1
+      expand 1:  1&rarr;2, 1&rarr;6                add 2, 6
+      expand 2:  2&rarr;3                      add 3
+      expand 3:  3&rarr;2 (seen), 3&rarr;4         add 4
+      expand 4, 6:  no &epsilon;-edges out
+      &rarr; {0,1,2,3,4,6}   armed: 2 (left branch A), 4 (its B), 6 (right branch A)
+
+  READING THE &#x27;B&#x27; OF &quot;AAABD&quot;, from {2,3,4}
+      advance:  state 2 is &#x27;A&#x27;  &rarr; no      state 3 is &#x27;*&#x27; &rarr; never matches
+                state 4 is &#x27;B&#x27;  &rarr; yes: 4&rarr;5      next = {5}
+      close:    expand 5:  5&rarr;8              add 8
+                expand 8:  8&rarr;9              add 9
+                expand 9:  no &epsilon;-edges out
+      &rarr; {5,8,9}   armed: 9, the &#x27;D&#x27;</pre>
+        <p style="margin-bottom:0">
+          Both phases are visible in the second block. <strong>Advance</strong>
+          only ever uses \(i \to i+1\) edges out of <em>letter</em> states, and
+          it is where input is consumed and where wrong branches die: the star
+          state \(3\) and the letter state \(2\) contribute nothing, so the
+          set shrinks to a single state. <strong>Close</strong> then spends
+          free moves to re-arm everything reachable, here walking the
+          <code>|</code>&rsquo;s join \(5\to8\) and the fall-throughs to park
+          the machine on the <code>D</code>. Every set in every trace of this
+          section is one of these two steps applied in turn, and the closure is
+          the same depth-first search over the \(\varepsilon\)-digraph each
+          time.
+        </p>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the witness: one accepting path for <code>&quot;AAABD&quot;</code>)</span>
+        Acceptance means at least one path through the machine consumes the
+        whole string and lands on the accept state. The simulation never
+        names that path, but it exists; unrolled:
+        <pre>  0 &rarr;&epsilon; 1 &rarr;&epsilon; 2 &#x2500;A&rarr; 3 &rarr;&epsilon; 2 &#x2500;A&rarr; 3 &rarr;&epsilon; 2 &#x2500;A&rarr; 3 &rarr;&epsilon; 4
+    &#x2500;B&rarr; 5 &rarr;&epsilon; 8 &rarr;&epsilon; 9 &#x2500;D&rarr; 10 &rarr;&epsilon; 11   accept</pre>
+        Three trips through the star&rsquo;s loop consume the
+        <code>A</code>&rsquo;s, the fall-through takes the <code>B</code>, the
+        <code>|</code> skips to the join, and the <code>D</code> drives home.
+        Every hop is an edge of the machine in &sect;3. The set-of-states
+        simulation is the device that establishes such a path exists without
+        ever guessing which one it will be.
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (simulation cost)</span>
+        Simulating a length-\(m\) regex&rsquo;s NFA on a length-\(n\) text takes
+        \(O(mn)\) time, worst case, guaranteed.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The NFA has \(m+1\) states and \(O(m)\) edges
+        (&sect;3). Each input character does at most \(m\) match checks (the set
+        never exceeds \(m+1\) states) plus one graph search over the
+        \(O(m)\)-edge \(\varepsilon\)-digraph (\(O(m)\) work) for
+        \(n\) characters. There is no input that makes this engine blow up, because
+        the set is bounded by the state count no matter how the branches multiply.
+        Compare <a href="algo-kmp.html">Knuth&ndash;Morris&ndash;Pratt (KMP)</a>: the same flavor of
+        promise (linear, worst-case, never backs up over the text), one level more general. <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (the simulation is exact)</span>
+        After reading the prefix \(t[0..i)\), the tracked set equals
+        <em>exactly</em> the set of states reachable from the start state by
+        consuming \(t[0..i)\). Hence the final accept test decides NFA acceptance.
+      </div>
+      <div class="proof">
+        <strong>Proof (induction on \(i\): a loop invariant, like every
+        other one this course).</strong> Base: before any input the reachable
+        states are those \(\varepsilon\)-reachable from the start: exactly
+        the initial closure. Step: a path consuming one more character
+        \(t[i]\) must take some matching edge out of a state reachable on the
+        shorter prefix, then any number of \(\varepsilon\)-moves: exactly
+        advance-then-close, no more and no less. So the set is never an
+        approximation. At the end, &ldquo;accept state \(\in\) set&rdquo; is
+        literally the definition of NFA acceptance: some path consumes the whole
+        string and ends at the accept state. Nondeterminism handled by
+        bookkeeping, proved by induction. <span class="qed">&#8718;</span>
+      </div>
+      <h3>Backtracking, ReDoS, and why this engine cannot blow up</h3>
+      <p>
+        Most production engines do not simulate an automaton at all. Perl, Java,
+        Python, JavaScript, and C++&rsquo;s <code>&lt;regex&gt;</code> match by
+        <strong>backtracking</strong>: a recursive search over the
+        pattern&rsquo;s choices. At <code>(a|aa)</code> the engine tries
+        <code>a</code> and continues with the rest of the pattern; if that fails
+        somewhere later, it comes back, undoes the choice, tries
+        <code>aa</code>, and continues again. Its working state is a single
+        <em>path</em> through the pattern, held on the call stack, and failure
+        means unwinding and trying the next path. That is
+        &ldquo;try all possibilities&rdquo; taken literally, with all the cost
+        that implies.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (how a pattern goes exponential)</span>
+        Match <code>(a|aa)*b</code> against \(n\) <code>a</code>&rsquo;s followed
+        by a <code>c</code>. Every way of cutting the run of
+        <code>a</code>&rsquo;s into pieces of size one and two is a
+        <em>different</em> path through the pattern, and the engine tries them
+        all. The number of such cuts obeys \(f(n) = f(n-1) + f(n-2)\)
+        (the first piece is either one <code>a</code> or two), so it is a
+        Fibonacci number: it grows like \(\varphi^{\,n} \approx 1.618^{\,n}\).
+        The trailing <code>c</code> is the adversary&rsquo;s trick, an input that
+        <em>almost</em> matches: no path can short-circuit, so every one must be
+        tried before the engine can answer &ldquo;no&rdquo;.
+        <table>
+          <tr><th>\(n\)</th><th>paths</th><th>backtracking (Python <code>re</code>)</th><th>set simulation (<code>nfa.py</code>)</th></tr>
+          <tr><td>20</td><td>10,946</td><td>0.002 s</td><td>0.0001 s</td></tr>
+          <tr><td>25</td><td>121,393</td><td>0.017 s</td><td>0.0001 s</td></tr>
+          <tr><td>30</td><td>1,346,269</td><td>0.17 s</td><td>0.0001 s</td></tr>
+          <tr><td>35</td><td>14,930,352</td><td>1.9 s</td><td>0.0002 s</td></tr>
+          <tr><td>40</td><td>165,580,141</td><td>22 s</td><td>0.0002 s</td></tr>
+        </table>
+        Each added character costs about 60% more time, so two characters past
+        the last row is a full minute. In the 22 seconds the backtracking engine
+        spends failing on 41 characters, the set simulation of &sect;4 consumes
+        about six million. (Measured on one laptop, same machine for both
+        columns; the shape of the growth is the point, not the constants.)
+        Nothing here is a defect in Python: it is what the algorithm does.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (ReDoS)</span>
+        A <strong>regular-expression denial of service</strong> (ReDoS) attack
+        supplies input, or a pattern, chosen so that matching takes superlinear
+        time, so that one small request occupies a CPU core for seconds or
+        minutes. Both halves are reachable in real systems: user input matched
+        against a fixed pattern, and user-supplied patterns (search boxes,
+        filters, alerting rules).
+      </div>
+      <p>
+        This is not hypothetical. Stack Overflow was down for 34 minutes in July
+        2016 when a post containing roughly 20,000 consecutive space characters
+        met a pattern that trimmed trailing whitespace; Cloudflare served global
+        HTTP 502s for 27 minutes in July 2019 when one regex in a new firewall
+        rule exhausted CPU across the fleet. Sedgewick&rsquo;s booksite records
+        an earlier one: an address pattern in SpamAssassin that a hostile
+        return address could stall.
+      </p>
+      <div class="thm">
+        <span class="tag">Why the set simulation is immune: paths versus states</span>
+        A backtracking engine&rsquo;s state is a <em>path</em>, and there are
+        \(\varphi^{\,n}\) of them. This handout&rsquo;s engine keeps a
+        <em>set of NFA states</em>, and there are only \(m+1\) of those.
+      </div>
+      <p>
+        Two paths that arrive at the same NFA state after the same number of
+        characters have <em>identical futures</em>: nothing about the rest of the
+        match can distinguish them. The set stores that state once, so the work
+        those two paths share is done once. A backtracker cannot notice the
+        coincidence, because it only ever holds one path at a time. Collapsing
+        exponentially many paths by indexing the work on the state they share is
+        exactly <a href="../dp/paradigm-dp-method.html">memoization</a>: the same move as
+        dynamic programming, applied to path search instead of to a grid of
+        subproblems. That is what takes \(1.618^{\,n}\) down to \(O(mn)\), and
+        the \(O(mn)\) bound of the proposition above is unconditional: no pattern
+        and no input can trigger a bad case, because the set is bounded by the
+        state count no matter how the branches multiply. This is precisely why
+        <code>grep</code> and Google&rsquo;s RE2 are built this way, and why
+        untrusted patterns must go through an engine of this kind (&sect;6).
+      </p>
+      <div class="aside">
+        <span class="tag">In fairness: what backtracking buys</span>
+        Backtracking supports features that are <em>not regular</em>, and so
+        cannot be compiled into a finite automaton at all: back references such
+        as <code>(a+)\1</code> (&ldquo;the same text again&rdquo;, which requires
+        remembering an arbitrary captured string) and lookaround. Matching with
+        back references is NP-hard, so the exponential is not laziness that a
+        better implementation could optimize away: it is the price of leaving the
+        regular languages. The engineering rule follows. If your pattern needs
+        only the four operations and their sugar, which is almost always, an
+        automaton engine gives you the same answer with a guarantee.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=nfa-sim">NFA simulation demo</a>. The
+        machine is drawn the way this handout draws it: states in a row with
+        their characters beneath, match edges straight on the line,
+        \(\varepsilon\)-arcs red and curved (forward above the row, the
+        star&rsquo;s repeat below), and an input strip on top that fills in as
+        characters are consumed. <em>Match</em> plays each character as
+        <strong>two steps</strong>, exactly the pseudocode&rsquo;s two lines:
+        <em>read</em> (the firing match edges turn green and the advanced
+        states light up) then <em>apply \(\varepsilon\)-transitions</em>
+        (the arcs the closure walks turn red and the states reached for free
+        are ringed). The regex in the box is the machine (default
+        <code>(A*B|AC)D</code>). Replay the table above: <code>AAABD</code> accepts through the left branch,
+        <code>ACD</code> through the right, and <code>AAD</code> dies mid-string: watch the set go empty. The text box accepts a repeat shorthand:
+        <code>A^9BD</code> means nine <code>A</code>&rsquo;s, and the star loop
+        churns \(\{2,3,4\}\) for as long as you like. Then press <em>Build</em>
+        with <code>(A|B)*B</code> from &sect;1 and match <code>B</code>,
+        <code>BAB</code>, <code>BA</code> against your hand answers.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="kleene">5. Kleene&rsquo;s theorem and the limits of regularity</h2>
+      <div class="thm">
+        <span class="tag">Theorem (Kleene)</span>
+        Regular expressions and finite automata describe exactly the same class of
+        languages: the regular languages. Every regex has an equivalent
+        finite automaton, and every finite automaton has an equivalent regex.
+      </div>
+      <div class="proof">
+        <strong>Why, in both directions (sketch).</strong>
+        <em>Regex \(\to\) automaton</em> is &sect;3: Thompson&rsquo;s construction
+        is itself the proof, an explicit \(O(m)\) recipe. <em>Automaton \(\to\)
+        regex</em> is <strong>state elimination</strong>: remove states one at a
+        time, and whenever a state goes, merge the paths through it into a single
+        edge labeled by a <em>regex</em>: concatenate what came in and out,
+        star any self-loop, union parallel edges. When only one
+        start\(\to\)accept edge remains, its label is a regex for the whole
+        machine. Both directions constructive, so the two formalisms have exactly
+        equal power. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This is the deep result the handout has been building: a rare, beautiful
+        equivalence between a <em>syntax</em> (patterns you write) and a
+        <em>machine model</em> (automata you run). It is why &ldquo;regular
+        expression&rdquo; and &ldquo;finite automaton&rdquo; are two views of one
+        idea, and why we can answer &ldquo;does it match?&rdquo; by running
+        a machine.
+      </p>
+      <div class="aside">
+        <span class="tag">Determinizing: the subset construction</span>
+        The simulation&rsquo;s &ldquo;current set of states&rdquo; can be made into
+        an explicit DFA state: one DFA state per reachable <em>subset</em> of
+        NFA states, with the advance-and-close step precomputed into its
+        transitions. That is the <strong>subset construction</strong>, and it is
+        where the \(2^m\) in &sect;2&rsquo;s table comes from: up to one DFA state
+        per subset. Once built, the DFA matches in pure \(O(n)\), no closure per
+        step.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the subset construction, worked as a worklist)</span>
+        Determinize <code>(A|B)*B</code>. Wrapped it is
+        <code>((A|B)*B)</code>: states \(0..9\), accept \(9\), built by the
+        rules of &sect;3:
+        <pre>  re:  ( ( A | B ) * B )      states 0..9   (9 = accept)
+  &epsilon;-edges: 0&rarr;1, 1&rarr;2, 1&rarr;4, 1&rarr;6, 3&rarr;5, 5&rarr;6, 6&rarr;1, 6&rarr;7, 8&rarr;9
+  match:    2&#x2500;A&rarr;3, 4&#x2500;B&rarr;5, 7&#x2500;B&rarr;8</pre>
+        The algorithm is &sect;4&rsquo;s two phases, run on <em>every</em>
+        character of the alphabet instead of on the next input character, with
+        each new subset pushed on a worklist until nothing new appears. Start
+        with \(\varepsilon\)-closure(\(\{0\}\)):
+        <table class="trace">
+          <tr><th class="lab">DFA state</th><th>subset</th><th>char</th><th>advance</th><th>close</th><th>lands on</th></tr>
+          <tr><td class="lab" rowspan="2">D0 (start)</td><td class="cell" rowspan="2">{0,1,2,4,6,7}</td>
+            <td>A</td><td>2 &#x2500;A&rarr; 3: {3}</td><td class="cell">{1,2,3,4,5,6,7}</td><td class="lt">new: D1</td></tr>
+          <tr><td>B</td><td>4 &#x2500;B&rarr; 5, 7 &#x2500;B&rarr; 8: {5,8}</td><td class="cell">{1,2,4,5,6,7,8,9}</td><td class="lt">new: D2</td></tr>
+          <tr><td class="lab" rowspan="2">D1</td><td class="cell" rowspan="2">{1,2,3,4,5,6,7}</td>
+            <td>A</td><td>2 &#x2500;A&rarr; 3: {3}</td><td class="cell">{1,2,3,4,5,6,7}</td><td>seen: D1</td></tr>
+          <tr><td>B</td><td>4 &#x2500;B&rarr; 5, 7 &#x2500;B&rarr; 8: {5,8}</td><td class="cell">{1,2,4,5,6,7,8,9}</td><td>seen: D2</td></tr>
+          <tr><td class="lab" rowspan="2">D2 (accept)</td><td class="cell" rowspan="2">{1,2,4,5,6,7,8,9}</td>
+            <td>A</td><td>2 &#x2500;A&rarr; 3: {3}</td><td class="cell">{1,2,3,4,5,6,7}</td><td>seen: D1</td></tr>
+          <tr><td>B</td><td>4 &#x2500;B&rarr; 5, 7 &#x2500;B&rarr; 8: {5,8}</td><td class="cell">{1,2,4,5,6,7,8,9}</td><td>seen: D2</td></tr>
+        </table>
+        <p>
+          Three closures worth checking by hand.
+          \(\varepsilon\)-closure(\(\{0\}\)) walks \(0\to1\), then
+          \(1\to2,4,6\), then \(6\to1\) (seen) and \(6\to7\):
+          \(\{0,1,2,4,6,7\}\), the three letter states \(2, 4, 7\) all armed
+          before any input, because the star may run zero times.
+          \(\varepsilon\)-closure(\(\{3\}\)) walks \(3\to5\), \(5\to6\),
+          \(6\to1\) and \(6\to7\), then \(1\to2,4,6\):
+          \(\{1,2,3,4,5,6,7\}\), which is \(D_0\) plus the just-consumed
+          \(3\) and \(5\), minus the unreachable start state \(0\).
+          \(\varepsilon\)-closure(\(\{5,8\}\)) adds \(9\) from \(8\to9\), and
+          state \(9\) is the accept state: <em>that</em> is why \(D_2\) is
+          accepting, and it is reached exactly by the subsets whose last
+          character was a <code>B</code>.
+        </p>
+        <p style="margin-bottom:0">
+          The worklist empties after three subsets: every row lands on a
+          subset already named, so the reachable part of the \(2^{10}\)
+          possible subsets is three states. Note what the table also proves:
+          the DFA is <em>total</em> (a transition for every state and
+          character) and deterministic, with no closure left to compute at
+          match time. The \(2^m\) worst case of &sect;2 is real but is a
+          bound on the reachable subsets, not a promise; on ordinary patterns,
+          as here, the count stays small.
+        </p>
+      </div>
+      <p>
+        The subset construction is honest but wasteful: it can hand back states
+        that no input can tell apart. <strong>Minimization</strong> merges them.
+        Say that the <strong>continuations</strong> of a state are the strings
+        that drive it to an accept state, so a state&rsquo;s continuations are
+        the language it still has left to recognize. Two states with the same
+        continuations cannot be distinguished by any input, so keeping them
+        separate records history the language does not care about, and they can
+        be merged.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (minimization, worked on <code>(A|B)*B</code>)</span>
+        Take &sect;1&rsquo;s ends-in-<code>B</code> pattern again. The worklist
+        above finished with three states, each a set of NFA states:
+        <pre>  D0 = {0,1,2,4,6,7}       start     A &rarr; D1    B &rarr; D2
+  D1 = {1,2,3,4,5,6,7}               A &rarr; D1    B &rarr; D2
+  D2 = {1,2,4,5,6,7,8,9}   accept    A &rarr; D1    B &rarr; D2</pre>
+        <code>D0</code> (before any character) and <code>D1</code> (after an
+        <code>A</code>) are different sets of NFA states, but read the rows: the
+        behavior is identical, and the continuations of both are &ldquo;every
+        string ending in <code>B</code>&rdquo;. They differ only in history, so
+        they merge, and what comes out is the two-state machine of
+        &sect;2 with the alphabet renamed:
+        <pre>  q0           "the input so far does NOT end in B"   A &rarr; q0   B &rarr; q1
+  q1  accept   "the input so far ends in B"           A &rarr; q0   B &rarr; q1</pre>
+        Three states down to two on a seven-character pattern; the same merging
+        is what keeps the table of a real lexer, built from dozens of token
+        patterns at once, small enough to ship.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=nfa2dfa">NFA &rarr; DFA demo</a>.
+        <em>Determinize</em> runs the subset construction as a worklist, one
+        step per (subset, character): the top panel replays each step ON the
+        NFA line (match edges green, closure arcs red, exactly &sect;4&rsquo;s
+        two phases), while the bottom panel grows the DFA, each state captioned
+        with the subset it froze. The default <code>(A*B|AC)D</code> reaches
+        only 6 DFA states (9 arrows) from its 12-state NFA. Type
+        <code>(A|B)*B</code> in the regex box and Determinize to reproduce the
+        example above: the demo&rsquo;s S0, S1, S2 are exactly D0, D1, D2, same
+        subsets, same arrows. Then walk the preset family &ldquo;k-th letter
+        from the end is A&rdquo;: the reachable subsets go 3, 5, 9, 17
+        (\(2^k+1\)), and one more <code>(A|B)</code> hits the demo&rsquo;s
+        32-state guard, the \(2^m\) blow-up in person.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the canonical form decides equivalence)</span>
+        Minimization always yields <em>the</em> unique smallest DFA for a
+        language, which makes it a canonical form: two patterns denote the same
+        language exactly when their minimal DFAs coincide. Take
+        <code>A(BA)*</code> and <code>(AB)*A</code>. They determinize to five
+        and four states respectively, and both minimize to the same three:
+        <pre>  q0             start    A &rarr; q1     B &rarr; dead
+  q1  accept              A &rarr; dead   B &rarr; q0
+  dead                    A &rarr; dead   B &rarr; dead</pre>
+        So the two patterns describe one language, the alternating strings that
+        start and end with <code>A</code>:
+        \(\{\texttt{A}, \texttt{ABA}, \texttt{ABABA}, \dots\}\). This is how
+        tools decide regex equivalence, and it is the only reliable way:
+        comparing the patterns themselves tells you nothing, since a language has
+        infinitely many regexes but exactly one minimal DFA. Compilers minimize
+        their lexer DFA for the other reason, space: that table is generated once
+        and then ships inside every copy of the compiler.
+      </div>
+      <h3>Above the regular languages</h3>
+      <p>
+        Kleene&rsquo;s theorem also sharpens &sect;1&rsquo;s ceiling: since regexes
+        and finite automata are the same thing, whatever a finite-memory machine
+        cannot do, no regex can say. \(\texttt{A}^n\texttt{B}^n\) needs an unbounded
+        counter; balanced parentheses need unbounded nesting. Those sit on the next
+        rungs of the <strong>Chomsky hierarchy</strong>, where each class adds power
+        by adding <em>memory</em>:
+      </p>
+      <table>
+        <tr><th>class</th><th>recognizer</th><th>memory</th><th>example</th></tr>
+        <tr><td><strong>regular</strong></td><td>finite automaton</td><td>none (just the state)</td><td>\(L(\texttt{A*B})\), &ldquo;ends in B&rdquo;</td></tr>
+        <tr><td><strong>context-free</strong></td><td>pushdown automaton</td><td>a <strong>stack</strong></td><td>balanced parens, \(\texttt{A}^n\texttt{B}^n\), program syntax</td></tr>
+        <tr><td><strong>recursively enumerable</strong></td><td>Turing machine</td><td>unbounded</td><td>everything computable</td></tr>
+      </table>
+      <p>
+        Regex sits at the bottom rung, which explains both its speed (finite
+        memory means one linear pass) and its limits (no counting, no nesting).
+        Programming-language syntax lives one rung up, recognized with a stack:
+        that is why a compiler&rsquo;s <em>lexer</em> is a regex engine but its
+        <em>parser</em> is not.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="practice">6. Choosing an engine in practice</h2>
+      <p>
+        Everything a real regex engine does is some point on the build-cost versus
+        run-cost trade the NFA/DFA table of &sect;2 set up:
+      </p>
+      <table>
+        <tr><th>you match&hellip;</th><th>use</th><th>why</th></tr>
+        <tr><td>a pattern <strong>once</strong></td><td>simulate the NFA</td><td>\(O(mn)\), no build cost worth amortizing</td></tr>
+        <tr><td><strong>one pattern, many texts</strong> (a lexer)</td><td>compile to a <strong>DFA</strong></td><td>pay the subset construction once, then \(O(n)\) per text</td></tr>
+        <tr><td><strong>untrusted</strong> patterns or inputs</td><td>NFA simulation</td><td>guaranteed \(O(mn)\), immune to ReDoS</td></tr>
+      </table>
+      <p>
+        Precompute or pay per query: the same decision as indexes, hash
+        tables, and dynamic programming. And the ideas land everywhere:
+        <code>grep</code> and RE2 are the set-of-states simulator of &sect;4;
+        every compiler tokenizes source with a (minimized) DFA generated by tools
+        like <code>flex</code>; protocol validators run automata over byte streams.
+        One more callback: KMP&rsquo;s precomputed failure-function table from the
+        <a href="algo-kmp.html"><em>Knuth&ndash;Morris&ndash;Pratt</em></a> handout <em>is</em> a DFA,
+        specialized to a single fixed pattern: you were doing automata
+        theory before the vocabulary arrived. Pattern \(\to\) machine
+        threads through the whole strings unit.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=nfa2dfa">NFA &rarr; DFA demo</a>,
+        <em>Match both</em>: the table&rsquo;s middle row, live. The two
+        machines race on the same string in lockstep. The NFA lane spends two
+        steps and \(O(m)\) set work per character; the DFA lane follows
+        <strong>one arrow</strong> per character (watch its counter read
+        &ldquo;\(n\) table reads, no set work&rdquo;) and visibly finishes
+        first. The set arithmetic did not disappear: <em>Determinize</em>
+        prepaid it, which is exactly the lexer&rsquo;s bargain, and exactly
+        what KMP&rsquo;s failure table prepaid for its one pattern.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">7. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Which of <code>&quot;ABAB&quot;</code>, <code>&quot;ABA&quot;</code>,
+          <code>&quot;&quot;</code> does <code>(AB)*</code> match? And write out
+          the language \(L(\texttt{(A|B)C})\) as an explicit set.
+          <details>
+            <summary>solution</summary>
+            <code>&quot;ABAB&quot;</code>: yes (two copies of
+            <code>AB</code>); <code>&quot;ABA&quot;</code>: no (a dangling
+            <code>A</code> that no whole number of copies covers);
+            <code>&quot;&quot;</code>: yes (<code>*</code> allows zero
+            copies). \(L(\texttt{(A|B)C}) = \{\texttt{AC}, \texttt{BC}\}\):
+            the group offers one choice, then a <code>C</code>.
+          </details>
+        </li>
+        <li>
+          Over \(\{\texttt{A},\texttt{B}\}\), give a regex for all strings that end
+          in <code>B</code>, and explain precisely why <code>A*B</code> is wrong.
+          <details>
+            <summary>solution</summary>
+            <code>(A|B)*B</code>, anything, then one final <code>B</code>.
+            <code>A*B</code> describes only &ldquo;a run of <code>A</code>&rsquo;s
+            then a single <code>B</code>&rdquo;: it is a <em>subset</em> of
+            ends-in-<code>B</code> that misses every string with an earlier
+            <code>B</code>, e.g. <code>&quot;BAB&quot;</code> (which ends in
+            <code>B</code> but is rejected: after the first <code>B</code>
+            the pattern is finished, and the trailing <code>AB</code> has nowhere
+            to go). Boundary checks on the right answer: <code>&quot;B&quot;</code>
+            &#10003;, <code>&quot;BA&quot;</code> &#10007;,
+            <code>&quot;&quot;</code> &#10007;.
+          </details>
+        </li>
+        <li>
+          Precedence. Fully parenthesize <code>AB|C*</code>. Then classify each of
+          <code>&quot;A&quot;</code>, <code>&quot;&quot;</code>,
+          <code>&quot;ABAB&quot;</code> as matching <code>AB*</code>,
+          <code>(AB)*</code>, both, or neither.
+          <details>
+            <summary>solution</summary>
+            Star binds tightest, then concatenation, then <code>|</code>:
+            <code>AB|C* = (AB)|(C*)</code>. For the classification,
+            <code>AB*</code> is &ldquo;one <code>A</code>, then zero or more
+            <code>B</code>&rsquo;s&rdquo; while <code>(AB)*</code> is &ldquo;zero
+            or more <code>AB</code> pairs&rdquo;: <code>&quot;A&quot;</code>
+            matches <code>AB*</code> only (zero <code>B</code>&rsquo;s);
+            <code>&quot;&quot;</code> matches <code>(AB)*</code> only (zero pairs; <code>AB*</code> requires the <code>A</code>);
+            <code>&quot;ABAB&quot;</code> matches <code>(AB)*</code> only
+            (<code>AB*</code> allows nothing after the <code>B</code>&rsquo;s
+            start). No string here matches both, though e.g.
+            <code>&quot;AB&quot;</code> would.
+          </details>
+        </li>
+        <li>
+          Build the NFA for <code>AB*</code> under Sedgewick&rsquo;s encoding
+          (unwrapped, like the worked <code>A*B</code>): list the states, the
+          \(\varepsilon\)-edges, and the match edges, then compute
+          \(\varepsilon\)-closure(\(\{0\}\)). It differs from
+          <code>A*B</code>&rsquo;s in an instructive way.
+          <details>
+            <summary>solution</summary>
+            States \(0\,\texttt{&#x27;A&#x27;}\), \(1\,\texttt{&#x27;B&#x27;}\),
+            \(2\,\texttt{&#x27;*&#x27;}\), \(3 =\) accept. The star&rsquo;s operand
+            is now the <code>B</code>, so the \(\varepsilon\)-edges wrap state 1:
+            \(1\to2\) (skip the <code>B</code>), \(2\to1\) (repeat it), and
+            \(2\to3\) (fall through). Match edges
+            \(0\,\xrightarrow{\texttt{A}}\,1\) and
+            \(1\,\xrightarrow{\texttt{B}}\,2\). And
+            \(\varepsilon\)-closure(\(\{0\}\)) \(= \{0\}\): state 0 has
+            <em>no</em> \(\varepsilon\)-edges out, so unlike <code>A*B</code>
+            nothing is free before the first character: the <code>A</code> is
+            mandatory. (Check: <code>&quot;A&quot;</code> accepts: \(\{0\}\to\{1,2,3\}\); <code>&quot;B&quot;</code> rejects: the
+            set dies immediately.)
+          </details>
+        </li>
+        <li>
+          Simulate the worked <code>A*B</code> machine on
+          <code>&quot;AB&quot;</code> and on the empty string
+          <code>&quot;&quot;</code>, giving every state set. What general fact does
+          the second trace illustrate?
+          <details>
+            <summary>solution</summary>
+            <code>&quot;AB&quot;</code>: start \(\{0,1,2\}\); read <code>A</code>: 0 advances to \(\{1\}\), closure \(\{0,1,2\}\); read
+            <code>B</code>: 2 advances to \(\{3\}\), closure \(\{3\}\);
+            \(3\) is the accept state &rarr; <strong>accept</strong>.
+            <code>&quot;&quot;</code>: no characters are read, so the final set is
+            the start closure \(\{0,1,2\}\), which does <em>not</em> contain
+            \(3\) &rarr; <strong>reject</strong>. The general fact: acceptance is
+            evaluated only <em>after the last character</em>, on whatever set is
+            active then: the machine being &ldquo;near&rdquo; the accept
+            state, or passing through it mid-string, counts for nothing.
+          </details>
+        </li>
+        <li>
+          Trace the wrapped 12-state <code>(A*B|AC)D</code> machine on
+          <code>&quot;BD&quot;</code>. Which branch of the alternation accepts it,
+          and what does that reveal about the string?
+          <details>
+            <summary>solution</summary>
+            Start closure \(\{0,1,2,3,4,6\}\). Read <code>B</code>: only state 4
+            matches, advance \(\{5\}\), closure \(\{5,8,9\}\) (the <code>|</code>
+            skips to the <code>)</code>, which falls through to the
+            <code>D</code>). Read <code>D</code>: state 9 advances to
+            \(\{10\}\), closure \(\{10,11\}\): contains the accept state
+            \(11\) &rarr; <strong>accept</strong>. The <em>left</em> branch
+            accepted, with the star contributing zero <code>A</code>&rsquo;s:
+            <code>&quot;BD&quot;</code> is \(\texttt{A*B}\) (as just
+            <code>B</code>) followed by <code>D</code>. The right branch
+            (<code>AC</code>) died on the first character: state 6 does not
+            match <code>B</code>.
+          </details>
+        </li>
+        <li>
+          Run the subset construction on the wrapped <code>(A*B)</code> machine
+          (states \(0..5\), accept \(5\); \(\varepsilon\)-edges \(0\to1\),
+          \(1\to2\), \(2\to1\), \(2\to3\), \(4\to5\); match edges
+          \(1\,\xrightarrow{\texttt{A}}\,2\) and
+          \(3\,\xrightarrow{\texttt{B}}\,4\)) over the alphabet
+          \(\{\texttt{A}, \texttt{B}\}\). How many DFA states does it reach,
+          and which of them could minimization merge?
+          <details>
+            <summary>solution</summary>
+            Four, one of them the empty set:
+            <pre>  D0 = {0,1,2,3}   start     A &rarr; D1    B &rarr; D2
+  D1 = {1,2,3}               A &rarr; D1    B &rarr; D2
+  D2 = {4,5}       accept    A &rarr; D3    B &rarr; D3
+  D3 = { }         dead      A &rarr; D3    B &rarr; D3</pre>
+            The start closure is \(\{0,1,2,3\}\) (the wrap&rsquo;s
+            \(0\to1\), the star&rsquo;s skip \(1\to2\), the fall-through
+            \(2\to3\)), so the <code>B</code> is armed with zero
+            <code>A</code>&rsquo;s. An <code>A</code> advances \(\{2\}\) and
+            closes to \(\{1,2,3\}\): the same set minus the unreachable start
+            state, so the machine loops there for any run of
+            <code>A</code>&rsquo;s. A <code>B</code> advances \(\{4\}\) and
+            closes to \(\{4,5\}\), which holds the accept state; from there
+            nothing matches, so both characters land on the empty subset,
+            a perfectly ordinary DFA state (the <strong>dead</strong> state)
+            that the NFA simulation represents as an empty active set.
+            \(D_0\) and \(D_1\) have identical rows and neither is accepting,
+            so they are equivalent and merge: the minimal DFA has three
+            states, one per honest fact about the input read so far
+            (&ldquo;only <code>A</code>&rsquo;s so far&rdquo;, &ldquo;the
+            <code>B</code> has been read&rdquo;, &ldquo;something is
+            wrong&rdquo;).
+          </details>
+        </li>
+        <li>
+          A compiler&rsquo;s lexer will match one fixed token pattern against
+          millions of source lines; a web form will run patterns supplied by
+          <em>users</em> against their own input. For each, choose NFA simulation
+          or DFA compilation, with costs.
+          <details>
+            <summary>solution</summary>
+            Lexer: compile to a DFA. The subset construction&rsquo;s build cost
+            (potentially large, up to \(2^m\) states, though rarely near it) is
+            paid once and amortized over millions of \(O(n)\) matches; per-text
+            there is no set tracking and no closure. User-supplied patterns: NFA
+            simulation. The build is \(\Theta(m)\) and matching is guaranteed
+            \(O(mn)\), so no adversarial pattern can trigger exponential behavior; whereas handing untrusted patterns to a backtracking engine
+            invites ReDoS, and determinizing an adversarial pattern could itself
+            blow up in space. This is the build-cost/run-cost trade of &sect;6:
+            amortize when the pattern is reused, stay linear when it is not
+            trusted or not reused.
+          </details>
+        </li>
+        <li>
+          Classify each language over \(\{\texttt{A},\texttt{B}\}\) (or the
+          bracket alphabet) as regular or not, with justification: (a) strings with
+          an <em>even number</em> of <code>A</code>&rsquo;s; (b)
+          \(\texttt{A}^n\texttt{B}^n\); (c) balanced parentheses.
+          <details>
+            <summary>solution</summary>
+            (a) <strong>Regular</strong>: a two-state automaton whose state is the
+            parity of <code>A</code>&rsquo;s seen decides it: finite memory
+            (one bit) suffices. A regex: <code>(B|AB*A)*</code>, reading
+            left to right, each block is either a lone <code>B</code> or a pair of
+            <code>A</code>&rsquo;s with any <code>B</code>&rsquo;s between, so
+            <code>A</code>&rsquo;s are consumed strictly in pairs.
+            (b) <strong>Not regular</strong>: matching the <code>B</code>-count to
+            the <code>A</code>-count requires remembering an unbounded integer
+            \(n\), and a finite automaton&rsquo;s only memory is which of its
+            fixed states it occupies; the pumping lemma formalizes the
+            contradiction. (c) <strong>Not regular</strong>, same reason: nesting
+            depth is an unbounded count. Both (b) and (c) are context-free, one rung up the hierarchy, recognized with a stack.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Regular Expressions &amp; Automata v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline, all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

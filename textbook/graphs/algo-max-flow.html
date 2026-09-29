@@ -1,0 +1,1483 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Maximum Flow & Minimum Cut.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Maximum Flow &amp; Minimum Cut - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Maximum Flow &amp; Minimum Cut</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        How much material can be pushed from a source to a sink through a network
+        of capacitated pipes, and what bottleneck stops it. Flow networks,
+        capacity and conservation, \(s\)-\(t\) cuts and the weak-duality bound,
+        residual graphs with their undo arcs, the Ford-Fulkerson augmenting-path
+        method unrolled iteration by iteration (including one augmentation that
+        pushes flow back along an edge already carrying flow), termination and
+        integrality with integer capacities, the max-flow min-cut theorem with
+        proof, the Edmonds-Karp breadth-first refinement and its
+        \(O(VE^2)\) bound, the pathological-capacity example that motivates it,
+        bipartite matching as a worked reduction, and exercises with solutions.
+      </div>
+
+      <p class="lead">
+        A pipeline network carries oil from a well to a refinery; every pipe has a
+        throughput limit, and junctions neither store nor create oil. A road
+        network moves cars from a stadium to a highway; every street has a lane
+        capacity. A scheduling system assigns applicants to jobs; every applicant
+        takes one job and every job takes one applicant. All three ask the same
+        question: given a directed graph whose edges have <em>capacities</em>, how
+        much can be sent from a designated <strong>source</strong> \(s\) to a
+        designated <strong>sink</strong> \(t\) at once? The answer is the
+        <strong>maximum flow</strong>. It comes with a companion answer that
+        certifies it: some set of edges, a <strong>cut</strong>, whose total
+        capacity equals that maximum and which every unit of flow must cross.
+        Maximum flow and minimum cut are two descriptions of one number, and the
+        algorithm that computes either computes both.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#problem">Flow networks: capacity and conservation</a></li>
+          <li><a href="#cuts">Cuts, and the bound they give</a></li>
+          <li><a href="#residual">Residual graphs: slack and undo</a></li>
+          <li><a href="#ff">Ford-Fulkerson</a></li>
+          <li><a href="#trace">A full run, iteration by iteration</a></li>
+          <li><a href="#terminate">Termination and integrality</a></li>
+          <li><a href="#theorem">The max-flow min-cut theorem</a></li>
+          <li><a href="#ek">Edmonds-Karp: choosing the path with BFS</a></li>
+          <li><a href="#matching">Bipartite matching, by reduction</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="problem">1. Flow networks: capacity and conservation</h2>
+      <div class="def">
+        <span class="tag">Definition (flow network)</span>
+        A <strong>flow network</strong> is a directed graph \(G = (V, E)\) with a
+        nonnegative integer <strong>capacity</strong> \(c(u,v) \ge 0\) on each
+        edge \(u \to v\), together with two distinguished vertices, the
+        <strong>source</strong> \(s\) and the <strong>sink</strong> \(t \ne s\).
+        Edges not present are given capacity \(0\). The representation is the
+        weighted adjacency list (or matrix) of the
+        <a href="ds-graph-representations.html">graph-representations
+        handout</a>, with the weight read as a capacity.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (flow)</span>
+        A <strong>flow</strong> is a function \(f\) assigning a number
+        \(f(u,v)\) to every edge, subject to two constraints:
+        <ul>
+          <li><strong>Capacity:</strong> \(0 \le f(u,v) \le c(u,v)\) for every
+            edge. No pipe carries more than it can hold, and nothing flows
+            backwards along an edge.</li>
+          <li><strong>Conservation:</strong> for every vertex \(v\) other than
+            \(s\) and \(t\),
+            \[
+              \sum_{u \,:\, u \to v} f(u,v) \;=\; \sum_{w \,:\, v \to w} f(v,w).
+            \]
+            What arrives leaves. Interior vertices are junctions, not tanks.</li>
+        </ul>
+        The <strong>value</strong> of the flow is the net amount leaving the
+        source,
+        \[
+          |f| \;=\; \sum_{w \,:\, s \to w} f(s,w) \;-\; \sum_{u \,:\, u \to s} f(u,s),
+        \]
+        and the <strong>maximum-flow problem</strong> is to find a flow of
+        largest value.
+      </div>
+      <p>
+        Two conventions keep the statement clean. Capacities are integers
+        throughout this handout; <a href="#terminate">&sect;6</a> explains exactly
+        what that buys and what breaks without it. And the network is assumed to
+        have no edge into \(s\) and no edge out of \(t\); this costs nothing
+        (such edges can carry flow only in circulation, never in a route from
+        \(s\) to \(t\)) and lets \(|f|\) be read simply as
+        \(\sum_w f(s,w)\).
+      </p>
+      <h3>The running network</h3>
+      <p>
+        One network anchors every trace below: four vertices \(s, a, b, t\) and
+        five edges.
+      </p>
+      <figure>
+        <svg viewBox="0 0 440 300" role="img" aria-label="The running flow network. Source s at the left, vertex a at the top middle, vertex b at the bottom middle, sink t at the right. Five directed edges with capacities: s to a capacity 9, s to b capacity 7, a to b capacity 4 pointing downward, a to t capacity 6, and b to t capacity 8.">
+          <defs>
+            <marker id="mfah" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#4a5163"/>
+            </marker>
+          </defs>
+          <g stroke="#4a5163" stroke-width="1.8" fill="none" marker-end="url(#mfah)">
+            <line x1="71" y1="140" x2="184" y2="70"/>    <!-- s->a -->
+            <line x1="71" y1="160" x2="184" y2="230"/>   <!-- s->b -->
+            <line x1="200" y1="79" x2="200" y2="221"/>   <!-- a->b -->
+            <line x1="217" y1="68" x2="373" y2="142"/>   <!-- a->t -->
+            <line x1="217" y1="232" x2="373" y2="158"/>  <!-- b->t -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="700"
+             fill="#0a7d4d" stroke="#fff" stroke-width="3" paint-order="stroke"
+             text-anchor="middle">
+            <text x="116" y="96">9</text>    <!-- s->a -->
+            <text x="116" y="212">7</text>   <!-- s->b -->
+            <text x="215" y="155">4</text>   <!-- a->b -->
+            <text x="296" y="94">6</text>    <!-- a->t -->
+            <text x="296" y="214">8</text>   <!-- b->t -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="55" cy="150" r="19"/>  <circle cx="200" cy="60" r="19"/>
+              <circle cx="200" cy="240" r="19"/> <circle cx="390" cy="150" r="19"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="55" y="155">s</text>   <text x="200" y="65">a</text>
+              <text x="200" y="245">b</text>  <text x="390" y="155">t</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The running network. Capacities: \(c(s,a) = 9\), \(c(s,b) = 7\),
+          \(c(a,b) = 4\), \(c(a,t) = 6\), \(c(b,t) = 8\). The middle edge
+          \(a \to b\) is the interesting one: it is the only way for supply that
+          arrives at \(a\) to be spent at \(b\), and <a href="#trace">&sect;5</a>
+          shows an algorithm putting \(4\) units on it and later taking one back.
+        </figcaption>
+      </figure>
+      <p>
+        A first guess: send \(9\) down \(s \to a\) and \(7\) down \(s \to b\), for
+        \(16\). Conservation refuses it. Vertex \(a\) would have \(9\) arriving
+        and at most \(6 + 4 = 10\) of outgoing capacity, which is fine, but
+        \(b\) would then have \(7 + 4 = 11\) arriving and only \(8\) of outgoing
+        capacity. Something has to give, and the next section says exactly how
+        much.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cuts">2. Cuts, and the bound they give</h2>
+      <div class="def">
+        <span class="tag">Definition (\(s\)-\(t\) cut)</span>
+        An <strong>\(s\)-\(t\) cut</strong> is a partition of \(V\) into two sets
+        \((S, T)\) with \(s \in S\), \(t \in T\), and \(T = V \setminus S\). Its
+        <strong>capacity</strong> is the total capacity of the edges pointing from
+        \(S\) into \(T\):
+        \[
+          \operatorname{cap}(S,T) \;=\; \sum_{u \in S} \sum_{v \in T} c(u,v).
+        \]
+        Edges pointing from \(T\) back into \(S\) contribute <em>nothing</em> to
+        the capacity. A <strong>minimum cut</strong> is one of least capacity.
+      </div>
+      <p>
+        Since a cut is determined by its \(S\) side, and \(S\) must contain \(s\)
+        and exclude \(t\), a network with \(V\) vertices has exactly
+        \(2^{V-2}\) cuts. The running network has \(2^2 = 4\), and they can simply
+        be listed:
+      </p>
+      <table class="trace">
+        <tr>
+          <th class="lab">cut \((S,T)\)</th>
+          <th style="text-align:left">edges \(S \to T\)</th>
+          <th>capacity</th>
+        </tr>
+        <tr><td class="lab">\(S=\{s\}\)</td>
+          <td class="lab">\(s\to a\,(9)\), \(s\to b\,(7)\)</td><td>16</td></tr>
+        <tr><td class="lab">\(S=\{s,a\}\)</td>
+          <td class="lab">\(s\to b\,(7)\), \(a\to b\,(4)\), \(a\to t\,(6)\)</td><td>17</td></tr>
+        <tr><td class="lab">\(S=\{s,b\}\)</td>
+          <td class="lab">\(s\to a\,(9)\), \(b\to t\,(8)\)</td><td>17</td></tr>
+        <tr><td class="lab">\(S=\{s,a,b\}\)</td>
+          <td class="lab">\(a\to t\,(6)\), \(b\to t\,(8)\)</td><td class="set">14</td></tr>
+      </table>
+      <p>
+        Note the third row: the edge \(a \to b\) points from \(T\) back into
+        \(S\), so it is not counted, and the cut \(\{s,b\}\) costs \(9 + 8 = 17\),
+        not \(21\). The minimum over all four cuts is \(14\), at
+        \(S = \{s,a,b\}\). The next two results say that \(14\) is not merely a
+        listing curiosity: it is an upper bound on every flow, and it is attained.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (flow across a cut)</span>
+        For any flow \(f\) and any \(s\)-\(t\) cut \((S,T)\),
+        \[
+          |f| \;=\; \underbrace{\sum_{u \in S}\sum_{v \in T} f(u,v)}_{\text{flow leaving } S}
+                 \;-\; \underbrace{\sum_{v \in T}\sum_{u \in S} f(v,u)}_{\text{flow returning to } S}.
+        \]
+        Every cut measures the same net flow, no matter where it is drawn.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> For a vertex \(v\), write
+        \(\operatorname{net}(v) = \sum_{w} f(v,w) - \sum_{u} f(u,v)\), the net
+        outflow at \(v\). Conservation says \(\operatorname{net}(v) = 0\) for every
+        \(v \notin \{s,t\}\), and the definition of value says
+        \(\operatorname{net}(s) = |f|\). Sum over all of \(S\):
+        \[
+          \sum_{v \in S} \operatorname{net}(v) \;=\; |f| + 0 + \cdots + 0 \;=\; |f|.
+        \]
+        Now expand the left side edge by edge. An edge with both endpoints inside
+        \(S\) contributes \(+f\) at its tail and \(-f\) at its head, cancelling. An
+        edge from \(S\) to \(T\) contributes only \(+f\), at its tail. An edge from
+        \(T\) to \(S\) contributes only \(-f\), at its head. Edges with both
+        endpoints in \(T\) contribute nothing. What survives is exactly the stated
+        difference. <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (weak duality)</span>
+        For any flow \(f\) and any \(s\)-\(t\) cut \((S,T)\),
+        \(\;|f| \le \operatorname{cap}(S,T)\). Consequently
+        \(\max_f |f| \le \min_{(S,T)} \operatorname{cap}(S,T)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Start from the lemma. The returning term is a sum
+        of flows, hence \(\ge 0\), so dropping it can only raise the right side:
+        \(|f| \le \sum_{u \in S, v \in T} f(u,v)\). Each term obeys
+        \(f(u,v) \le c(u,v)\) by the capacity constraint, so the sum is at most
+        \(\sum_{u \in S, v \in T} c(u,v) = \operatorname{cap}(S,T)\). Taking the
+        maximum on the left and the minimum on the right preserves the
+        inequality. <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (weak duality, checked numerically)</span>
+        Take the flow \(f\) on the running network with
+        \(f(s,a)=9\), \(f(s,b)=4\), \(f(a,b)=4\), \(f(a,t)=5\), \(f(b,t)=8\).
+        Capacity holds edge by edge (\(9\le9\), \(4\le7\), \(4\le4\),
+        \(5\le6\), \(8\le8\)) and conservation holds at both interior vertices:
+        at \(a\), \(9\) in and \(4+5 = 9\) out; at \(b\), \(4+4 = 8\) in and
+        \(8\) out. Its value is \(|f| = 9+4 = 13\). The lemma says every cut
+        reports \(13\):
+        <table class="trace">
+          <tr><th class="lab">cut</th><th>flow \(S \to T\)</th><th>flow \(T \to S\)</th><th>net</th><th>capacity</th></tr>
+          <tr><td class="lab">\(\{s\}\)</td><td>\(9+4=13\)</td><td>0</td><td class="set">13</td><td>16</td></tr>
+          <tr><td class="lab">\(\{s,a\}\)</td><td>\(4+4+5=13\)</td><td>0</td><td class="set">13</td><td>17</td></tr>
+          <tr><td class="lab">\(\{s,b\}\)</td><td>\(9+8=17\)</td><td>\(4\)</td><td class="set">13</td><td>17</td></tr>
+          <tr><td class="lab">\(\{s,a,b\}\)</td><td>\(5+8=13\)</td><td>0</td><td class="set">13</td><td>14</td></tr>
+        </table>
+        The \(\{s,b\}\) row is the one that shows why the returning term matters:
+        \(17\) units cross forward, but \(4\) of them come straight back along
+        \(a \to b\), and the net is \(13\) like everywhere else. Weak duality is
+        visible in the last two columns: \(13 \le 16, 17, 17, 14\). The tightest
+        bound is \(14\), so no flow on this network can exceed \(14\), and this
+        particular flow is at most \(1\) short of optimal. Whether it is short at
+        all is the question <a href="#residual">&sect;3</a> answers.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="residual">3. Residual graphs: slack and undo</h2>
+      <p>
+        Given a flow, how can it be improved? The naive move is to find a path
+        from \(s\) to \(t\) all of whose edges still have spare capacity, and push
+        more along it. That move alone is not enough: the flow of value \(13\)
+        above has no such path (\(s \to a\) is saturated, and from \(s \to b\)
+        the only continuation \(b \to t\) is saturated too), yet a flow of value
+        \(14\) exists. The missing move is <em>retraction</em>: sending flow back
+        along an edge that already carries some, freeing capacity downstream so it
+        can be spent better. The residual graph packages both moves as ordinary
+        edges, so that a single path search finds either.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (residual graph)</span>
+        Given a flow \(f\) on \(G\), the <strong>residual graph</strong>
+        \(G_f\) has the same vertices and, for every edge \(u \to v\) of \(G\), up
+        to two arcs:
+        <ul>
+          <li>a <strong>forward arc</strong> \(u \to v\) of residual capacity
+            \(c(u,v) - f(u,v)\), the unused slack, present when that is positive;</li>
+          <li>a <strong>backward arc</strong> \(v \to u\) of residual capacity
+            \(f(u,v)\), the amount that could be undone, present when that is
+            positive.</li>
+        </ul>
+        Write \(c_f(x,y)\) for the residual capacity of arc \(x \to y\) in
+        \(G_f\). An <strong>augmenting path</strong> is any directed
+        \(s \to t\) path in \(G_f\); its <strong>bottleneck</strong> is the
+        minimum residual capacity along it.
+      </div>
+      <p>
+        A backward arc is not a physical pipe. It is the bookkeeping entry that
+        says &ldquo;up to \(f(u,v)\) units currently routed \(u \to v\) may be
+        rerouted elsewhere.&rdquo; The point of the construction is that pushing
+        \(b\) units along an augmenting path, treating forward and backward arcs
+        identically, always yields a valid flow of value \(|f| + b\).
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (augmentation is legal)</span>
+        Let \(P\) be an augmenting path in \(G_f\) with bottleneck \(b &gt; 0\).
+        Define \(f'\) by adding \(b\) to \(f(u,v)\) for each forward arc
+        \(u \to v\) of \(P\) and subtracting \(b\) from \(f(u,v)\) for each
+        backward arc \(v \to u\) of \(P\). Then \(f'\) is a flow and
+        \(|f'| = |f| + b\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> <em>Capacity.</em> On a forward arc,
+        \(b \le c_f(u,v) = c(u,v) - f(u,v)\), so
+        \(f'(u,v) = f(u,v) + b \le c(u,v)\), and it stays \(\ge 0\). On a
+        backward arc, \(b \le c_f(v,u) = f(u,v)\), so
+        \(f'(u,v) = f(u,v) - b \ge 0\), and it stays \(\le c(u,v)\).
+        <br>
+        <em>Conservation.</em> Let \(x\) be an interior vertex on \(P\); the path
+        enters \(x\) by one arc and leaves by another (a path visits \(x\) once).
+        Four cases, by the direction of each of the two arcs. If both are forward,
+        \(x\) gains \(b\) of inflow and \(b\) of outflow. If both are backward,
+        \(x\) loses \(b\) of outflow (the incoming arc undoes an edge \(x \to y\))
+        and loses \(b\) of inflow (the outgoing arc undoes an edge \(z \to x\)),
+        again balanced. If the entering arc is forward and the leaving arc is
+        backward, \(x\) gains \(b\) of inflow and loses \(b\) of inflow on another
+        edge, so both sides are unchanged; symmetrically for the fourth case,
+        where outflow rises on one edge and falls on another. Vertices not on
+        \(P\) are untouched.
+        <br>
+        <em>Value.</em> \(P\) leaves \(s\) by exactly one arc, and it cannot be a
+        backward arc, because a backward arc out of \(s\) would come from an edge
+        into \(s\), and there are none. So exactly one term
+        \(f(s,w)\) increases, by \(b\), giving
+        \(|f'| = |f| + b\). <span class="qed">&#8718;</span>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ff">4. Ford-Fulkerson</h2>
+      <p>
+        The augmentation lemma turns into an algorithm immediately: start with the
+        zero flow, and while the residual graph has an \(s \to t\) path, push its
+        bottleneck along it. This is the <strong>Ford-Fulkerson method</strong>,
+        published by L. R. Ford and D. R. Fulkerson in 1956. It is a
+        <em>method</em>, not a single algorithm, because it does not say which
+        augmenting path to take, and the choice turns out to matter a great deal
+        (<a href="#terminate">&sect;6</a>, <a href="#ek">&sect;8</a>).
+      </p>
+      <pre>  f = 0 on every edge
+  while G_f has an s-to-t path P:
+      b = min residual capacity along P     <span class="cm">// the bottleneck</span>
+      push b along P                        <span class="cm">// forward arcs +b, backward arcs -b</span>
+  return f</pre>
+      <p>
+        The implementation below keeps <em>only</em> the residual graph, in a
+        matrix <code>res</code> initialized to the capacities. Pushing \(b\) along
+        an arc \(u \to v\) does <code>res[u][v] -= b; res[v][u] += b;</code>, which
+        simultaneously consumes forward slack and grows the undo arc, with no
+        separate flow array to keep in step. The flow on an original edge is
+        recovered afterwards as \(c(u,v) - \texttt{res}[u][v]\). The path search
+        shown is a breadth-first search (BFS), which makes this the Edmonds-Karp
+        version of <a href="#ek">&sect;8</a>; swapping the queue for a stack gives
+        a depth-first search (DFS) and the generic method.
+      </p>
+      <div class="code-tabs" data-snippet="graphs/max-flow">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Ford-Fulkerson with BFS-chosen augmenting paths (Edmonds-Karp).
+// res[u][v] is the residual capacity of u-&gt;v; initialize res to the capacities.
+// On return, res holds the final residual graph and parent[] marks the min cut.
+int maxFlow(vector&lt;vector&lt;int&gt;&gt;&amp; res, int s, int t, vector&lt;int&gt;&amp; parent) {
+    int n = res.size(), value = 0;
+    while (true) {
+        parent.assign(n, -1);
+        parent[s] = s;                            <span class="cm">// s is its own parent: "seen"</span>
+        queue&lt;int&gt; q;  q.push(s);
+        while (!q.empty() &amp;&amp; parent[t] == -1) {   <span class="cm">// BFS in the residual graph</span>
+            int u = q.front();  q.pop();
+            for (int v = 0; v &lt; n; v++)
+                if (parent[v] == -1 &amp;&amp; res[u][v] &gt; 0) { parent[v] = u; q.push(v); }
+        }
+        if (parent[t] == -1) return value;        <span class="cm">// no augmenting path: done</span>
+
+        int b = INT_MAX;                          <span class="cm">// bottleneck along the path</span>
+        for (int v = t; v != s; v = parent[v]) b = min(b, res[parent[v]][v]);
+        for (int v = t; v != s; v = parent[v]) {
+            res[parent[v]][v] -= b;               <span class="cm">// spend forward slack</span>
+            res[v][parent[v]] += b;               <span class="cm">// grow the undo arc</span>
+        }
+        value += b;
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Ford-Fulkerson with BFS-chosen augmenting paths (Edmonds-Karp).
+// res[u][v] is the residual capacity of u-&gt;v; initialize res to the capacities.
+// On return, res holds the final residual graph and parent[] marks the min cut.
+int maxFlow(int[][] res, int s, int t, int[] parent) {
+    int n = res.length, value = 0;
+    while (true) {
+        Arrays.fill(parent, -1);
+        parent[s] = s;                            // s is its own parent: "seen"
+        Deque&lt;Integer&gt; q = new ArrayDeque&lt;&gt;();  q.add(s);
+        while (!q.isEmpty() &amp;&amp; parent[t] == -1) { // BFS in the residual graph
+            int u = q.poll();
+            for (int v = 0; v &lt; n; v++)
+                if (parent[v] == -1 &amp;&amp; res[u][v] &gt; 0) { parent[v] = u; q.add(v); }
+        }
+        if (parent[t] == -1) return value;        // no augmenting path: done
+
+        int b = Integer.MAX_VALUE;                // bottleneck along the path
+        for (int v = t; v != s; v = parent[v]) b = Math.min(b, res[parent[v]][v]);
+        for (int v = t; v != s; v = parent[v]) {
+            res[parent[v]][v] -= b;               // spend forward slack
+            res[v][parent[v]] += b;               // grow the undo arc
+        }
+        value += b;
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Ford-Fulkerson with BFS-chosen augmenting paths (Edmonds-Karp).
+# res[u][v] is the residual capacity of u-&gt;v; initialize res to the capacities.
+# Returns (value, parent); parent marks the min cut on the final iteration.
+def max_flow(res, s, t):
+    n, value = len(res), 0
+    while True:
+        parent = [-1] * n
+        parent[s] = s                             # s is its own parent: "seen"
+        q = deque([s])
+        while q and parent[t] == -1:              # BFS in the residual graph
+            u = q.popleft()
+            for v in range(n):
+                if parent[v] == -1 and res[u][v] &gt; 0:
+                    parent[v] = u
+                    q.append(v)
+        if parent[t] == -1:
+            return value, parent                  # no augmenting path: done
+
+        b, v = float(&quot;inf&quot;), t                    # bottleneck along the path
+        while v != s:
+            b = min(b, res[parent[v]][v]); v = parent[v]
+        v = t
+        while v != s:
+            res[parent[v]][v] -= b                # spend forward slack
+            res[v][parent[v]] += b                # grow the undo arc
+            v = parent[v]
+        value += b</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Ford-Fulkerson with BFS-chosen augmenting paths (Edmonds-Karp).
+// res[u][v] is the residual capacity of u-&gt;v; initialize res to the capacities.
+// Returns (value, parent); parent marks the min cut on the final iteration.
+fn max_flow(res: &amp;mut Vec&lt;Vec&lt;i64&gt;&gt;, s: usize, t: usize) -&gt; (i64, Vec&lt;isize&gt;) {
+    let n = res.len();
+    let mut value = 0i64;
+    loop {
+        let mut parent = vec![-1isize; n];
+        parent[s] = s as isize;                   // s is its own parent: "seen"
+        let mut q = VecDeque::from(vec![s]);
+        while let Some(u) = q.pop_front() {       // BFS in the residual graph
+            if parent[t] != -1 { break; }
+            for v in 0..n {
+                if parent[v] == -1 &amp;&amp; res[u][v] &gt; 0 { parent[v] = u as isize; q.push_back(v); }
+            }
+        }
+        if parent[t] == -1 { return (value, parent); }   // no augmenting path
+
+        let (mut b, mut v) = (i64::MAX, t);       // bottleneck along the path
+        while v != s { let p = parent[v] as usize; b = b.min(res[p][v]); v = p; }
+        v = t;
+        while v != s {
+            let p = parent[v] as usize;
+            res[p][v] -= b;                       // spend forward slack
+            res[v][p] += b;                       // grow the undo arc
+            v = p;
+        }
+        value += b;
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/max-flow.cpp &middot; code/graphs/max-flow.java &middot; code/graphs/max-flow.py &middot; code/graphs/max-flow.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Three notes on the representation. First, the matrix merges antiparallel
+        edges: if the network has both \(u \to v\) of capacity \(3\) and
+        \(v \to u\) of capacity \(5\), a single <code>res</code> pair cannot tell
+        &ldquo;\(3\) units of forward slack&rdquo; from &ldquo;\(3\) units of undo
+        on the reverse edge.&rdquo; The maximum <em>value</em> is unaffected, but
+        if the per-edge flows are wanted, split one of the two edges by inserting
+        a new vertex (<a href="#ex">exercise 6</a>). Second, on sparse graphs
+        replace the matrix by an adjacency list of arcs stored in pairs, each arc
+        holding the index of its reverse arc, so BFS scans \(\Theta(E)\) instead
+        of \(\Theta(V^2)\). Third, when the loop finally exits, the
+        <code>parent</code> array is exactly the record of which vertices the last
+        BFS could reach, and <a href="#theorem">&sect;7</a> proves that this set is
+        the \(S\) side of a minimum cut: the algorithm hands back the certificate
+        for free.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">5. A full run, iteration by iteration</h2>
+      <p>
+        Ford-Fulkerson on the running network, with the augmenting paths chosen in
+        an order a depth-first search would plausibly produce (it prefers
+        \(a \to b\) over \(a \to t\) on the first descent). Each iteration shows
+        the residual graph as four rows over the five original edges: the fixed
+        capacity, the current flow, the forward slack \(c - f\), and the undo arc
+        \(f\). Any arc with a positive entry in the &ldquo;slack&rdquo; row is
+        usable in its printed direction; any arc with a positive entry in the
+        &ldquo;undo&rdquo; row is usable in the <em>reverse</em> direction.
+      </p>
+
+      <h3>Iteration 1</h3>
+      <table class="trace">
+        <tr><th class="lab">edge</th><th>\(s\to a\)</th><th>\(s\to b\)</th><th>\(a\to b\)</th><th>\(a\to t\)</th><th>\(b\to t\)</th></tr>
+        <tr><td class="lab">capacity</td><td>9</td><td>7</td><td>4</td><td>6</td><td>8</td></tr>
+        <tr><td class="lab">flow</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+        <tr><td class="lab">slack (forward arc)</td><td class="set">9</td><td>7</td><td class="set">4</td><td>6</td><td class="set">8</td></tr>
+        <tr><td class="lab">undo (backward arc)</td><td class="inf">0</td><td class="inf">0</td><td class="inf">0</td><td class="inf">0</td><td class="inf">0</td></tr>
+      </table>
+      <p>
+        The residual graph is just the network itself. Path
+        \(s \to a \to b \to t\), residual capacities \(9, 4, 8\), bottleneck
+        \(b = 4\) (set by the middle edge). Push \(4\): the flow becomes
+        \(f(s,a)=4\), \(f(a,b)=4\), \(f(b,t)=4\), value \(4\).
+      </p>
+
+      <h3>Iteration 2</h3>
+      <table class="trace">
+        <tr><th class="lab">edge</th><th>\(s\to a\)</th><th>\(s\to b\)</th><th>\(a\to b\)</th><th>\(a\to t\)</th><th>\(b\to t\)</th></tr>
+        <tr><td class="lab">capacity</td><td>9</td><td>7</td><td>4</td><td>6</td><td>8</td></tr>
+        <tr><td class="lab">flow</td><td>4</td><td>0</td><td>4</td><td>0</td><td>4</td></tr>
+        <tr><td class="lab">slack (forward arc)</td><td class="set">5</td><td>7</td><td class="inf">0</td><td class="set">6</td><td>4</td></tr>
+        <tr><td class="lab">undo (backward arc)</td><td>4</td><td class="inf">0</td><td>4</td><td class="inf">0</td><td>4</td></tr>
+      </table>
+      <p>
+        \(a \to b\) is saturated, so the residual graph has lost that forward arc
+        and gained the backward arc \(b \to a\) of capacity \(4\). Path
+        \(s \to a \to t\), residual capacities \(5, 6\), bottleneck \(b = 5\).
+        Push \(5\): \(f(s,a)=9\), \(f(a,t)=5\), value \(9\).
+      </p>
+
+      <h3>Iteration 3</h3>
+      <table class="trace">
+        <tr><th class="lab">edge</th><th>\(s\to a\)</th><th>\(s\to b\)</th><th>\(a\to b\)</th><th>\(a\to t\)</th><th>\(b\to t\)</th></tr>
+        <tr><td class="lab">capacity</td><td>9</td><td>7</td><td>4</td><td>6</td><td>8</td></tr>
+        <tr><td class="lab">flow</td><td>9</td><td>0</td><td>4</td><td>5</td><td>4</td></tr>
+        <tr><td class="lab">slack (forward arc)</td><td class="inf">0</td><td class="set">7</td><td class="inf">0</td><td>1</td><td class="set">4</td></tr>
+        <tr><td class="lab">undo (backward arc)</td><td>9</td><td class="inf">0</td><td>4</td><td>5</td><td>4</td></tr>
+      </table>
+      <p>
+        Now \(s \to a\) is saturated too, so every remaining route out of \(s\)
+        starts with \(s \to b\). Path \(s \to b \to t\), residual capacities
+        \(7, 4\), bottleneck \(b = 4\). Push \(4\): \(f(s,b)=4\), \(f(b,t)=8\),
+        value \(13\). This is exactly the flow examined in
+        <a href="#cuts">&sect;2</a>, and weak duality left open whether it is
+        optimal.
+      </p>
+
+      <h3>Iteration 4: pushing flow back</h3>
+      <table class="trace">
+        <tr><th class="lab">edge</th><th>\(s\to a\)</th><th>\(s\to b\)</th><th>\(a\to b\)</th><th>\(a\to t\)</th><th>\(b\to t\)</th></tr>
+        <tr><td class="lab">capacity</td><td>9</td><td>7</td><td>4</td><td>6</td><td>8</td></tr>
+        <tr><td class="lab">flow</td><td>9</td><td>4</td><td>4</td><td>5</td><td>8</td></tr>
+        <tr><td class="lab">slack (forward arc)</td><td class="inf">0</td><td class="set">3</td><td class="inf">0</td><td class="set">1</td><td class="inf">0</td></tr>
+        <tr><td class="lab">undo (backward arc)</td><td>9</td><td>4</td><td class="upd">4</td><td>5</td><td>8</td></tr>
+      </table>
+      <p>
+        Three of the five forward arcs are gone: \(s \to a\), \(a \to b\) and
+        \(b \to t\) are all saturated. Using only forward slack there is no way
+        out of \(b\), so a search restricted to unsaturated original edges would
+        stop here and report \(13\). The residual graph is not so restricted.
+        Reading the shaded entries: \(s \to b\) has slack \(3\); the backward arc
+        \(b \to a\) has capacity \(4\), because \(4\) units are currently routed
+        \(a \to b\); and \(a \to t\) has slack \(1\). That is an
+        \(s \to t\) path in \(G_f\):
+        \[
+          s \;\xrightarrow{\ 3\ }\; b \;\xrightarrow{\ 4 \text{ (undo)}\ }\; a \;\xrightarrow{\ 1\ }\; t,
+          \qquad \text{bottleneck } b = \min(3,4,1) = 1.
+        \]
+        Pushing \(1\) along it adds \(1\) to \(f(s,b)\), <em>subtracts</em> \(1\)
+        from \(f(a,b)\), and adds \(1\) to \(f(a,t)\):
+        \(f(s,b) = 5\), \(f(a,b) = 3\), \(f(a,t) = 6\), value \(14\). In physical
+        terms: one unit that had been travelling \(s \to a \to b \to t\) is
+        rerouted to travel \(s \to a \to t\), and the unit of capacity it vacated
+        on \(b \to t\) is filled by a fresh unit sent \(s \to b \to t\). Two
+        routes are rewritten to make room for a third. No sequence of pushes along
+        unsaturated original edges can do this, which is precisely why the
+        backward arcs exist.
+      </p>
+      <p>
+        Check that the result is still a legal flow. Capacity: \(9 \le 9\),
+        \(5 \le 7\), \(3 \le 4\), \(6 \le 6\), \(8 \le 8\). Conservation at
+        \(a\): \(9\) in, \(3 + 6 = 9\) out. At \(b\): \(5 + 3 = 8\) in, \(8\) out.
+        Value: \(9 + 5 = 14\).
+      </p>
+
+      <h3>Iteration 5: no augmenting path, and the cut that proves it</h3>
+      <table class="trace">
+        <tr><th class="lab">edge</th><th>\(s\to a\)</th><th>\(s\to b\)</th><th>\(a\to b\)</th><th>\(a\to t\)</th><th>\(b\to t\)</th></tr>
+        <tr><td class="lab">capacity</td><td>9</td><td>7</td><td>4</td><td>6</td><td>8</td></tr>
+        <tr><td class="lab">flow</td><td>9</td><td>5</td><td>3</td><td>6</td><td>8</td></tr>
+        <tr><td class="lab">slack (forward arc)</td><td class="inf">0</td><td>2</td><td>1</td><td class="inf">0</td><td class="inf">0</td></tr>
+        <tr><td class="lab">undo (backward arc)</td><td>9</td><td>5</td><td>3</td><td>6</td><td>8</td></tr>
+      </table>
+      <p>
+        The search from \(s\) in this residual graph: \(s \to a\) has no slack, so
+        the only step out of \(s\) is \(s \to b\) (slack \(2\)); from \(b\), the
+        arc \(b \to t\) has no slack, but the undo arc \(b \to a\) (capacity
+        \(3\)) is available, so \(a\) is reached; from \(a\), the forward arc
+        \(a \to b\) (slack \(1\)) revisits a seen vertex, \(a \to t\) has no
+        slack, and the undo arc \(a \to s\) returns to the source. The search
+        exhausts itself having reached \(\{s, b, a\}\) and never \(t\). No
+        augmenting path exists; the algorithm returns \(14\).
+      </p>
+      <p>
+        Take \(S = \{s,a,b\}\), the set the search reached, and \(T = \{t\}\). The
+        edges crossing forward are \(a \to t\,(6)\) and \(b \to t\,(8)\), and both
+        are saturated: \(f(a,t) = 6 = c(a,t)\) and \(f(b,t) = 8 = c(b,t)\). No edge
+        crosses backward. So \(\operatorname{cap}(S,T) = 14 = |f|\), which by weak
+        duality is only possible if the flow is maximum and the cut is minimum.
+        The listing in <a href="#cuts">&sect;2</a> agrees: \(14\) was the smallest
+        of the four cut capacities.
+      </p>
+      <figure>
+        <svg viewBox="0 0 440 300" role="img" aria-label="The running network with the maximum flow marked on each edge as flow over capacity: s to a nine over nine, s to b five over seven, a to b three over four, a to t six over six, b to t eight over eight. A dashed vertical line separates the set containing s, a and b from the sink t, crossing only the two saturated edges into t.">
+          <defs>
+            <marker id="mfah2" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#4a5163"/>
+            </marker>
+            <marker id="mfahr" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#b3261e"/>
+            </marker>
+          </defs>
+          <line x1="330" y1="24" x2="330" y2="278" stroke="#1f5fb0" stroke-width="2"
+                stroke-dasharray="7 5"/>
+          <text x="330" y="18" font-family="system-ui, sans-serif" font-size="12.5"
+                fill="#1f5fb0" text-anchor="middle">cut, capacity 14</text>
+          <g stroke="#4a5163" stroke-width="1.8" fill="none" marker-end="url(#mfah2)">
+            <line x1="71" y1="160" x2="184" y2="230"/>   <!-- s->b -->
+            <line x1="200" y1="79" x2="200" y2="221"/>   <!-- a->b -->
+          </g>
+          <g stroke="#b3261e" stroke-width="2.2" fill="none" marker-end="url(#mfahr)">
+            <line x1="71" y1="140" x2="184" y2="70"/>    <!-- s->a saturated -->
+            <line x1="217" y1="68" x2="373" y2="142"/>   <!-- a->t saturated -->
+            <line x1="217" y1="232" x2="373" y2="158"/>  <!-- b->t saturated -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
+             stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="middle">
+            <text x="112" y="94" fill="#b3261e">9/9</text>
+            <text x="112" y="214" fill="#0a7d4d">5/7</text>
+            <text x="219" y="155" fill="#0a7d4d">3/4</text>
+            <text x="292" y="92" fill="#b3261e">6/6</text>
+            <text x="292" y="216" fill="#b3261e">8/8</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="55" cy="150" r="19"/>  <circle cx="200" cy="60" r="19"/>
+              <circle cx="200" cy="240" r="19"/> <circle cx="390" cy="150" r="19"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="55" y="155">s</text>   <text x="200" y="65">a</text>
+              <text x="200" y="245">b</text>  <text x="390" y="155">t</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The maximum flow, written flow/capacity, with saturated edges in red and
+          the minimum cut dashed. The cut crosses only \(a \to t\) and
+          \(b \to t\), both saturated, for a capacity of \(6 + 8 = 14\), matching
+          the flow value. \(s \to a\) is also saturated but does not cross the
+          cut, so it does not count toward the capacity; and \(a \to b\) carries
+          \(3\) of \(4\), one unit having been retracted in iteration 4.
+        </figcaption>
+      </figure>
+      <figure>
+        <table class="trace">
+          <tr><th class="lab">after iteration</th><th>\(f(s,a)\)</th><th>\(f(s,b)\)</th><th>\(f(a,b)\)</th><th>\(f(a,t)\)</th><th>\(f(b,t)\)</th><th>path pushed</th><th>\(b\)</th><th>\(|f|\)</th></tr>
+          <tr><td class="lab">start</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="lab">none yet</td><td class="inf">n/a</td><td>0</td></tr>
+          <tr><td class="lab">1</td><td class="upd">4</td><td>0</td><td class="upd">4</td><td>0</td><td class="upd">4</td><td class="lab">\(s\,a\,b\,t\)</td><td>4</td><td>4</td></tr>
+          <tr><td class="lab">2</td><td class="upd">9</td><td>0</td><td>4</td><td class="upd">5</td><td>4</td><td class="lab">\(s\,a\,t\)</td><td>5</td><td>9</td></tr>
+          <tr><td class="lab">3</td><td>9</td><td class="upd">4</td><td>4</td><td>5</td><td class="upd">8</td><td class="lab">\(s\,b\,t\)</td><td>4</td><td>13</td></tr>
+          <tr><td class="lab">4</td><td>9</td><td class="upd">5</td><td class="upd">3</td><td class="upd">6</td><td>8</td><td class="lab">\(s\,b\,\overline{a}\,t\)</td><td>1</td><td class="set">14</td></tr>
+        </table>
+        <figcaption>
+          The whole run. Shaded cells changed that iteration. In iteration 4 the
+          entry \(f(a,b)\) <em>fell</em>, from \(4\) to \(3\): the overlined
+          \(\overline{a}\) marks the step taken along an undo arc. Every row is a
+          legal flow, and the value rises by the bottleneck each time.
+        </figcaption>
+      </figure>
+      <p>
+        Two branches of the algorithm are on display beyond the ordinary ones.
+        Iteration 1 has its bottleneck set by a middle edge rather than by the
+        first or last edge of the path, so the push saturates neither the arc out
+        of \(s\) nor the arc into \(t\). Iteration 4 uses a backward arc.
+        Iteration 5 is the exit branch: a search that reaches some vertices but
+        not \(t\). The remaining branch, a search from \(s\) that reaches nothing
+        at all, occurs when every edge out of \(s\) is saturated at the moment the
+        loop is entered again; that happens whenever the minimum cut is
+        \(S = \{s\}\), which is the case in <a href="#ex">exercise 2</a>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="terminate">6. Termination and integrality</h2>
+      <p>
+        Nothing so far guarantees the <code>while</code> loop ever stops. With
+        integer capacities it does, for a blunt reason.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (termination and integrality)</span>
+        If every capacity is a nonnegative integer, Ford-Fulkerson halts, whatever
+        rule it uses to pick augmenting paths, after at most
+        \(C = \sum_{w} c(s,w)\) augmentations. Every intermediate flow, and the
+        final one, is integral on every edge. Hence a maximum flow with integer
+        values on every edge always exists.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Induct on the number of augmentations. The initial
+        flow is \(0\), an integer on every edge. If \(f\) is integral then every
+        residual capacity \(c(u,v)-f(u,v)\) and \(f(u,v)\) is an integer, so the
+        bottleneck \(b\) is an integer, and \(b &gt; 0\) forces \(b \ge 1\);
+        adding or subtracting \(b\) keeps the flow integral. So every augmentation
+        raises \(|f|\) by at least \(1\). Weak duality with the cut
+        \(S = \{s\}\) gives \(|f| \le C\), so at most \(C\) augmentations can
+        occur. The final flow is integral by the induction.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The integrality half of that theorem is a workhorse. Whenever a
+        combinatorial problem is encoded as a flow network with unit or integer
+        capacities, the theorem promises that an optimal solution exists which
+        makes whole-number decisions: an applicant is assigned to a job or not,
+        never to two-thirds of one. <a href="#matching">&sect;9</a> uses exactly
+        this.
+      </p>
+      <p>
+        The cost bound that comes with it is weak. Finding one augmenting path by
+        BFS or DFS costs \(\Theta(E)\) on an adjacency-list residual graph (or
+        \(\Theta(V^2)\) on the matrix), and there may be \(C\) of them, so
+        generic Ford-Fulkerson runs in \(O(EC)\). That is
+        <em>pseudo-polynomial</em>: \(C\) is the numeric value of the capacities,
+        not the size of the input. A network encoded in a few dozen bytes can have
+        \(C\) in the billions, and the bound is achieved.
+      </p>
+      <div class="aside">
+        <span class="tag">The pathological-capacity example</span>
+        Four vertices, five edges: \(s \to a\) and \(s \to b\) and
+        \(a \to t\) and \(b \to t\), all of capacity \(M\), plus the middle edge
+        \(a \to b\) of capacity \(1\). The maximum flow is \(2M\) (send \(M\)
+        along \(s \to a \to t\) and \(M\) along \(s \to b \to t\); the cut
+        \(S = \{s\}\) has capacity \(2M\)), and two augmentations suffice. But an
+        adversarial path rule can alternate: push \(1\) along
+        \(s \to a \to b \to t\), which saturates the middle edge, then push \(1\)
+        along \(s \to b \to a \to t\), which uses the middle edge&rsquo;s undo arc
+        and restores its slack, then repeat. Each augmentation has bottleneck
+        \(1\), so this takes \(2M\) iterations. Running it for \(M = 5\),
+        \(M = 100\) and \(M = 10^6\) gives \(10\), \(200\) and \(2{,}000{,}000\)
+        augmentations respectively, all for the same five-edge network. The cure
+        is to stop letting the path rule be adversarial, which is
+        <a href="#ek">&sect;8</a>.
+      </div>
+      <div class="aside">
+        <span class="tag">Irrational capacities</span>
+        Drop integrality and termination can fail outright. With capacities
+        involving \(\varphi = (\sqrt5 - 1)/2\), which satisfies
+        \(\varphi^{\,k+2} = \varphi^{\,k} - \varphi^{\,k+1}\), there are networks
+        and path choices on which the bottlenecks form a geometric sequence: the
+        flow value increases forever, converging to a number that is not even the
+        maximum flow. The bound &ldquo;each augmentation gains at least \(1\)&rdquo;
+        is what fails, and nothing replaces it. This is a real limitation of the
+        method as stated, not an artifact of floating point; it is another reason
+        to fix the path rule rather than leave it free.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="theorem">7. The max-flow min-cut theorem</h2>
+      <p>
+        Weak duality said \(\max |f| \le \min \operatorname{cap}\). The run in
+        <a href="#trace">&sect;5</a> ended with the two equal. That was not luck.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (max-flow min-cut, Ford-Fulkerson 1956)</span>
+        For a flow \(f\) in a network with source \(s\) and sink \(t\), the
+        following three statements are equivalent:
+        <ol>
+          <li>\(f\) is a maximum flow;</li>
+          <li>the residual graph \(G_f\) contains no augmenting path;</li>
+          <li>\(|f| = \operatorname{cap}(S,T)\) for some \(s\)-\(t\) cut \((S,T)\).</li>
+        </ol>
+        In particular the maximum flow value equals the minimum cut capacity, and
+        Ford-Fulkerson, when it halts, returns both.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The three implications form a cycle.
+        <br>
+        <em>(1) \(\Rightarrow\) (2).</em> Contrapositive. If \(G_f\) has an
+        augmenting path \(P\), its bottleneck \(b\) is positive (every arc of
+        \(G_f\) has positive residual capacity by definition), and the
+        augmentation lemma of <a href="#residual">&sect;3</a> produces a legal
+        flow of value \(|f| + b &gt; |f|\). So \(f\) is not maximum.
+        <br>
+        <em>(2) \(\Rightarrow\) (3).</em> Suppose no augmenting path exists. Let
+        \(S\) be the set of vertices reachable from \(s\) in \(G_f\), and
+        \(T = V \setminus S\). Then \(s \in S\), and \(t \in T\) precisely
+        because no \(s \to t\) path exists in \(G_f\), so \((S,T)\) is an
+        \(s\)-\(t\) cut. Take any \(u \in S\) and \(v \in T\).
+        <ul>
+          <li>If \(u \to v\) is an edge of \(G\), it must be
+            <strong>saturated</strong>: \(f(u,v) = c(u,v)\). Otherwise its
+            residual slack \(c(u,v)-f(u,v)\) would be positive, putting the
+            forward arc \(u \to v\) in \(G_f\), and \(v\) would be reachable from
+            \(s\) through \(u\), contradicting \(v \in T\).</li>
+          <li>If \(v \to u\) is an edge of \(G\), it must carry
+            <strong>no flow</strong>: \(f(v,u) = 0\). Otherwise the backward arc
+            \(u \to v\) of residual capacity \(f(v,u) &gt; 0\) would be in
+            \(G_f\), again making \(v\) reachable.</li>
+        </ul>
+        Now apply the flow-across-a-cut lemma of <a href="#cuts">&sect;2</a>:
+        \[
+          |f| = \sum_{u \in S, v \in T} f(u,v) - \sum_{v \in T, u \in S} f(v,u)
+              = \sum_{u \in S, v \in T} c(u,v) - 0
+              = \operatorname{cap}(S,T).
+        \]
+        <br>
+        <em>(3) \(\Rightarrow\) (1).</em> Suppose \(|f| = \operatorname{cap}(S,T)\)
+        for some cut. By weak duality every flow \(g\) satisfies
+        \(|g| \le \operatorname{cap}(S,T) = |f|\), so \(f\) is maximum. The same
+        inequality read the other way shows \((S,T)\) is a minimum cut: every cut
+        \((S',T')\) satisfies
+        \(\operatorname{cap}(S',T') \ge |f| = \operatorname{cap}(S,T)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The step that carries the theorem is (2) \(\Rightarrow\) (3), and it is
+        worth stating in words: <em>when the search stops, the frontier it stopped
+        at is the bottleneck.</em> Every edge leaving the reached set is full, and
+        every edge entering it is empty, so the reached set is a cut whose capacity
+        the flow already meets. This is why the certificate is free: the last,
+        failed path search computes it as a byproduct, in the <code>parent</code>
+        array of the code in <a href="#ff">&sect;4</a>.
+      </p>
+      <p>
+        Trace the argument on iteration 5 of <a href="#trace">&sect;5</a>. The
+        search reached \(S = \{s,a,b\}\). Edges from \(S\) to \(T = \{t\}\) are
+        \(a \to t\) and \(b \to t\), and both are saturated, as the first bullet
+        demands. There are no edges from \(T\) back to \(S\), so the second bullet
+        is vacuous. The sum is \(6 + 8 = 14 = |f|\).
+      </p>
+      <div class="aside">
+        <span class="tag">Two consequences worth naming</span>
+        The minimum cut need not be unique: <a href="#ex">exercise 2</a> has two
+        of them. When several exist, the reachable set \(S\) from the theorem is
+        the <em>smallest</em> one (every vertex in it is genuinely reachable);
+        running the same argument backwards from \(t\) in the reverse residual
+        graph produces the largest. Also, the theorem is a statement about
+        capacities, not about the algorithm: it holds for any network, including
+        those with irrational capacities on which Ford-Fulkerson may fail to
+        halt.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ek">8. Edmonds-Karp: choosing the path with BFS</h2>
+      <p>
+        The pathological example of <a href="#terminate">&sect;6</a> is a rule
+        problem, not a network problem: the two-augmentation solution was there
+        all along, and the adversary refused to take it by always routing through
+        the capacity-\(1\) middle edge, which is the <em>longest</em> of the
+        available \(s \to t\) paths. Jack Edmonds and Richard Karp&rsquo;s fix
+        (1972) is one line: <strong>always augment along a shortest augmenting
+        path</strong>, measured in number of arcs, which means finding the path
+        with a breadth-first search rather than a depth-first search. The
+        <a href="algo-bfs.html">BFS handout</a> proves the property this relies
+        on: BFS from \(s\) labels every reachable vertex with its exact hop
+        distance from \(s\), so the path it recovers through the parent pointers
+        is a minimum-arc path. The code in <a href="#ff">&sect;4</a> is already
+        written this way.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (Edmonds-Karp)</span>
+        With shortest augmenting paths, Ford-Fulkerson performs at most
+        \(VE/2\) augmentations, so it runs in \(O(VE^2)\) time. The bound does not
+        mention the capacities at all, and holds for real-valued capacities, so
+        termination is guaranteed unconditionally.
+      </div>
+      <div class="proof">
+        <strong>Proof sketch.</strong> Let \(d_f(v)\) be the hop distance from
+        \(s\) to \(v\) in \(G_f\). Two claims do the work.
+        <br>
+        <em>Claim 1: distances never decrease.</em> Augmenting along a shortest
+        path only adds arcs that are reverses of arcs on that path, and each such
+        reverse points from a vertex at BFS level \(i+1\) back to one at level
+        \(i\). A new arc that goes backwards by one level cannot create a shorter
+        route to anything: any path using it is at least as long as one that never
+        did. So \(d_f(v)\) is nondecreasing over the run for every \(v\).
+        <br>
+        <em>Claim 2: each edge is critical \(O(V)\) times.</em> Call an arc
+        \(u \to v\) <strong>critical</strong> in an augmentation if it set the
+        bottleneck; it then disappears from the residual graph. It can only come
+        back when some later augmentation pushes along \(v \to u\), and that later
+        path is a shortest path, so at that moment
+        \(d(u) = d(v) + 1\). At the earlier moment, \(d(v) = d(u) + 1\). Combining
+        with Claim 1, the value of \(d(u)\) has grown by at least \(2\) between
+        the two events. Since \(d(u) &lt; V\) while \(u\) is reachable, each of
+        the \(2E\) residual arcs can be critical at most \(V/2\) times, giving at
+        most \(VE\) critical events; every augmentation has at least one critical
+        arc, so there are at most \(VE\) augmentations. (A more careful count over
+        the \(E\) original edges gives \(VE/2\).) Each augmentation costs one BFS,
+        \(O(E)\), for \(O(VE^2)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <h3>The same network, run with BFS</h3>
+      <p>
+        On the running network, BFS scans neighbors in the order \(s, a, b, t\).
+      </p>
+      <table class="trace">
+        <tr><th class="lab">iter</th><th style="text-align:left">BFS finds</th><th>bottleneck</th><th>\(f(s,a)\)</th><th>\(f(s,b)\)</th><th>\(f(a,b)\)</th><th>\(f(a,t)\)</th><th>\(f(b,t)\)</th><th>\(|f|\)</th></tr>
+        <tr><td class="lab">1</td><td class="lab">\(s \to a \to t\), caps \(9, 6\)</td><td>6</td><td class="upd">6</td><td>0</td><td>0</td><td class="upd">6</td><td>0</td><td>6</td></tr>
+        <tr><td class="lab">2</td><td class="lab">\(s \to b \to t\), caps \(7, 8\)</td><td>7</td><td>6</td><td class="upd">7</td><td>0</td><td>6</td><td class="upd">7</td><td>13</td></tr>
+        <tr><td class="lab">3</td><td class="lab">\(s \to a \to b \to t\), caps \(3, 4, 1\)</td><td>1</td><td class="upd">7</td><td>7</td><td class="upd">1</td><td>6</td><td class="upd">8</td><td class="set">14</td></tr>
+        <tr><td class="lab">4</td><td class="lab">reaches \(\{s,a,b\}\), not \(t\): stop</td><td class="inf">n/a</td><td>7</td><td>7</td><td>1</td><td>6</td><td>8</td><td class="set">14</td></tr>
+      </table>
+      <p>
+        Three augmentations instead of four, and none of them needed a backward
+        arc: the shortest-path rule took both two-arc paths first, and only then
+        the three-arc one, so no unit was ever routed somewhere it had to be
+        pulled back from. The final flow differs from the one in
+        <a href="#trace">&sect;5</a> edge by edge (\(f(s,a) = 7\) here against
+        \(9\) there) and has the same value, \(14\): maximum flows are not unique.
+        The final residual graph gives the same reachable set \(\{s,a,b\}\) and so
+        the same minimum cut, capacity \(6 + 8 = 14\). On the pathological network
+        of <a href="#terminate">&sect;6</a>, BFS finds the two-arc paths
+        \(s \to a \to t\) and \(s \to b \to t\) before the three-arc path through
+        the middle edge, and finishes in \(2\) augmentations for any \(M\).
+      </p>
+      <table>
+        <tr><th></th><th>generic Ford-Fulkerson</th><th>Edmonds-Karp</th></tr>
+        <tr><td>path rule</td><td>any \(s \to t\) path in \(G_f\)</td><td>fewest arcs, found by <a href="algo-bfs.html">BFS</a></td></tr>
+        <tr><td>augmentations</td><td>up to \(C\) (the capacity out of \(s\))</td><td>at most \(VE/2\)</td></tr>
+        <tr><td>time</td><td>\(O(EC)\), pseudo-polynomial</td><td>\(O(VE^2)\), strongly polynomial</td></tr>
+        <tr><td>integer capacities</td><td>required for termination</td><td>not required</td></tr>
+        <tr><td>implementation</td><td>stack (<a href="algo-dfs.html">DFS</a>) or anything</td><td>queue (<a href="algo-bfs.html">BFS</a>)</td></tr>
+      </table>
+      <p>
+        Faster methods exist and build on the same residual-graph idea: Dinic's
+        algorithm augments along all shortest paths of a given length at once, for
+        \(O(V^2E)\) in general and \(O(E\sqrt{V})\) on unit-capacity networks such
+        as the matching networks of <a href="#matching">&sect;9</a>; capacity
+        scaling prefers high-bottleneck paths for \(O(E^2 \log C)\); push-relabel
+        methods abandon paths entirely. None of them changes the max-flow min-cut
+        theorem or the meaning of the answer.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="matching">9. Bipartite matching, by reduction</h2>
+      <p>
+        The reason maximum flow is worth learning as a general tool is that many
+        problems with no pipes in them are flow problems in disguise. The standard
+        example:
+      </p>
+      <div class="def">
+        <span class="tag">Definition (bipartite graph, matching)</span>
+        A graph is <strong>bipartite</strong> if its vertices split into two sets
+        \(X\) and \(Y\) such that every edge joins an \(X\) vertex to a \(Y\)
+        vertex. A <strong>matching</strong> is a set of edges no two of which
+        share a vertex; a <strong>maximum matching</strong> is one of largest
+        size. In the assignment reading, \(X\) is applicants, \(Y\) is jobs, an
+        edge means &ldquo;this applicant is qualified for this job,&rdquo; and a
+        matching is a conflict-free set of hires.
+      </div>
+      <div class="def">
+        <span class="tag">The reduction</span>
+        From a bipartite graph \((X \cup Y, E)\) build a flow network:
+        <ul>
+          <li>add a source \(s\) and a sink \(t\);</li>
+          <li>an edge \(s \to x\) of capacity \(1\) for every \(x \in X\);</li>
+          <li>an edge \(x \to y\) of capacity \(1\) for every original edge
+            \(\{x,y\}\), directed from \(X\) to \(Y\);</li>
+          <li>an edge \(y \to t\) of capacity \(1\) for every \(y \in Y\).</li>
+        </ul>
+        The network has \(|X|+|Y|+2\) vertices and \(|X|+|Y|+|E|\) edges, and is
+        built in \(\Theta(V+E)\) time.
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (the reduction is correct)</span>
+        The maximum flow value in that network equals the size of a maximum
+        matching, and an integral maximum flow yields a maximum matching: take
+        the edges \(x \to y\) with \(f(x,y) = 1\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> <em>Matching \(\Rightarrow\) flow.</em> Given a
+        matching \(M\), put one unit on \(s \to x\), \(x \to y\), \(y \to t\) for
+        each edge \(\{x,y\} \in M\). Capacities hold because \(M\) uses each
+        \(x\) and each \(y\) at most once, so no unit-capacity edge is used twice;
+        conservation holds at each \(x\) and \(y\) by construction. The value is
+        \(|M|\).
+        <br>
+        <em>Flow \(\Rightarrow\) matching.</em> Take an integral maximum flow,
+        which exists by the integrality theorem of
+        <a href="#terminate">&sect;6</a>. Every edge value is \(0\) or \(1\), since
+        capacities are \(1\). Let \(M\) be the middle edges carrying \(1\). Each
+        \(x\) has inflow at most \(1\) (the single edge \(s \to x\) has capacity
+        \(1\)), so conservation gives outflow at most \(1\): \(x\) is in at most
+        one edge of \(M\). Symmetrically each \(y\) has outflow at most \(1\) and
+        so inflow at most \(1\). Hence \(M\) is a matching, and
+        \(|M| = \) the flow into \(t = |f|\). The two directions give
+        \(\max |f| = \max |M|\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Note where integrality is doing real work. Without it, the maximum flow
+        might in principle split a unit into halves across two jobs, which is not
+        an assignment; the theorem rules that out.
+      </p>
+      <h3>A worked instance</h3>
+      <p>
+        Three applicants \(x_1, x_2, x_3\), three jobs \(y_1, y_2, y_3\).
+        Qualifications: \(x_1\) for \(y_1\) or \(y_2\); \(x_2\) for \(y_1\) only;
+        \(x_3\) for \(y_2\) or \(y_3\).
+      </p>
+      <figure>
+        <svg viewBox="0 0 400 220" role="img" aria-label="The flow network built from the bipartite instance. Source s on the left connects to applicants x1, x2, x3; x1 connects to y1 and y2; x2 connects to y1; x3 connects to y2 and y3; jobs y1, y2, y3 connect to sink t on the right. Every edge has capacity one.">
+          <defs>
+            <marker id="bpah" markerWidth="8" markerHeight="8" refX="7" refY="2.6" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L7,2.6 L0,5.2 Z" fill="#4a5163"/>
+            </marker>
+          </defs>
+          <g stroke="#4a5163" stroke-width="1.6" fill="none" marker-end="url(#bpah)">
+            <line x1="54" y1="102" x2="126" y2="58"/>    <!-- s->x1 -->
+            <line x1="56" y1="110" x2="124" y2="110"/>   <!-- s->x2 -->
+            <line x1="54" y1="118" x2="126" y2="162"/>   <!-- s->x3 -->
+            <line x1="156" y1="50" x2="234" y2="50"/>    <!-- x1->y1 -->
+            <line x1="154" y1="58" x2="236" y2="102"/>   <!-- x1->y2 -->
+            <line x1="154" y1="102" x2="236" y2="58"/>   <!-- x2->y1 -->
+            <line x1="154" y1="162" x2="236" y2="118"/>  <!-- x3->y2 -->
+            <line x1="156" y1="170" x2="234" y2="170"/>  <!-- x3->y3 -->
+            <line x1="264" y1="58" x2="336" y2="102"/>   <!-- y1->t -->
+            <line x1="266" y1="110" x2="334" y2="110"/>  <!-- y2->t -->
+            <line x1="264" y1="162" x2="336" y2="118"/>  <!-- y3->t -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.5">
+              <circle cx="40" cy="110" r="16"/>
+              <circle cx="140" cy="50" r="16"/> <circle cx="140" cy="110" r="16"/> <circle cx="140" cy="170" r="16"/>
+              <circle cx="250" cy="50" r="16"/> <circle cx="250" cy="110" r="16"/> <circle cx="250" cy="170" r="16"/>
+              <circle cx="350" cy="110" r="16"/>
+            </g>
+            <g fill="#1a1c22" stroke="none" font-size="12">
+              <text x="40" y="115" font-size="14">s</text>
+              <text x="140" y="54">x1</text> <text x="140" y="114">x2</text>
+              <text x="140" y="174">x3</text>
+              <text x="250" y="54">y1</text> <text x="250" y="114">y2</text>
+              <text x="250" y="174">y3</text>
+              <text x="350" y="115" font-size="14">t</text>
+            </g>
+          </g>
+          <text x="200" y="210" font-family="system-ui, sans-serif" font-size="12.5"
+                fill="#5c6270" text-anchor="middle">every edge has capacity 1</text>
+        </svg>
+        <figcaption>
+          The reduction applied to the instance: applicants in the left column,
+          jobs in the right, source and sink added at the ends. All eleven edges
+          have capacity \(1\), which is what forces each applicant to take at
+          most one job and each job to take at most one applicant.
+        </figcaption>
+      </figure>
+      <p>
+        Suppose a greedy pass over the applicants assigns \(x_1\) to \(y_1\) and
+        then \(x_3\) to \(y_2\). Now \(x_2\), who is qualified only for \(y_1\),
+        has nothing, and the matching has size \(2\). A greedy assignment is stuck
+        there. The flow formulation is not, because the residual graph offers the
+        undo arcs. In the network, the current flow is \(1\) on
+        \(s \to x_1, x_1 \to y_1, y_1 \to t\) and on
+        \(s \to x_3, x_3 \to y_2, y_2 \to t\). Search for an augmenting path:
+      </p>
+      <pre>  s &rarr; x2       slack 1 (x2 unassigned)
+    &rarr; y1       slack 1 (x2 is qualified for y1)
+    &rarr; x1       undo arc: 1 unit is routed x1&rarr;y1, so it may be retracted
+    &rarr; y2       slack 1 (x1 is also qualified for y2)
+    &rarr; x3       undo arc: 1 unit is routed x3&rarr;y2
+    &rarr; y3       slack 1 (x3 is also qualified for y3)
+    &rarr; t        slack 1 (y3 is unfilled)
+  bottleneck = 1</pre>
+      <p>
+        Pushing \(1\) unit flips every middle edge on the path: \(x_2 \to y_1\)
+        goes to \(1\), \(x_1 \to y_1\) drops to \(0\), \(x_1 \to y_2\) goes to
+        \(1\), \(x_3 \to y_2\) drops to \(0\), \(x_3 \to y_3\) goes to \(1\). The
+        matching becomes \(\{x_2 y_1,\; x_1 y_2,\; x_3 y_3\}\) of size \(3\), and
+        every applicant is placed. In matching language this is an
+        <em>alternating path</em> from an unmatched \(x\) to an unmatched \(y\),
+        alternating between non-matching and matching edges, and flipping it
+        raises the matching size by one; the residual graph is what makes that
+        classical notion a plain path search. Running Edmonds-Karp from the zero
+        flow instead finds \(s\,x_1\,y_1\,t\), then \(s\,x_3\,y_2\,t\), then the
+        seven-arc path above, and stops with value \(3\).
+      </p>
+      <p>
+        The minimum cut carries meaning too. Here the maximum flow saturates all
+        three edges out of \(s\), so the reachable set is \(\{s\}\) and the
+        minimum cut has capacity \(3\). In general, a minimum cut in the matching
+        network corresponds to a smallest set of vertices touching every edge of
+        the bipartite graph (a minimum vertex cover), and max-flow min-cut becomes
+        the statement that in a bipartite graph the maximum matching size equals
+        the minimum vertex cover size, which is K&ouml;nig's theorem.
+      </p>
+      <p>
+        The same template covers a family of problems. Multiple sources or sinks:
+        add a super-source with infinite-capacity edges to each real source.
+        Vertex capacities: split \(v\) into \(v_{\text{in}} \to v_{\text{out}}\)
+        with the vertex capacity on that edge, and rewire. Supplies and demands:
+        capacities out of the super-source encode supplies, capacities into the
+        super-sink encode demands, and a feasible schedule exists exactly when the
+        maximum flow saturates the demand edges. Edge-disjoint paths: give every
+        edge capacity \(1\), and the maximum flow value is the maximum number of
+        edge-disjoint \(s \to t\) paths, with the minimum cut the fewest edges
+        whose removal disconnects \(t\) from \(s\) (Menger's theorem).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">10. Where this sits</h2>
+      <p>
+        Maximum flow is a graph algorithm built from the search primitives: the
+        inner loop is one path search per augmentation, on a graph that changes
+        between searches. That search is <a href="algo-bfs.html">breadth-first
+        search</a> in the Edmonds-Karp form and
+        <a href="algo-dfs.html">depth-first search</a> in the generic form, and
+        the residual graph is stored with the adjacency structures of the
+        <a href="ds-graph-representations.html">graph-representations handout</a>.
+        The contrast with <a href="algo-dijkstra.html">Dijkstra</a> and
+        <a href="algo-bellman-ford.html">Bellman-Ford</a> is instructive: those
+        also improve a candidate solution by local moves (relaxations), but their
+        moves are monotone and never undone, whereas an augmentation may retract
+        an earlier decision, which is exactly what lets a locally greedy start
+        still reach a global optimum. It is also why maximum flow is not in the
+        <a href="../greedy/paradigm-greedy-method.html">greedy paradigm</a>: no
+        exchange argument licenses committing to a first augmenting path, and the
+        run in <a href="#trace">&sect;5</a> shows a commitment being taken back.
+        The \(O(VE^2)\) and \(O(EC)\) bounds are read in the notation of the
+        <a href="../foundations/foundation-asymptotic-notation.html">asymptotic-notation
+        handout</a>, and the distinction they draw, a bound in the size of the
+        input against a bound in the numeric value of the input, is the same
+        pseudo-polynomial distinction that appears for the
+        <a href="../dp/algo-knapsack.html">knapsack problem</a>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">11. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          On the running network of <a href="#problem">&sect;1</a>, verify weak
+          duality for the flow \(f(s,a)=4\), \(f(s,b)=7\), \(f(a,b)=1\),
+          \(f(a,t)=3\), \(f(b,t)=8\): check it is a legal flow, give its value,
+          and evaluate the flow-across-a-cut lemma on the cut \(S = \{s,b\}\).
+          <details>
+            <summary>solution</summary>
+            Capacity: \(4\le9\), \(7\le7\), \(1\le4\), \(3\le6\), \(8\le8\), all
+            fine. Conservation at \(a\): in \(4\), out \(1+3=4\). At \(b\): in
+            \(7+1 = 8\), out \(8\). Value \(|f| = 4+7 = 11\). Cut
+            \(S=\{s,b\}\), \(T=\{a,t\}\): edges \(S \to T\) are \(s \to a\)
+            carrying \(4\) and \(b \to t\) carrying \(8\), total \(12\); the edge
+            \(T \to S\) is \(a \to b\) carrying \(1\). Net
+            \(12 - 1 = 11 = |f|\), as the lemma requires. The capacity of that cut
+            is \(9 + 8 = 17\), and \(11 \le 17\). The tightest bound is still the
+            minimum cut, \(14\), so this flow is \(3\) short of optimal.
+          </details>
+        </li>
+        <li>
+          Network on \(s,a,b,t\) with \(c(s,a)=3\), \(c(s,b)=2\), \(c(a,b)=2\),
+          \(c(a,t)=2\), \(c(b,t)=3\). List all four cuts with their capacities,
+          run Edmonds-Karp, and identify the minimum cut the algorithm reports.
+          Is it unique?
+          <details>
+            <summary>solution</summary>
+            Cuts: \(S=\{s\}\): \(3+2 = 5\). \(S=\{s,a\}\):
+            \(c(s,b)+c(a,b)+c(a,t) = 2+2+2 = 6\). \(S=\{s,b\}\):
+            \(c(s,a)+c(b,t) = 3+3 = 6\). \(S=\{s,a,b\}\):
+            \(c(a,t)+c(b,t) = 2+3 = 5\). Minimum \(5\), attained twice.
+            Edmonds-Karp: BFS finds \(s\,a\,t\) (residual caps \(3,2\)),
+            bottleneck \(2\); then \(s\,b\,t\) (caps \(2,3\)), bottleneck \(2\);
+            then the three-arc \(s\,a\,b\,t\) (caps \(1,2,1\)), bottleneck \(1\);
+            value \(5\). The next BFS: both \(s \to a\) (flow \(3\) of \(3\)) and
+            \(s \to b\) (flow \(2\) of \(2\)) are saturated, so the search reaches
+            nothing beyond \(s\) and the reported cut is \(S = \{s\}\), capacity
+            \(5\). Not unique: \(S = \{s,a,b\}\) also has capacity \(5\). As
+            <a href="#theorem">&sect;7</a> notes, the reachable set is the
+            smallest minimum cut, which is why \(\{s\}\) is the one returned. This
+            is also the branch where the final search reaches no new vertex at
+            all.
+          </details>
+        </li>
+        <li>
+          In iteration 4 of <a href="#trace">&sect;5</a>, suppose the backward arc
+          \(b \to a\) were simply omitted from the residual graph (only unused
+          capacity on original edges may be used). What value would
+          Ford-Fulkerson report, and what goes wrong with the proof of the
+          max-flow min-cut theorem?
+          <details>
+            <summary>solution</summary>
+            After iteration 3 the flow has value \(13\) and the unsaturated
+            original edges are \(s \to b\) (slack \(3\)) and \(a \to t\) (slack
+            \(1\)). There is no \(s \to t\) path among them: from \(s\) the only
+            step is to \(b\), and \(b\)'s only out-edge \(b \to t\) is saturated.
+            The crippled algorithm reports \(13\), one short of the maximum
+            \(14\). The proof of (2) \(\Rightarrow\) (3) breaks at its second
+            bullet. The reachable set would be \(S = \{s,b\}\), and the theorem
+            needs every edge from \(T\) into \(S\) to carry no flow; but
+            \(a \to b\) runs from \(T\) into \(S\) carrying \(4\). The
+            flow-across-a-cut lemma then gives
+            \(|f| = (9 + 8) - 4 = 13\) while
+            \(\operatorname{cap}(\{s,b\}) = 17\), and no equality is obtained. The
+            backward arc is exactly the mechanism that forces the second bullet to
+            hold at termination.
+          </details>
+        </li>
+        <li>
+          Give a network on which generic Ford-Fulkerson may take \(2{,}000{,}000\)
+          augmentations while Edmonds-Karp takes \(2\), and state precisely the
+          path sequence that produces the bad behavior.
+          <details>
+            <summary>solution</summary>
+            Vertices \(s,a,b,t\); \(c(s,a) = c(s,b) = c(a,t) = c(b,t) = 10^6\) and
+            \(c(a,b) = 1\). Maximum flow \(2 \times 10^6\), certified by the cut
+            \(S = \{s\}\) of capacity \(2 \times 10^6\). Bad sequence: alternate
+            \(s \to a \to b \to t\) and \(s \to b \to a \to t\). The first uses the
+            middle edge forward, bottleneck \(1\) (set by \(c(a,b)=1\)), and
+            saturates it. The second uses the middle edge's undo arc, again with
+            bottleneck \(1\), and restores its slack, so the pair of augmentations
+            adds \(2\) to the value and returns the residual graph to a state
+            differing only in the two big edges' slack. Repeating for
+            \(10^6\) rounds gives \(2 \times 10^6\) augmentations. Edmonds-Karp
+            never does this: the two-arc paths \(s \to a \to t\) and
+            \(s \to b \to t\) are strictly shorter than any path through
+            \(a \to b\), so BFS takes them first, each with bottleneck \(10^6\),
+            and the third BFS finds no path. Two augmentations, whatever \(M\) is.
+          </details>
+        </li>
+        <li>
+          Prove: if every edge capacity is multiplied by a positive constant
+          \(k\), the maximum flow value is multiplied by \(k\) and the minimum
+          cuts are unchanged as vertex sets. Does the number of Edmonds-Karp
+          augmentations change?
+          <details>
+            <summary>solution</summary>
+            Scaling. If \(f\) is a flow for capacities \(c\), then \(kf\) is a
+            flow for \(kc\) (capacity: \(0 \le kf \le kc\); conservation: both
+            sides of every conservation equation scale by \(k\)), and its value is
+            \(k|f|\); the same map with \(1/k\) inverts it, so the maximum flow
+            scales exactly by \(k\). For cuts,
+            \(\operatorname{cap}_{kc}(S,T) = \sum k\,c(u,v) = k \operatorname{cap}_c(S,T)\)
+            for every cut, so the ordering of cuts by capacity is unchanged and the
+            same vertex sets are minimum. Augmentations: no change if the algorithm
+            is deterministic, because the BFS depends only on which residual
+            capacities are positive, and positivity is preserved under
+            multiplication by \(k &gt; 0\); every bottleneck is simply \(k\) times
+            what it was. This is another reading of why the \(O(VE^2)\) bound
+            cannot mention capacities while the \(O(EC)\) bound must: scaling
+            capacities by \(k\) changes \(C\) but changes nothing the algorithm
+            does.
+          </details>
+        </li>
+        <li>
+          The matrix representation of <a href="#ff">&sect;4</a> cannot store both
+          \(u \to v\) and \(v \to u\) with their own capacities. Show how to
+          rewrite a network with such an antiparallel pair into one without,
+          preserving the maximum flow value, and confirm the transformation on
+          \(c(u,v) = 3\), \(c(v,u) = 5\).
+          <details>
+            <summary>solution</summary>
+            Insert a fresh vertex \(z\): delete the edge \(u \to v\) and add
+            \(u \to z\) and \(z \to v\), both of capacity \(c(u,v)\). The edge
+            \(v \to u\) is left alone, so no antiparallel pair remains. Any flow in
+            the new network gives one in the old by setting
+            \(f(u,v) = f(u,z) = f(z,v)\) (conservation at the degree-two vertex
+            \(z\) forces those two to be equal), and any flow in the old gives one
+            in the new the same way; values agree, so the maxima agree. On the
+            example, \(u \to v\) of capacity \(3\) becomes \(u \to z\,(3)\) and
+            \(z \to v\,(3)\), and \(v \to u\,(5)\) stays. The cost is one extra
+            vertex and one extra edge per antiparallel pair, so \(O(E)\) of each
+            in the worst case, which does not change the asymptotic bounds.
+          </details>
+        </li>
+        <li>
+          Four applicants \(x_1, \dots, x_4\) and four jobs. Qualifications:
+          \(x_1, x_2, x_3\) are each qualified only for \(y_1\) and \(y_2\), and
+          \(x_4\) only for \(y_3\). Build the flow network, give the maximum
+          matching, and exhibit a minimum cut of the network. Explain what the
+          cut says about the instance.
+          <details>
+            <summary>solution</summary>
+            Network: \(s \to x_i\,(1)\) for \(i = 1,\dots,4\); the seven middle
+            edges \(x_1y_1, x_1y_2, x_2y_1, x_2y_2, x_3y_1, x_3y_2, x_4y_3\), all
+            of capacity \(1\); \(y_j \to t\,(1)\) for \(j = 1,\dots,4\). Maximum
+            matching has size \(3\), for instance
+            \(\{x_1y_1,\; x_2y_2,\; x_4y_3\}\); no larger is possible, since
+            \(x_1, x_2, x_3\) compete for only two jobs, so at most two of them
+            can be placed, plus \(x_4\). Edmonds-Karp from the zero flow finds
+            \(s\,x_1\,y_1\,t\), \(s\,x_2\,y_2\,t\), \(s\,x_4\,y_3\,t\), each with
+            bottleneck \(1\), and then a search that reaches
+            \(S = \{s, x_1, x_2, x_3, y_1, y_2\}\) without reaching \(t\).
+            That set is the minimum cut. Its crossing edges are
+            \(s \to x_4\,(1)\), \(y_1 \to t\,(1)\) and \(y_2 \to t\,(1)\), for
+            capacity \(3\): the six middle edges \(x_i \to y_j\) with
+            \(i \le 3\) have both endpoints inside \(S\), and \(x_4 \to y_3\) has
+            both endpoints outside. The cut names the obstruction. Its three
+            edges correspond to the vertices \(y_1\), \(y_2\) and \(x_4\), a set
+            of three vertices touching every qualification edge, that is, a
+            minimum vertex cover. K&ouml;nig's theorem in miniature: maximum
+            matching \(3\) equals minimum vertex cover \(3\).
+          </details>
+        </li>
+        <li>
+          The Edmonds-Karp analysis claims that when a critical arc \(u \to v\)
+          reappears in the residual graph, the distance \(d(u)\) has increased by
+          at least \(2\) since it was critical. Write out that step in full, and
+          say where Claim 1 (distances never decrease) is used.
+          <details>
+            <summary>solution</summary>
+            Let the augmentation at time \(\tau_1\) have \(u \to v\) critical.
+            That augmentation used a shortest path in \(G_{f_1}\) containing
+            \(u \to v\), and along a shortest path every step advances the BFS
+            level by exactly one, so
+            \(d_{1}(v) = d_{1}(u) + 1\). Being critical, \(u \to v\) is removed
+            from the residual graph, and the only way it can return is that some
+            later augmentation, at time \(\tau_2 &gt; \tau_1\), pushes flow along
+            \(v \to u\), which restores slack on \(u \to v\). That augmentation
+            also used a shortest path, this time containing \(v \to u\), so
+            \(d_{2}(u) = d_{2}(v) + 1\). Chain the four facts:
+            \[
+              d_{2}(u) = d_{2}(v) + 1 \;\ge\; d_{1}(v) + 1 = d_{1}(u) + 2,
+            \]
+            where the inequality \(d_{2}(v) \ge d_{1}(v)\) is exactly Claim 1,
+            applied to \(v\) across the interval \([\tau_1, \tau_2]\). Without
+            Claim 1 nothing connects the two times and the argument collapses.
+            Since \(d(u)\) is a nonnegative integer less than \(V\) whenever
+            \(u\) is reachable, and it gains \(2\) per reappearance, the arc can
+            be critical at most \(V/2\) times.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Maximum Flow &amp; Minimum Cut v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

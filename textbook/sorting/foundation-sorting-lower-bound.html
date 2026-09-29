@@ -1,0 +1,392 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: The Sorting Lower Bound.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Sorting Lower Bound - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>The Sorting Lower Bound</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        The decision-tree argument that any algorithm sorting \(n\) keys by
+        comparisons alone makes \(\Omega(n\log n)\) comparisons in the worst
+        case: \(n!\) orderings need \(n!\) leaves, and a binary tree that
+        tall has height \(\log_2(n!) = \Theta(n\log n)\). Includes the tree
+        drawn in full for \(n = 3\) with every ordering walked to its leaf, the
+        two-sided bound on \(\log_2(n!)\) without Stirling, and the
+        non-comparison sorts (counting, radix) the bound does not cover.
+        With exercises.
+      </div>
+
+      <p class="lead">
+        Sorting has a provable difficulty floor: any algorithm that orders
+        keys only by <em>comparing</em> them makes \(\Omega(n\log n)\)
+        comparisons in the worst case. The argument is a counting argument
+        about information, not about any particular algorithm, and it licenses
+        two conclusions: <a href="algo-mergesort.html">mergesort</a> and
+        <a href="algo-quicksort.html">quicksort</a> are asymptotically optimal
+        among comparison sorts, and only a sort that exploits key structure
+        instead of comparing can run faster.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#lower">Why comparison sorts stop at \(n\log n\)</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="lower">1. Why comparison sorts stop at \(n\log n\)</h2>
+      <p>
+        <a href="algo-mergesort.html">Mergesort</a> and
+        <a href="algo-quicksort.html">quicksort</a> both reach \(\Theta(n\log n)\); no algorithm that
+        sorts by <em>comparing</em> keys does asymptotically better, and the reason is
+        a counting argument about information, not about any particular algorithm.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (comparison-sort lower bound)</span>
+        Any sorting algorithm that only compares keys makes \(\Omega(n\log n)\)
+        comparisons in the worst case.
+      </div>
+      <div class="proof">
+        <strong>Proof (decision tree).</strong> A comparison sort on \(n\) elements is
+        a binary <em>decision tree</em>: each internal node is a comparison with two
+        outcomes, and each leaf is one of the possible sorted outputs. To sort
+        correctly the tree must have a leaf for each of the \(n!\) possible input
+        orderings, so it has at least \(n!\) leaves. A binary tree of height \(h\) has
+        at most \(2^h\) leaves, so \(2^h \ge n!\), giving
+        \[
+          h \;\ge\; \log_2(n!) \;=\; \Theta(n\log n)
+        \]
+        by the two-sided bound below. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Here is the whole object for \(n = 3\), keys \(a_1, a_2, a_3\). Each
+        internal node compares two keys; each leaf
+        \(\langle i, j, k \rangle\) asserts the sorted order
+        \(a_i \le a_j \le a_k\). There are \(3! = 6\) orderings, so the tree
+        needs \(6\) leaves, and all \(6\) appear:
+      </p>
+      <figure>
+        <svg viewBox="0 0 540 250" role="img" aria-label="The decision tree for sorting three keys a1, a2, a3. The root compares a1 to a2. Its left branch (a1 at most a2) compares a2 to a3, reaching the leaf a1 a2 a3 on one side and a further comparison of a1 to a3 on the other, whose two leaves are a1 a3 a2 and a3 a1 a2. The root's right branch (a1 greater than a2) compares a1 to a3, reaching the leaf a2 a1 a3 on one side and a comparison of a2 to a3 on the other, whose leaves are a2 a3 a1 and a3 a2 a1. Six leaves in total, one per permutation; the tree has height 3.">
+          <g stroke="#b9c0d0" stroke-width="1.5" fill="none">
+            <line x1="270" y1="42" x2="145" y2="98"/>
+            <line x1="270" y1="42" x2="395" y2="98"/>
+            <line x1="145" y1="98" x2="62" y2="158"/>
+            <line x1="145" y1="98" x2="208" y2="158"/>
+            <line x1="395" y1="98" x2="330" y2="158"/>
+            <line x1="395" y1="98" x2="452" y2="158"/>
+            <line x1="208" y1="158" x2="158" y2="216"/>
+            <line x1="208" y1="158" x2="258" y2="216"/>
+            <line x1="452" y1="158" x2="402" y2="216"/>
+            <line x1="452" y1="158" x2="498" y2="216"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="11.5" fill="#5c6270" text-anchor="middle">
+            <text x="196" y="66">&le;</text>  <text x="344" y="66">&gt;</text>
+            <text x="92" y="126">&le;</text>  <text x="188" y="126">&gt;</text>
+            <text x="352" y="126">&le;</text> <text x="435" y="126">&gt;</text>
+            <text x="172" y="186">&le;</text> <text x="244" y="186">&gt;</text>
+            <text x="416" y="186">&le;</text> <text x="486" y="186">&gt;</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12.5" font-weight="600" text-anchor="middle">
+            <g fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4">
+              <rect x="240" y="26" width="60" height="24" rx="6"/>
+              <rect x="115" y="84" width="60" height="24" rx="6"/>
+              <rect x="365" y="84" width="60" height="24" rx="6"/>
+              <rect x="178" y="144" width="60" height="24" rx="6"/>
+              <rect x="422" y="144" width="60" height="24" rx="6"/>
+            </g>
+            <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4">
+              <rect x="26" y="144" width="72" height="24" rx="6"/>
+              <rect x="294" y="144" width="72" height="24" rx="6"/>
+              <rect x="122" y="202" width="72" height="24" rx="6"/>
+              <rect x="222" y="202" width="72" height="24" rx="6"/>
+              <rect x="366" y="202" width="72" height="24" rx="6"/>
+              <rect x="462" y="202" width="72" height="24" rx="6"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="270" y="43">a&#8321; : a&#8322;</text>
+              <text x="145" y="101">a&#8322; : a&#8323;</text>
+              <text x="395" y="101">a&#8321; : a&#8323;</text>
+              <text x="208" y="161">a&#8321; : a&#8323;</text>
+              <text x="452" y="161">a&#8322; : a&#8323;</text>
+            </g>
+            <g fill="#0a7d4d" stroke="none" font-size="12">
+              <text x="62" y="161">&#9001;1,2,3&#9002;</text>
+              <text x="330" y="161">&#9001;2,1,3&#9002;</text>
+              <text x="158" y="219">&#9001;1,3,2&#9002;</text>
+              <text x="258" y="219">&#9001;3,1,2&#9002;</text>
+              <text x="402" y="219">&#9001;2,3,1&#9002;</text>
+              <text x="498" y="219">&#9001;3,2,1&#9002;</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The decision tree for \(n = 3\). Six permutations, six leaves; each
+          input ordering follows exactly one root-to-leaf path. The height is
+          \(3\), and indeed \(\lceil \log_2 6 \rceil = \lceil 2.58 \rceil = 3\):
+          no algorithm sorts three keys in two comparisons in the worst case.
+        </figcaption>
+      </figure>
+      <p>
+        &ldquo;All six appear&rdquo; is a claim worth checking rather than
+        asserting, and with six inputs it can be checked exhaustively. Feed the
+        tree each of the \(3! = 6\) orderings, writing \(a_1 a_2 a_3\) as a
+        permutation of \(1, 2, 3\), and record the branch taken at each node:
+      </p>
+      <table class="trace">
+        <tr><th class="lab">\((a_1, a_2, a_3)\)</th><th>\(a_1 : a_2\)</th>
+          <th>second test</th><th>third test</th><th>leaf reached</th><th>depth</th></tr>
+        <tr><td class="lab">(1, 2, 3)</td><td>1 &le; 2, left</td><td>\(a_2{:}a_3\) 2 &le; 3, left</td><td>&ndash;</td><td class="cell">&#9001;1,2,3&#9002;</td><td>2</td></tr>
+        <tr><td class="lab">(1, 3, 2)</td><td>1 &le; 3, left</td><td>\(a_2{:}a_3\) 3 &gt; 2, right</td><td>\(a_1{:}a_3\) 1 &le; 2, left</td><td class="cell">&#9001;1,3,2&#9002;</td><td>3</td></tr>
+        <tr><td class="lab">(2, 3, 1)</td><td>2 &le; 3, left</td><td>\(a_2{:}a_3\) 3 &gt; 1, right</td><td>\(a_1{:}a_3\) 2 &gt; 1, right</td><td class="cell">&#9001;3,1,2&#9002;</td><td>3</td></tr>
+        <tr><td class="lab">(2, 1, 3)</td><td>2 &gt; 1, right</td><td>\(a_1{:}a_3\) 2 &le; 3, left</td><td>&ndash;</td><td class="cell">&#9001;2,1,3&#9002;</td><td>2</td></tr>
+        <tr><td class="lab">(3, 1, 2)</td><td>3 &gt; 1, right</td><td>\(a_1{:}a_3\) 3 &gt; 2, right</td><td>\(a_2{:}a_3\) 1 &le; 2, left</td><td class="cell">&#9001;2,3,1&#9002;</td><td>3</td></tr>
+        <tr><td class="lab">(3, 2, 1)</td><td>3 &gt; 2, right</td><td>\(a_1{:}a_3\) 3 &gt; 1, right</td><td>\(a_2{:}a_3\) 2 &gt; 1, right</td><td class="cell">&#9001;3,2,1&#9002;</td><td>3</td></tr>
+      </table>
+      <p>
+        Six inputs, six <em>different</em> leaves, which is the property the proof
+        needs: if two orderings ever reached the same leaf, the algorithm would
+        emit the same permutation for both and be wrong on at least one. Check one
+        row against its leaf to see that the leaf really is the answer: the input
+        \((2, 3, 1)\) lands at \(\langle 3, 1, 2\rangle\), which asserts
+        \(a_3 \le a_1 \le a_2\), and indeed \(1 \le 2 \le 3\). The depths are
+        \(2, 3, 3, 2, 3, 3\), so this tree makes \(3\) comparisons in the worst
+        case and \(16/6 \approx 2.67\) on average, against an information-theoretic
+        average floor of \(\log_2 6 \approx 2.58\).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (one input walks the tree)</span>
+        Sort \((a_1, a_2, a_3) = (8, 3, 5)\). At the root, \(a_1 : a_2\) is
+        \(8 &gt; 3\): go right. Next, \(a_1 : a_3\) is \(8 &gt; 5\): go right
+        again. Finally \(a_2 : a_3\) is \(3 \le 5\): go left, reaching the leaf
+        \(\langle 2, 3, 1 \rangle\), which asserts
+        \(a_2 \le a_3 \le a_1\), i.e. \(3 \le 5 \le 8\). Three comparisons,
+        and the leaf <em>is</em> the answer: everything the algorithm ever
+        learns about the input is which path it took. The four inputs whose
+        paths end at depth \(3\) (leaves \(\langle 1,3,2\rangle,
+        \langle 3,1,2\rangle, \langle 2,3,1\rangle, \langle 3,2,1\rangle\))
+        are the worst cases; the two at depth \(2\) got lucky.
+      </div>
+      <div class="ex">
+        <span class="tag">Why \(\log_2(n!) = \Theta(n\log n)\), without Stirling</span>
+        Bound the product from both sides. Every factor is at most \(n\), so
+        \[ n! \;\le\; n^n \quad\Longrightarrow\quad \log_2(n!) \;\le\; n\log_2 n. \]
+        For the other direction, throw away the smaller half of the factors: the remaining
+        \(n/2\) of them (those from \(n/2\) up to \(n\)) are each at least \(n/2\), so
+        \[ n! \;\ge\; (n/2)^{n/2} \quad\Longrightarrow\quad
+           \log_2(n!) \;\ge\; \tfrac{n}{2}\log_2\tfrac{n}{2}. \]
+        Both bounds are \(\Theta(n\log n)\), so \(\log_2(n!)\) is too. Discarding half the
+        factors costs only a constant factor: the standard trick for bounding a product
+        from below. Stirling gives the sharp constant
+        (\(\log_2(n!) = n\log_2 n - n\log_2 e + O(\log n)\)); the lower bound does not need it. The height \(h\) is the worst-case number of comparisons, so
+        every comparison sort makes \(\Omega(n\log n)\) of them.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        So mergesort and quicksort are asymptotically optimal <em>among comparison
+        sorts</em>: a rare case where we can prove a problem&rsquo;s difficulty,
+        not just an algorithm&rsquo;s cost. The escape hatch is to stop comparing:
+      </p>
+      <div class="aside">
+        <span class="tag">Non-comparison sorts</span>
+        If the keys have exploitable structure, you can sort in linear time.
+        <strong>Counting sort</strong> tallies how many keys take each value and is
+        \(\Theta(n + k)\) for keys in a range of size \(k\);
+        <strong>radix sort</strong> sorts fixed-width keys digit by digit in
+        \(\Theta(d\,n)\) for \(d\) digits (both are worked in the
+        <a href="algo-counting-radix-sort.html">Counting and Radix Sort</a>
+        handout). Neither ever compares two keys, so the
+        \(\Omega(n\log n)\) bound simply does not apply to them. The price is that the
+        keys must be small integers or fixed-width strings, and extra space is needed;
+        when the data fits, these are unbeatable.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">2. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          A comparison sort claims to sort any \(8\)-element array in at most \(10\)
+          comparisons. Show this is impossible.
+          <details>
+            <summary>solution</summary>
+            An \(8\)-element sort must distinguish \(8! = 40320\) orderings, so its
+            decision tree needs at least \(40320\) leaves. A binary tree of height
+            \(10\) has at most \(2^{10} = 1024\) leaves, far fewer than
+            \(40320\), so some orderings share a leaf and are sorted wrongly.
+            The minimum possible worst case is \(\lceil \log_2 8! \rceil =
+            \lceil 15.3 \rceil = 16\) comparisons, so no comparison sort can promise
+            \(10\).
+          </details>
+        </li>
+        <li>
+          You are sorting one million \(32\)-bit integers and can spare extra memory.
+          Can you beat \(\Theta(n\log n)\)? If so, name the method and its cost; if
+          not, explain why.
+          <details>
+            <summary>solution</summary>
+            Yes: the \(\Omega(n\log n)\) bound applies only to <em>comparison</em>
+            sorts, and these keys have structure.
+            <a href="algo-counting-radix-sort.html">Radix sort</a> in a few passes over
+            fixed-width digits (say four \(8\)-bit passes) is \(\Theta(d\,n)\) with
+            \(d = 4\), i.e. linear in \(n\), using counting sort within each pass. It
+            never compares two keys, so the lower bound does not apply. The cost is the
+            extra \(\Theta(n + k)\) space per pass, which the problem allows.
+          </details>
+        </li>
+        <li>
+          Draw the decision tree an algorithm would need for \(n = 3\) if it
+          always made exactly two comparisons, and say which orderings it gets
+          wrong. Then explain why \(\lceil \log_2 (n!) \rceil\) is a lower bound on
+          the worst case but not a promise that it is achievable.
+          <details>
+            <summary>solution</summary>
+            A tree of height \(2\) has at most \(4\) leaves, but \(3! = 6\)
+            orderings must be told apart, so at least two pairs of orderings share
+            a leaf. Whichever permutation such a leaf emits, it is wrong for at
+            least one of the two inputs that reach it; which orderings suffer
+            depends on the two comparisons chosen, but some pair always does. The
+            counting argument bounds the height from below and says nothing about
+            whether a tree of that height exists: it is a statement about
+            information, and building a tree also requires that every internal
+            node&rsquo;s question be answerable by <em>one</em> comparison of two
+            keys, which is a real constraint. For \(n = 3\) the bound
+            \(\lceil \log_2 6\rceil = 3\) is met, and for \(n = 4\) and \(n = 5\)
+            the bounds \(\lceil 4.58 \rceil = 5\) and \(\lceil 6.91 \rceil = 7\)
+            are met as well; but at \(n = 12\) the bound is
+            \(\lceil \log_2 12! \rceil = \lceil 28.84 \rceil = 29\) while no
+            algorithm does better than \(30\). A lower bound is a floor, not a
+            blueprint.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; The Sorting Lower Bound v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1116 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Floyd–Warshall.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Floyd&ndash;Warshall - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; width: auto; margin-left: auto; margin-right: auto; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 10px; font-variant-numeric: tabular-nums; min-width: 40px; }
+      table.trace td.lab, table.trace th.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.piv, table.trace th.piv { background: var(--accentbg); }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      table.trace td.neg { background: #fdeaea; color: #b02a2a; font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>The Floyd&ndash;Warshall Algorithm</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
+      </div>
+      <div class="src">
+        All-pairs shortest paths by dynamic programming. The subproblem is
+        derived rather than handed down: restricting which vertices a path may
+        pass <em>through</em> turns a min over \(V\) choices into a min over two,
+        and the whole algorithm into a triple loop. A matrix-by-matrix trace on a
+        four-vertex digraph, path reconstruction from the <code>next</code>
+        matrix, why negative edges are fine and how negative cycles announce
+        themselves on the diagonal, the \(\Theta(V^3)\) time and
+        \(\Theta(V^2)\) space accounting, and when \(V\) runs of Dijkstra beat
+        it. With exercises.
+      </div>
+
+      <p class="lead">
+        The <a href="algo-dijkstra.html">Dijkstra handout</a> solves
+        single-source shortest paths: one source, distances to everywhere. Route
+        planners, network-routing tables, and any &ldquo;distance oracle&rdquo;
+        ask a harder question: the distance between <em>every</em> pair of
+        vertices at once. The obvious answer is to rerun a single-source
+        algorithm from each source in turn. The Floyd&ndash;Warshall algorithm
+        answers differently: a
+        <a href="../dp/paradigm-dp-method.html">dynamic program</a> whose entire
+        body is three nested loops around one <code>if</code>, which computes all
+        \(V^2\) distances in \(\Theta(V^3)\), tolerates negative edge weights
+        that break Dijkstra outright, and detects negative cycles as a bonus. The
+        interesting part is not the code, which is three lines; it is
+        <em>finding the subproblem</em>, and this handout derives it instead of
+        presenting it finished.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#apsp">All-pairs shortest paths</a></li>
+          <li><a href="#subproblem">Finding the subproblem</a></li>
+          <li><a href="#algo">The algorithm: three loops</a></li>
+          <li><a href="#trace">The full trace, matrix by matrix</a></li>
+          <li><a href="#paths">Reconstructing paths: the next matrix</a></li>
+          <li><a href="#negative">Negative edges and negative cycles</a></li>
+          <li><a href="#cost">Cost, and when to use it</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="apsp">1. All-pairs shortest paths</h2>
+      <div class="def">
+        <span class="tag">Definition (all-pairs shortest paths)</span>
+        Given a weighted digraph with \(V\) vertices, the
+        <strong>all-pairs shortest-paths</strong> (APSP) problem asks for the
+        distance \(\delta(i,j)\), the minimum total weight of any \(i \to j\)
+        path, for <em>every ordered pair</em> \((i,j)\), together with enough
+        information to reconstruct an actual shortest path for each pair. If no
+        \(i \to j\) path exists, \(\delta(i,j) = \infty\); always
+        \(\delta(i,i) \le 0\) since the empty path costs \(0\).
+      </div>
+      <p>
+        The output is a \(V \times V\) <strong>distance matrix</strong>, which is
+        why the natural input here is the <em>adjacency matrix</em> of the
+        <a href="ds-graph-representations.html">graph-representations
+        handout</a>: entry \((i,j)\) starts as the weight of the edge
+        \(i \to j\) (or \(\infty\) if there is none), and the algorithm lowers
+        entries until they are distances. This is the &ldquo;dense&rdquo;
+        representation, and it fits: the answer alone occupies \(\Theta(V^2)\)
+        space, so APSP is inherently a \(V^2\)-sized computation.
+      </p>
+      <h3>The baseline: one source at a time</h3>
+      <p>
+        APSP is \(V\) single-source problems, so the first solution is free:
+        run a single-source algorithm from every vertex.
+      </p>
+      <ul>
+        <li>
+          All weights nonnegative: \(V\) runs of
+          <a href="algo-dijkstra.html">Dijkstra</a> with a binary heap,
+          \(O(V \cdot E \log V)\).
+        </li>
+        <li>
+          Negative weights allowed (no negative cycles): Dijkstra&rsquo;s greedy
+          argument fails (its handout shows the exact line that breaks), so each
+          source needs the slower relax-everything algorithm of Bellman and Ford
+          at \(O(VE)\) per source: \(O(V^2 E)\) in all, which on a dense graph
+          (\(E = \Theta(V^2)\)) is \(\Theta(V^4)\).
+        </li>
+      </ul>
+      <p>
+        So the target is set: beat \(O(V \cdot E \log V)\) when the graph is
+        dense, beat \(\Theta(V^4)\) whenever weights can be negative, and do it
+        with less machinery than \(V\) coordinated heap runs.
+        Floyd&ndash;Warshall achieves \(\Theta(V^3)\), unconditionally, with no
+        heap, no adjacency list, and no per-source bookkeeping.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="subproblem">2. Finding the subproblem</h2>
+      <p>
+        The <a href="../dp/paradigm-dp-method.html">dynamic-programming
+        method</a> says: find a family of subproblems, ordered so that each is
+        answerable from smaller ones, such that the original problem is the
+        largest. The question is always <em>what to shrink</em>. For paths there
+        are two natural knobs, and it pays to try the wrong one first.
+      </p>
+      <h3>Attempt 1: shrink the number of edges</h3>
+      <p>
+        Let \(d_m(i,j)\) be the cost of the cheapest \(i \to j\) path using
+        <em>at most \(m\) edges</em>. Base case: \(d_0(i,j)\) is \(0\) if
+        \(i = j\) and \(\infty\) otherwise. A path of at most \(m\) edges is a
+        path of at most \(m-1\) edges to some predecessor \(x\), plus the final
+        edge \(x \to j\) (or no final edge at all):
+        \[
+          d_m(i,j) \;=\; \min\Big(\, d_{m-1}(i,j),\;
+          \min_{x}\big( d_{m-1}(i,x) + w(x,j) \big) \Big).
+        \]
+        With no negative cycles a shortest path is simple, so \(m = V - 1\)
+        suffices and \(d_{V-1} = \delta\). The recurrence is correct, but count
+        its work: \(V - 1\) rounds, \(V^2\) entries per round, and each entry
+        takes a minimum over all \(V\) candidate predecessors \(x\). That is
+        \(\Theta(V^4)\): no better than Bellman&ndash;Ford run from every
+        source, which is essentially what this is. The expensive part is the
+        inner \(\min_x\) over \(V\) choices. To do better, the subproblem must
+        change so that growing it by one step offers <em>O(1)</em> alternatives,
+        not \(V\).
+      </p>
+      <h3>Attempt 2: shrink which vertices may appear inside</h3>
+      <p>
+        Here is the other knob. A path from \(i\) to \(j\) consists of its two
+        endpoints and its <strong>interior</strong>: the vertices it passes
+        through along the way. Instead of restricting how <em>long</em> the path
+        is, restrict <em>which vertices its interior may use</em>. Number the
+        vertices \(0, 1, \dots, V-1\) and admit them one at a time.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (the Floyd&ndash;Warshall subproblem)</span>
+        For \(k = -1, 0, 1, \dots, V-1\), let \(d^{(k)}(i,j)\) be the cost of
+        the cheapest \(i \to j\) path whose interior vertices all come from
+        \(\{0, 1, \dots, k\}\) (the endpoints \(i, j\) themselves are exempt
+        from the restriction). Read \(k = -1\) as the empty set: no
+        intermediates at all, so
+        \(d^{(-1)}(i,j)\) is \(0\) if \(i = j\), the weight \(w(i,j)\) if the
+        edge \(i \to j\) exists, and \(\infty\) otherwise: exactly the adjacency
+        matrix. At the other end, \(\{0,\dots,V-1\}\) is every vertex, so
+        \(d^{(V-1)}(i,j) = \delta(i,j)\): the restriction has dissolved and the
+        largest subproblem is the answer.
+      </div>
+      <p>
+        Why is this the right knob? Because admitting <em>one</em> new vertex
+        \(k\) presents exactly one binary question per pair: does the best path
+        use the newcomer or not?
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (the recurrence)</span>
+        If the graph has no negative cycles, then for all \(i, j\) and all
+        \(k \ge 0\):
+        \[
+          d^{(k)}(i,j) \;=\; \min\Big( d^{(k-1)}(i,j),\;\;
+          d^{(k-1)}(i,k) + d^{(k-1)}(k,j) \Big).
+        \]
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Consider a cheapest \(i \to j\) path \(P\) with
+        interior in \(\{0,\dots,k\}\); with no negative cycles we may take \(P\)
+        simple (deleting a cycle from a walk removes a subtour of nonnegative
+        cost, never raising the total). Two cases, by whether \(k\) appears in
+        \(P\)&rsquo;s interior.
+        <em>Case 1: it does not.</em> Then \(P\)&rsquo;s interior already lies in
+        \(\{0,\dots,k-1\}\), so \(P\) costs \(d^{(k-1)}(i,j)\), the first
+        alternative.
+        <em>Case 2: it does.</em> \(P\) is simple, so \(k\) appears exactly once;
+        split \(P\) at that visit into \(i \rightsquigarrow k\) and
+        \(k \rightsquigarrow j\). Neither piece contains \(k\) in its interior
+        (\(k\) is now an endpoint of each), so each piece&rsquo;s interior lies
+        in \(\{0,\dots,k-1\}\), and by optimal substructure (each piece of a
+        cheapest path must itself be cheapest for its endpoints and restriction,
+        else splicing in a cheaper piece improves \(P\)) the two pieces cost
+        \(d^{(k-1)}(i,k)\) and \(d^{(k-1)}(k,j)\): the second alternative.
+        Conversely both alternatives are costs of genuine \(i \to j\) walks with
+        interior in \(\{0,\dots,k\}\) (for the second, concatenate the two
+        pieces; if the concatenation repeats a vertex, deleting the resulting
+        cycle only cheapens it), so the minimum of the two is achieved and is
+        exactly \(d^{(k)}(i,j)\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Compare the two attempts side by side. Both have \(\Theta(V)\) stages of
+        \(\Theta(V^2)\) entries, but attempt 1 pays \(\Theta(V)\) per entry
+        while the new recurrence pays \(\Theta(1)\): a two-way minimum. That
+        single structural improvement is the whole algorithm:
+        \(V \cdot V^2 \cdot O(1) = \Theta(V^3)\).
+      </p>
+      <div class="aside">
+        <span class="tag">Where the DP recipe shows through</span>
+        This is the standard shape of a
+        <a href="../dp/paradigm-dp-method.html">dynamic program</a>: optimal
+        substructure (proved inside the theorem above), a parameter that orders
+        the subproblems (\(k\), the largest admitted intermediate), and massive
+        overlap (all \(V^2\) pairs at stage \(k\) reuse the same stage-\((k-1)\)
+        table). The catalog of such parameter choices is the
+        <a href="../dp/algo-dp-patterns.html">DP patterns handout</a>;
+        &ldquo;restrict the allowed resource set and admit one element per
+        stage&rdquo; is one of its recurring moves.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="algo">3. The algorithm: three loops</h2>
+      <p>
+        The recurrence wants \(V+1\) matrices \(d^{(-1)}, d^{(0)}, \dots\), but
+        one matrix suffices, updated in place. That is safe because pass \(k\)
+        never changes the entries it reads:
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (row \(k\) and column \(k\) are fixed points of pass \(k\))</span>
+        With no negative cycles, \(d^{(k)}(i,k) = d^{(k-1)}(i,k)\) and
+        \(d^{(k)}(k,j) = d^{(k-1)}(k,j)\) for all \(i, j\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Apply the recurrence to the pair \((i,k)\):
+        the second alternative is
+        \(d^{(k-1)}(i,k) + d^{(k-1)}(k,k)\), and \(d^{(k-1)}(k,k) = 0\)
+        (the empty path costs \(0\), and with no negative cycles no closed walk
+        beats it). So the two alternatives are equal and the entry does not
+        move. Symmetrically for \((k,j)\). Hence during pass \(k\), the values
+        \(d(i,k)\) and \(d(k,j)\) that the update reads are the same whether or
+        not they have already been &ldquo;overwritten&rdquo; this pass, and
+        one in-place matrix computes exactly the sequence
+        \(d^{(0)}, d^{(1)}, \dots\) <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        So the program is: load the adjacency matrix, then for each \(k\) sweep
+        every pair once. Alongside <code>dist</code> we maintain
+        <code>nxt[i][j]</code>, the <em>first hop</em> of the best known
+        \(i \to j\) path, for path reconstruction
+        (<a href="#paths">&sect;5</a>): it starts as \(j\) where the edge
+        \(i \to j\) exists, and whenever a route via \(k\) wins, the first hop
+        toward \(j\) becomes the first hop toward \(k\).
+      </p>
+      <div class="code-tabs" data-snippet="graphs/floyd-warshall">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Floyd-Warshall, in place. dist starts as the adjacency matrix:
+// dist[i][i] = 0, dist[i][j] = w(i,j), INF where no edge. nxt[i][j] is the
+// first hop of the best known i-&gt;j path (-1 = no path known).
+const long INF = LONG_MAX / 4;   <span class="cm">// headroom: INF + INF must not overflow</span>
+
+void floydWarshall(vector&lt;vector&lt;long&gt;&gt;&amp; dist, vector&lt;vector&lt;int&gt;&gt;&amp; nxt) {
+    int V = dist.size();
+    for (int k = 0; k &lt; V; k++)               <span class="cm">// pass k: admit k as an intermediate</span>
+        for (int i = 0; i &lt; V; i++)
+            for (int j = 0; j &lt; V; j++)
+                if (dist[i][k] + dist[k][j] &lt; dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];  <span class="cm">// route i -&gt; k -&gt; j wins</span>
+                    nxt[i][j]  = nxt[i][k];                <span class="cm">// first hop: toward k now</span>
+                }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Floyd-Warshall, in place. dist starts as the adjacency matrix:
+// dist[i][i] = 0, dist[i][j] = w(i,j), INF where no edge. nxt[i][j] is the
+// first hop of the best known i-&gt;j path (-1 = no path known).
+static final long INF = Long.MAX_VALUE / 4;  <span class="cm">// headroom: INF + INF must not overflow</span>
+
+void floydWarshall(long[][] dist, int[][] nxt) {
+    int V = dist.length;
+    for (int k = 0; k &lt; V; k++)               <span class="cm">// pass k: admit k as an intermediate</span>
+        for (int i = 0; i &lt; V; i++)
+            for (int j = 0; j &lt; V; j++)
+                if (dist[i][k] + dist[k][j] &lt; dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];  <span class="cm">// route i -&gt; k -&gt; j wins</span>
+                    nxt[i][j]  = nxt[i][k];                <span class="cm">// first hop: toward k now</span>
+                }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>INF = float("inf")               <span class="cm"># a true infinity: INF + w stays INF</span>
+
+# Floyd-Warshall, in place. dist starts as the adjacency matrix:
+# dist[i][i] = 0, dist[i][j] = w(i,j), INF where no edge. nxt[i][j] is the
+# first hop of the best known i-&gt;j path (None = no path known).
+def floyd_warshall(dist, nxt):
+    V = len(dist)
+    for k in range(V):                        <span class="cm"># pass k: admit k as an intermediate</span>
+        for i in range(V):
+            for j in range(V):
+                if dist[i][k] + dist[k][j] &lt; dist[i][j]:
+                    dist[i][j] = dist[i][k] + dist[k][j]  <span class="cm"># route i -&gt; k -&gt; j wins</span>
+                    nxt[i][j] = nxt[i][k]                 <span class="cm"># first hop: toward k now</span></pre>
+<pre class="ct-pane" data-lang="rs" hidden>const INF: i64 = i64::MAX / 4;   <span class="cm">// headroom: INF + INF must not overflow</span>
+
+// Floyd-Warshall, in place. dist starts as the adjacency matrix:
+// dist[i][i] = 0, dist[i][j] = w(i,j), INF where no edge. nxt[i][j] is the
+// first hop of the best known i-&gt;j path (usize::MAX = no path known).
+fn floyd_warshall(dist: &amp;mut Vec&lt;Vec&lt;i64&gt;&gt;, nxt: &amp;mut Vec&lt;Vec&lt;usize&gt;&gt;) {
+    let v = dist.len();
+    for k in 0..v {                           <span class="cm">// pass k: admit k as an intermediate</span>
+        for i in 0..v {
+            for j in 0..v {
+                if dist[i][k] + dist[k][j] &lt; dist[i][j] {
+                    dist[i][j] = dist[i][k] + dist[k][j]; <span class="cm">// route i -&gt; k -&gt; j wins</span>
+                    nxt[i][j] = nxt[i][k];                <span class="cm">// first hop: toward k now</span>
+                }
+            }
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/floyd-warshall.cpp &middot; code/graphs/floyd-warshall.java &middot; code/graphs/floyd-warshall.py &middot; code/graphs/floyd-warshall.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Two mechanical points. In languages with fixed-width integers,
+        \(\infty\) is a large sentinel, and <code>dist[i][k] + dist[k][j]</code>
+        can be sentinel + sentinel; dividing the maximum by \(4\) leaves
+        headroom so the sum cannot overflow into a negative number and
+        &ldquo;win&rdquo; the comparison. (Python&rsquo;s
+        <code>float("inf")</code> is a true infinity and needs no care.) Second:
+      </p>
+      <div class="aside">
+        <span class="tag">The loop order is the algorithm</span>
+        \(k\) must be the <em>outermost</em> loop: the whole matrix must finish
+        stage \(k-1\) before any entry consults it at stage \(k\). Swapping the
+        loops to put \(k\) innermost computes, for each pair once, a minimum
+        over intermediates using half-baked entries, and produces wrong answers
+        (a concrete failure is <a href="#ex">exercise 7</a>). The
+        \(i\) and \(j\) loops may be exchanged freely; only \(k\)&rsquo;s
+        position is load-bearing.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">4. The full trace, matrix by matrix</h2>
+      <p>
+        The running graph: four vertices, six weighted directed edges.
+        Vertex \(0\) has no incoming edges, and both a direct edge and a
+        three-hop detour lead from \(0\) to \(3\).
+      </p>
+      <figure>
+        <svg viewBox="0 0 420 280" role="img" aria-label="The running four-vertex weighted digraph. Vertices 0, 1, 2, 3 sit at the corners of a square: 0 top left, 1 top right, 2 bottom right, 3 bottom left. Six directed edges: 0 to 1 with weight 3 along the top, 0 to 3 with weight 12 down the left side, 1 to 2 with weight 5 down the right side, 1 to 3 with weight 13 along one diagonal, 2 to 3 with weight 1 along the bottom, and 3 to 1 with weight 2 along the other diagonal. Vertex 0 has no incoming edges.">
+          <defs>
+            <marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#4a5163"/>
+            </marker>
+          </defs>
+          <g stroke="#4a5163" stroke-width="1.8" fill="none" marker-end="url(#ah)">
+            <line x1="131" y1="60" x2="289" y2="60"/>    <!-- 0->1 -->
+            <line x1="110" y1="81" x2="110" y2="199"/>   <!-- 0->3 -->
+            <line x1="310" y1="81" x2="310" y2="199"/>   <!-- 1->2 -->
+            <line x1="289" y1="220" x2="131" y2="220"/>  <!-- 2->3 -->
+            <line x1="299" y1="77" x2="129" y2="213"/>   <!-- 1->3 -->
+            <line x1="121" y1="203" x2="291" y2="67"/>   <!-- 3->1 -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
+             fill="#0a7d4d" stroke="#fff" stroke-width="3" paint-order="stroke"
+             text-anchor="middle">
+            <text x="210" y="52">3</text>    <!-- 0->1 -->
+            <text x="96" y="144">12</text>   <!-- 0->3 -->
+            <text x="324" y="144">5</text>   <!-- 1->2 -->
+            <text x="210" y="238">1</text>   <!-- 2->3 -->
+            <text x="234" y="163">13</text>  <!-- 1->3 -->
+            <text x="186" y="123">2</text>   <!-- 3->1 -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="110" cy="60" r="19"/>  <circle cx="310" cy="60" r="19"/>
+              <circle cx="310" cy="220" r="19"/> <circle cx="110" cy="220" r="19"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="110" y="65">0</text>  <text x="310" y="65">1</text>
+              <text x="310" y="225">2</text> <text x="110" y="225">3</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The running graph: \(V = 4\), \(E = 6\). Edges
+          \(0\to1\,(3)\), \(0\to3\,(12)\), \(1\to2\,(5)\), \(1\to3\,(13)\),
+          \(2\to3\,(1)\), \(3\to1\,(2)\). Nothing enters vertex \(0\), so no
+          other vertex can reach it; and the direct \(0 \to 3\) at \(12\)
+          competes with the detour \(0 \to 1 \to 2 \to 3\) at \(3+5+1 = 9\).
+        </figcaption>
+      </figure>
+      <p>
+        Below, one matrix per stage. The <span style="background:var(--accentbg);padding:0 4px;border-radius:3px">green</span>
+        band is pass \(k\)&rsquo;s pivot row and column (which the pass reads
+        and, per <a href="#algo">&sect;3</a>, never changes); a
+        <span style="background:var(--warnbg);padding:0 4px;border-radius:3px;font-weight:700">shaded bold</span>
+        entry was lowered this pass. Entry \((i,j)\) means: cheapest
+        \(i \to j\) path seen so far.
+      </p>
+
+      <h3>Initialize: \(d^{(-1)}\) = the adjacency matrix</h3>
+      <table class="trace">
+        <tr><th class="lab">from \ to</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
+        <tr><td class="lab">0</td><td>0</td><td>3</td><td class="inf">&infin;</td><td>12</td></tr>
+        <tr><td class="lab">1</td><td class="inf">&infin;</td><td>0</td><td>5</td><td>13</td></tr>
+        <tr><td class="lab">2</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td>0</td><td>1</td></tr>
+        <tr><td class="lab">3</td><td class="inf">&infin;</td><td>2</td><td class="inf">&infin;</td><td>0</td></tr>
+      </table>
+      <p>
+        Diagonal \(0\), edges where they exist, \(\infty\) elsewhere. No
+        intermediates are allowed yet.
+      </p>
+
+      <h3>Pass \(k = 0\): routes through vertex 0</h3>
+      <table class="trace">
+        <tr><th class="lab">from \ to</th><th class="piv">0</th><th>1</th><th>2</th><th>3</th></tr>
+        <tr><td class="lab">0</td><td class="piv">0</td><td class="piv">3</td><td class="piv inf">&infin;</td><td class="piv">12</td></tr>
+        <tr><td class="lab">1</td><td class="piv inf">&infin;</td><td>0</td><td>5</td><td>13</td></tr>
+        <tr><td class="lab">2</td><td class="piv inf">&infin;</td><td class="inf">&infin;</td><td>0</td><td>1</td></tr>
+        <tr><td class="lab">3</td><td class="piv inf">&infin;</td><td>2</td><td class="inf">&infin;</td><td>0</td></tr>
+      </table>
+      <p>
+        <strong>Nothing changes.</strong> Every candidate is
+        \(d(i,0) + d(0,j)\), and column \(0\) is all \(\infty\) off the
+        diagonal: no edge enters vertex \(0\), so no path can pass
+        <em>through</em> it. A pass can be entirely vacuous; the loop neither
+        knows nor cares.
+      </p>
+
+      <h3>Pass \(k = 1\): routes through vertex 1</h3>
+      <table class="trace">
+        <tr><th class="lab">from \ to</th><th>0</th><th class="piv">1</th><th>2</th><th>3</th></tr>
+        <tr><td class="lab">0</td><td>0</td><td class="piv">3</td><td class="upd">8</td><td>12</td></tr>
+        <tr><td class="lab">1</td><td class="inf">&infin;</td><td class="piv">0</td><td class="piv">5</td><td class="piv">13</td></tr>
+        <tr><td class="lab">2</td><td class="inf">&infin;</td><td class="piv inf">&infin;</td><td>0</td><td>1</td></tr>
+        <tr><td class="lab">3</td><td class="inf">&infin;</td><td class="piv">2</td><td class="upd">7</td><td>0</td></tr>
+      </table>
+      <p>
+        Two entries improve, and one candidate loses; all three cases on view:
+      </p>
+      <ul>
+        <li>
+          \((0,2)\): \(d(0,1) + d(1,2) = 3 + 5 = 8 &lt; \infty\).
+          <strong>Improves</strong>: an unreachable pair becomes reachable via
+          the newcomer.
+        </li>
+        <li>
+          \((3,2)\): \(d(3,1) + d(1,2) = 2 + 5 = 7 &lt; \infty\). Improves the
+          same way.
+        </li>
+        <li>
+          \((0,3)\): the candidate \(d(0,1) + d(1,3) = 3 + 13 = 16\) is worse
+          than the standing \(12\). <strong>No improvement</strong>: the entry
+          keeps its old value. Routing through the newcomer is an offer, not an
+          order.
+        </li>
+        <li>
+          Column \(0\): every candidate \(d(i,1) + d(1,0)\) ends in
+          \(d(1,0) = \infty\). <strong>Unreachable stays \(\infty\)</strong>.
+        </li>
+      </ul>
+
+      <h3>Pass \(k = 2\): routes through vertex 2</h3>
+      <table class="trace">
+        <tr><th class="lab">from \ to</th><th>0</th><th>1</th><th class="piv">2</th><th>3</th></tr>
+        <tr><td class="lab">0</td><td>0</td><td>3</td><td class="piv">8</td><td class="upd">9</td></tr>
+        <tr><td class="lab">1</td><td class="inf">&infin;</td><td>0</td><td class="piv">5</td><td class="upd">6</td></tr>
+        <tr><td class="lab">2</td><td class="piv inf">&infin;</td><td class="piv inf">&infin;</td><td class="piv">0</td><td class="piv">1</td></tr>
+        <tr><td class="lab">3</td><td class="inf">&infin;</td><td>2</td><td class="piv">7</td><td>0</td></tr>
+      </table>
+      <ul>
+        <li>
+          \((0,3)\): \(d(0,2) + d(2,3) = 8 + 1 = 9 &lt; 12\).
+          <strong>Improves</strong>: and note it improves a <em>finite</em>
+          entry, using a value (\(d(0,2) = 8\)) that was itself computed only
+          one pass ago. Stages stand on each other&rsquo;s shoulders; the
+          route this represents is \(0 \to 1 \to 2 \to 3\), three hops beating
+          the direct edge.
+        </li>
+        <li>
+          \((1,3)\): \(d(1,2) + d(2,3) = 5 + 1 = 6 &lt; 13\). Improves: the
+          detour through \(2\) beats \(1\)&rsquo;s direct edge.
+        </li>
+        <li>
+          \((3,3)\): the candidate \(d(3,2) + d(2,3) = 7 + 1 = 8\) does not
+          beat the diagonal&rsquo;s \(0\). A cycle \(3 \to 1 \to 2 \to 3\) of
+          cost \(8\) exists, but a nonnegative cycle never beats staying put.
+          Hold that thought for <a href="#negative">&sect;6</a>.
+        </li>
+        <li>
+          Pivot row \(2\) and pivot column \(2\): unchanged, exactly as the
+          in-place proposition promised.
+        </li>
+      </ul>
+
+      <h3>Pass \(k = 3\): routes through vertex 3</h3>
+      <table class="trace">
+        <tr><th class="lab">from \ to</th><th>0</th><th>1</th><th>2</th><th class="piv">3</th></tr>
+        <tr><td class="lab">0</td><td>0</td><td>3</td><td>8</td><td class="piv">9</td></tr>
+        <tr><td class="lab">1</td><td class="inf">&infin;</td><td>0</td><td>5</td><td class="piv">6</td></tr>
+        <tr><td class="lab">2</td><td class="inf">&infin;</td><td class="upd">3</td><td>0</td><td class="piv">1</td></tr>
+        <tr><td class="lab">3</td><td class="piv inf">&infin;</td><td class="piv">2</td><td class="piv">7</td><td class="piv">0</td></tr>
+      </table>
+      <ul>
+        <li>
+          \((2,1)\): \(d(2,3) + d(3,1) = 1 + 2 = 3 &lt; \infty\).
+          <strong>Improves</strong>: the only way from \(2\) to \(1\) is
+          through \(3\), and it is discovered only in the last pass, when
+          \(3\) is finally admitted.
+        </li>
+        <li>
+          \((0,1)\): \(d(0,3) + d(3,1) = 9 + 2 = 11\), worse than \(3\).
+          No improvement.
+        </li>
+        <li>
+          \((2,2)\): \(d(2,3) + d(3,2) = 1 + 7 = 8\), worse than \(0\).
+          The diagonal survives again.
+        </li>
+        <li>
+          Column \(0\): still \(\infty\), now permanently. All intermediates
+          have been admitted; \(\infty\) in the final matrix means
+          <em>no path exists</em>, full stop.
+        </li>
+      </ul>
+      <p>
+        The final matrix is the distance matrix. Reading it: \(\delta(0,3) = 9\)
+        (the three-hop detour), \(\delta(2,1) = 3\) (through \(3\)),
+        \(\delta(1,0) = \infty\) (vertex \(0\) is unreachable from everywhere),
+        and each row \(i\) is exactly what a single-source run from \(i\) would
+        report. Verified: the four rows match Bellman&ndash;Ford run from each
+        of the four sources.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="paths">5. Reconstructing paths: the next matrix</h2>
+      <p>
+        Distances say how far; the <code>nxt</code> matrix says which way.
+        The invariant is: <code>nxt[i][j]</code> is the <em>first hop</em> of
+        the cheapest known \(i \to j\) path. Initially, where an edge
+        \(i \to j\) exists, the path is that edge and the first hop is \(j\)
+        itself. When pass \(k\) reroutes pair \((i,j)\) via \(k\), the new best
+        path <em>starts</em> with the best path from \(i\) to \(k\), so its
+        first hop is <code>nxt[i][k]</code>: one assignment, already in the code
+        of <a href="#algo">&sect;3</a>.
+      </p>
+      <p>
+        On the running graph the five improvements of
+        <a href="#trace">&sect;4</a> update <code>nxt</code> five times:
+      </p>
+      <table>
+        <tr><th>pass</th><th>pair improved</th><th>assignment</th><th>value</th></tr>
+        <tr><td>\(k=1\)</td><td>\((0,2)\)</td><td><code>nxt[0][2] = nxt[0][1]</code></td><td>\(1\)</td></tr>
+        <tr><td>\(k=1\)</td><td>\((3,2)\)</td><td><code>nxt[3][2] = nxt[3][1]</code></td><td>\(1\)</td></tr>
+        <tr><td>\(k=2\)</td><td>\((0,3)\)</td><td><code>nxt[0][3] = nxt[0][2]</code></td><td>\(1\)</td></tr>
+        <tr><td>\(k=2\)</td><td>\((1,3)\)</td><td><code>nxt[1][3] = nxt[1][2]</code></td><td>\(2\)</td></tr>
+        <tr><td>\(k=3\)</td><td>\((2,1)\)</td><td><code>nxt[2][1] = nxt[2][3]</code></td><td>\(3\)</td></tr>
+      </table>
+      <p>The final <code>nxt</code> matrix (&ldquo;&middot;&rdquo; = no path):</p>
+      <table class="trace">
+        <tr><th class="lab">from \ to</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
+        <tr><td class="lab">0</td><td class="inf">&middot;</td><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td class="lab">1</td><td class="inf">&middot;</td><td class="inf">&middot;</td><td>2</td><td>2</td></tr>
+        <tr><td class="lab">2</td><td class="inf">&middot;</td><td>3</td><td class="inf">&middot;</td><td>3</td></tr>
+        <tr><td class="lab">3</td><td class="inf">&middot;</td><td>1</td><td>1</td><td class="inf">&middot;</td></tr>
+      </table>
+      <p>
+        To print a path, hop until arrival:
+      </p>
+      <div class="code-tabs" data-snippet="graphs/floyd-warshall-path">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// The actual shortest i -&gt; j path, from the nxt matrix; {} if none exists.
+vector&lt;int&gt; path(vector&lt;vector&lt;int&gt;&gt;&amp; nxt, int i, int j) {
+    if (nxt[i][j] == -1) return {};       <span class="cm">// dist[i][j] is INF: no path</span>
+    vector&lt;int&gt; p = {i};
+    while (i != j) {
+        i = nxt[i][j];                    <span class="cm">// hop to the next vertex toward j</span>
+        p.push_back(i);
+    }
+    return p;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// The actual shortest i -&gt; j path, from the nxt matrix; empty if none exists.
+List&lt;Integer&gt; path(int[][] nxt, int i, int j) {
+    List&lt;Integer&gt; p = new ArrayList&lt;&gt;();
+    if (nxt[i][j] == -1) return p;        <span class="cm">// dist[i][j] is INF: no path</span>
+    p.add(i);
+    while (i != j) {
+        i = nxt[i][j];                    <span class="cm">// hop to the next vertex toward j</span>
+        p.add(i);
+    }
+    return p;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># The actual shortest i -&gt; j path, from the nxt matrix; [] if none exists.
+def path(nxt, i, j):
+    if nxt[i][j] is None:                 <span class="cm"># dist[i][j] is INF: no path</span>
+        return []
+    p = [i]
+    while i != j:
+        i = nxt[i][j]                     <span class="cm"># hop to the next vertex toward j</span>
+        p.append(i)
+    return p</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// The actual shortest i -&gt; j path, from the nxt matrix; empty if none exists.
+fn path(nxt: &amp;Vec&lt;Vec&lt;usize&gt;&gt;, mut i: usize, j: usize) -&gt; Vec&lt;usize&gt; {
+    if nxt[i][j] == usize::MAX { return vec![]; } <span class="cm">// no path</span>
+    let mut p = vec![i];
+    while i != j {
+        i = nxt[i][j];                    <span class="cm">// hop to the next vertex toward j</span>
+        p.push(i);
+    }
+    p
+}</pre>
+<p class="ct-src">source: <code>code/graphs/floyd-warshall-path.cpp &middot; code/graphs/floyd-warshall-path.java &middot; code/graphs/floyd-warshall-path.py &middot; code/graphs/floyd-warshall-path.rs</code></p>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (three walks, step by step)</span>
+        <pre>  path(0, 3):  at 0, nxt[0][3] = 1   &rarr; hop to 1
+               at 1, nxt[1][3] = 2   &rarr; hop to 2
+               at 2, nxt[2][3] = 3   &rarr; hop to 3, arrived
+               path 0 &rarr; 1 &rarr; 2 &rarr; 3, cost 3 + 5 + 1 = 9 = dist[0][3]  &#10003;
+
+  path(2, 1):  at 2, nxt[2][1] = 3   &rarr; hop to 3
+               at 3, nxt[3][1] = 1   &rarr; hop to 1, arrived
+               path 2 &rarr; 3 &rarr; 1, cost 1 + 2 = 3 = dist[2][1]  &#10003;
+
+  path(1, 0):  nxt[1][0] = &middot;        &rarr; no path, matching dist[1][0] = &infin;</pre>
+        Each hop re-reads the entry for the <em>final</em> destination \(j\),
+        not for the next waypoint: \(\texttt{nxt}[1][3]\) is consulted, not
+        \(\texttt{nxt}[1][2]\). The walk for a pair at distance \(d\) with
+        \(h\) hops takes \(\Theta(h)\) time: reconstruction is free compared
+        with the \(\Theta(V^3)\) already spent.
+      </div>
+      <p>
+        The alternative record is a <strong>predecessor</strong> matrix
+        (<code>pred[i][j]</code> = the vertex just before \(j\) on the best
+        \(i \to j\) path, updated as <code>pred[i][j] = pred[k][j]</code>),
+        which walks paths backward, exactly like the <code>parent[]</code>
+        array of the single-source algorithms. One matrix per convention; both
+        are \(\Theta(V^2)\) space and both reconstruct any path in time
+        proportional to its length.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="negative">6. Negative edges and negative cycles</h2>
+      <p>
+        Reread the correctness proof of <a href="#subproblem">&sect;2</a>:
+        nowhere does it ask weights to be nonnegative. It asks only that the
+        graph have <strong>no negative cycles</strong>, so that walks can be
+        pruned to simple paths without raising cost. So Floyd&ndash;Warshall
+        computes correct distances with negative edges present, no
+        modifications, no extra passes: precisely the case where
+        <a href="algo-dijkstra.html">Dijkstra</a>&rsquo;s greedy settling fails
+        (its handout exhibits the failing three-vertex graph). The DP does not
+        greedily freeze anything; every entry stays revisable until all \(V\)
+        passes are done.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (negative cycle)</span>
+        A <strong>negative cycle</strong> is a directed cycle whose edge weights
+        sum to less than \(0\). If some \(i \to j\) walk can reach such a cycle,
+        loop it, and continue to \(j\), then no cheapest \(i \to j\) path
+        exists: every trip around lowers the total, and the infimum is
+        \(-\infty\). &ldquo;Shortest path&rdquo; stops being well defined for
+        such pairs.
+      </div>
+      <p>
+        Floyd&ndash;Warshall cannot return correct distances in that case
+        (there are none to return), but it detects the situation, and the
+        detector is the diagonal it has been maintaining all along.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (negative-cycle detection)</span>
+        Run the triple loop to completion. Then
+        \(\texttt{dist}[i][i] &lt; 0\) for some \(i\) if and only if the graph
+        contains a negative cycle. Moreover any such \(i\) lies on one.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong>
+        (\(\Leftarrow\)) Let \(C\) be a negative cycle and let \(i\) be its
+        highest-numbered vertex, say with cycle cost \(c &lt; 0\). Split \(C\)
+        at \(i\): it is an \(i \to i\) closed walk whose interior lies in
+        \(\{0, \dots, i\}\), with the possible interior repetition of \(i\)
+        itself absent since we split there. Trace the recurrence: after pass
+        \(i\), \(\texttt{dist}[i][i]\) is at most the cost of the cheapest
+        \(i \to i\) closed walk with interior in \(\{0,\dots,i\}\), hence
+        \(\le c &lt; 0\). Updates only decrease entries, so the final
+        \(\texttt{dist}[i][i]\) is still negative.
+        (\(\Rightarrow\)) Entries are only ever set to sums of edge weights
+        along genuine walks (induction, exactly as for the honest-labels
+        invariant of the single-source algorithms): \(\texttt{dist}[i][i] &lt; 0\)
+        exhibits a closed \(i \to i\) walk of negative total cost. A closed walk
+        decomposes into simple cycles; if every one of them had nonnegative
+        cost, the walk&rsquo;s total would be nonnegative, so some simple cycle
+        in it, through vertices of the walk, is negative.
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a negative cycle caught on the diagonal)</span>
+        Take the three-vertex graph \(0 \to 1\,(1)\), \(1 \to 2\,(-3)\),
+        \(2 \to 0\,(1)\): one big cycle of cost \(1 - 3 + 1 = -1\). The
+        final matrix, with the diagonal flagged:
+        <table class="trace">
+          <tr><th class="lab">from \ to</th><th>0</th><th>1</th><th>2</th></tr>
+          <tr><td class="lab">0</td><td class="neg">&minus;1</td><td>0</td><td>&minus;3</td></tr>
+          <tr><td class="lab">1</td><td>&minus;2</td><td class="neg">&minus;1</td><td>&minus;4</td></tr>
+          <tr><td class="lab">2</td><td>0</td><td>1</td><td class="neg">&minus;2</td></tr>
+        </table>
+        Every diagonal entry has gone negative (all three vertices lie on the
+        cycle), and the first symptom appears early:
+        \(\texttt{dist}[2][2]\) drops to \(-1\) already during pass \(k = 1\),
+        via the walk \(2 \to 0 \to 1 \to 2 = 1 + 1 - 3\). One caution: when the
+        theorem fires, the <em>off</em>-diagonal entries are not distances
+        (for pairs that can route through the cycle, no finite distance
+        exists); the matrix is a detector&rsquo;s readout, not an answer.
+        Verified by running the triple loop on this graph.
+      </div>
+      <p>
+        So the complete contract is: nonnegative edges, or negative edges with
+        no negative cycle, give exact distances; a negative cycle is reported by
+        a scan of the diagonal, \(\Theta(V)\) extra work after the run.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">7. Cost, and when to use it</h2>
+      <div class="thm">
+        <span class="tag">Proposition (time and space)</span>
+        Floyd&ndash;Warshall runs in exactly \(\Theta(V^3)\) time and
+        \(\Theta(V^2)\) space, on every input.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The loop body (one addition, one comparison,
+        at most two assignments) is \(\Theta(1)\), and it executes exactly
+        \(V \cdot V \cdot V\) times: no early exit, no data-dependent pruning.
+        Best case equals worst case, hence \(\Theta\), not merely \(O\). Space:
+        the <code>dist</code> and <code>nxt</code> matrices are \(\Theta(V^2)\)
+        each, updated in place (licensed by the fixed-point proposition of
+        <a href="#algo">&sect;3</a>); no other state exists. Note \(\Theta(V^2)\)
+        is optimal for APSP in any case: the output alone is \(V^2\) numbers.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Two features of this accounting deserve notice. \(E\) does not appear:
+        a sparse graph and a complete graph on the same \(V\) cost the same,
+        because the matrix, not the edge list, drives the loops. And the
+        constant factor is tiny: no heap, no visited sets, no pointer chasing;
+        three loops over a contiguous array, which caches and vectorizes about
+        as well as code can.
+      </p>
+      <h3>Versus \(V\) runs of Dijkstra</h3>
+      <table>
+        <tr><th>approach</th><th>weights</th><th>cost</th><th>sweet spot</th></tr>
+        <tr><td>\(V \times\) <a href="algo-dijkstra.html">Dijkstra</a> (heap)</td><td>\(\ge 0\) only</td><td>\(O(V E \log V)\)</td><td>sparse, nonnegative</td></tr>
+        <tr><td>\(V \times\) Bellman&ndash;Ford</td><td>any (no neg. cycle)</td><td>\(O(V^2 E)\)</td><td>rarely: superseded below</td></tr>
+        <tr><td><strong>Floyd&ndash;Warshall</strong></td><td>any; detects neg. cycles</td><td>\(\Theta(V^3)\)</td><td>dense, or negative edges, or small \(V\)</td></tr>
+      </table>
+      <p>
+        The comparison is one substitution. Dense graph,
+        \(E = \Theta(V^2)\): repeated Dijkstra costs
+        \(\Theta(V^3 \log V)\), and Floyd&ndash;Warshall&rsquo;s
+        \(\Theta(V^3)\) wins by the \(\log\) factor <em>and</em> by its much
+        smaller constant. Sparse graph, \(E = \Theta(V)\): repeated Dijkstra
+        costs \(\Theta(V^2 \log V)\), which beats \(V^3\) by roughly
+        \(V / \log V\), an enormous margin at scale (concrete numbers in
+        <a href="#ex">exercise 6</a>). Negative edges take repeated Dijkstra
+        off the table entirely, at any density. And below a few hundred
+        vertices the asymptotics hardly matter: the triple loop&rsquo;s
+        simplicity, predictability, and cache behavior make it the default
+        APSP tool whenever \(V^3\) is affordable at all.
+      </p>
+      <div class="aside">
+        <span class="tag">The sparse-and-negative corner: Johnson&rsquo;s algorithm</span>
+        One cell of the decision table is left uncovered: sparse <em>and</em>
+        negative-weighted. Johnson&rsquo;s algorithm fills it by running the
+        Bellman&ndash;Ford relaxation scheme once from an artificial source to
+        compute a potential \(h(v)\) for every vertex, reweighting each edge as
+        \(w'(u,v) = w(u,v) + h(u) - h(v) \ge 0\) (a transformation that, unlike
+        adding a constant, preserves shortest paths, since the \(h\)-terms
+        telescope along any path), and then running \(V\) Dijkstras on the now
+        nonnegative graph: \(O(V E \log V)\) total. On dense graphs
+        Floyd&ndash;Warshall still wins; on sparse ones Johnson does.
+      </div>
+      <h3>Where this sits</h3>
+      <p>
+        Floyd&ndash;Warshall is the graph catalog&rsquo;s meeting point with
+        dynamic programming: the subproblem-by-restriction derivation of
+        <a href="#subproblem">&sect;2</a> is the
+        <a href="../dp/paradigm-dp-method.html">DP method</a> practiced on a
+        graph problem, and its stage-by-stage table is one more entry in the
+        <a href="../dp/algo-dp-patterns.html">DP patterns</a> family. Within
+        shortest paths it completes a progression: unweighted single-source is
+        <a href="algo-bfs.html">BFS</a>, weighted nonnegative single-source is
+        <a href="algo-dijkstra.html">Dijkstra</a>, and all-pairs is this
+        handout. It reads its input straight from the adjacency matrix of the
+        <a href="ds-graph-representations.html">graph-representations
+        handout</a>: the one algorithm in the catalog for which the matrix,
+        not the list, is the natural home. The same triple loop with other
+        operators computes transitive closure
+        (<a href="#ex">exercise 8</a>) and, with \((\min,+)\) swapped for other
+        semirings, a family of path problems well beyond distances.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Run Floyd&ndash;Warshall by hand on the graph \(0\to1\,(2)\),
+          \(1\to2\,(2)\), \(0\to2\,(5)\), \(2\to0\,(-1)\). Give the matrix
+          after each pass, and state which entries each pass changed. (Note
+          the negative edge; check first that no cycle is negative.)
+          <details>
+            <summary>solution</summary>
+            The two cycles are \(0\to1\to2\to0 = 2+2-1 = 3\) and
+            \(0\to2\to0 = 5-1 = 4\), both positive, so distances exist.
+            Initial rows: \((0, 2, 5)\), \((\infty, 0, 2)\),
+            \((-1, \infty, 0)\). Pass \(k=0\): \(d(2,1) = d(2,0)+d(0,1)
+            = -1+2 = 1\), one change. Pass \(k=1\): \(d(0,2) = d(0,1)+d(1,2)
+            = 2+2 = 4 &lt; 5\), one change (the candidate \(d(2,2) = 1+2 = 3\)
+            loses to the diagonal&rsquo;s \(0\)). Pass \(k=2\):
+            \(d(1,0) = d(1,2)+d(2,0) = 2-1 = 1 &lt; \infty\), one change
+            (\(d(0,0) = 4-1 = 3\) loses to \(0\)). Final rows:
+            \((0, 2, 4)\), \((1, 0, 2)\), \((-1, 1, 0)\). The negative edge
+            caused no special handling anywhere; only a negative <em>cycle</em>
+            would have.
+          </details>
+        </li>
+        <li>
+          In the trace of <a href="#trace">&sect;4</a>, pass \(k=0\) changed
+          nothing. State the structural property of vertex \(0\) that
+          guarantees this in advance, and give the general condition under
+          which pass \(k\) is vacuous no matter what the other passes did.
+          <details>
+            <summary>solution</summary>
+            Vertex \(0\) has no incoming edges, so \(d(i,0) = \infty\) for
+            every \(i \ne 0\), and every candidate
+            \(d(i,0) + d(0,j)\) with \(i \ne 0\) is \(\infty\); candidates
+            with \(i = 0\) reduce to \(d(0,0) + d(0,j) = d(0,j)\), never an
+            improvement. In general pass \(k\) is vacuous whenever no vertex
+            reaches \(k\) or \(k\) reaches no vertex (row or column \(k\) is
+            all \(\infty\) off the diagonal): a vertex nothing enters, or
+            nothing leaves, can sit in no path&rsquo;s interior.
+          </details>
+        </li>
+        <li>
+          The in-place update reads \(\texttt{dist}[i][k]\) and
+          \(\texttt{dist}[k][j]\) during the very pass that is overwriting the
+          matrix. Prove this is safe, and point to the exact place where the
+          argument uses the absence of negative cycles.
+          <details>
+            <summary>solution</summary>
+            Apply pass \(k\)&rsquo;s own update to an entry in column \(k\):
+            the candidate for \((i,k)\) is
+            \(d(i,k) + d(k,k)\), and since \(d(k,k) = 0\) it ties the standing
+            value and the strict <code>&lt;</code> rejects it; symmetrically
+            for row \(k\). So the entries the pass reads are never modified by
+            it, and reading &ldquo;partly updated&rdquo; memory returns the
+            same values as reading the previous stage&rsquo;s matrix. The
+            negative-cycle assumption is exactly what keeps \(d(k,k) = 0\):
+            a negative closed walk through earlier intermediates would have
+            driven \(d(k,k)\) below \(0\) in an earlier pass, and the pivot
+            row and column would then shift mid-pass.
+          </details>
+        </li>
+        <li>
+          Run Floyd&ndash;Warshall on \(0\to1\,(2)\), \(1\to2\,(-5)\),
+          \(2\to1\,(2)\). Report the final diagonal, name the negative cycle,
+          and classify every entry of the final matrix as meaningful or
+          meaningless.
+          <details>
+            <summary>solution</summary>
+            The cycle \(1 \to 2 \to 1\) costs \(-5 + 2 = -3\). The final
+            matrix has rows \((0, -1, -6)\), \((\infty, -3, -8)\),
+            \((\infty, -1, -6)\): diagonal \((0, -3, -6)\), and the two
+            negative diagonal entries flag vertices \(1\) and \(2\), exactly
+            the vertices on the cycle. Meaningful entries:
+            \(d(0,0) = 0\) (vertex \(0\) lies on no cycle) and
+            \(d(1,0) = d(2,0) = \infty\) (nothing enters \(0\), a true
+            no-path answer). Every other entry, \((0,1), (0,2), (1,1), (1,2),
+            (2,1), (2,2)\), describes a pair whose walks can loop the cycle:
+            the true infimum is \(-\infty\), and the printed finite numbers are
+            merely where the \(V\)-pass recurrence stopped (running the triple
+            loop a second time lowers them further, another usable symptom).
+          </details>
+        </li>
+        <li>
+          Using only the final <code>nxt</code> matrix of
+          <a href="#paths">&sect;5</a>, reconstruct the shortest paths
+          \(3 \to 2\) and \(0 \to 2\), listing each hop and checking each cost
+          against the distance matrix.
+          <details>
+            <summary>solution</summary>
+            \(3 \to 2\): at \(3\), \(\texttt{nxt}[3][2] = 1\), hop to \(1\);
+            at \(1\), \(\texttt{nxt}[1][2] = 2\), hop to \(2\), arrived. Path
+            \(3 \to 1 \to 2\), cost \(2 + 5 = 7 = \texttt{dist}[3][2]\).
+            \(0 \to 2\): at \(0\), \(\texttt{nxt}[0][2] = 1\); at \(1\),
+            \(\texttt{nxt}[1][2] = 2\), arrived. Path \(0 \to 1 \to 2\), cost
+            \(3 + 5 = 8 = \texttt{dist}[0][2]\). Both agree with the trace
+            (both were verified by machine as well).
+          </details>
+        </li>
+        <li>
+          A graph has \(V = 1000\) vertices and nonnegative weights. Estimate
+          the operation counts for all-pairs via \(V\) heap-Dijkstras versus
+          Floyd&ndash;Warshall when (a) \(E = 5{,}000\) and (b)
+          \(E = 499{,}500\) (nearly complete). Which wins where, and what
+          single change of assumptions eliminates repeated Dijkstra at any
+          density?
+          <details>
+            <summary>solution</summary>
+            Floyd&ndash;Warshall is \(V^3 = 10^9\) either way. (a) Repeated
+            Dijkstra is roughly \(V \cdot E \log_2 V \approx 1000 \cdot 5000
+            \cdot 10 = 5 \times 10^7\): about \(20\times\) fewer operations;
+            sparse Dijkstra wins comfortably. (b) Roughly \(1000 \cdot
+            499{,}500 \cdot 10 \approx 5 \times 10^9\): now
+            Floyd&ndash;Warshall does about \(5\times\) fewer operations, each
+            far cheaper (no heap traffic), so it wins decisively. One negative
+            edge anywhere invalidates Dijkstra&rsquo;s greedy proof and
+            removes option one entirely, at any density;
+            Floyd&ndash;Warshall&rsquo;s count does not change.
+          </details>
+        </li>
+        <li>
+          A classmate writes the three loops as <code>for i, for j, for k</code>
+          (pairs outer, intermediates inner), reasoning that each pair should
+          simply take its best intermediate in one shot. On the graph
+          \(0\to3\,(1)\), \(3\to2\,(1)\), \(2\to1\,(1)\), what does one such
+          sweep report for \(d(0,1)\) and for \(d(0,2)\) (loops ascending), and
+          why does the correct loop order fix it?
+          <details>
+            <summary>solution</summary>
+            True distances: \(d(0,2) = 2\) (via \(3\)) and \(d(0,1) = 3\)
+            (via \(3\) then \(2\)). The sweep computes \(d(0,1)\) first
+            (with \(i=0, j=1\)): its candidates \(d(0,k) + d(k,1)\) use only
+            direct-edge values, and no <em>single</em> intermediate connects
+            \(0\) to \(1\) (\(d(0,2)\) is still \(\infty\) when read), so
+            \(d(0,1)\) finishes as \(\infty\): wrong. \(d(0,2)\) happens to
+            come out \(2\) via \(k=3\), because both halves are direct edges.
+            The failure is structural: with \(k\) innermost each pair is
+            finalized once, so a shortest path of \(h\) hops, which needs
+            \(h-1\) levels of already-improved entries, can never assemble.
+            With \(k\) outermost every pair is revisited at every stage, and
+            the theorem of <a href="#subproblem">&sect;2</a> guarantees stage
+            \(k\) only ever needs stage \(k-1\) values. (Both sweeps verified
+            by machine: the wrong order leaves \(d(0,1) = \infty\).)
+          </details>
+        </li>
+        <li>
+          <strong>Transitive closure (Warshall&rsquo;s algorithm).</strong>
+          Adapt the triple loop to compute reachability instead of distance:
+          \(\texttt{reach}[i][j]\) true iff some \(i \to j\) path exists.
+          State the modified update and the resulting matrix for the running
+          graph of <a href="#trace">&sect;4</a>.
+          <details>
+            <summary>solution</summary>
+            Booleans replace weights: initialize
+            \(\texttt{reach}[i][j]\) true iff \(i = j\) or the edge
+            \(i \to j\) exists, and update with
+            <code>reach[i][j] = reach[i][j] || (reach[i][k] &amp;&amp;
+            reach[k][j])</code>: minimum becomes OR, addition becomes AND, the
+            same derivation goes through word for word. On the running graph
+            the result is the finiteness pattern of the final distance matrix:
+            row \(0\) all true; rows \(1\), \(2\), \(3\) true everywhere
+            except column \(0\), which is false (nothing enters vertex
+            \(0\)). Packing rows as bitsets makes the inner loop a word-wide
+            OR, cutting the cost to \(\Theta(V^3 / w)\) for word size \(w\):
+            the standard trick for closures of large relations.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; The Floyd&ndash;Warshall Algorithm
+        v1.0 &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

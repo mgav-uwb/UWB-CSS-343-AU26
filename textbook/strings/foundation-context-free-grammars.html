@@ -1,0 +1,1817 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Context-Free Grammars & Parsing.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Context-Free Grammars &amp; Parsing - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      table.trace td.act { text-align: left; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; white-space: pre; }
+      table.trace td.nt { text-align: left; font-size: 12.5px; color: var(--dim); }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Context-Free Grammars &amp; Parsing</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        Grammars as generators of languages: terminals, nonterminals,
+        productions, start symbol. Leftmost and rightmost derivations and the
+        parse tree they share, worked on one arithmetic-expression grammar.
+        Ambiguity exhibited as two parse trees for a single string and removed
+        by stratifying the grammar by precedence. A proof that the regular
+        languages are a <em>strict</em> subset of the context-free languages,
+        with \(\texttt{a}^n\texttt{b}^n\) as the separating example and the
+        pumping-lemma argument given in full. Pushdown automata in an aside.
+        Two parsers implemented and traced: recursive descent (linear, top-down)
+        and the CYK dynamic-programming parser (cubic, any grammar), with a
+        verified parse trace and a filled CYK table. With exercises.
+      </div>
+
+      <p class="lead">
+        <a href="algo-regex-automata.html"><em>Regular Expressions &amp;
+        Automata</em></a> ends at a ceiling: a finite automaton has finitely
+        many states, so it cannot count without bound, and no regular
+        expression can describe balanced parentheses or
+        \(\texttt{a}^n\texttt{b}^n\). Programming-language syntax, arithmetic
+        expressions, JSON and HTML all live above that ceiling. This handout
+        climbs one rung. A <strong>context-free grammar</strong> replaces the
+        automaton&rsquo;s fixed states with <em>recursive rules</em>, which
+        gives it unbounded nesting for free; the machine that matches it
+        replaces the automaton&rsquo;s finite memory with a <em>stack</em>.
+        Regular languages turn out to be exactly the context-free languages a
+        stack is not needed for: a strict subset, and this handout proves both
+        halves of that claim.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#grammars">Grammars: four parts, one language</a></li>
+          <li><a href="#deriv">Derivations and parse trees</a></li>
+          <li><a href="#ambig">Ambiguity, and how precedence removes it</a></li>
+          <li><a href="#strict">Regular \(\subsetneq\) context-free</a></li>
+          <li><a href="#rd">Recursive-descent parsing</a></li>
+          <li><a href="#cyk">CYK: parsing by dynamic programming</a></li>
+          <li><a href="#tools">Parser generators, and where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="grammars">1. Grammars: four parts, one language</h2>
+      <p>
+        A regular expression <em>describes</em> a set of strings. A grammar
+        <em>generates</em> one, by rewriting: start from a single symbol and
+        repeatedly replace a symbol by one of its right-hand sides until only
+        real characters remain. Everything you can produce that way is in the
+        language; nothing else is.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (context-free grammar)</span>
+        A <strong>context-free grammar</strong> (CFG) is a quadruple
+        \(G = (V, \Sigma, R, S)\):
+        <ul>
+          <li>
+            \(\Sigma\), the <strong>terminals</strong>: the alphabet the
+            generated strings are written in (characters, or tokens such as
+            <code>+</code>, <code>id</code>, <code>while</code>). Terminals
+            are never rewritten.
+          </li>
+          <li>
+            \(V\), the <strong>nonterminals</strong>: the syntactic categories
+            (<code>Expression</code>, <code>Term</code>), disjoint from
+            \(\Sigma\). Each names a set of strings still to be determined.
+          </li>
+          <li>
+            \(R\), the <strong>productions</strong> (rules), each of the form
+            \(A \to \alpha\) with \(A \in V\) a single nonterminal and
+            \(\alpha \in (V \cup \Sigma)^{*}\) any string of terminals and
+            nonterminals, possibly empty (written \(\varepsilon\)).
+          </li>
+          <li>\(S \in V\), the <strong>start symbol</strong>.</li>
+        </ul>
+        &ldquo;Context-free&rdquo; is exactly the restriction that the left side
+        of a production is one bare nonterminal: \(A\) may be replaced by
+        \(\alpha\) <em>wherever</em> \(A\) occurs, with no regard for its
+        neighbours. That single restriction is what makes efficient parsing
+        possible.
+      </div>
+      <p>
+        The running grammar of this handout describes arithmetic expressions
+        over a single kind of operand, written <code>a</code> (read it as
+        &ldquo;any identifier or number&rdquo;: a real lexer would deliver one
+        token for it). Terminals \(\Sigma = \{\texttt{a}, \texttt{+},
+        \texttt{*}, \texttt{(}, \texttt{)}\}\); one nonterminal
+        \(V = \{E\}\); start symbol \(E\):
+      </p>
+      <pre>  G1 (ambiguous):
+      E &rarr; E + E
+      E &rarr; E * E
+      E &rarr; ( E )
+      E &rarr; a</pre>
+      <p>
+        Alternatives for the same nonterminal are usually stacked with
+        <code>|</code>: \(E \to E + E \mid E * E \mid (\,E\,) \mid \texttt{a}\).
+        Note the self-reference: \(E\) appears on both sides. That recursion is
+        the whole point, and it is what a finite automaton cannot imitate.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (derives; the language of a grammar)</span>
+        Write \(\alpha \Rightarrow \beta\) (&ldquo;\(\alpha\)
+        <strong>derives</strong> \(\beta\) in one step&rdquo;) when \(\beta\) is
+        obtained from \(\alpha\) by replacing one occurrence of a nonterminal
+        \(A\) by the right-hand side of some production \(A \to \gamma\). Write
+        \(\alpha \Rightarrow^{*} \beta\) for zero or more such steps. A string
+        of terminals and nonterminals reachable from \(S\) is a
+        <strong>sentential form</strong>; one containing only terminals is a
+        <strong>sentence</strong>. The <strong>language</strong> of \(G\) is
+        \[ L(G) \;=\; \{\, w \in \Sigma^{*} \;:\; S \Rightarrow^{*} w \,\}. \]
+        A language is <strong>context-free</strong> if it equals \(L(G)\) for
+        some CFG \(G\).
+      </div>
+      <div class="def">
+        <span class="tag">Definition (parsing)</span>
+        Given \(G\) and a string \(w\), the <strong>recognition</strong> problem
+        asks whether \(w \in L(G)\); the <strong>parsing</strong> problem asks
+        for a derivation (equivalently, a parse tree) witnessing it. A compiler
+        needs the second: the tree <em>is</em> the program&rsquo;s structure,
+        and the rest of the compiler walks it.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="deriv">2. Derivations and parse trees</h2>
+      <p>
+        A derivation is a sequence of rewriting choices, and it makes two kinds
+        of choice at once: <em>which</em> nonterminal to expand, and
+        <em>which</em> production to use for it. Only the second carries
+        information about the string&rsquo;s structure. Fixing the first by
+        convention removes the noise.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (leftmost, rightmost)</span>
+        A derivation is <strong>leftmost</strong> if every step expands the
+        leftmost nonterminal of the current sentential form, and
+        <strong>rightmost</strong> if every step expands the rightmost one.
+      </div>
+      <p>
+        Work both on the precedence-stratified grammar introduced in
+        &sect;<a href="#ambig">3</a> (repeated here so the derivations can be
+        followed now):
+      </p>
+      <pre>  G2 (stratified by precedence):
+      E &rarr; E + T | T          <span class="cm">an expression is a sum of terms</span>
+      T &rarr; T * F | F          <span class="cm">a term is a product of factors</span>
+      F &rarr; ( E ) | a          <span class="cm">a factor is atomic</span></pre>
+      <div class="ex">
+        <span class="tag">Example (leftmost and rightmost derivations of <code>a + a * a</code>)</span>
+        The leftmost derivation always rewrites the underlined symbol, which is
+        the first nonterminal from the left:
+        <table class="trace">
+          <tr><th>step</th><th class="lab">leftmost: sentential form</th><th class="lab">production used</th></tr>
+          <tr><td>0</td><td class="lab">E</td><td class="lab">(start symbol)</td></tr>
+          <tr><td>1</td><td class="lab">E + T</td><td class="lab">E &rarr; E + T</td></tr>
+          <tr><td>2</td><td class="lab">T + T</td><td class="lab">E &rarr; T</td></tr>
+          <tr><td>3</td><td class="lab">F + T</td><td class="lab">T &rarr; F</td></tr>
+          <tr><td>4</td><td class="lab">a + T</td><td class="lab">F &rarr; a</td></tr>
+          <tr><td>5</td><td class="lab">a + T * F</td><td class="lab">T &rarr; T * F</td></tr>
+          <tr><td>6</td><td class="lab">a + F * F</td><td class="lab">T &rarr; F</td></tr>
+          <tr><td>7</td><td class="lab">a + a * F</td><td class="lab">F &rarr; a</td></tr>
+          <tr><td>8</td><td class="lab">a + a * a</td><td class="lab">F &rarr; a</td></tr>
+        </table>
+        The rightmost derivation of the <em>same</em> string uses the same
+        eight productions in a different order:
+        <table class="trace">
+          <tr><th>step</th><th class="lab">rightmost: sentential form</th><th class="lab">production used</th></tr>
+          <tr><td>0</td><td class="lab">E</td><td class="lab">(start symbol)</td></tr>
+          <tr><td>1</td><td class="lab">E + T</td><td class="lab">E &rarr; E + T</td></tr>
+          <tr><td>2</td><td class="lab">E + T * F</td><td class="lab">T &rarr; T * F</td></tr>
+          <tr><td>3</td><td class="lab">E + T * a</td><td class="lab">F &rarr; a</td></tr>
+          <tr><td>4</td><td class="lab">E + F * a</td><td class="lab">T &rarr; F</td></tr>
+          <tr><td>5</td><td class="lab">E + a * a</td><td class="lab">F &rarr; a</td></tr>
+          <tr><td>6</td><td class="lab">T + a * a</td><td class="lab">E &rarr; T</td></tr>
+          <tr><td>7</td><td class="lab">F + a * a</td><td class="lab">T &rarr; F</td></tr>
+          <tr><td>8</td><td class="lab">a + a * a</td><td class="lab">F &rarr; a</td></tr>
+        </table>
+        Both derivations are eight steps long and use the multiset of
+        productions \(\{E \to E{+}T,\; E \to T,\; T \to T{*}F,\; T \to F
+        \text{ (twice)},\; F \to \texttt{a} \text{ (three times)}\}\). What
+        differs is only the order in which independent rewrites were performed.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (parse tree)</span>
+        A <strong>parse tree</strong> (derivation tree) for \(G\) is an ordered
+        tree whose root is labelled \(S\), whose internal nodes are labelled
+        with nonterminals, whose leaves are labelled with terminals or
+        \(\varepsilon\), and in which a node labelled \(A\) with children
+        labelled \(X_1, \dots, X_k\) left to right requires \(A \to X_1 \cdots
+        X_k\) to be a production of \(G\). Reading the leaves left to right
+        gives the tree&rsquo;s <strong>yield</strong>, the string it derives.
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (derivations and trees)</span>
+        For every parse tree with yield \(w\) there is exactly one leftmost
+        derivation of \(w\) and exactly one rightmost derivation of \(w\)
+        corresponding to it; conversely every leftmost (rightmost) derivation
+        determines one parse tree. The two derivations above are therefore the
+        same tree, seen twice.
+        <div class="proof">
+          <em>Sketch.</em> Given a tree, expand nonterminals in the order a
+          preorder walk that always recurses into the leftmost unexpanded child
+          encounters them: at every stage the frontier of expanded nodes,
+          read left to right, is a sentential form, and the next node taken is
+          the leftmost nonterminal on that frontier, so the induced derivation
+          is leftmost. The choice at each node is forced by the node&rsquo;s
+          children, so the derivation is unique. Rightmost is the mirror walk.
+          Conversely, given a leftmost derivation, build the tree by induction
+          on its length: each step replaces one leaf labelled \(A\) with
+          children matching the production used, and leftmost order guarantees
+          the leaf is determined at every step.
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <figure>
+        <svg viewBox="0 0 420 232" width="420" role="img"
+             aria-label="Parse tree of a plus a times a under the stratified grammar"
+             font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14.5">
+          <g stroke="#8a90a0" stroke-width="1.1" fill="none">
+            <path d="M170 30 L72 62 M170 30 L170 62 M170 30 L282 62"/>
+            <path d="M72 78 L72 108 M72 124 L72 154 M72 170 L72 200"/>
+            <path d="M282 78 L232 108 M282 78 L282 108 M282 78 L336 108"/>
+            <path d="M232 124 L232 154 M232 170 L232 200"/>
+            <path d="M336 124 L336 154"/>
+          </g>
+          <g text-anchor="middle" fill="#1a1c22">
+            <text x="170" y="26" font-weight="700" fill="#1f5fb0">E</text>
+            <text x="72" y="74" fill="#1f5fb0">E</text>
+            <text x="170" y="74">+</text>
+            <text x="282" y="74" fill="#1f5fb0">T</text>
+            <text x="72" y="120" fill="#1f5fb0">T</text>
+            <text x="72" y="166" fill="#1f5fb0">F</text>
+            <text x="72" y="212" fill="#0a7d4d" font-weight="700">a</text>
+            <text x="232" y="120" fill="#1f5fb0">T</text>
+            <text x="282" y="120">*</text>
+            <text x="336" y="120" fill="#1f5fb0">F</text>
+            <text x="232" y="166" fill="#1f5fb0">F</text>
+            <text x="232" y="212" fill="#0a7d4d" font-weight="700">a</text>
+            <text x="336" y="166" fill="#0a7d4d" font-weight="700">a</text>
+          </g>
+        </svg>
+        <figcaption>
+          The one parse tree of <code>a + a * a</code> under G2, shared by both
+          derivations above. Its yield, read across the leaves, is
+          <code>a + a * a</code>. The multiplication sits <em>below</em> the
+          addition, so any evaluator walking the tree bottom-up multiplies
+          first.
+        </figcaption>
+      </figure>
+
+      <!-- ============================================================ -->
+      <h2 id="ambig">3. Ambiguity, and how precedence removes it</h2>
+      <div class="def">
+        <span class="tag">Definition (ambiguous grammar)</span>
+        A grammar is <strong>ambiguous</strong> if some string in its language
+        has two or more distinct parse trees (equivalently, two distinct
+        leftmost derivations). A <em>language</em> is
+        <strong>inherently ambiguous</strong> if every grammar for it is
+        ambiguous; ambiguity of a grammar is a property of the grammar, and can
+        often be engineered away.
+      </div>
+      <p>
+        G1 is ambiguous, and <code>a + a * a</code> is the shortest witness.
+        Two leftmost derivations, differing at the very first step:
+      </p>
+      <div class="ex">
+        <span class="tag">Example (two leftmost derivations, one string)</span>
+        <table class="trace">
+          <tr><th>step</th><th class="lab">derivation (i): multiply first</th><th class="lab">derivation (ii): add first</th></tr>
+          <tr><td>0</td><td class="lab">E</td><td class="lab">E</td></tr>
+          <tr><td>1</td><td class="lab">E + E&nbsp;&nbsp;<span style="color:#5c6270">[E &rarr; E + E]</span></td><td class="lab">E * E&nbsp;&nbsp;<span style="color:#5c6270">[E &rarr; E * E]</span></td></tr>
+          <tr><td>2</td><td class="lab">a + E</td><td class="lab">E + E * E</td></tr>
+          <tr><td>3</td><td class="lab">a + E * E</td><td class="lab">a + E * E</td></tr>
+          <tr><td>4</td><td class="lab">a + a * E</td><td class="lab">a + a * E</td></tr>
+          <tr><td>5</td><td class="lab">a + a * a</td><td class="lab">a + a * a</td></tr>
+        </table>
+        Same string, same grammar, different trees:
+      </div>
+      <figure>
+        <svg viewBox="0 0 700 238" width="700" role="img"
+             aria-label="Two parse trees for a plus a times a under the ambiguous grammar"
+             font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14.5">
+          <g stroke="#8a90a0" stroke-width="1.1" fill="none">
+            <path d="M150 30 L60 62 M150 30 L150 62 M150 30 L245 62"/>
+            <path d="M60 78 L60 116"/>
+            <path d="M245 78 L195 116 M245 78 L245 116 M245 78 L295 116"/>
+            <path d="M195 132 L195 170 M295 132 L295 170"/>
+          </g>
+          <g stroke="#8a90a0" stroke-width="1.1" fill="none">
+            <path d="M510 30 L415 62 M510 30 L510 62 M510 30 L600 62"/>
+            <path d="M600 78 L600 116"/>
+            <path d="M415 78 L365 116 M415 78 L415 116 M415 78 L465 116"/>
+            <path d="M365 132 L365 170 M465 132 L465 170"/>
+          </g>
+          <g text-anchor="middle" fill="#1a1c22">
+            <text x="150" y="26" font-weight="700" fill="#1f5fb0">E</text>
+            <text x="60" y="74" fill="#1f5fb0">E</text>
+            <text x="150" y="74" font-weight="700" fill="#9a5b00">+</text>
+            <text x="245" y="74" fill="#1f5fb0">E</text>
+            <text x="60" y="128" fill="#0a7d4d" font-weight="700">a</text>
+            <text x="195" y="128" fill="#1f5fb0">E</text>
+            <text x="245" y="128" font-weight="700" fill="#9a5b00">*</text>
+            <text x="295" y="128" fill="#1f5fb0">E</text>
+            <text x="195" y="182" fill="#0a7d4d" font-weight="700">a</text>
+            <text x="295" y="182" fill="#0a7d4d" font-weight="700">a</text>
+            <text x="510" y="26" font-weight="700" fill="#1f5fb0">E</text>
+            <text x="415" y="74" fill="#1f5fb0">E</text>
+            <text x="510" y="74" font-weight="700" fill="#9a5b00">*</text>
+            <text x="600" y="74" fill="#1f5fb0">E</text>
+            <text x="600" y="128" fill="#0a7d4d" font-weight="700">a</text>
+            <text x="365" y="128" fill="#1f5fb0">E</text>
+            <text x="415" y="128" font-weight="700" fill="#9a5b00">+</text>
+            <text x="465" y="128" fill="#1f5fb0">E</text>
+            <text x="365" y="182" fill="#0a7d4d" font-weight="700">a</text>
+            <text x="465" y="182" fill="#0a7d4d" font-weight="700">a</text>
+          </g>
+          <g text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#5c6270">
+            <text x="175" y="222">(i) a + (a * a) &nbsp;&rarr;&nbsp; evaluates to 7 at a = 1, 2, 3</text>
+            <text x="510" y="222">(ii) (a + a) * a &nbsp;&rarr;&nbsp; evaluates to 9</text>
+          </g>
+        </svg>
+        <figcaption>
+          The same sentence, two structures. Substituting <code>1 + 2 * 3</code>
+          for the three operands, tree (i) yields \(1 + (2 \cdot 3) = 7\) and
+          tree (ii) yields \((1 + 2) \cdot 3 = 9\). A grammar that admits both
+          does not determine what the program means.
+        </figcaption>
+      </figure>
+      <p>
+        Ambiguity is not a cosmetic defect. The parse tree is the input to
+        every later phase of a compiler, so an ambiguous grammar leaves the
+        meaning of a program undefined. And the damage compounds: under G1 the
+        string \(\texttt{a}\,(+\,\texttt{a})^{k}\) with \(k\) operators has
+        \(C_k\) parse trees, the \(k\)-th Catalan number
+        \(C_k = \frac{1}{k+1}\binom{2k}{k}\), which is
+        \(\Theta(4^{k}/k^{3/2})\): \(1, 2, 5, 14, 42, \dots\) for
+        \(k = 1,2,3,4,5\). Every one of those is a different program.
+      </p>
+      <h3>The fix: one nonterminal per precedence level</h3>
+      <p>
+        The repair is structural. Give each precedence level its own
+        nonterminal, and let a level refer <em>only</em> to itself and to the
+        level below. Loosest-binding operator at the top, atoms at the bottom:
+      </p>
+      <pre>  G2:
+      E &rarr; E + T | T          <span class="cm">level 1: +   (loosest)</span>
+      T &rarr; T * F | F          <span class="cm">level 2: *   (tighter)</span>
+      F &rarr; ( E ) | a          <span class="cm">level 3: atoms, and the escape hatch ( E )</span></pre>
+      <div class="thm">
+        <span class="tag">Proposition (G2 forces precedence and left associativity)</span>
+        In every parse tree of G2, no \(*\) node is an ancestor of a \(+\) node
+        unless a parenthesized \(F \to (\,E\,)\) lies between them; and a run of
+        equal-precedence operators groups to the left.
+        <div class="proof">
+          <em>Precedence.</em> A \(+\) is introduced only by \(E \to E + T\),
+          whose children are an \(E\) and a \(T\); a \(*\) only by
+          \(T \to T * F\), whose children are a \(T\) and an \(F\). Follow any
+          downward path from a \(*\) node. Its subtrees are rooted at \(T\) and
+          \(F\); from \(T\) the only productions are \(T \to T*F\) and
+          \(T \to F\), and from \(F\) they are \(F \to \texttt{a}\) and
+          \(F \to (\,E\,)\). So an \(E\) (the only nonterminal that can carry a
+          \(+\)) is reachable below a \(*\) only by passing through
+          \(F \to (\,E\,)\), that is, through explicit parentheses. Hence
+          without parentheses every \(+\) node sits above every \(*\) node, and
+          a bottom-up evaluator performs the multiplications first.
+          <em>Associativity.</em> The rule \(E \to E + T\) is left-recursive:
+          the recursive occurrence is the <em>left</em> child, and the right
+          child \(T\) cannot itself derive an unparenthesized \(+\). So the
+          only tree for \(\texttt{a}+\texttt{a}+\texttt{a}\) has the second
+          \(+\) at the root with the first \(+\) inside its left subtree,
+          giving \((\texttt{a}+\texttt{a})+\texttt{a}\). Writing the rule as
+          \(E \to T + E\) instead would make it right-associative, which is how
+          one writes an exponentiation level.
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <p>
+        G2 generates the same language as G1 (both describe all well-formed
+        expressions over these five terminals) but assigns each sentence
+        exactly one tree. Verified by exhaustive enumeration: on all 19 530
+        strings of length at most 6 over \(\{\texttt{a}, \texttt{+},
+        \texttt{*}, \texttt{(}, \texttt{)}\}\), G2 accepts exactly the same
+        set as G1, and never with more than one parse tree.
+      </p>
+      <div class="aside">
+        <span class="tag">The dangling else</span>
+        The other classic ambiguity, and the one every language designer meets:
+        <code>S &rarr; if E then S | if E then S else S | other</code>. The
+        string <code>if a then if b then s1 else s2</code> has two trees, one
+        attaching the <code>else</code> to the inner <code>if</code>, one to the
+        outer. Most languages resolve it by fiat (&ldquo;an <code>else</code>
+        binds to the nearest unmatched <code>then</code>&rdquo;) rather than by
+        rewriting the grammar, because the unambiguous grammar for it is
+        genuinely unpleasant. Languages that require the closing keyword
+        (<code>fi</code>, <code>endif</code>) or braces do not have the problem
+        at all: the terminator does the same job as G2&rsquo;s parentheses.
+      </div>
+      <div class="aside">
+        <span class="tag">Ambiguity is undecidable</span>
+        There is no algorithm that takes an arbitrary CFG and decides whether it
+        is ambiguous; nor one that decides whether two CFGs generate the same
+        language, or whether a CFG generates all of \(\Sigma^{*}\). These follow
+        from the undecidability of the Post correspondence problem, and they sit
+        alongside the halting problem in the landscape sketched in
+        <a href="../foundations/foundation-p-np.html"><em>P, NP &amp;
+        NP-Completeness</em></a>. In practice a parser generator does not decide
+        ambiguity: it checks a <em>sufficient</em> condition (that its parse
+        table has no conflicts), and reports a conflict when the check fails.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="strict">4. Regular \(\subsetneq\) context-free</h2>
+      <p>
+        Two claims, proved separately: every regular language is context-free,
+        and some context-free language is not regular. Together they place the
+        regular languages strictly inside the context-free ones.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (containment)</span>
+        Every regular language is context-free.
+        <div class="proof">
+          <em>Proof (construction).</em> Let \(L\) be regular. By Kleene&rsquo;s
+          theorem (see
+          <a href="algo-regex-automata.html"><em>Regular Expressions &amp;
+          Automata</em></a>) there is a deterministic finite automaton (DFA)
+          \(M = (Q, \Sigma, \delta, q_0, F)\) with \(L(M) = L\). Build a grammar
+          with one nonterminal \(A_q\) per state \(q \in Q\), start symbol
+          \(A_{q_0}\), and productions
+          \[
+            A_q \to c\,A_{\delta(q,c)} \ \text{ for every } q \in Q,\, c \in \Sigma;
+            \qquad A_q \to \varepsilon \ \text{ for every } q \in F.
+          \]
+          Every production has at most one nonterminal, at its right end (such a
+          grammar is called <strong>right-linear</strong>), so it is a CFG. By
+          induction on \(|w|\): \(A_q \Rightarrow^{*} w\) if and only if
+          \(M\) started in state \(q\) reaches an accepting state after reading
+          \(w\). The base case \(w = \varepsilon\) is the rule
+          \(A_q \to \varepsilon\), present exactly when \(q \in F\). For the
+          step, \(w = c\,w'\) forces the first rewrite to be
+          \(A_q \to c\,A_{\delta(q,c)}\), the only production emitting \(c\)
+          from \(A_q\), and the claim follows from the hypothesis applied to
+          \(w'\) at state \(\delta(q,c)\). Taking \(q = q_0\) gives
+          \(L(G) = L(M) = L\).
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the construction run)</span>
+        The language &ldquo;an even number of <code>A</code>s&rdquo; over
+        \(\{\texttt{A},\texttt{B}\}\) has a two-state DFA: \(q_0\) (even, and
+        accepting), \(q_1\) (odd), with \(\delta(q_0,\texttt{A}) = q_1\),
+        \(\delta(q_1,\texttt{A}) = q_0\), and \(\texttt{B}\) a self-loop on
+        both. The construction gives, mechanically:
+        <pre>  A&#8320; &rarr; A A&#8321; | B A&#8320; | &epsilon;      <span class="cm">state q0: even, accepting</span>
+  A&#8321; &rarr; A A&#8320; | B A&#8321;          <span class="cm">state q1: odd, not accepting</span></pre>
+        A derivation of <code>ABAB</code>:
+        \(A_0 \Rightarrow \texttt{A}A_1 \Rightarrow \texttt{AB}A_1 \Rightarrow
+        \texttt{ABA}A_0 \Rightarrow \texttt{ABAB}A_0 \Rightarrow \texttt{ABAB}\),
+        ending on the \(\varepsilon\) rule because \(q_0\) accepts. Generating
+        every string of length at most 4 from this grammar produces exactly the
+        16 strings with an even number of <code>A</code>s, and no others.
+      </div>
+      <p>
+        The containment is not an accident of the construction: a right-linear
+        grammar can only ever carry <em>one</em> nonterminal in its sentential
+        form, and that nonterminal is exactly the automaton&rsquo;s current
+        state. A general CFG may carry many nonterminals at once, and that is
+        the extra power.
+      </p>
+      <h3>The separating language</h3>
+      <div class="def">
+        <span class="tag">Definition (the language \(\texttt{a}^n\texttt{b}^n\))</span>
+        \(L_{ab} = \{\, \texttt{a}^{n}\texttt{b}^{n} : n \ge 0 \,\}\):
+        \(\varepsilon\), <code>ab</code>, <code>aabb</code>,
+        <code>aaabbb</code>, and so on. Matching counts, nothing else.
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (\(L_{ab}\) is context-free)</span>
+        The two-production grammar \(S \to \texttt{a}\,S\,\texttt{b} \mid
+        \varepsilon\) generates exactly \(L_{ab}\), and is unambiguous.
+        <div class="proof">
+          Every sentential form reachable from \(S\) is
+          \(\texttt{a}^{k}S\texttt{b}^{k}\) or \(\texttt{a}^{k}\texttt{b}^{k}\)
+          (induction on the number of steps: the first rule preserves the shape
+          and increments \(k\), the second terminates it), so
+          \(L(G) \subseteq L_{ab}\); and \(\texttt{a}^{n}\texttt{b}^{n}\) is
+          produced by \(n\) uses of the first rule and one of the second, so
+          \(L_{ab} \subseteq L(G)\). Uniqueness: for a nonempty target the first
+          rule is the only one whose yield is nonempty, so at every stage the
+          choice is forced by whether any characters remain. The recursion
+          <em>is</em> the counter: the \(k\) pending <code>b</code>s to the
+          right of \(S\) remember how many <code>a</code>s have been emitted.
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <div class="thm">
+        <span class="tag">Lemma (pumping lemma for regular languages)</span>
+        If \(L\) is regular, there is an integer \(p \ge 1\) (a
+        <em>pumping length</em>) such that every \(s \in L\) with
+        \(|s| \ge p\) can be written \(s = xyz\) with
+        (i) \(|y| \ge 1\), (ii) \(|xy| \le p\), and
+        (iii) \(x y^{i} z \in L\) for every \(i \ge 0\).
+        <div class="proof">
+          Take a DFA for \(L\) with \(p\) states, and let
+          \(s = s_1 s_2 \cdots s_m \in L\) with \(m \ge p\). Running the DFA on
+          \(s\) visits states \(r_0, r_1, \dots, r_m\), one more than the number
+          of characters read. Among the first \(p+1\) of these,
+          \(r_0, \dots, r_p\), there are \(p+1\) entries drawn from only \(p\)
+          states, so by the pigeonhole principle two coincide: \(r_j = r_k\) for
+          some \(0 \le j &lt; k \le p\). Set \(x = s_1 \cdots s_j\),
+          \(y = s_{j+1} \cdots s_k\), \(z = s_{k+1} \cdots s_m\). Then
+          \(|y| = k - j \ge 1\) and \(|xy| = k \le p\), giving (i) and (ii).
+          For (iii): reading \(y\) takes the machine from \(r_j\) back to the
+          same state \(r_j\), so that loop may be traversed any number of times
+          (including zero) without changing where the machine ends up; since
+          reading \(z\) from \(r_j\) reaches the accepting state \(r_m\), every
+          \(xy^{i}z\) is accepted.
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (\(L_{ab}\) is not regular)</span>
+        \(L_{ab} = \{\texttt{a}^{n}\texttt{b}^{n}\}\) is not a regular language.
+        Hence the regular languages are a <strong>strict</strong> subset of the
+        context-free languages.
+        <div class="proof">
+          Suppose \(L_{ab}\) were regular, and let \(p\) be a pumping length for
+          it. The string \(s = \texttt{a}^{p}\texttt{b}^{p}\) is in \(L_{ab}\)
+          and has length \(2p \ge p\), so the lemma applies: \(s = xyz\) with
+          \(|y| \ge 1\) and \(|xy| \le p\). Because the first \(p\) characters
+          of \(s\) are all <code>a</code>s and \(xy\) lies within them, \(y\)
+          consists solely of <code>a</code>s, say \(y = \texttt{a}^{k}\) with
+          \(1 \le k \le p\). Pump once (\(i = 2\)):
+          \(x y^{2} z = \texttt{a}^{p+k}\texttt{b}^{p}\), which the lemma says
+          must be in \(L_{ab}\). But \(p + k \neq p\) since \(k \ge 1\), so it
+          has unequal counts and is not in \(L_{ab}\): contradiction. Therefore
+          \(L_{ab}\) is not regular. Combined with the previous proposition it
+          is context-free but not regular, and combined with the containment
+          theorem the inclusion regular \(\subseteq\) context-free is proper.
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <p>
+        The intuition the proof makes precise: a finite automaton&rsquo;s only
+        memory is <em>which state it is in</em>, and there are finitely many
+        states, so after reading enough <code>a</code>s it must revisit one and
+        thereby lose track of how many it has seen. A grammar has no such
+        bound, because a sentential form can grow: the pending
+        \(\texttt{b}^{k}\) in \(\texttt{a}^{k}S\texttt{b}^{k}\) is an unbounded
+        counter written down in the middle of the work.
+      </p>
+      <div class="aside">
+        <span class="tag">Aside: pushdown automata, and what the stack buys</span>
+        The machine that matches a grammar the way a finite automaton matches a
+        regex is the <strong>pushdown automaton</strong> (PDA): a finite
+        automaton plus one unbounded <strong>stack</strong>. A move reads (or
+        skips) an input character, pops the top stack symbol, and pushes a
+        string of symbols in its place; acceptance is by final state or by empty
+        stack. The theorem parallel to Kleene&rsquo;s holds: a language is
+        context-free if and only if some (nondeterministic) PDA accepts it, and
+        the translation is direct: put the start symbol on the stack, and
+        thereafter replace a nonterminal on top by the right-hand side of one of
+        its productions, or match a terminal on top against the next input
+        character.
+        <pre>  PDA for a&#8319;b&#8319;, in three rules:
+      read 'a'  &rarr;  push X            <span class="cm">count up, one X per a</span>
+      read 'b'  &rarr;  pop  X            <span class="cm">count down; fail if the stack is empty</span>
+      end       &rarr;  accept iff the stack is empty</pre>
+        On <code>aaabbb</code> the stack climbs to <code>XXX</code> and drains
+        to empty: accept. On <code>aabbb</code> the third <code>b</code> finds
+        an empty stack: reject. On <code>aaabb</code> the stack still holds one
+        <code>X</code> at end of input: reject. The stack is precisely what the
+        regular-language proof showed a finite automaton lacks, and precisely
+        what &sect;<a href="#rd">5</a>&rsquo;s recursive-descent parser gets for
+        free: its <em>call stack</em> is the PDA&rsquo;s stack, and the depth of
+        parenthesis nesting is the depth of recursion.
+        <p class="note">
+          One asymmetry worth knowing: for finite automata, nondeterminism adds
+          no power (the subset construction determinizes any nondeterministic
+          finite automaton). For pushdown automata it does: the deterministic
+          PDAs accept a strictly smaller class than the CFGs describe. That gap
+          is why practical parser generators (&sect;<a href="#tools">7</a>)
+          accept only a restricted family of grammars, and why the fully general
+          parser of &sect;<a href="#cyk">6</a> costs cubic time.
+        </p>
+      </div>
+      <p>
+        Adding memory is the organizing principle of the whole ladder, the
+        <strong>Chomsky hierarchy</strong>:
+      </p>
+      <table>
+        <tr><th>class</th><th>described by</th><th>recognizer</th><th>memory</th><th>recognition cost</th></tr>
+        <tr><td><strong>regular</strong></td><td><a href="algo-regex-automata.html">regular expression</a></td><td>finite automaton</td><td>the state alone</td><td>\(O(n)\)</td></tr>
+        <tr><td><strong>context-free</strong></td><td>CFG</td><td>pushdown automaton</td><td>a <strong>stack</strong></td><td>\(O(n^3)\) general, \(O(n)\) for the usual restricted families</td></tr>
+        <tr><td><strong>context-sensitive</strong></td><td>\(\alpha A \beta \to \alpha\gamma\beta\)</td><td>linear-bounded automaton</td><td>tape of size \(O(n)\)</td><td>PSPACE-complete</td></tr>
+        <tr><td><strong>recursively enumerable</strong></td><td>unrestricted grammar</td><td>Turing machine</td><td>unbounded tape</td><td>undecidable in general</td></tr>
+      </table>
+      <p>
+        A compiler straddles the first two rungs on purpose. Its
+        <strong>lexer</strong> is a finite automaton, because identifiers,
+        numbers and keywords are regular and a linear scan is the cheapest thing
+        available; its <strong>parser</strong> is a pushdown machine, because
+        nested expressions and blocks are not regular. The type checker then
+        handles what neither can (&ldquo;is this variable declared?&rdquo; is
+        not context-free), which is why the front end has three phases and not
+        one.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="rd">5. Recursive-descent parsing</h2>
+      <p>
+        The most direct parser writes <em>one function per nonterminal</em>.
+        The function for \(A\) is responsible for consuming an \(A\) from the
+        front of the input; where the grammar has \(A \to B\,C\) the function
+        calls the functions for \(B\) and \(C\) in order; where the grammar has
+        a terminal, the function matches and consumes it. The grammar becomes
+        the call graph, and mutual recursion (see
+        <a href="../foundations/foundation-recursion.html"><em>Recursion &amp;
+        Recurrences</em></a>) does the nesting.
+      </p>
+      <h3>The obstacle: left recursion</h3>
+      <p>
+        Translating G2 naively fails immediately. The rule \(E \to E + T\) says
+        &ldquo;to parse an \(E\), first parse an \(E\)&rdquo;, so
+        <code>parseE()</code> would call <code>parseE()</code> with the input
+        pointer unmoved: infinite recursion, stack overflow, no characters
+        consumed. Any grammar with \(A \Rightarrow^{*} A\alpha\) is
+        <strong>left-recursive</strong> and cannot be parsed by naive top-down
+        descent.
+      </p>
+      <p>
+        The standard repair rewrites each left-recursive level as a
+        <em>loop</em>. \(E \to E + T \mid T\) generates exactly a \(T\) followed
+        by zero or more <code>+ T</code> groups, so write it in extended
+        notation with braces meaning &ldquo;zero or more&rdquo;:
+      </p>
+      <pre>  G3 (G2 with the left recursion turned into iteration; same language, same trees):
+      E &rarr; T { + T }
+      T &rarr; F { * F }
+      F &rarr; ( E ) | a</pre>
+      <p>
+        The loop must build its tree by folding <em>left</em>
+        (<code>node = combine(node, next)</code> inside the loop body), which
+        reproduces G2&rsquo;s left associativity exactly; folding right instead
+        would silently change the grammar&rsquo;s meaning. This is the one place
+        the transformation can go wrong, and the code below marks it.
+      </p>
+      <h3>The parser</h3>
+      <p>
+        The tokens are a <code>string</code> of characters here, with a
+        sentinel <code>$</code> appended so the lookahead is always defined; a
+        real front end feeds a token stream from the lexer instead. Each
+        function returns the subtree it parsed, printed as a fully
+        parenthesized expression so the structure is visible.
+      </p>
+      <div class="code-tabs" data-snippet="strings/recursive-descent">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Recursive descent for  E -> T { + T }   T -> F { * F }   F -> ( E ) | a
+// One function per nonterminal; the call stack is the pushdown store.
+// Returns a fully parenthesized string so the tree shape is visible.
+struct Parser {
+    string s;                      // input, with '$' appended as sentinel
+    size_t p = 0;                  // read position: never moves backward
+
+    char la() const { return s[p]; }                 // one-token lookahead
+    void eat(char c) {                               // match and consume
+        if (s[p] != c) throw runtime_error("expected " + string(1, c));
+        p++;
+    }
+
+    string E() {                                     // E -> T { + T }
+        string v = T();
+        while (la() == '+') {                        // LOOP replaces E -> E + T
+            eat('+');
+            v = "(" + v + " + " + T() + ")";         // fold LEFT: left-associative
+        }
+        return v;
+    }
+    string T() {                                     // T -> F { * F }
+        string v = F();
+        while (la() == '*') {                        // LOOP replaces T -> T * F
+            eat('*');
+            v = "(" + v + " * " + F() + ")";         // fold LEFT
+        }
+        return v;
+    }
+    string F() {                                     // F -> ( E ) | a
+        if (la() == '(') {                           // case 1: parenthesized
+            eat('('); string v = E(); eat(')');
+            return v;
+        }
+        eat('a');                                    // case 2: atom
+        return "a";
+    }
+};
+
+string parse(string text) {
+    Parser ps{text + "$"};
+    string v = ps.E();
+    if (ps.la() != '$') throw runtime_error("trailing input");  // must consume all
+    return v;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Recursive descent for  E -> T { + T }   T -> F { * F }   F -> ( E ) | a
+// One method per nonterminal; the call stack is the pushdown store.
+class Parser {
+    private final String s;        // input, with '$' appended as sentinel
+    private int p = 0;             // read position: never moves backward
+
+    Parser(String text) { this.s = text + "$"; }
+
+    private char la() { return s.charAt(p); }        // one-token lookahead
+    private void eat(char c) {                       // match and consume
+        if (s.charAt(p) != c) throw new IllegalArgumentException("expected " + c);
+        p++;
+    }
+
+    String E() {                                     // E -> T { + T }
+        String v = T();
+        while (la() == '+') {                        // LOOP replaces E -> E + T
+            eat('+');
+            v = "(" + v + " + " + T() + ")";         // fold LEFT: left-associative
+        }
+        return v;
+    }
+    String T() {                                     // T -> F { * F }
+        String v = F();
+        while (la() == '*') {                        // LOOP replaces T -> T * F
+            eat('*');
+            v = "(" + v + " * " + F() + ")";         // fold LEFT
+        }
+        return v;
+    }
+    String F() {                                     // F -> ( E ) | a
+        if (la() == '(') {                           // case 1: parenthesized
+            eat('('); String v = E(); eat(')');
+            return v;
+        }
+        eat('a');                                    // case 2: atom
+        return "a";
+    }
+    static String parse(String text) {
+        Parser ps = new Parser(text);
+        String v = ps.E();
+        if (ps.la() != '$') throw new IllegalArgumentException("trailing input");
+        return v;
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Recursive descent for  E -> T { + T }   T -> F { * F }   F -> ( E ) | a
+# One function per nonterminal; the call stack is the pushdown store.
+class Parser:
+    def __init__(self, text):
+        self.s = text + "$"        # sentinel so lookahead is always defined
+        self.p = 0                 # read position: never moves backward
+
+    def la(self):                                    # one-token lookahead
+        return self.s[self.p]
+
+    def eat(self, c):                                # match and consume
+        if self.s[self.p] != c:
+            raise ValueError("expected " + c)
+        self.p += 1
+
+    def E(self):                                     # E -> T { + T }
+        v = self.T()
+        while self.la() == '+':                      # LOOP replaces E -> E + T
+            self.eat('+')
+            v = "(" + v + " + " + self.T() + ")"     # fold LEFT: left-associative
+        return v
+
+    def T(self):                                     # T -> F { * F }
+        v = self.F()
+        while self.la() == '*':                      # LOOP replaces T -> T * F
+            self.eat('*')
+            v = "(" + v + " * " + self.F() + ")"     # fold LEFT
+        return v
+
+    def F(self):                                     # F -> ( E ) | a
+        if self.la() == '(':                         # case 1: parenthesized
+            self.eat('(')
+            v = self.E()
+            self.eat(')')
+            return v
+        self.eat('a')                                # case 2: atom
+        return "a"
+
+def parse(text):
+    ps = Parser(text)
+    v = ps.E()
+    if ps.la() != '$':                               # must consume all input
+        raise ValueError("trailing input")
+    return v</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Recursive descent for  E -> T { + T }   T -> F { * F }   F -> ( E ) | a
+// One method per nonterminal; the call stack is the pushdown store.
+struct Parser { s: Vec&lt;u8&gt;, p: usize }               // s ends with b'$'
+
+impl Parser {
+    fn la(&amp;self) -&gt; u8 { self.s[self.p] }             // one-token lookahead
+    fn eat(&amp;mut self, c: u8) -&gt; Result&lt;(), String&gt; {  // match and consume
+        if self.s[self.p] != c { return Err(format!("expected {}", c as char)); }
+        self.p += 1;
+        Ok(())
+    }
+
+    fn e(&amp;mut self) -&gt; Result&lt;String, String&gt; {       // E -> T { + T }
+        let mut v = self.t()?;
+        while self.la() == b'+' {                     // LOOP replaces E -> E + T
+            self.eat(b'+')?;
+            v = format!("({} + {})", v, self.t()?);   // fold LEFT: left-associative
+        }
+        Ok(v)
+    }
+    fn t(&amp;mut self) -&gt; Result&lt;String, String&gt; {       // T -> F { * F }
+        let mut v = self.f()?;
+        while self.la() == b'*' {                     // LOOP replaces T -> T * F
+            self.eat(b'*')?;
+            v = format!("({} * {})", v, self.f()?);   // fold LEFT
+        }
+        Ok(v)
+    }
+    fn f(&amp;mut self) -&gt; Result&lt;String, String&gt; {       // F -> ( E ) | a
+        if self.la() == b'(' {                        // case 1: parenthesized
+            self.eat(b'(')?;
+            let v = self.e()?;
+            self.eat(b')')?;
+            return Ok(v);
+        }
+        self.eat(b'a')?;                              // case 2: atom
+        Ok("a".to_string())
+    }
+}
+
+fn parse(text: &amp;str) -&gt; Result&lt;String, String&gt; {
+    let mut ps = Parser { s: format!("{}$", text).into_bytes(), p: 0 };
+    let v = ps.e()?;
+    if ps.la() != b'$' { return Err("trailing input".into()); }   // consume all
+    Ok(v)
+}</pre>
+<p class="ct-src">source: <code>code/strings/recursive-descent.cpp &middot; code/strings/recursive-descent.java &middot; code/strings/recursive-descent.py &middot; code/strings/recursive-descent.rs</code></p>
+<!--/ct--></div>
+
+      <h3>A full parse, step by step</h3>
+      <p>
+        Input <code>( a + a ) * a</code>, tokens indexed \(0 \dots 6\) with the
+        sentinel <code>$</code> at index 7. Every call, every consumption and
+        every return is one row; indentation is recursion depth. This one input
+        exercises every branch of the parser: both cases of \(F\), the
+        \(T\)-loop taken and not taken, and the \(E\)-loop taken (inside the
+        parentheses) and not taken (at top level).
+      </p>
+      <table class="trace">
+        <tr>
+          <th>#</th><th class="lab">action (indent = depth)</th>
+          <th>pos</th><th>lookahead</th><th class="lab">note</th>
+        </tr>
+        <tr><td>1</td><td class="act">call E</td><td>0</td><td class="cell">(</td><td class="nt">E &rarr; T { + T }</td></tr>
+        <tr><td>2</td><td class="act">  call T</td><td>0</td><td class="cell">(</td><td class="nt">T &rarr; F { * F }</td></tr>
+        <tr><td>3</td><td class="act">    call F</td><td>0</td><td class="cell">(</td><td class="nt">F &rarr; ( E ) | a</td></tr>
+        <tr><td>4</td><td class="act">      F: lookahead is (</td><td>0</td><td class="cell piv">(</td><td class="nt">take case 1, F &rarr; ( E )</td></tr>
+        <tr><td>5</td><td class="act">      match '('</td><td>1</td><td class="cell">a</td><td class="nt">consume; pos 0 &rarr; 1</td></tr>
+        <tr><td>6</td><td class="act">      call E</td><td>1</td><td class="cell">a</td><td class="nt">recursion: depth 2 of the pushdown store</td></tr>
+        <tr><td>7</td><td class="act">        call T</td><td>1</td><td class="cell">a</td><td class="nt"></td></tr>
+        <tr><td>8</td><td class="act">          call F</td><td>1</td><td class="cell">a</td><td class="nt"></td></tr>
+        <tr><td>9</td><td class="act">            F: lookahead is a</td><td>1</td><td class="cell piv">a</td><td class="nt">take case 2, F &rarr; a</td></tr>
+        <tr><td>10</td><td class="act">            match 'a'</td><td>2</td><td class="cell">+</td><td class="nt">consume; pos 1 &rarr; 2</td></tr>
+        <tr><td>11</td><td class="act">          return F</td><td>2</td><td class="cell">+</td><td class="nt">value <code>a</code></td></tr>
+        <tr><td>12</td><td class="act">          T: lookahead is not *</td><td>2</td><td class="cell">+</td><td class="nt">T-loop <strong>not</strong> entered</td></tr>
+        <tr><td>13</td><td class="act">        return T</td><td>2</td><td class="cell">+</td><td class="nt">value <code>a</code></td></tr>
+        <tr><td>14</td><td class="act">        E: lookahead is +</td><td>2</td><td class="cell lt">+</td><td class="nt">E-loop <strong>entered</strong></td></tr>
+        <tr><td>15</td><td class="act">        match '+'</td><td>3</td><td class="cell">a</td><td class="nt">consume; pos 2 &rarr; 3</td></tr>
+        <tr><td>16</td><td class="act">        call T</td><td>3</td><td class="cell">a</td><td class="nt">right operand of +</td></tr>
+        <tr><td>17</td><td class="act">          call F</td><td>3</td><td class="cell">a</td><td class="nt"></td></tr>
+        <tr><td>18</td><td class="act">            F: lookahead is a</td><td>3</td><td class="cell piv">a</td><td class="nt">take case 2, F &rarr; a</td></tr>
+        <tr><td>19</td><td class="act">            match 'a'</td><td>4</td><td class="cell">)</td><td class="nt">consume; pos 3 &rarr; 4</td></tr>
+        <tr><td>20</td><td class="act">          return F</td><td>4</td><td class="cell">)</td><td class="nt">value <code>a</code></td></tr>
+        <tr><td>21</td><td class="act">          T: lookahead is not *</td><td>4</td><td class="cell">)</td><td class="nt">T-loop not entered</td></tr>
+        <tr><td>22</td><td class="act">        return T</td><td>4</td><td class="cell">)</td><td class="nt">value <code>a</code></td></tr>
+        <tr><td>23</td><td class="act">        E: lookahead is not +</td><td>4</td><td class="cell">)</td><td class="nt">E-loop exits; fold left gave <code>(a + a)</code></td></tr>
+        <tr><td>24</td><td class="act">      return E</td><td>4</td><td class="cell">)</td><td class="nt">value <code>(a + a)</code></td></tr>
+        <tr><td>25</td><td class="act">      match ')'</td><td>5</td><td class="cell">*</td><td class="nt">consume; pos 4 &rarr; 5</td></tr>
+        <tr><td>26</td><td class="act">    return F</td><td>5</td><td class="cell">*</td><td class="nt">value <code>(a + a)</code></td></tr>
+        <tr><td>27</td><td class="act">    T: lookahead is *</td><td>5</td><td class="cell lt">*</td><td class="nt">T-loop <strong>entered</strong></td></tr>
+        <tr><td>28</td><td class="act">    match '*'</td><td>6</td><td class="cell">a</td><td class="nt">consume; pos 5 &rarr; 6</td></tr>
+        <tr><td>29</td><td class="act">    call F</td><td>6</td><td class="cell">a</td><td class="nt">right operand of *</td></tr>
+        <tr><td>30</td><td class="act">      F: lookahead is a</td><td>6</td><td class="cell piv">a</td><td class="nt">take case 2, F &rarr; a</td></tr>
+        <tr><td>31</td><td class="act">      match 'a'</td><td>7</td><td class="cell">$</td><td class="nt">consume; pos 6 &rarr; 7, input exhausted</td></tr>
+        <tr><td>32</td><td class="act">    return F</td><td>7</td><td class="cell">$</td><td class="nt">value <code>a</code></td></tr>
+        <tr><td>33</td><td class="act">    T: lookahead is not *</td><td>7</td><td class="cell">$</td><td class="nt">T-loop exits</td></tr>
+        <tr><td>34</td><td class="act">  return T</td><td>7</td><td class="cell">$</td><td class="nt">value <code>((a + a) * a)</code></td></tr>
+        <tr><td>35</td><td class="act">  E: lookahead is not +</td><td>7</td><td class="cell">$</td><td class="nt">E-loop not entered at top level</td></tr>
+        <tr><td>36</td><td class="act">return E</td><td>7</td><td class="cell lt">$</td><td class="nt">accept: <code>((a + a) * a)</code>, lookahead is the sentinel</td></tr>
+      </table>
+      <p>
+        Thirty-six steps, nine calls, seven consumptions, and the position
+        counter <code>pos</code> never decreases. The result
+        <code>((a + a) * a)</code> is the parenthesized form of the parse tree.
+        Three more results from the same parser, showing that the folding
+        direction and the precedence stratification behave as
+        &sect;<a href="#ambig">3</a> proved:
+        <code>a + a * a</code> gives <code>(a + (a * a))</code>,
+        <code>a * a + a</code> gives <code>((a * a) + a)</code>, and
+        <code>a + a + a</code> gives <code>((a + a) + a)</code>.
+      </p>
+      <h3>Cost</h3>
+      <div class="thm">
+        <span class="tag">Proposition (recursive descent runs in \(\Theta(n)\))</span>
+        On an input of \(n\) tokens the parser above performs at most
+        \(3n + 3\) function calls and exactly \(n\) token consumptions, for
+        \(\Theta(n)\) time and \(\Theta(d)\) stack space where \(d\) is the
+        maximum nesting depth of parentheses (\(d \le n\)).
+        <div class="proof">
+          Charge each call to a token. A call to \(F\) is made either from a
+          \(T\) (at most one per \(T\) call) or immediately after consuming a
+          <code>*</code>; a call to \(T\) either from an \(E\) or after
+          consuming a <code>+</code>; a call to \(E\) either once at the top
+          level or immediately after consuming a <code>(</code>. So
+          \(\#E \le 1 + \#\texttt{(}\), \(\#T \le \#E + \#\texttt{+}\), and
+          \(\#F \le \#T + \#\texttt{*}\); each of these token classes is
+          disjoint and each token is consumed once, so summing gives
+          \(\#E + \#T + \#F \le 3 + 3n\). Between calls each function does
+          \(O(1)\) work per loop iteration, and each iteration consumes an
+          operator token, so the total non-call work is \(O(n)\) as well.
+          Consumptions: <code>eat</code> advances <code>pos</code> by one and
+          <code>pos</code> never decreases, so there are exactly \(n\) of them
+          on a successful parse. Stack depth: a frame is pushed only for a
+          nonterminal, and the chain \(E \to T \to F\) adds a constant 3 per
+          level of parenthesis nesting, so depth is \(\Theta(d)\).
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <p>
+        Two costs are worth naming. The linear bound depends on the
+        <em>single-token lookahead being decisive</em>: at every choice point
+        (which case of \(F\), whether to enter a loop) one token settles the
+        question with no guessing and no backtracking. A grammar with that
+        property is called <strong>LL(1)</strong> (scanned Left to right,
+        producing a Leftmost derivation, with 1 token of lookahead). When a
+        grammar is not LL(1), a hand-written descent parser backtracks, and the
+        worst case degrades to exponential. And the stack depth is real: deeply
+        nested input can overflow the machine stack, which is why production
+        parsers for adversarial input either impose a nesting limit or manage an
+        explicit stack instead of the call stack.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cyk">6. CYK: parsing by dynamic programming</h2>
+      <p>
+        Recursive descent is fast but picky: it needs an LL(1) grammar, and it
+        cannot handle left recursion or ambiguity at all. The
+        Cocke&ndash;Younger&ndash;Kasami algorithm (CYK) gives up the linear
+        time and takes in exchange a parser that works on
+        <strong>every</strong> context-free grammar, ambiguous or not. It is
+        <a href="../dp/paradigm-dp-method.html">dynamic programming</a> on
+        substrings: the subproblem is &ldquo;which nonterminals derive
+        \(w_i \cdots w_j\)?&rdquo;, and the answer for a long substring is
+        assembled from the answers for its pieces.
+      </p>
+      <h3>Chomsky Normal Form</h3>
+      <p>
+        CYK requires productions of a fixed shape, so that splitting a
+        substring in two is always the right move.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (Chomsky Normal Form)</span>
+        A grammar is in <strong>Chomsky Normal Form</strong> (CNF) if every
+        production has one of the two shapes
+        \[ A \to BC \quad (B, C \text{ nonterminals}), \qquad A \to c \quad (c \text{ a terminal}), \]
+        plus \(S \to \varepsilon\) if the empty string is in the language.
+        Every CFG can be converted to CNF generating the same language (minus
+        \(\varepsilon\) handling), by four mechanical steps: give each terminal
+        appearing in a long rule its own nonterminal; eliminate
+        \(\varepsilon\)-productions; eliminate unit productions \(A \to B\) by
+        splicing in \(B\)&rsquo;s right-hand sides; and binarize rules longer
+        than two symbols by introducing fresh intermediate nonterminals. The
+        conversion at most squares the grammar size.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (G2 converted to CNF, step by step)</span>
+        Start from \(E \to E{+}T \mid T\), \(T \to T{*}F \mid F\),
+        \(F \to (\,E\,) \mid \texttt{a}\).
+        <ol>
+          <li>
+            <strong>Isolate terminals.</strong> Introduce
+            \(P \to \texttt{+}\), \(M \to \texttt{*}\), \(L \to \texttt{(}\),
+            \(R \to \texttt{)}\), and rewrite the long rules over them:
+            \(E \to E\,P\,T\), \(T \to T\,M\,F\), \(F \to L\,E\,R\).
+          </li>
+          <li>
+            <strong>Eliminate unit productions.</strong> The unit rules are
+            \(E \to T\) and \(T \to F\), so the unit closure of \(E\) is
+            \(\{E, T, F\}\) and of \(T\) is \(\{T, F\}\). Give each nonterminal
+            every non-unit right-hand side reachable through units:
+            \(E \to E\,P\,T \mid T\,M\,F \mid L\,E\,R \mid \texttt{a}\),
+            \(T \to T\,M\,F \mid L\,E\,R \mid \texttt{a}\),
+            \(F \to L\,E\,R \mid \texttt{a}\).
+          </li>
+          <li>
+            <strong>Binarize.</strong> Each remaining three-symbol rule gets one
+            fresh nonterminal for its first two symbols:
+            \(E_1 \to E\,P\), \(T_1 \to T\,M\), \(F_1 \to E\,R\). (The last is
+            paired from the right, so \(L\,E\,R\) becomes \(L\,F_1\).)
+          </li>
+          <li>
+            There are no \(\varepsilon\)-productions to remove.
+          </li>
+        </ol>
+        <pre>  G2 in Chomsky Normal Form (10 nonterminals, 15 productions):
+      E  &rarr; E&#8321; T | T&#8321; F | L F&#8321; | a
+      T  &rarr; T&#8321; F | L F&#8321; | a
+      F  &rarr; L F&#8321; | a
+      E&#8321; &rarr; E P          T&#8321; &rarr; T M          F&#8321; &rarr; E R
+      P  &rarr; +            M  &rarr; *            L  &rarr; (            R &rarr; )</pre>
+        Checked by exhaustive enumeration over all 19 530 strings of length at
+        most 6 in these five terminals: this CNF grammar accepts exactly the
+        same set as G2, with zero mismatches.
+      </div>
+      <h3>The algorithm</h3>
+      <p>
+        Index the input \(w = w_1 w_2 \cdots w_n\) from 1. Define the table
+        \[
+          \mathrm{tab}[i][j] \;=\; \{\, A \in V : A \Rightarrow^{*} w_i w_{i+1} \cdots w_j \,\},
+        \]
+        the set of nonterminals deriving the substring from \(i\) to \(j\)
+        inclusive. Two recurrences fill it:
+        \[
+          \mathrm{tab}[i][i] = \{\, A : A \to w_i \in R \,\},
+        \]
+        \[
+          \mathrm{tab}[i][j] = \bigcup_{k=i}^{\,j-1}
+          \{\, A : A \to BC \in R,\ B \in \mathrm{tab}[i][k],\ C \in \mathrm{tab}[k{+}1][j] \,\}.
+        \]
+        The second is exactly the CNF shape read as a subproblem
+        decomposition: if \(A\) derives \(w_i \cdots w_j\), the first rewrite
+        must be some \(A \to BC\), and \(B\) must cover a prefix \(w_i \cdots
+        w_k\) with \(C\) covering the rest. Every \(k\) from \(i\) to \(j-1\) is
+        a candidate <strong>split point</strong>, so all are tried. The string
+        is in the language exactly when \(S \in \mathrm{tab}[1][n]\). Because
+        the recurrence for a span of length \(\ell\) reads only spans of length
+        \(&lt; \ell\), filling the table by increasing length is a valid
+        evaluation order, and each cell is computed once: the two hallmarks of
+        <a href="../dp/paradigm-dp-method.html">dynamic programming</a>. The
+        split-point loop is the same shape as the one in
+        <a href="../dp/algo-matrix-chain.html"><em>Matrix Chain
+        Multiplication</em></a>, and for the same reason: both problems ask how
+        to cut an interval in two.
+      </p>
+      <div class="code-tabs" data-snippet="strings/cyk">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// CYK recognition. Grammar in Chomsky Normal Form:
+//   unit[A]   = set of terminals c with A -> c
+//   pairs[A]  = list of (B, C) with A -> B C
+// tab[i][j] holds every nonterminal deriving w[i..j] (1-based, inclusive).
+bool cyk(const vector&lt;char&gt;&amp; w,
+         const map&lt;string, set&lt;char&gt;&gt;&amp; unit,
+         const map&lt;string, vector&lt;pair&lt;string,string&gt;&gt;&gt;&amp; pairs,
+         const string&amp; start) {
+    int n = w.size();
+    vector&lt;vector&lt;set&lt;string&gt;&gt;&gt; tab(n + 1, vector&lt;set&lt;string&gt;&gt;(n + 1));
+
+    for (int i = 1; i &lt;= n; i++)                    // spans of length 1
+        for (auto&amp; [A, cs] : unit)
+            if (cs.count(w[i - 1])) tab[i][i].insert(A);
+
+    for (int len = 2; len &lt;= n; len++)              // increasing span length
+        for (int i = 1; i + len - 1 &lt;= n; i++) {
+            int j = i + len - 1;
+            for (int k = i; k &lt; j; k++)             // every split point
+                for (auto&amp; [A, rhs] : pairs)
+                    for (auto&amp; [B, C] : rhs)
+                        if (tab[i][k].count(B) &amp;&amp; tab[k + 1][j].count(C))
+                            tab[i][j].insert(A);
+        }
+    return tab[1][n].count(start) &gt; 0;              // start symbol spans it all
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// CYK recognition. Grammar in Chomsky Normal Form:
+//   unit.get(A)  = set of terminals c with A -> c
+//   pairs.get(A) = list of (B, C) with A -> B C
+// tab[i][j] holds every nonterminal deriving w[i..j] (1-based, inclusive).
+static boolean cyk(char[] w,
+                   Map&lt;String, Set&lt;Character&gt;&gt; unit,
+                   Map&lt;String, List&lt;String[]&gt;&gt; pairs,
+                   String start) {
+    int n = w.length;
+    Set&lt;String&gt;[][] tab = new HashSet[n + 1][n + 1];
+    for (int i = 0; i &lt;= n; i++)
+        for (int j = 0; j &lt;= n; j++) tab[i][j] = new HashSet&lt;&gt;();
+
+    for (int i = 1; i &lt;= n; i++)                    // spans of length 1
+        for (var e : unit.entrySet())
+            if (e.getValue().contains(w[i - 1])) tab[i][i].add(e.getKey());
+
+    for (int len = 2; len &lt;= n; len++)              // increasing span length
+        for (int i = 1; i + len - 1 &lt;= n; i++) {
+            int j = i + len - 1;
+            for (int k = i; k &lt; j; k++)             // every split point
+                for (var e : pairs.entrySet())
+                    for (String[] bc : e.getValue())
+                        if (tab[i][k].contains(bc[0]) &amp;&amp; tab[k + 1][j].contains(bc[1]))
+                            tab[i][j].add(e.getKey());
+        }
+    return tab[1][n].contains(start);               // start symbol spans it all
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># CYK recognition. Grammar in Chomsky Normal Form:
+#   unit[A]  = set of terminals c with A -> c
+#   pairs[A] = list of (B, C) with A -> B C
+# tab[i][j] holds every nonterminal deriving w[i..j] (1-based, inclusive).
+def cyk(w, unit, pairs, start):
+    n = len(w)
+    tab = [[set() for _ in range(n + 1)] for _ in range(n + 1)]
+
+    for i in range(1, n + 1):                       # spans of length 1
+        for A, cs in unit.items():
+            if w[i - 1] in cs:
+                tab[i][i].add(A)
+
+    for length in range(2, n + 1):                  # increasing span length
+        for i in range(1, n - length + 2):
+            j = i + length - 1
+            for k in range(i, j):                   # every split point
+                for A, rhs in pairs.items():
+                    for (B, C) in rhs:
+                        if B in tab[i][k] and C in tab[k + 1][j]:
+                            tab[i][j].add(A)
+
+    return start in tab[1][n]                       # start symbol spans it all</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// CYK recognition. Grammar in Chomsky Normal Form:
+//   unit[A]  = set of terminals c with A -> c
+//   pairs[A] = list of (B, C) with A -> B C
+// tab[i][j] holds every nonterminal deriving w[i..j] (1-based, inclusive).
+use std::collections::{HashMap, HashSet};
+
+fn cyk(w: &amp;[char],
+       unit: &amp;HashMap&lt;String, HashSet&lt;char&gt;&gt;,
+       pairs: &amp;HashMap&lt;String, Vec&lt;(String, String)&gt;&gt;,
+       start: &amp;str) -&gt; bool {
+    let n = w.len();
+    let mut tab = vec![vec![HashSet::&lt;String&gt;::new(); n + 1]; n + 1];
+
+    for i in 1..=n {                                 // spans of length 1
+        for (a, cs) in unit {
+            if cs.contains(&amp;w[i - 1]) { tab[i][i].insert(a.clone()); }
+        }
+    }
+    for len in 2..=n {                               // increasing span length
+        for i in 1..=(n - len + 1) {
+            let j = i + len - 1;
+            for k in i..j {                          // every split point
+                let mut found = Vec::new();
+                for (a, rhs) in pairs {
+                    for (b, c) in rhs {
+                        if tab[i][k].contains(b) &amp;&amp; tab[k + 1][j].contains(c) {
+                            found.push(a.clone());
+                        }
+                    }
+                }
+                for a in found { tab[i][j].insert(a); }
+            }
+        }
+    }
+    tab[1][n].contains(start)                        // start symbol spans it all
+}</pre>
+<p class="ct-src">source: <code>code/strings/cyk.cpp &middot; code/strings/cyk.java &middot; code/strings/cyk.py &middot; code/strings/cyk.rs</code></p>
+<!--/ct--></div>
+
+      <h3>A filled table</h3>
+      <p>
+        Input <code>a + a * a</code> (\(n = 5\)), grammar the CNF form above,
+        start symbol \(E\). Row \(\ell\) holds the spans of length \(\ell\);
+        the cell in row \(\ell\), column \(i\) is
+        \(\mathrm{tab}[i][i + \ell - 1]\), the nonterminals deriving the
+        substring of length \(\ell\) starting at position \(i\). The table is
+        filled from the bottom row upward.
+      </p>
+      <table class="trace">
+        <tr>
+          <th class="lab">span length</th>
+          <th>from 1: <code>a</code></th><th>from 2: <code>+</code></th>
+          <th>from 3: <code>a</code></th><th>from 4: <code>*</code></th>
+          <th>from 5: <code>a</code></th>
+        </tr>
+        <tr>
+          <td class="lab">5 (whole string)</td>
+          <td class="cell lt">E</td>
+          <td colspan="4" style="background:#fafbfc"></td>
+        </tr>
+        <tr>
+          <td class="lab">4</td>
+          <td class="cell">&empty;</td><td class="cell">&empty;</td>
+          <td colspan="3" style="background:#fafbfc"></td>
+        </tr>
+        <tr>
+          <td class="lab">3</td>
+          <td class="cell">E</td><td class="cell">&empty;</td><td class="cell piv">E, T</td>
+          <td colspan="2" style="background:#fafbfc"></td>
+        </tr>
+        <tr>
+          <td class="lab">2</td>
+          <td class="cell piv">E&#8321;</td><td class="cell">&empty;</td>
+          <td class="cell">T&#8321;</td><td class="cell">&empty;</td>
+          <td style="background:#fafbfc"></td>
+        </tr>
+        <tr>
+          <td class="lab">1</td>
+          <td class="cell">E, T, F</td><td class="cell">P</td>
+          <td class="cell">E, T, F</td><td class="cell">M</td>
+          <td class="cell">E, T, F</td>
+        </tr>
+      </table>
+      <p>
+        Reading the table upward, cell by cell:
+      </p>
+      <ul>
+        <li>
+          <strong>Length 1.</strong> Each <code>a</code> gets
+          \(\{E, T, F\}\) (all three have the production \(\to \texttt{a}\));
+          <code>+</code> gets \(\{P\}\), <code>*</code> gets \(\{M\}\).
+        </li>
+        <li>
+          <strong>Length 2.</strong> Span (1,2) = <code>a +</code>: the only
+          pair rule whose right half can be \(P\) is \(E_1 \to E\,P\), and
+          \(E \in \mathrm{tab}[1][1]\), so \(E_1\) goes in. Span (3,4) =
+          <code>a *</code> gets \(T_1\) by \(T_1 \to T\,M\) for the same reason.
+          Spans (2,3) = <code>+ a</code> and (4,5) = <code>* a</code> are empty:
+          no production starts with \(P\) or \(M\), so nothing derives an
+          operator followed by an operand.
+        </li>
+        <li>
+          <strong>Length 3.</strong> Span (1,3) = <code>a + a</code>: split
+          \(k = 1\) pairs \(\{E,T,F\}\) with the empty cell (2,3) and yields
+          nothing; split \(k = 2\) pairs \(E_1 \in \mathrm{tab}[1][2]\) with
+          \(T \in \mathrm{tab}[3][3]\), matching \(E \to E_1 T\), so \(E\) goes
+          in. Span (3,5) = <code>a * a</code>: split \(k = 4\) pairs
+          \(T_1 \in \mathrm{tab}[3][4]\) with \(F \in \mathrm{tab}[5][5]\),
+          matching both \(E \to T_1 F\) and \(T \to T_1 F\), so
+          \(\{E, T\}\) goes in. Span (2,4) = <code>+ a *</code> stays empty.
+        </li>
+        <li>
+          <strong>Length 4.</strong> Both cells are empty. Span (1,4) =
+          <code>a + a *</code> tries \(k = 1, 2, 3\), pairing
+          \((\{E,T,F\}, \emptyset)\), then \((\{E_1\}, \{T_1\})\), then
+          \((\{E\}, \{M\})\). The first has an empty partner. The second finds
+          no production with right-hand side \(E_1 T_1\) (the rule
+          \(E \to E_1 T\) wants a \(T\) on the right, and \(T_1\) is a different
+          symbol). The third finds no production \(E\,M\) (the rule
+          \(T_1 \to T\,M\) wants a \(T\) on the left, and
+          \(\mathrm{tab}[1][3] = \{E\}\) does not contain one). Span (2,5)
+          likewise. Empty cells are informative: a trailing operator can never
+          complete an expression.
+        </li>
+        <li>
+          <strong>Length 5.</strong> Four split points. \(k = 1\) and
+          \(k = 3\) and \(k = 4\) all pair something with an empty cell.
+          Only \(k = 2\) works: \(E_1 \in \mathrm{tab}[1][2]\) (spanning
+          <code>a +</code>) with \(T \in \mathrm{tab}[3][5]\) (spanning
+          <code>a * a</code>), matching \(E \to E_1 T\). So
+          \(E \in \mathrm{tab}[1][5]\): <strong>accepted</strong>.
+        </li>
+      </ul>
+      <p>
+        Note what the successful split says. The <em>only</em> way the whole
+        string parses is with <code>a * a</code> as a single \(T\) on the right
+        of the <code>+</code>. The table has rediscovered precedence, and the
+        winning split point is the operator at the root of the parse tree in
+        &sect;<a href="#deriv">2</a>. Ten of the fifteen cells are nonempty; the
+        five empty ones are exactly the substrings that begin or end with a
+        dangling operator. The same code rejects <code>a + * a</code> and
+        <code>a a</code> (the start symbol never reaches the top cell) and
+        accepts <code>a + a</code>, <code>( a + a ) * a</code>.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (CYK cost)</span>
+        On an input of length \(n\) with a CNF grammar of \(|G|\) productions,
+        CYK runs in \(\Theta(n^{3}\,|G|)\) time and \(\Theta(n^{2}|V|)\) space.
+        <div class="proof">
+          The table has one cell per substring: \(\binom{n+1}{2} =
+          \Theta(n^{2})\) of them, each a subset of \(V\), giving the space
+          bound. Filling a cell \(\mathrm{tab}[i][j]\) tries every split point
+          \(k \in \{i, \dots, j-1\}\), at most \(n-1\), and for each split
+          examines every production \(A \to BC\), at most \(|G|\), doing
+          \(O(1)\) work per (set membership on a bitset over \(V\)). So the
+          total is \(\Theta(n^{2}) \cdot O(n\,|G|) = O(n^{3}|G|)\). The bound is
+          tight on grammars where most cells fill: the triple loop over
+          \((i, j, k)\) executes \(\sum_{\ell=2}^{n}(n-\ell+1)(\ell-1) =
+          \binom{n+1}{3} = \Theta(n^{3})\) times regardless of the input, since
+          nothing prunes it. At \(n = 5\) that is
+          \(\binom{6}{3} = 20\) split-point evaluations, matching the counts
+          listed cell by cell above.
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <p>
+        The grammar factor \(|G|\) is a constant for a fixed language, but it is
+        not a small one after CNF conversion (which can square the grammar), and
+        it is the reason CYK is a theoretical workhorse rather than a production
+        parser. What earns its place is generality: it parses <em>any</em> CFG,
+        including ambiguous ones, and storing a back-pointer with each entry
+        (which production and which split point put \(A\) into
+        \(\mathrm{tab}[i][j]\)) turns recognition into parsing by the usual
+        <a href="../dp/algo-traceback-space-saving.html">traceback</a>: follow
+        the back-pointers down from \(S \in \mathrm{tab}[1][n]\) to rebuild the
+        tree. Storing <em>all</em> back-pointers rather than one represents
+        every parse tree at once, in \(O(n^{3})\) space, which is how parsers
+        for natural language handle grammars with thousands of trees per
+        sentence.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="tools">7. Parser generators, and where this sits</h2>
+      <p>
+        Neither parser above is what a compiler usually ships. Between LL(1)
+        recursive descent (linear, but only for grammars a single lookahead
+        token can steer) and CYK (any grammar, but cubic) sits the family that
+        real tools use: <strong>bottom-up LR parsers</strong>, which shift input
+        symbols onto a stack and reduce the top of the stack by a production
+        when a right-hand side is complete. LR parsers run in \(\Theta(n)\),
+        handle left recursion natively (the natural direction for a bottom-up
+        method), and accept a strictly larger class of grammars than LL(1).
+      </p>
+      <table>
+        <tr><th>method</th><th>direction</th><th>grammars accepted</th><th>time</th><th>typical tool</th></tr>
+        <tr><td>recursive descent, LL(1)</td><td>top-down</td><td>LL(1): no left recursion, no ambiguity</td><td>\(\Theta(n)\)</td><td>hand-written; ANTLR (LL(*))</td></tr>
+        <tr><td>LALR(1) / LR(1)</td><td>bottom-up</td><td>most practical language grammars</td><td>\(\Theta(n)\)</td><td>yacc, bison, CUP</td></tr>
+        <tr><td>Earley</td><td>chart</td><td>every CFG</td><td>\(O(n^{3})\), \(O(n)\) on unambiguous grammars</td><td>NLP toolkits</td></tr>
+        <tr><td>CYK</td><td>bottom-up DP</td><td>every CFG (in CNF)</td><td>\(\Theta(n^{3}|G|)\)</td><td>teaching, NLP, probabilistic parsing</td></tr>
+      </table>
+      <p>
+        A <strong>parser generator</strong> takes the grammar as its input file
+        and emits the parser: yacc and its descendant bison (LALR(1), C),
+        ANTLR (LL(*), several target languages), CUP (Java), lalrpop (Rust).
+        Writing the grammar is then the whole job, and the grammar file
+        <em>is</em> the language specification. What such a tool actually
+        computes is a table of shift and reduce actions indexed by state and
+        lookahead; where the construction wants to put two different actions in
+        one entry it reports a <strong>shift/reduce</strong> or
+        <strong>reduce/reduce</strong> conflict. Those conflicts are what the
+        ambiguity of &sect;<a href="#ambig">3</a> looks like at the tool level:
+        a shift/reduce conflict is the exact symptom of the dangling-else
+        grammar, and the conventional resolution (prefer shift) implements
+        &ldquo;bind <code>else</code> to the nearest <code>then</code>&rdquo;.
+        Because ambiguity itself is undecidable, a conflict report is a
+        conservative warning, not a proof of ambiguity: some conflict-free
+        rewriting may exist.
+      </p>
+      <p>
+        Hand-written recursive descent has not gone away, though: several
+        production compilers (including major C++ and C# front ends) use it,
+        because a hand-written parser gives far better control over error
+        messages and error recovery than a generated table does, and because the
+        code reads like the grammar it implements.
+      </p>
+      <h3>Where this sits in the catalog</h3>
+      <p>
+        This handout sits one rung above
+        <a href="algo-regex-automata.html"><em>Regular Expressions &amp;
+        Automata</em></a> on the Chomsky hierarchy: that handout builds regular
+        expressions and the finite automata that recognize them, and establishes
+        the ceiling (finite memory, no counting) that &sect;<a href="#strict">4</a>
+        proves cannot be raised without a stack. Read it first if the words
+        &ldquo;nondeterministic finite automaton&rdquo; or &ldquo;Kleene&rsquo;s
+        theorem&rdquo; are unfamiliar: the containment proof here builds a
+        grammar directly out of a DFA.
+      </p>
+      <ul>
+        <li>
+          <a href="../dp/paradigm-dp-method.html"><em>Dynamic Programming: The
+          Method</em></a> gives the recipe CYK follows (identify the subproblem,
+          find the recurrence, choose an evaluation order, then trace back);
+          <a href="../dp/algo-matrix-chain.html"><em>Matrix Chain
+          Multiplication</em></a> is the same interval-over-split-points shape
+          with a numeric objective instead of a set of nonterminals, and
+          <a href="../dp/algo-traceback-space-saving.html"><em>Traceback &amp;
+          Space Saving</em></a> covers recovering the structure, not just the
+          answer, from a filled table.
+        </li>
+        <li>
+          <a href="../foundations/foundation-recursion.html"><em>Recursion &amp;
+          Recurrences</em></a> covers the mutual recursion that recursive
+          descent is built from, and the call stack that plays the pushdown
+          store&rsquo;s role.
+        </li>
+        <li>
+          <a href="../trees/ds-trees-bst.html"><em>Binary Search Trees</em></a>
+          supplies the tree vocabulary (root, yield, subtree, traversal) that
+          parse trees reuse; a compiler&rsquo;s later phases are tree walks over
+          the parse tree.
+        </li>
+        <li>
+          <a href="../foundations/foundation-p-np.html"><em>P, NP &amp;
+          NP-Completeness</em></a> is where the undecidability results quoted in
+          &sect;<a href="#ambig">3</a> (ambiguity, grammar equivalence) belong,
+          and where the distinction between &ldquo;no efficient algorithm
+          known&rdquo; and &ldquo;no algorithm at all&rdquo; is drawn.
+        </li>
+        <li>
+          <a href="ds-tries.html"><em>Tries &amp; Ternary Search Trees</em></a>
+          and <a href="foundation-substring-search.html"><em>Substring Search:
+          The Problem &amp; Baselines</em></a> handle the other half of a
+          lexer&rsquo;s job: recognizing keywords and finding fixed patterns
+          fast.
+        </li>
+      </ul>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Give a leftmost derivation and a rightmost derivation of
+          <code>( a + a ) * a</code> under G2, and state how many parse trees
+          the string has under G2 and under G1.
+          <details>
+            <summary>solution</summary>
+            Leftmost:
+            \(E \Rightarrow T \Rightarrow T * F \Rightarrow F * F \Rightarrow
+            (E) * F \Rightarrow (E + T) * F \Rightarrow (T + T) * F \Rightarrow
+            (F + T) * F \Rightarrow (\texttt{a} + T) * F \Rightarrow
+            (\texttt{a} + F) * F \Rightarrow (\texttt{a} + \texttt{a}) * F
+            \Rightarrow (\texttt{a} + \texttt{a}) * \texttt{a}\).
+            Rightmost: same eleven productions, applied in the mirror order:
+            \(E \Rightarrow T \Rightarrow T * F \Rightarrow T * \texttt{a}
+            \Rightarrow F * \texttt{a} \Rightarrow (E) * \texttt{a} \Rightarrow
+            (E + T) * \texttt{a} \Rightarrow (E + F) * \texttt{a} \Rightarrow
+            (E + \texttt{a}) * \texttt{a} \Rightarrow (T + \texttt{a}) *
+            \texttt{a} \Rightarrow (F + \texttt{a}) * \texttt{a} \Rightarrow
+            (\texttt{a} + \texttt{a}) * \texttt{a}\).
+            One parse tree under G2 (it is unambiguous), and also exactly one
+            under G1: the parentheses force the grouping, so G1&rsquo;s
+            ambiguity has nothing to exploit here. Ambiguity is a property of
+            the grammar, but it only shows up on strings that give it room.
+          </details>
+        </li>
+        <li>
+          Under G1, how many parse trees does <code>a + a * a + a</code> have?
+          Under G2? Justify the first count without drawing all the trees.
+          <details>
+            <summary>solution</summary>
+            Five under G1, one under G2. Under G1 all four operands and three
+            binary operators are interchangeable as far as the grammar is
+            concerned: the grammar is exactly &ldquo;a binary tree over four
+            leaves whose internal nodes take the operators in left-to-right
+            order&rdquo;, and the number of such shapes is the Catalan number
+            \(C_3 = \frac{1}{4}\binom{6}{3} = 5\). (The counts for
+            \(k = 1,2,3,4,5\) operators are \(1, 2, 5, 14, 42\).) Under G2 the
+            stratification proposition of &sect;<a href="#ambig">3</a> forces
+            the unique tree \(((\texttt{a} + (\texttt{a} * \texttt{a})) +
+            \texttt{a})\).
+          </details>
+        </li>
+        <li>
+          Extend G2 with unary minus and exponentiation so that
+          <code>-</code> binds tighter than <code>*</code>, <code>^</code>
+          binds tightest of all, and <code>^</code> is
+          <em>right</em>-associative (so <code>a^a^a</code> means
+          <code>a^(a^a)</code>). Write the grammar, and say which of your rules
+          a recursive-descent parser must handle with a loop and which with a
+          recursive call.
+          <details>
+            <summary>solution</summary>
+            Add a level per operator, tightest at the bottom:
+            <pre>  E &rarr; E + T | T
+  T &rarr; T * U | U
+  U &rarr; - U | B          <span class="cm">unary minus: recursive, so --a parses</span>
+  B &rarr; F ^ B | F          <span class="cm">RIGHT-recursive: right-associative</span>
+  F &rarr; ( E ) | a</pre>
+            In the parser: \(E\) and \(T\) are left-recursive, so each becomes
+            a loop with a left fold (<code>while la()=='+'</code>,
+            <code>while la()=='*'</code>). \(U\) is left-<em>most</em> recursive
+            only through the terminal <code>-</code>, which is consumed before
+            the recursive call, so a plain recursive call works and no
+            transformation is needed. \(B\) is right-recursive, and right
+            recursion is harmless for top-down parsing: parse an \(F\), and if
+            the lookahead is <code>^</code>, consume it and call \(B\)
+            recursively, combining as <code>F ^ (result)</code>. That recursive
+            call is what makes it right-associative; writing it as a loop with
+            a left fold would give <code>(a^a)^a</code> and change the language
+            it means.
+          </details>
+        </li>
+        <li>
+          Prove that \(L = \{\, w \in \{\texttt{a},\texttt{b}\}^{*} : w
+          \text{ has equally many } \texttt{a}\text{s and }
+          \texttt{b}\text{s} \,\}\) is not regular, and give a CFG for it.
+          <details>
+            <summary>solution</summary>
+            <em>Not regular.</em> Let \(p\) be a pumping length and take
+            \(s = \texttt{a}^{p}\texttt{b}^{p} \in L\), of length
+            \(2p \ge p\). Write \(s = xyz\) with \(|y| \ge 1\) and
+            \(|xy| \le p\); since the first \(p\) characters are all
+            <code>a</code>s, \(y = \texttt{a}^{k}\) for some \(k \ge 1\). Then
+            \(xy^{2}z = \texttt{a}^{p+k}\texttt{b}^{p}\) has \(p+k\)
+            <code>a</code>s and \(p\) <code>b</code>s, so it is not in \(L\),
+            contradicting the lemma. (An alternative: if \(L\) were regular then
+            \(L \cap L(\texttt{a*b*}) = \{\texttt{a}^{n}\texttt{b}^{n}\}\) would
+            be regular too, since regular languages are closed under
+            intersection, and &sect;<a href="#strict">4</a> showed it is not.)
+            <em>Grammar.</em> \(S \to \texttt{a}\,S\,\texttt{b} \mid
+            \texttt{b}\,S\,\texttt{a} \mid S\,S \mid \varepsilon\). Every
+            production keeps the counts balanced, so everything derived is in
+            \(L\); conversely any balanced string either has a proper balanced
+            prefix (use \(S \to SS\)) or is \(\texttt{a}\,u\,\texttt{b}\) or
+            \(\texttt{b}\,u\,\texttt{a}\) with \(u\) balanced (use the first two
+            rules), so induction on length gives the converse. Note this grammar
+            is ambiguous (<code>abab</code> parses both as \(SS\) and as
+            \(\texttt{a}(\texttt{b}\,\varepsilon\,\texttt{a})\texttt{b}\)); the
+            language is not inherently ambiguous, but this grammar for it is.
+          </details>
+        </li>
+        <li>
+          The pumping lemma is a one-way street: it is a property of every
+          regular language, not a characterization of them. Explain precisely
+          what conclusion you may and may not draw when a language satisfies the
+          lemma&rsquo;s conclusion, and why the proof of
+          &sect;<a href="#strict">4</a> is nevertheless valid.
+          <details>
+            <summary>solution</summary>
+            The lemma reads &ldquo;\(L\) regular \(\Rightarrow\) \(L\) is
+            pumpable&rdquo;. Its contrapositive, &ldquo;\(L\) not pumpable
+            \(\Rightarrow\) \(L\) not regular&rdquo;, is what &sect;4 uses, and
+            that is valid. The converse is false: there exist non-regular
+            languages that <em>are</em> pumpable, so exhibiting a valid
+            decomposition proves nothing about regularity. Practically, this
+            means the lemma is usable only in one direction, and the proof has a
+            fixed adversarial shape: the pumping length \(p\) is given to you
+            (you may not choose it), you choose the string \(s \in L\) with
+            \(|s| \ge p\), the decomposition \(xyz\) is given to you subject
+            only to \(|y| \ge 1\) and \(|xy| \le p\), and you choose the
+            exponent \(i\). Losing track of who chooses what is the usual error.
+            In &sect;4 the choice \(s = \texttt{a}^{p}\texttt{b}^{p}\) is what
+            makes the constraint \(|xy| \le p\) do the work, by trapping \(y\)
+            inside the <code>a</code>s no matter how the adversary splits.
+          </details>
+        </li>
+        <li>
+          Run the recursive-descent parser of &sect;<a href="#rd">5</a> by hand
+          on the input <code>a * ( a + a</code> and say exactly where and how it
+          fails. Then do the same for <code>a + a )</code>. Why do the two
+          failures surface in different places in the code?
+          <details>
+            <summary>solution</summary>
+            <code>a * ( a + a</code>: \(E\) calls \(T\) calls \(F\), which eats
+            <code>a</code>; back in \(T\) the lookahead is <code>*</code>, so
+            the loop is entered, <code>*</code> is consumed and \(F\) is called
+            at position 2. Lookahead is <code>(</code>, so case 1 runs:
+            <code>(</code> is consumed, \(E\) is called, parses
+            <code>a + a</code>, and returns with the lookahead at the sentinel
+            <code>$</code>. \(F\) then calls <code>eat(')')</code>, which finds
+            <code>$</code> instead: the parser throws from inside
+            <code>eat</code>, with the useful message &ldquo;expected
+            <code>)</code>&rdquo; and the position of the failure.
+            <code>a + a )</code>: everything parses normally up to position 3;
+            the \(E\)-loop exits because the lookahead <code>)</code> is not
+            <code>+</code>, \(E\) returns, and the top-level check
+            <code>la() != '$'</code> fires: &ldquo;trailing input&rdquo;. The
+            difference is structural. A missing closer is detected by a
+            <em>specific</em> <code>eat</code> that knows which terminal it
+            wanted, because the grammar told it. An extra closer matches no
+            pending expectation at all, so no <code>eat</code> is looking for
+            it; only the final &ldquo;all input consumed&rdquo; check catches
+            it. This is why that final check is not optional: without it the
+            parser would happily accept any string with a valid expression as a
+            prefix.
+          </details>
+        </li>
+        <li>
+          Fill the CYK table for <code>a * a * a</code> using the CNF grammar of
+          &sect;<a href="#cyk">6</a>. How many split points does the top cell
+          try, which ones succeed, and what does the answer say about
+          associativity?
+          <details>
+            <summary>solution</summary>
+            The filled table, rows by span length:
+            <table class="trace">
+              <tr><th class="lab">len</th><th>from 1: <code>a</code></th><th>from 2: <code>*</code></th><th>from 3: <code>a</code></th><th>from 4: <code>*</code></th><th>from 5: <code>a</code></th></tr>
+              <tr><td class="lab">5</td><td class="cell lt">E, T</td><td colspan="4" style="background:#fafbfc"></td></tr>
+              <tr><td class="lab">4</td><td class="cell piv">T&#8321;</td><td class="cell">&empty;</td><td colspan="3" style="background:#fafbfc"></td></tr>
+              <tr><td class="lab">3</td><td class="cell">E, T</td><td class="cell">&empty;</td><td class="cell">E, T</td><td colspan="2" style="background:#fafbfc"></td></tr>
+              <tr><td class="lab">2</td><td class="cell">T&#8321;</td><td class="cell">&empty;</td><td class="cell">T&#8321;</td><td class="cell">&empty;</td><td style="background:#fafbfc"></td></tr>
+              <tr><td class="lab">1</td><td class="cell">E, T, F</td><td class="cell">M</td><td class="cell">E, T, F</td><td class="cell">M</td><td class="cell">E, T, F</td></tr>
+            </table>
+            Length 1: positions 1, 3, 5 (the <code>a</code>s) get
+            \(\{E,T,F\}\); positions 2 and 4 (the <code>*</code>s) get
+            \(\{M\}\). Length 2: (1,2) and (3,4) get \(\{T_1\}\) by
+            \(T_1 \to T\,M\); (2,3) and (4,5) are empty, since no production
+            begins with \(M\). Length 3: (1,3) gets \(\{E,T\}\) from split
+            \(k = 2\), pairing \(T_1\) with \(F \in \mathrm{tab}[3][3]\) via
+            \(E \to T_1 F\) and \(T \to T_1 F\); (3,5) gets \(\{E,T\}\) the same
+            way from \(k = 4\). Length 4: (1,4) tries \(k = 1,2,3\), pairing
+            \((\{E,T,F\}, \emptyset)\), then \((\{T_1\}, \{E,T\})\), then
+            \((\{E,T\}, \{M\})\). The first has an empty partner; the second
+            fails because \(E \to T_1 F\) and \(T \to T_1 F\) both want an
+            \(F\) on the right and \(\mathrm{tab}[3][4] = \{E,T\}\) has none;
+            the third <em>succeeds</em>, since \(T \in \mathrm{tab}[1][3]\) and
+            \(M \in \mathrm{tab}[4][4]\) match \(T_1 \to T\,M\). So
+            \(\mathrm{tab}[1][4] = \{T_1\}\), and (2,5) stays empty.
+            Length 5: four split points. \(k = 1\) and \(k = 3\) each pair
+            something with an empty cell; \(k = 2\) pairs \(T_1\) with
+            \(\mathrm{tab}[3][5] = \{E,T\}\) and fails for want of an \(F\);
+            only \(k = 4\) works, pairing \(T_1 \in \mathrm{tab}[1][4]\) with
+            \(F \in \mathrm{tab}[5][5]\) via \(E \to T_1 F\) and
+            \(T \to T_1 F\). The top cell is \(\{E,T\}\), which contains the
+            start symbol: <strong>accepted</strong>. The single successful split
+            at \(k = 4\) puts the <em>last</em> <code>*</code> at the root, with
+            <code>a * a</code> beneath it on the left: left-associative, exactly
+            as the left-recursive rule \(T \to T * F\) requires. Had the grammar
+            been right-recursive, the successful split would have been at
+            \(k = 2\) instead.
+          </details>
+        </li>
+        <li>
+          A colleague proposes replacing CYK with recursive descent everywhere,
+          &ldquo;since \(\Theta(n)\) beats \(\Theta(n^{3})\)&rdquo;. Give three
+          concrete situations in which that replacement is not available, and
+          one in which CYK is not available either.
+          <details>
+            <summary>solution</summary>
+            (1) <em>Left recursion in the grammar as given.</em> Naive descent
+            does not terminate on \(E \to E + T\); it must be transformed first,
+            and for grammars where the left recursion is indirect
+            (\(A \Rightarrow^{*} A\alpha\) through several nonterminals) that
+            transformation is mechanical but disfiguring. CYK does not care.
+            (2) <em>Ambiguity that must be preserved.</em> Natural-language
+            parsers want <em>all</em> the trees, ranked by a probabilistic
+            model; recursive descent commits to one path per choice point and
+            structurally cannot enumerate them. CYK's table represents them all
+            at once. (3) <em>Grammars that are not LL(k) for any k.</em> Whether
+            a single production applies may depend on arbitrarily distant input,
+            so no bounded lookahead decides it and descent degrades to
+            backtracking, which is exponential in the worst case; CYK is
+            \(\Theta(n^{3})\) on every input, adversarial or not. Where CYK is
+            unavailable: <em>streaming or interactive input</em>. CYK needs the
+            entire string in hand before it can start (its first row is indexed
+            by position, and cells depend on later positions), and it needs
+            \(\Theta(n^{2})\) space, so it cannot parse an unbounded stream or
+            report an error at the first offending character. Recursive descent
+            reads left to right, uses \(O(d)\) space, and stops at the first
+            token that cannot continue any parse: that is why editors and
+            compilers, which need incremental behaviour and good error
+            positions, use top-down or LR parsers rather than CYK.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Context-Free Grammars &amp; Parsing v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,541 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Depth-First Search.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Depth-First Search - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Depth-First Search</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Follow one path as far as it can go, then backtrack and try the next.
+        The recursive and iterative forms of depth-first search, a proof that it
+        visits exactly the reachable set, the \(\Theta(V+E)\) cost via the
+        handshake lemma, and edge classification with cycle detection. With a
+        worked trace, an optional aside on articulation points, links to the
+        interactive demo, and exercises.
+      </div>
+
+      <p class="lead">
+        Graph vocabulary and the adjacency-list representation this handout
+        builds on are in <a href="ds-graph-representations.html"><em>Graphs:
+        Vocabulary &amp; Representations</em></a>, along with the running
+        directed graph used by the worked examples and the demo (adjacency list
+        \(0\to\{1,3,5\}\), \(1\to\{2,3\}\), \(2\to\{3\}\), \(3\to\{4,7\}\),
+        \(4\to\{5,7\}\), \(5\to\{6\}\)).
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#dfs">Depth-first search</a></li>
+          <li><a href="#reach">DFS visits exactly the reachable set</a></li>
+          <li><a href="#cost">Cost: cashing in the handshake lemma</a></li>
+          <li><a href="#iter">Iterative DFS, and a recursion-depth caveat</a></li>
+          <li><a href="#edges">Edge classification and cycle detection</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="dfs">1. Depth-first search</h2>
+      <p>
+        The basic search problem: given a start vertex \(s\), visit every vertex
+        reachable from \(s\), each exactly once. Trees never revisit a node
+        because there is one path to each; graphs break that: a cycle
+        would send a naive search around forever, and multiple paths would visit a
+        vertex several times. The fix is a \(\texttt{seen}\) array: mark a vertex
+        the first time you reach it and never process it twice. Both DFS and
+        <a href="algo-bfs.html">BFS</a> rely on it.
+      </p>
+      <p>
+        <strong>Depth-first search</strong> follows one path as far as it can,
+        then backtracks and tries the next: preorder tree traversal
+        generalized to graphs, with the recursion itself doing the backtracking:
+      </p>
+      <div class="code-tabs" data-snippet="graphs/dfs-recursive">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">void dfs(Graph&amp; g, int u, vector&lt;bool&gt;&amp; seen) {
+    seen[u] = true;                 // visit u
+    for (int v : g.adj[u])          // each neighbor
+        if (!seen[v])
+            dfs(g, v, seen);        // recurse; backtrack on return
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>void dfs(Graph g, int u, boolean[] seen) {
+    seen[u] = true;                 // visit u
+    for (int v : g.adj.get(u))      // each neighbor
+        if (!seen[v])
+            dfs(g, v, seen);        // recurse; backtrack on return
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>def dfs(g, u, seen):
+    seen[u] = True                  # visit u
+    for v in g.adj[u]:              # each neighbor
+        if not seen[v]:
+            dfs(g, v, seen)         # recurse; backtrack on return</pre>
+<pre class="ct-pane" data-lang="rs" hidden>fn dfs(g: &amp;Graph, u: usize, seen: &amp;mut Vec&lt;bool&gt;) {
+    seen[u] = true;                 // visit u
+    for &amp;v in &amp;g.adj[u] {           // each neighbor
+        if !seen[v] {
+            dfs(g, v, seen);        // recurse; backtrack on return
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/dfs-recursive.cpp &middot; code/graphs/dfs-recursive.java &middot; code/graphs/dfs-recursive.py &middot; code/graphs/dfs-recursive.rs</code></p>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (a DFS trace)</span>
+        On the directed diamond \(0\to1,\ 0\to2,\ 1\to3,\ 2\to3\) with lists
+        \(0\to[1,2]\):
+        <pre>  dfs(0): visit 0 &rarr; dfs(1): visit 1 &rarr; dfs(3): visit 3
+          back to 1 (done) &rarr; back to 0
+          &rarr; dfs(2): visit 2 &rarr; 3 already seen, SKIP
+  visit order:  0  1  3  2</pre>
+        From \(0\) the search dives into \(1\), then \(3\) (a dead end), backs up
+        to \(1\) (done) and to \(0\), then into \(2\); when \(2\) examines its
+        edge to \(3\), that vertex is already visited, so the edge is skipped:
+        the cycle guard at work. The whole \(1\)-branch finishes before
+        \(2\) is touched: that is what &ldquo;depth-first&rdquo; means.
+        <br><span class="note">If instead \(0\)&rsquo;s list were \([2,1]\), the
+        order would be \(0\ 2\ 3\ 1\). The <em>set</em> of visited vertices is
+        fixed by the graph; the <em>order</em> depends on how the adjacency lists
+        are stored, so any order some DFS could produce is a valid DFS order.</span>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="reach">2. DFS visits exactly the reachable set</h2>
+      <div class="thm">
+        <span class="tag">Theorem (DFS = reachability)</span>
+        Calling \(\texttt{dfs}(s)\) marks a vertex \(v\) if and only if there is a
+        path from \(s\) to \(v\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong>
+        (\(\Rightarrow\)) DFS only ever recurses along an edge out of an
+        already-marked vertex, starting from \(s\); so following the recursive
+        calls that led to \(v\) traces an actual path \(s \rightsquigarrow v\).
+        Every mark is genuinely reachable. <br>
+        (\(\Leftarrow\)) Suppose some reachable vertex is <em>missed</em>. Take a
+        path \(s \rightsquigarrow w\) to a missed vertex \(w\), and let \(q\) be
+        the <em>first</em> missed vertex along it, with \(p\) the vertex just
+        before \(q\) (so \(p\) was visited, and \(p \to q\) is an edge). But
+        \(\texttt{dfs}(p)\) loops over <em>all</em> of \(p\)&rsquo;s out-edges,
+        including \(p \to q\); it therefore either found \(q\) unvisited and
+        recursed into it (marking \(q\)) or found \(q\) already visited. Either
+        way \(q\) is marked, contradicting &ldquo;\(q\) missed.&rdquo; So
+        nothing reachable is missed. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The &ldquo;first missed vertex on a path&rdquo; argument is the template
+        for many graph proofs. A single DFS reaches one connected piece; to cover
+        a disconnected graph, restart DFS from every not-yet-seen vertex, and each
+        restart discovers one <strong>connected component</strong>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">3. Cost: cashing in the handshake lemma</h2>
+      <div class="thm">
+        <span class="tag">Proposition (DFS cost)</span>
+        DFS runs in \(\Theta(V + E)\) time on an adjacency list.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The \(\texttt{seen}\) check guarantees each
+        vertex is processed once. Processing \(v\) does \(O(1)\) work plus a scan
+        of its neighbor list, which is \(\deg(v)\) entries. Summing over vertices,
+        \[
+          \sum_{v}\bigl(1 + \deg(v)\bigr)
+          = \underbrace{\sum_v 1}_{V} + \underbrace{\sum_v \deg(v)}_{2E}
+          = V + 2E = \Theta(V+E),
+        \]
+        the degree sum being \(2E\) by the handshake lemma of
+        <a href="ds-graph-representations.html"><em>Graphs: Vocabulary &amp;
+        Representations</em></a> (exactly \(E\) for a
+        digraph&rsquo;s out-degrees). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This is optimal: any correct search must at least look at every vertex and
+        every edge. BFS&rsquo;s cost proof, in the
+        <a href="algo-bfs.html"><em>Breadth-First Search</em></a> handout, is
+        word-for-word the same: the two searches differ only in the frontier
+        container, not in the accounting.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="iter">4. Iterative DFS, and a recursion-depth caveat</h2>
+      <p>
+        Recursion uses the program&rsquo;s call stack; the same search can manage
+        an explicit stack instead:
+      </p>
+      <div class="code-tabs" data-snippet="graphs/dfs-iterative">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">void dfs(Graph&amp; g, int s) {
+    stack&lt;int&gt; st; st.push(s);
+    vector&lt;bool&gt; seen(g.V, false);
+    while (!st.empty()) {
+        int u = st.top(); st.pop();
+        if (seen[u]) continue;
+        seen[u] = true;             // visit u
+        for (int v : g.adj[u])
+            if (!seen[v]) st.push(v);
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>void dfs(Graph g, int s) {
+    Deque&lt;Integer&gt; st = new ArrayDeque&lt;&gt;();
+    st.push(s);
+    boolean[] seen = new boolean[g.V];
+    while (!st.isEmpty()) {
+        int u = st.pop();
+        if (seen[u]) continue;
+        seen[u] = true;             // visit u
+        for (int v : g.adj.get(u))
+            if (!seen[v]) st.push(v);
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>def dfs(g, s):
+    st = [s]
+    seen = [False] * g.V
+    while st:
+        u = st.pop()
+        if seen[u]:
+            continue
+        seen[u] = True              # visit u
+        for v in g.adj[u]:
+            if not seen[v]:
+                st.append(v)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>fn dfs(g: &amp;Graph, s: usize) {
+    let mut st = vec![s];
+    let mut seen = vec![false; g.adj.len()];
+    while let Some(u) = st.pop() {
+        if seen[u] { continue; }
+        seen[u] = true;             // visit u
+        for &amp;v in &amp;g.adj[u] {
+            if !seen[v] { st.push(v); }
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/dfs-iterative.cpp &middot; code/graphs/dfs-iterative.java &middot; code/graphs/dfs-iterative.py &middot; code/graphs/dfs-iterative.rs</code></p>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (the stack reverses the order)</span>
+        Iterative DFS on the diamond \(0\to1,\ 0\to2,\ 1\to3,\ 2\to3\), lists
+        ascending, the stack written bottom to top:
+        <pre>  pop 0: visit, push 1, 2      stack [1 2]
+  pop 2: visit, push 3         stack [1 3]    (2 surfaces before 1)
+  pop 3: visit, no new         stack [1]
+  pop 1: visit; 3 seen         stack []
+
+  iterative order:  0 2 3 1    (recursive gave 0 1 3 2)</pre>
+        Pushing \(1\) then \(2\) means \(2\) pops first: each neighbor list
+        comes back reversed, so the two versions produce different (both
+        valid) orders on the same graph. The <code>if (seen[u]) continue;</code>
+        guard has no recursive counterpart, and it earns its keep when a vertex
+        is pushed twice. On \(0\to1,\ 0\to2,\ 2\to1\):
+        <pre>  pop 0: visit, push 1, 2      stack [1 2]
+  pop 2: visit, push 1 again   stack [1 1]    (1 still unseen)
+  pop 1: visit                 stack [1]
+  pop 1: already seen, SKIP    stack []</pre>
+        Both \(0\) and \(2\) push the still-unseen \(1\); by the time the
+        deeper copy surfaces, \(1\) has been visited, and the guard discards
+        the stale entry instead of processing it twice.
+      </div>
+      <p>
+        The iterative form matters in
+        production: recursive DFS&rsquo;s depth equals the longest path it
+        explores, and the call stack is small (often about a megabyte), so a
+        graph with a million-vertex path overflows it. The explicit stack lives on
+        the heap, which is far larger; prefer it for arbitrarily deep
+        graphs.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="edges">5. Edge classification and cycle detection</h2>
+      <p>As DFS runs it classifies every edge \(u \to v\) it examines:</p>
+      <ul>
+        <li>a <strong>tree edge</strong> leads to an unvisited vertex (DFS
+          recurses); these form the DFS tree;</li>
+        <li>a <strong>back edge</strong> leads to a vertex still on the recursion
+          stack (an ancestor of \(u\)); it closes a loop back to that
+          ancestor, so it is the signature of a <strong>cycle</strong>;</li>
+        <li>an edge to a vertex already <em>finished</em> is harmless (no cycle).</li>
+      </ul>
+      <p>
+        Cycle detection in a digraph is therefore exactly &ldquo;did DFS find a
+        back edge?&rdquo;, tracked with three states per vertex (unvisited /
+        on-stack / finished). Topological sort puts this to work: see the
+        <a href="algo-topological-sort.html"><em>Topological Sort</em></a> handout,
+        which orders a DAG by DFS finish times.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (all three edge kinds in one run)</span>
+        Take the digraph \(0\to1\), \(1\to2\), \(1\to3\), \(2\to0\),
+        \(3\to2\) and run \(\texttt{dfs}(0)\) with the three-state marking,
+        lists ascending:
+        <pre>  dfs(0)  [0 on stack]
+    0&rarr;1 unvisited            &rarr; TREE edge, recurse
+    dfs(1)  [0 1 on stack]
+      1&rarr;2 unvisited          &rarr; TREE edge, recurse
+      dfs(2)  [0 1 2 on stack]
+        2&rarr;0: 0 is ON STACK   &rarr; BACK edge: cycle 0&rarr;1&rarr;2&rarr;0
+        2 finishes
+      1&rarr;3 unvisited          &rarr; TREE edge, recurse
+      dfs(3)  [0 1 3 on stack]
+        3&rarr;2: 2 is FINISHED   &rarr; harmless, no cycle
+        3 finishes
+      1 finishes
+  0 finishes</pre>
+        The edge \(2\to0\) closes a loop to an ancestor still on the recursion
+        stack, so it, and it alone, reports a cycle. The edge \(3\to2\) also
+        reaches a visited vertex, but \(2\) has already <em>finished</em>: no
+        path from \(2\) leads back to \(3\), so no cycle passes through this
+        edge. Distinguishing on-stack from finished is the entire content of
+        the three-state refinement; a plain \(\texttt{seen}\) bit cannot tell
+        these two edges apart.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=graph">DFS demo</a>. Watch the dive-and-
+        backtrack rhythm and the recursion stack (the second row) grow on the
+        dive and shrink as calls return. On the running graph from \(0\) the
+        search dives \(0\ 1\ 2\ 3\ 4\ 5\ 6\), backs up to \(4\) and ends at
+        \(7\), so the visit order is \(0\ 1\ 2\ 3\ 4\ 5\ 6\ 7\) and the finish
+        order is \(6\ 5\ 7\ 4\ 3\ 2\ 1\ 0\); starting instead from \(2\), the vertices
+        \(0\) and \(1\) are never reached and stay unmarked: the
+        reachability theorem made visible.
+      </div>
+      <div class="aside">
+        <span class="tag">Aside: articulation points (optional, not examined)</span>
+        A related reliability question about an undirected graph is which single
+        vertex, if removed, would disconnect it: an <strong>articulation
+        point</strong> (cut vertex). One DFS finds them all in \(\Theta(V+E)\), using
+        two numbers per vertex: \(\texttt{disc}[v]\), its discovery time, and
+        \(\texttt{low}[v]\), the earliest discovery time reachable from \(v\)&rsquo;s
+        DFS subtree using tree edges plus at most one back edge. A non-root \(u\) is an
+        articulation point exactly when some DFS child \(c\) has
+        \(\texttt{low}[c] \ge \texttt{disc}[u]\) (that subtree cannot escape above
+        \(u\), so removing \(u\) strands it); the root is one exactly when it has two
+        or more DFS children. It is the same DFS-tree-and-back-edge machinery as the
+        cycle detection above, put to a new use.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">6. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          On the running DAG, give the DFS visit order and the BFS distance from
+          \(0\) to every vertex, starting from \(0\) with adjacency lists sorted
+          ascending.
+          <details>
+            <summary>solution</summary>
+            DFS: \(0\ 1\ 2\ 3\ 4\ 5\ 6\ 7\). Dive
+            \(0\to1\to2\to3\to4\to5\to6\), back up to \(4\), then \(4\to7\)
+            (\(5\) already seen); every remaining edge (\(3\to7\), \(1\to3\),
+            \(0\to3\), \(0\to5\)) points at an already-visited vertex.
+            BFS distances: \(0{:}0,\ 1{:}1,\ 2{:}2,\ 3{:}1,\ 4{:}2,\ 5{:}1,\
+            6{:}2,\ 7{:}2\), three rings \(\{0\}\), \(\{1,3,5\}\),
+            \(\{2,4,6,7\}\).
+          </details>
+        </li>
+        <li>
+          Run the <em>iterative</em> DFS of &sect;4 from \(0\) on the running
+          graph, lists ascending, writing the stack after every pop. Compare the
+          visit order with the recursive order of the previous exercise.
+          <details>
+            <summary>solution</summary>
+            <pre>  pop 0: visit, push 1, 3, 5   stack [1 3 5]
+  pop 5: visit, push 6         stack [1 3 6]
+  pop 6: visit, nothing new    stack [1 3]
+  pop 3: visit, push 4, 7      stack [1 4 7]
+  pop 7: visit, nothing new    stack [1 4]
+  pop 4: visit; 5, 7 seen      stack [1]
+  pop 1: visit, push 2; 3 seen stack [2]
+  pop 2: visit; 3 seen         stack []
+
+  iterative order:  0 5 6 3 7 4 1 2
+  recursive order:  0 1 2 3 4 5 6 7</pre>
+            The stack hands back \(0\)&rsquo;s neighbor list reversed, so the
+            iterative run leaves along \(0\to5\) while the recursive run leaves
+            along \(0\to1\). Vertex \(1\) is the recursive version&rsquo;s
+            second visit and the iterative version&rsquo;s seventh. Both orders
+            are valid depth-first orders: each finishes one branch before
+            starting the next.
+          </details>
+        </li>
+        <li>
+          Add the edge \(6 \to 2\) to the running graph and run
+          \(\texttt{dfs}(0)\) with the three-state marking of &sect;5, lists
+          ascending. Classify every edge examined, name the cycle, and say what
+          a plain \(\texttt{seen}\) bit would report instead.
+          <details>
+            <summary>solution</summary>
+            The dive is \(0\to1\to2\to3\to4\to5\to6\), with \(4\to7\) taken on
+            the way back up:
+            <pre>  TREE      0&rarr;1  1&rarr;2  2&rarr;3  3&rarr;4  4&rarr;5  5&rarr;6  4&rarr;7
+  BACK      6&rarr;2   (2 is still on the stack)
+  FINISHED  3&rarr;7  1&rarr;3  0&rarr;3  0&rarr;5</pre>
+            Only \(6 \to 2\) reaches a vertex still on the recursion stack, and
+            it closes the cycle \(2 \to 3 \to 4 \to 5 \to 6 \to 2\). The last
+            four edges reach vertices that have already finished, so no cycle
+            runs through them. A single \(\texttt{seen}\) bit cannot separate
+            the two situations: it would flag all five of \(6\to2\), \(3\to7\),
+            \(1\to3\), \(0\to3\), \(0\to5\) alike as &ldquo;edge to a visited
+            vertex&rdquo;, and so would report a cycle on the original acyclic
+            graph too.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Depth-First Search v1.0 &middot;
+        prepared by Dr. Marcel Gavriliu.
+        Typeset with MathJax; interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

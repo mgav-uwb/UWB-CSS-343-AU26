@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!-- CSS 343 handout - Finding Memory Leaks with Valgrind. Self-contained.
+     The Valgrind transcripts below are REAL output captured on Ubuntu 24.04,
+     g++ 13.3.0, valgrind-3.22.0. No external dependencies. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finding Memory Leaks with Valgrind - CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6;
+         --bad:#b3261e; --badbg:#fcebea; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:48px clamp(20px,6vw,64px) 64px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:27px;line-height:1.25;margin:0 0 4px}
+  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 4px}
+  .src{color:var(--dim);font-size:13.5px;font-style:italic;margin:0 0 26px;border-bottom:1px solid var(--line);padding-bottom:18px}
+  h2{font-size:20px;margin:34px 0 10px;padding-top:6px}
+  h3{font-size:16.5px;margin:22px 0 6px;color:#2a2d36}
+  p{margin:10px 0}
+  a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.92em;
+       background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;
+      font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  pre.term{background:#f7f8fa}
+  pre .c{color:var(--dim)}
+  pre b.good{color:var(--accent)} pre b.bad{color:var(--bad)}
+  .lead{font-size:16.5px;color:#33363f}
+  .def,.ex,.aside,.bad{border:1px solid var(--line);border-radius:8px;padding:13px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .ex{border-left:4px solid #777;background:#f6f7f9}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .bad{border-left:4px solid var(--bad);background:var(--badbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;
+       font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .ex .tag{color:#555} .aside .tag{color:var(--warn)} .bad .tag{color:var(--bad)}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-family:system-ui,sans-serif;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#f0f2f6} td code{background:#eef1f6}
+  ul,ol{margin:8px 0;padding-left:24px} li{margin:5px 0}
+  footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);
+         font-size:13px;font-family:system-ui,sans-serif}
+  .toc{font-family:system-ui,sans-serif;font-size:14.5px;background:var(--box);border:1px solid var(--line);
+       border-radius:8px;padding:12px 18px;margin:18px 0}
+  .toc ol{margin:4px 0;padding-left:22px} .toc a{text-decoration:none}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Finding Memory Leaks with Valgrind</h1>
+  <div class="subtitle">CSS 343 - Data Structures, Algorithms &amp; Discrete Mathematics II. Tooling handout. Practical guide.</div>
+  <div class="src">How to build for Valgrind, run it, and <strong>read its report</strong> - a clean run versus a real leak - with annotated transcripts. Every assignment that uses <code>new</code>/<code>delete</code> is graded leak-free with Valgrind. (Transcripts below are real output, captured on Ubuntu 24.04, g++ 13.3.0, Valgrind 3.22.)</div>
+
+  <p class="lead">When you manage memory by hand, two questions decide your grade on the Memory criterion: <em>did every <code>new</code> get a matching <code>delete</code>?</em> and <em>did you ever touch memory you shouldn't?</em> Valgrind answers both. It runs your program on a simulated CPU, tracking every heap block and every access, and at exit tells you exactly <strong>how much leaked and where it was allocated</strong>.</p>
+
+  <div class="toc">
+    <strong>Contents</strong>
+    <ol>
+      <li><a href="#run">Build it &amp; run it</a></li>
+      <li><a href="#clean">A clean report (what passing looks like)</a></li>
+      <li><a href="#leak">A leak report, line by line</a></li>
+      <li><a href="#categories">The five leak categories</a></li>
+      <li><a href="#sources">Where leaks come from in this course</a></li>
+      <li><a href="#other">Other errors Valgrind catches</a></li>
+      <li><a href="#where">Where Valgrind runs (and the macOS substitute)</a></li>
+      <li><a href="#checklist">Checklist</a></li>
+    </ol>
+  </div>
+
+  <h2 id="run">1. Build it &amp; run it</h2>
+  <p>Compile <strong>with <code>-g</code></strong> (debug symbols, so Valgrind can name your file and line), then run your program under Valgrind with full leak checking:</p>
+  <pre>g++ -std=c++17 -g driver.cpp -o driver
+valgrind --leak-check=full ./driver</pre>
+  <p>Your program runs normally - just 10-50&times; slower, since every memory access is checked. <code>--leak-check=full</code> prints a stack trace for each leak. (Add <code>-s</code> to also list error details, or <code>--track-origins=yes</code> to trace uninitialized values back to their source.)</p>
+
+  <h2 id="clean">2. A clean report (what passing looks like)</h2>
+  <p>This is the linked-list builder that frees every node. Two lines decide it - the <b>HEAP SUMMARY</b> and the <b>ERROR SUMMARY</b>:</p>
+  <pre class="term">==584== Memcheck, a memory error detector
+==584== Command: ./clean
+==584==
+sum = 6
+==584==
+==584== HEAP SUMMARY:
+==584==     <b class="good">in use at exit: 0 bytes in 0 blocks</b>
+==584==   total heap usage: 5 allocs, 5 frees, 77,872 bytes allocated
+==584==
+==584== <b class="good">All heap blocks were freed -- no leaks are possible</b>
+==584==
+==584== <b class="good">ERROR SUMMARY: 0 errors from 0 contexts</b> (suppressed: 0 from 0)</pre>
+  <div class="def"><span class="tag">A pass is exactly this</span>
+    <code>in use at exit: 0 bytes in 0 blocks</code>, &nbsp;<code>All heap blocks were freed -- no leaks are possible</code>, &nbsp;and&nbsp; <code>ERROR SUMMARY: 0 errors</code>. (The number after <code>==</code> is just the process id. <code>5 allocs, 5 frees</code> - allocations and frees balance.)
+  </div>
+
+  <h2 id="leak">3. A leak report, line by line</h2>
+  <p>Now the <em>same</em> program with the <code>delete</code> loop removed - it builds a 3-node list and never frees it:</p>
+  <pre class="term">==583== HEAP SUMMARY:
+==583==     <b class="bad">in use at exit: 48 bytes in 3 blocks</b>
+==583==   total heap usage: 5 allocs, <b class="bad">2 frees</b>, 77,872 bytes allocated
+==583==
+==583== <b class="bad">48 (16 direct, 32 indirect) bytes in 1 blocks are definitely lost</b> in loss record 2 of 2
+==583==    at 0x4846FA3: operator new(unsigned long) (vg_replace_malloc.c)
+==583==    <b class="bad">by 0x1091AF: main (leak.cpp:8)</b>
+==583==
+==583== LEAK SUMMARY:
+==583==    <b class="bad">definitely lost: 16 bytes in 1 blocks</b>
+==583==    indirectly lost: 32 bytes in 2 blocks
+==583==      possibly lost: 0 bytes in 0 blocks
+==583==    still reachable: 0 bytes in 0 blocks
+==583==         suppressed: 0 bytes in 0 blocks
+==583==
+==583== <b class="bad">ERROR SUMMARY: 1 errors from 1 contexts</b> (suppressed: 0 from 0)</pre>
+  <p>Read it top to bottom:</p>
+  <ul>
+    <li><strong><code>in use at exit: 48 bytes in 3 blocks</code></strong> - 3 heap blocks were still allocated when the program ended. Those are leaked.</li>
+    <li><strong><code>5 allocs, 2 frees</code></strong> - you allocated 5 times but freed only 2, so 3 blocks were never freed. (The extra 2 allocs/frees are the C++ I/O library's, not yours.)</li>
+    <li><strong>The loss record + stack trace</strong> - <code>by 0x1091AF: main (leak.cpp:8)</code> points at the <em>allocation</em> that leaked: line 8, <code>head = new Node{...}</code>. That is where the lost memory was created; your missing <code>delete</code> is the fix. Build with <code>-g</code> or you get raw addresses instead of <code>file:line</code>.</li>
+    <li><strong><code>48 (16 direct, 32 indirect)</code></strong> - the teaching detail for linked structures (see below).</li>
+    <li><strong><code>ERROR SUMMARY: 1 errors</code></strong> - not clean. Grading requires <code>0</code>.</li>
+  </ul>
+  <div class="bad"><span class="tag">Direct vs indirect loss</span>
+    Forgetting to free a linked list loses the <strong>head node directly</strong> (16 bytes - you dropped the last pointer to it) and the <strong>two nodes it chains to indirectly</strong> (32 bytes - they were only reachable <em>through</em> the head). One missing destructor leaks the whole chain. Fix the <strong>definitely lost</strong> blocks (free the structure) and the indirect losses disappear with them.
+  </div>
+
+  <h2 id="categories">4. The five leak categories</h2>
+  <table>
+    <tr><th>Category</th><th>Meaning</th><th>Action</th></tr>
+    <tr><td><strong>definitely lost</strong></td><td>No pointer to the block survives - a true leak you caused.</td><td><strong>Fix it.</strong></td></tr>
+    <tr><td><strong>indirectly lost</strong></td><td>Lost only because a block that pointed to it was lost (e.g. chained nodes).</td><td>Fixing the definite leaks clears these.</td></tr>
+    <tr><td><strong>possibly lost</strong></td><td>A pointer into the <em>middle</em> of the block survives, but not to its start.</td><td>Usually your bug - investigate.</td></tr>
+    <tr><td><strong>still reachable</strong></td><td>Not freed, but a valid pointer still exists at exit (often library/global state).</td><td>Usually benign; clean it up if it's yours.</td></tr>
+    <tr><td><strong>suppressed</strong></td><td>Known, deliberately ignored (system suppression files).</td><td>Ignore.</td></tr>
+  </table>
+
+  <h2 id="sources">5. Where leaks come from in this course</h2>
+  <p>For the pointer-based structures you build (linked lists, trees), almost every leak is a <strong>Rule-of-Three</strong> gap:</p>
+  <ul>
+    <li><strong>Destructor</strong> that doesn't walk the whole structure and <code>delete</code> every node (and, for a list with a sentinel, the dummy header too).</li>
+    <li><strong><code>clear()</code></strong> that resets <code>head = nullptr</code> without deleting the nodes first - it abandons them.</li>
+    <li><strong>Copy constructor / <code>operator=</code></strong> that do a <em>shallow</em> copy: both objects share the same nodes, so you get a <strong>double free</strong> (an <em>error</em>, not a leak) - or you reassign without freeing the old contents first, which leaks.</li>
+    <li><strong>Self-assignment</strong> (<code>a = a</code>) that frees <code>this</code>'s nodes before copying from the same object.</li>
+  </ul>
+  <div class="def"><span class="tag">The rule</span>
+    Every <code>new</code> has exactly one matching <code>delete</code>. The <strong>destructor</strong> frees the entire structure; the <strong>copy constructor</strong> and <strong>assignment operator</strong> make a <em>deep</em> copy (and assignment frees the old contents first, after guarding against self-assignment).
+  </div>
+
+  <h2 id="other">6. Other errors Valgrind catches</h2>
+  <p>Leaks are only half of it. Memcheck also flags, each with a stack trace and a non-zero <code>ERROR SUMMARY</code>:</p>
+  <ul>
+    <li><strong>Invalid read / write</strong> - <code>Invalid read of size 8</code>: reading or writing outside a block, e.g. walking one node past the end, or using <code>retrieve(index)</code> out of bounds.</li>
+    <li><strong>Use after free / double free</strong> - touching or deleting a node you already deleted (classic shallow-copy fallout).</li>
+    <li><strong>Uninitialized values</strong> - <code>Conditional jump or move depends on uninitialised value(s)</code>: e.g. a <code>next</code> pointer you forgot to set to <code>nullptr</code>. Add <code>--track-origins=yes</code> to find where it came from.</li>
+    <li><strong>Mismatched <code>new</code>/<code>delete</code></strong> - freeing array <code>new[]</code> with scalar <code>delete</code> (or vice versa).</li>
+  </ul>
+  <p>Read every stack trace <strong>top-down</strong> and stop at the first line that names <em>your</em> file - that's where to look.</p>
+
+  <h2 id="where">7. Where Valgrind runs (and the macOS substitute)</h2>
+  <p>Valgrind runs on <strong>Linux</strong> - the CSS lab, or a Linux container/VM. It is <strong>not</strong> supported on current macOS. While developing on a Mac, get most of the same coverage from the compiler's <strong>sanitizers</strong>, then do the authoritative Valgrind check on the lab:</p>
+  <pre><span class="c"># macOS / quick local check (AddressSanitizer + UB sanitizer)</span>
+clang++ -std=c++17 -fsanitize=address,undefined -g driver.cpp -o driver
+./driver
+
+<span class="c"># authoritative check on the CSS Linux lab (this is what grading uses)</span>
+g++ -std=c++17 -g driver.cpp -o driver
+valgrind --leak-check=full ./driver</pre>
+  <p>See the <a href="guide-computing-environment.html">Computing Environment</a> handout for connecting to the lab.</p>
+
+  <h2 id="checklist">8. Checklist</h2>
+  <ul>
+    <li>Built with <code>-g</code>.</li>
+    <li>Ran <code>valgrind --leak-check=full ./prog</code> on every code path (have your driver exercise insert/remove/copy/assign/clear).</li>
+    <li><code>All heap blocks were freed -- no leaks are possible</code> <strong>and</strong> <code>ERROR SUMMARY: 0 errors</code> &rArr; pass.</li>
+    <li>Any <code>definitely lost</code>, <code>Invalid read/write</code>, or <code>ERROR SUMMARY: &ge;1</code> &rArr; fix using the <code>file:line</code> in the trace, then rerun.</li>
+  </ul>
+
+  <footer>
+    CSS 343 &middot; handout v1.0 &middot; prepared by Dr. Marcel Gavriliu. Transcripts captured live on Ubuntu 24.04 / Valgrind 3.22.
+  </footer>
+
+</div>
+</body>
+</html>

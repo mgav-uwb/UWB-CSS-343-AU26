@@ -1,0 +1,1298 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Elementary Sorts.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Elementary Sorts - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Elementary Sorts</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Reference material for the quadratic sorts the rest of the course text
+        assumes: selection sort (exactly \(n(n-1)/2\) compares on every input,
+        \(n-1\) exchanges, oblivious to input order), insertion sort (compares
+        and exchanges tied to the inversion count, linear on sorted input,
+        quadratic on reversed input, stable), and shellsort (\(h\)-sorting with
+        a decreasing gap sequence, and what is and is not proved about its
+        cost). With bubble sort in an aside, full traces of all four on one
+        eight-element array, a stability and in-place comparison table, the
+        handoff to the divide-and-conquer sorts, and exercises with solutions.
+      </div>
+
+      <p class="lead">
+        Three sorting methods run in \(\Theta(n^2)\) time and about ten lines of
+        code: <strong>selection sort</strong>, <strong>insertion sort</strong>,
+        and their refinement <strong>shellsort</strong>. They are the sorts the
+        faster methods are built out of and measured against: insertion sort is
+        the finisher inside production quicksort and mergesort, selection sort
+        fixes the exact compare count that the \(\Omega(n\log n)\) lower bound
+        argument is contrasted with, and shellsort is the one sort in wide use
+        whose running time nobody has managed to characterize. This handout
+        gives each of them in code, traces each of them completely on one input,
+        and argues each cost rather than quoting it.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#setting">The problem, and how cost is counted</a></li>
+          <li><a href="#selection">Selection sort</a></li>
+          <li><a href="#insertion">Insertion sort</a></li>
+          <li><a href="#shell">Shellsort</a></li>
+          <li><a href="#bubble">Bubble sort</a></li>
+          <li><a href="#compare">Stability, space, and the four side by side</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="setting">1. The problem, and how cost is counted</h2>
+      <p>
+        The input is an array \(a[0..n-1]\) of items drawn from a totally
+        ordered set: any two items \(x\) and \(y\) satisfy exactly one of
+        \(x &lt; y\), \(x = y\), \(x &gt; y\), and the order is transitive. The
+        output is a permutation of the input in nondecreasing order.
+      </p>
+      <div class="def">
+        <span class="tag">Definitions</span>
+        A <strong>comparison sort</strong> learns about the input only by
+        comparing pairs of items; it never inspects a key's internal structure.
+        All four sorts here are comparison sorts.
+        <ul>
+          <li>
+            A sort is <strong>in place</strong> if it uses \(O(1)\) auxiliary
+            memory beyond the input array (a fixed number of index and item
+            variables, independent of \(n\)).
+          </li>
+          <li>
+            A sort is <strong>stable</strong> if items with equal keys appear in
+            the output in the same relative order they had in the input.
+          </li>
+          <li>
+            An <strong>inversion</strong> of an array is a pair of positions
+            \(i &lt; j\) with \(a[i] &gt; a[j]\): a pair that is out of order.
+            An array of \(n\) distinct items has between \(0\) inversions
+            (sorted) and \(\binom{n}{2} = n(n-1)/2\) inversions (reversed).
+          </li>
+        </ul>
+      </div>
+      <p>
+        Cost is counted in two operations, because the two scale differently
+        with the size of an item: <strong>compares</strong> (evaluations of
+        <code>a[i] &lt; a[j]</code>) and <strong>exchanges</strong> (swaps of
+        two array entries). Comparing two integers is cheap and comparing two
+        long strings is not; moving a 4-byte integer is cheap and moving a
+        400-byte record is not. A sort with few exchanges and many compares can
+        beat one with the opposite profile, or lose to it, depending on the item
+        type, so both counts are reported throughout.
+      </p>
+      <p>
+        One eight-element array runs through the whole handout:
+      </p>
+      <pre>  a = [ 6, 5, 3, 1, 8, 7, 2, 4 ]      n = 8, 16 inversions</pre>
+      <p>
+        The \(16\) inversions are the pairs \((6,5), (6,3), (6,1), (6,2),
+        (6,4), (5,3), (5,1), (5,2), (5,4), (3,1), (3,2), (8,7), (8,2),
+        (8,4), (7,2), (7,4)\). Out of a possible \(28\), so the array is
+        moderately, not pathologically, disordered.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="selection">2. Selection sort</h2>
+      <p>
+        <strong>Selection sort</strong> makes the sorted prefix grow one
+        position per round. At round \(i\) it scans \(a[i..n-1]\) for the
+        smallest remaining item and exchanges that item into position \(i\).
+        After \(n-1\) rounds, position \(n-1\) necessarily holds the largest
+        item, and the array is sorted.
+      </p>
+      <div class="def">
+        <span class="tag">Invariant</span>
+        Before round \(i\): the entries \(a[0..i-1]\) are in final sorted
+        position, and every one of them is \(\le\) every entry of
+        \(a[i..n-1]\). Round \(i\) preserves the invariant with \(i\) increased
+        by one, because the item it puts at position \(i\) is a minimum of
+        \(a[i..n-1]\), hence \(\ge\) everything in the prefix (by the second
+        half of the invariant) and \(\le\) everything left behind.
+      </div>
+      <div class="code-tabs" data-snippet="sorting/selection">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Selection sort: n-1 rounds; round i puts the minimum of a[i..n-1] at a[i].
+// Compares: exactly n(n-1)/2. Exchanges: exactly n-1. On every input.
+void selection_sort(int a[], int n) {
+    for (int i = 0; i &lt; n - 1; i++) {
+        int min = i;                          // index of the smallest seen
+        for (int j = i + 1; j &lt; n; j++)       // scan the unsorted suffix
+            if (a[j] &lt; a[min]) min = j;       // the ONE compare of this step
+        std::swap(a[i], a[min]);              // no-op when min == i
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Selection sort: n-1 rounds; round i puts the minimum of a[i..n-1] at a[i].
+// Compares: exactly n(n-1)/2. Exchanges: exactly n-1. On every input.
+static void selectionSort(int[] a) {
+    int n = a.length;
+    for (int i = 0; i &lt; n - 1; i++) {
+        int min = i;                          // index of the smallest seen
+        for (int j = i + 1; j &lt; n; j++)       // scan the unsorted suffix
+            if (a[j] &lt; a[min]) min = j;       // the ONE compare of this step
+        int t = a[i]; a[i] = a[min]; a[min] = t;   // no-op when min == i
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Selection sort: n-1 rounds; round i puts the minimum of a[i..n-1] at a[i].
+# Compares: exactly n(n-1)/2. Exchanges: exactly n-1. On every input.
+def selection_sort(a):
+    n = len(a)
+    for i in range(n - 1):
+        m = i                                 # index of the smallest seen
+        for j in range(i + 1, n):             # scan the unsorted suffix
+            if a[j] &lt; a[m]:                   # the ONE compare of this step
+                m = j
+        a[i], a[m] = a[m], a[i]               # no-op when m == i</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Selection sort: n-1 rounds; round i puts the minimum of a[i..n-1] at a[i].
+// Compares: exactly n(n-1)/2. Exchanges: exactly n-1. On every input.
+fn selection_sort(a: &amp;mut [i32]) {
+    let n = a.len();
+    for i in 0..n.saturating_sub(1) {
+        let mut min = i;                      // index of the smallest seen
+        for j in (i + 1)..n {                 // scan the unsorted suffix
+            if a[j] &lt; a[min] { min = j; }     // the ONE compare of this step
+        }
+        a.swap(i, min);                       // no-op when min == i
+    }
+}</pre>
+<p class="ct-src">source: <code>code/sorting/selection_sort.cpp &middot; code/sorting/selection_sort.java &middot; code/sorting/selection_sort.py &middot; code/sorting/selection_sort.rs</code></p>
+<!--/ct--></div>
+
+      <h3>The trace, round by round</h3>
+      <p>
+        Each row is one complete round. The green cell is the item the round
+        moves into final position; the entries left of the vertical bar are
+        finished.
+      </p>
+      <table class="trace">
+        <tr>
+          <th class="lab">round</th><th>scan</th><th>min found</th><th>action</th>
+          <th>array after the round</th><th>cmp</th><th>cmp so far</th>
+        </tr>
+        <tr><td class="lab">start</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td>
+          <td class="cell">6 5 3 1 8 7 2 4</td><td>&ndash;</td><td>0</td></tr>
+        <tr><td class="lab">i = 0</td><td class="cell">a[1..7]</td><td class="lt">1 at 3</td>
+          <td>swap a[0], a[3]</td><td class="cell">1 &vert; 5 3 6 8 7 2 4</td><td>7</td><td>7</td></tr>
+        <tr><td class="lab">i = 1</td><td class="cell">a[2..7]</td><td class="lt">2 at 6</td>
+          <td>swap a[1], a[6]</td><td class="cell">1 2 &vert; 3 6 8 7 5 4</td><td>6</td><td>13</td></tr>
+        <tr><td class="lab">i = 2</td><td class="cell">a[3..7]</td><td class="lt">3 at 2</td>
+          <td class="piv">swap a[2], a[2]: no-op</td><td class="cell">1 2 3 &vert; 6 8 7 5 4</td><td>5</td><td>18</td></tr>
+        <tr><td class="lab">i = 3</td><td class="cell">a[4..7]</td><td class="lt">4 at 7</td>
+          <td>swap a[3], a[7]</td><td class="cell">1 2 3 4 &vert; 8 7 5 6</td><td>4</td><td>22</td></tr>
+        <tr><td class="lab">i = 4</td><td class="cell">a[5..7]</td><td class="lt">5 at 6</td>
+          <td>swap a[4], a[6]</td><td class="cell">1 2 3 4 5 &vert; 7 8 6</td><td>3</td><td>25</td></tr>
+        <tr><td class="lab">i = 5</td><td class="cell">a[6..7]</td><td class="lt">6 at 7</td>
+          <td>swap a[5], a[7]</td><td class="cell">1 2 3 4 5 6 &vert; 8 7</td><td>2</td><td>27</td></tr>
+        <tr><td class="lab">i = 6</td><td class="cell">a[7..7]</td><td class="lt">7 at 7</td>
+          <td>swap a[6], a[7]</td><td class="cell">1 2 3 4 5 6 7 8</td><td>1</td><td>28</td></tr>
+      </table>
+      <p>
+        Two features of the trace are worth naming. Round \(i = 2\) exchanges
+        \(a[2]\) with itself, because \(3\) is already in place: the code still
+        performs the swap, so the exchange count stays at exactly \(n-1 = 7\)
+        regardless of input (\(6\) of the \(7\) move something here). And the
+        array is fully sorted after round \(i = 6\), yet the algorithm cannot
+        know that: it has no test that could stop it early, which is the next
+        theorem.
+      </p>
+
+      <h3>Exactly \(n(n-1)/2\) compares, on every input</h3>
+      <div class="thm">
+        <span class="tag">Theorem</span>
+        On an array of \(n\) items, selection sort as written above performs
+        exactly \(n(n-1)/2\) compares and exactly \(n-1\) exchanges, for
+        <em>every</em> input array.
+        <div class="proof">
+          The outer loop runs once for each \(i \in \{0, 1, \dots, n-2\}\), a
+          fixed set determined by \(n\). For a fixed \(i\), the inner loop runs
+          once for each \(j \in \{i+1, \dots, n-1\}\) and performs exactly one
+          compare per iteration, namely \(a[j] &lt; a[\mathit{min}]\). That is
+          \(n-1-i\) compares. Nothing inside the inner loop can change the loop
+          bounds: the body's only effect is the assignment
+          \(\mathit{min} \leftarrow j\), which alters <em>which</em> entry the
+          next compare reads but not <em>how many</em> compares occur. Summing,
+          \[
+            \sum_{i=0}^{n-2} (n-1-i) \;=\; \sum_{k=1}^{n-1} k \;=\;
+            \frac{n(n-1)}{2}.
+          \]
+          The exchange count is immediate: the outer loop body contains exactly
+          one unconditional swap, and the body runs \(n-1\) times. Both totals
+          depend on \(n\) alone.
+          <span class="qed">&#9633;</span>
+        </div>
+      </div>
+      <p>
+        The trace confirms the count: \(7 + 6 + 5 + 4 + 3 + 2 + 1 = 28 =
+        8 \cdot 7 / 2\), which is the last entry of the running column.
+      </p>
+      <div class="aside">
+        <span class="tag">Oblivious to input order</span>
+        A stronger statement than the count holds: the <em>sequence of index
+        pairs</em> selection sort compares is \((0,1), (0,2), \dots\) determined
+        by \(n\) alone, identical for every input. Running selection sort on
+        the already-sorted \([1,2,3,4,5,6,7,8]\) costs the same \(28\) compares
+        and \(7\) exchanges as running it on \([8,7,6,5,4,3,2,1]\). There is no
+        best case and no worst case: best, average, and worst are all
+        \(\Theta(n^2)\) compares and \(\Theta(n)\) exchanges. Selection sort is
+        therefore the wrong choice when inputs are often nearly sorted, and the
+        right choice in exactly one situation: when an exchange is enormously
+        more expensive than a compare, since \(n-1\) exchanges is the fewest of
+        any sort here, and no other sort in this handout can promise a linear
+        bound on data movement.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (selection sort is not stable)</span>
+        Label two equal keys to tell them apart: input
+        \([\,2_a,\ 2_b,\ 1\,]\). Round \(i = 0\) finds the minimum \(1\) at
+        index \(2\) and swaps it with \(a[0] = 2_a\), giving
+        \([\,1,\ 2_b,\ 2_a\,]\). Round \(i = 1\) compares \(2_a\) against
+        \(2_b\), finds nothing smaller, and swaps \(a[1]\) with itself. Output:
+        \([\,1,\ 2_b,\ 2_a\,]\). The two equal keys came out reversed, so the
+        sort is <strong>not stable</strong>. The culprit is the long-distance
+        swap, which can throw an item over an equal one arbitrarily far away.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="insertion">3. Insertion sort</h2>
+      <p>
+        <strong>Insertion sort</strong> also grows a sorted prefix, but it
+        grows it by taking the next item and sliding it left into its place
+        among the items already seen, the way a hand of playing cards gets
+        sorted. The difference from selection sort is decisive: the prefix is
+        sorted but <em>not</em> final, because a later item can land anywhere
+        inside it.
+      </p>
+      <div class="def">
+        <span class="tag">Invariant</span>
+        Before step \(i\): the entries \(a[0..i-1]\) are in sorted order among
+        themselves, and they are exactly the first \(i\) items of the input (in
+        some order). Step \(i\) exchanges \(a[i]\) leftward past every entry
+        strictly greater than it and stops at the first entry that is \(\le\)
+        it, restoring the invariant for \(i+1\). Nothing to the right of \(i\)
+        has been touched.
+      </div>
+      <div class="code-tabs" data-snippet="sorting/insertion">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Insertion sort: slide a[i] left past every strictly larger entry.
+// Exchanges = number of inversions. Compares = exchanges + (stops before 0).
+void insertion_sort(int a[], int n) {
+    for (int i = 1; i &lt; n; i++)
+        // STRICT &lt; is what makes the sort stable: an equal entry stops the
+        // slide, so a[i] never passes an equal key that came before it.
+        for (int j = i; j &gt; 0 &amp;&amp; a[j] &lt; a[j - 1]; j--)
+            std::swap(a[j], a[j - 1]);
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Insertion sort: slide a[i] left past every strictly larger entry.
+// Exchanges = number of inversions. Compares = exchanges + (stops before 0).
+static void insertionSort(int[] a) {
+    for (int i = 1; i &lt; a.length; i++)
+        // STRICT &lt; is what makes the sort stable: an equal entry stops the
+        // slide, so a[i] never passes an equal key that came before it.
+        for (int j = i; j &gt; 0 &amp;&amp; a[j] &lt; a[j - 1]; j--) {
+            int t = a[j]; a[j] = a[j - 1]; a[j - 1] = t;
+        }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Insertion sort: slide a[i] left past every strictly larger entry.
+# Exchanges = number of inversions. Compares = exchanges + (stops before 0).
+def insertion_sort(a):
+    for i in range(1, len(a)):
+        j = i
+        # STRICT &lt; is what makes the sort stable: an equal entry stops the
+        # slide, so a[i] never passes an equal key that came before it.
+        while j &gt; 0 and a[j] &lt; a[j - 1]:
+            a[j], a[j - 1] = a[j - 1], a[j]
+            j -= 1</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Insertion sort: slide a[i] left past every strictly larger entry.
+// Exchanges = number of inversions. Compares = exchanges + (stops before 0).
+fn insertion_sort(a: &amp;mut [i32]) {
+    for i in 1..a.len() {
+        let mut j = i;
+        // STRICT &lt; is what makes the sort stable: an equal entry stops the
+        // slide, so a[i] never passes an equal key that came before it.
+        while j &gt; 0 &amp;&amp; a[j] &lt; a[j - 1] {
+            a.swap(j, j - 1);
+            j -= 1;
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/sorting/insertion_sort.cpp &middot; code/sorting/insertion_sort.java &middot; code/sorting/insertion_sort.py &middot; code/sorting/insertion_sort.rs</code></p>
+<!--/ct--></div>
+
+      <p>
+        Production code replaces the repeated exchange with a shift and one
+        final store, which makes the same compares and the same decisions but
+        writes each displaced entry once instead of three times per swap:
+      </p>
+      <pre>  for (int i = 1; i &lt; n; i++) {
+      int key = a[i], j = i - 1;
+      while (j &gt;= 0 &amp;&amp; a[j] &gt; key) { a[j + 1] = a[j]; j--; }   <span class="cm">// shift right</span>
+      a[j + 1] = key;                                         <span class="cm">// drop it in</span>
+  }</pre>
+      <p>
+        The exchange form is traced below because the exchange is the unit the
+        analysis counts.
+      </p>
+
+      <h3>The trace, step by step</h3>
+      <p>
+        Each row is one step \(i\): the item at index \(i\) (green) slides left
+        past the larger entries. The compare column counts every evaluation of
+        <code>a[j] &lt; a[j-1]</code>, including the one that fails and ends the
+        slide.
+      </p>
+      <table class="trace">
+        <tr>
+          <th class="lab">step</th><th>item</th><th>array after the step</th>
+          <th>moves</th><th>cmp</th><th>cmp so far</th><th>exch so far</th>
+        </tr>
+        <tr><td class="lab">start</td><td>&ndash;</td><td class="cell">6 5 3 1 8 7 2 4</td>
+          <td>&ndash;</td><td>&ndash;</td><td>0</td><td>0</td></tr>
+        <tr><td class="lab">i = 1</td><td class="lt">5</td><td class="cell">5 6 &vert; 3 1 8 7 2 4</td>
+          <td>1</td><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td class="lab">i = 2</td><td class="lt">3</td><td class="cell">3 5 6 &vert; 1 8 7 2 4</td>
+          <td>2</td><td>2</td><td>3</td><td>3</td></tr>
+        <tr><td class="lab">i = 3</td><td class="lt">1</td><td class="cell">1 3 5 6 &vert; 8 7 2 4</td>
+          <td>3</td><td>3</td><td>6</td><td>6</td></tr>
+        <tr><td class="lab">i = 4</td><td class="lt">8</td><td class="cell">1 3 5 6 8 &vert; 7 2 4</td>
+          <td class="piv">0</td><td>1</td><td>7</td><td>6</td></tr>
+        <tr><td class="lab">i = 5</td><td class="lt">7</td><td class="cell">1 3 5 6 7 8 &vert; 2 4</td>
+          <td>1</td><td>2</td><td>9</td><td>7</td></tr>
+        <tr><td class="lab">i = 6</td><td class="lt">2</td><td class="cell">1 2 3 5 6 7 8 &vert; 4</td>
+          <td>5</td><td>6</td><td>15</td><td>12</td></tr>
+        <tr><td class="lab">i = 7</td><td class="lt">4</td><td class="cell">1 2 3 4 5 6 7 8</td>
+          <td>4</td><td>5</td><td>20</td><td>16</td></tr>
+      </table>
+      <p>
+        Every branch of the inner loop appears here. Step \(i = 4\) is the
+        <em>immediate stop</em>: \(8\) is already \(\ge\) its left neighbour,
+        so one compare fails and nothing moves. Steps \(i = 1, 2, 3\) are the
+        <em>run off the left end</em>: the item is smaller than everything seen
+        so far, the loop ends because \(j\) reached \(0\), and the compare count
+        equals the move count. Steps \(i = 5, 6, 7\) are the general case: the
+        slide stops in the interior, at a cost of one compare more than the
+        number of moves. Totals: \(20\) compares, \(16\) exchanges, against
+        selection sort's \(28\) and \(7\) on the same array.
+      </p>
+
+      <h3>What the counts are, exactly</h3>
+      <div class="thm">
+        <span class="tag">Theorem</span>
+        On an array with \(I\) inversions, insertion sort performs exactly
+        \(I\) exchanges, and \(C\) compares with
+        \[ \max(I,\ n-1) \;\le\; C \;\le\; I + n - 1 . \]
+        <div class="proof">
+          <em>Exchanges.</em> Every exchange is of adjacent entries \(a[j-1]\)
+          and \(a[j]\) with \(a[j] &lt; a[j-1]\). Swapping two adjacent entries
+          leaves the relative order of every other pair untouched and flips the
+          order of this one pair, so it changes the inversion count by exactly
+          \(-1\) here. The array starts with \(I\) inversions and ends sorted,
+          with \(0\), so exactly \(I\) exchanges occur.
+          <br />
+          <em>Compares.</em> Step \(i\) performs one compare per move plus, if
+          the slide stops before reaching index \(0\), one final failed
+          compare. Hence \(C = I + s\), where \(s\) is the number of steps that
+          stop in the interior, and \(0 \le s \le n-1\) since there are \(n-1\)
+          steps. That gives \(I \le C \le I + n - 1\). Each of the \(n-1\)
+          steps performs at least one compare (either it moves at least once,
+          or it stops at once), so \(C \ge n-1\) as well.
+          <span class="qed">&#9633;</span>
+        </div>
+      </div>
+      <p>
+        The trace matches: the array has \(I = 16\) inversions and the trace
+        ends at \(16\) exchanges. Four steps stopped in the interior
+        (\(i = 4, 5, 6, 7\)), so \(s = 4\) and \(C = 16 + 4 = 20\), inside the
+        predicted window \([16, 23]\).
+      </p>
+      <table>
+        <tr><th>input of size \(n\)</th><th>inversions</th><th>compares</th><th>exchanges</th><th>order</th></tr>
+        <tr><td>sorted \([1,\dots,8]\)</td><td>0</td><td>7</td><td>0</td><td>\(\Theta(n)\)</td></tr>
+        <tr><td>the running array</td><td>16</td><td>20</td><td>16</td><td>&ndash;</td></tr>
+        <tr><td>reversed \([8,\dots,1]\)</td><td>28</td><td>28</td><td>28</td><td>\(\Theta(n^2)\)</td></tr>
+      </table>
+      <p>
+        <strong>Best case, sorted input.</strong> Every step fails its first
+        compare and moves nothing: \(n-1 = 7\) compares, \(0\) exchanges,
+        \(\Theta(n)\) time. No sort in this handout beats that, and selection
+        sort does not come close to it.
+        <strong>Worst case, reversed input.</strong> Every item is smaller than
+        everything before it, so step \(i\) makes \(i\) moves and \(i\)
+        compares: \(\sum_{i=1}^{n-1} i = n(n-1)/2 = 28\) of each,
+        \(\Theta(n^2)\). <strong>Average case</strong>, over a uniformly random
+        permutation of distinct keys: each of the \(\binom{n}{2}\) pairs is an
+        inversion with probability \(1/2\), so \(\mathbb{E}[I] = n(n-1)/4\), and
+        both counts are \(\sim n^2/4\), half the worst case but still
+        quadratic.
+      </p>
+      <div class="aside">
+        <span class="tag">Why this makes insertion sort useful</span>
+        \(C \le I + n - 1\) is a much sharper statement than \(O(n^2)\): the
+        running time is linear in the amount of disorder, not in the size. An
+        array where no item is more than \(k\) positions from its final place
+        has \(I \le kn\), so insertion sort finishes it in \(O(kn)\) time, which
+        is \(O(n)\) for constant \(k\). Two consequences used elsewhere: an
+        almost-sorted array (a sorted log with a few late arrivals appended, say)
+        is sorted in near-linear time; and a small subarray, of size at most
+        \(k\), is sorted in \(O(k^2)\) time with a tiny constant, which is why
+        insertion sort is the finisher inside faster sorts (&sect;<a href="#sits">7</a>).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (insertion sort is stable)</span>
+        Same labelled input \([\,2_a,\ 2_b,\ 1\,]\). Step \(i = 1\) compares
+        \(2_b &lt; 2_a\), which is <em>false</em> (the test is strict), so
+        nothing moves: \([\,2_a,\ 2_b,\ 1\,]\). Step \(i = 2\) slides \(1\) past
+        \(2_b\) and then past \(2_a\), reaching index \(0\):
+        \([\,1,\ 2_a,\ 2_b\,]\). The equal keys kept their input order. In
+        general an item never passes an equal item, because the loop guard
+        <code>a[j] &lt; a[j-1]</code> is false on equality, so equal keys can
+        never change relative order; and every move is a swap of adjacent
+        entries, which cannot leapfrog anything. Replacing <code>&lt;</code>
+        with <code>&lt;=</code> destroys stability without changing the sorted
+        output.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="shell">4. Shellsort</h2>
+      <p>
+        Insertion sort's weakness is visible in its own theorem: exchanges equal
+        inversions, and each exchange removes exactly one inversion, because
+        each exchange moves an item one position. An item that belongs \(k\)
+        positions to the left needs \(k\) exchanges to get there. Shellsort
+        (D. L. Shell, 1959) attacks that by sorting items that are far apart
+        first, so that a single exchange can move an item a long distance and
+        cancel many inversions at once.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (\(h\)-sorted, \(h\)-sorting)</span>
+        An array is <strong>\(h\)-sorted</strong> if \(a[i] \le a[i+h]\) for
+        every \(i\) with \(0 \le i &lt; n - h\); equivalently, each of the \(h\)
+        interleaved subsequences
+        \(a[r], a[r+h], a[r+2h], \dots\) (for \(r = 0, \dots, h-1\)) is sorted.
+        <strong>\(h\)-sorting</strong> an array means making it \(h\)-sorted,
+        and the way to do it is insertion sort with the step size \(h\) in place
+        of \(1\): the code is the insertion sort of &sect;<a href="#insertion">3</a>
+        with every \(1\) replaced by \(h\). A \(1\)-sorted array is sorted.
+      </div>
+      <p>
+        <strong>Shellsort</strong> is: \(h\)-sort the array for each \(h\) in a
+        decreasing <strong>gap sequence</strong> that ends at \(1\). The last
+        pass is an ordinary insertion sort, so the output is correct no matter
+        what the earlier passes did; the earlier passes exist only to make that
+        last pass cheap. The gap sequence below is Shell's original, repeated
+        halving, which for \(n = 8\) gives \(4, 2, 1\).
+      </p>
+      <div class="code-tabs" data-snippet="sorting/shell">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Shellsort with Shell's original halving gaps: n/2, n/4, ..., 1.
+// The h == 1 pass IS insertion sort, so correctness never depends on the gaps.
+void shellsort(int a[], int n) {
+    for (int h = n / 2; h &gt; 0; h /= 2)            // decreasing gaps, last is 1
+        for (int i = h; i &lt; n; i++)               // h-sort a[0..n-1]
+            for (int j = i; j &gt;= h &amp;&amp; a[j] &lt; a[j - h]; j -= h)
+                std::swap(a[j], a[j - h]);        // one exchange of distance h
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Shellsort with Shell's original halving gaps: n/2, n/4, ..., 1.
+// The h == 1 pass IS insertion sort, so correctness never depends on the gaps.
+static void shellsort(int[] a) {
+    int n = a.length;
+    for (int h = n / 2; h &gt; 0; h /= 2)            // decreasing gaps, last is 1
+        for (int i = h; i &lt; n; i++)               // h-sort a[0..n-1]
+            for (int j = i; j &gt;= h &amp;&amp; a[j] &lt; a[j - h]; j -= h) {
+                int t = a[j]; a[j] = a[j - h]; a[j - h] = t;
+            }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Shellsort with Shell's original halving gaps: n//2, n//4, ..., 1.
+# The h == 1 pass IS insertion sort, so correctness never depends on the gaps.
+def shellsort(a):
+    n = len(a)
+    h = n // 2
+    while h &gt; 0:                                  # decreasing gaps, last is 1
+        for i in range(h, n):                     # h-sort a[0..n-1]
+            j = i
+            while j &gt;= h and a[j] &lt; a[j - h]:
+                a[j], a[j - h] = a[j - h], a[j]   # one exchange of distance h
+                j -= h
+        h //= 2</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Shellsort with Shell's original halving gaps: n/2, n/4, ..., 1.
+// The h == 1 pass IS insertion sort, so correctness never depends on the gaps.
+fn shellsort(a: &amp;mut [i32]) {
+    let n = a.len();
+    let mut h = n / 2;
+    while h &gt; 0 {                                 // decreasing gaps, last is 1
+        for i in h..n {                           // h-sort a[0..n-1]
+            let mut j = i;
+            while j &gt;= h &amp;&amp; a[j] &lt; a[j - h] {
+                a.swap(j, j - h);                 // one exchange of distance h
+                j -= h;
+            }
+        }
+        h /= 2;
+    }
+}</pre>
+<p class="ct-src">source: <code>code/sorting/shellsort.cpp &middot; code/sorting/shellsort.java &middot; code/sorting/shellsort.py &middot; code/sorting/shellsort.rs</code></p>
+<!--/ct--></div>
+
+      <h3>The trace: gaps 4, 2, 1 on the running array</h3>
+      <p>
+        The <code>h = 4</code> pass sorts four interleaved pairs:
+        \((a[0], a[4]) = (6,8)\), \((a[1], a[5]) = (5,7)\),
+        \((a[2], a[6]) = (3,2)\), \((a[3], a[7]) = (1,4)\). Only the third is
+        out of order.
+      </p>
+      <table class="trace">
+        <tr><th class="lab">step</th><th>compares</th><th>result</th><th>array</th><th>cmp so far</th><th>exch so far</th></tr>
+        <tr><td class="lab">h = 4 start</td><td>&ndash;</td><td>&ndash;</td><td class="cell">6 5 3 1 8 7 2 4</td><td>0</td><td>0</td></tr>
+        <tr><td class="lab">i = 4</td><td class="cell">a[4]=8 vs a[0]=6</td><td>in order, stop</td><td class="cell">6 5 3 1 8 7 2 4</td><td>1</td><td>0</td></tr>
+        <tr><td class="lab">i = 5</td><td class="cell">a[5]=7 vs a[1]=5</td><td>in order, stop</td><td class="cell">6 5 3 1 8 7 2 4</td><td>2</td><td>0</td></tr>
+        <tr><td class="lab">i = 6</td><td class="cell">a[6]=2 vs a[2]=3</td><td class="lt">swap; j = 2 &lt; h, stop</td><td class="cell">6 5 <strong>2</strong> 1 8 7 <strong>3</strong> 4</td><td>3</td><td>1</td></tr>
+        <tr><td class="lab">i = 7</td><td class="cell">a[7]=4 vs a[3]=1</td><td>in order, stop</td><td class="cell">6 5 2 1 8 7 3 4</td><td>4</td><td>1</td></tr>
+      </table>
+      <p>
+        After the pass, \([6, 5, 2, 1, 8, 7, 3, 4]\) is 4-sorted (check the four
+        pairs: \(6\le8\), \(5\le7\), \(2\le3\), \(1\le4\)) and has \(15\)
+        inversions, down from \(16\). The <code>h = 2</code> pass now sorts the
+        two interleaved subsequences \(a[0],a[2],a[4],a[6] = 6,2,8,3\) and
+        \(a[1],a[3],a[5],a[7] = 5,1,7,4\).
+      </p>
+      <table class="trace">
+        <tr><th class="lab">step</th><th>slide</th><th>array</th><th>cmp so far</th><th>exch so far</th></tr>
+        <tr><td class="lab">h = 2 start</td><td>&ndash;</td><td class="cell">6 5 2 1 8 7 3 4</td><td>4</td><td>1</td></tr>
+        <tr><td class="lab">i = 2</td><td class="cell">2 &lt; 6: swap, then j = 0, stop</td><td class="cell"><strong>2</strong> 5 <strong>6</strong> 1 8 7 3 4</td><td>5</td><td>2</td></tr>
+        <tr><td class="lab">i = 3</td><td class="cell">1 &lt; 5: swap, then j = 1, stop</td><td class="cell">2 <strong>1</strong> 6 <strong>5</strong> 8 7 3 4</td><td>6</td><td>3</td></tr>
+        <tr><td class="lab">i = 4</td><td class="cell">8 vs 6: in order, stop</td><td class="cell">2 1 6 5 8 7 3 4</td><td>7</td><td>3</td></tr>
+        <tr><td class="lab">i = 5</td><td class="cell">7 vs 5: in order, stop</td><td class="cell">2 1 6 5 8 7 3 4</td><td>8</td><td>3</td></tr>
+        <tr><td class="lab">i = 6</td><td class="cell">3 &lt; 8: swap; 3 &lt; 6: swap; 3 vs 2: stop</td><td class="cell">2 1 <strong>3</strong> 5 <strong>6</strong> 7 <strong>8</strong> 4</td><td>11</td><td>5</td></tr>
+        <tr><td class="lab">i = 7</td><td class="cell">4 &lt; 7: swap; 4 &lt; 5: swap; 4 vs 1: stop</td><td class="cell">2 1 3 <strong>4</strong> 6 <strong>5</strong> 8 <strong>7</strong></td><td>14</td><td>7</td></tr>
+      </table>
+      <p>
+        After the pass, \([2, 1, 3, 4, 6, 5, 8, 7]\) has \(3\) inversions left,
+        down from \(15\), and it is 2-sorted <em>and still 4-sorted</em> (a
+        general fact, stated as a lemma below). Every item is now within one
+        position of its final place, and the final <code>h = 1</code> pass is an
+        insertion sort of an almost-sorted array:
+      </p>
+      <table class="trace">
+        <tr><th class="lab">step</th><th>item</th><th>moves</th><th>array</th><th>cmp so far</th><th>exch so far</th></tr>
+        <tr><td class="lab">h = 1 start</td><td>&ndash;</td><td>&ndash;</td><td class="cell">2 1 3 4 6 5 8 7</td><td>14</td><td>7</td></tr>
+        <tr><td class="lab">i = 1</td><td class="lt">1</td><td>1</td><td class="cell">1 2 3 4 6 5 8 7</td><td>15</td><td>8</td></tr>
+        <tr><td class="lab">i = 2</td><td>3</td><td class="piv">0</td><td class="cell">1 2 3 4 6 5 8 7</td><td>16</td><td>8</td></tr>
+        <tr><td class="lab">i = 3</td><td>4</td><td class="piv">0</td><td class="cell">1 2 3 4 6 5 8 7</td><td>17</td><td>8</td></tr>
+        <tr><td class="lab">i = 4</td><td>6</td><td class="piv">0</td><td class="cell">1 2 3 4 6 5 8 7</td><td>18</td><td>8</td></tr>
+        <tr><td class="lab">i = 5</td><td class="lt">5</td><td>1</td><td class="cell">1 2 3 4 5 6 8 7</td><td>20</td><td>9</td></tr>
+        <tr><td class="lab">i = 6</td><td>8</td><td class="piv">0</td><td class="cell">1 2 3 4 5 6 8 7</td><td>21</td><td>9</td></tr>
+        <tr><td class="lab">i = 7</td><td class="lt">7</td><td>1</td><td class="cell">1 2 3 4 5 6 7 8</td><td>23</td><td>10</td></tr>
+      </table>
+
+      <h3>Why the passes help</h3>
+      <p>
+        The final pass of shellsort did the same job insertion sort does alone,
+        but on an array with \(3\) inversions instead of \(16\): \(9\) compares
+        and \(3\) exchanges, against \(20\) and \(16\). The two cheap earlier
+        passes bought that reduction for \(14\) compares and \(7\) exchanges.
+        Totals on this array:
+      </p>
+      <table>
+        <tr><th>sort</th><th>compares</th><th>exchanges</th><th>compares + exchanges</th></tr>
+        <tr><td>insertion sort alone</td><td>20</td><td>16</td><td>36</td></tr>
+        <tr><td>shellsort, gaps 4, 2, 1</td><td>23</td><td>10</td><td>33</td></tr>
+        <tr><td>selection sort</td><td>28</td><td>7</td><td>35</td></tr>
+      </table>
+      <p>
+        The honest reading of that table: at \(n = 8\), shellsort saves six
+        exchanges and pays three extra compares, and the margin over insertion
+        sort is a rounding error. It has to be. Three passes over eight items
+        cannot beat one pass by much, because the fixed cost of the extra passes
+        (one compare per position per pass, at minimum) is a large fraction of
+        the total. What the trace shows is the <em>mechanism</em>, and the
+        mechanism is what scales: the inversion count fell \(16 \to 15 \to 3
+        \to 0\), and the expensive pass ran last, when there was almost nothing
+        left to do.
+      </p>
+      <p>
+        The mechanism is clearest on the input that is worst for insertion sort,
+        the reversed array \([8,7,6,5,4,3,2,1]\), where insertion sort needs
+        \(28\) compares and \(28\) exchanges. Shellsort with the same gaps needs
+        \(22\) and \(12\). The \(h = 4\) pass alone costs \(4\) compares and
+        \(4\) exchanges and removes \(16\) of the \(28\) inversions:
+      </p>
+      <pre>  start                     8 7 6 5 4 3 2 1     28 inversions
+  h=4, i=4: swap 8 and 4    4 7 6 5 8 3 2 1     21   (this one exchange killed 7)
+  h=4, i=5: swap 7 and 3    4 3 6 5 8 7 2 1     16
+  h=4, i=6: swap 6 and 2    4 3 2 5 8 7 6 1     13
+  h=4, i=7: swap 5 and 1    4 3 2 1 8 7 6 5     12   4 exchanges, 16 inversions gone
+  after h=2                 2 1 4 3 6 5 8 7      4
+  after h=1                 1 2 3 4 5 6 7 8      0   totals: 22 compares, 12 exchanges</pre>
+      <p>
+        A single exchange across a gap of \(h\) can remove up to \(2h-1\)
+        inversions, against exactly \(1\) for insertion sort's adjacent
+        exchange. That is the entire idea.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (\(h\)-sortedness survives later passes)</span>
+        If an array is \(h\)-sorted, then \(g\)-sorting it for any \(g\) leaves
+        it \(h\)-sorted.
+        <div class="proof">
+          The proof is not short, and the standard reference (Knuth,
+          <em>The Art of Computer Programming</em>, vol.&nbsp;3, &sect;5.2.1)
+          argues it through the following fact about \(g\)-sorting: if
+          \(x_1 \le y_1,\ \dots,\ x_m \le y_m\) are two sequences compared
+          elementwise, then sorting the \(x\)'s and sorting the \(y\)'s
+          preserves the elementwise inequality. Apply it with the \(x\)'s the
+          positions \(i, i+g, i+2g, \dots\) and the \(y\)'s the positions
+          \(i+h, i+h+g, \dots\): \(h\)-sortedness says \(x_k \le y_k\)
+          throughout, the \(g\)-sort sorts both sequences (they are two of the
+          interleaved subsequences the \(g\)-pass sorts), and the conclusion is
+          exactly \(h\)-sortedness of the result.
+          <span class="qed">&#9633;</span>
+        </div>
+      </div>
+      <p>
+        The trace shows the lemma at work: \([2, 1, 3, 4, 6, 5, 8, 7]\) is still
+        4-sorted after the \(h = 2\) pass. Without the lemma, a later pass could
+        undo the work of an earlier one and the gap sequence would be pointless.
+        With it, the array entering the \(h = 1\) pass is simultaneously
+        \(h\)-sorted for every gap used, and the more gaps, the more constrained
+        (that is, the fewer inversions) it must be.
+      </p>
+
+      <h3>What is known about shellsort's running time</h3>
+      <p>
+        Very little, and this is not a gap in the exposition: the running time
+        of shellsort is a genuine open problem, and it is the reason shellsort
+        is worth knowing about beyond its practical use. The cost depends
+        entirely on the gap sequence, and the analysis is hard because after the
+        first pass the array is no longer a random permutation but a
+        conditioned one.
+      </p>
+      <table>
+        <tr><th>gap sequence</th><th>values (descending from \(n\))</th><th>worst case, proved</th></tr>
+        <tr><td>Shell (1959), halving</td><td>\(n/2, n/4, \dots, 1\)</td><td>\(\Theta(n^2)\)</td></tr>
+        <tr><td>Hibbard (1963)</td><td>\(1, 3, 7, 15, \dots, 2^k-1\)</td><td>\(\Theta(n^{3/2})\)</td></tr>
+        <tr><td>Pratt (1971)</td><td>all \(2^p 3^q\): \(1,2,3,4,6,8,9,\dots\)</td><td>\(\Theta(n \log^2 n)\)</td></tr>
+        <tr><td>Sedgewick (1986)</td><td>\(1, 5, 19, 41, 109, \dots\)</td><td>\(O(n^{4/3})\)</td></tr>
+        <tr><td>Knuth, \(3x+1\)</td><td>\(1, 4, 13, 40, 121, \dots\)</td><td>no useful bound proved</td></tr>
+      </table>
+      <p>
+        The halving sequence's \(\Theta(n^2)\) is easy to see and worth seeing,
+        because it explains why the sequence in the code above is the one to
+        <em>replace</em> in practice. Take \(n\) a power of two, put the \(n/2\)
+        largest values in the even positions and the \(n/2\) smallest in the odd
+        positions:
+      </p>
+      <pre>  n = 16:  9 1 10 2 11 3 12 4 13 5 14 6 15 7 16 8       36 inversions</pre>
+      <p>
+        Every gap before the last is even, so every pass before \(h = 1\)
+        compares only even positions with even positions and odd with odd. The
+        evens are already sorted among themselves and so are the odds, so the
+        \(h = 8, 4, 2\) passes make <em>zero</em> exchanges (\(8 + 12 + 14 = 34\)
+        wasted compares), and the \(h = 1\) pass then faces all \(36\)
+        inversions: \(50\) compares and \(36\) exchanges. Generalizing, the
+        construction leaves \(\sum_{k=1}^{n/2} k = \Theta(n^2)\) inversions for
+        the final pass. The cure is a sequence whose gaps are relatively prime,
+        such as \(3x+1\).
+      </p>
+      <p>
+        What is <em>not</em> known is more interesting:
+      </p>
+      <ul>
+        <li>
+          No tight worst-case bound is known for the \(3x+1\) sequence, the one
+          most commonly recommended in practice.
+        </li>
+        <li>
+          The <strong>average</strong>-case running time is unknown for every
+          gap sequence in practical use, including \(3x+1\) and Sedgewick's. It
+          is not known even for three-gap sequences in general.
+        </li>
+        <li>
+          No sequence is known that makes shellsort \(O(n\log n)\), and none
+          exists: Plaxton, Poonen and Suel proved in 1992 that
+          <em>every</em> gap sequence forces
+          \(\Omega\!\left(n \log^2 n / (\log\log n)^2\right)\) in the worst
+          case, which is asymptotically above \(n\log n\). Pratt's
+          \(\Theta(n\log^2 n)\) is within a \((\log\log n)^2\) factor of that
+          barrier, but it uses \(\Theta(\log^2 n)\) gaps, and the per-pass
+          overhead makes it slower than the alternatives at practical sizes.
+        </li>
+      </ul>
+      <p>
+        Empirically, on uniformly random permutations with the halving sequence,
+        total operations (compares plus exchanges) measured against insertion
+        sort on the same inputs, averaged over 200 trials each:
+      </p>
+      <table>
+        <tr><th>\(n\)</th><th>8</th><th>16</th><th>64</th><th>256</th><th>1024</th></tr>
+        <tr><td>insertion sort</td><td>34</td><td>132</td><td>2092</td><td>32892</td><td>524626</td></tr>
+        <tr><td>shellsort</td><td>30</td><td>94</td><td>780</td><td>5815</td><td>42764</td></tr>
+        <tr><td>ratio</td><td>1.1&times;</td><td>1.4&times;</td><td>2.7&times;</td><td>5.7&times;</td><td>12.3&times;</td></tr>
+      </table>
+      <p>
+        The growth of the ratio is the point. Quadrupling \(n\) from \(64\) to
+        \(256\) and again to \(1024\) multiplies insertion sort's count by
+        \(15.7\) and then \(16.0\), the factor of \(16\) that \(\Theta(n^2)\)
+        predicts; it multiplies shellsort's by \(7.5\) and then \(7.4\), well
+        under quadratic though above the \(4\) of \(\Theta(n)\) and the roughly
+        \(5\) of \(\Theta(n\log n)\) at these sizes. The practical summary:
+        shellsort is the sort to
+        reach for when the
+        code must be short and in place, recursion is unwelcome (embedded
+        systems, kernel code, hard real-time constraints on stack depth), and
+        \(n\) is in the thousands: it is a few times slower than a tuned
+        quicksort and several times faster than anything quadratic, in about six
+        lines.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (shellsort is not stable)</span>
+        Input \([\,2_a,\ 2_b,\ 1,\ 3\,]\) with gaps \(2, 1\). The \(h = 2\) pass
+        compares \(a[2] = 1\) against \(a[0] = 2_a\) and swaps them, giving
+        \([\,1,\ 2_b,\ 2_a,\ 3\,]\); it then compares \(3\) against \(2_b\) and
+        stops. The \(h = 1\) pass finds nothing out of order. Output
+        \([\,1,\ 2_b,\ 2_a,\ 3\,]\): the equal keys are reversed. Any pass with
+        \(h &gt; 1\) moves items across long distances and can jump an item over
+        an equal one, exactly as selection sort's swap does.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="bubble">5. Bubble sort</h2>
+      <div class="aside">
+        <span class="tag">Bubble sort</span>
+        <strong>Bubble sort</strong> makes repeated left-to-right passes,
+        exchanging each adjacent out-of-order pair as it meets it. One pass
+        carries the largest remaining item all the way to the right end, so
+        after pass \(k\) the last \(k\) positions are final and the next pass
+        can stop \(k\) short. A pass with no exchange means the array is sorted,
+        which lets the sort exit early on nearly-sorted input.
+        <pre>void bubble_sort(int a[], int n) {
+    for (int i = 0; i &lt; n - 1; i++) {
+        bool swapped = false;
+        for (int j = 0; j &lt; n - 1 - i; j++)     // last i entries are final
+            if (a[j] &gt; a[j + 1]) { std::swap(a[j], a[j + 1]); swapped = true; }
+        if (!swapped) return;                   // sorted: stop early
+    }
+}</pre>
+        On the running array it takes six passes (the sixth exchanges nothing
+        and triggers the early exit), \(27\) compares and \(16\) exchanges:
+        <table class="trace">
+          <tr><th class="lab">pass</th><th>array after</th><th>cmp so far</th><th>exch so far</th></tr>
+          <tr><td class="lab">start</td><td class="cell">6 5 3 1 8 7 2 4</td><td>0</td><td>0</td></tr>
+          <tr><td class="lab">1</td><td class="cell">5 3 1 6 7 2 4 &vert; 8</td><td>7</td><td>6</td></tr>
+          <tr><td class="lab">2</td><td class="cell">3 1 5 6 2 4 &vert; 7 8</td><td>13</td><td>10</td></tr>
+          <tr><td class="lab">3</td><td class="cell">1 3 5 2 4 &vert; 6 7 8</td><td>18</td><td>13</td></tr>
+          <tr><td class="lab">4</td><td class="cell">1 3 2 4 &vert; 5 6 7 8</td><td>22</td><td>15</td></tr>
+          <tr><td class="lab">5</td><td class="cell">1 2 3 &vert; 4 5 6 7 8</td><td>25</td><td>16</td></tr>
+          <tr><td class="lab">6</td><td class="cell">1 2 3 4 5 6 7 8</td><td>27</td><td>16</td></tr>
+        </table>
+        Bubble sort exchanges only adjacent out-of-order pairs, so, by the same
+        argument as insertion sort's theorem, it performs exactly \(I\)
+        exchanges: \(16\) here, matching insertion sort exactly. Its compares
+        are the problem. Insertion sort stops each step as soon as the item
+        lands, whereas bubble sort's inner loop always runs to the end of the
+        unsorted region: \(27\) compares here against \(20\), and
+        \(\Theta(n^2)\) compares on <em>every</em> input with more than one
+        misplaced item, even when the array is nearly sorted. Bubble sort is
+        stable and in place, and it is dominated by insertion sort on both
+        counts on essentially every input; it appears here because it is widely
+        taught and needs to be recognized, not because it should be used.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="compare">6. Stability, space, and the four side by side</h2>
+      <p>
+        All four sorts are in place: each uses a fixed number of index and item
+        variables and no array proportional to \(n\). Two are stable, and the
+        split is not accidental. A sort whose only data movement is the exchange
+        of <em>adjacent</em> entries, performed only when they are strictly out
+        of order, cannot reorder equal keys; a sort that moves items across
+        distances greater than one can, and does.
+      </p>
+      <table>
+        <tr>
+          <th>sort</th><th>compares</th><th>exchanges</th>
+          <th>best case</th><th>worst case</th><th>stable</th><th>in place</th>
+        </tr>
+        <tr>
+          <td><strong>Selection</strong></td>
+          <td>\(n(n-1)/2\), always</td><td>\(n-1\), always</td>
+          <td>\(\Theta(n^2)\)</td><td>\(\Theta(n^2)\)</td><td>no</td><td>yes</td>
+        </tr>
+        <tr>
+          <td><strong>Insertion</strong></td>
+          <td>\(I\) to \(I + n - 1\)</td><td>\(I\) exactly</td>
+          <td>\(\Theta(n)\) (sorted)</td><td>\(\Theta(n^2)\) (reversed)</td><td>yes</td><td>yes</td>
+        </tr>
+        <tr>
+          <td><strong>Shellsort</strong></td>
+          <td colspan="2">depends on the gap sequence; no bound known for the sequences used in practice</td>
+          <td>\(\Theta(n\log n)\) (sorted, one compare per position per pass)</td>
+          <td>\(\Theta(n^2)\) halving; \(\Theta(n^{3/2})\) Hibbard</td><td>no</td><td>yes</td>
+        </tr>
+        <tr>
+          <td><strong>Bubble</strong></td>
+          <td>\(n-1\) to \(n(n-1)/2\)</td><td>\(I\) exactly</td>
+          <td>\(\Theta(n)\) (sorted, one pass)</td><td>\(\Theta(n^2)\)</td><td>yes</td><td>yes</td>
+        </tr>
+      </table>
+      <p class="note">
+        \(I\) is the number of inversions in the input, between \(0\) and
+        \(n(n-1)/2\), averaging \(n(n-1)/4\) over random permutations of
+        distinct keys. Shellsort's best case is \(\Theta(n \log n)\) for a
+        sequence of \(\Theta(\log n)\) gaps, since each pass makes at least one
+        compare per position even when nothing moves.
+      </p>
+      <p>
+        Any unstable sort can be made stable by attaching the original index to
+        each item as a tiebreaker, at a cost of \(\Theta(n)\) extra space.
+        Stability is worth paying for because it makes sorting composable: to
+        order records by department and then by name within each department,
+        sort by name first, then stably by department, and the name order
+        survives inside each department's block.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">7. Where this sits</h2>
+      <p>
+        Everything in this handout is \(\Theta(n^2)\) or unproven, and the
+        \(\Theta(n\log n)\) sorts take over from here. All three are in the
+        catalog: <a href="algo-mergesort.html">Mergesort</a> splits at the
+        midpoint and does its work merging, buying a \(\Theta(n\log n)\)
+        guarantee on every input and stability at the price of a
+        \(\Theta(n)\) buffer; <a href="algo-quicksort.html">Quicksort</a>
+        partitions around a pivot and does its work dividing, running in place
+        with the best constants of the three but a \(\Theta(n^2)\) worst case
+        that randomization makes vanishingly unlikely;
+        <a href="../heaps/algo-heapsort.html">Heapsort</a> reaches
+        \(\Theta(n\log n)\) in place and without randomization by paying in
+        cache locality. The shared method behind the first two is
+        <a href="paradigm-divide-and-conquer.html">Divide and Conquer</a>, and
+        the reason none of them can do better is
+        <a href="foundation-sorting-lower-bound.html">The Sorting Lower
+        Bound</a>: \(\Omega(n\log n)\) compares for any comparison sort. That
+        lower bound is also the sharpest thing to say about selection sort's
+        \(n(n-1)/2\): the information-theoretic minimum is
+        \(\lceil \log_2 n! \rceil\) compares, which for \(n = 8\) is \(16\),
+        against selection sort's \(28\) and insertion sort's \(20\) on the array
+        traced above. Escaping \(\Omega(n\log n)\) requires giving up
+        comparisons entirely, which is what
+        <a href="algo-counting-radix-sort.html">Counting Sort &amp; Radix
+        Sort</a> do; the same partition-based idea applied to selection rather
+        than sorting is <a href="algo-quickselect.html">Quickselect</a>.
+      </p>
+      <p>
+        Insertion sort does not retire when the faster sorts arrive: it becomes
+        their base case. Both mergesort and quicksort recurse down to subarrays
+        of size \(1\), and at that scale the recursion overhead (a call, two
+        index computations, a partition or a merge setup) dominates the
+        actual sorting work. Production implementations stop the recursion at a
+        cutoff \(k\), typically between \(7\) and \(16\), and finish with
+        insertion sort. For quicksort the standard arrangement is to leave every
+        subarray of size \(\le k\) unsorted and run one insertion sort over the
+        whole array at the end: after the partitioning, no item is more than
+        \(k\) positions from its final place, so \(I \le kn\) and the finisher
+        costs \(O(kn) = O(n)\) by the bound of &sect;<a href="#insertion">3</a>.
+        The three properties that make insertion sort right for the job are
+        exactly the ones established above: it is in place, its constant factor
+        is tiny, and its cost is proportional to the disorder that is left
+        rather than to the size of the array.
+      </p>
+      <p>
+        The counting conventions used throughout (compares and exchanges, best
+        against worst against average, the \(\Theta\) and \(\Omega\) notation)
+        are set out in
+        <a href="../foundations/foundation-asymptotic-notation.html">Asymptotic
+        Notation</a> and
+        <a href="../foundations/foundation-time-analysis.html">Time
+        Analysis</a>; the in-place claims are the \(O(1)\) auxiliary space of
+        <a href="../foundations/foundation-space-complexity.html">Space
+        Complexity</a>. Selection sort also has a second life: repeatedly
+        removing the minimum from a
+        <a href="../heaps/ds-heaps-pq.html">binary heap</a> is selection sort
+        with the linear scan for the minimum replaced by a \(\Theta(\log n)\)
+        heap operation, and that substitution is exactly heapsort.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Without running the algorithm, state how many compares selection sort
+          makes on each of \([1,2,3,4,5,6,7,8]\), \([8,7,6,5,4,3,2,1]\), and
+          \([6,5,3,1,8,7,2,4]\). Then say how many exchanges it makes on the
+          first of the three, and how many of those exchanges move an item.
+          <details>
+            <summary>solution</summary>
+            \(28\) compares on all three, since the count \(n(n-1)/2\) with
+            \(n = 8\) depends only on \(n\). On the sorted array the code
+            performs \(n-1 = 7\) exchanges, every one of them a swap of
+            \(a[i]\) with itself, so \(0\) of them move an item. This is the
+            content of obliviousness: an already-sorted input is not detected
+            and is not cheaper.
+          </details>
+        </li>
+        <li>
+          Run insertion sort on \([3, 1, 4, 1, 5, 9, 2, 6]\). Give the array
+          after each step, the total compares and the total exchanges, then
+          check the exchange total against the inversion count and the compare
+          total against the bound \(I \le C \le I + n - 1\).
+          <details>
+            <summary>solution</summary>
+            <table class="trace">
+              <tr><th class="lab">step</th><th>item</th><th>moves</th><th>cmp</th><th>array after</th></tr>
+              <tr><td class="lab">start</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td class="cell">3 1 4 1 5 9 2 6</td></tr>
+              <tr><td class="lab">i = 1</td><td>1</td><td>1</td><td>1</td><td class="cell">1 3 4 1 5 9 2 6</td></tr>
+              <tr><td class="lab">i = 2</td><td>4</td><td>0</td><td>1</td><td class="cell">1 3 4 1 5 9 2 6</td></tr>
+              <tr><td class="lab">i = 3</td><td>1</td><td>2</td><td>3</td><td class="cell">1 1 3 4 5 9 2 6</td></tr>
+              <tr><td class="lab">i = 4</td><td>5</td><td>0</td><td>1</td><td class="cell">1 1 3 4 5 9 2 6</td></tr>
+              <tr><td class="lab">i = 5</td><td>9</td><td>0</td><td>1</td><td class="cell">1 1 3 4 5 9 2 6</td></tr>
+              <tr><td class="lab">i = 6</td><td>2</td><td>4</td><td>5</td><td class="cell">1 1 2 3 4 5 9 6</td></tr>
+              <tr><td class="lab">i = 7</td><td>6</td><td>1</td><td>2</td><td class="cell">1 1 2 3 4 5 6 9</td></tr>
+            </table>
+            Totals: \(14\) compares, \(8\) exchanges. The inversions are
+            \((3,1), (3,1), (3,2), (4,1), (4,2), (5,2), (9,2), (9,6)\), so
+            \(I = 8\), matching the exchange count. The bound gives
+            \(8 \le 14 \le 8 + 7 = 15\), and indeed six of the seven steps
+            (\(i = 2, 3, 4, 5, 6, 7\)) stopped in the interior rather than at
+            index \(0\), so \(C = I + 6 = 14\). Note that step \(i = 3\) stops
+            with the new \(1\) to the <em>right</em> of the old one: the strict
+            comparison preserved their input order.
+          </details>
+        </li>
+        <li>
+          Give a three-element input on which selection sort is not stable and
+          insertion sort is, and identify the single operation responsible for
+          the difference.
+          <details>
+            <summary>solution</summary>
+            \([\,2_a,\ 2_b,\ 1\,]\). Selection sort's first round swaps the
+            minimum \(1\) (at index \(2\)) with \(a[0] = 2_a\), producing
+            \([\,1,\ 2_b,\ 2_a\,]\), and the second round changes nothing:
+            the equal keys are reversed. Insertion sort leaves \(2_b\) alone at
+            step \(1\) (the test \(2_b &lt; 2_a\) is false) and then slides \(1\)
+            leftward past both, producing \([\,1,\ 2_a,\ 2_b\,]\). The operation
+            responsible is the long-distance swap: selection sort throws
+            \(a[0]\) to index \(2\), over an equal key, in one move. Insertion
+            sort only ever exchanges adjacent entries, and only when they are
+            strictly out of order, so equal keys can never cross.
+          </details>
+        </li>
+        <li>
+          Prove that exchanging two entries \(a[i]\) and \(a[j]\) with
+          \(i &lt; j\) and \(a[i] &gt; a[j]\) changes the inversion count by an
+          odd amount, and that it removes at most \(2(j-i)-1\) inversions. Use
+          this to bound how many inversions one exchange of shellsort's
+          \(h\)-pass can remove, and compare with insertion sort.
+          <details>
+            <summary>solution</summary>
+            Write \(X = a[i]\) and \(Y = a[j]\), so \(X &gt; Y\). Classify the
+            pairs of positions by how many of \(i, j\) they contain.
+            <em>Neither:</em> untouched.
+            <em>One endpoint, partner outside \([i,j]\):</em> take such a
+            position \(k\) and consider its two pairs, one with \(i\) and one
+            with \(j\), together. Before the swap those two pairs compare
+            \(a[k]\) against \(X\) and against \(Y\); after the swap they
+            compare \(a[k]\) against \(Y\) and against \(X\). The same two
+            comparisons occur in the other order, and \(k\) is on the same side
+            of both \(i\) and \(j\), so their combined contribution is
+            unchanged.
+            <em>The pair \((i,j)\) itself:</em> it was an inversion and is not
+            one afterwards, a change of \(-1\).
+            <em>One endpoint, partner strictly between:</em> let \(Z = a[m]\)
+            with \(i &lt; m &lt; j\). The pairs \((i,m)\) and \((m,j)\)
+            contribute \([X &gt; Z] + [Z &gt; Y]\) before and
+            \([Y &gt; Z] + [Z &gt; X]\) after. If \(Y &lt; Z &lt; X\) that is
+            \(2\) before and \(0\) after, a change of \(-2\); otherwise
+            (\(Z &lt; Y\) or \(Z &gt; X\)) it is \(1\) before and \(1\) after, a
+            change of \(0\). So the total change is \(-1\) plus an even number:
+            odd, and always a decrease. The most that can be removed is
+            \(1 + 2(j-i-1) = 2(j-i)-1\), attained when every one of the
+            \(j-i-1\) values in between lies strictly between \(Y\) and \(X\).
+            For shellsort's \(h\)-pass,
+            \(j - i = h\), so one exchange removes at most \(2h-1\) inversions
+            and at least \(1\); for insertion sort \(h = 1\) and the answer is
+            exactly \(1\). That is why shellsort's early passes can make so much
+            progress for so few exchanges, and why its total exchange count can
+            be far below the inversion count while insertion sort's is exactly
+            equal to it.
+          </details>
+        </li>
+        <li>
+          Shellsort with the halving sequence on
+          \([\,9,\ 1,\ 10,\ 2,\ 11,\ 3,\ 12,\ 4,\ 13,\ 5,\ 14,\ 6,\ 15,\ 7,\
+          16,\ 8\,]\) (\(n = 16\), gaps \(8, 4, 2, 1\)). How many exchanges do
+          the \(h = 8, 4, 2\) passes make, and why? What does that make the
+          total cost, and what property of the gap sequence is to blame?
+          <details>
+            <summary>solution</summary>
+            Zero exchanges in all three passes. The array places the eight
+            largest values \(9..16\) in the even positions, in increasing order,
+            and the eight smallest \(1..8\) in the odd positions, also in
+            increasing order. The gaps \(8, 4, 2\) are all even, so every
+            compare in those passes is between two even positions or between two
+            odd positions, and both of those subsequences are already sorted:
+            every compare succeeds and nothing moves. The three passes spend
+            \(8 + 12 + 14 = 34\) compares learning nothing. The \(h = 1\) pass
+            then faces the full inversion count, which is \(1 + 2 + \dots + 8 =
+            36\) (value \(k\) sits at index \(2k-1\) preceded by exactly \(k\)
+            larger values), and costs \(50\) compares and \(36\) exchanges, for
+            \(84\) and \(36\) overall. Generalizing the construction to any
+            \(n = 2^m\) leaves \(\sum_{k=1}^{n/2} k = \Theta(n^2)\) inversions
+            for the final pass, which is the \(\Theta(n^2)\) worst case of the
+            halving sequence. The blame is that all its gaps share the factor
+            \(2\), so positions of different parity are never compared until the
+            end; a sequence of relatively prime gaps such as \(3x+1\)
+            (\(1, 4, 13, 40, \dots\)) has no such blind spot.
+          </details>
+        </li>
+        <li>
+          A quicksort implementation leaves every subarray of size \(\le k\)
+          unsorted and runs a single insertion sort over the whole array at the
+          end. Show that the finisher costs \(O(kn)\), and explain what goes
+          wrong if selection sort or bubble sort is used instead.
+          <details>
+            <summary>solution</summary>
+            When the partitioning stops, the array is a concatenation of blocks
+            of size at most \(k\), and every element is \(\le\) every element of
+            every later block (that is what partitioning guarantees). An
+            inversion can therefore only be between two positions in the same
+            block, and a block of size \(s \le k\) contributes at most
+            \(\binom{s}{2} &lt; sk/2\) inversions. Summing over blocks whose
+            sizes total \(n\) gives \(I &lt; kn/2\), so by the theorem of
+            &sect;<a href="#insertion">3</a> insertion sort finishes in
+            \(C \le I + n - 1 = O(kn)\) compares and \(I = O(kn)\) exchanges,
+            which is \(O(n)\) for constant \(k\).
+            Selection sort would cost \(n(n-1)/2\) compares no matter how nearly
+            sorted the array is, destroying the whole point: its cost does not
+            depend on the input at all. Bubble sort would perform the right
+            number of exchanges (\(I\), by the same adjacent-exchange argument)
+            but \(\Theta(n^2)\) compares, because each of its passes scans the
+            entire unsorted region and it needs one pass per block-sized
+            displacement rather than stopping each item as soon as it lands.
+            Only insertion sort's cost is proportional to the disorder that
+            remains.
+          </details>
+        </li>
+        <li>
+          Insertion sort's compares can be reduced by finding the insertion
+          point with binary search instead of a linear scan
+          (<em>binary insertion sort</em>). Give the resulting compare count and
+          explain why the running time is still \(\Theta(n^2)\).
+          <details>
+            <summary>solution</summary>
+            Step \(i\) binary-searches a sorted prefix of length \(i\), using
+            \(\lceil \log_2 (i+1) \rceil\) compares, so the total is
+            \(\sum_{i=1}^{n-1} \lceil \log_2(i+1)\rceil = \Theta(n\log n)\)
+            compares in the worst case, an improvement over \(\Theta(n^2)\).
+            The running time does not improve, because the compares were never
+            the bottleneck: the item still has to be <em>moved</em> into place,
+            and moving it past \(m\) entries costs \(m\) shifts however the
+            insertion point was located. The number of shifts is still exactly
+            \(I\), which is \(\Theta(n^2)\) in the worst and average cases.
+            Binary insertion sort is worth using precisely when a compare is
+            much more expensive than a move, for instance when the keys are long
+            strings and the array holds pointers to them. It also loses insertion
+            sort's \(\Theta(n)\) best case: on sorted input it still spends
+            \(\Theta(n\log n)\) compares confirming that nothing needs to move.
+          </details>
+        </li>
+        <li>
+          After the \(h = 2\) pass of the &sect;<a href="#shell">4</a> trace the
+          array is \([2, 1, 3, 4, 6, 5, 8, 7]\). Verify that it is 2-sorted and
+          4-sorted, and use the lemma to argue that an array which is both
+          2-sorted and 3-sorted has each element at most one position from its
+          final place. Which gap sequence does that suggest?
+          <details>
+            <summary>solution</summary>
+            2-sorted: \(2\le3,\ 1\le4,\ 3\le6,\ 4\le5,\ 6\le8,\ 5\le7\), all
+            true. 4-sorted: \(2\le6,\ 1\le5,\ 3\le8,\ 4\le7\), all true, and
+            that 4-sortedness was inherited from the \(h = 4\) pass and
+            preserved by the \(h = 2\) pass, which is the lemma.
+            Now suppose an array is both 2-sorted and 3-sorted. Every index
+            \(k \ge 2\) can be written as a nonnegative combination
+            \(2p + 3q\), so \(a[i] \le a[i+k]\) for every \(k \ge 2\) by
+            chaining the two guarantees along such a decomposition
+            (\(a[i] \le a[i+2] \le a[i+4] \le \dots\), inserting one step of
+            \(3\) if \(k\) is odd). The only pairs that may be out of order are
+            the adjacent ones, so no element is more than one position from
+            where it belongs, and the \(h = 1\) pass costs \(O(n)\). Generalizing,
+            an array \(h\)-sorted for all \(h\) in a set whose numerical
+            semigroup covers everything above some bound is nearly sorted; the
+            gap sequence built from this observation is Pratt's, the numbers of
+            the form \(2^p 3^q\), and it is the sequence with the best proved
+            worst case, \(\Theta(n\log^2 n)\).
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Elementary Sorts v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

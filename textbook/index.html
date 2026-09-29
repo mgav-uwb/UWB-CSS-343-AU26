@@ -1,0 +1,423 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: online textbook. Entry point and table of
+     contents. Self-contained; no external assets. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Data Structures &amp; Algorithms</title>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --ds: #1f5fb0; --dsbg: #eef4fc;
+        --algo: #0a7d4d; --algobg: #eaf6ef;
+        --para: #6b40d8; --parabg: #f3efff;
+        --found: #9a5b00; --foundbg: #fff5e6;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 980px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 5vw, 60px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 31px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.2px; }
+      .tagline { color: var(--dim); font-size: 16.5px; margin: 0 0 22px; }
+      .lead { font-size: 16.5px; color: #33363f; margin: 0 0 18px; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      h2 {
+        font-size: 20px; margin: 40px 0 4px; padding-bottom: 7px;
+        border-bottom: 1px solid var(--line);
+      }
+      h2 .n { color: var(--dim); font-weight: normal; font-size: 15px; margin-left: 8px; }
+      .partnote { color: var(--dim); font-size: 14.5px; margin: 7px 0 14px; }
+
+      .legend {
+        border: 1px solid var(--line); border-radius: 8px; background: var(--box);
+        padding: 14px 16px; margin: 20px 0 6px;
+      }
+      .legend dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; }
+      .legend dt { margin: 0; }
+      .legend dd { margin: 0; font-size: 14.5px; color: #3a3e48; }
+
+      .tag {
+        font-family: system-ui, -apple-system, sans-serif; font-size: 11px;
+        font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+        padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+        border: 1px solid transparent;
+      }
+      .t-ds { color: var(--ds); background: var(--dsbg); border-color: #cfe0f5; }
+      .t-algo { color: var(--algo); background: var(--algobg); border-color: #c9e6d6; }
+      .t-paradigm { color: var(--para); background: var(--parabg); border-color: #ddd2fa; }
+      .t-foundation { color: var(--found); background: var(--foundbg); border-color: #f0dcb8; }
+
+      .controls {
+        display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+        margin: 22px 0 4px; padding: 12px 14px;
+        border: 1px solid var(--line); border-radius: 8px; background: #fbfcfd;
+        position: sticky; top: 0; z-index: 5;
+      }
+      #q {
+        flex: 1 1 240px; min-width: 180px; font: inherit; font-size: 15px;
+        padding: 7px 11px; border: 1px solid var(--line); border-radius: 6px;
+        background: #fff; color: var(--ink);
+      }
+      #q:focus { outline: 2px solid #b9d4c6; outline-offset: 1px; }
+      .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+      .fbtn {
+        font-family: system-ui, -apple-system, sans-serif; font-size: 12.5px;
+        padding: 5px 11px; border: 1px solid var(--line); border-radius: 999px;
+        background: #fff; color: var(--dim); cursor: pointer;
+      }
+      .fbtn:hover { border-color: #b6bcc9; color: var(--ink); }
+      .fbtn.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+      .count { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); }
+
+      ul.topics { list-style: none; margin: 0; padding: 0; }
+      ul.topics li { border-bottom: 1px solid #edeff3; }
+      ul.topics li:last-child { border-bottom: none; }
+      .topic {
+        display: grid; grid-template-columns: 1fr auto; gap: 4px 14px;
+        align-items: baseline; padding: 11px 4px; text-decoration: none; color: inherit;
+        border-radius: 6px;
+      }
+      .topic:hover { background: #f5f8fa; }
+      .topic .name { font-size: 16.5px; font-weight: 600; color: #16341f; }
+      .topic:hover .name { text-decoration: underline; }
+      .topic .desc { grid-column: 1 / 2; color: var(--dim); font-size: 14.5px; line-height: 1.5; }
+      .topic .meta { grid-row: 1 / 3; align-self: center; text-align: right; }
+      .paradigm-of {
+        font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim);
+        display: block; margin-top: 4px;
+      }
+      .empty { color: var(--dim); font-style: italic; padding: 10px 4px; }
+      footer {
+        margin-top: 46px; padding-top: 16px; border-top: 1px solid var(--line);
+        color: var(--dim); font-size: 13.5px;
+      }
+      @media (max-width: 620px) {
+        .topic { grid-template-columns: 1fr; }
+        .topic .meta { grid-row: auto; text-align: left; }
+        .controls { position: static; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1>Data Structures &amp; Algorithms</h1>
+      <p class="tagline">An online textbook, one self-contained chapter per topic.</p>
+
+      <p class="lead">
+        Every chapter states its problem, develops the method, works a full
+        example step by step with each case of the algorithm exercised, argues
+        the cost rather than asserting it, and ends in exercises with solutions.
+        Chapters are independent: each names and links what it depends on, so
+        they can be read in any order and assembled into a syllabus freely.
+      </p>
+
+      <div class="legend">
+        <dl>
+          <dt><span class="tag t-ds">Data structure</span></dt>
+          <dd>How data is stored, and what each operation costs.</dd>
+          <dt><span class="tag t-algo">Algorithm</span></dt>
+          <dd>A procedure that solves one problem, with its design paradigm noted where it has one.</dd>
+          <dt><span class="tag t-paradigm">Design paradigm</span></dt>
+          <dd>A method for building algorithms, and the conditions under which it works.</dd>
+          <dt><span class="tag t-foundation">Foundation</span></dt>
+          <dd>Analysis tools, problem statements, and the theorems that license the algorithms.</dd>
+        </dl>
+      </div>
+
+      <div class="controls">
+        <input id="q" type="search" placeholder="Search topics: heap, shortest path, NP, hashing…"
+               aria-label="Search topics" autocomplete="off" />
+        <div class="filters" id="filters">
+          <button class="fbtn on" data-f="all">All</button>
+          <button class="fbtn" data-f="ds">Data structures</button>
+          <button class="fbtn" data-f="algo">Algorithms</button>
+          <button class="fbtn" data-f="paradigm">Paradigms</button>
+          <button class="fbtn" data-f="foundation">Foundations</button>
+        </div>
+        <span class="count" id="count"></span>
+      </div>
+
+      <div id="toc"></div>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; online textbook &middot; prepared by
+        Dr. Marcel Gavriliu. Mathematics typeset with MathJax; each chapter is a
+        single self-contained page.
+      </footer>
+    </div>
+
+    <script>
+      // One entry per chapter. cls: ds | algo | paradigm | foundation.
+      // par: the design paradigm an algorithm belongs to, when it has one.
+      const PARTS = [
+        {
+          name: "Foundations",
+          note: "The analysis toolkit, and the limits of what algorithms can do.",
+          items: [
+            ["foundations/foundation-time-analysis.html", "Analysis of Algorithms: Time", "foundation", "",
+             "Counting the operations that matter, the doubling method, and reading growth from measurements."],
+            ["foundations/foundation-space-complexity.html", "Space Complexity", "foundation", "",
+             "Bytes, object layout and padding, stack versus heap, and the space a recursion occupies."],
+            ["foundations/foundation-asymptotic-notation.html", "Asymptotic Notation", "foundation", "",
+             "O, Omega and Theta defined as sets of functions, with the algebra for comparing growth rates."],
+            ["foundations/foundation-recursion.html", "Recursion &amp; Induction", "foundation", "",
+             "Base cases and the call stack, proofs by ordinary and strong induction, and converting recursion to iteration."],
+            ["foundations/foundation-amortized-analysis.html", "Amortized Analysis", "foundation", "",
+             "Aggregate, banker's and potential methods, worked on the doubling array and the binary counter."],
+            ["foundations/foundation-p-np.html", "P, NP &amp; Reductions", "foundation", "",
+             "Verifiers and certificates, polynomial-time reductions, NP-completeness, and what a hardness proof licenses."],
+            ["foundations/foundation-computability.html", "Turing Machines &amp; Computability", "foundation", "",
+             "A precise machine model, decidable versus recognizable languages, and the halting problem by diagonalization."]
+          ]
+        },
+        {
+          name: "Search Trees",
+          note: "Ordered symbol tables, and the balance schemes that keep them shallow.",
+          items: [
+            ["trees/ds-trees-bst.html", "Trees &amp; Binary Search Trees", "ds", "",
+             "Tree vocabulary and traversals, then the BST as an ordered symbol table, including Hibbard deletion."],
+            ["trees/ds-avl-trees.html", "AVL Trees", "ds", "",
+             "The height-balance invariant, the four rotation cases, and the resulting logarithmic guarantee."],
+            ["trees/ds-two-three-trees.html", "2-3 Trees", "ds", "",
+             "Multiway nodes, insertion by split and promote, deletion by borrowing and merging."],
+            ["trees/ds-red-black-trees.html", "Red-Black Trees", "ds", "",
+             "The 2-3 tree encoded in a binary tree, maintained by rotations and color flips."],
+            ["trees/ds-b-trees.html", "B-Trees &amp; B+ Trees", "ds", "",
+             "High fan-out nodes sized for disk pages, and the leaf chain that makes range scans cheap."],
+            ["trees/ds-splay-trees.html", "Splay Trees", "ds", "",
+             "Self-adjusting search by zig, zig-zig and zig-zag, with an amortized logarithmic bound and no balance field."],
+            ["trees/ds-skip-lists.html", "Skip Lists", "ds", "",
+             "Randomized express lanes over a sorted list, giving expected logarithmic search without rebalancing."],
+            ["trees/ds-treaps.html", "Treaps", "ds", "",
+             "A search tree by key and a heap by random priority, which pins down one shape and balances it in expectation."]
+          ]
+        },
+        {
+          name: "Heaps &amp; Priority Queues",
+          note: "",
+          items: [
+            ["heaps/ds-heaps-pq.html", "Heaps &amp; Priority Queues", "ds", "",
+             "The priority queue interface, the binary heap embedded in an array, and the swim and sink repairs."],
+            ["heaps/algo-heapsort.html", "Heapsort", "algo", "",
+             "Sorting in place by building a heap and then repeatedly removing the maximum."]
+          ]
+        },
+        {
+          name: "Hashing &amp; Sketches",
+          note: "Constant-time lookup, and what you can compute if you accept a small error.",
+          items: [
+            ["hashing/ds-hashing.html", "Hashing", "ds", "",
+             "Hash functions, separate chaining, open addressing with three probe schemes, tombstones and resizing."],
+            ["hashing/ds-bloom-filters.html", "Bloom Filters", "ds", "",
+             "Set membership in a bit array, with false positives but never false negatives."],
+            ["hashing/ds-count-min-sketch.html", "Count-Min Sketch", "ds", "",
+             "Frequency estimation over a stream in sublinear space, with a one-sided error guarantee."]
+          ]
+        },
+        {
+          name: "Graphs",
+          note: "Representation, traversal, shortest paths, spanning trees and flow.",
+          items: [
+            ["graphs/ds-graph-representations.html", "Graphs: Vocabulary &amp; Representations", "ds", "",
+             "The vocabulary, adjacency lists versus adjacency matrices, and what each operation costs in both."],
+            ["graphs/algo-bfs.html", "Breadth-First Search", "algo", "",
+             "Exploring in layers from a source, and why that yields fewest-edge paths."],
+            ["graphs/algo-dfs.html", "Depth-First Search", "algo", "",
+             "Recursive and iterative depth-first traversal, edge classification, cycle detection and articulation points."],
+            ["graphs/algo-topological-sort.html", "Topological Sort", "algo", "",
+             "Ordering a directed acyclic graph, by Kahn's algorithm or by DFS post-order, and detecting a cycle."],
+            ["graphs/algo-dijkstra.html", "Dijkstra's Algorithm", "algo", "greedy",
+             "Shortest paths from a source with nonnegative weights, using edge relaxation and a priority queue."],
+            ["graphs/algo-bellman-ford.html", "Bellman-Ford", "algo", "dynamic programming",
+             "Shortest paths that tolerate negative edges, by relaxing every edge in rounds, with negative-cycle detection."],
+            ["graphs/algo-floyd-warshall.html", "Floyd-Warshall", "algo", "dynamic programming",
+             "All-pairs shortest paths, as a dynamic program over which vertices may be used in the middle."],
+            ["graphs/algo-strongly-connected-components.html", "Strongly Connected Components", "algo", "",
+             "Kosaraju's two-pass algorithm, and the acyclic condensation it produces."],
+            ["graphs/ds-union-find.html", "Union-Find", "ds", "",
+             "Disjoint sets under union and find, sped up by weighting and path compression."],
+            ["graphs/foundation-minimum-spanning-trees.html", "Minimum Spanning Trees: The Cut Property", "foundation", "",
+             "The spanning tree problem, and the cut and cycle properties that license a greedy choice of edges."],
+            ["graphs/algo-kruskal.html", "Kruskal's Algorithm", "algo", "greedy",
+             "Sorting the edges and accepting each one that does not close a cycle, using union-find."],
+            ["graphs/algo-prim.html", "Prim's Algorithm", "algo", "greedy",
+             "Growing one tree outward, always taking the lightest edge that crosses out of it."],
+            ["graphs/algo-max-flow.html", "Maximum Flow &amp; Minimum Cut", "algo", "",
+             "Augmenting paths over a residual graph, the duality with cuts, and bipartite matching by reduction."]
+          ]
+        },
+        {
+          name: "Sorting &amp; Selection",
+          note: "",
+          items: [
+            ["sorting/paradigm-divide-and-conquer.html", "Divide-and-Conquer", "paradigm", "",
+             "Splitting a problem, recombining the answers, and solving the resulting recurrences with the master theorem."],
+            ["sorting/algo-elementary-sorts.html", "Elementary Sorts", "algo", "",
+             "Selection, insertion, shellsort and bubble sort: their invariants, exact costs, and when insertion sort still wins."],
+            ["sorting/algo-mergesort.html", "Mergesort", "algo", "divide-and-conquer",
+             "Stable sorting by merging, with a guaranteed n log n cost and linear extra space."],
+            ["sorting/algo-quicksort.html", "Quicksort", "algo", "divide-and-conquer",
+             "Partitioning in place, pivot choice and the degenerate cases, three-way partitioning, and the stack depth."],
+            ["sorting/algo-quickselect.html", "Quickselect", "algo", "divide-and-conquer",
+             "Finding the kth smallest element in expected linear time by partitioning toward it."],
+            ["sorting/algo-counting-radix-sort.html", "Counting Sort &amp; Radix Sort", "algo", "",
+             "Sorting without comparisons by key-indexed counting, and why stability is load-bearing for radix passes."],
+            ["sorting/foundation-sorting-lower-bound.html", "The Sorting Lower Bound", "foundation", "",
+             "The decision-tree argument that no comparison sort can beat n log n, and what escapes it."]
+          ]
+        },
+        {
+          name: "Greedy Algorithms",
+          note: "",
+          items: [
+            ["greedy/paradigm-greedy-method.html", "The Greedy Method", "paradigm", "",
+             "When a locally best choice is globally safe, proved by exchange arguments, and where greed fails."],
+            ["greedy/algo-interval-scheduling.html", "Interval Scheduling", "algo", "greedy",
+             "Earliest finish time first, why three other plausible rules fail, and interval partitioning."],
+            ["greedy/algo-huffman-coding.html", "Huffman Coding", "algo", "greedy",
+             "Building an optimal prefix-free code bottom-up from symbol frequencies, and why it is optimal."]
+          ]
+        },
+        {
+          name: "Dynamic Programming",
+          note: "",
+          items: [
+            ["dp/paradigm-dp-method.html", "The Dynamic Programming Method", "paradigm", "",
+             "Overlapping subproblems and optimal substructure, memoization versus tabulation, and a recipe to apply."],
+            ["dp/algo-rod-cutting.html", "Rod Cutting", "algo", "dynamic programming",
+             "Optimizing revenue over the choice of first cut."],
+            ["dp/algo-longest-common-subsequence.html", "Longest Common Subsequence", "algo", "dynamic programming",
+             "Aligning two sequences by matching a character or skipping one."],
+            ["dp/algo-knapsack.html", "0/1 Knapsack", "algo", "dynamic programming",
+             "Taking or skipping each item under a weight budget, and what pseudo-polynomial time means."],
+            ["dp/algo-edit-distance.html", "Edit Distance", "algo", "dynamic programming",
+             "Transforming one string into another by insertions, deletions and substitutions at least cost."],
+            ["dp/algo-matrix-chain.html", "Matrix-Chain Multiplication", "algo", "dynamic programming",
+             "Choosing a parenthesization by filling an interval table diagonal by diagonal."],
+            ["dp/algo-dp-patterns.html", "DP Patterns: Grid, Interval, Coin Change &amp; LIS", "algo", "dynamic programming",
+             "Four recurring shapes, so a new problem can be matched against one that is already solved."],
+            ["dp/algo-traceback-space-saving.html", "Traceback &amp; Space-Saving", "algo", "dynamic programming",
+             "Recovering the solution itself from a filled table, and reducing the table to the rows still needed."]
+          ]
+        },
+        {
+          name: "Strings &amp; Languages",
+          note: "Text indexing and search, compression, and the language hierarchy.",
+          items: [
+            ["strings/ds-tries.html", "Tries &amp; Ternary Search Trees", "ds", "",
+             "Symbol tables keyed by strings, supporting prefix queries that hashing cannot answer."],
+            ["strings/foundation-substring-search.html", "Substring Search: The Problem &amp; Baselines", "foundation", "",
+             "The problem stated, brute force traced including its worst case, and the bar the fast methods must clear."],
+            ["strings/algo-kmp.html", "Knuth-Morris-Pratt", "algo", "",
+             "The failure function built from the pattern's borders, so the text pointer never backs up."],
+            ["strings/algo-boyer-moore.html", "Boyer-Moore", "algo", "",
+             "Matching from the right end and skipping ahead by the bad-character rule, often sublinear in practice."],
+            ["strings/algo-rabin-karp.html", "Rabin-Karp", "algo", "",
+             "Comparing rolling hashes instead of characters, with verification to reject spurious hits."],
+            ["strings/ds-suffix-arrays.html", "Suffix Arrays", "ds", "",
+             "Every suffix sorted, giving substring search by binary search and repeats via the LCP array."],
+            ["strings/algo-lzw-compression.html", "LZW Compression", "algo", "",
+             "Dictionary coding that builds its table while reading, and the decoder case that needs care."],
+            ["strings/algo-regex-automata.html", "Regular Expressions &amp; Automata", "algo", "",
+             "Regular expressions, Thompson's construction to an NFA, simulation, and determinization."],
+            ["strings/foundation-context-free-grammars.html", "Context-Free Grammars &amp; Parsing", "foundation", "",
+             "Grammars and parse trees, ambiguity and how precedence removes it, recursive descent and CYK parsing."]
+          ]
+        }
+      ];
+
+      const LABEL = { ds: "Data structure", algo: "Algorithm",
+                      paradigm: "Design paradigm", foundation: "Foundation" };
+
+      const toc = document.getElementById("toc");
+      let total = 0;
+      PARTS.forEach((part, pi) => {
+        const h = document.createElement("h2");
+        h.innerHTML = part.name + ' <span class="n">' + part.items.length + "</span>";
+        toc.appendChild(h);
+        if (part.note) {
+          const n = document.createElement("p");
+          n.className = "partnote"; n.textContent = part.note;
+          toc.appendChild(n);
+        }
+        const ul = document.createElement("ul");
+        ul.className = "topics"; ul.dataset.part = pi;
+        part.items.forEach(([href, name, cls, par, desc]) => {
+          total++;
+          const li = document.createElement("li");
+          li.dataset.cls = cls;
+          li.dataset.text = (name + " " + desc + " " + par + " " + LABEL[cls]).toLowerCase();
+          li.innerHTML =
+            '<a class="topic" href="' + href + '">' +
+              '<span class="name">' + name + "</span>" +
+              '<span class="meta"><span class="tag t-' + cls + '">' + LABEL[cls] + "</span>" +
+                (par ? '<span class="paradigm-of">' + par + "</span>" : "") +
+              "</span>" +
+              '<span class="desc">' + desc + "</span>" +
+            "</a>";
+          ul.appendChild(li);
+        });
+        toc.appendChild(ul);
+      });
+
+      const q = document.getElementById("q");
+      const countEl = document.getElementById("count");
+      let filter = "all";
+
+      function apply() {
+        const term = q.value.trim().toLowerCase();
+        let shown = 0;
+        document.querySelectorAll("ul.topics").forEach((ul) => {
+          let visible = 0;
+          ul.querySelectorAll("li").forEach((li) => {
+            const okCls = filter === "all" || li.dataset.cls === filter;
+            const okTxt = !term || li.dataset.text.includes(term);
+            const ok = okCls && okTxt;
+            li.hidden = !ok;
+            if (ok) visible++;
+          });
+          shown += visible;
+          ul.hidden = visible === 0;
+          const h = ul.previousElementSibling && ul.previousElementSibling.className === "partnote"
+            ? ul.previousElementSibling.previousElementSibling
+            : ul.previousElementSibling;
+          const note = ul.previousElementSibling.className === "partnote" ? ul.previousElementSibling : null;
+          if (h) h.hidden = visible === 0;
+          if (note) note.hidden = visible === 0;
+        });
+        countEl.textContent = shown === total
+          ? total + " chapters"
+          : shown + " of " + total + " chapters";
+        let none = document.getElementById("none");
+        if (shown === 0) {
+          if (!none) {
+            none = document.createElement("p");
+            none.id = "none"; none.className = "empty";
+            none.textContent = "No chapter matches that search.";
+            toc.appendChild(none);
+          }
+          none.hidden = false;
+        } else if (none) none.hidden = true;
+      }
+
+      q.addEventListener("input", apply);
+      document.getElementById("filters").addEventListener("click", (e) => {
+        const b = e.target.closest(".fbtn");
+        if (!b) return;
+        filter = b.dataset.f;
+        document.querySelectorAll(".fbtn").forEach((x) => x.classList.toggle("on", x === b));
+        apply();
+      });
+      apply();
+    </script>
+  </body>
+</html>

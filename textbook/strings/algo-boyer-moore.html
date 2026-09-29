@@ -1,0 +1,600 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Boyer–Moore.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Boyer&ndash;Moore - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Boyer&ndash;Moore</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Substring search at practical speed: compare each alignment right to
+        left, and on a mismatch let the mismatched text character decide the
+        jump, skipping up to a whole pattern length for one comparison. The
+        bad-character rule with a worked trace, the good-suffix rule, and the
+        quadratic worst case that the linear-guarantee fixes address. With
+        the race demo, and exercises.
+      </div>
+
+      <p class="lead">
+        <a href="algo-kmp.html"><em>Knuth&ndash;Morris&ndash;Pratt</em></a>
+        guarantees linearity; <strong>Boyer&ndash;Moore</strong> goes
+        after raw speed, and on typical text it examines <em>fewer than
+        \(n\)</em> characters (sublinear), which is why it (or a
+        variant) sits inside <code>grep</code> and most editors&rsquo; find. The
+        substring-search problem and its brute-force baseline are in
+        <a href="foundation-substring-search.html"><em>Substring Search: The Problem
+        &amp; Baselines</em></a>.
+        The written treatment here is the idea, the code, and worked traces
+        of every shift the rule can produce; the
+        <a href="../../lib/demo.html?ds=string-search">race demo</a> implements
+        the same bad-character rule, so every claim in this handout
+        can be checked live (pick <strong>BF vs Boyer</strong> or
+        <strong>KMP vs Boyer</strong> in its Run menu).
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#bad">Right to left, and the bad-character rule</a></li>
+          <li><a href="#algo">The right[] table, and the code</a></li>
+          <li><a href="#cases">A second trace, and every case of the shift</a></li>
+          <li><a href="#cost">Cost: sublinear on top, quadratic on the bottom</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="bad">1. Right to left, and the bad-character rule</h2>
+      <p>
+        Two reversals produce the speed. Compare each alignment
+        <strong>right to left</strong>; then, on a mismatch, use the
+        mismatched <em>text</em> character (the <strong>bad
+        character</strong>) to decide the jump. If that character does
+        not occur in the pattern at all, no alignment overlapping it can
+        possibly match, so the pattern leaps <em>past it entirely</em>: up to
+        \(m\) positions skipped for one comparison. If it does occur, slide
+        the pattern so its <em>last</em> occurrence lines up under the text
+        character (never sliding backward: the shift is at least 1).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (Boyer&ndash;Moore, worked)</span>
+        Search for <code>SEARCH</code> (\(m = 6\)) in
+        <code>STRING&nbsp;SEARCH</code> (\(n = 13\)). Cells show the
+        pattern&rsquo;s placement; only
+        <span style="color:#0a7d4d;font-weight:700">green</span>
+        (compared, matched) and
+        <span style="color:#9a5b00;font-weight:700">amber</span>
+        (compared, mismatched) cells were actually examined; plain cells
+        were skipped without a look:
+        <table class="trace">
+          <tr><th class="lab">text &rarr;</th><th>S</th><th>T</th><th>R</th><th>I</th><th>N</th><th>G</th><th>&#9251;</th><th>S</th><th>E</th><th>A</th><th>R</th><th>C</th><th>H</th><th>compares</th></tr>
+          <tr><td class="lab">align 0</td>
+            <td class="cell">S</td><td class="cell">E</td><td class="cell">A</td><td class="cell">R</td><td class="cell">C</td><td class="cell piv">H</td>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr>
+          <tr><td class="lab">align 6</td>
+            <td></td><td></td><td></td><td></td><td></td><td></td>
+            <td class="cell">S</td><td class="cell">E</td><td class="cell">A</td><td class="cell">R</td><td class="cell">C</td><td class="cell piv">H</td><td></td><td>1</td></tr>
+          <tr><td class="lab">align 7</td>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+            <td class="cell lt">S</td><td class="cell lt">E</td><td class="cell lt">A</td><td class="cell lt">R</td><td class="cell lt">C</td><td class="cell lt">H</td><td>6</td></tr>
+        </table>
+        Alignment 0: the rightmost comparison pits <code>pattern[5] =
+        H</code> against <code>text[5] = G</code>, and <code>G</code>
+        occurs nowhere in <code>SEARCH</code>, so the pattern jumps past it:
+        shift by \(6\), one comparison for six positions. Alignment 6:
+        <code>H</code> against <code>text[11] = C</code>; <code>C</code> <em>does</em> occur in the pattern (last occurrence at
+        index \(4\)), so slide until they line up: shift by \(5 - 4 = 1\).
+        Alignment 7: the right-to-left comparison matches all six: found at index \(7\). Total: \(8\) comparisons to search a
+        \(13\)-character text; six of the text&rsquo;s characters were never
+        examined at all. That is the sublinear effect, and it grows with
+        \(m\): a longer pattern skips <em>further</em>.
+      </div>
+      <div class="aside">
+        <span class="tag">The full algorithm: two rules</span>
+        Industrial Boyer&ndash;Moore precomputes two shift tables from the
+        pattern and jumps by whichever is larger. The <strong>bad-character
+        rule</strong> is the one traced above (as a lone heuristic it is the
+        <em>Boyer&ndash;Moore&ndash;Horspool</em> variant, a popular
+        simplification). The <strong>good-suffix rule</strong> is KMP&rsquo;s
+        idea pointed the other way: the alignment just matched a
+        <em>suffix</em> of the pattern before failing, so slide to the next
+        place that suffix (or a prefix of the pattern matching its tail)
+        re-occurs. Combined, they make Boyer&ndash;Moore the practical
+        champion on natural text; its plain worst case is \(\Theta(nm)\)
+        (e.g. all-<code>A</code> texts), with known fixes that restore a
+        linear guarantee at some constant-factor cost.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="algo">2. The right[] table, and the code</h2>
+      <p>
+        The rule needs one precomputed table.
+        <code>right[c]</code> is the index of the <em>rightmost</em> occurrence
+        of character \(c\) in the pattern, and \(-1\) if \(c\) does not occur:
+        one pass over the pattern, later occurrences overwriting earlier ones.
+        On a mismatch at \(P[j]\) against text character \(c\), the shift is
+        \(j - \mathit{right}[c]\), clamped to at least \(1\) so the pattern
+        never slides backward. For the pattern <code>NEEDLE</code> (used in the
+        trace of the next section):
+      </p>
+      <table class="trace">
+        <tr><td class="lab">c</td><td class="cell">N</td><td class="cell">E</td><td class="cell">D</td><td class="cell">L</td><td class="cell">every other c</td></tr>
+        <tr><td class="lab">right[c]</td><td>0</td><td>5</td><td>3</td><td>4</td><td>&minus;1</td></tr>
+      </table>
+      <p>
+        <code>E</code> occurs three times (indices \(1, 2, 5\)) and the table
+        keeps only the last, \(5\): the rightmost occurrence gives the
+        <em>smallest</em> forward slide that lines the characters up, and any
+        larger slide could jump over a match. The scan itself is the
+        brute-force loop with both reversals installed: compare right to left,
+        and advance by the table&rsquo;s verdict.
+      </p>
+      <div class="code-tabs" data-snippet="strings/boyer-moore">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Bad-character table: right[c] = index of the RIGHTMOST occurrence of c in
+// the pattern, -1 if absent. One pass, later occurrences overwrite: Theta(m + R).
+vector&lt;int&gt; rightmost(const string&amp; p) {
+    vector&lt;int&gt; right(256, -1);
+    for (int j = 0; j &lt; (int)p.size(); j++)
+        right[(unsigned char)p[j]] = j;
+    return right;
+}
+
+// Boyer-Moore, bad-character rule: compare each alignment RIGHT to left; on a
+// mismatch at p[j] against text character c, slide so the pattern&#x27;s rightmost
+// c lands under it: shift = j - right[c], clamped to at least 1 (never slide
+// backward). Sublinear on typical text; Theta(nm) worst case.
+int bmSearch(const string&amp; t, const string&amp; p) {
+    int n = t.size(), m = p.size();
+    vector&lt;int&gt; right = rightmost(p);
+    int skip;
+    for (int i = 0; i + m &lt;= n; i += skip) {
+        skip = 0;
+        for (int j = m - 1; j &gt;= 0; j--)           // right to left
+            if (p[j] != t[i + j]) {
+                skip = j - right[(unsigned char)t[i + j]];
+                if (skip &lt; 1) skip = 1;            // clamp: at least 1
+                break;
+            }
+        if (skip == 0) return i;                   // all m matched: found
+    }
+    return -1;                                     // no occurrence
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Bad-character table: right[c] = index of the RIGHTMOST occurrence of c in
+// the pattern, -1 if absent. One pass, later occurrences overwrite: Theta(m + R).
+static int[] rightmost(String p) {
+    int[] right = new int[256];
+    Arrays.fill(right, -1);
+    for (int j = 0; j &lt; p.length(); j++)
+        right[p.charAt(j)] = j;
+    return right;
+}
+
+// Boyer-Moore, bad-character rule: compare each alignment RIGHT to left; on a
+// mismatch at p[j] against text character c, slide so the pattern&#x27;s rightmost
+// c lands under it: shift = j - right[c], clamped to at least 1 (never slide
+// backward). Sublinear on typical text; Theta(nm) worst case.
+static int bmSearch(String t, String p) {
+    int n = t.length(), m = p.length();
+    int[] right = rightmost(p);
+    int skip;
+    for (int i = 0; i + m &lt;= n; i += skip) {
+        skip = 0;
+        for (int j = m - 1; j &gt;= 0; j--) {         // right to left
+            if (p.charAt(j) != t.charAt(i + j)) {
+                skip = Math.max(1, j - right[t.charAt(i + j)]);
+                break;                             // clamp: at least 1
+            }
+        }
+        if (skip == 0) return i;                   // all m matched: found
+    }
+    return -1;                                     // no occurrence
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Bad-character table: right[c] = index of the RIGHTMOST occurrence of c in
+# the pattern; absent characters are treated as -1. One pass, later
+# occurrences overwrite: Theta(m).
+def rightmost(p):
+    right = {}
+    for j, c in enumerate(p):
+        right[c] = j                       # later occurrences overwrite
+    return right
+
+# Boyer-Moore, bad-character rule: compare each alignment RIGHT to left; on a
+# mismatch at p[j] against text character c, slide so the pattern&#x27;s rightmost
+# c lands under it: shift = j - right[c], clamped to at least 1 (never slide
+# backward). Sublinear on typical text; Theta(nm) worst case.
+def bm_search(t, p):
+    n, m = len(t), len(p)
+    right = rightmost(p)
+    i = 0
+    while i + m &lt;= n:
+        skip = 0
+        for j in range(m - 1, -1, -1):     # right to left
+            if p[j] != t[i + j]:
+                skip = max(1, j - right.get(t[i + j], -1))
+                break                      # clamp: at least 1
+        if skip == 0:
+            return i                       # all m matched: found
+        i += skip
+    return -1                              # no occurrence</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Bad-character table: right[c] = index of the RIGHTMOST occurrence of c in
+// the pattern, -1 if absent. One pass, later occurrences overwrite: O(m + R).
+fn rightmost(p: &amp;[u8]) -&gt; [i32; 256] {
+    let mut right = [-1i32; 256];
+    for (j, &amp;c) in p.iter().enumerate() {
+        right[c as usize] = j as i32;      // later occurrences overwrite
+    }
+    right
+}
+
+// Boyer-Moore, bad-character rule: compare each alignment RIGHT to left; on a
+// mismatch at p[j] against text character c, slide so the pattern&#x27;s rightmost
+// c lands under it: shift = j - right[c], clamped to at least 1 (never slide
+// backward). Sublinear on typical text; O(nm) worst case.
+fn bm_search(t: &amp;str, p: &amp;str) -&gt; i32 {
+    let (t, p) = (t.as_bytes(), p.as_bytes());
+    let (n, m) = (t.len() as i32, p.len() as i32);
+    let right = rightmost(p);
+    let mut i = 0i32;
+    while i + m &lt;= n {
+        let mut skip = 0i32;
+        for j in (0..m).rev() {            // right to left
+            if p[j as usize] != t[(i + j) as usize] {
+                let c = t[(i + j) as usize] as usize;
+                skip = (j - right[c]).max(1);   // clamp: at least 1
+                break;
+            }
+        }
+        if skip == 0 { return i; }         // all m matched: found
+        i += skip;
+    }
+    -1                                     // no occurrence
+}</pre>
+<!--/ct--></div>
+      <p>
+        Note what the code does <em>not</em> do: nothing remembers the matched
+        suffix of a failed alignment, so unlike
+        <a href="algo-kmp.html">Knuth&ndash;Morris&ndash;Pratt (KMP)</a> the next
+        alignment may re-read text characters this one already compared. The
+        bet is that the jumps more than pay for the re-reads, and on real text
+        they do.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cases">3. A second trace, and every case of the shift</h2>
+      <p>
+        One alignment&rsquo;s right-to-left scan ends in exactly one of four
+        ways, and a correct hand-trace must handle all four:
+      </p>
+      <ol>
+        <li><strong>Full match:</strong> all \(m\) comparisons succeed; report
+          the index.</li>
+        <li><strong>Mismatch, \(c\) absent</strong>
+          (\(\mathit{right}[c] = -1\)): no alignment overlapping \(c\) can
+          match; shift \(j - (-1) = j + 1\), past it entirely.</li>
+        <li><strong>Mismatch, \(\mathit{right}[c] &lt; j\):</strong> slide the
+          rightmost \(c\) under the text&rsquo;s \(c\); shift
+          \(j - \mathit{right}[c] \ge 1\).</li>
+        <li><strong>Mismatch, \(\mathit{right}[c] \ge j\):</strong> the
+          rightmost \(c\) sits at or to the <em>right</em> of the mismatch, so
+          the formula is zero or negative, a backward slide. The clamp fires:
+          shift \(1\). The rule learned nothing usable; only correctness
+          (never go backward) decides the move.</li>
+      </ol>
+      <p>
+        The &sect;1 trace showed cases 1, 2, and 3 with every mismatch on the
+        <em>first</em> comparison. This trace adds a mismatch <em>after</em> a
+        partial match: <code>NEEDLE</code> (\(m = 6\)) in
+        <code>FINDINAHAYSTACKNEEDLE</code> (\(n = 21\)), with the
+        \(\mathit{right}\) table of &sect;2:
+      </p>
+      <div class="ex">
+        <span class="tag">Example (NEEDLE, worked)</span>
+        <table class="trace">
+          <tr><th class="lab">text &rarr;</th><th>F</th><th>I</th><th>N</th><th>D</th><th>I</th><th>N</th><th>A</th><th>H</th><th>A</th><th>Y</th><th>S</th><th>T</th><th>A</th><th>C</th><th>K</th><th>N</th><th>E</th><th>E</th><th>D</th><th>L</th><th>E</th><th>compares</th></tr>
+          <tr><td class="lab">align 0</td>
+            <td class="cell">N</td><td class="cell">E</td><td class="cell">E</td><td class="cell">D</td><td class="cell">L</td><td class="cell piv">E</td>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr>
+          <tr><td class="lab">align 5</td>
+            <td></td><td></td><td></td><td></td><td></td>
+            <td class="cell">N</td><td class="cell">E</td><td class="cell">E</td><td class="cell">D</td><td class="cell">L</td><td class="cell piv">E</td>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr>
+          <tr><td class="lab">align 11</td>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+            <td class="cell">N</td><td class="cell">E</td><td class="cell">E</td><td class="cell">D</td><td class="cell piv">L</td><td class="cell lt">E</td>
+            <td></td><td></td><td></td><td></td><td>2</td></tr>
+          <tr><td class="lab">align 15</td>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+            <td class="cell lt">N</td><td class="cell lt">E</td><td class="cell lt">E</td><td class="cell lt">D</td><td class="cell lt">L</td><td class="cell lt">E</td><td>6</td></tr>
+        </table>
+        <p>
+          Alignment 0: \(P[5] = \texttt{E}\) against
+          \(t[5] = \texttt{N}\); \(\mathit{right}[\texttt{N}] = 0\), so shift
+          \(5 - 0 = 5\) (case 3: the pattern&rsquo;s leading <code>N</code>
+          slides under the text&rsquo;s). Alignment 5: <code>E</code> against
+          \(t[10] = \texttt{S}\), absent from the pattern: shift
+          \(5 - (-1) = 6\), the full leap (case 2). Alignment 11: the last
+          comparison <em>matches</em> (\(t[16] = \texttt{E}\)), then
+          \(P[4] = \texttt{L}\) against \(t[15] = \texttt{N}\) mismatches
+          after a partial match; the shift comes from the mismatch position,
+          \(j = 4\): \(4 - \mathit{right}[\texttt{N}] = 4 - 0 = 4\) (case 3
+          again, and the one matched <code>E</code> is simply forgotten).
+          Alignment 15: all six match (case 1): found at index \(15\). Total:
+          \(10\) comparisons for a \(21\)-character text, and eleven text
+          characters never examined.
+        </p>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (case 4: the clamp)</span>
+        Search for <code>BAAAA</code> (\(m = 5\),
+        \(\mathit{right}[\texttt{A}] = 4\), \(\mathit{right}[\texttt{B}] = 0\))
+        in <code>AAAAAAAAAA</code> (\(n = 10\)). Every alignment plays out
+        identically:
+        <pre>  text:     A A A A A A A A A A
+  align 0:  B A A A A            scan right to left: A,A,A,A match,
+                                 then P[0] = B vs t[0] = A mismatches
+  rule:     j = 0, c = A, right[A] = 4  &rarr;  shift 0 - 4 = -4  &rarr; CLAMPED to 1
+  align 1:  . B A A A A          the same five comparisons, the same clamp
+  &hellip;         (6 alignments of 5 comparisons each: 30 comparisons, no match)</pre>
+        The mismatched <code>A</code> occurs in the pattern to the
+        <em>right</em> of the mismatch position, so &ldquo;line up the
+        rightmost <code>A</code>&rdquo; would slide the pattern backward, and
+        the clamp advances it by \(1\) instead. Every alignment then costs
+        \(m\) comparisons and gains one position: the sublinear engine running
+        at its worst. The next section turns this example into the
+        worst-case bound.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">4. Cost: sublinear on top, quadratic on the bottom</h2>
+      <div class="thm">
+        <span class="tag">Proposition (best case \(\approx n/m\))</span>
+        If every alignment mismatches on its first comparison against a
+        character absent from the pattern, Boyer&ndash;Moore makes about
+        \(n/m\) comparisons in total.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Such an alignment costs exactly one comparison
+        (case 2 of &sect;3) and shifts by \(j + 1 = m\). The alignments
+        therefore sit \(m\) apart: about \(n/m\) of them, one comparison each.
+        The condition is not exotic: searching English prose for a word with
+        an uncommon final letter meets it at most alignments, which is why the
+        demo&rsquo;s prose run examines fewer than a fifth of the text&rsquo;s
+        characters. A longer pattern makes the search <em>cheaper</em>: the
+        opposite of every other algorithm in this unit.
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (worst case \(\Theta(nm)\))</span>
+        With the bad-character rule alone, there are pattern/text pairs on
+        which Boyer&ndash;Moore makes \(\Theta(nm)\) comparisons.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The clamp example of &sect;3, scaled up:
+        pattern \(\texttt{B}\texttt{A}^{m-1}\), text \(\texttt{A}^n\). Every
+        alignment matches \(m - 1\) <code>A</code>&rsquo;s right to left, then
+        mismatches \(P[0] = \texttt{B}\) against an <code>A</code>; since
+        \(\mathit{right}[\texttt{A}] = m - 1 &gt; 0\), the shift clamps to
+        \(1\). So each of the \(n - m + 1\) alignments costs \(m\)
+        comparisons: \((n - m + 1)\,m = \Theta(nm)\), brute force&rsquo;s
+        worst case with extra steps. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Both bounds are real, and the gap between them is the
+        Boyer&ndash;Moore trade: typically far under \(n\), with no
+        worst-case guarantee. The good-suffix rule (&sect;1&rsquo;s aside)
+        does not close the gap by itself; the known fixes that do (Galil&rsquo;s
+        rule, which remembers the matched suffix across alignments the way KMP
+        remembers its prefix) restore a linear guarantee at a constant-factor
+        cost, and engines that need the guarantee cheaply instead fall back on
+        KMP. On the DNA alphabet the sublinear case collapses for a different
+        reason: with \(R = 4\), every text character occurs in any reasonable
+        pattern, so case 2 never fires and the average shift is small; the
+        demo&rsquo;s <code>GATC</code> run measures exactly that.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">5. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Boyer&ndash;Moore is matching <code>SEARCH</code> right to left, and
+          the very first comparison of an alignment mismatches at
+          \(P[5] = \texttt{H}\). Using the bad-character rule, give the shift
+          when the mismatched text character is (a) <code>X</code>, (b)
+          <code>S</code>, (c) <code>R</code>.
+          <details>
+            <summary>solution</summary>
+            The rule slides the pattern so its <em>last</em> occurrence of the
+            text character lands under it: shift
+            \(= j - \mathit{last}[c]\) with \(\mathit{last}[c] = -1\) for an
+            absent character (taking at least \(1\)). Last occurrences in
+            <code>SEARCH</code>: <code>S</code>:0, <code>E</code>:1,
+            <code>A</code>:2, <code>R</code>:3, <code>C</code>:4,
+            <code>H</code>:5. (a) <code>X</code> is absent:
+            \(5 - (-1) = 6\); leap the whole pattern past it.
+            (b) <code>S</code>: \(5 - 0 = 5\). (c) <code>R</code>:
+            \(5 - 3 = 2\). One comparison can thus discard up to \(m\)
+            alignments: the sublinear engine.
+          </details>
+        </li>
+        <li>
+          Build the \(\mathit{right}\) table for the pattern
+          <code>ABABAC</code>, then give the shift for each of these
+          mismatches: (a) \(P[5] = \texttt{C}\) against text character
+          <code>B</code>; (b) \(P[5] = \texttt{C}\) against <code>A</code>;
+          (c) \(P[1] = \texttt{B}\) against <code>C</code>. Which case of
+          &sect;3 is each?
+          <details>
+            <summary>solution</summary>
+            Scanning <code>ABABAC</code> left to right and letting later
+            occurrences overwrite: \(\mathit{right}[\texttt{A}] = 4\),
+            \(\mathit{right}[\texttt{B}] = 3\),
+            \(\mathit{right}[\texttt{C}] = 5\), everything else \(-1\).
+            (a) \(5 - 3 = 2\) (case 3). (b) \(5 - 4 = 1\), the smallest
+            useful slide, still case 3. (c) \(\mathit{right}[\texttt{C}] = 5
+            \ge j = 1\), so the formula gives \(1 - 5 = -4\), a backward
+            slide; the clamp fires and the shift is \(1\) (case 4). The
+            pattern&rsquo;s only <code>C</code> is to the right of the
+            mismatch, so lining it up would move the pattern the wrong way,
+            and the rule contributes nothing.
+          </details>
+        </li>
+        <li>
+          Trace Boyer&ndash;Moore searching for <code>PAJAMAS</code>
+          (\(m = 7\)) in <code>BANANAS&nbsp;IN&nbsp;PAJAMAS</code>
+          (\(n = 18\), indices \(0\)&ndash;\(17\)). List each alignment, the
+          comparisons it makes, the shift, and the total comparison count.
+          <details>
+            <summary>solution</summary>
+            \(\mathit{right}\): <code>P</code>:0, <code>A</code>:5,
+            <code>J</code>:2, <code>M</code>:4, <code>S</code>:6, everything
+            else \(-1\).
+            <table class="trace">
+              <tr><th class="lab">align \(i\)</th><th>comparisons</th><th>outcome</th><th>shift</th></tr>
+              <tr><td class="lab">0</td><td>3</td><td>\(t[6]=\texttt{S}\) matches \(P[6]\), \(t[5]=\texttt{A}\) matches \(P[5]\), then \(P[4] = \texttt{M}\) vs \(t[4] = \texttt{N}\) mismatches; <code>N</code> is absent</td><td>\(4 - (-1) = 5\)</td></tr>
+              <tr><td class="lab">5</td><td>1</td><td>\(P[6] = \texttt{S}\) vs \(t[11] = \texttt{P}\); \(\mathit{right}[\texttt{P}] = 0\)</td><td>\(6 - 0 = 6\)</td></tr>
+              <tr><td class="lab">11</td><td>7</td><td>all seven match: found at index \(11\)</td><td>none: report and stop</td></tr>
+            </table>
+            Total \(3 + 1 + 7 = 11\) comparisons for \(18\) text characters.
+            The first alignment is the case the &sect;1 trace does not show:
+            a mismatch <em>after</em> a partial match, whose shift is
+            computed from the mismatch position \(j = 4\), not from the right
+            end. The two matched characters are then forgotten, which is
+            exactly what KMP would have kept.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Boyer&ndash;Moore v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+  </body>
+</html>

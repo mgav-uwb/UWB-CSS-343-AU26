@@ -1,0 +1,1319 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Dijkstra’s Algorithm.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dijkstra&rsquo;s Algorithm - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Dijkstra&rsquo;s Algorithm</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (greedy).
+      </div>
+      <div class="src">
+        Edges now carry weights, and &ldquo;shortest&rdquo; means least total
+        weight rather than fewest edges. The one operation every shortest-path
+        algorithm is built from (edge relaxation); Dijkstra&rsquo;s greedy
+        ordering of it, a proof that the greedy choice is correct when weights are
+        nonnegative, the priority-queue implementation that makes it
+        \(O(E\log V)\), and the exact line of the proof that negative weights
+        break. With worked traces, the correctness proof, links to the interactive
+        demos, and exercises. The greedy method in general is the companion
+        <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout.
+      </div>
+
+      <p class="lead">
+        The <a href="algo-bfs.html">BFS handout</a> gave us
+        breadth-first search, which finds the path with the <em>fewest edges</em>
+        and proves it: a proof that worked precisely
+        because every edge counted the same, one step. This handout lets edges
+        carry <strong>weights</strong>: a distance, a time, a price, a latency. Now
+        the cheapest route is a matter of the total weight along it, and the
+        fewest-edge path and the least-weight path can be different paths
+        entirely, so BFS answers the wrong question. The fix, <strong>Dijkstra&rsquo;s
+        algorithm</strong>, turns out to be BFS with one part swapped (the
+        plain queue becomes a priority queue keyed by distance), which is why
+        we built heaps back in
+        <a href="../heaps/ds-heaps-pq.html"><em>Heaps &amp; Priority Queues</em></a>.
+        Dijkstra is a <strong>greedy
+        algorithm</strong>: the method in general (the template, the
+        change-making pair, the licensing properties) is the companion
+        <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout; its
+        greedy choice is <em>settle the nearest unsettled vertex</em>. And this
+        time we do not just watch it work in a demo: we prove that choice safe,
+        and see negative weights break its license.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#weighted">Weighted graphs and the shortest-path problem</a></li>
+          <li><a href="#relax">Edge relaxation: the one operation</a></li>
+          <li><a href="#dijkstra">Dijkstra&rsquo;s algorithm</a></li>
+          <li><a href="#correct">Why Dijkstra is correct</a></li>
+          <li><a href="#negative">Negative weights and the limits of greed</a></li>
+          <li><a href="#frontier">One frontier, many searches</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="weighted">1. Weighted graphs and the shortest-path problem</h2>
+      <div class="def">
+        <span class="tag">Definition (weighted graph, path cost)</span>
+        A <strong>weighted graph</strong> attaches to each edge a number, its
+        <strong>weight</strong> \(w(u,v)\). The <strong>cost of a path</strong> is
+        the <em>sum</em> of the weights of its edges. A <strong>shortest path</strong>
+        from \(s\) to \(t\) is one of minimum cost; its cost is the
+        <strong>distance</strong> \(\delta(s,t)\), written \(\delta(t)\) when the
+        source is fixed.
+      </div>
+      <p>
+        A weight is whatever the edges model: miles on a road, dollars for a
+        flight, milliseconds of latency. On the graph below, the path
+        \(0 \to 3 \to 4 \to 5\) costs \(6 + 2 + 3 = 11\); the path
+        \(0 \to 1 \to 2\) costs \(4 + 1 = 5\). The shortest-path problem asks, among
+        possibly very many routes, for the one with the smallest such sum.
+      </p>
+      <h3>Fewest edges is not least weight</h3>
+      <p>
+        The whole reason this handout exists is that weighting the edges divorces
+        two notions that the <a href="algo-bfs.html">BFS handout</a> held together. On this
+        little digraph,
+      </p>
+      <pre>  0 &mdash;2&rarr; 1
+  |      |
+  5      4        plus one direct edge   0 &mdash;9&rarr; 3
+  &darr;      &darr;
+  2 &mdash;8&rarr; 3</pre>
+      <p>
+        three routes lead from \(0\) to \(3\): the direct edge (one hop, cost
+        \(9\)), the detour \(0 \to 1 \to 3\) (two hops, cost \(2 + 4 = 6\)), and
+        \(0 \to 2 \to 3\) (two hops, cost \(5 + 8 = 13\)). The
+        <em>fewest-edge</em> route is the direct edge; the <em>least-weight</em>
+        route is the two-hop detour through \(1\), at \(6\). BFS
+        minimizes the number of edges and would seize the \(9\)-cost direct edge:
+        the wrong answer. We need an algorithm that sums weights, and it
+        must somehow discover that a longer-looking, more-hops path can be cheaper.
+        That hops-beats-direct shape recurs throughout the handout.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (single-source shortest paths)</span>
+        Given a weighted digraph and a <strong>source</strong> \(s\), the
+        <strong>single-source shortest-paths</strong> (SSSP) problem asks for
+        \(\delta(v)\) for <em>every</em> vertex \(v\), together with enough
+        information to reconstruct an actual shortest path to each.
+      </div>
+      <p>
+        We solve the all-destinations version because the single-pair version
+        (one \(s\), one \(t\)) is, surprisingly, no easier in general:
+        the only known way to be sure \(t\)&rsquo;s distance is final is
+        essentially to settle every vertex nearer than \(t\) first, which is what
+        Dijkstra does anyway. The one saving is that we may stop the moment \(t\)
+        is settled (<a href="#dijkstra">&sect;3</a>).
+      </p>
+
+      <h3>Why not enumerate? Exponentially many paths: a proof</h3>
+      <p>
+        The obvious brute force (list every \(s \to t\) path, keep the
+        cheapest) founders on a counting fact. Take the little digraph
+        above, drop its direct edge, and chain \(k\) copies of the diamond end to
+        end, the exit vertex of each serving as the entrance of the next:
+      </p>
+      <pre>        a1        a2        a3
+      &#8599;    &#8600;    &#8599;    &#8600;    &#8599;    &#8600;
+   v0        v1        v2        v3     k = 3 diamonds
+      &#8600;    &#8599;    &#8600;    &#8599;    &#8600;    &#8599;
+        b1        b2        b3</pre>
+      <div class="thm">
+        <span class="tag">Proposition (exponentially many paths)</span>
+        For every \(k \ge 1\), the chain of \(k\) diamonds is a digraph with
+        \(V = 3k+1\) vertices and \(E = 4k\) edges on which the number of distinct
+        \(v_0 \to v_k\) paths is exactly \(2^k = 2^{(V-1)/3}\), exponential
+        in \(V\).
+      </div>
+      <div class="proof">
+        <strong>Proof (product rule).</strong> Formally, the vertices are
+        \(v_0, \dots, v_k\) together with \(a_i, b_i\) for \(1 \le i \le k\), and
+        the edges are \(v_{i-1} \to a_i\), \(v_{i-1} \to b_i\), \(a_i \to v_i\),
+        \(b_i \to v_i\). Every \(v_0 \to v_k\) path visits
+        \(v_1, v_2, \dots, v_k\) in order: the only edges leaving \(v_{i-1}\) go
+        to \(a_i\) or \(b_i\), and the only edge leaving either of those goes to
+        \(v_i\). So between consecutive \(v\)&rsquo;s a path makes exactly one
+        free choice, top (\(a_i\)) or bottom (\(b_i\)), and a path
+        <em>is</em> a sequence of \(k\) independent binary choices. Different
+        choice sequences give different paths (they differ at the first diamond
+        where the choices part), and every sequence is realizable. By the product
+        rule the paths number
+        \(\underbrace{2 \cdot 2 \cdots 2}_{k} = 2^k\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Exponential means gone almost immediately. \(k = 30\) diamonds is a graph
+        of \(91\) vertices holding \(2^{30} \approx 10^9\) routes: a
+        billion paths in a graph that fits on this page. \(k = 100\) (\(301\)
+        vertices, \(400\) edges) packs \(2^{100} \approx 1.3 \times 10^{30}\)
+        routes; enumerating a billion per second, the survey finishes in roughly
+        \(4 \times 10^{13}\) years, three thousand times the age of the
+        universe. Two remarks. The chain is a DAG, so acyclicity is no escape.
+        And grids are just as bad: moving only right and up, an \(n \times n\)
+        grid has \(\binom{2n}{n} \approx 4^n / \sqrt{\pi n}\) corner-to-corner
+        routes. Dijkstra will nevertheless compute every true distance in
+        \(O(E \log V)\), without listing a single path; the structural
+        property that makes such a shortcut possible at all is next.
+      </p>
+
+      <h3>The shortest-paths tree and optimal substructure</h3>
+      <p>
+        Brute force is hopeless; the diamond chain just proved it. What
+        saves us is that shortest paths nest inside one another.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (optimal substructure)</span>
+        Every sub-path of a shortest path is itself a shortest path. If
+        \(s \rightsquigarrow u \rightsquigarrow t\) is a shortest \(s\)-to-\(t\)
+        path, then its prefix \(s \rightsquigarrow u\) is a shortest \(s\)-to-\(u\)
+        path.
+      </div>
+      <div class="proof">
+        <strong>Proof (exchange argument).</strong> Suppose the prefix
+        \(s \rightsquigarrow u\) were <em>not</em> shortest, so some route
+        \(s \rightsquigarrow u\) is strictly cheaper. Splice that cheaper prefix in
+        front of the original suffix \(u \rightsquigarrow t\): the result is an
+        \(s\)-to-\(t\) path of strictly smaller total cost than the one we called
+        shortest, a contradiction. (The splice is a valid path because the
+        suffix still starts at \(u\).) <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Optimal substructure is exactly what lets us build shortest paths out of
+        shorter ones instead of enumerating them (extend a known-shortest
+        path by one relaxed edge), and it is the same property that will power
+        <a href="../dp/paradigm-dp-method.html">dynamic programming</a>. One
+        consequence is structural: the
+        shortest paths from \(s\) overlap into a <strong>shortest-paths tree</strong>
+        rooted at \(s\), because each vertex \(v\) has a single best predecessor on
+        its shortest path. Storing that one <code>parent[v]</code> pointer per
+        vertex (\(\Theta(V)\) space) is enough to reconstruct every
+        shortest path, exactly as BFS&rsquo;s tree edges did for unit weights.
+      </p>
+
+      <h3>Representation: the weighted adjacency list</h3>
+      <p>
+        One small change from the <a href="ds-graph-representations.html">graph-representations
+        handout</a>: each adjacency-list entry now carries a
+        weight alongside the neighbor. Space is still \(\Theta(V+E)\), and the inner
+        loop of every algorithm here (iterate a vertex&rsquo;s weighted
+        out-edges) stays \(O(\deg u)\).
+      </p>
+      <div class="code-tabs" data-snippet="graphs/wgraph-adt">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">struct Edge {
+    int  to;    // the neighbor this edge leads to
+    long w;     // the edge&#x27;s weight (the cost of traversing it)
+};
+
+struct WGraph {
+    int V;                            // number of vertices
+    vector&lt;vector&lt;Edge&gt;&gt; adj;         // adj[u] = u&#x27;s weighted out-edges
+    WGraph(int n) : V(n), adj(n) {}
+    void addEdge(int u, int v, long w) {
+        adj[u].push_back({v, w});
+        // adj[v].push_back({u, w});  // add this line for an UNDIRECTED edge
+    }
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>class Edge {
+    int to;       // the neighbor this edge leads to
+    long w;       // the edge&#x27;s weight (the cost of traversing it)
+    Edge(int t, long weight) { to = t; w = weight; }
+}
+
+class WGraph {
+    int V;                                  // number of vertices
+    List&lt;List&lt;Edge&gt;&gt; adj;                   // adj.get(u) = u&#x27;s out-edges
+    WGraph(int n) {
+        V = n;
+        adj = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; n; i++) adj.add(new ArrayList&lt;&gt;());
+    }
+    void addEdge(int u, int v, long w) {
+        adj.get(u).add(new Edge(v, w));
+        // adj.get(v).add(new Edge(u, w));  // add this line for an UNDIRECTED edge
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>class WGraph:
+    def __init__(self, n):
+        self.V = n                          # number of vertices
+        self.adj = [[] for _ in range(n)]   # adj[u] = list of (v, w) pairs
+
+    def add_edge(self, u, v, w):
+        self.adj[u].append((v, w))
+        # self.adj[v].append((u, w))        # add this line for an UNDIRECTED edge</pre>
+<pre class="ct-pane" data-lang="rs" hidden>struct WGraph {
+    adj: Vec&lt;Vec&lt;(usize, i64)&gt;&gt;,        // adj[u] = list of (v, weight) pairs
+}
+impl WGraph {
+    fn new(n: usize) -&gt; Self {
+        WGraph { adj: vec![Vec::new(); n] }
+    }
+    fn add_edge(&amp;mut self, u: usize, v: usize, w: i64) {
+        self.adj[u].push((v, w));
+        // self.adj[v].push((u, w));      // add this line for an UNDIRECTED edge
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/wgraph-adt.cpp &middot; code/graphs/wgraph-adt.java &middot; code/graphs/wgraph-adt.py &middot; code/graphs/wgraph-adt.rs</code></p>
+<!--/ct--></div>
+      <p>
+        An undirected weighted edge \(u - v\) is simply the two directed edges
+        \(u \to v\) and \(v \to u\) with the same weight; Dijkstra only ever reads
+        out-edges, so it never needs to know which kind it started with. Road
+        networks (two-way streets) are the common undirected case.
+      </p>
+
+      <h3>The nonnegative-weight assumption</h3>
+      <div class="aside">
+        <span class="tag">All weights must be \(\ge 0\)</span>
+        Dijkstra&rsquo;s algorithm requires every edge weight to be nonnegative.
+        Physical costs (distances, times, prices, capacities) are
+        naturally \(\ge 0\), so it fits most real problems. Negative weights break
+        the greedy argument, and <a href="#negative">&sect;5</a> points at the exact
+        line of the correctness proof that fails and the algorithm (Bellman&ndash;Ford)
+        that replaces it. State this precondition up front: it is the one thing
+        Dijkstra cannot be talked out of.
+      </div>
+
+      <h3>The running graph</h3>
+      <p>
+        One weighted digraph anchors every worked example and demo in this handout.
+        It is <em>the same graph, edge for edge, as the
+        <a href="ds-graph-representations.html">graph-representations
+        handout</a>&rsquo;s DAG</em> (the same eight vertices and eleven edges), now
+        carrying weights:
+      </p>
+      <figure>
+        <svg viewBox="0 0 420 300" role="img" aria-label="The running weighted directed acyclic graph, the same eight-vertex graph as the graph-representations handout with a green weight on each edge. Vertices 0 through 7 are circles spaced evenly around a ring in index order, 0 at the top, indices increasing clockwise. The eleven directed edges and their weights are: edge from 0 to 1 with weight 4, edge from 0 to 3 with weight 6, edge from 0 to 5 with weight 20, edge from 1 to 2 with weight 1, edge from 1 to 3 with weight 5, edge from 2 to 3 with weight 8, edge from 3 to 4 with weight 2, edge from 3 to 7 with weight 11, edge from 4 to 5 with weight 3, edge from 4 to 7 with weight 7, and edge from 5 to 6 with weight 9. Vertices 6 and 7 have no outgoing edges.">
+          <defs>
+            <marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#4a5163"/>
+            </marker>
+          </defs>
+          <g stroke="#4a5163" stroke-width="1.8" fill="none" marker-end="url(#ah)">
+            <line x1="230" y1="46" x2="269" y2="62"/>  <!-- 0->1 -->
+            <line x1="218" y1="58" x2="281" y2="209"/>  <!-- 0->3 -->
+            <line x1="202" y1="58" x2="139" y2="209"/>  <!-- 0->5 -->
+            <line x1="298" y1="91" x2="314" y2="130"/>  <!-- 1->2 -->
+            <line x1="289" y1="93" x2="289" y2="207"/>  <!-- 1->3 -->
+            <line x1="314" y1="170" x2="298" y2="209"/>  <!-- 2->3 -->
+            <line x1="269" y1="238" x2="230" y2="254"/>  <!-- 3->4 -->
+            <line x1="274" y1="214" x2="146" y2="86"/>  <!-- 3->7 -->
+            <line x1="190" y1="254" x2="151" y2="238"/>  <!-- 4->5 -->
+            <line x1="202" y1="242" x2="139" y2="91"/>  <!-- 4->7 -->
+            <line x1="122" y1="209" x2="106" y2="170"/>  <!-- 5->6 -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
+             fill="#0a7d4d" stroke="#fff" stroke-width="3" paint-order="stroke"
+             text-anchor="middle">
+            <text x="250" y="58">4</text>    <!-- 0->1 -->
+            <text x="250" y="138">6</text>   <!-- 0->3 -->
+            <text x="170" y="138">20</text>  <!-- 0->5 -->
+            <text x="306" y="115">1</text>   <!-- 1->2 -->
+            <text x="289" y="154">5</text>   <!-- 1->3 -->
+            <text x="306" y="194">8</text>   <!-- 2->3 -->
+            <text x="250" y="250">2</text>   <!-- 3->4 -->
+            <text x="210" y="154">11</text>  <!-- 3->7 -->
+            <text x="170" y="250">3</text>   <!-- 4->5 -->
+            <text x="170" y="171">7</text>   <!-- 4->7 -->
+            <text x="114" y="194">9</text>    <!-- 5->6 -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="210" cy="38" r="19"/>  <circle cx="289" cy="71" r="19"/>
+              <circle cx="322" cy="150" r="19"/>  <circle cx="289" cy="229" r="19"/>
+              <circle cx="210" cy="262" r="19"/>  <circle cx="131" cy="229" r="19"/>
+              <circle cx="98" cy="150" r="19"/>  <circle cx="131" cy="71" r="19"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="210" y="43">0</text>  <text x="289" y="76">1</text>
+              <text x="322" y="155">2</text>  <text x="289" y="234">3</text>
+              <text x="210" y="267">4</text>  <text x="131" y="234">5</text>
+              <text x="98" y="155">6</text>  <text x="131" y="76">7</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The running graph: \(V = 8\), \(E = 11\), every edge pointing from a lower
+          to a higher index, with weights in green. Weighted adjacency list:
+          \(0\to\{1{:}4,\,3{:}6,\,5{:}20\}\), \(1\to\{2{:}1,\,3{:}5\}\),
+          \(2\to\{3{:}8\}\), \(3\to\{4{:}2,\,7{:}11\}\), \(4\to\{5{:}3,\,7{:}7\}\),
+          \(5\to\{6{:}9\}\). Note the built-in trap: the direct edge \(0 \to 5\)
+          costs \(20\), but the detour \(0 \to 3 \to 4 \to 5\) costs
+          \(6 + 2 + 3 = 11\).
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=dijkstra">Dijkstra demo</a>. Every trace in this
+        handout runs on this graph; the <code>u v w</code> edge triples are
+        editable, so you can watch the algorithm on your own weighted graph. What
+        you compute on paper is exactly what the demo animates.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="relax">2. Edge relaxation: the one operation</h2>
+      <p>
+        Every shortest-path algorithm in this handout, and beyond it,
+        is built from a single primitive applied in some order. Learn the primitive
+        and its invariant first; the algorithms are then just orderings.
+      </p>
+      <p>
+        Keep a <strong>tentative distance</strong> <code>dist[v]</code> for every
+        vertex: an over-estimate of \(\delta(v)\) that we drive downward as we
+        learn more.
+      </p>
+      <pre>  dist[s] = 0        <span class="cm">// zero cost to reach the source from itself</span>
+  dist[v] = &infin;        <span class="cm">// every other vertex: no route known yet</span></pre>
+      <div class="def">
+        <span class="tag">Definition (edge relaxation)</span>
+        To <strong>relax</strong> an edge \(u \to v\) of weight \(w\) is to ask
+        whether routing through \(u\) beats \(v\)&rsquo;s current best, and if so, to
+        take it:
+        <pre>  if (dist[u] + w &lt; dist[v]) {
+      dist[v] = dist[u] + w;   <span class="cm">// found a cheaper route to v</span>
+      parent[v] = u;           <span class="cm">// remember the edge, for the path</span>
+  }</pre>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (one relaxation)</span>
+        Suppose \(\texttt{dist}[u] = 3\), \(\texttt{dist}[v] = 10\), and the edge
+        \(u \to v\) has weight \(4\). Then \(\texttt{dist}[u] + w = 3 + 4 = 7 &lt;
+        10\), so the edge relaxes: \(\texttt{dist}[v] \leftarrow 7\) and
+        \(\texttt{parent}[v] \leftarrow u\). If later some other route offers
+        \(\texttt{dist}[v] = 6\), it relaxes again to \(6\). The value only ever
+        falls.
+      </div>
+      <p>
+        Relaxation is monotone (it never raises a label), and it is
+        also <em>honest</em>: a relaxed label always equals the cost of some real
+        path. That honesty is the invariant the whole subject rests on.
+      </p>
+      <div class="thm">
+        <span class="tag">Invariant (labels never lie low)</span>
+        At all times, either \(\texttt{dist}[v] = \infty\) or \(\texttt{dist}[v]\)
+        is the cost of some genuine \(s \to v\) path. In particular
+        \(\texttt{dist}[v] \ge \delta(v)\) always, and when no edge can be relaxed,
+        \(\texttt{dist}[v] = \delta(v)\) for every \(v\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Initially \(\texttt{dist}[s] = 0\) (the empty path)
+        and all others are \(\infty\); the claim holds. A relaxation of \(u \to v\)
+        sets \(\texttt{dist}[v] = \texttt{dist}[u] + w\), and by induction
+        \(\texttt{dist}[u]\) is the cost of a real \(s \to u\) path, so appending
+        the edge \(u \to v\) exhibits a real \(s \to v\) path of exactly that cost;
+        the invariant is preserved, and since a real path cannot cost less than the
+        shortest, \(\texttt{dist}[v] \ge \delta(v)\). For the terminal claim, suppose
+        no edge relaxes yet some \(\texttt{dist}[v] &gt; \delta(v)\). Take a shortest
+        \(s \to v\) path and let \(x \to y\) be its first edge with
+        \(\texttt{dist}[x] = \delta(x)\) but \(\texttt{dist}[y] &gt; \delta(y)\)
+        (the source has \(\texttt{dist}[s] = \delta(s) = 0\), and \(v\) fails, so
+        such an edge exists along the path). Then
+        \(\texttt{dist}[x] + w(x,y) = \delta(x) + w(x,y) = \delta(y) &lt;
+        \texttt{dist}[y]\), so \(x \to y\) <em>can</em> be relaxed,
+        contradicting &ldquo;no edge relaxes.&rdquo; <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This is the backbone of correctness for the entire family. Every algorithm
+        below reaches the terminal &ldquo;nothing relaxes&rdquo; state; they differ
+        only in <em>how efficiently</em>, that is, in the order they relax edges.
+      </p>
+      <table>
+        <tr><th>algorithm</th><th>relaxation order</th><th>cost</th></tr>
+        <tr><td>BFS (unit weights)</td><td>by layer (a queue)</td><td>\(\Theta(V+E)\)</td></tr>
+        <tr><td>DAG shortest paths</td><td>topological order</td><td>\(\Theta(V+E)\)</td></tr>
+        <tr><td><strong>Dijkstra</strong></td><td>nearest-first (greedy)</td><td>\(O(E\log V)\)</td></tr>
+        <tr><td>Bellman&ndash;Ford</td><td>all edges, \(V-1\) rounds</td><td>\(O(VE)\)</td></tr>
+      </table>
+      <p>
+        A bad order forces the same edge to relax many times (Bellman&ndash;Ford
+        does \(V-1\) full passes because it never knows which labels are final); the
+        right order relaxes each edge once. On a DAG that order is free:
+        relax in topological order (the
+        <a href="algo-topological-sort.html">topological-sort handout</a>&rsquo;s product)
+        and each vertex is
+        final before its out-edges are touched, giving linear-time shortest paths
+        even with negative weights. Dijkstra finds a once-each order for general
+        nonnegative graphs, and the rest of the handout is about it.
+      </p>
+      <p>
+        Finally, relaxation is also what reconstructs paths. Each improving
+        relaxation records <code>parent[v]</code>; to recover a route, walk
+        \(t \to \texttt{parent}[t] \to \texttt{parent}[\texttt{parent}[t]] \to
+        \cdots \to s\) and reverse it. Distances tell you <em>how far</em>; parents
+        tell you <em>which way</em>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="dijkstra">3. Dijkstra&rsquo;s algorithm</h2>
+      <p>
+        <strong>Dijkstra&rsquo;s algorithm</strong> chooses the relaxation order
+        greedily. Maintain a set of <strong>settled</strong> vertices, whose
+        shortest distances are final. Repeatedly take the <em>unsettled vertex with
+        the smallest tentative distance</em>, settle it, and relax its out-edges.
+      </p>
+      <pre>  settled : shortest distance is now KNOWN (final)
+  frontier: discovered, tentative, waiting in the priority queue
+  &infin;       : not yet discovered</pre>
+      <p>
+        Each iteration promotes the nearest frontier vertex into <em>settled</em>
+        and pushes its improved neighbors onto the frontier: exactly BFS
+        promoting the front of its queue, except &ldquo;nearest&rdquo; is now by
+        total weight, not edge count. That single swap (queue \(\to\) priority
+        queue) is the whole difference from BFS.
+      </p>
+      <div class="code-tabs" data-snippet="graphs/dijkstra">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Lazy Dijkstra: a min-heap of (dist, vertex) pairs. Settle a vertex the moment
+// it POPS as the minimum; skip stale pops; relax its out-edges and push any
+// improved neighbor. Needs all weights &gt;= 0.
+vector&lt;long&gt; dijkstra(WGraph&amp; g, int s) {
+    vector&lt;long&gt; dist(g.V, LONG_MAX);      // dist[v] = best-known cost s-&gt;v
+    vector&lt;bool&gt; settled(g.V, false);      // settled[v] = dist[v] is final
+    priority_queue&lt;pair&lt;long,int&gt;, vector&lt;pair&lt;long,int&gt;&gt;,
+                   greater&lt;&gt;&gt; pq;              // min-heap keyed by distance
+    dist[s] = 0;
+    pq.push({0, s});
+    while (!pq.empty()) {
+        int u = pq.top().second; pq.pop();     // nearest unsettled
+        if (settled[u]) continue;              // stale entry: skip
+        settled[u] = true;                     // dist[u] is now FINAL
+        for (Edge e : g.adj[u])
+            if (!settled[e.to] &amp;&amp; dist[u] + e.w &lt; dist[e.to]) {
+                dist[e.to] = dist[u] + e.w;     // relax: a cheaper route to e.to
+                pq.push({dist[e.to], e.to});    // push, don&#x27;t decrease-key
+            }
+    }
+    return dist;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Lazy Dijkstra: a min-heap of {dist, vertex}. Settle a vertex the moment it
+// POPS as the minimum; skip stale pops; relax and push improved neighbors.
+long[] dijkstra(WGraph g, int s) {
+    long[] dist = new long[g.V];         // dist[v] = best-known cost s-&gt;v
+    Arrays.fill(dist, Long.MAX_VALUE);   // MAX_VALUE plays the role of infinity
+    boolean[] settled = new boolean[g.V]; // settled[v] = dist[v] is final
+    // min-heap of {dist, vertex}, ordered by distance
+    PriorityQueue&lt;long[]&gt; pq =
+        new PriorityQueue&lt;&gt;((a, b) -&gt; Long.compare(a[0], b[0]));
+    dist[s] = 0;
+    pq.add(new long[]{0, s});
+    while (!pq.isEmpty()) {
+        int u = (int) pq.poll()[1];          // nearest unsettled
+        if (settled[u]) continue;            // stale entry: skip
+        settled[u] = true;                   // dist[u] is now FINAL
+        for (Edge e : g.adj.get(u))
+            if (!settled[e.to] &amp;&amp; dist[u] + e.w &lt; dist[e.to]) {
+                dist[e.to] = dist[u] + e.w;   // relax: a cheaper route to e.to
+                pq.add(new long[]{dist[e.to], e.to});
+            }
+    }
+    return dist;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>import heapq
+
+# Lazy Dijkstra: a min-heap of (dist, vertex). Settle a vertex the moment it
+# POPS as the minimum; skip stale pops; relax and push improved neighbors.
+def dijkstra(g, s):
+    dist = [float(&quot;inf&quot;)] * g.V         # dist[v] = best-known cost s-&gt;v
+    settled = [False] * g.V              # settled[v] = dist[v] is final
+    dist[s] = 0
+    pq = [(0, s)]                            # min-heap of (dist, vertex)
+    while pq:
+        d, u = heapq.heappop(pq)             # nearest unsettled
+        if settled[u]:                       # stale entry: skip
+            continue
+        settled[u] = True                    # dist[u] is now FINAL
+        for v, w in g.adj[u]:
+            if not settled[v] and dist[u] + w &lt; dist[v]:
+                dist[v] = dist[u] + w        # relax: a cheaper route to v
+                heapq.heappush(pq, (dist[v], v))
+    return dist</pre>
+<pre class="ct-pane" data-lang="rs" hidden>use std::collections::BinaryHeap;
+use std::cmp::Reverse;
+
+// Lazy Dijkstra. BinaryHeap is a MAX-heap, so wrap each (dist, vertex) in
+// Reverse to pop the SMALLEST distance. Settle on pop; skip stale pops.
+fn dijkstra(g: &amp;WGraph, s: usize) -&gt; Vec&lt;i64&gt; {
+    let n = g.adj.len();
+    let mut dist = vec![i64::MAX; n];    // dist[v] = best-known cost s-&gt;v
+    let mut settled = vec![false; n];    // settled[v] = dist[v] is final
+    let mut pq = BinaryHeap::new();
+    dist[s] = 0;
+    pq.push(Reverse((0i64, s)));
+    while let Some(Reverse((_d, u))) = pq.pop() {   // nearest unsettled
+        if settled[u] { continue; }                 // stale entry: skip
+        settled[u] = true;                          // dist[u] is now FINAL
+        for &amp;(v, w) in &amp;g.adj[u] {
+            if !settled[v] &amp;&amp; dist[u] + w &lt; dist[v] {
+                dist[v] = dist[u] + w;              // relax: cheaper route to v
+                pq.push(Reverse((dist[v], v)));
+            }
+        }
+    }
+    dist
+}</pre>
+<p class="ct-src">source: <code>code/graphs/dijkstra.cpp &middot; code/graphs/dijkstra.java &middot; code/graphs/dijkstra.py &middot; code/graphs/dijkstra.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Two details in that loop carry the algorithm. First, a vertex is settled
+        <em>when it pops as the minimum</em>, not when it is first discovered:
+        settling on discovery would freeze a label that a later, cheaper
+        route could still lower, the classic Dijkstra bug. Second, an improved
+        neighbor is handled by <em>pushing a new entry</em> rather than editing the
+        old one; the stale duplicate is discarded when it later pops. We return to
+        both.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a full trace)</span>
+        On the small graph \(0\to1(2)\), \(0\to2(5)\), \(1\to2(1)\), \(1\to3(7)\),
+        \(2\to3(3)\):
+        <pre>  settle 0 (dist 0):  relax 0&rarr;1 &rArr; dist[1]=2;  0&rarr;2 &rArr; dist[2]=5
+  settle 1 (dist 2):  relax 1&rarr;2: 2+1=3 &lt; 5 &rArr; dist[2]=3;
+                      relax 1&rarr;3: 2+7=9      &rArr; dist[3]=9
+  settle 2 (dist 3):  relax 2&rarr;3: 3+3=6 &lt; 9 &rArr; dist[3]=6
+  settle 3 (dist 6):  done
+  distances:  0  2  3  6</pre>
+        Watch vertex \(2\): its label dropped from \(5\) to \(3\) via the
+        \(1 \to 2\) edge <em>before</em> it settled: relaxation finding a
+        better route just in time. Because \(2\) settles (at \(3\)) before \(3\)
+        does, the improvement to \(\texttt{dist}[3]\) is already in hand when \(3\)
+        settles.
+      </div>
+
+      <h3>The priority queue, and lazy deletion</h3>
+      <p>
+        The bottleneck is &ldquo;which unsettled vertex is nearest?&rdquo; A linear
+        scan answers it in \(O(V)\); a <strong>min-heap</strong>
+        (the <a href="../heaps/ds-heaps-pq.html">Heaps &amp; Priority Queues</a>
+        handout) answers
+        it in \(O(\log V)\). This is the payoff for building heaps first: the
+        heap is the engine that makes Dijkstra fast. In C++ a
+        <code>priority_queue&lt;pair&lt;long,int&gt;, &hellip;, greater&lt;&gt;&gt;</code>
+        is a min-heap of \(\{\text{distance},\text{vertex}\}\) pairs, which compare
+        lexicographically, distance first, exactly as wanted.
+      </p>
+      <p>
+        A textbook heap cannot cheaply lower the key of an entry already inside it,
+        so instead of a <em>decrease-key</em> we simply push another entry with the
+        smaller distance and let the outdated one go <strong>stale</strong>. When a
+        stale entry finally pops, its vertex is already settled, and the
+        <code>if (settled[u]) continue;</code> line discards it. This
+        <strong>lazy deletion</strong> is simpler than maintaining an indexed heap,
+        and it costs only a constant factor:
+      </p>
+      <table>
+        <tr><th></th><th>lazy (our code)</th><th>eager</th></tr>
+        <tr><td>on an improving relax</td><td><strong>push</strong> a new entry</td><td><strong>decrease-key</strong> the old</td></tr>
+        <tr><td>heap size</td><td>up to \(E\)</td><td>at most \(V\)</td></tr>
+        <tr><td>heap needed</td><td>a plain binary heap</td><td>an <em>indexed</em> heap</td></tr>
+        <tr><td>both cost</td><td>\(O(E\log V)\)</td><td>\(O(E\log V)\)</td></tr>
+      </table>
+
+      <h3>Cost</h3>
+      <div class="thm">
+        <span class="tag">Proposition (Dijkstra cost)</span>
+        With a binary-heap priority queue, lazy Dijkstra runs in \(O(E\log V)\) on a
+        graph with \(V\) vertices and \(E\) edges.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Each improving relaxation pushes exactly one entry,
+        and only an edge can cause a relaxation, so there are at most \(E\) pushes
+        and hence at most \(E\) pops over the whole run. Each push and pop is
+        \(O(\log(\text{heap size}))\), and the heap holds at most \(E \le V^2\)
+        entries, so \(\log(\text{heap size}) \le \log V^2 = 2\log V = O(\log V)\).
+        Settling a vertex scans its out-edge list, and each list is scanned once
+        (a vertex settles once), for \(\sum_u \deg(u) = E\) edge examinations in
+        total. Adding it up: \(O(E\log V)\) for the heap traffic plus \(O(V+E)\) for
+        the scans, i.e. \(O(E\log V)\) on a connected graph (\(E \ge V-1\)).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This is the same &ldquo;sum of degrees is \(E\)&rdquo; accounting as
+        the <a href="algo-bfs.html">BFS handout</a>&rsquo;s \(\Theta(V+E)\), now with a \(\log V\) price for each
+        priority-queue touch. There is also a queue-free variant:
+      </p>
+      <div class="aside">
+        <span class="tag">The array-scan version, \(O(V^2)\)</span>
+        Drop the heap and, each round, scan all vertices for the nearest unsettled
+        one: \(V\) rounds, an \(O(V)\) scan each, \(O(V^2)\) total. It is simpler and
+        (for a <em>dense</em> graph, where \(E = \Theta(V^2)\))
+        actually faster, since \(V^2 &lt; E\log V\) there. The heap version wins on
+        sparse graphs, which is most of them. This is the same dense-versus-sparse
+        choice that picked the adjacency matrix over the list in the
+        <a href="ds-graph-representations.html">graph-representations handout</a>.
+      </div>
+      <div class="aside">
+        <span class="tag">Sharper heaps: the \(O(E + V\log V)\) bound</span>
+        The \(\log V\) factor rides on <em>every</em> priority-queue operation, and a
+        <strong>Fibonacci heap</strong> (Cormen&nbsp;et&nbsp;al.) shaves it where it
+        hurts. It supports <code>decrease-key</code> in \(O(1)\) amortized and
+        <code>extract-min</code> in \(O(\log V)\) amortized, so eager Dijkstra does
+        \(E\) decrease-keys and \(V\) extract-mins for a total of \(O(E + V\log V)\),
+        asymptotically better on dense graphs (where \(E\) approaches
+        \(V^2\)). The constant factors are large enough that a plain binary heap wins
+        in practice, but the bound is the theoretical state of the art, and it is why
+        decrease-key is worth naming even though our lazy code avoids it.
+      </div>
+
+      <h3>Tracing the running graph, step by step</h3>
+      <p>
+        The table below is the algorithm&rsquo;s state after each settle, on the
+        running graph from source \(0\). Each row shows the whole
+        <code>dist</code> array; the <span style="color:#0a7d4d;font-weight:700">green</span>
+        cell is the vertex settled that step (its label is now final), and a
+        <span style="color:#9a5b00;font-weight:700">shaded</span> cell is a distance
+        <em>lowered</em> by a relaxation that step. Reading down a column shows a
+        vertex&rsquo;s label ratchet downward and then freeze.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr>
+            <th class="lab">step (settle)</th>
+            <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th>
+          </tr>
+          <tr><td class="lab">initialize</td>
+            <td class="upd">0</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td></tr>
+          <tr><td class="lab">settle 0 (d=0)</td>
+            <td class="set">0</td><td class="upd">4</td><td class="inf">&infin;</td><td class="upd">6</td><td class="inf">&infin;</td><td class="upd">20</td><td class="inf">&infin;</td><td class="inf">&infin;</td></tr>
+          <tr><td class="lab">settle 1 (d=4)</td>
+            <td>0</td><td class="set">4</td><td class="upd">5</td><td>6</td><td class="inf">&infin;</td><td>20</td><td class="inf">&infin;</td><td class="inf">&infin;</td></tr>
+          <tr><td class="lab">settle 2 (d=5)</td>
+            <td>0</td><td>4</td><td class="set">5</td><td>6</td><td class="inf">&infin;</td><td>20</td><td class="inf">&infin;</td><td class="inf">&infin;</td></tr>
+          <tr><td class="lab">settle 3 (d=6)</td>
+            <td>0</td><td>4</td><td>5</td><td class="set">6</td><td class="upd">8</td><td>20</td><td class="inf">&infin;</td><td class="upd">17</td></tr>
+          <tr><td class="lab">settle 4 (d=8)</td>
+            <td>0</td><td>4</td><td>5</td><td>6</td><td class="set">8</td><td class="upd">11</td><td class="inf">&infin;</td><td class="upd">15</td></tr>
+          <tr><td class="lab">settle 5 (d=11)</td>
+            <td>0</td><td>4</td><td>5</td><td>6</td><td>8</td><td class="set">11</td><td class="upd">20</td><td>15</td></tr>
+          <tr><td class="lab">settle 7 (d=15)</td>
+            <td>0</td><td>4</td><td>5</td><td>6</td><td>8</td><td>11</td><td>20</td><td class="set">15</td></tr>
+          <tr><td class="lab">settle 6 (d=20)</td>
+            <td>0</td><td>4</td><td>5</td><td>6</td><td>8</td><td>11</td><td class="set">20</td><td>15</td></tr>
+        </table>
+        <figcaption>
+          Dijkstra from \(0\). Vertices settle in nondecreasing distance order
+          (\(0,1,2,3,4,5,7,6\)), the same monotonicity BFS had by edge
+          count. Watch \(\texttt{dist}[5]\) fall \(20 \to 11\) when \(4\) settles, and
+          \(\texttt{dist}[7]\) fall \(17 \to 15\) at the same step: a label may be
+          relaxed several times before its vertex is settled, but never after.
+        </figcaption>
+      </figure>
+      <p>
+        The <code>parent</code> pointer set by each winning relaxation records one
+        edge per vertex, and together they form the <strong>shortest-paths tree</strong>:
+        the actual routes, drawn below. Note it uses \(4 \to 5\) rather than
+        the direct \(0 \to 5\), and \(0 \to 3\) rather than \(1 \to 3\): the tree is
+        assembled from whichever relaxation last lowered each label.
+      </p>
+      <figure>
+        <svg viewBox="0 0 420 300" role="img" aria-label="The shortest-paths tree Dijkstra computes from vertex 0, drawn on the same eight-vertex ring layout as the running graph. Seven tree edges are thick and green: edge from 0 to 1, edge from 0 to 3, edge from 1 to 2, edge from 3 to 4, edge from 4 to 5, edge from 4 to 7, and edge from 5 to 6. The four unused edges are thin and gray: edge from 0 to 5, edge from 1 to 3, edge from 2 to 3, and edge from 3 to 7. Beside each vertex is its final shortest distance from 0: vertex 0 has distance 0, vertex 1 has 4, vertex 2 has 5, vertex 3 has 6, vertex 4 has 8, vertex 5 has 11, vertex 6 has 20, and vertex 7 has 15.">
+          <defs>
+            <marker id="ahg" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#0a7d4d"/>
+            </marker>
+            <marker id="ahx" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#b8bec9"/>
+            </marker>
+          </defs>
+          <g stroke="#b8bec9" stroke-width="1.6" fill="none" marker-end="url(#ahx)">
+            <line x1="202" y1="58" x2="139" y2="209"/>  <!-- 0->5 (unused) -->
+            <line x1="289" y1="93" x2="289" y2="207"/>  <!-- 1->3 (unused) -->
+            <line x1="314" y1="170" x2="298" y2="209"/>  <!-- 2->3 (unused) -->
+            <line x1="274" y1="214" x2="146" y2="86"/>  <!-- 3->7 (unused) -->
+          </g>
+          <g stroke="#0a7d4d" stroke-width="2.6" fill="none" marker-end="url(#ahg)">
+            <line x1="230" y1="46" x2="269" y2="62"/>  <!-- 0->1 -->
+            <line x1="218" y1="58" x2="281" y2="209"/>  <!-- 0->3 -->
+            <line x1="298" y1="91" x2="314" y2="130"/>  <!-- 1->2 -->
+            <line x1="269" y1="238" x2="230" y2="254"/>  <!-- 3->4 -->
+            <line x1="190" y1="254" x2="151" y2="238"/>  <!-- 4->5 -->
+            <line x1="202" y1="242" x2="139" y2="91"/>  <!-- 4->7 -->
+            <line x1="122" y1="209" x2="106" y2="170"/>  <!-- 5->6 -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
+             fill="#0a7d4d" stroke="#fff" stroke-width="3" paint-order="stroke"
+             text-anchor="middle">
+            <text x="210" y="14">0</text>    <text x="318" y="66">4</text>
+            <text x="351" y="150">5</text>   <text x="318" y="234">6</text>
+            <text x="210" y="292">8</text>   <text x="101" y="234">11</text>
+            <text x="68" y="150">20</text>   <text x="101" y="66">15</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="210" cy="38" r="19"/>  <circle cx="289" cy="71" r="19"/>
+              <circle cx="322" cy="150" r="19"/>  <circle cx="289" cy="229" r="19"/>
+              <circle cx="210" cy="262" r="19"/>  <circle cx="131" cy="229" r="19"/>
+              <circle cx="98" cy="150" r="19"/>  <circle cx="131" cy="71" r="19"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="210" y="43">0</text>  <text x="289" y="76">1</text>
+              <text x="322" y="155">2</text>  <text x="289" y="234">3</text>
+              <text x="210" y="267">4</text>  <text x="131" y="234">5</text>
+              <text x="98" y="155">6</text>  <text x="131" y="76">7</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The shortest-paths tree from \(0\) (green), with each vertex&rsquo;s final
+          distance beside it. The four gray edges (\(0\to5\), \(1\to3\),
+          \(2\to3\), \(3\to7\)) are never used, each beaten by a cheaper route
+          through the tree.
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=dijkstra">Dijkstra demo</a>. Run it from \(0\) on
+        the running graph and watch the settle&rarr;relax rhythm; the full settle
+        order is \(0,1,2,3,4,5,7,6\) with final distances
+        \(0,4,5,6,8,11,20,15\). The satisfying moment is
+        \(\texttt{dist}[5]\) dropping from \(20\) to \(11\) as the detour
+        \(0\to3\to4\to5\) is found: the algorithm settles \(3\) and \(4\)
+        before it ever settles \(5\), so the cheap route is already in hand. Then
+        run it from \(2\): vertices \(0\) and \(1\) have no incoming path and stay
+        \(\infty\), the unreachable case made visible.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="correct">4. Why Dijkstra is correct</h2>
+      <p>
+        The greedy claim is that the nearest unsettled vertex can be settled:
+        its tentative distance is already final. Everything rides on it, and
+        it is exactly here that nonnegativity does its work.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (greedy is safe)</span>
+        When all weights are \(\ge 0\), the moment Dijkstra pops a vertex \(u\) as
+        the nearest unsettled vertex, \(\texttt{dist}[u] = \delta(u)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Let \(S\) be the settled set, and assume inductively
+        that \(\texttt{dist}[x] = \delta(x)\) for every \(x \in S\) (true at the
+        start, when \(S = \{s\}\) and \(\texttt{dist}[s] = 0\)). We show no path to
+        \(u\) can cost less than \(\texttt{dist}[u]\); since \(\texttt{dist}[u]\) is
+        the cost of a real path (the invariant of <a href="#relax">&sect;2</a>), that
+        forces \(\texttt{dist}[u] = \delta(u)\).
+        <br>
+        Take any path \(P\) from \(s\) to \(u\). It begins inside \(S\) (at \(s\))
+        and ends outside \(S\) (at \(u\), which is about to be settled), so it has a
+        <em>first</em> edge \(x \to y\) that leaves \(S\): \(x \in S\),
+        \(y \notin S\). Split \(P\) at that edge and bound each piece:
+        \[
+          \operatorname{cost}(P)
+          = \underbrace{\operatorname{cost}(s \rightsquigarrow x)}_{\ge\ \delta(x)}
+            + w(x,y)
+            + \underbrace{\operatorname{cost}(y \rightsquigarrow u)}_{\ge\ 0}
+          \;\ge\; \delta(x) + w(x,y).
+        \]
+        The tail is \(\ge 0\) <em>because every weight is nonnegative</em>;
+        this is the one and only place the assumption is used. Now \(x\) is settled,
+        so \(\delta(x) = \texttt{dist}[x]\), and when \(x\) settled we relaxed
+        \(x \to y\), giving \(\texttt{dist}[y] \le \texttt{dist}[x] + w(x,y) =
+        \delta(x) + w(x,y)\). Finally \(u\) was popped as the nearest unsettled
+        vertex and \(y\) is also unsettled, so \(\texttt{dist}[u] \le
+        \texttt{dist}[y]\). Chaining,
+        \[
+          \operatorname{cost}(P) \;\ge\; \delta(x) + w(x,y)
+          \;\ge\; \texttt{dist}[y] \;\ge\; \texttt{dist}[u].
+        \]
+        Every path to \(u\) costs at least \(\texttt{dist}[u]\), so
+        \(\delta(u) \ge \texttt{dist}[u]\); with \(\texttt{dist}[u] \ge \delta(u)\)
+        from the invariant, \(\texttt{dist}[u] = \delta(u)\), and the induction
+        extends to \(S \cup \{u\}\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The theorem also explains the speed. Because a settled distance is provably
+        final, no vertex is ever settled twice and no out-edge is ever relaxed
+        twice: one pass suffices, in contrast to Bellman&ndash;Ford&rsquo;s
+        \(V-1\) blind passes. Correctness of the greedy step is precisely what buys
+        the single pass. It also justifies the early exit: if you only need
+        \(\delta(t)\), stop the instant \(t\) settles (its label will never
+        change), often long before the whole graph is explored. That early
+        exit is the doorway to A* (<a href="#frontier">&sect;6</a>).
+      </p>
+      <div class="aside">
+        <span class="tag">The relaxation framework behind the proof</span>
+        Cormen&nbsp;et&nbsp;al. isolate the three facts every relaxation-based proof
+        leans on, worth naming because they are reused for Bellman&ndash;Ford and the
+        DAG algorithm too. The <strong>upper-bound property</strong>: once
+        \(\texttt{dist}[v]\) reaches \(\delta(v)\) it never changes, and it is always
+        \(\ge \delta(v)\) (our invariant of <a href="#relax">&sect;2</a>). The
+        <strong>convergence property</strong>: if \(s \rightsquigarrow u \to v\) is a
+        shortest path and \(\texttt{dist}[u] = \delta(u)\) at the moment
+        \(u \to v\) is relaxed, then \(\texttt{dist}[v] = \delta(v)\) forever after.
+        The <strong>path-relaxation property</strong>: if the edges of a shortest
+        \(s\rightsquigarrow v\) path are relaxed <em>in path order</em> (possibly with
+        other relaxations interleaved), then \(\texttt{dist}[v] = \delta(v)\). Every
+        shortest-path algorithm is a scheme for relaxing each shortest path&rsquo;s
+        edges in order: Dijkstra by settling nearest-first, Bellman&ndash;Ford by
+        brute-force rounds, the DAG algorithm by topological order. Correctness is
+        always &ldquo;did we relax the right edges in the right order?&rdquo;
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="negative">5. Negative weights and the limits of greed</h2>
+      <p>
+        The proof used nonnegativity in exactly one place: the tail
+        \(\operatorname{cost}(y \rightsquigarrow u) \ge 0\). Remove that guarantee
+        and a farther boundary crossing can undercut a label that was already
+        settled, and Dijkstra never reconsiders a settled vertex.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (Dijkstra settles too early)</span>
+        <pre>  s ──1──→ a        edges:  s→a (1),  s→b (2),  b→a (−4)
+  │        ↑
+  2       −4        greedy from s: settle s(0); nearest is a(1),
+  │        │        declared FINAL. Then settle b(2); relax b→a:
+  └──→ b ──┘        2 + (−4) = −2 &lt; 1, but a is already settled.</pre>
+        Vertex \(a\) settles at distance \(1\), but the true shortest route
+        \(s \to b \to a\) costs \(2 + (-4) = -2\). The cheaper route arrives after
+        \(a\) is frozen, so Dijkstra silently returns \(1\), not \(-2\). Nothing
+        crashes; the answer is just wrong, which is what makes the
+        precondition matter more than most.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=dijkstra">Dijkstra demo</a>: append the
+        edge <code>7 1 -20</code> to the running graph and rebuild, then run from
+        \(0\). Dijkstra happily reports \(\texttt{dist}[1] = 4\), but the demo&rsquo;s
+        final <em>edge re-check</em> (a scan for any edge that still relaxes,
+        which by the invariant of <a href="#relax">&sect;2</a> should find none)
+        flags \(7 \to 1\) in red, because \(15 + (-20) = -5 &lt; 4\). The
+        red edge is the proof&rsquo;s failed line made visible. (Worse: that edge
+        closes the cycle \(1 \to 3 \to 4 \to 7 \to 1\) of weight
+        \(5+2+7-20 = -6\), so a shortest path to \(1\) does not even exist;
+        see below.) The re-check is a fine debugging trick for your own
+        implementation: at the end, nothing should relax.
+      </div>
+      <h3>Bellman&ndash;Ford, and negative cycles</h3>
+      <p>
+        When weights may be negative, drop the greedy shortcut and relax blindly:
+        pass over <em>all</em> \(E\) edges, \(V-1\) times.
+      </p>
+      <pre>  for i in 1 .. V-1:
+      for each edge (u, v, w):
+          relax(u, v, w)</pre>
+      <p>
+        A shortest path has at most \(V-1\) edges, and one can show that after round
+        \(i\) every shortest path using at most \(i\) edges is final; so \(V-1\)
+        rounds settle everything, at a cost of \(O(VE)\). This is
+        <strong>Bellman&ndash;Ford</strong>, and it handles negative edges that
+        Dijkstra cannot. Notice the strategy: greedy lost its license, so this is the
+        try-everything-remembered fallback: round \(i\) solves the
+        subproblem &ldquo;shortest paths using at most \(i\) edges&rdquo;,
+        a dynamic program (the
+        <a href="../dp/paradigm-dp-method.html">Dynamic Programming</a> handout)
+        in all but name.
+      </p>
+      <div class="aside">
+        <span class="tag">Negative cycles have no shortest path</span>
+        If some cycle&rsquo;s weights sum to a negative number, &ldquo;shortest
+        path&rdquo; becomes meaningless: each extra lap lowers the cost, so the
+        infimum is \(-\infty\). Bellman&ndash;Ford detects this with one more pass:
+        after \(V-1\) rounds all labels must be final, so if a \(V\)-th pass
+        still relaxes an edge, a negative cycle is reachable. Notice this is the
+        <em>same</em> &ldquo;does anything still relax?&rdquo; test the demo runs;
+        there it exposed a broken greedy choice, here it exposes a broken problem.
+      </div>
+      <div class="aside">
+        <span class="tag">Aside: longest paths are hard</span>
+        Shortest and longest sound symmetric, but they are worlds apart. The
+        <em>longest simple path</em> problem is NP-hard (it would solve Hamiltonian
+        path), and the natural trick (negate every weight and run a
+        shortest-path algorithm) fails, because negating a positive cycle
+        makes it negative, landing in the undefined territory above. A small change
+        to a problem can flip it from linear-time to intractable.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="frontier">6. One frontier, many searches</h2>
+      <p>
+        The <a href="algo-bfs.html">BFS</a> and <a href="algo-dfs.html">DFS</a> handouts
+        built a shared template: an explore loop whose
+        behavior is set by the
+        container holding the frontier. Dijkstra is the next row of that table, and
+        seeing it there is the point of these handouts.
+      </p>
+      <table>
+        <tr><th>frontier container</th><th>removes next</th><th>you get</th></tr>
+        <tr><td>stack (LIFO)</td><td>deepest</td><td>DFS</td></tr>
+        <tr><td>queue (FIFO)</td><td>oldest</td><td>BFS (fewest edges)</td></tr>
+        <tr><td>priority queue by \(\texttt{dist}[u]\)</td><td>nearest</td><td><strong>Dijkstra</strong></td></tr>
+        <tr><td>priority queue by \(\texttt{dist}[u] + h(u)\)</td><td>most promising</td><td>A*</td></tr>
+      </table>
+      <p>
+        BFS is literally Dijkstra with all weights equal to \(1\): its queue already
+        dequeues vertices in distance order (the queue-monotone lemma proved in
+        the <a href="algo-bfs.html">BFS handout</a>), so it <em>is</em> a priority queue for unit weights. Weighted
+        edges are the only reason the frontier must become a real heap.
+      </p>
+      <div class="aside">
+        <span class="tag">Dijkstra and Prim are the same skeleton</span>
+        Prim&rsquo;s minimum-spanning-tree algorithm (the
+        <a href="algo-prim.html">Prim&rsquo;s Algorithm</a>
+        handout) also grows a tree
+        by pulling the nearest frontier vertex from a priority queue. The two differ
+        only in the key: Dijkstra prioritizes \(\texttt{dist}[u] + w\), the total
+        distance from the <em>source</em>; Prim prioritizes \(w\) alone, the single
+        cheapest edge connecting a vertex to the <em>growing tree</em>. Same greedy,
+        PQ-driven growth; different priority. Recognizing the shared skeleton makes
+        both easier to hold in mind.
+      </div>
+      <h3>A*: the same relaxation, a smarter order</h3>
+      <p>
+        Plain Dijkstra explores outward in all directions equally. For a single
+        target, <strong>A*</strong> biases the priority by a
+        <strong>heuristic</strong> \(h(u)\) estimating the cost still to go, so it
+        expands toward the goal first:
+      </p>
+      <pre>  priority = dist[u] + h(u)          <span class="cm">// h(u) &asymp; remaining cost to the target</span></pre>
+      <p>
+        What is \(h\), and how is it computed? <em>Not from the graph</em>:
+        knowing the true remaining cost is the very problem being solved. It comes
+        from cheap domain knowledge stored on the vertices. On a road map every
+        vertex carries coordinates, so
+        \(h(u) = \sqrt{(x_u - x_t)^2 + (y_u - y_t)^2}\): the straight-line
+        distance to the target, one \(O(1)\) formula, no graph search; on a game
+        board, Manhattan distance plays the same role. This is why A* lives on
+        <em>embedded</em> graphs (maps, grids, game worlds): an abstract graph
+        offers no side-information to build an \(h\) from. The implementation is
+        one changed line of <a href="#dijkstra">&sect;3</a>&rsquo;s code: push
+        \(\{\texttt{dist}[v] + h(v),\, v\}\) instead of
+        \(\{\texttt{dist}[v],\, v\}\).
+      </p>
+      <p>
+        It stays exact as long as \(h\) is <strong>admissible</strong>: it never
+        overestimates the true remaining cost (straight-line distance is admissible
+        for roads, since a road is never shorter than the straight line). An
+        admissible heuristic only reorders the exploration; it never misses the
+        shortest path. Set \(h \equiv 0\) and A* degenerates to Dijkstra, a clean
+        sanity check. This is what real map routers build on (along with
+        searching from both ends and precomputed shortcuts), but every layer
+        sits on the same settle-and-relax core.
+      </p>
+      <h3>Which shortest-path algorithm?</h3>
+      <table>
+        <tr><th>situation</th><th>use</th><th>cost</th></tr>
+        <tr><td>unweighted</td><td><strong>BFS</strong></td><td>\(\Theta(V+E)\)</td></tr>
+        <tr><td>a DAG (any weights)</td><td>relax in topological order</td><td>\(\Theta(V+E)\)</td></tr>
+        <tr><td>nonnegative, sparse</td><td><strong>Dijkstra + heap</strong></td><td>\(O(E\log V)\)</td></tr>
+        <tr><td>nonnegative, dense</td><td>Dijkstra + array scan</td><td>\(O(V^2)\)</td></tr>
+        <tr><td>negative weights</td><td>Bellman&ndash;Ford</td><td>\(O(VE)\)</td></tr>
+      </table>
+      <p>
+        Ask in order: weighted at all? a DAG (then topological-order relaxation is
+        linear and handles negatives too)? nonnegative? sparse or dense? BFS and
+        heap-Dijkstra are the everyday tools; the rest are specialists. All of them
+        (and the GPS routers, OSPF network routing, transit planners, and
+        game pathfinders that use them) are the same idea: relax edges until
+        nothing improves, in the cleverest order you can afford.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">7. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          In the diamond chain of <a href="#weighted">&sect;1</a>, keep each
+          diamond&rsquo;s <em>direct</em> edge \(v_{i-1} \to v_i\) as well (so
+          each diamond looks exactly like the running example). How many distinct
+          \(v_0 \to v_k\) paths are there now? How many vertices does the graph
+          need before the path count passes \(10^{30}\)?
+          <details>
+            <summary>solution</summary>
+            Each stage now offers <em>three</em> ways from \(v_{i-1}\) to
+            \(v_i\): via \(a_i\), via \(b_i\), or the direct edge. The choices
+            remain independent, so by the product rule there are \(3^k\) paths.
+            For the count: \(3^k > 10^{30}\) needs
+            \(k > 30/\log_{10} 3 \approx 62.9\), so \(k = 63\) diamonds
+            (\(V = 3k+1 = 190\) vertices) already exceed \(10^{30}\)
+            paths (versus \(301\) vertices for the \(2^k\) version: the fatter
+            branching factor gets there sooner).
+          </details>
+        </li>
+        <li>
+          On the graph \(0\to1(1)\), \(0\to2(4)\), \(1\to2(1)\), \(1\to3(5)\),
+          \(2\to3(1)\), run Dijkstra from \(0\). Give the settle order and the final
+          distances.
+          <details>
+            <summary>solution</summary>
+            Settle \(0(0)\): relax \(\texttt{dist}[1]=1\), \(\texttt{dist}[2]=4\).
+            Settle \(1(1)\) (nearest): \(1\to2\) gives \(1+1=2 &lt; 4\) so
+            \(\texttt{dist}[2]=2\); \(1\to3\) gives \(6\) so \(\texttt{dist}[3]=6\).
+            Settle \(2(2)\): \(2\to3\) gives \(2+1=3 &lt; 6\) so
+            \(\texttt{dist}[3]=3\). Settle \(3(3)\). Order \(0,1,2,3\); distances
+            \(0,1,2,3\). Note \(2\)&rsquo;s label fell from \(4\) to \(2\) and
+            \(3\)&rsquo;s from \(6\) to \(3\) before each settled: the
+            two-hop detour beating the direct edge, twice.
+          </details>
+        </li>
+        <li>
+          A classmate marks a vertex settled the moment they <em>push</em> it onto
+          the priority queue, rather than when it pops. Give a three-vertex weighted
+          graph on which this produces a wrong distance, and name the true distance.
+          <details>
+            <summary>solution</summary>
+            Take \(0\to1(4)\), \(0\to2(1)\), \(2\to1(2)\). Pushing settles \(1\) at
+            \(4\) the instant \(0\)&rsquo;s edges are scanned. But the real shortest
+            route is \(0\to2\to1 = 1+2 = 3\); since \(1\) is frozen at \(4\), the
+            \(2\to1\) relaxation is ignored and the reported \(\texttt{dist}[1]=4\)
+            is wrong (true distance \(3\)). Settling only on <em>pop</em> keeps
+            \(1\) improvable until \(2\) has relaxed into it.
+          </details>
+        </li>
+        <li>
+          Explain why lazy Dijkstra&rsquo;s priority queue can hold up to \(E\)
+          entries yet the running time is still \(O(E\log V)\), not
+          \(O(E\log E)\).
+          <details>
+            <summary>solution</summary>
+            Each improving relaxation pushes one entry and there are at most \(E\)
+            of them, so the heap holds \(O(E)\) entries and each operation is
+            \(O(\log E)\). But \(E \le V^2\), so \(\log E \le \log V^2 = 2\log V\),
+            which is \(O(\log V)\). The extra duplicates from lazy deletion cost only
+            this constant factor, so the bound is \(O(E\log V)\), identical in
+            order to the eager, decrease-key version whose heap never exceeds \(V\).
+          </details>
+        </li>
+        <li>
+          Point to the exact step of the correctness proof that fails when a single
+          negative-weight edge is present, and connect it to the settle-too-early
+          example.
+          <details>
+            <summary>solution</summary>
+            The step \(\operatorname{cost}(y \rightsquigarrow u) \ge 0\), which bounds
+            the tail of the path after it first leaves the settled set. With a
+            negative edge in that tail, a path crossing the boundary at a
+            <em>farther</em> vertex \(y\) can still reach \(u\) more cheaply than
+            \(\texttt{dist}[u]\), so &ldquo;nearest boundary crossing wins&rdquo; is
+            no longer valid. In the example \(s\to a(1)\), \(s\to b(2)\),
+            \(b\to a(-4)\), vertex \(a\) settles at \(1\) but \(s\to b\to a = -2\);
+            the \(-4\) tail undercuts the settled label, exactly the failed
+            inequality.
+          </details>
+        </li>
+        <li>
+          Give a weighted graph where the shortest \(s\)-to-\(t\) path has
+          <em>more edges</em> than every other \(s\)-to-\(t\) path, and state what
+          BFS would return instead.
+          <details>
+            <summary>solution</summary>
+            \(s\to t(10)\) directly, and \(s\to a(1)\), \(a\to b(1)\), \(b\to t(1)\).
+            The shortest path \(s\to a\to b\to t\) has three edges and cost \(3\);
+            the only other path is the single edge \(s\to t\) of cost \(10\). BFS
+            minimizes edge count and returns the one-edge path, reporting distance
+            \(10\) instead of the true \(3\). This is the fewest-edge-versus-least-weight
+            gap of <a href="#weighted">&sect;1</a>, made as wide as you like.
+          </details>
+        </li>
+        <li>
+          You must answer many point-to-point queries on one fixed road network with
+          nonnegative weights. Which parts of Dijkstra can you reuse across queries,
+          and what does the early-exit rule save on a single query?
+          <details>
+            <summary>solution</summary>
+            The graph (the weighted adjacency list) is reused across all queries; the
+            per-query state is \(\texttt{dist}\), \(\texttt{settled}\), the parent
+            pointers, and the heap, all reset each time. For one query \(s \to t\),
+            the correctness theorem says \(t\)&rsquo;s label is final the moment \(t\)
+            pops, so you may stop then rather than settling the rest of the graph,
+            often a large saving. Steering the search toward \(t\) with an
+            admissible heuristic (A*) prunes even more, without losing exactness.
+          </details>
+        </li>
+        <li>
+          On a DAG, shortest paths can be computed in \(\Theta(V+E)\) with no
+          priority queue, even with negative weights. Explain the order of
+          relaxation that achieves this and why it works.
+          <details>
+            <summary>solution</summary>
+            Topologically sort the DAG (as in the
+            <a href="algo-topological-sort.html">topological-sort handout</a>), then relax every vertex&rsquo;s
+            out-edges in that order. When a vertex \(u\) is processed, every edge into
+            \(u\) comes from a vertex earlier in topological order, which has already
+            been processed, so \(\texttt{dist}[u]\) is already final: no later
+            relaxation can improve it. Each edge relaxes exactly once, giving
+            \(\Theta(V+E)\). Nonnegativity is not needed because the topological order,
+            not a greedy distance argument, guarantees finality; there are simply no
+            back edges to reconsider.
+          </details>
+        </li>
+        <li>
+          True or false, with justification: &ldquo;Adding a constant \(c &gt; 0\) to
+          every edge weight leaves all shortest paths unchanged.&rdquo;
+          <details>
+            <summary>solution</summary>
+            False. Adding \(c\) to every edge adds \(c \cdot (\text{number of edges})\)
+            to a path&rsquo;s cost, so it penalizes paths with more edges. A
+            two-edge path costing \(2\) becomes \(2 + 2c\); a one-edge path costing
+            \(9\) becomes \(9 + c\); for \(c &gt; 7\) the formerly-expensive direct
+            edge now wins. The transformation changes which path is shortest, so it
+            cannot be used to, say, turn negative weights nonnegative and run
+            Dijkstra, a common and wrong idea.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Dijkstra&rsquo;s Algorithm v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

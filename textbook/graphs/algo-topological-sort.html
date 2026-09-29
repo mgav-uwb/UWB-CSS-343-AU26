@@ -1,0 +1,469 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Topological Sort.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Topological Sort - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      /* static run tables (rendered by lib/core/trace-table.js; styles copied
+         from lib/core/lib.css .u-ttable so the handout stays self-styled) */
+      .u-ttable { border-collapse: collapse; font: 500 12.5px ui-monospace, Menlo, monospace; color: #1a1c22; margin: 10px auto; }
+      .u-ttable th { font: 700 11px system-ui; letter-spacing: 0.05em; text-transform: uppercase; color: #66708a; background: #f3f0ff; border: 1px solid #e2dcff; padding: 4px 9px; }
+      .u-ttable td { border: 1px solid #eceef2; padding: 4px 9px; text-align: center; white-space: nowrap; }
+      .u-ttable .u-tt-num { color: #9aa3b5; }
+      .u-ttable .u-tt-act { text-align: left; color: #3a3f4d; }
+      .u-ttable tbody tr:last-child td { background: #f4fbf7; }
+      figure.linefig { margin: 1.5em 0; text-align: center; }
+      figure.linefig canvas { max-width: 100%; height: auto; border: 1px solid #eef0f4; border-radius: 10px; background: #fff; }
+      figure.linefig figcaption { font-size: 0.85em; color: var(--dim); margin-top: 6px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Topological Sort</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Ordering the vertices of a digraph so that every edge points forward.
+        Directed acyclic graphs, when a topological order exists (exactly when
+        the graph is acyclic), and two algorithms that construct one:
+        Kahn&rsquo;s algorithm and DFS reverse post-order, both proved correct
+        in \(\Theta(V+E)\), each doubling as a cycle detector. With
+        machine-generated traces, links to the interactive demo, and exercises.
+      </div>
+
+      <p class="lead">
+        Digraph vocabulary and the adjacency-list representation are in
+        <a href="ds-graph-representations.html"><em>Graphs: Vocabulary &amp;
+        Representations</em></a>, along with the running directed graph used by
+        the worked examples and the demo (adjacency list \(0\to\{1,3,5\}\),
+        \(1\to\{2,3\}\), \(2\to\{3\}\), \(3\to\{4,7\}\), \(4\to\{5,7\}\),
+        \(5\to\{6\}\)); depth-first search itself, including the edge
+        classification used below, is in
+        <a href="algo-dfs.html"><em>Depth-First Search</em></a>.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#dag">Directed acyclic graphs and topological order</a></li>
+          <li><a href="#kahn">Kahn&rsquo;s algorithm</a></li>
+          <li><a href="#postorder">Topological sort via DFS post-order</a></li>
+          <li><a href="#orders">Many valid orders, and applications</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="dag">1. Directed acyclic graphs and topological order</h2>
+      <div class="def">
+        <span class="tag">Definition (DAG, topological order)</span>
+        A <strong>directed acyclic graph</strong> (DAG) is a digraph with no
+        directed cycle. A <strong>topological order</strong> of a digraph is a
+        listing of its vertices such that every edge points forward: for each edge
+        \(u \to v\), \(u\) appears before \(v\).
+      </div>
+      <p>
+        A DAG models &ldquo;must happen before&rdquo; relationships (course
+        prerequisites, compilation order, spreadsheet formulas, package installs),
+        and a topological order is a schedule that respects all of them:
+        do the vertices left to right and every prerequisite is already done. The
+        diamond \(0\to1,\ 0\to2,\ 1\to3,\ 2\to3\) has two topological orders,
+        \(0\,1\,2\,3\) and \(0\,2\,1\,3\), since \(1\) and \(2\) are independent.
+        When does an order exist?
+      </p>
+      <figure class="linefig">
+        <div id="topo-line"></div>
+        <figcaption>The definition made visible (after Sedgewick&rsquo;s
+        &ldquo;edges all point right&rdquo; figure): the running DAG&rsquo;s
+        vertices on a line in topological order: same vertices, same
+        edges, and every arrow flows rightward. Drawn by the demo engine from
+        its own Kahn run; the interactive topo demo ends every successful run
+        with this frame.</figcaption>
+      </figure>
+      <p>
+        A cycle destroys it immediately: \(a \to b \to \cdots \to a\) would demand
+        \(a\) before \(b\) before \(\cdots\) before \(a\), which no linear order
+        satisfies. So a topological order exists only if the graph is a DAG. The
+        converse (every DAG has one) is proved constructively by an
+        algorithm, and the algorithm rests on one lemma.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (every DAG has a source)</span>
+        A <strong>source</strong> is a vertex of in-degree \(0\). Every non-empty
+        DAG has at least one source.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Start at any vertex and, while the current vertex
+        has some incoming edge \(u \to v\), step backward to \(u\). If this walk
+        never got stuck, after \(V\) steps it would have listed \(V+1\) vertices;
+        among only \(V\) distinct vertices, two must coincide (pigeonhole), and a
+        repeat on a backward walk exhibits a directed cycle, impossible in
+        a DAG. So the walk gets stuck, at a vertex with no incoming edge: a
+        source. (Symmetrically, walking forward proves every DAG has a
+        <em>sink</em>, an out-degree-\(0\) vertex.) <span class="qed">&#8718;</span>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="kahn">2. Kahn&rsquo;s algorithm</h2>
+      <p>
+        Repeatedly output a source and remove it, freeing its dependents:
+      </p>
+      <pre>compute the in-degree of every vertex
+queue all vertices with in-degree 0
+repeat until the queue is empty:
+    dequeue u  &rarr;  OUTPUT u
+    for each edge u &rarr; v:  in-degree(v)--
+        if in-degree(v) becomes 0:  enqueue v</pre>
+      <div class="ex">
+        <span class="tag">Example (Kahn on the diamond)</span>
+        <pre>  0&rarr;1  0&rarr;2  1&rarr;3  2&rarr;3     in-deg: 0:0  1:1  2:1  3:2
+
+  queue [0]                 (only source: 0)
+  out 0 &rarr; dec 1, 2 &rarr; both hit 0 &rarr; queue [1, 2]
+  out 1 &rarr; dec 3 &rarr; 3:1
+  out 2 &rarr; dec 3 &rarr; 3:0 &rarr; queue [3]
+  out 3
+  order:  0 1 2 3    (all 4 output &rArr; the graph is acyclic)</pre>
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (Kahn is correct, \(\Theta(V+E)\))</span>
+        On a DAG, Kahn&rsquo;s algorithm outputs all \(V\) vertices in a valid
+        topological order, in \(\Theta(V+E)\) time. On a graph with a cycle it
+        outputs fewer than \(V\) vertices.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> By the source lemma a DAG always has an
+        in-degree-\(0\) vertex available, so the algorithm never stalls early;
+        deleting a vertex from a DAG leaves a DAG (removing vertices and edges
+        cannot create a cycle), so by induction it proceeds to the end and outputs
+        every vertex. An edge \(u \to v\) is processed (and \(v\)&rsquo;s
+        in-degree decremented) only when \(u\) is output; \(v\) is not
+        output until its in-degree reaches \(0\), i.e. until <em>all</em> its
+        predecessors are out, so \(u\) precedes \(v\): every edge points forward.
+        Cost: computing in-degrees scans all lists once (\(\Theta(V+E)\)); each
+        vertex is enqueued and dequeued once, and each edge is decremented exactly
+        once, so the loop is \(\Theta(V+E)\). Finally, if the graph has a cycle,
+        the cycle&rsquo;s vertices each wait on another in the cycle, so none ever
+        reaches in-degree \(0\); the algorithm halts with fewer than \(V\) outputs,
+        which is a ready-made cycle detector.
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (Kahn on the running DAG)</span>
+        In-degrees: \(0{:}0,\ 1{:}1,\ 2{:}1,\ 3{:}3,\ 4{:}1,\ 5{:}2,\ 6{:}1,\
+        7{:}2\). The only source is \(0\); outputting it drops \(1\) to in-degree
+        \(0\) (and \(3\) to \(2\), \(5\) to \(1\)); each output in turn frees the
+        next index, and breaking ties by smaller index gives the order
+        \(0\ 1\ 2\ 3\ 4\ 5\ 6\ 7\). Row by row, from the engine&rsquo;s own
+        trace (the labels column is the eight live in-degrees):
+        <div id="kahn-run-table" style="overflow-x:auto"></div>
+        One tie does occur: outputting \(4\) drops both \(5\) and \(7\) to
+        in-degree \(0\), so the ready set holds \(\{5,7\}\) and either may go
+        next. Taking \(7\) first would give \(0\,1\,2\,3\,4\,7\,5\,6\), equally
+        valid.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (two sources at the start, and a stall)</span>
+        The running DAG has a single source, so two of Kahn&rsquo;s situations
+        stay hidden there. First, several sources at once: take
+        \(0\to2,\ 1\to2,\ 2\to3,\ 2\to4\), whose in-degrees are
+        \(0{:}0,\ 1{:}0,\ 2{:}2,\ 3{:}1,\ 4{:}1\).
+        <pre>  ready [0 1]              (TWO sources: 0 and 1 both have in-degree 0)
+  out 0 &rarr; dec 2 &rarr; 2:1        ready [1]
+  out 1 &rarr; dec 2 &rarr; 2:0        ready [2]
+  out 2 &rarr; dec 3, 4 &rarr; both 0  ready [3 4]   (a TIE)
+  out 3                     ready [4]
+  out 4                     ready []
+  order:  0 1 2 3 4         (5 of 5 output &rArr; acyclic)</pre>
+        Starting instead with \(1\), or taking \(4\) before \(3\) at the tie,
+        gives \(1\,0\,2\,3\,4\) and \(0\,1\,2\,4\,3\): every choice from the
+        ready set leads to a valid order, because a ready vertex has no
+        unoutput predecessor left. Second, a graph that is not a DAG: add
+        \(6 \to 2\) to the running graph, which raises \(2\)&rsquo;s in-degree
+        to \(2\).
+        <pre>  ready [0]                in-deg 0 1 2 3 4 5 6 7
+                                  0 1 2 3 1 2 1 2
+  out 0 &rarr; dec 1, 3, 5          0 0 2 2 1 1 1 2   ready [1]
+  out 1 &rarr; dec 2, 3            0 0 1 1 1 1 1 2   ready []
+  STALL: 2 of 8 output</pre>
+        Nothing reaches in-degree \(0\) again: each of \(2,3,4,5,6\) waits on
+        the one before it around the loop \(2 \to 3 \to 4 \to 5 \to 6 \to 2\),
+        and \(7\) waits on \(3\) and \(4\). The output count \(2 < 8\) is the
+        cycle report, and the vertices left behind are exactly those on or
+        downstream of the cycle.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="postorder">3. Topological sort via DFS post-order</h2>
+      <p>
+        A second route uses DFS. Run DFS (restarting at every unvisited vertex so
+        all vertices finish); record each vertex&rsquo;s <em>finish</em> time when
+        its call returns; the answer is the <em>reverse</em> of finish order.
+      </p>
+      <pre>dfs(u): ... recurse into all of u's unvisited neighbors ...
+        on FINISHING u, push u onto a stack
+answer = pop the stack   <span class="cm">// reverse of finish order</span></pre>
+      <div class="ex">
+        <span class="tag">Example (DFS post-order on the diamond)</span>
+        <pre>  dfs(0) &rarr; dfs(1) &rarr; dfs(3): 3 finishes   (finish #1)
+           1 finishes                   (finish #2)
+           dfs(2): 3 seen &rarr; 2 finishes  (finish #3)
+           0 finishes                   (finish #4)
+
+  finish order:  3 1 2 0
+  REVERSE     :  0 2 1 3     &check; a topological order</pre>
+        Deepest vertices finish first; \(0\) finishes last, because everything
+        depends on it, and lands first when reversed. Compare with Kahn&rsquo;s
+        \(0\,1\,2\,3\): different tie-breaking, both valid.
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (reverse post-order is topological)</span>
+        In a DAG, for every edge \(u \to v\), \(v\) finishes before \(u\) in DFS.
+        Hence listing vertices in reverse order of finish time places every edge
+        forward.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> When \(\texttt{dfs}(u)\) examines the edge
+        \(u \to v\), vertex \(v\) is in one of three states.
+        (1) <em>Unvisited</em>: then \(\texttt{dfs}(v)\) runs inside
+        \(\texttt{dfs}(u)\) and returns before it, so \(v\) finishes first.
+        (2) <em>Already finished</em>: then \(v\) finished before \(u\) trivially.
+        (3) <em>On the recursion stack</em> (an ancestor of \(u\)): then a path
+        \(v \rightsquigarrow u\) exists, and together with \(u \to v\) that is a
+        directed cycle, impossible in a DAG. So only cases (1) and (2)
+        occur, and in both \(v\) finishes before \(u\). Reversing finish order
+        therefore lists \(u\) before \(v\) for every edge.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Case (3) is exactly the back edge of the
+        <a href="algo-dfs.html"><em>Depth-First Search</em></a> handout&rsquo;s edge
+        classification: on a
+        general digraph its occurrence is precisely the cycle detector, so the
+        same three-case analysis does double duty as topological sort and cycle
+        detection. Two free cycle detectors, then: <em>Kahn</em> (fewer than \(V\)
+        vertices come out) and <em>DFS</em> (a back edge appears). A digraph has a
+        topological order if and only if it is acyclic.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=graph">Topological-sort demo</a> (Kahn, with
+        live in-degree labels). Run it on the running DAG to watch the in-degrees
+        tick down and vertices pop as they reach \(0\); then hold on the
+        finale: the vertices rearrange onto a line in the output order, every
+        edge a right-pointing arc (the figure above, earned live). Then pick the
+        &ldquo;with a cycle (6&rarr;2 added)&rdquo; preset and rebuild: now
+        \(2 \to 3 \to 4 \to 5 \to 6 \to 2\) is a cycle,
+        Kahn strands the cycle&rsquo;s vertices (they never reach in-degree \(0\)),
+        and DFS from \(0\) flags the back edge: two detectors, one bug.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="orders">4. Many valid orders, and applications</h2>
+      <p>
+        Whenever two vertices have no path between them (like \(1\) and \(2\) in
+        the diamond), either may come first, so a topological order is <em>not</em>
+        unique unless the DAG is a single chain. A grader (and every real
+        consumer) must therefore check the <em>property</em> (all edges
+        forward), not compare against one specific sequence. Topological sort is
+        DFS&rsquo;s most practically important application: build systems compile
+        in dependency order, package managers install dependencies first,
+        spreadsheets recompute cells in formula order, and a &ldquo;circular
+        dependency&rdquo; or &ldquo;import cycle&rdquo; error is the cycle detector
+        speaking.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">5. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Prove that a digraph has a topological order if and only if it is
+          acyclic.
+          <details>
+            <summary>solution</summary>
+            (\(\Rightarrow\)) If a cycle \(a \to b \to \cdots \to a\) existed, a
+            topological order would need \(a\) before \(b\) before \(\cdots\)
+            before \(a\), a contradiction; so an order forces acyclicity.
+            (\(\Leftarrow\)) If the graph is a DAG, Kahn&rsquo;s algorithm outputs
+            all \(V\) vertices in a valid order (source lemma + the correctness
+            proposition of <a href="#kahn">&sect;2</a>), constructing an order.
+            Both directions hold.
+          </details>
+        </li>
+        <li>
+          You add the edge \(6 \to 2\) to the running DAG. List a cycle it
+          creates, and state what each of the two cycle detectors reports.
+          <details>
+            <summary>solution</summary>
+            The edge closes the cycle \(2 \to 3 \to 4 \to 5 \to 6 \to 2\) (the
+            unique path from \(2\) to \(6\), now looped back). Kahn outputs \(0\),
+            then \(1\), and then no remaining vertex ever reaches in-degree \(0\)
+            (each of \(2,3,4,5,6\) waits on the next around the loop), so it halts
+            with fewer than \(8\) outputs; the leftover vertices contain
+            the cycle. DFS from \(0\) eventually examines an edge into a vertex
+            still on the recursion stack (\(6 \to 2\) while \(2\) is an
+            ancestor), a back edge, and reports the cycle.
+          </details>
+        </li>
+        <li>
+          Run DFS from \(0\) on the running DAG, lists ascending, and give the
+          finish order and the reverse post-order. Compare it with Kahn&rsquo;s
+          \(0\,1\,2\,3\,4\,5\,6\,7\), and check the two disagree only where the
+          order was free to differ.
+          <details>
+            <summary>solution</summary>
+            The dive is \(0\to1\to2\to3\to4\to5\to6\); \(6\) finishes first,
+            then \(5\), then \(7\) (reached from \(4\) on the way back), then
+            \(4, 3, 2, 1, 0\). So
+            <pre>  finish order   6 5 7 4 3 2 1 0
+  REVERSE        0 1 2 3 4 7 5 6</pre>
+            The two orders agree on \(0\,1\,2\,3\,4\) and then differ:
+            reverse post-order emits \(7\) before \(5\) and \(6\). That is
+            legal because no path joins \(7\) to \(5\) or \(6\) in either
+            direction, which is the same freedom Kahn had at its ready set
+            \(\{5,7\}\). Every edge still points forward in both, and that
+            property, not agreement with one sequence, is what a checker must
+            test.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Topological Sort v1.0 &middot;
+        prepared by Dr. Marcel Gavriliu.
+        Typeset with MathJax; interactive demos in the course library.
+      </footer>
+    </div>
+    <!-- Run table + the topological line-up figure: all generated by the
+         demo library FROM ITS OWN TRACES, so the numbers cannot drift from
+         what the interactive demos show (lib/core/trace-table.js). -->
+    <script type="module">
+      import { Graph, GraphRenderer, renderTraceTable } from "../../lib/index.js";
+      // Kahn on the running DAG (§2): rows at each output/final step
+      const DAG = [0, 1, 0, 3, 1, 2, 1, 3, 2, 3, 0, 5, 3, 4, 3, 7, 4, 5, 5, 6, 4, 7];
+      {
+        const g = new Graph(); g.build(DAG);
+        renderTraceTable(document.getElementById("kahn-run-table"), {
+          trace: g.topo(),
+          pick: (f) => /^(compute|\d+ has in-degree 0|topological order)/.test(f.msg),
+          action: (f) => f.msg.replace(/^(\d+) has in-degree 0 → output it.*$/, "output $1 (in-degree 0)").replace(/topological order:.*$/, "done: all 8 output (valid order)").replace(/ \(shown on each vertex\)/, ""),
+          cols: [
+            { label: "ready", get: (f) => `[${f.snapshot.frontier.items.join(" ")}]` },
+            { label: "in-degrees 0–7", get: (f) => f.highlight?.dist ? Object.keys(f.highlight.dist).sort((a, b) => a - b).map((k) => f.highlight.dist[k]).join(" ") : "" },
+            { label: "order so far", get: (f) => (f.highlight?.nodes?.done ?? []).join(" ") },
+          ],
+        });
+      }
+      // the line-up figure (§1): Kahn's finale frame, painted static
+      {
+        const g = new Graph(); g.build(DAG);
+        const last = g.topo().last;
+        const cv = document.createElement("canvas");
+        cv.width = 860; cv.height = 150;
+        document.getElementById("topo-line").appendChild(cv);
+        new GraphRenderer(cv, { directed: true }).draw(last.snapshot, last.highlight);
+      }
+    </script>
+  </body>
+</html>

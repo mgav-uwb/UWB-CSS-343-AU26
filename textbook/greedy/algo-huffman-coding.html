@@ -1,0 +1,1283 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Huffman Coding.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Huffman Coding - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { padding: 5px 9px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Huffman Coding</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (greedy).
+      </div>
+      <div class="src">
+        Huffman coding, the greedy method&rsquo;s most elegant success:
+        merge the two rarest symbols repeatedly to build a provably optimal
+        prefix-free code. With worked builds, both optimality proofs (the
+        exchange lemma and the substructure identity), encoding and decoding,
+        the limits of compression, links to the demos, and exercises. The
+        greedy method in general is the companion
+        <a href="paradigm-greedy-method.html">Greedy Method</a> handout.
+      </div>
+
+      <p class="lead">
+        The <a href="../graphs/algo-dijkstra.html">Dijkstra&rsquo;s
+        Algorithm</a> handout named the greedy pattern when
+        Dijkstra introduced it; Prim and Kruskal (the
+        <a href="../graphs/algo-prim.html">Prim&rsquo;s Algorithm</a> and
+        <a href="../graphs/algo-kruskal.html">Kruskal&rsquo;s Algorithm</a>
+        handouts) deepened the habit; and the
+        <a href="paradigm-greedy-method.html">Greedy Method</a> handout develops
+        the method in general: the licensing properties, the exchange
+        argument, and the counterexamples that demolish an unproved rule. This
+        handout applies all of it to one problem done end to end:
+        <strong>Huffman coding</strong>, where a single repeated greedy move
+        (merge the two least-frequent symbols) builds an optimal
+        compression code, proved optimal by that handout&rsquo;s own technique.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#huffman">Huffman coding: an optimal prefix-free code</a></li>
+          <li><a href="#proof">Why Huffman is optimal</a></li>
+          <li><a href="#compress">Encoding, decoding, and the limits of compression</a></li>
+          <li><a href="#adaptive">Adaptive Huffman: coding without a table</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="huffman">1. Huffman coding: an optimal prefix-free code</h2>
+      <p>
+        The problem is data compression: store text in fewer bits. Start with what
+        a code <em>is</em>. A computer stores text as bits, so every symbol needs a
+        bit pattern. The distinct symbols of the text form its
+        <strong>alphabet</strong>, and a <strong>code</strong> assigns each symbol a
+        <strong>codeword</strong>, a string of bits. To
+        <strong>encode</strong> a text you replace each symbol by its codeword and
+        concatenate; to <strong>decode</strong> you recover the symbols from the bit
+        stream. The quantity to minimize is the total length,
+        \[ \operatorname{cost} \;=\; \sum_{\text{symbols } s} f_s \cdot
+           \lvert \operatorname{codeword}(s) \rvert, \]
+        with \(f_s\) the number of times \(s\) occurs. A
+        <strong>fixed-length</strong> code gives every codeword the same width:
+        \(\lceil \log_2 6 \rceil = 3\) bits for \(6\) symbols, the same
+        idea as ASCII&rsquo;s \(8\) bits for \(256\). It is trivial to decode
+        (chop the stream into equal pieces), but it
+        spends the same on a symbol that appears a hundred times as on
+        one that appears once, which is wasteful whenever the frequencies are skewed.
+        A <strong>variable-length</strong> code fixes this by giving frequent symbols
+        short codes and rare symbols long ones, lowering the <em>average</em> bits per
+        symbol. But variable-length codes raise a hazard:
+      </p>
+      <div class="ex">
+        <span class="tag">Example (ambiguity)</span>
+        With \(a = 0\), \(b = 1\), \(c = 01\), the bit string \(01\) could be
+        &ldquo;\(ab\)&rdquo; or &ldquo;\(c\)&rdquo;: undecodable. The trouble is
+        that \(a\)&rsquo;s code \(0\) is a <em>prefix</em> of \(c\)&rsquo;s code
+        \(01\).
+      </div>
+      <div class="def">
+        <span class="tag">Definition (prefix-free code and its trie)</span>
+        A code is <strong>prefix-free</strong> if no codeword is a prefix of another.
+        Such a code is exactly a binary <strong>trie</strong> (a tree whose
+        <em>paths</em> spell things out, here one codeword per root-to-leaf path;
+        the <a href="../strings/ds-tries.html"><em>Tries</em></a> handout studies tries
+        in their own right) with the symbols at
+        its <em>leaves</em>: the code of a symbol is the sequence of turns from the root
+        (left \(= 0\), right \(= 1\)). Because a leaf is never an ancestor of another
+        leaf, no code is a prefix of another, so decoding is unambiguous.
+      </div>
+      <p>
+        Decoding a prefix-free code is a walk down the trie: read bits, turn left or
+        right, and emit a symbol the instant you reach a leaf, then restart at the
+        root. The cost above now reads off the tree, because a symbol&rsquo;s
+        codeword length <em>is</em> its depth:
+        \[
+          \operatorname{cost}(T) \;=\; \sum_{\text{symbols } s} f_s \cdot d_s,
+        \]
+        where \(f_s\) is \(s\)&rsquo;s frequency and \(d_s\) its depth in the trie
+        (the length of its code). Minimizing this over all prefix-free codes is the
+        question Huffman answers.
+      </p>
+      <h3>Huffman&rsquo;s greedy idea</h3>
+      <p>
+        A deep leaf has a long code, so it should hold a <em>rare</em> symbol; the two
+        rarest symbols can afford to be the deepest, as sibling leaves. That is
+        exactly the greedy move: <strong>repeatedly merge the two least-frequent
+        nodes</strong> into a new parent whose frequency is their sum, until one tree
+        remains. The &ldquo;two smallest&rdquo; query is answered by a min-heap,
+        the structure from the
+        <a href="../heaps/ds-heaps-pq.html"><em>Heaps &amp; Priority Queues</em></a>
+        handout again.
+      </p>
+      <div class="code-tabs" data-snippet="huffman/build">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// A Huffman tree node. Leaves carry a symbol; internal nodes just a frequency.
+struct Node {
+    long freq; char sym;            // sym is &#x27;\0&#x27; for internal nodes
+    Node *left, *right;
+};
+
+// Build the Huffman tree: repeatedly merge the two lowest-frequency nodes. A
+// min-heap of Node* keyed by frequency answers &quot;the two smallest&quot; in O(log n).
+Node* buildHuffman(const vector&lt;pair&lt;char,long&gt;&gt;&amp; freqs) {
+    auto cmp = [](Node* a, Node* b) { return a-&gt;freq &gt; b-&gt;freq; };  // min-heap
+    priority_queue&lt;Node*, vector&lt;Node*&gt;, decltype(cmp)&gt; pq(cmp);
+    for (auto [sym, f] : freqs)
+        pq.push(new Node{f, sym, nullptr, nullptr});
+    while (pq.size() &gt; 1) {
+        Node* x = pq.top(); pq.pop();          // two smallest frequencies
+        Node* y = pq.top(); pq.pop();
+        pq.push(new Node{x-&gt;freq + y-&gt;freq, &#x27;\0&#x27;, x, y});   // merge under a parent
+    }
+    return pq.top();                           // the single remaining root
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// A Huffman tree node. Leaves carry a symbol; internal nodes have sym = 0.
+class Node {
+    long freq; char sym;
+    Node left, right;
+    Node(long f, char s, Node l, Node r) { freq = f; sym = s; left = l; right = r; }
+}
+
+// Build the Huffman tree: merge the two lowest-frequency nodes until one remains.
+Node buildHuffman(Map&lt;Character, Long&gt; freqs) {
+    PriorityQueue&lt;Node&gt; pq =
+        new PriorityQueue&lt;&gt;((a, b) -&gt; Long.compare(a.freq, b.freq));  // min-heap
+    for (var e : freqs.entrySet())
+        pq.add(new Node(e.getValue(), e.getKey(), null, null));
+    while (pq.size() &gt; 1) {
+        Node x = pq.poll();                    // two smallest frequencies
+        Node y = pq.poll();
+        pq.add(new Node(x.freq + y.freq, &#x27;\0&#x27;, x, y));   // merge under a parent
+    }
+    return pq.peek();                          // the single remaining root
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>import heapq
+from dataclasses import dataclass, field
+from typing import Optional
+
+# A Huffman tree node. Ordering compares frequency only (the other fields are
+# excluded), so a min-heap of Nodes pops the two lowest-frequency nodes.
+@dataclass(order=True)
+class Node:
+    freq: int
+    sym: Optional[str] = field(compare=False, default=None)   # None = internal
+    left: &quot;Node&quot; = field(compare=False, default=None)
+    right: &quot;Node&quot; = field(compare=False, default=None)
+
+def build_huffman(freqs):                     # freqs: list of (sym, freq)
+    heap = [Node(f, sym) for sym, f in freqs]
+    heapq.heapify(heap)
+    while len(heap) &gt; 1:
+        x = heapq.heappop(heap)               # two smallest frequencies
+        y = heapq.heappop(heap)
+        heapq.heappush(heap, Node(x.freq + y.freq, None, x, y))  # merge
+    return heap[0]                            # the single remaining root</pre>
+<pre class="ct-pane" data-lang="rs" hidden>use std::collections::BinaryHeap;
+use std::cmp::Ordering;
+
+// A Huffman tree node. Leaves carry a symbol; internal nodes have sym = None.
+struct Node {
+    freq: u64,
+    sym: Option&lt;char&gt;,
+    left: Option&lt;Box&lt;Node&gt;&gt;,
+    right: Option&lt;Box&lt;Node&gt;&gt;,
+}
+// Order by frequency, REVERSED so BinaryHeap (a max-heap) yields the smallest.
+impl Ord for Node {
+    fn cmp(&amp;self, other: &amp;Self) -&gt; Ordering { other.freq.cmp(&amp;self.freq) }
+}
+impl PartialOrd for Node {
+    fn partial_cmp(&amp;self, other: &amp;Self) -&gt; Option&lt;Ordering&gt; { Some(self.cmp(other)) }
+}
+impl PartialEq for Node { fn eq(&amp;self, o: &amp;Self) -&gt; bool { self.freq == o.freq } }
+impl Eq for Node {}
+
+fn build_huffman(freqs: &amp;[(char, u64)]) -&gt; Node {
+    let mut pq: BinaryHeap&lt;Node&gt; = freqs.iter()
+        .map(|&amp;(sym, freq)| Node { freq, sym: Some(sym), left: None, right: None })
+        .collect();
+    while pq.len() &gt; 1 {
+        let x = pq.pop().unwrap();            // two smallest frequencies
+        let y = pq.pop().unwrap();
+        pq.push(Node {                        // merge under a new parent
+            freq: x.freq + y.freq, sym: None,
+            left: Some(Box::new(x)), right: Some(Box::new(y)),
+        });
+    }
+    pq.pop().unwrap()                         // the single remaining root
+}</pre>
+<p class="ct-src">source: <code>code/huffman/build.cpp &middot; code/huffman/build.java &middot; code/huffman/build.py &middot; code/huffman/build.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Starting from \(n\) leaf nodes, each merge removes two roots and adds one, so
+        there are exactly \(n-1\) merges, ending with a single tree of \(2n-1\) nodes.
+        Every internal node has two children (the tree is <strong>full</strong>),
+        which is what guarantees every symbol lands on a leaf.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a worked build, the CLRS frequencies)</span>
+        Symbols with frequencies \(a{:}5,\ b{:}9,\ c{:}12,\ d{:}13,\ e{:}16,\
+        f{:}45\) (total \(100\)):
+        <pre>  merge a+b &rarr; 14        pool: 12 13 14 16 45
+  merge c+d &rarr; 25        pool: 14 16 25 45
+  merge 14+16 &rarr; 30      pool: 25 30 45
+  merge 25+30 &rarr; 55      pool: 45 55
+  merge 45+55 &rarr; 100     &rarr; the root</pre>
+        The rarest symbols \(a\) and \(b\) merge first and sink deepest; the most
+        frequent, \(f\), waits until the final merge and lands one hop from the root.
+        The internal-node sums \(14, 25, 30, 55, 100\) build up to the total character
+        count.
+      </div>
+      <p>
+        Seen as the <em>priority queue&rsquo;s</em> contents (the state the
+        build actually maintains), each step removes the two smallest roots
+        (<span style="color:#9a5b00;font-weight:700">shaded</span>) and pushes their
+        sum. Leaf roots are written with their symbol; internal roots are bare sums.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr><th>step</th><th>priority queue (roots, by frequency)</th><th>push</th></tr>
+          <tr><td class="num">1</td><td class="pq"><span class="two">5&middot;a</span> <span class="two">9&middot;b</span> 12&middot;c 13&middot;d 16&middot;e 45&middot;f</td><td class="new">14</td></tr>
+          <tr><td class="num">2</td><td class="pq"><span class="two">12&middot;c</span> <span class="two">13&middot;d</span> 14 16&middot;e 45&middot;f</td><td class="new">25</td></tr>
+          <tr><td class="num">3</td><td class="pq"><span class="two">14</span> <span class="two">16&middot;e</span> 25 45&middot;f</td><td class="new">30</td></tr>
+          <tr><td class="num">4</td><td class="pq"><span class="two">25</span> <span class="two">30</span> 45&middot;f</td><td class="new">55</td></tr>
+          <tr><td class="num">5</td><td class="pq"><span class="two">45&middot;f</span> <span class="two">55</span></td><td class="new">100</td></tr>
+        </table>
+        <figcaption>
+          The \(n-1 = 5\) merges as priority-queue operations. Each row pops the two
+          shaded minima and pushes their sum; the queue shrinks by one root per step
+          until only the root, frequency \(100\), remains. Notice a merged node
+          re-enters the ordering by its <em>sum</em>: the \(14\) from step 1
+          sits among the leaves in step 3 and is itself merged there.
+        </figcaption>
+      </figure>
+      <figure>
+        <svg viewBox="0 0 420 288" role="img" aria-label="The Huffman trie for the CLRS frequencies. The root has frequency 100; its left child is the leaf f (45) and its right child is an internal node 55; the 55 node's children are internal nodes 25 and 30; 25 has leaf children c (12) and d (13); 30 has an internal child 14 and the leaf e (16); 14 has leaf children a (5) and b (9). Left edges are labeled 0, right edges 1, so the root-to-leaf paths give the codes f = 0, c = 100, d = 101, e = 111, a = 1100, and b = 1101.">
+          <g stroke="#8a9099" stroke-width="1.6" fill="none">
+            <line x1="141" y1="40" x2="45" y2="92"/>    <!-- root-f -->
+            <line x1="141" y1="40" x2="237" y2="92"/>   <!-- root-55 -->
+            <line x1="237" y1="92" x2="148" y2="144"/>  <!-- 55-25 -->
+            <line x1="237" y1="92" x2="326" y2="144"/>  <!-- 55-30 -->
+            <line x1="148" y1="144" x2="120" y2="196"/> <!-- 25-c -->
+            <line x1="148" y1="144" x2="175" y2="196"/> <!-- 25-d -->
+            <line x1="326" y1="144" x2="278" y2="196"/> <!-- 30-14 -->
+            <line x1="326" y1="144" x2="375" y2="196"/> <!-- 30-e -->
+            <line x1="278" y1="196" x2="250" y2="248"/> <!-- 14-a -->
+            <line x1="278" y1="196" x2="305" y2="248"/> <!-- 14-b -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12" font-weight="700"
+             fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke"
+             text-anchor="middle">
+            <text x="83" y="66">0</text>    <text x="199" y="66">1</text>
+            <text x="182" y="116">0</text>  <text x="291" y="116">1</text>
+            <text x="124" y="170">0</text>  <text x="171" y="170">1</text>
+            <text x="292" y="170">0</text>  <text x="359" y="170">1</text>
+            <text x="254" y="222">0</text>  <text x="301" y="222">1</text>
+          </g>
+          <!-- internal nodes: gray circles with the frequency -->
+          <g font-family="system-ui, sans-serif" font-size="12.5" font-weight="600" text-anchor="middle">
+            <g fill="#eef1f6" stroke="#8a9099" stroke-width="1.5">
+              <circle cx="141" cy="40" r="16"/>  <circle cx="237" cy="92" r="16"/>
+              <circle cx="148" cy="144" r="16"/> <circle cx="326" cy="144" r="16"/>
+              <circle cx="278" cy="196" r="16"/>
+            </g>
+            <g fill="#5c6270" stroke="none">
+              <text x="141" y="44">100</text>  <text x="237" y="96">55</text>
+              <text x="148" y="148">25</text>  <text x="326" y="148">30</text>
+              <text x="278" y="200">14</text>
+            </g>
+          </g>
+          <!-- leaves: green circles with the symbol, frequency below -->
+          <g font-family="system-ui, sans-serif" text-anchor="middle">
+            <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7">
+              <circle cx="45" cy="92" r="17"/>   <circle cx="120" cy="196" r="17"/>
+              <circle cx="175" cy="196" r="17"/> <circle cx="375" cy="196" r="17"/>
+              <circle cx="250" cy="248" r="17"/> <circle cx="305" cy="248" r="17"/>
+            </g>
+            <g fill="#0a7d4d" font-size="15" font-weight="700">
+              <text x="45" y="97">f</text>    <text x="120" y="201">c</text>
+              <text x="175" y="201">d</text>  <text x="375" y="201">e</text>
+              <text x="250" y="253">a</text>  <text x="305" y="253">b</text>
+            </g>
+            <g fill="#5c6270" font-size="10.5">
+              <text x="45" y="120">45</text>   <text x="120" y="224">12</text>
+              <text x="175" y="224">13</text>  <text x="375" y="224">16</text>
+              <text x="250" y="276">5</text>   <text x="305" y="276">9</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The finished Huffman trie for the CLRS frequencies. Reading each
+          root-to-leaf path (left \(= 0\), right \(= 1\)) gives the codes
+          \(f = 0\), \(c = 100\), \(d = 101\), \(e = 111\), \(a = 1100\),
+          \(b = 1101\). Frequent \(f\) sits at depth \(1\); the rarest \(a, b\) at
+          depth \(4\).
+        </figcaption>
+      </figure>
+      <p>
+        Once the tree is built, one traversal collects every code: append
+        <code>0</code> going left, <code>1</code> going right, and record the path at
+        each leaf:
+      </p>
+      <div class="code-tabs" data-snippet="huffman/codes">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Walk the finished trie once, building each leaf&#x27;s root-to-leaf path
+// (left = &#x27;0&#x27;, right = &#x27;1&#x27;). Fills code[sym] for every symbol. O(n).
+void extractCodes(Node* node, string path,
+                  unordered_map&lt;char, string&gt;&amp; code) {
+    if (!node) return;
+    if (!node-&gt;left &amp;&amp; !node-&gt;right) {         // a leaf: record its code
+        code[node-&gt;sym] = path;
+        return;
+    }
+    extractCodes(node-&gt;left,  path + &quot;0&quot;, code);
+    extractCodes(node-&gt;right, path + &quot;1&quot;, code);
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Walk the finished trie once, building each leaf&#x27;s root-to-leaf path
+// (left = &#x27;0&#x27;, right = &#x27;1&#x27;). Fills code[sym] for every symbol. O(n).
+void extractCodes(Node node, String path, Map&lt;Character, String&gt; code) {
+    if (node == null) return;
+    if (node.left == null &amp;&amp; node.right == null) {   // a leaf: record its code
+        code.put(node.sym, path);
+        return;
+    }
+    extractCodes(node.left,  path + &quot;0&quot;, code);
+    extractCodes(node.right, path + &quot;1&quot;, code);
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Walk the finished trie once, building each leaf&#x27;s root-to-leaf path
+# (left = &quot;0&quot;, right = &quot;1&quot;). Returns {sym: code}. O(n).
+def extract_codes(node, path=&quot;&quot;, code=None):
+    if code is None:
+        code = {}
+    if node.left is None and node.right is None:     # a leaf: record its code
+        code[node.sym] = path
+        return code
+    extract_codes(node.left,  path + &quot;0&quot;, code)
+    extract_codes(node.right, path + &quot;1&quot;, code)
+    return code</pre>
+<pre class="ct-pane" data-lang="rs" hidden>use std::collections::HashMap;
+
+// Walk the finished trie once, building each leaf&#x27;s root-to-leaf path
+// (left = &#x27;0&#x27;, right = &#x27;1&#x27;). Fills `code` for every leaf. O(n).
+fn extract_codes(node: &amp;Node, path: String, code: &amp;mut HashMap&lt;char, String&gt;) {
+    match (&amp;node.left, &amp;node.right) {
+        (None, None) =&gt; { code.insert(node.sym.unwrap(), path); }   // a leaf
+        _ =&gt; {
+            if let Some(l) = &amp;node.left  { extract_codes(l, format!(&quot;{path}0&quot;), code); }
+            if let Some(r) = &amp;node.right { extract_codes(r, format!(&quot;{path}1&quot;), code); }
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/huffman/codes.cpp &middot; code/huffman/codes.java &middot; code/huffman/codes.py &middot; code/huffman/codes.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The weighted total for these codes is
+        \(45{\cdot}1 + 12{\cdot}3 + 13{\cdot}3 + 16{\cdot}3 + 5{\cdot}4 + 9{\cdot}4
+        = 224\) bits, against \(100 \cdot 3 = 300\) for a fixed \(3\)-bit code:
+        a \(25\%\) saving, and (as the next section proves) the minimum any prefix
+        code can achieve for these frequencies.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (Huffman cost)</span>
+        Building the tree and extracting the codes takes \(O(n\log n)\) time for
+        \(n\) symbols.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Heapifying \(n\) leaves is \(O(n)\). The build does
+        \(n-1\) merges, each two <code>delMin</code>s and one <code>insert</code>, each
+        \(O(\log n)\), for \(O(n\log n)\). Extracting the codes is a single DFS over
+        \(2n-1\) nodes, \(O(n)\). The heap operations dominate: \(O(n\log n)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="aside">
+        <span class="tag">Breaking ties</span>
+        When two nodes tie for smallest frequency, Huffman may merge either:
+        different tie-breaks yield different trees and even different individual code
+        lengths, but every resulting tree is optimal, so the <em>total</em> encoded
+        length is identical. This is exactly the minimum-spanning-tree situation:
+        the optimal cost is unique, the optimal structure need not be.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a tie, resolved both ways)</span>
+        Frequencies \(a{:}1,\ b{:}1,\ c{:}2,\ d{:}2\), total \(6\). The first merge is
+        forced, since \(a\) and \(b\) are the only \(1\)s, and it manufactures the tie:
+        <pre>  pool: 1&middot;a 1&middot;b 2&middot;c 2&middot;d       merge a+b &rarr; 2
+  pool: 2(ab) 2&middot;c 2&middot;d         three roots tie at 2, any two may be popped</pre>
+        Popping \(c\) and \(d\) gives one tree; popping \(ab\) and \(c\) gives another:
+        <pre>  choice A: pop c and d
+    merge c+d &rarr; 4, pool 2(ab) 4(cd); merge 2+4 &rarr; 6, the root
+
+          6
+         / \
+      2(ab) 4(cd)
+       / \   / \
+      a   b c   d
+
+  choice B: pop (ab) and c
+    merge (ab)+c &rarr; 4, pool 2&middot;d 4(ab,c); merge 2+4 &rarr; 6, the root
+
+          6
+         / \
+        d   4
+           / \
+          c  2(ab)
+             / \
+            a   b</pre>
+        The two trees give different code lengths for every symbol except \(c\),
+        and the same total:
+        <table class="trace">
+          <tr><th>symbol</th><th>\(f_s\)</th><th>A: code</th><th>A: \(d_s\)</th>
+            <th>A: \(f_s d_s\)</th><th>B: code</th><th>B: \(d_s\)</th>
+            <th>B: \(f_s d_s\)</th></tr>
+          <tr><td class="num">a</td><td class="num">1</td><td class="pq">00</td>
+            <td class="num">2</td><td class="num">2</td><td class="pq">110</td>
+            <td class="num">3</td><td class="num">3</td></tr>
+          <tr><td class="num">b</td><td class="num">1</td><td class="pq">01</td>
+            <td class="num">2</td><td class="num">2</td><td class="pq">111</td>
+            <td class="num">3</td><td class="num">3</td></tr>
+          <tr><td class="num">c</td><td class="num">2</td><td class="pq">10</td>
+            <td class="num">2</td><td class="num">4</td><td class="pq">10</td>
+            <td class="num">2</td><td class="num">4</td></tr>
+          <tr><td class="num">d</td><td class="num">2</td><td class="pq">11</td>
+            <td class="num">2</td><td class="num">4</td><td class="pq">0</td>
+            <td class="num">1</td><td class="num">2</td></tr>
+          <tr><th colspan="4">total \(\sum_s f_s d_s\)</th>
+            <td class="num"><span class="two">12</span></td><td></td><td></td>
+            <td class="num"><span class="two">12</span></td></tr>
+        </table>
+        Twelve is the minimum. An optimal prefix code on four symbols is a
+        <em>full</em> binary tree with four leaves, and a full four-leaf tree has
+        only two depth profiles: \((2,2,2,2)\) and \((1,2,3,3)\).
+        The first costs \(2(1+1+2+2) = 12\) whatever the labelling; the second is
+        cheapest when the depth-\(1\) leaf takes a \(2\) and the two depth-\(3\)
+        leaves take the \(1\)s, giving \(2{\cdot}1 + 2{\cdot}2 + 1{\cdot}3 +
+        1{\cdot}3 = 12\) as well. Both tie-breaks land on the optimum; \(d\)
+        merely pays \(1\) bit in B and \(2\) in A, with \(a\) and \(b\) paying the
+        difference back.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=huffman">Huffman demo</a>. <em>Build</em> merges
+        the two smallest-frequency roots at each step on the CLRS frequencies above;
+        watch \(a\) and \(b\) sink deepest and \(f\) land one hop from the root, then
+        <em>Encode</em> text over \(a\ldots f\) and see it decode back. For the
+        counter-experiment, set the frequencies equal (say \(10,10,10,10\)) and
+        rebuild: the tree comes out perfectly balanced, \(2\) bits per symbol, no
+        better than a fixed-length code; the saving comes entirely from skew.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="proof">2. Why Huffman is optimal</h2>
+      <p>
+        Two lemmas, in the standard greedy shape: the first shows the greedy merge is
+        safe (greedy-choice property), the second shows the rest is the same problem
+        (optimal substructure). Together with induction they prove every Huffman tree
+        minimizes \(\operatorname{cost}(T) = \sum_s f_s d_s\).
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma 1 (the two rarest may be deepest siblings)</span>
+        Let \(x, y\) be the two lowest-frequency symbols. Some optimal prefix-code
+        tree has \(x\) and \(y\) as sibling leaves at maximum depth.
+      </div>
+      <div class="proof">
+        <strong>Proof (exchange).</strong> Take any optimal tree \(T\). An optimal
+        code tree is <em>full</em> (a one-child node could be deleted, shortening its
+        subtree and lowering the cost), so its deepest internal node has two leaf
+        children; call them \(a, b\), sibling leaves at maximum depth. Swap the rarest
+        symbol \(x\) with whatever sits at \(a\). The only costs that change are those
+        of the two symbols moved, so
+        \[
+          \Delta\operatorname{cost}
+          = (f_x d_a + f_a d_x) - (f_x d_x + f_a d_a)
+          = (f_a - f_x)(d_x - d_a) \le 0,
+        \]
+        because \(f_a \ge f_x\) (\(x\) is a rarest symbol) and \(d_x \le d_a\)
+        (\(a\) is at maximum depth). The swap cannot increase the cost, so the result
+        is still optimal. Swapping \(y\) with the occupant of \(b\) likewise, we reach
+        an optimal tree with \(x, y\) as deepest sibling leaves, which is
+        exactly Huffman&rsquo;s first merge. <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Lemma 2 (merging shrinks the problem)</span>
+        Merge \(x, y\) into a single symbol \(z\) with \(f_z = f_x + f_y\). For any
+        tree \(T\) in which \(x, y\) are siblings, let \(T'\) be \(T\) with that
+        sibling pair replaced by the single leaf \(z\). Then
+        \(\operatorname{cost}(T) = \operatorname{cost}(T') + f_x + f_y\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The symbols other than \(x, y\) occupy the same
+        positions in \(T\) and \(T'\), contributing equally. In \(T\), \(x\) and \(y\)
+        sit one level below \(z\)&rsquo;s position in \(T'\), so each occurrence of
+        \(x\) or \(y\) pays one extra bit compared with \(z\): the difference is
+        \(f_x d_z' + f_y d_z' \) replaced by \(f_x(d_z'+1) + f_y(d_z'+1)\), i.e. an
+        extra \(f_x + f_y\). Hence \(\operatorname{cost}(T) = \operatorname{cost}(T') +
+        f_x + f_y\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Since \(f_x + f_y\) is a constant independent of the tree&rsquo;s shape,
+        minimizing \(\operatorname{cost}(T)\) is the same as minimizing
+        \(\operatorname{cost}(T')\), a Huffman instance on \(n-1\) symbols. By
+        Lemma 1 the first merge is safe; by Lemma 2 the remaining problem is a smaller
+        Huffman instance; by induction on the number of symbols, Huffman&rsquo;s tree
+        is optimal. This two-lemma structure (greedy choice is safe, then the
+        rest is the same problem) is the canonical greedy-optimality proof, the
+        same shape as the MST cut property and activity selection.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="compress">3. Encoding, decoding, and the limits of compression</h2>
+      <p>
+        With the trie in hand, <strong>encoding</strong> replaces each symbol with its
+        code and concatenates the bits: no separators, because the code is
+        prefix-free. <strong>Decoding</strong> walks the trie from the root, emitting a
+        symbol at each leaf and restarting.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a round trip)</span>
+        Using the codes \(f{=}0,\ c{=}100,\ d{=}101,\ e{=}111,\ a{=}1100,\
+        b{=}1101\):
+        <pre>  encode "face":  f&middot;a&middot;c&middot;e = 0&middot;1100&middot;100&middot;111 = 01100100111   (11 bits)
+  decode 1010:    1,0,1 &rarr; leaf d;  restart;  0 &rarr; leaf f   &rArr; "df"</pre>
+        The decode shows the crux: after emitting \(d\) you jump back to the root, and
+        the lone remaining \(0\) is a complete code. No delimiter was needed;
+        the tree&rsquo;s leaf boundaries <em>are</em> the delimiters, which is why
+        prefix-free codes are also called <em>instantaneous</em>.
+      </div>
+
+      <h3>Encoding, symbol by symbol</h3>
+      <p>
+        Encoding is a table lookup per symbol and a concatenation. Take the message
+        <code>facade</code> over the same codes, and watch the output stream grow:
+      </p>
+      <table class="trace">
+        <tr><th>step</th><th>symbol</th><th>its codeword</th><th>bits appended</th>
+          <th>stream so far</th><th>length</th></tr>
+        <tr><td class="num">1</td><td class="num">f</td><td class="pq">0</td>
+          <td class="num">1</td><td class="pq">0</td><td class="num">1</td></tr>
+        <tr><td class="num">2</td><td class="num">a</td><td class="pq">1100</td>
+          <td class="num">4</td><td class="pq">01100</td><td class="num">5</td></tr>
+        <tr><td class="num">3</td><td class="num">c</td><td class="pq">100</td>
+          <td class="num">3</td><td class="pq">01100100</td><td class="num">8</td></tr>
+        <tr><td class="num">4</td><td class="num">a</td><td class="pq">1100</td>
+          <td class="num">4</td><td class="pq">011001001100</td><td class="num">12</td></tr>
+        <tr><td class="num">5</td><td class="num">d</td><td class="pq">101</td>
+          <td class="num">3</td><td class="pq">011001001100101</td><td class="num">15</td></tr>
+        <tr><td class="num">6</td><td class="num">e</td><td class="pq">111</td>
+          <td class="num">3</td><td class="pq">011001001100101111</td><td class="num">18</td></tr>
+      </table>
+      <p>
+        Eighteen bits, which is exactly what a \(3\)-bit fixed code would spend on
+        six symbols. That is not a defect in the tree: the tree is optimal for the
+        frequencies it was built from, where \(f\) is \(45\%\) of the text, and
+        <code>facade</code> is not a sample from those frequencies (it spends two of
+        its six symbols on \(a\), the rarest). Over the \(100\)-symbol text the
+        frequencies describe, the same code pays \(224\) bits against \(300\).
+        Section&nbsp;<a href="#adaptive">&sect;4</a> returns to this gap between the
+        model and the message.
+      </p>
+
+      <h3>Decoding, bit by bit</h3>
+      <p>
+        The decoder holds one variable, the current node, starting at the root. Each
+        bit is one step down; reaching a leaf emits that symbol and resets the node to
+        the root. Feeding it the \(18\) bits just produced, with the current node
+        written as the path walked so far:
+      </p>
+      <table class="trace">
+        <tr><th>bit #</th><th>bit</th><th>node after the step</th><th>action</th>
+          <th>output so far</th></tr>
+        <tr><td class="num">1</td><td class="num">0</td><td class="pq">0</td>
+          <td>leaf: emit <strong>f</strong>, back to the root</td><td class="pq">f</td></tr>
+        <tr><td class="num">2</td><td class="num">1</td><td class="pq">1</td>
+          <td>internal, keep reading</td><td class="pq">f</td></tr>
+        <tr><td class="num">3</td><td class="num">1</td><td class="pq">11</td>
+          <td>internal</td><td class="pq">f</td></tr>
+        <tr><td class="num">4</td><td class="num">0</td><td class="pq">110</td>
+          <td>internal</td><td class="pq">f</td></tr>
+        <tr><td class="num">5</td><td class="num">0</td><td class="pq">1100</td>
+          <td>leaf: emit <strong>a</strong>, back to the root</td><td class="pq">fa</td></tr>
+        <tr><td class="num">6</td><td class="num">1</td><td class="pq">1</td>
+          <td>internal</td><td class="pq">fa</td></tr>
+        <tr><td class="num">7</td><td class="num">0</td><td class="pq">10</td>
+          <td>internal</td><td class="pq">fa</td></tr>
+        <tr><td class="num">8</td><td class="num">0</td><td class="pq">100</td>
+          <td>leaf: emit <strong>c</strong>, back to the root</td><td class="pq">fac</td></tr>
+        <tr><td class="num">9</td><td class="num">1</td><td class="pq">1</td>
+          <td>internal</td><td class="pq">fac</td></tr>
+        <tr><td class="num">10</td><td class="num">1</td><td class="pq">11</td>
+          <td>internal</td><td class="pq">fac</td></tr>
+        <tr><td class="num">11</td><td class="num">0</td><td class="pq">110</td>
+          <td>internal</td><td class="pq">fac</td></tr>
+        <tr><td class="num">12</td><td class="num">0</td><td class="pq">1100</td>
+          <td>leaf: emit <strong>a</strong>, back to the root</td><td class="pq">faca</td></tr>
+        <tr><td class="num">13</td><td class="num">1</td><td class="pq">1</td>
+          <td>internal</td><td class="pq">faca</td></tr>
+        <tr><td class="num">14</td><td class="num">0</td><td class="pq">10</td>
+          <td>internal</td><td class="pq">faca</td></tr>
+        <tr><td class="num">15</td><td class="num">1</td><td class="pq">101</td>
+          <td>leaf: emit <strong>d</strong>, back to the root</td><td class="pq">facad</td></tr>
+        <tr><td class="num">16</td><td class="num">1</td><td class="pq">1</td>
+          <td>internal</td><td class="pq">facad</td></tr>
+        <tr><td class="num">17</td><td class="num">1</td><td class="pq">11</td>
+          <td>internal</td><td class="pq">facad</td></tr>
+        <tr><td class="num">18</td><td class="num">1</td><td class="pq">111</td>
+          <td>leaf: emit <strong>e</strong>, back to the root</td><td class="pq">facade</td></tr>
+      </table>
+      <p>
+        Three things are worth reading off the table. The decoder never looks ahead:
+        it commits to a symbol the instant it lands on a leaf, at bit 1 for
+        <code>f</code> and only at bit 5 for <code>a</code>. It never needs to know
+        where a codeword began, because it is always either at the root (between
+        codewords) or partway down (inside one). And the stream ends at a leaf with
+        the node back at the root, which is the only way a well-formed stream can end:
+        a stream that runs out at an internal node was truncated.
+      </p>
+      <p>
+        The bits alone do not decode; the decoder needs the same trie, so a
+        compressed file carries either the frequency table (the decoder re-runs the
+        build to get the identical tree) or a serialization of the tree in its header.
+        For a fixed alphabet (say \(256\) byte values) that header is a
+        few hundred bytes, negligible against a large file.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (Shannon&rsquo;s limit)</span>
+        No code can beat the <strong>entropy</strong>
+        \(H = -\sum_s p_s \log_2 p_s\) bits per symbol on average, where \(p_s\) is
+        \(s\)&rsquo;s probability. Huffman comes within \(1\) bit of \(H\) per symbol,
+        and is exactly optimal among codes that use an integer number of bits per
+        symbol.
+      </div>
+      <p>
+        It is worth putting a number on that guarantee rather than leaving it
+        abstract. For this handout&rsquo;s own frequencies,
+        \[ H \;=\; -\!\!\sum_{s \in \{a,\dots,f\}} p_s \log_2 p_s \;=\; 2.2199
+           \ \text{bits/symbol} \;\Longrightarrow\; 222 \ \text{bits}, \]
+        against Huffman&rsquo;s \(224\): a gap of \(0.02\) bits per
+        symbol, not the \(1\) bit the theorem allows. The bound is a worst
+        case, and Huffman is usually far inside it. Note also that \(222\) is a
+        floor no prefix code can reach here, not a target: attaining it would
+        need fractional code lengths, which is precisely what the next paragraph
+        is about.
+      </p>
+      <div class="aside">
+        <span class="tag">Kraft&rsquo;s inequality: which code lengths are even possible</span>
+        Before asking which prefix code is <em>best</em>, ask which are <em>legal</em>.
+        <strong>Kraft&rsquo;s inequality</strong> says a binary prefix code with codeword
+        lengths \(\ell_1, \dots, \ell_n\) exists if and only if
+        \[ \sum_{i=1}^{n} 2^{-\ell_i} \;\le\; 1. \]
+        The reason is exactly the trie: a codeword of length \(\ell\) is a leaf at depth
+        \(\ell\), which claims a \(2^{-\ell}\) fraction of the leaves of a full depth-\(D\)
+        tree, and disjoint leaves&rsquo; fractions cannot exceed the whole. Huffman is
+        then the solution to a clean optimization: minimize \(\sum_i f_i \ell_i\) over all
+        integer lengths satisfying Kraft. Relax the integers to real lengths and calculus
+        gives the optimum \(\ell_i = -\log_2 p_i\), whose cost is the entropy \(H\),
+        the theoretical floor of the theorem above. Huffman pays for rounding
+        those lengths back to whole bits, which is the entire &ldquo;within one
+        bit&rdquo; gap, and is what arithmetic coding sidesteps by never rounding.
+      </div>
+      <p>
+        The residual sub-bit gap (Huffman must spend a whole number of bits per
+        symbol, while \(H\) may be fractional) is why arithmetic and ANS coders
+        exist, squeezing closer to \(H\). And Huffman rarely works alone: it captures
+        <em>frequency</em> skew but not repetition, so real compressors first find
+        repeats (run-length or LZ77) and then Huffman-code the residual. This is
+        DEFLATE, the engine inside ZIP, gzip, and PNG; Huffman also codes the
+        quantized data in JPEG and MP3. Not bad for the answer to a 1952 term-paper
+        assignment.
+      </p>
+      <div class="aside">
+        <span class="tag">The greedy quartet</span>
+        Greedy is a thread through the back half of this course, not a one-off, and
+        every instance is assembled from a structure built earlier:
+        <table>
+          <tr><th>algorithm</th><th>greedy choice</th><th>proof</th></tr>
+          <tr><td>Dijkstra</td><td>nearest unsettled vertex</td><td>exchange (boundary cut)</td></tr>
+          <tr><td>Prim</td><td>lightest edge leaving the tree</td><td>cut property</td></tr>
+          <tr><td>Kruskal</td><td>cheapest safe edge</td><td>cut property</td></tr>
+          <tr><td>Huffman</td><td>merge the two rarest</td><td>exchange</td></tr>
+        </table>
+        When the greedy gamble cannot be proved (0/1 knapsack, coin-change with
+        \(\{1,3,4\}\), longest common subsequence), dynamic programming
+        (the <a href="../dp/paradigm-dp-method.html"><em>Dynamic Programming Method</em></a>
+        handout) is the fallback that tries all
+        choices instead of one.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="adaptive">4. Adaptive Huffman: coding without a table</h2>
+      <p>
+        Everything above assumes the frequencies are known before encoding starts.
+        That assumption costs twice. First, it forces <strong>two passes</strong>: read
+        the whole input to count, then read it again to encode, impossible for a
+        stream that has no end. Second, the decoder cannot decode without the code, so
+        the <strong>table travels with the message</strong>, and a table is not free.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (the table is not free)</span>
+        Spend \(8\) bits naming the symbol, \(4\) bits for its code length, and the
+        codeword itself, per symbol:
+        <pre>  "mississippi"  11 chars, 4 symbols     "abracadabra"  11 chars, 5 symbols
+     ASCII                 88 bits        ASCII                 88 bits
+     Huffman body          21 bits        Huffman body          23 bits
+     + the table           78 bits        + the table           96 bits
+                    still a win                            now a LOSS</pre>
+        The body is what the earlier sections counted; it is not what you transmit.
+        A short message with many distinct symbols spends most of its budget
+        introducing them.
+      </div>
+      <p>
+        There is a second, subtler failure. A Huffman code is optimal
+        <em>for the frequencies it was built from</em>, and only for those. Meet it
+        with a text drawn from some other distribution and it can cost more than the
+        fixed-length code it replaced: not because the algorithm went wrong, but
+        because the bet was wrong. Under a code built for average English prose
+        (26 letters plus the space, the space at 18% of characters),
+        <code>she sells sea shells on the sea shore</code> costs 138 bits against the
+        5-bit fixed code's 185, while <code>jazzy vixen quips</code> costs
+        <em>103 against 85</em>. The mechanism is Kraft's inequality: the codeword
+        lengths of any prefix code satisfy \(\sum_s 2^{-\ell_s} \le 1\), a fixed
+        budget, so buying <code>e</code> a 3-bit code forces <code>z</code> up to 10.
+        Huffman spends that budget where the <em>model</em> says the mass is.
+      </p>
+
+      <h3>One tree, two machines</h3>
+      <p>
+        Adaptive Huffman removes both problems at once. Encoder and decoder start from
+        the <strong>same empty tree</strong> and, after every symbol, run the
+        <strong>same update</strong>. The encoder codes symbol \(s\) with the tree
+        built from symbols \(1 \ldots s-1\); the decoder, having just decoded
+        \(1 \ldots s-1\), holds exactly that tree, so it can decode \(s\);
+        only then does either side update. No table is transmitted because none is
+        needed: it is derived, in lockstep, at both ends.
+      </p>
+      <p>
+        A symbol not yet seen has no leaf, so the tree keeps one weight-0 leaf called
+        <strong>NYT</strong> (&ldquo;not yet transmitted&rdquo;) whose path is the
+        escape prefix. Encoding a brand-new symbol emits the path to NYT followed by
+        the symbol&rsquo;s 8 plain ASCII bits; NYT then <em>splits</em> into a new NYT
+        and a leaf for that symbol. The very first symbol of a message is the
+        degenerate case worth checking: the tree <em>is</em> NYT, its path is empty,
+        and the symbol costs exactly its 8 raw bits.
+      </p>
+
+      <h3>The sibling property</h3>
+      <p>
+        Rebuilding a Huffman tree after every symbol would cost
+        \(\Theta(n \log n)\) each time. Instead the algorithm maintains the property
+        that <em>characterizes</em> Huffman trees. Number the nodes bottom-up, left to
+        right, so the root has the highest number. A tree has the
+        <strong>sibling property</strong> when every node has a sibling and weight
+        never decreases as the number grows.
+      </p>
+      <div class="ex">
+        <span class="tag">Gallager&rsquo;s theorem</span>
+        A binary tree is a Huffman tree for its leaf weights <em>exactly when</em> it
+        has the sibling property.
+      </div>
+      <p>
+        Nodes of equal weight form a <strong>block</strong>, and within a block the
+        numbering is free; that freedom is what the update exploits.
+        Incrementing one leaf can break the ordering in only one way: the node now
+        outweighs a same-weight node that sits higher in the numbering. Moving it into
+        that node&rsquo;s slot first repairs it.
+      </p>
+      <pre>  update(s):
+    node &larr; leaf(s)                       # a new symbol: split NYT first
+    while node &ne; null:
+        leader &larr; highest-numbered node of the SAME weight
+        if leader exists and outranks node:
+            swap(node, leader)            # positions swap, numbers stay behind
+        node.weight &larr; node.weight + 1
+        node &larr; node.parent</pre>
+      <p>
+        Numbers belong to <em>positions</em>, not to nodes, so a swap exchanges them
+        back; this is the detail implementations most often get wrong. Never swap with
+        a parent or a descendant: that tangles the tree instead of reordering
+        equals. The cost is one increment and at most one swap per level, so
+        \(O(d)\) per symbol on both sides, with \(d\) the current depth.
+      </p>
+
+      <h3>The update, run on the first four symbols</h3>
+      <p>
+        The rule has three cases, and <code>abracadabra</code> shows all of them in
+        its first four symbols. Nodes are drawn with their number and weight, and the
+        numbering is checked after every step: read the nodes in increasing number and
+        the weights never decrease, which is the sibling property.
+      </p>
+      <table class="trace">
+        <tr><th>step</th><th>symbol</th><th>case</th><th>sent</th><th>what the update walk does</th></tr>
+        <tr><td class="num">1</td><td class="num">a</td><td>new symbol, and the tree
+            <em>is</em> NYT</td><td class="pq">(empty path) + 8 raw bits = 8</td>
+          <td>NYT splits: new NYT <span class="mono">#1</span>, leaf
+            <span class="mono">a #2</span>, the old NYT becomes the internal root
+            <span class="mono">#3</span>. Walk visits <span class="mono">#3</span>
+            only: no other node has weight 0, so no swap; \(0 \to 1\).</td></tr>
+        <tr><td class="num">2</td><td class="num">b</td><td>new symbol</td>
+          <td class="pq">0 + 8 raw bits = 9</td>
+          <td>NYT <span class="mono">#3</span> splits into
+            <span class="mono">#1</span> NYT, <span class="mono">#2</span> b,
+            <span class="mono">#3</span> internal. Walk:
+            <span class="mono">#3</span> \(0 \to 1\), then the root
+            <span class="mono">#5</span> \(1 \to 2\); no swap at either.</td></tr>
+        <tr><td class="num">3</td><td class="num">r</td><td>new symbol, and the walk
+            hits a <strong>swap</strong></td>
+          <td class="pq">00 + 8 raw bits = 10</td>
+          <td>NYT <span class="mono">#3</span> splits into
+            <span class="mono">#1</span> NYT, <span class="mono">#2</span> r,
+            <span class="mono">#3</span> internal, weight \(0 \to 1\). Next up is the
+            internal node <span class="mono">#5</span>, weight 1; the weight-1 block is
+            <span class="mono">#2, #4, #5, #6</span> and its leader is the leaf
+            <span class="mono">a #6</span>, which outranks it, so
+            <span class="two">swap</span>, then \(1 \to 2\). Root
+            <span class="mono">#7</span>: \(2 \to 3\).</td></tr>
+        <tr><td class="num">4</td><td class="num">a</td><td>symbol already in the
+            tree</td><td class="pq">0 = 1 bit</td>
+          <td>Leaf <span class="mono">a</span> is now <span class="mono">#5</span>,
+            weight 1, and no higher-numbered node has weight 1, so no swap:
+            \(1 \to 2\). Root <span class="mono">#7</span>: \(3 \to 4\).</td></tr>
+      </table>
+      <pre>  after 'a':  weights by number 0,1,1
+    #3 root w1
+    |-0- #1 NYT w0                    NYT: code 0
+    `-1- #2 a   w1                    a:   code 1
+
+  after 'b':  weights by number 0,1,1,1,2
+    #5 root w2
+    |-0- #3 int w1
+    |    |-0- #1 NYT w0               NYT: code 00
+    |    `-1- #2 b   w1               b:   code 01
+    `-1- #4 a   w1                    a:   code 1
+
+  after 'r' (the swap has already happened):  0,1,1,1,1,2,3
+    #7 root w3
+    |-0- #5 a   w1                    a:   code 0
+    `-1- #6 int w2
+         |-0- #3 int w1
+         |    |-0- #1 NYT w0          NYT: code 100
+         |    `-1- #2 r   w1          r:   code 101
+         `-1- #4 b   w1               b:   code 11
+
+  after the 4th symbol, 'a':  0,1,1,1,2,2,4  (shape unchanged)
+    #7 root w4
+    |-0- #5 a   w2                    a:   code 0
+    `-1- #6 int w2
+         |-0- #3 int w1
+         |    |-0- #1 NYT w0          NYT: code 100
+         |    `-1- #2 r   w1          r:   code 101
+         `-1- #4 b   w1               b:   code 11</pre>
+      <p>
+        The swap at step 3 is what makes step 4 cheap. Before it, \(a\) sat as an
+        ordinary leaf; the swap lifts it to depth 1, so the next \(a\) costs a single
+        bit, and every later \(a\) does too. That is the adaptation happening: the
+        symbol that has been seen most rises toward the root without anyone
+        recomputing a tree. Note also what the swap moved. Positions
+        <span class="mono">#5</span> and <span class="mono">#6</span> exchanged
+        <em>subtrees</em>; the numbers stayed with the positions, which is why
+        \(a\) is <span class="mono">#5</span> afterwards and the internal node is
+        <span class="mono">#6</span>.
+      </p>
+      <p>
+        Two leaves can swap with each other as well. At the ninth symbol, the second
+        \(b\), the leaf \(b\) has weight 1 and sits at
+        <span class="mono">#5</span> while the leaf \(r\), also weight 1, sits at
+        <span class="mono">#6</span>: the two exchange places before \(b\)&rsquo;s
+        increment. Its codeword <code>110</code> is emitted first, from the tree the
+        decoder still holds, and the tenth symbol, \(r\), then finds itself at
+        <span class="mono">#5</span> and sends <code>110</code> in its turn: the same
+        three bits for a different symbol, one step apart, which is exactly the
+        behaviour a static code cannot have.
+      </p>
+
+      <div class="ex">
+        <span class="tag">Example (&ldquo;abracadabra&rdquo;, adaptively)</span>
+        <pre>  symbol  in tree?  sent                       bits   total
+    a     new       (NYT is the root) + ASCII    8       8
+    b     new       0 + ASCII                    9      17
+    r     new       00 + ASCII                  10      27
+    a     yes       0                            1      28
+    c     new       100 + ASCII                 11      39
+    a     yes       0                            1      40
+    d     new       1100 + ASCII                12      52
+    a     yes       0                            1      53
+    b     yes       110                          3      56
+    r     yes       110                          3      59
+    a     yes       0                            1      60</pre>
+        Eleven characters in 60 bits with no table, against ASCII&rsquo;s 88 and static
+        Huffman&rsquo;s 23-bit body plus 73-bit table. First appearances are expensive
+        and everything after is cheap: <code>a</code> has been promoted to depth 1, so
+        it costs a single bit. The five new-symbol rows carry \(8\) raw bits each,
+        \(40\) of the \(60\); the escape prefixes add \(0+1+2+3+4 = 10\), one bit
+        longer each time because NYT sinks a level with every split; and the six
+        repeats add \(1+1+1+3+3+1 = 10\). Together \(40 + 10 + 10 = 60\).
+      </div>
+
+      <table>
+        <tr><th>text</th><th>n</th><th>ASCII</th><th>static body</th><th>+ table</th><th>adaptive</th></tr>
+        <tr><td><code>abracadabra</code></td><td>11</td><td>88</td><td>23</td><td>96</td><td><strong>60</strong></td></tr>
+        <tr><td><code>mississippi</code></td><td>11</td><td>88</td><td>21</td><td>78</td><td><strong>53</strong></td></tr>
+        <tr><td><code>she sells sea shells&hellip;</code></td><td>37</td><td>296</td><td>112</td><td>268</td><td><strong>191</strong></td></tr>
+        <tr><td><code>the quick brown fox&hellip;</code></td><td>43</td><td>344</td><td>192</td><td>647</td><td>406</td></tr>
+      </table>
+      <p>
+        Static Huffman&rsquo;s <em>body</em> is unbeatable among prefix codes for those
+        exact frequencies (that is the theorem of &sect;2), but the body is
+        not the message. Priced honestly, adaptive wins all but the last row, where
+        nothing works: 27 distinct symbols in 43 characters means both schemes spend
+        their lives introducing symbols they never see again. Compression is a bet on
+        repetition, and no coder manufactures redundancy that is not there.
+      </p>
+      <p>
+        Adaptive Huffman itself is now mostly of historical and teaching interest;
+        modern compressors keep an adaptive <em>model</em> but pair it with
+        arithmetic coding or ANS, which escape Huffman&rsquo;s whole-bit-per-symbol
+        floor. What survives is the architecture: both ends maintain the same model
+        under the same update rule, so the model never has to be sent, and it adapts to
+        the data in front of it rather than to an average. A code that is provably
+        optimal is not automatically the code you ship.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">5. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Build the Huffman tree for frequencies \(x{:}1,\ y{:}1,\ z{:}2,\ w{:}4\).
+          Give the codes and the total encoded length \(\sum f_s d_s\).
+          <details>
+            <summary>solution</summary>
+            Merge \(x{+}y \to 2\); pool \(\{2(z),\ 2(xy),\ 4(w)\}\). Merge the two
+            \(2\)s \(\to 4\); pool \(\{4(w),\ 4\}\). Merge \(\to 8\), the root. Codes:
+            \(w = 0\) (frequency \(4\), shallow), \(z = 10\), \(x = 110\),
+            \(y = 111\). Total \(= 4{\cdot}1 + 2{\cdot}2 + 1{\cdot}3 + 1{\cdot}3 = 14\)
+            bits. The rarest symbols \(x, y\) sink deepest, as the greedy merge
+            guarantees.
+          </details>
+        </li>
+        <li>
+          Frequencies \(a{:}1,\ b{:}2,\ c{:}3,\ d{:}3\). The second merge faces a
+          three-way tie. Build both trees the tie allows, give the codes, and compare
+          the totals.
+          <details>
+            <summary>solution</summary>
+            The first merge is forced: \(a + b \to 3\), leaving the pool
+            \(\{3(ab),\ 3(c),\ 3(d)\}\), where any two roots are &ldquo;the two
+            smallest.&rdquo; Popping \(c\) and \(d\) gives \(6\), then merging with
+            \(3(ab)\) gives the root \(9\): codes \(a = 00\), \(b = 01\), \(c = 10\),
+            \(d = 11\), total \(1{\cdot}2 + 2{\cdot}2 + 3{\cdot}2 + 3{\cdot}2 = 18\).
+            Popping \(ab\) and \(c\) instead gives \(6\), then merging with \(3(d)\)
+            gives the root \(9\): codes \(d = 0\), \(c = 10\), \(a = 110\),
+            \(b = 111\), total \(3{\cdot}1 + 3{\cdot}2 + 1{\cdot}3 + 2{\cdot}3 = 18\).
+            The trees differ, every codeword length but \(c\)&rsquo;s differs, and the
+            totals agree, which is the general fact: ties change the tree, never the
+            cost.
+          </details>
+        </li>
+        <li>
+          In Lemma 1&rsquo;s exchange, the cost change is
+          \((f_a - f_x)(d_x - d_a)\). Explain why each factor has the sign claimed,
+          and what would go wrong if \(x\) were <em>not</em> a lowest-frequency symbol.
+          <details>
+            <summary>solution</summary>
+            \(f_a - f_x \ge 0\) because \(x\) is chosen as a minimum-frequency symbol,
+            so no symbol (including \(a\)) has smaller frequency. \(d_x - d_a \le 0\)
+            because \(a\) sits at maximum depth, so no leaf (including \(x\)) is
+            deeper. Their product is \(\le 0\), so the swap does not raise the cost. If
+            \(x\) were not a rarest symbol, \(f_a - f_x\) could be negative while
+            \(d_x - d_a\) is negative, making the product positive; the swap
+            could <em>increase</em> cost, and the argument that the rarest belongs
+            deepest would fail.
+          </details>
+        </li>
+        <li>
+          A file uses only two symbols, \(a\) with frequency \(999\) and \(b\) with
+          frequency \(1\). What codes does Huffman assign, how many bits does it use,
+          and why can it not do better?
+          <details>
+            <summary>solution</summary>
+            With two symbols there is one merge, giving a tree with both as leaves at
+            depth \(1\): \(a = 0\), \(b = 1\) (or the reverse), one bit each. Total
+            \(999 + 1 = 1000\) bits. It cannot do better because a prefix-free code for
+            two distinct symbols needs two distinct nonempty codewords, and the
+            shortest such pair is two single bits; you cannot give \(a\) a
+            zero-length code. This is Huffman&rsquo;s one weakness against entropy: the
+            entropy here is far below \(1\) bit per symbol, but integer-length codes
+            cannot spend a fraction of a bit, which is what arithmetic coding is for.
+          </details>
+        </li>
+        <li>
+          Give a set of interval activities on which the greedy &ldquo;pick the
+          activity that <em>starts</em> earliest&rdquo; rule selects fewer than the
+          optimum, and state the optimum.
+          <details>
+            <summary>solution</summary>
+            Activities \([0, 10)\), \([1, 2)\), \([3, 4)\), written half-open as in
+            the <a href="algo-interval-scheduling.html">Interval Scheduling</a>
+            handout. Earliest-start greedy takes \([0,10)\) first, which conflicts
+            with both others, yielding \(1\) activity. The optimum takes \([1,2)\) and
+            \([3,4)\): \(2\) activities, compatible because \(2 \le 3\).
+            Earliest-<em>finish</em> greedy would take \([1,2)\) first and then
+            \([3,4)\), matching the optimum, which is why the correct rule sorts
+            by finish time, not start time.
+          </details>
+        </li>
+        <li>
+          True or false, with justification: &ldquo;A prefix-free code always uses no
+          more bits than a fixed-length code on the same text.&rdquo;
+          <details>
+            <summary>solution</summary>
+            False in general, true for the <em>Huffman</em> prefix code. A prefix-free
+            code can be chosen badly (e.g. giving a frequent symbol a long code)
+            and use more bits than the fixed-length code. What is true is that
+            <em>Huffman&rsquo;s</em> prefix code is optimal, so it uses no more than any
+            other prefix code, including the fixed-length one (which is itself a
+            prefix code, the balanced tree). When frequencies are uniform, Huffman
+            ties the fixed-length code; when skewed, it beats it.
+          </details>
+        </li>
+        <li>
+          A code built for average English gives <code>e</code> 3 bits and
+          <code>z</code> 10. Explain, using Kraft&rsquo;s inequality, why no prefix
+          code can give both of them short codewords, and what that implies about a
+          text made mostly of rare letters.
+          <details>
+            <summary>solution</summary>
+            Any prefix code satisfies \(\sum_s 2^{-\ell_s} \le 1\): each codeword of
+            length \(\ell\) claims a \(2^{-\ell}\) share of the leaf budget, and the
+            shares cannot exceed the whole. Giving <code>e</code> 3 bits spends
+            \(1/8\) of the budget on one symbol, so the remaining symbols must share
+            what is left and some are pushed deep. The lengths are therefore
+            competitive, not independent. A text made of rare letters pays those deep
+            codewords on every character, which is why <code>jazzy vixen quips</code>
+            costs 103 bits under the English code against the fixed code&rsquo;s 85.
+            Huffman is optimal for the frequencies it was given, not for whatever text
+            arrives.
+          </details>
+        </li>
+        <li>
+          In adaptive Huffman, why must the encoder update the tree <em>after</em>
+          emitting a symbol&rsquo;s codeword rather than before? What would break?
+          <details>
+            <summary>solution</summary>
+            The decoder can only reproduce the tree the encoder used if it has already
+            seen everything that tree was built from. It decodes symbol \(s\) using
+            the tree over symbols \(1 \ldots s-1\), so the encoder must have coded
+            \(s\) with that same tree, i.e. before applying \(s\)&rsquo;s
+            update. Updating first would code \(s\) with a tree that includes
+            \(s\)&rsquo;s own increment, which the decoder cannot construct until it
+            knows \(s\): a circular dependency, and the streams desynchronize
+            from the first symbol.
+          </details>
+        </li>
+        <li>
+          Why does Huffman&rsquo;s build produce a <em>full</em> binary tree (every
+          internal node has two children), and why does optimality require fullness?
+          <details>
+            <summary>solution</summary>
+            Every merge creates a parent from exactly two popped nodes, so no internal
+            node is ever built with one child; the tree is full by construction.
+            Fullness is necessary for optimality: a one-child internal node adds a bit
+            to every symbol in its subtree without any branching benefit, so deleting
+            it (promoting its child) lowers every affected code length and strictly
+            reduces \(\sum f_s d_s\). An optimal tree therefore cannot contain a
+            one-child node.
+          </details>
+        </li>
+        <li>
+          You must compress a stream but cannot afford a first pass to count
+          frequencies. Name the property of static Huffman this violates and the
+          variant that resolves it.
+          <details>
+            <summary>solution</summary>
+            Static Huffman needs the symbol frequencies <em>before</em> it can build
+            the tree, so it requires either a first counting pass over the data or a
+            transmitted frequency table, impossible on a single-pass stream of
+            unknown composition. <strong>Adaptive Huffman</strong> resolves it by
+            building and updating the tree as symbols arrive, keeping encoder and
+            decoder in lockstep from the same running counts, so no prior pass or
+            transmitted table is needed (at the cost of continual tree maintenance).
+          </details>
+        </li>
+        <li>
+          In the adaptive trace, the update for the third symbol swaps an internal
+          node with the leaf \(a\) before incrementing. Why is the swap necessary,
+          and why must a node never be swapped with its own parent?
+          <details>
+            <summary>solution</summary>
+            At that moment the internal node is <span class="mono">#5</span> with
+            weight 1 and the leaf \(a\) is <span class="mono">#6</span> with weight 1.
+            Incrementing <span class="mono">#5</span> in place would leave a weight-2
+            node numbered below a weight-1 node, so weights would no longer be
+            nondecreasing in the numbering: the sibling property, and with it
+            Gallager&rsquo;s guarantee that the tree is a Huffman tree for its
+            weights, would break. Moving the node to the top of its equal-weight block
+            first makes the increment safe, because it then sits above every other
+            node of that weight and below every heavier one. A swap with the parent is
+            different in kind: a parent&rsquo;s weight already counts the
+            child&rsquo;s, so the two are not interchangeable positions, and
+            exchanging them would make a node an ancestor of itself. The same applies
+            to any ancestor, which is why the leader search skips them.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Huffman Coding v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

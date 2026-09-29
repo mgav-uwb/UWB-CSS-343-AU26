@@ -1,0 +1,571 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: B-Trees & B+ Trees.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>B-Trees &amp; B+ Trees - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom: 2px solid var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      h2.part {
+        font-size: 22.5px; margin: 46px 0 10px; padding: 10px 14px;
+        background: var(--box); border: 1px solid var(--line);
+        border-left: 4px solid var(--accent); border-radius: 8px;
+      }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>B-Trees &amp; B+ Trees</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        A B-tree of order \(M\) lets each node hold up to \(M-1\) keys, keeps
+        every leaf at the same depth, and splits a full node by promoting its
+        middle key: the 2-3 mechanism widened to fill a disk block. One block
+        read per level gives \(O(\log_M n)\) disk reads per lookup, which is
+        why databases and filesystems are built on B-trees. The B+ variant
+        stores records only in linked leaves, so range scans are one descent
+        plus a leaf walk. Closes with a comparison of the balanced search
+        trees and when to use each. With figures, proofs, a link to the
+        interactive demo, and exercises.
+      </div>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#btrees">B-trees: sized for the disk</a></li>
+          <li><a href="#bplus">B+ trees: values in the leaves</a></li>
+          <li><a href="#which">One goal, several tools</a></li>
+          <li><a href="#ex-btree">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <p class="lead">
+        A <a href="ds-two-three-trees.html">2-3 tree</a> keeps every leaf at the
+        same depth by splitting a full node and promoting its middle key, and
+        that mechanism, unlike the rotations of the
+        <a href="ds-avl-trees.html">AVL tree</a>, does not care how wide a node
+        is. A <strong>B-tree</strong> widens the node deliberately: size it to
+        a disk block, and the tree becomes shallow enough that a lookup costs
+        a handful of block reads. That is the structure underneath essentially
+        every database and filesystem, and this handout closes by comparing
+        the balanced search trees and when to reach for each.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="btrees">1. B-trees: sized for the disk</h2>
+      <p>
+        A <a href="ds-two-three-trees.html">2-3 node</a> holds one or two keys. Why stop at two? A <strong>B-tree of order
+        \(M\)</strong> lets each node hold up to \(M-1\) keys (and thus up to \(M\)
+        children), keeps every leaf at the same depth, and splits a node the moment it
+        reaches \(M\) keys: the identical split-and-promote, just with a wider
+        node. A 2-3 tree is exactly a B-tree of order 3.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (B-tree of order \(M\))</span>
+        A search tree in which every node holds a sorted array of at most \(M-1\) keys
+        and at most \(M\) child pointers, every <em>non-root</em> node has at least
+        \(\lceil M/2 \rceil\) children (so at least \(\lceil M/2\rceil - 1\) keys), the
+        root has at least two children unless it is a leaf, and all leaves lie at the
+        same depth. The &ldquo;at least half full&rdquo; lower bound is what bounds the
+        height at \(\log_{\lceil M/2\rceil} n\) and keeps the tree shallow.
+      </div>
+      <p>
+        The reason to want fat nodes is not comparison count: it is the
+        <strong>disk</strong>. Reading from disk or SSD is not \(\approx 1\times\) the
+        cost of a memory access; it is \(\approx 10^5\times\) slower, and it arrives a
+        whole <strong>block</strong> (page) at a time. So the cost that matters is the
+        <em>number of node accesses = disk reads</em>, not the number of comparisons.
+      </p>
+      <pre>   register  ~1 ns
+   RAM       ~100 ns
+   SSD       ~100 &micro;s      <span class="cm">// ~1000x RAM</span>
+   disk      ~10 ms       <span class="cm">// ~100000x RAM</span></pre>
+      <p>
+        Size a node to fill exactly one block, and each node holds hundreds of keys, so
+        the tree is only a few levels deep. One block read brings a whole key array
+        into memory, where a single in-RAM binary search picks the child: one
+        disk read per level, and the height is \(\log_M n\).
+      </p>
+      <figure>
+        <svg viewBox="0 0 520 190" role="img" aria-label="An order-5 B-tree of height 1. The root node, highlighted green, holds the two keys 30 and 60 and has three leaf children: the left leaf holds 10 and 20, the middle leaf holds 40 and 50, and the right leaf holds 70, 80, and 90. Keys less than 30 go left, keys between 30 and 60 go to the middle, and keys greater than 60 go right.">
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="600" text-anchor="middle">
+            <g stroke="#4a5163" stroke-width="1.5" fill="none">
+              <line x1="230" y1="54" x2="86"  y2="120"/>
+              <line x1="260" y1="56" x2="260" y2="120"/>
+              <line x1="290" y1="54" x2="446" y2="120"/>
+            </g>
+            <!-- root [30|60] -->
+            <rect x="222" y="26" width="76" height="30" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+            <line x1="260" y1="26" x2="260" y2="56" stroke="#9fd3b8" stroke-width="1"/>
+            <text x="241" y="46" fill="#0a7d4d">30</text><text x="279" y="46" fill="#0a7d4d">60</text>
+            <!-- leaves -->
+            <rect x="44" y="120" width="76" height="30" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+            <line x1="82" y1="120" x2="82" y2="150" stroke="#c8ccd6" stroke-width="1"/>
+            <text x="63" y="140">10</text><text x="101" y="140">20</text>
+            <rect x="222" y="120" width="76" height="30" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+            <line x1="260" y1="120" x2="260" y2="150" stroke="#c8ccd6" stroke-width="1"/>
+            <text x="241" y="140">40</text><text x="279" y="140">50</text>
+            <rect x="392" y="120" width="110" height="30" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+            <line x1="429" y1="120" x2="429" y2="150" stroke="#c8ccd6" stroke-width="1"/>
+            <line x1="465" y1="120" x2="465" y2="150" stroke="#c8ccd6" stroke-width="1"/>
+            <text x="410" y="140">70</text><text x="447" y="140">80</text><text x="483" y="140">90</text>
+          </g>
+        </svg>
+        <figcaption>
+          An order-5 B-tree: each node holds up to \(M-1 = 4\) keys and \(M = 5\)
+          children. One node is sized to one disk block, so a lookup costs one block
+          read per level. With order \(M = 1000\), a billion keys fit in
+          \(\log_{1000}(10^9) = 3\) levels: any lookup in about three disk reads.
+          That is why databases and filesystems are built on B-trees.
+        </figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Example (searching across the separators)</span>
+        Search in a node is a scan of its sorted key array, and the keys act as
+        <strong>separators</strong>: with keys \(k_1 \lt \cdots \lt k_{m}\) and
+        children \(c_0, \ldots, c_{m}\), child \(c_i\) holds exactly the keys
+        between \(k_i\) and \(k_{i+1}\). Three searches on the tree above, whose
+        root is \([30\,|\,60]\) over the leaves \([10\,|\,20]\),
+        \([40\,|\,50]\), and \([70\,|\,80\,|\,90]\).
+        <pre>  search 50:  read the root [30|60]. 50 &gt; 30 and 50 &lt; 60, so it belongs
+              between the two separators: follow the MIDDLE child.
+              read [40|50]. 50 is present: HIT, 2 node reads.
+
+  search 65:  read the root. 65 &gt; 60, past the last separator: follow the
+              RIGHT child. read [70|80|90]. 65 is smaller than every key
+              there and the node is a leaf: MISS, 2 node reads.
+
+  search 30:  read the root. 30 equals the first separator, so the search
+              stops at the ROOT: HIT, 1 node read. A key stored in an
+              internal node is found without ever reaching a leaf.</pre>
+        Each search reads one node per level, one disk block per level, no
+        matter how many keys that block holds. The hit at \(30\) is worth
+        noticing: in a plain B-tree records sit in internal nodes too, so a
+        lookup may finish early, whereas the B+ tree of &sect;2 always walks all
+        the way down to a leaf.
+      </div>
+      <p>
+        Insertion is the 2-3 rule at width \(M\), as the demo shows.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a B-tree split, \(M=5\))</span>
+        Insert \(55\) into a full leaf \([60\,|\,70\,|\,80\,|\,90]\):
+        <pre>  temp [55|60|70|80|90]   <span class="cm">// 5 keys: overflow at M</span>
+              &darr;  split, promote the middle (70)
+        parent gains 70
+       [ ... | 70 | ... ]
+        /             \
+   [55|60]          [80|90]</pre>
+        Split at \(M\) keys, promote the middle, and two half-full nodes remain: the same rule as a 2-3 split, only the threshold (5 keys instead of 3)
+        and the halves (two keys each instead of one) differ. A root split still grows
+        the height by one, at the top.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (building the tree above, key by key, \(M=5\))</span>
+        Insert \(10, 20, \ldots, 90\) into an empty order-5 B-tree. A node
+        overflows at \(M = 5\) keys and promotes the third of the five.
+        <figure>
+          <table class="trace">
+            <tr>
+              <th class="lab">insert</th><th>goes to</th><th>split?</th>
+              <th>tree after</th><th>height</th>
+            </tr>
+            <tr><td class="set">10, 20, 30, 40</td><td class="lab">the one leaf</td><td class="inf">&middot;</td><td class="lab">[10|20|30|40]</td><td>0</td></tr>
+            <tr><td class="set">50</td><td class="lab">the one leaf, now 5 keys</td><td class="upd">root split, promote 30</td><td class="lab">[30] over [10|20], [40|50]</td><td>1</td></tr>
+            <tr><td class="set">60</td><td class="lab">right leaf (\(60 &gt; 30\))</td><td class="inf">&middot;</td><td class="lab">[30] over [10|20], [40|50|60]</td><td>1</td></tr>
+            <tr><td class="set">70</td><td class="lab">right leaf</td><td class="inf">&middot;</td><td class="lab">[30] over [10|20], [40|50|60|70]</td><td>1</td></tr>
+            <tr><td class="set">80</td><td class="lab">right leaf, now 5 keys</td><td class="upd">leaf split, promote 60</td><td class="lab">[30|60] over [10|20], [40|50], [70|80]</td><td>1</td></tr>
+            <tr><td class="set">90</td><td class="lab">rightmost leaf</td><td class="inf">&middot;</td><td class="lab">[30|60] over [10|20], [40|50], [70|80|90]</td><td>1</td></tr>
+          </table>
+          <figcaption>
+            Nine ascending keys, the input that ruins a plain BST, build the
+            order-5 tree of the figure above. Three behaviours appear: an insert
+            into a leaf with room (no split); the split of the root itself, which
+            is the only step that adds a level; and a leaf split whose promoted
+            key \(60\) joins a root that had room, widening it from
+            \([30]\) to \([30\,|\,60]\) without changing the height.
+          </figcaption>
+        </figure>
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (few disk reads)</span>
+        A B-tree of order \(M\) on \(n\) keys has height at most
+        \(\log_{\lceil M/2\rceil} n\), so a lookup costs \(O(\log_M n)\) disk reads.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Every non-root node has at least \(\lceil M/2\rceil\)
+        children, so a tree of height \(h\) has at least \(2\lceil M/2\rceil^{\,h-1}\)
+        leaves, hence at least that many keys. Solving \(n \ge 2\lceil M/2\rceil^{\,h-1}\)
+        for \(h\) gives \(h \le 1 + \log_{\lceil M/2\rceil}(n/2) = O(\log_M n)\). Each
+        level costs exactly one node access (one block read); the in-node binary search
+        is free once the block is in RAM. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The contrast with a binary tree is the whole argument for B-trees. A balanced
+        <em>binary</em> tree over \(10^9\) keys is about \(\log_2 10^9 \approx 30\)
+        levels: up to 30 disk reads, roughly \(0.3\) s on a spinning disk. The
+        same keys in an order-1000 B-tree take 3 reads, roughly \(30\) ms: the
+        branching factor does all the work. In RAM, 30 versus 3 comparisons is nothing;
+        against the disk it is the difference between a snappy query and a slow one. The
+        lesson is to match the node size to the unit of I/O; historically the
+        original motivation (Bayer &amp; McCreight, 1972).
+      </p>
+      <!-- ============================================================ -->
+      <h2 id="bplus">2. B+ trees: values in the leaves</h2>
+      <p>
+        Databases use a variant, the <strong>B+ tree</strong>, that pushes all values
+        down to the leaves. Internal nodes hold only keys (pure routing information);
+        every value lives in a leaf, and the leaves are <strong>linked</strong> into a
+        sorted list. Value-free internal nodes fan out even wider (each block
+        routes to more children), so the tree is even shorter, and the linked
+        leaves make range scans a single descent followed by a walk along the chain.
+      </p>
+      <pre>  index on age, order 3 (routers upstairs, records in the leaves):
+
+  internal:          [ 30 | 60 ]
+                    /      |      \
+  leaves:   [10|20] &rarr; [30|45] &rarr; [60|90] &rarr; &empty;
+             (each leaf key carries its own record; a key such
+              as 30 or 60 appears twice: once as a router,
+              once in a leaf)</pre>
+      <p>
+        Because the leaves form a sorted linked list, a range query such as
+        <code>SELECT * WHERE age BETWEEN 20 AND 40</code> descends once to find
+        \(20\), then follows leaf links until it passes \(40\). <code>ORDER BY</code>,
+        <code>BETWEEN</code>, and pagination are all just sequential leaf walks,
+        which is why B+ trees, not plain B-trees, index essentially every relational
+        database and back most modern filesystems (NTFS, ext4, APFS).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a range scan along the leaf chain)</span>
+        Run <code>BETWEEN 20 AND 40</code> against the index drawn above: the
+        router \([30\,|\,60]\) over the linked leaves \([10\,|\,20] \to
+        [30\,|\,45] \to [60\,|\,90]\).
+        <pre>  1. descend for the low end, 20: read the router [30|60]; 20 &lt; 30, so
+     follow the LEFT child. Read the leaf [10|20] and position on 20.
+     (Note the descent does NOT stop at a router: 30 appears upstairs as a
+     separator, but its record lives in a leaf, so every search reaches
+     a leaf. That is the B+ rule.)
+
+  2. scan this leaf from that position: 20 is in range, emit it. The leaf
+     ends, so follow its NEXT-leaf link.
+
+  3. read [30|45]: 30 is in range, emit it; 45 &gt; 40, out of range, stop.
+
+  result 20, 30 in one descent (2 node reads) plus one extra leaf read,
+  and no internal node was ever revisited.</pre>
+        A plain B-tree answers the same query by walking the tree itself,
+        returning to internal nodes between leaves; the linked leaves replace
+        that wandering with a sequential read, which is also exactly what a disk
+        is fastest at. Extending the range to \(90\) would simply continue the
+        walk into \([60\,|\,90]\), one more leaf read, with no extra descent.
+      </div>
+      <table>
+        <tr><th></th><th>B-tree</th><th>B+ tree</th></tr>
+        <tr><td>records stored</td><td>in <strong>all</strong> nodes</td><td><strong>leaves only</strong></td></tr>
+        <tr><td>internal node</td><td>keys + records</td><td><strong>keys only</strong> (wider)</td></tr>
+        <tr><td>range scan</td><td>full-tree walk</td><td><strong>leaf-chain</strong> walk</td></tr>
+        <tr><td>a key appears</td><td>once</td><td>router <strong>and</strong> leaf</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Choosing the order \(M\)</span>
+        The order is dictated by hardware, not taste: pick \(M\) so a node fills one
+        block. With a \(4096\)-byte block, \(8\)-byte keys, and \(8\)-byte pointers, an
+        internal node needs about \(M\cdot 8 + (M-1)\cdot 8 \approx 4096\), giving
+        \(M \approx 256\). Then three levels hold roughly \(1 \times 256 \times 256^2
+        \times 255 \approx 16\) million keys in three reads; pushing to \(M = 1000\)
+        and one more level reaches billions in about four. Those figures assume full
+        nodes, though. The order property only <em>guarantees</em> half-full, and the
+        root is exempt even from that: right after any root split the new root
+        holds a single key. Counting the guaranteed minimum (\(\lceil M/2\rceil\)
+        children) instead of the maximum gives far fewer keys at the same depth, but
+        because capacity grows exponentially in the fan-out, one extra disk read makes
+        it up. &ldquo;A few disk reads for the largest real datasets&rdquo; is the sound
+        takeaway (Open Data Structures, Morin, Ch. 14); just do not quote the
+        best case as if it were the guarantee. This block-size arithmetic is the disk
+        exercise you will see on the homework.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=btree">B-tree demo</a>. Insert into an order-5
+        B-tree and watch the same split-and-promote as a 2-3 tree, only wider: a node
+        splits when it reaches five keys, its middle rises, and the fan-out stays high
+        so the tree hardly deepens. Notice how many keys sit at each level even as the
+        tree fills: the high fan-out is the entire benefit.
+      </div>
+      <!-- ============================================================ -->
+      <h2 id="which">3. One goal, several tools</h2>
+      <p>
+        The <a href="ds-avl-trees.html">AVL tree</a>, the
+        <a href="ds-red-black-trees.html">red-black BST</a>, the
+        <a href="ds-two-three-trees.html">2-3 tree</a>, and the B-tree all
+        deliver \(\Theta(\log n)\)
+        search, insert, and delete. They differ in the <em>mechanism</em> that keeps
+        them balanced and in which level of the memory hierarchy they optimise for.
+      </p>
+      <table>
+        <tr><th>structure</th><th>balance kept by</th><th>height</th><th>best when</th></tr>
+        <tr><td>plain BST</td><td>nothing</td><td>up to \(n-1\)</td><td>keys arrive randomly</td></tr>
+        <tr><td><strong>AVL</strong></td><td>rotations, bf \(\in \pm 1\)</td><td>\(\le 1.44\log_2 n\)</td><td><strong>read</strong>-heavy (tightest)</td></tr>
+        <tr><td><strong>red-black</strong></td><td>rotations + colours</td><td>\(\le 2\log_2 n\)</td><td><strong>write</strong>-heavy (std. lib.)</td></tr>
+        <tr><td><strong>2-3</strong></td><td>split &amp; promote</td><td>\(\Theta(\log n)\)</td><td>teaching / basis of red-black</td></tr>
+        <tr><td><strong>B / B+</strong></td><td>split &amp; promote</td><td>\(\log_M n\)</td><td><strong>disk / databases</strong></td></tr>
+      </table>
+      <p>
+        The choice between AVL and red-black is a choice of constant, not of asymptotic
+        class. AVL keeps a tighter tree (height \(1.44\log_2 n\) versus \(2\log_2 n\)),
+        so it searches a little faster, and it does at most one rotation per insertion;
+        but a deletion can rotate at every level. Red-black does slightly more work per
+        insertion yet keeps deletion to \(O(1)\) rotations (recolours may cascade, but
+        they are cheaper than rotations). So AVL optimises the <em>search</em> and wins
+        when reads dominate; red-black optimises the <em>update</em> and wins when
+        writes dominate, which is why a general-purpose library map is red-black.
+      </p>
+      <table>
+        <tr><th></th><th>AVL</th><th>red-black</th></tr>
+        <tr><td>height</td><td>\(\le 1.44\log_2 n\)</td><td>\(\le 2\log_2 n\)</td></tr>
+        <tr><td>balance</td><td><strong>tighter</strong></td><td>looser</td></tr>
+        <tr><td>rotations / insert</td><td>\(\le 1\)</td><td>\(\le 2\) + recolours</td></tr>
+        <tr><td>rotations / delete</td><td>up to \(\log n\)</td><td>\(O(1)\)</td></tr>
+        <tr><td>best for</td><td><strong>read</strong>-heavy</td><td><strong>write</strong>-heavy</td></tr>
+      </table>
+      <p>
+        Underneath, 2-3 trees, red-black trees, and B-trees are <em>one</em> algorithm
+        at three node widths (split a full node and send its middle key up):
+      </p>
+      <table>
+        <tr><th></th><th>node width</th><th>splits at</th></tr>
+        <tr><td><strong>2-3</strong></td><td>1&ndash;2 keys</td><td>3 keys</td></tr>
+        <tr><td><strong>red-black</strong></td><td>1 key + colour bit</td><td>two reds (flip)</td></tr>
+        <tr><td><strong>B-tree (order \(M\))</strong></td><td>\(\le M-1\) keys</td><td>\(M\) keys</td></tr>
+      </table>
+      <p>
+        In a red-black tree the &ldquo;promote&rdquo; is a <code>flipColors</code>
+        passing a red link up; in a B-tree it is the same middle-key promotion, widened
+        to fill a disk block. Balance is a <strong>goal</strong>, reached by whichever
+        mechanism suits the machine, not a single algorithm. A blunt decision guide:
+      </p>
+      <pre>   in RAM, read-heavy        &rarr;  AVL
+   in RAM, general/mutable   &rarr;  red-black   (std::map)
+   on disk / a database      &rarr;  B+ tree
+   learning / interviews     &rarr;  2-3         (it explains red-black)</pre>
+      <p>
+        You will rarely hand-roll any of these: you reach for <code>std::map</code>
+        (red-black) in memory or trust your database&rsquo;s B+ tree on disk. But
+        knowing <em>which</em> is running tells you the cost and the gotchas; and
+        the split-and-promote idea returns, transformed, in the <a href="../hashing/ds-hashing.html"><em>Hashing</em></a> handout.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex-btree">4. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Start from the order-5 B-tree with root \([30\,|\,60]\) over the leaves
+          \([10\,|\,20]\), \([40\,|\,50]\), and \([70\,|\,80\,|\,90]\). Insert
+          \(45\), then \(55\), then \(35\). Which node splits, which key is
+          promoted, and what is the tree at the end? How many more insertions
+          could the root absorb before it too must split?
+          <details>
+            <summary>solution</summary>
+            \(45\) and \(55\) both fall between the separators \(30\) and \(60\)
+            and join the middle leaf, giving \([40\,|\,45\,|\,50]\) and then
+            \([40\,|\,45\,|\,50\,|\,55]\): four keys, full but legal, since a
+            node overflows only at \(M = 5\). \(35\) lands in that same leaf,
+            making the five keys \([35\,|\,40\,|\,45\,|\,50\,|\,55]\), so the
+            leaf splits and its middle key \(45\) is promoted:
+            <pre>          [ 30 | 45 | 60 ]
+         /      |     |      \
+   [10|20] [35|40] [50|55] [70|80|90]</pre>
+            The root now holds three keys, so it can accept one more promoted
+            key (reaching the legal maximum of four) and splits on the next one,
+            which would lift a new
+            root above it and take the tree to height 2. Every leaf is still at
+            the same depth, as it is after every insertion.
+          </details>
+        </li>
+        <li>
+          A B-tree has order \(M = 256\) and three levels (so a lookup is three disk
+          reads). Assuming every node is full, how many keys can it hold? Repeat for
+          order \(M\) and \(h\) levels in general.
+          <details>
+            <summary>solution</summary>
+            A full node has \(M\) children and \(M-1\) keys. With \(h\) levels the number
+            of nodes is \(1 + M + M^2 + \dots + M^{h-1} = (M^h - 1)/(M - 1)\), and each
+            holds \(M-1\) keys, for a total of \(M^h - 1\) keys. For \(M = 256\),
+            \(h = 3\): \(256^3 - 1 \approx 1.67 \times 10^7\), about 16.7 million keys in
+            three reads. (This is the best case; the order property only guarantees
+            half-full nodes, so the <em>guaranteed</em> capacity at three levels is far
+            smaller, but one more level restores &ldquo;millions.&rdquo;)
+          </details>
+        </li>
+        <li>
+          Why do databases prefer B+ trees over plain B-trees for queries such as
+          <code>SELECT * WHERE age BETWEEN 20 AND 40</code>?
+          <details>
+            <summary>solution</summary>
+            In a B+ tree all records live in the leaves, and the leaves are linked into a
+            sorted list. A range query descends once to the first key in range, then walks
+            the leaf chain sequentially until it leaves the range: no re-traversal
+            of the tree. In a plain B-tree records sit at every level, so a range scan must
+            wander up and down the tree, revisiting internal nodes. B+ trees also keep
+            internal nodes value-free, so each block routes to more children (higher
+            fan-out, shorter tree). The cost is that some keys appear twice (as a router
+            and in a leaf), a small price for cheap range and ordered scans.
+          </details>
+        </li>
+        <li>
+          For each situation, name the balanced search tree you
+          would reach for: (a) an in-memory dictionary that is queried far more often
+          than it is updated; (b) the general-purpose ordered map in a standard library;
+          (c) an index for a database table on disk that must support ordered range
+          scans.
+          <details>
+            <summary>solution</summary>
+            (a) an <strong>AVL</strong> tree: its tighter height (\(1.44\log_2 n\))
+            makes reads fastest. (b) a <strong>red-black</strong> BST: fewer
+            rotations per update suit a mix of inserts and erases, which is why
+            <code>std::map</code>/<code>TreeMap</code> use it. (c) a <strong>B+ tree</strong>: wide nodes minimise disk reads and the linked leaves make range scans a
+            single descent plus a leaf walk. All three are \(\Theta(\log n)\); the machine
+            and the workload decide.
+          </details>
+        </li>
+        <li>
+          True or false, with justification: &ldquo;AVL, red-black, 2-3, and B-trees all
+          guarantee \(\Theta(\log n)\) search regardless of the order the keys are
+          inserted.&rdquo;
+          <details>
+            <summary>solution</summary>
+            True. Each maintains a height bound that is \(\Theta(\log n)\) under every
+            insertion order: AVL keeps \(h \le 1.44\log_2 n\) via the balance-factor
+            invariant; red-black keeps \(h \le 2\log_2 n\) via black balance and the
+            no-double-red rule; a 2-3 tree keeps \(\log_3 n \le h \le \log_2 n\) by perfect
+            balance; and a B-tree of order \(M\) keeps \(h \le \log_{\lceil M/2\rceil} n\)
+            by the half-full rule. Search visits one node per level, so it is
+            \(\Theta(h) = \Theta(\log n)\) in every case. (A plain BST would make the claim
+            <em>false</em>: adversarial inserts give height \(n-1\), which is
+            exactly the problem these structures were built to solve.)
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+  </body>
+</html>

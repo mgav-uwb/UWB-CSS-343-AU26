@@ -1,0 +1,953 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Suffix Arrays.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Suffix Arrays - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Suffix Arrays</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        The suffix array: every suffix of a text, sorted, stored as an array
+        of starting indices. Built fully by hand for
+        <code>banana$</code>; substring search as binary search over the
+        sorted suffixes (a hit and a miss both traced); the longest-common-prefix
+        array computed by hand and used to find the longest repeated substring;
+        construction cost from the naive \(O(n^2 \log n)\) sort through
+        prefix doubling, with linear-time algorithms name-checked; suffix
+        trees in an aside. With full implementations and exercises.
+      </div>
+
+      <p class="lead">
+        The substring searchers
+        (<a href="foundation-substring-search.html"><em>Substring Search: The
+        Problem &amp; Baselines</em></a>) all preprocess the
+        <em>pattern</em> and then scan the text: the right shape when the text
+        arrives once and the pattern is fixed. Flip the workload: one huge,
+        fixed text (a genome, a corpus, a log archive) and <em>many</em>
+        patterns, arriving later, unknown in advance. Now it pays to
+        preprocess the <em>text</em>. The suffix array is the standard way to
+        do it: sort all \(n\) suffixes of the text once, and every future
+        pattern becomes a binary search.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#build">All suffixes, sorted</a></li>
+          <li><a href="#search">Substring search as binary search</a></li>
+          <li><a href="#lcp">The LCP array, and the longest repeated substring</a></li>
+          <li><a href="#construct">Construction cost: naive, doubling, linear</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="build">1. All suffixes, sorted</h2>
+      <div class="def">
+        <span class="tag">Definition (suffix, sentinel)</span>
+        For a text \(t\) of length \(n\), the <strong>suffix</strong> starting
+        at index \(i\) is \(t[i \mathinner{.\,.} n-1]\): the tail of the text
+        from position \(i\) to the end. There are exactly \(n\) of them, one
+        per starting index. By convention the text ends with a
+        <strong>sentinel</strong> character <code>$</code> that appears
+        nowhere else and sorts before every real character; it guarantees
+        that no suffix is a prefix of another, so any two suffixes differ at
+        some character position.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (suffix array)</span>
+        The <strong>suffix array</strong> \(SA\) of \(t\) is the array of the
+        \(n\) starting indices, arranged so that the suffixes they name are in
+        sorted (lexicographic) order: \(SA[r]\) is the starting index of the
+        \(r\)-th smallest suffix. The suffixes themselves are never copied:
+        the structure is \(n\) integers, and every &ldquo;row&rdquo; is read
+        off the original text on demand.
+      </div>
+      <p>
+        Build one fully by hand for \(t = \texttt{banana\$}\)
+        (\(n = 7\)). Step one: list every suffix with its starting index.
+      </p>
+      <table class="trace">
+        <tr><th>start index \(i\)</th><th>suffix \(t[i..]\)</th></tr>
+        <tr><td>0</td><td class="cell">banana$</td></tr>
+        <tr><td>1</td><td class="cell">anana$</td></tr>
+        <tr><td>2</td><td class="cell">nana$</td></tr>
+        <tr><td>3</td><td class="cell">ana$</td></tr>
+        <tr><td>4</td><td class="cell">na$</td></tr>
+        <tr><td>5</td><td class="cell">a$</td></tr>
+        <tr><td>6</td><td class="cell">$</td></tr>
+      </table>
+      <p>
+        Step two: sort the seven strings (with
+        <code>$</code> &lt; <code>a</code> &lt; <code>b</code> &lt;
+        <code>n</code>). Step three: read the indices off the sorted order.
+        That index column <em>is</em> the suffix array.
+      </p>
+      <table class="trace">
+        <tr><th>row \(r\)</th><th>suffix (sorted)</th><th>\(SA[r]\)</th></tr>
+        <tr><td>0</td><td class="cell">$</td><td class="piv">6</td></tr>
+        <tr><td>1</td><td class="cell">a$</td><td class="piv">5</td></tr>
+        <tr><td>2</td><td class="cell">ana$</td><td class="piv">3</td></tr>
+        <tr><td>3</td><td class="cell">anana$</td><td class="piv">1</td></tr>
+        <tr><td>4</td><td class="cell">banana$</td><td class="piv">0</td></tr>
+        <tr><td>5</td><td class="cell">na$</td><td class="piv">4</td></tr>
+        <tr><td>6</td><td class="cell">nana$</td><td class="piv">2</td></tr>
+      </table>
+      <p>
+        So \(SA(\texttt{banana\$}) = [\,6, 5, 3, 1, 0, 4, 2\,]\). Two
+        observations that drive everything below. First, all suffixes
+        beginning with the same string sit in a <strong>contiguous run of
+        rows</strong>: the three <code>a</code>-suffixes are rows 1&ndash;3,
+        the two <code>na</code>-suffixes are rows 5&ndash;6; that is just what
+        sorted order means. Second, the array costs \(n\) integers
+        (28 bytes here at 4 bytes each) no matter how long the suffixes are,
+        because it stores indices, never string copies.
+      </p>
+      <p>
+        The complete operations in code: build (naively, by sorting the
+        indices with suffix comparisons; the real algorithms are the subject
+        of <a href="#construct">the construction section</a>), search, count, and the
+        LCP scan of <a href="#lcp">the LCP section</a>.
+      </p>
+      <div class="code-tabs" data-snippet="strings/suffix-array">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Suffix array: build (naive O(n^2 log n) sort), search (binary search for the
+// first row whose suffix &gt;= pattern), count (the band of rows starting with
+// the pattern), LCP array (adjacent-row scan). Text must end with '$'.
+vector&lt;int&gt; suffixArray(const string&amp; t) {
+    vector&lt;int&gt; sa(t.size());
+    iota(sa.begin(), sa.end(), 0);            // indices 0..n-1
+    sort(sa.begin(), sa.end(), [&amp;](int a, int b) {
+        return t.compare(a, string::npos, t, b, string::npos) &lt; 0;
+    });                                       // compare the two SUFFIXES
+    return sa;
+}
+int search(const string&amp; t, const vector&lt;int&gt;&amp; sa, const string&amp; p) {
+    int lo = 0, hi = sa.size();
+    while (lo &lt; hi) {                         // invariant: rows &lt; lo are &lt; p
+        int mid = (lo + hi) / 2;              //            rows &gt;= hi are &gt;= p
+        if (t.compare(sa[mid], string::npos, p) &lt; 0) lo = mid + 1;
+        else hi = mid;
+    }
+    if (lo &lt; (int)sa.size() &amp;&amp; t.compare(sa[lo], p.size(), p) == 0)
+        return sa[lo];                        // suffix at row lo starts with p
+    return -1;                                // no occurrence
+}
+int count(const string&amp; t, const vector&lt;int&gt;&amp; sa, const string&amp; p) {
+    int lo = 0, hi = sa.size();               // lower bound: first row &gt;= p
+    while (lo &lt; hi) { int m = (lo + hi) / 2;
+        if (t.compare(sa[m], string::npos, p) &lt; 0) lo = m + 1; else hi = m; }
+    int lo2 = lo; hi = sa.size();             // upper bound: first row whose
+    while (lo2 &lt; hi) { int m = (lo2 + hi) / 2;   // length-m prefix &gt; p
+        if (t.compare(sa[m], p.size(), p) &lt;= 0) lo2 = m + 1; else hi = m; }
+    return lo2 - lo;                          // width of the band
+}
+vector&lt;int&gt; lcpArray(const string&amp; t, const vector&lt;int&gt;&amp; sa) {
+    vector&lt;int&gt; lcp(sa.size(), 0);            // lcp[r]: rows r-1 and r
+    for (size_t r = 1; r &lt; sa.size(); r++) {
+        int i = sa[r-1], j = sa[r], k = 0;
+        while (t[i+k] == t[j+k]) k++;         // '$' stops the loop
+        lcp[r] = k;
+    }
+    return lcp;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Suffix array: build (naive O(n^2 log n) sort), search (binary search for the
+// first row whose suffix &gt;= pattern), count (the band of rows starting with
+// the pattern), LCP array (adjacent-row scan). Text must end with '$'.
+static Integer[] suffixArray(String t) {
+    Integer[] sa = new Integer[t.length()];
+    for (int i = 0; i &lt; sa.length; i++) sa[i] = i;   // indices 0..n-1
+    Arrays.sort(sa, (a, b) -&gt; t.substring(a).compareTo(t.substring(b)));
+    return sa;                                // compare the two SUFFIXES
+}
+static int search(String t, Integer[] sa, String p) {
+    int lo = 0, hi = sa.length;
+    while (lo &lt; hi) {                         // invariant: rows &lt; lo are &lt; p
+        int mid = (lo + hi) / 2;              //            rows &gt;= hi are &gt;= p
+        if (t.substring(sa[mid]).compareTo(p) &lt; 0) lo = mid + 1;
+        else hi = mid;
+    }
+    if (lo &lt; sa.length &amp;&amp; t.startsWith(p, sa[lo]))
+        return sa[lo];                        // suffix at row lo starts with p
+    return -1;                                // no occurrence
+}
+static int count(String t, Integer[] sa, String p) {
+    int lo = 0, hi = sa.length;               // lower bound: first row &gt;= p
+    while (lo &lt; hi) { int m = (lo + hi) / 2;
+        if (t.substring(sa[m]).compareTo(p) &lt; 0) lo = m + 1; else hi = m; }
+    int lo2 = lo; hi = sa.length;             // upper bound: first row whose
+    while (lo2 &lt; hi) { int m = (lo2 + hi) / 2;   // length-m prefix &gt; p
+        String pre = t.substring(sa[m], Math.min(sa[m] + p.length(), t.length()));
+        if (pre.compareTo(p) &lt;= 0) lo2 = m + 1; else hi = m; }
+    return lo2 - lo;                          // width of the band
+}
+static int[] lcpArray(String t, Integer[] sa) {
+    int[] lcp = new int[sa.length];           // lcp[r]: rows r-1 and r
+    for (int r = 1; r &lt; sa.length; r++) {
+        int i = sa[r-1], j = sa[r], k = 0;
+        while (t.charAt(i+k) == t.charAt(j+k)) k++;   // '$' stops the loop
+        lcp[r] = k;
+    }
+    return lcp;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Suffix array: build (naive O(n^2 log n) sort), search (binary search for the
+# first row whose suffix >= pattern), count (the band of rows starting with
+# the pattern), LCP array (adjacent-row scan). Text must end with '$'.
+def suffix_array(t):
+    return sorted(range(len(t)), key=lambda i: t[i:])   # compare SUFFIXES
+
+def search(t, sa, p):
+    lo, hi = 0, len(sa)
+    while lo &lt; hi:                            # invariant: rows &lt; lo are &lt; p
+        mid = (lo + hi) // 2                  #            rows &gt;= hi are &gt;= p
+        if t[sa[mid]:] &lt; p: lo = mid + 1
+        else: hi = mid
+    if lo &lt; len(sa) and t.startswith(p, sa[lo]):
+        return sa[lo]                         # suffix at row lo starts with p
+    return -1                                 # no occurrence
+
+def count(t, sa, p):
+    lo, hi = 0, len(sa)                       # lower bound: first row &gt;= p
+    while lo &lt; hi:
+        m = (lo + hi) // 2
+        if t[sa[m]:] &lt; p: lo = m + 1
+        else: hi = m
+    lo2, hi = lo, len(sa)                     # upper bound: first row whose
+    while lo2 &lt; hi:                           # length-m prefix &gt; p
+        m = (lo2 + hi) // 2
+        if t[sa[m]:sa[m]+len(p)] &lt;= p: lo2 = m + 1
+        else: hi = m
+    return lo2 - lo                           # width of the band
+
+def lcp_array(t, sa):
+    lcp = [0] * len(sa)                       # lcp[r]: rows r-1 and r
+    for r in range(1, len(sa)):
+        i, j, k = sa[r-1], sa[r], 0
+        while t[i+k] == t[j+k]:               # '$' stops the loop
+            k += 1
+        lcp[r] = k
+    return lcp</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Suffix array: build (naive O(n^2 log n) sort), search (binary search for the
+// first row whose suffix &gt;= pattern), count (the band of rows starting with
+// the pattern), LCP array (adjacent-row scan). Text must end with '$'.
+fn suffix_array(t: &amp;str) -&gt; Vec&lt;usize&gt; {
+    let mut sa: Vec&lt;usize&gt; = (0..t.len()).collect();  // indices 0..n-1
+    sa.sort_by(|&amp;a, &amp;b| t[a..].cmp(&amp;t[b..]));         // compare the SUFFIXES
+    sa
+}
+fn search(t: &amp;str, sa: &amp;[usize], p: &amp;str) -&gt; i32 {
+    let (mut lo, mut hi) = (0, sa.len());
+    while lo &lt; hi {                           // invariant: rows &lt; lo are &lt; p
+        let mid = (lo + hi) / 2;              //            rows &gt;= hi are &gt;= p
+        if &amp;t[sa[mid]..] &lt; p { lo = mid + 1; } else { hi = mid; }
+    }
+    if lo &lt; sa.len() &amp;&amp; t[sa[lo]..].starts_with(p) {
+        return sa[lo] as i32;                 // suffix at row lo starts with p
+    }
+    -1                                        // no occurrence
+}
+fn count(t: &amp;str, sa: &amp;[usize], p: &amp;str) -&gt; usize {
+    let (mut lo, mut hi) = (0, sa.len());     // lower bound: first row &gt;= p
+    while lo &lt; hi { let m = (lo + hi) / 2;
+        if &amp;t[sa[m]..] &lt; p { lo = m + 1; } else { hi = m; } }
+    let (mut lo2, mut hi) = (lo, sa.len());   // upper bound: first row whose
+    while lo2 &lt; hi {                          // length-m prefix &gt; p
+        let m = (lo2 + hi) / 2;
+        let end = (sa[m] + p.len()).min(t.len());
+        if &amp;t[sa[m]..end] &lt;= p { lo2 = m + 1; } else { hi = m; }
+    }
+    lo2 - lo                                  // width of the band
+}
+fn lcp_array(t: &amp;str, sa: &amp;[usize]) -&gt; Vec&lt;usize&gt; {
+    let tb = t.as_bytes();
+    let mut lcp = vec![0; sa.len()];          // lcp[r]: rows r-1 and r
+    for r in 1..sa.len() {
+        let (i, j, mut k) = (sa[r-1], sa[r], 0);
+        while tb[i+k] == tb[j+k] { k += 1; }  // '$' stops the loop
+        lcp[r] = k;
+    }
+    lcp
+}</pre>
+<p class="ct-src">source: <code>code/strings/suffix-array.cpp &middot; code/strings/suffix-array.java &middot; code/strings/suffix-array.py &middot; code/strings/suffix-array.rs</code></p>
+<!--/ct--></div>
+
+      <!-- ============================================================ -->
+      <h2 id="search">2. Substring search as binary search</h2>
+      <p>
+        The key equivalence: a pattern \(p\) occurs in \(t\) at index \(i\)
+        <strong>exactly when \(p\) is a prefix of the suffix starting at
+        \(i\)</strong>. So &ldquo;find \(p\) in \(t\)&rdquo; becomes
+        &ldquo;find a suffix that starts with \(p\)&rdquo;, and since the
+        suffixes starting with \(p\) form a contiguous band of rows, binary
+        search finds the band. The search above maintains the standard
+        lower-bound invariant: every row below <code>lo</code> holds a suffix
+        \(&lt; p\), every row at or above <code>hi</code> holds a suffix
+        \(\ge p\). When <code>lo</code> meets <code>hi</code>, that row is
+        the first suffix \(\ge p\); the pattern occurs in the text if and
+        only if that suffix starts with \(p\).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (hit, traced)</span>
+        Search for \(p = \texttt{ana}\) in \(\texttt{banana\$}\),
+        \(SA = [6,5,3,1,0,4,2]\), rows \(0..6\), so
+        <code>lo</code>&nbsp;=&nbsp;0, <code>hi</code>&nbsp;=&nbsp;7. Each
+        step compares the pattern with the suffix at the middle row:
+        <table class="trace">
+          <tr><th>step</th><th>lo</th><th>hi</th><th>mid</th><th>\(SA[mid]\)</th><th>suffix there</th><th>compare with <code>ana</code></th><th>move</th></tr>
+          <tr><td>1</td><td>0</td><td>7</td><td class="piv">3</td><td>1</td><td class="cell">anana$</td><td class="cell">ana|n&hellip; &gt; ana (prefix, then longer)</td><td>hi = 3</td></tr>
+          <tr><td>2</td><td>0</td><td>3</td><td class="piv">1</td><td>5</td><td class="cell">a$</td><td class="cell">a|$ &lt; a|n at position 1</td><td>lo = 2</td></tr>
+          <tr><td>3</td><td>2</td><td>3</td><td class="piv">2</td><td>3</td><td class="cell">ana$</td><td class="cell">ana|$ &gt; ana (prefix, then longer)</td><td>hi = 2</td></tr>
+          <tr><td colspan="8" class="lab">lo = hi = 2: suffix at row 2 is ana$, which starts with ana &rarr; <strong>hit at text index \(SA[2] = 3\)</strong></td></tr>
+        </table>
+        Three suffix comparisons for \(n = 7\). Note both flavors of
+        &ldquo;suffix \(\ge\) pattern&rdquo; appear: at steps 1 and 3 the
+        pattern is a <em>prefix</em> of the suffix (so the longer suffix
+        sorts after it), which is precisely the configuration that means
+        &ldquo;occurrence here&rdquo;.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (miss, traced)</span>
+        Search for \(p = \texttt{nab}\) in the same array:
+        <table class="trace">
+          <tr><th>step</th><th>lo</th><th>hi</th><th>mid</th><th>\(SA[mid]\)</th><th>suffix there</th><th>compare with <code>nab</code></th><th>move</th></tr>
+          <tr><td>1</td><td>0</td><td>7</td><td class="piv">3</td><td>1</td><td class="cell">anana$</td><td class="cell">a &lt; n at position 0</td><td>lo = 4</td></tr>
+          <tr><td>2</td><td>4</td><td>7</td><td class="piv">5</td><td>4</td><td class="cell">na$</td><td class="cell">na|$ &lt; na|b at position 2</td><td>lo = 6</td></tr>
+          <tr><td>3</td><td>6</td><td>7</td><td class="piv">6</td><td>2</td><td class="cell">nana$</td><td class="cell">na|n &gt; na|b at position 2</td><td>hi = 6</td></tr>
+          <tr><td colspan="8" class="lab">lo = hi = 6: suffix at row 6 is nana$, which does NOT start with nab &rarr; <strong>miss</strong></td></tr>
+        </table>
+        The search lands exactly where <code>nab</code> <em>would</em> sit
+        (between <code>na\$</code> and <code>nana\$</code>), finds a suffix
+        that does not begin with the pattern, and reports no occurrence.
+        Step 2 shows the sentinel doing its quiet work: <code>na$</code>
+        loses to <code>nab</code> because <code>$</code> sorts below every
+        real character. The remaining miss shape: a pattern greater than
+        every suffix (say \(\texttt{z}\)) drives <code>lo</code> all the way
+        to \(n\), and the <code>lo &lt; n</code> guard catches it
+        (exercise 5).
+      </div>
+      <h3>Counting and reporting all occurrences</h3>
+      <p>
+        Because the suffixes starting with \(p\) are one contiguous band, a
+        second binary search (for the first row whose length-\(m\) prefix
+        exceeds \(p\)) finds the band&rsquo;s end, and the band answers three
+        queries at once: <em>exists</em> (band nonempty), <em>count</em>
+        (band width), <em>report all</em> (read the band&rsquo;s \(SA\)
+        entries). For \(p = \texttt{ana}\) the band is rows \([2, 4)\):
+        count \(2\), occurrences at text indices \(\{3, 1\}\), and the two
+        occurrences overlap in the text; the suffix array counts overlapping
+        occurrences without any extra care. For \(p = \texttt{a}\) the band
+        is rows \([1, 4)\): count \(3\), indices \(\{5, 3, 1\}\).
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (search cost)</span>
+        Searching for a length-\(m\) pattern in the suffix array of a
+        length-\(n\) text costs \(O(m \log n)\) character comparisons:
+        the binary search runs \(\lceil \log_2 (n+1) \rceil\) rounds, and
+        each round&rsquo;s suffix-versus-pattern comparison stops at the first
+        mismatch, after at most \(m\) character comparisons (the pattern has
+        only \(m\) characters, and comparing beyond a mismatch is never
+        needed). Reporting all \(occ\) occurrences adds \(O(occ)\) after the
+        two bounding searches.
+      </div>
+      <p>
+        The \(m\) and \(\log n\) multiply rather than add, which is the price
+        of the array&rsquo;s simplicity; a refinement that reuses
+        longest-common-prefix information inside the binary search brings
+        search to \(O(m + \log n)\) (Manber and Myers), and a suffix
+        <em>tree</em> achieves \(O(m)\) (aside below). In practice
+        \(m \log n\) is small: a 30-character pattern against a
+        \(n = 10^9\) genome is at most \(30 \times 30 = 900\) character
+        comparisons.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="lcp">3. The LCP array, and the longest repeated substring</h2>
+      <div class="def">
+        <span class="tag">Definition (LCP array)</span>
+        The <strong>longest common prefix</strong> (LCP) of two strings is
+        the longest string that is a prefix of both. The <strong>LCP
+        array</strong> of a suffix array stores, for each row \(r \ge 1\),
+        the length of the longest common prefix of the suffixes at rows
+        \(r-1\) and \(r\): \(LCP[r] = \mathrm{lcp}(t[SA[r-1]..],\,
+        t[SA[r]..])\). Adjacent rows only: in sorted order, adjacent
+        suffixes are the similar ones, and (as the theorem below shows)
+        adjacent entries already carry all the repetition structure.
+      </div>
+      <p>
+        Compute it by hand for \(\texttt{banana\$}\): walk the sorted rows,
+        comparing each suffix with the one above it character by character.
+      </p>
+      <table class="trace">
+        <tr><th>row \(r\)</th><th>\(SA[r]\)</th><th>suffix</th><th>common prefix with row above</th><th>\(LCP[r]\)</th></tr>
+        <tr><td>0</td><td>6</td><td class="cell">$</td><td class="lab">(no row above)</td><td>&ndash;</td></tr>
+        <tr><td>1</td><td>5</td><td class="cell">a$</td><td class="cell">(none: $ vs a)</td><td>0</td></tr>
+        <tr><td>2</td><td>3</td><td class="cell">ana$</td><td class="cell">a</td><td>1</td></tr>
+        <tr><td>3</td><td>1</td><td class="cell">anana$</td><td class="cell piv">ana</td><td class="piv">3</td></tr>
+        <tr><td>4</td><td>0</td><td class="cell">banana$</td><td class="cell">(none: a vs b)</td><td>0</td></tr>
+        <tr><td>5</td><td>4</td><td class="cell">na$</td><td class="cell">(none: b vs n)</td><td>0</td></tr>
+        <tr><td>6</td><td>2</td><td class="cell">nana$</td><td class="cell">na</td><td>2</td></tr>
+      </table>
+      <p>
+        So \(LCP = [\,\text{&ndash;}, 0, 1, 3, 0, 0, 2\,]\). What it buys:
+        the LCP array is the repetition structure of the text, precomputed.
+        The flagship application:
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (longest repeated substring)</span>
+        The length of the longest substring that occurs at least twice in
+        \(t\) equals \(\max_r LCP[r]\), and the maximizing row exhibits it:
+        the substring is the first \(LCP[r]\) characters of the suffix at
+        row \(r\), occurring at text indices \(SA[r-1]\) and \(SA[r]\).
+        <div class="proof">
+          (\(\le\)) Let \(w\), of length \(L\), occur at two distinct indices
+          \(i \ne j\). Then \(w\) is a prefix of both the suffix starting at
+          \(i\) and the suffix starting at \(j\), so both suffixes lie in the
+          contiguous band of rows beginning with \(w\). Any two <em>adjacent</em>
+          rows inside that band share at least the prefix \(w\) (both start
+          with it), so every adjacent pair in the band has LCP \(\ge L\); the
+          band contains at least two rows, hence at least one adjacent pair,
+          hence \(\max_r LCP[r] \ge L\).
+          (\(\ge\)) Conversely, for the maximizing row \(r\), the first
+          \(LCP[r]\) characters of row \(r\)&rsquo;s suffix occur at both
+          \(SA[r-1]\) and \(SA[r]\): a repeated substring of exactly that
+          length. So the maximum is achieved and no repeat is longer.
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (longest repeated substring, worked)</span>
+        For \(\texttt{banana\$}\) the maximum LCP entry is \(LCP[3] = 3\),
+        at the adjacent rows \(\texttt{ana\$}\) (row 2, index 3) and
+        \(\texttt{anana\$}\) (row 3, index 1). The longest repeated
+        substring is their common prefix \(\texttt{ana}\), length 3,
+        occurring at text indices 1 and 3: \(\texttt{b\,\underline{ana}na\$}\)
+        and \(\texttt{ban\,\underline{ana}\$}\). The two occurrences overlap;
+        the theorem never needed them disjoint. One linear scan of the LCP
+        array answers a question that looks quadratic.
+      </div>
+      <p>
+        The same array powers a family of one-scan answers: the number of
+        <em>distinct</em> substrings of \(t\) is
+        \(\binom{n}{2} + n - \sum_r LCP[r]\) (each row contributes its length
+        minus what it shares with the row above; exercise 6 works a small
+        case), and the Manber&ndash;Myers search refinement of
+        <a href="#search">the search section</a> is LCP information applied inside the
+        binary search. Computing the LCP array by the adjacent-pair scan
+        above costs \(O(n^2)\) in the worst case; <strong>Kasai&rsquo;s
+        algorithm</strong> computes it in \(O(n)\) from the text and the
+        suffix array (name-checked here; the trick is that dropping the
+        first character of a suffix decreases its LCP with its neighbor by at
+        most one, so a smart visiting order makes the total work telescope).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="construct">4. Construction cost: naive, doubling, linear</h2>
+      <div class="thm">
+        <span class="tag">Proposition (naive construction cost)</span>
+        Building the suffix array by handing the \(n\) suffix indices to a
+        comparison sort costs \(O(n^2 \log n)\) character comparisons in the
+        worst case: the sort performs \(\Theta(n \log n)\) suffix
+        comparisons (<a href="../sorting/algo-mergesort.html"><em>Mergesort</em></a>&rsquo;s
+        guarantee, or expected for
+        <a href="../sorting/algo-quicksort.html"><em>Quicksort</em></a>),
+        and one suffix comparison walks character by character until the
+        first mismatch, which can take \(\Theta(n)\) characters: on
+        \(\texttt{aaa}\ldots\texttt{a\$}\), any two suffixes agree until the
+        shorter one runs into the sentinel, so a comparison of two long
+        suffixes costs their full length. On non-repetitive text comparisons
+        stop early and the naive build behaves like \(O(n \log n)\); it is
+        the repetitive texts, exactly the ones suffix arrays are built for,
+        that hit the bound.
+      </div>
+      <h3>Prefix doubling: sort by 1, 2, 4, 8, &hellip; characters</h3>
+      <p>
+        The naive build wastes work the same way brute-force substring search
+        does: it re-compares the same characters again and again. The classic
+        fix (Manber and Myers) sorts the suffixes by their first \(k\)
+        characters for \(k = 1, 2, 4, 8, \ldots\), <strong>doubling</strong>
+        \(k\) each round, and never compares characters after round one.
+        The engine is a <strong>rank</strong> array: after the round for
+        length \(k\), \(rank_k[i]\) is the sorted position of suffix
+        \(i\)&rsquo;s length-\(k\) prefix (equal prefixes share a rank). The
+        doubling step is one observation:
+      </p>
+      <div class="def">
+        <span class="tag">Key idea (rank pairs)</span>
+        The first \(2k\) characters of suffix \(i\) are the first \(k\)
+        characters of suffix \(i\) followed by the first \(k\) characters of
+        suffix \(i+k\). So sorting suffixes by length-\(2k\) prefixes is
+        sorting the <strong>pairs</strong>
+        \(\bigl(rank_k[i],\, rank_k[i+k]\bigr)\): two already-computed
+        integers, compared in \(O(1)\), no characters touched. (When
+        \(i + k \ge n\) there is no second half; use \(-1\), which sorts
+        first, matching the fact that the shorter prefix, ending in the
+        sentinel, sorts first.)
+      </div>
+      <div class="ex">
+        <span class="tag">Example (one doubling round, traced)</span>
+        \(t = \texttt{banana\$}\). Round \(k=1\): rank each suffix by its
+        first character, using \(\texttt{\$}=0, \texttt{a}=1, \texttt{b}=2,
+        \texttt{n}=3\): \(rank_1 = [\,2, 1, 3, 1, 3, 1, 0\,]\) (ties
+        everywhere: three suffixes rank 1, two rank 3). The doubling round
+        \(k = 1 \to 2\) forms each suffix&rsquo;s pair and sorts the pairs:
+        <table class="trace">
+          <tr><th>\(i\)</th><th>suffix</th><th>pair \((rank_1[i],\, rank_1[i+1])\)</th><th>sorted position &rarr; \(rank_2[i]\)</th></tr>
+          <tr><td>0</td><td class="cell">banana$</td><td class="cell">(2, 1)</td><td>3</td></tr>
+          <tr><td>1</td><td class="cell">anana$</td><td class="cell piv">(1, 3)</td><td class="piv">2</td></tr>
+          <tr><td>2</td><td class="cell">nana$</td><td class="cell piv">(3, 1)</td><td class="piv">4</td></tr>
+          <tr><td>3</td><td class="cell">ana$</td><td class="cell piv">(1, 3)</td><td class="piv">2</td></tr>
+          <tr><td>4</td><td class="cell">na$</td><td class="cell piv">(3, 1)</td><td class="piv">4</td></tr>
+          <tr><td>5</td><td class="cell">a$</td><td class="cell">(1, 0)</td><td>1</td></tr>
+          <tr><td>6</td><td class="cell">$</td><td class="cell">(0, &minus;1)</td><td>0</td></tr>
+        </table>
+        Sorted pair order: \((0,-1) &lt; (1,0) &lt; (1,3) = (1,3) &lt; (2,1)
+        &lt; (3,1) = (3,1)\), so
+        \(rank_2 = [\,3, 2, 4, 2, 4, 1, 0\,]\): the suffixes are now sorted
+        by their first <em>two</em> characters, and the surviving ties
+        (\(\texttt{anana\$}\) vs \(\texttt{ana\$}\), both starting
+        \(\texttt{an}\); \(\texttt{nana\$}\) vs \(\texttt{na\$}\), both
+        \(\texttt{na}\)) are exactly the suffix pairs that agree to depth 2.
+        The next round \(k = 2 \to 4\) pairs ranks two apart:
+        \(i=1\!: (2,2)\), \(i=3\!: (2,1)\), \(i=2\!: (4,4)\),
+        \(i=4\!: (4,0)\), and the ties break:
+        \(rank_4 = [\,4, 3, 6, 2, 5, 1, 0\,]\), all seven ranks distinct.
+        Reading the indices in rank order gives
+        \(SA = [\,6, 5, 3, 1, 0, 4, 2\,]\): the same array as the hand
+        sort in <a href="#build">the build section</a>, reached without ever comparing
+        characters after round one.
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (doubling cost)</span>
+        Prefix doubling stops when all ranks are distinct, which happens
+        after at most \(\lceil \log_2 n \rceil\) rounds (once \(k \ge n\),
+        prefixes are whole suffixes, and the sentinel makes those distinct).
+        Each round sorts \(n\) integer pairs: \(O(n \log n)\) per round by
+        comparison sort, so \(O(n \log^2 n)\) total; sorting the pairs with
+        radix sort (two stable counting-sort passes on integers in
+        \([-1, n)\), see the counting-sort idea in
+        <a href="../sorting/foundation-sorting-lower-bound.html"><em>The
+        Sorting Lower Bound</em></a>: it does not apply to integer keys)
+        makes each round \(O(n)\) and the build \(O(n \log n)\).
+      </div>
+      <p>
+        Linear-time construction exists and is what production libraries
+        use: the <strong>DC3 / skew</strong> algorithm (K&auml;rkk&auml;inen
+        and Sanders, a divide-and-conquer on suffix positions modulo 3) and
+        <strong>SA-IS</strong> (Nong, Zhang, and Chan, induced sorting),
+        both \(O(n)\). Name-checked only: each is a handout&rsquo;s worth of
+        machinery, and prefix doubling is the version worth carrying in your
+        head. The practical summary: build once in \(O(n)\) to
+        \(O(n \log n)\), store \(n\) integers, answer every later pattern in
+        \(O(m \log n)\).
+      </p>
+      <div class="aside">
+        <span class="tag">Aside (suffix trees)</span>
+        The suffix array&rsquo;s older sibling is the <strong>suffix
+        tree</strong>: a compressed trie
+        (<a href="ds-tries.html"><em>Tries &amp; Ternary Search
+        Trees</em></a>, which compresses one-child chains into
+        edges labeled with substrings) whose keys are all \(n\) suffixes of
+        the text. The sentinel gives it exactly \(n\) leaves; searching costs
+        \(O(m)\), and it supports a wider zoo of queries directly. The two
+        structures carry the same information: the suffix array is the
+        left-to-right order of the tree&rsquo;s leaves, the LCP array is the
+        depth of the branching node between adjacent leaves, and the pair
+        \((SA, LCP)\) can simulate any suffix-tree traversal (the
+        &ldquo;enhanced suffix array&rdquo;). Arrays are the practical form:
+        a suffix tree costs tens of bytes per text character in nodes,
+        pointers, and edge labels, against 4&ndash;8 bytes per character for
+        the array, and the array&rsquo;s binary search touches memory in a
+        cache-friendly pattern where the tree chases pointers. Linear-time
+        suffix-tree construction (Ukkonen&rsquo;s algorithm) predates
+        linear-time suffix-array construction, but modern practice builds
+        the array and adds LCP when tree power is needed.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">5. Where this sits</h2>
+      <p>
+        The suffix array completes a symmetry in the string toolkit.
+        <a href="foundation-substring-search.html"><em>Substring Search: The
+        Problem &amp; Baselines</em></a> and its fast successors
+        (<a href="algo-kmp.html"><em>Knuth&ndash;Morris&ndash;Pratt</em></a>,
+        <a href="algo-boyer-moore.html"><em>Boyer&ndash;Moore</em></a>)
+        preprocess the <em>pattern</em> in \(O(m)\) and pay \(O(n)\) per
+        search: right when the text streams past once. The suffix array
+        preprocesses the <em>text</em> in \(O(n)\) to \(O(n \log n)\) and
+        pays \(O(m \log n)\) per search: right when the text is fixed and
+        the patterns keep coming. And it is the
+        <a href="ds-tries.html"><em>trie</em></a> idea pushed to its limit:
+        a trie exploits the character structure of a key <em>set</em> you
+        chose to store; the suffix array (and the suffix tree behind it)
+        applies the same exploit to the set of <em>all suffixes of one
+        string</em>, turning questions about the string&rsquo;s insides
+        (occurrences, repeats, distinct substrings) into questions about a
+        sorted collection. It is the index behind genome aligners,
+        full-text search in editors and databases, plagiarism and clone
+        detectors, and data-compression transforms that need the sorted
+        rotations of a text.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">6. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Build the suffix array of \(\texttt{mississippi\$}\)
+          (\(n = 12\)) fully by hand: list the twelve suffixes, sort them,
+          and read off \(SA\).
+          <details>
+            <summary>solution</summary>
+            The suffixes, sorted (with <code>$</code> first, then
+            <code>i &lt; m &lt; p &lt; s</code>):
+            <table class="trace">
+              <tr><th>row</th><th>suffix</th><th>\(SA\)</th></tr>
+              <tr><td>0</td><td class="cell">$</td><td>11</td></tr>
+              <tr><td>1</td><td class="cell">i$</td><td>10</td></tr>
+              <tr><td>2</td><td class="cell">ippi$</td><td>7</td></tr>
+              <tr><td>3</td><td class="cell">issippi$</td><td>4</td></tr>
+              <tr><td>4</td><td class="cell">ississippi$</td><td>1</td></tr>
+              <tr><td>5</td><td class="cell">mississippi$</td><td>0</td></tr>
+              <tr><td>6</td><td class="cell">pi$</td><td>9</td></tr>
+              <tr><td>7</td><td class="cell">ppi$</td><td>8</td></tr>
+              <tr><td>8</td><td class="cell">sippi$</td><td>6</td></tr>
+              <tr><td>9</td><td class="cell">sissippi$</td><td>3</td></tr>
+              <tr><td>10</td><td class="cell">ssippi$</td><td>5</td></tr>
+              <tr><td>11</td><td class="cell">ssissippi$</td><td>2</td></tr>
+            </table>
+            \(SA = [\,11, 10, 7, 4, 1, 0, 9, 8, 6, 3, 5, 2\,]\). The four
+            <code>i</code>-suffixes sort by their <em>second</em> characters
+            (<code>$</code>, <code>p</code>, <code>s</code>,
+            <code>s</code>), and the tie between \(\texttt{issippi\$}\) and
+            \(\texttt{ississippi\$}\) runs four characters deep before
+            <code>p</code> vs <code>s</code> breaks it.
+          </details>
+        </li>
+        <li>
+          Trace the binary search for \(p = \texttt{ssi}\) in the array of
+          exercise 1 (rows \(0..11\), so <code>lo</code>&nbsp;=&nbsp;0,
+          <code>hi</code>&nbsp;=&nbsp;12), then find the full band and
+          report every occurrence with its text index.
+          <details>
+            <summary>solution</summary>
+            <table class="trace">
+              <tr><th>step</th><th>lo</th><th>hi</th><th>mid</th><th>suffix there</th><th>compare with <code>ssi</code></th><th>move</th></tr>
+              <tr><td>1</td><td>0</td><td>12</td><td class="piv">6</td><td class="cell">pi$</td><td class="cell">p &lt; s at position 0</td><td>lo = 7</td></tr>
+              <tr><td>2</td><td>7</td><td>12</td><td class="piv">9</td><td class="cell">sissippi$</td><td class="cell">s|i &lt; s|s at position 1</td><td>lo = 10</td></tr>
+              <tr><td>3</td><td>10</td><td>12</td><td class="piv">11</td><td class="cell">ssissippi$</td><td class="cell">ssi&hellip; &gt; ssi (prefix)</td><td>hi = 11</td></tr>
+              <tr><td>4</td><td>10</td><td>11</td><td class="piv">10</td><td class="cell">ssippi$</td><td class="cell">ssi&hellip; &gt; ssi (prefix)</td><td>hi = 10</td></tr>
+            </table>
+            <code>lo</code>&nbsp;=&nbsp;<code>hi</code>&nbsp;=&nbsp;10;
+            \(\texttt{ssippi\$}\) starts with \(\texttt{ssi}\): hit at text
+            index \(SA[10] = 5\). The upper-bound search finds the first row
+            whose length-3 prefix exceeds \(\texttt{ssi}\): row 12 (past the
+            end, since rows 10 and 11 both start \(\texttt{ssi}\)). Band
+            \([10, 12)\), count 2, occurrences at indices \(\{5, 2\}\):
+            \(\texttt{mi\underline{ssi}ssippi}\) and
+            \(\texttt{missi\underline{ssi}ppi}\).
+          </details>
+        </li>
+        <li>
+          Compute the LCP array of \(\texttt{mississippi\$}\) by hand from
+          the sorted table of exercise 1, and read off the longest repeated
+          substring.
+          <details>
+            <summary>solution</summary>
+            Comparing each row with the one above:
+            \(LCP = [\,\text{&ndash;}, 0, 1, 1, 4, 0, 0, 1, 0, 2, 1, 3\,]\)
+            (rows in the order of the table: <code>$</code>|<code>i$</code>
+            share 0, <code>i$</code>|<code>ippi$</code> share 1
+            (<code>i</code>), <code>ippi$</code>|<code>issippi$</code>
+            share 1, <code>issippi$</code>|<code>ississippi$</code> share 4
+            (<code>issi</code>), then 0 at the <code>i</code>/<code>m</code>
+            and <code>m</code>/<code>p</code> borders,
+            <code>pi$</code>|<code>ppi$</code> share 1,
+            0 at <code>p</code>/<code>s</code>,
+            <code>sippi$</code>|<code>sissippi$</code> share 2
+            (<code>si</code>),
+            <code>sissippi$</code>|<code>ssippi$</code> share 1,
+            <code>ssippi$</code>|<code>ssissippi$</code> share 3
+            (<code>ssi</code>)). The maximum is \(LCP[4] = 4\): longest
+            repeated substring \(\texttt{issi}\), at text indices
+            \(SA[3] = 4\) and \(SA[4] = 1\):
+            \(\texttt{m\underline{issi}ssippi}\) and
+            \(\texttt{miss\underline{issi}ppi}\), overlapping at index 4.
+          </details>
+        </li>
+        <li>
+          Run prefix doubling on \(t = \texttt{abab\$}\) (\(n = 5\)):
+          compute \(rank_1\), trace the round \(k = 1 \to 2\) (all five rank
+          pairs and the new ranks), state which tie survives, and finish.
+          <details>
+            <summary>solution</summary>
+            With \(\texttt{\$}=0, \texttt{a}=1, \texttt{b}=2\):
+            \(rank_1 = [\,1, 2, 1, 2, 0\,]\). Round \(k = 1 \to 2\), pairs
+            \((rank_1[i], rank_1[i+1])\), with \(-1\) past the end:
+            <table class="trace">
+              <tr><th>\(i\)</th><th>suffix</th><th>pair</th><th>\(rank_2[i]\)</th></tr>
+              <tr><td>0</td><td class="cell">abab$</td><td class="cell piv">(1, 2)</td><td class="piv">1</td></tr>
+              <tr><td>1</td><td class="cell">bab$</td><td class="cell">(2, 1)</td><td>3</td></tr>
+              <tr><td>2</td><td class="cell">ab$</td><td class="cell piv">(1, 2)</td><td class="piv">1</td></tr>
+              <tr><td>3</td><td class="cell">b$</td><td class="cell">(2, 0)</td><td>2</td></tr>
+              <tr><td>4</td><td class="cell">$</td><td class="cell">(0, &minus;1)</td><td>0</td></tr>
+            </table>
+            Sorted: \((0,-1) &lt; (1,2) = (1,2) &lt; (2,0) &lt; (2,1)\), so
+            \(rank_2 = [\,1, 3, 1, 2, 0\,]\). The surviving tie is suffixes
+            0 and 2, \(\texttt{abab\$}\) and \(\texttt{ab\$}\): both start
+            \(\texttt{ab}\). Round \(k = 2 \to 4\) pairs ranks two apart:
+            \(i=0\!: (1, rank_2[2]) = (1,1)\),
+            \(i=2\!: (1, rank_2[4]) = (1,0)\), and \((1,0) &lt; (1,1)\)
+            breaks the tie (suffix 2&rsquo;s continuation reaches the
+            sentinel first): \(rank_4 = [\,2, 4, 1, 3, 0\,]\), all distinct.
+            Reading indices in rank order:
+            \(SA = [\,4, 2, 0, 3, 1\,]\), which is the sorted list
+            \(\texttt{\$}, \texttt{ab\$}, \texttt{abab\$}, \texttt{b\$},
+            \texttt{bab\$}\).
+          </details>
+        </li>
+        <li>
+          Two searches in \(\texttt{banana\$}\) that miss differently:
+          (a) \(p = \texttt{z}\); (b) in \(\texttt{mississippi\$}\),
+          \(p = \texttt{issa}\). For each, say where the lower bound lands
+          and which check rejects it.
+          <details>
+            <summary>solution</summary>
+            (a) Every suffix starts with <code>$</code>, <code>a</code>,
+            <code>b</code>, or <code>n</code>, all \(&lt; \texttt{z}\), so
+            every comparison says &ldquo;suffix &lt; pattern&rdquo; and
+            <code>lo</code> climbs to \(n = 7\) (trace: mid 3
+            \(\texttt{anana\$}\), mid 5 \(\texttt{na\$}\), mid 6
+            \(\texttt{nana\$}\), all &lt;). The <code>lo &lt; n</code>
+            guard fails: miss, with no suffix ever tested for a prefix.
+            (b) The lower bound lands at row 3, \(\texttt{issippi\$}\):
+            every earlier row is \(&lt; \texttt{issa}\) (row 2,
+            \(\texttt{ippi\$}\), loses at position 1, <code>p</code> &lt;
+            <code>s</code>) and \(\texttt{issippi\$} &gt; \texttt{issa}\)
+            at position 3 (<code>i</code> &gt; <code>a</code>). The landing
+            row exists but does not start with \(\texttt{issa}\): the
+            <code>startswith</code> check rejects it. These are the only two
+            miss shapes; a hit is exactly &ldquo;lands in range <em>and</em>
+            starts with the pattern&rdquo;.
+          </details>
+        </li>
+        <li>
+          The number of distinct nonempty substrings of \(t\) (sentinel
+          excluded from \(t\)) equals the total length of all suffixes minus
+          \(\sum_r LCP[r]\). Explain why, and evaluate it for
+          \(\texttt{banana}\) using the arrays of the build and LCP sections
+          (drop the sentinel row and its \(LCP\) entry of 0; the sentinel
+          contributes nothing else).
+          <details>
+            <summary>solution</summary>
+            Every substring is a prefix of exactly the suffixes it starts,
+            so counting distinct substrings is counting distinct suffix
+            prefixes. Walk the rows in sorted order: row \(r\)&rsquo;s
+            suffix has as many prefixes as its length, but its first
+            \(LCP[r]\) prefixes already appeared as prefixes of row
+            \(r-1\)&rsquo;s suffix (they share exactly that much), and no
+            longer prefix of row \(r\) can have appeared earlier (rows
+            before \(r-1\) share \(\le LCP[r]\) with row \(r\), since the
+            band sharing more is contiguous and would include \(r-1\)). So
+            row \(r\) contributes \(|suffix_r| - LCP[r]\) new prefixes.
+            For \(\texttt{banana}\): suffix lengths sum to
+            \(6+5+4+3+2+1 = 21\); the LCP entries among the six real rows
+            (\(\texttt{a}, \texttt{ana}, \texttt{anana}, \texttt{banana},
+            \texttt{na}, \texttt{nana}\), same order as the build section&rsquo;s
+            table minus row 0) are \(0, 1, 3, 0, 0, 2\), summing to 6.
+            Distinct substrings: \(21 - 6 = 15\). Check by hand:
+            \(\texttt{a}, \texttt{an}, \texttt{ana}, \texttt{anan},
+            \texttt{anana}, \texttt{b}, \texttt{ba}, \texttt{ban},
+            \texttt{bana}, \texttt{banan}, \texttt{banana}, \texttt{n},
+            \texttt{na}, \texttt{nan}, \texttt{nana}\): fifteen.
+          </details>
+        </li>
+        <li>
+          A text of length \(n = 2^{30}\) (about a billion characters) is
+          searched for \(10^6\) different patterns of length \(m \le 50\).
+          Compare the total character-comparison budget of (a) running
+          Knuth&ndash;Morris&ndash;Pratt per pattern and (b) building a
+          suffix array once (assume the \(O(n \log n)\) doubling build) and
+          binary-searching per pattern. Where is the crossover?
+          <details>
+            <summary>solution</summary>
+            (a) KMP costs \(O(n + m)\) per pattern: about
+            \(10^6 \times 2^{30} \approx 10^{15}\) character comparisons
+            in all; the billion-character scan is paid a million times.
+            (b) The build costs \(O(n \log n) \approx 2^{30} \times 30
+            \approx 3 \times 10^{10}\) operations, paid once; each search
+            costs \(O(m \log n) \le 50 \times 31 \approx 1550\) character
+            comparisons, so \(10^6\) searches add
+            \(\approx 1.6 \times 10^9\): total \(\approx 3 \times 10^{10}\),
+            about \(30{,}000\) times less than (a). The crossover: the array
+            wins as soon as the number of searches exceeds roughly
+            build cost divided by scan cost,
+            \((n \log n)/n = \log n \approx 30\) searches. Thirty queries
+            against a fixed text already justify indexing it; this is the
+            precompute-to-answer-fast trade,
+            with the roles of pattern and text exchanged relative to
+            <a href="foundation-substring-search.html"><em>Substring Search:
+            The Problem &amp; Baselines</em></a>.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Suffix Arrays v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

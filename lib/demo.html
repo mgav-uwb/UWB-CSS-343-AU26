@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 343 — Data-Structure Demos</title>
+<link rel="stylesheet" href="core/lib.css">
+<style>
+  body { margin: 0; background: #f6f7fb; color: #1a1c22; font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  header { background: #0b0c10; color: #e7eaf0; padding: 18px clamp(14px,5vw,48px); }
+  header h1 { margin: 0; font-size: 21px; }
+  header h1 a { color: #8b93a7; text-decoration: none; font-weight: 400; }
+  header .sub { color: #8b93a7; font-size: 13px; margin-top: 3px; }
+  .picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .picker a { font-size: 13px; font-weight: 600; text-decoration: none; color: #cfd4e0; border: 1px solid #262a35; border-radius: 8px; padding: 5px 11px; }
+  .picker a.on { color: #0b0c10; background: #00e58a; border-color: #00e58a; }
+  main { max-width: 940px; margin: 0 auto; padding: 16px clamp(12px,4vw,28px) 60px; }
+  .note { color: #66708a; font-size: 12.5px; margin: 14px 2px 0; }
+
+  /* the demo's own title row: the name, and the ? that opens the panel. The
+     description used to sit here as ~10 lines of prose above every demo; it now
+     lives behind the ?, and the demo gets the height back. */
+  .demo-head { display: flex; align-items: center; gap: 10px; margin: 0 2px 8px; }
+  .demo-head h2 { margin: 0; font-size: 17px; font-weight: 700; }
+  .about-btn { margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+    font: 600 13px system-ui, sans-serif; color: #4b3ccc; background: #f3f0ff;
+    border: 1px solid #ddd6ff; border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+  .about-btn:hover { border-color: #7c5cff; }
+  .about-btn .q { display: inline-grid; place-items: center; width: 17px; height: 17px;
+    border-radius: 50%; background: #7c5cff; color: #fff; font-size: 12px; }
+
+  /* the panel itself: OVER the demo, not above it */
+  .demo-wrap { position: relative; }
+  .about-scrim { position: absolute; inset: 0; z-index: 40; background: rgba(246, 247, 251, 0.72); }
+  .about {
+    position: absolute; left: 0; right: 0; top: 0; z-index: 41; max-height: 100%;
+    overflow: auto; overscroll-behavior: contain; background: #fff;
+    border: 1px solid #e3e7ee; border-radius: 12px;
+    box-shadow: 0 14px 44px rgba(20, 22, 40, 0.22); padding: 18px 20px 20px;
+  }
+  .about h3 { margin: 0 0 10px; font-size: 16px; }
+  .about p { margin: 0 0 10px; color: #3a3f4d; font-size: 14px; }
+  .about p:last-child { margin-bottom: 0; }
+  .about b, .about strong { color: #1a1c22; }
+  .about code { font: 600 12.5px ui-monospace, Menlo, monospace; background: #f3f4f8;
+    border-radius: 4px; padding: 1px 5px; }
+  .about ul { margin: 0 0 10px; padding-left: 20px; color: #3a3f4d; font-size: 14px; }
+  .about li { margin: 3px 0; }
+  .about .lede { color: #1a1c22; font-size: 15px; }
+  .about-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;
+    padding-top: 12px; border-top: 1px solid #eef0f4; }
+  .about-links a { font: 600 13px system-ui, sans-serif; text-decoration: none; color: #4b3ccc;
+    background: #f7f8fb; border: 1px solid #e3e7ee; border-radius: 8px; padding: 6px 11px; }
+  .about-links a:hover { border-color: #7c5cff; }
+  .about-close { position: absolute; top: 10px; right: 12px; font: 700 16px system-ui; line-height: 1;
+    color: #8a93a6; background: none; border: 0; cursor: pointer; padding: 4px 6px; }
+  .about-close:hover { color: #1a1c22; }
+</style>
+</head>
+<body>
+<header>
+  <h1><a href="../index.html">CSS 343</a> · Data-Structure Demos</h1>
+  <div class="sub">Full sandboxes — every operation, step by step (forward &amp; back), with live operation counts.</div>
+  <div class="picker" id="picker"></div>
+</header>
+<main>
+  <div class="demo-head">
+    <h2 id="demo-title"></h2>
+    <button class="about-btn" id="about-btn" aria-expanded="false" aria-controls="about">
+      <span class="q" aria-hidden="true">?</span> What is this?
+    </button>
+  </div>
+  <div class="demo-wrap" id="demo-wrap">
+    <div id="mount"></div>
+    <div class="about-scrim" id="about-scrim" hidden></div>
+    <div class="about" id="about" role="dialog" aria-modal="false" aria-labelledby="about-h" hidden>
+      <button class="about-close" id="about-close" aria-label="close">✕</button>
+      <h3 id="about-h"></h3>
+      <div id="about-body"></div>
+      <div class="about-links" id="about-links"></div>
+    </div>
+  </div>
+  <p class="note">Each structure here exposes <b>all</b> its operations. Lecture slides embed the <b>same</b> engine with a simplified view that spotlights one step. Missing a structure? It gets added as its lecture is built.</p>
+</main>
+
+<script type="module">
+  import { mountDemo, resolveSpec } from "./deck.js";
+  import { DEMOS, DEMO_LIST } from "./demos/registry.js";
+
+  const params = new URLSearchParams(location.search);
+  const ds = params.get("ds") || "avl";
+  const spec = DEMOS[ds] || DEMOS.avl;
+
+  // ?config=<url-encoded JSON> — a preconfigured sandbox link (same override
+  // grammar as a slide's data-config; see core/spec-config.js)
+  let cfg = null;
+  if (params.get("config")) {
+    try { cfg = JSON.parse(params.get("config")); }
+    catch (err) { console.error("bad ?config= JSON", err); }
+  }
+
+  document.getElementById("picker").innerHTML = DEMO_LIST // deduped: alias slugs list once
+    .map((d) => `<a href="?ds=${d.id}" class="${d.id === spec.id ? "on" : ""}">${d.title}</a>`).join("");
+  document.getElementById("demo-title").textContent = spec.title;
+  document.title = `CSS 343 — ${spec.title} demo`;
+
+  // ── the ? panel ──────────────────────────────────────────────────────────
+  // `about` is the long form (HTML, written per demo); `blurb` is the one-
+  // paragraph fallback every spec already has. The panel opens OVER the demo,
+  // so the description can be as long as it deserves without costing the
+  // canvases a single pixel.
+  document.getElementById("about-h").textContent = spec.title;
+  document.getElementById("about-body").innerHTML =
+    spec.about ?? `<p class="lede">${spec.blurb ?? ""}</p>`;
+  const links = [
+    ...(spec.proto ? [{ href: `protos.html#${spec.proto}`, label: "Prototype / pseudocode →" }] : []),
+    ...(spec.links ?? []),
+  ];
+  const $links = document.getElementById("about-links");
+  $links.innerHTML = links.map((l) => `<a href="${l.href}"${l.href.startsWith("http") ? ' target="_blank" rel="noopener"' : ""}>${l.label}</a>`).join("");
+  if (!links.length) $links.hidden = true;
+
+  const $btn = document.getElementById("about-btn");
+  const $about = document.getElementById("about");
+  const $scrim = document.getElementById("about-scrim");
+  const $wrap = document.getElementById("demo-wrap");
+  const setOpen = (on) => {
+    // a percentage max-height resolves to `none` against an auto-height
+    // containing block, so the cap is measured at open time instead: the panel
+    // never grows past the demo it covers, it scrolls inside it
+    if (on) $about.style.maxHeight = Math.round($wrap.getBoundingClientRect().height) + "px";
+    $about.hidden = !on; $scrim.hidden = !on;
+    $btn.setAttribute("aria-expanded", String(on));
+    if (on) document.getElementById("about-close").focus();
+  };
+  $btn.onclick = () => setOpen($about.hidden);
+  document.getElementById("about-close").onclick = () => { setOpen(false); $btn.focus(); };
+  $scrim.onclick = () => setOpen(false);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !$about.hidden) { setOpen(false); $btn.focus(); }
+    // "?" opens it from anywhere on the page, as long as no box has focus
+    if (e.key === "?" && $about.hidden && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName)
+        && !document.activeElement?.isContentEditable) {
+      e.preventDefault(); setOpen(true);
+    }
+  });
+
+  // ── the height the description used to occupy ────────────────────────────
+  // With the prose behind the ?, the gallery has ~150px more to give the demo
+  // than the deck does. Grow the MAIN views (a tree, a graph, a matrix — all
+  // autofit, so more height means a bigger drawing) and leave the short strips
+  // alone: an array row or a counter strip gets nothing from extra whitespace.
+  // A spec that has already been sized for the gallery says so with
+  // `galleryHeight` and is taken verbatim.
+  const grow = (h) => (h >= 180 ? Math.min(420, Math.round(h * 1.3)) : h);
+  const base = spec.height ?? 320;
+  const height = spec.galleryHeight ?? (Array.isArray(base) ? base.map(grow) : grow(base));
+
+  // the deck bridge defaults to its simplified mini chrome — the gallery is
+  // the FULL sandbox tier, so restore scrub + cost counters unless a spec
+  // (or a ?config= override, which wins last) opts out
+  const full = resolveSpec(
+    { chrome: { mini: false, showScrub: true, showCosts: !!spec.costs } },
+    spec, { height }, cfg);
+  mountDemo(document.getElementById("mount"), full);
+</script>
+</body>
+</html>

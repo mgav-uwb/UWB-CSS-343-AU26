@@ -1,0 +1,1217 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Interval Scheduling.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interval Scheduling - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { padding: 5px 9px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Interval Scheduling</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (greedy).
+      </div>
+      <div class="src">
+        Activity selection: choose the largest set of pairwise non-overlapping
+        intervals. Three plausible greedy rules (shortest first, fewest
+        conflicts, earliest start) with a worked counterexample killing each;
+        the earliest-finish-time rule, its code, and a full unrolled trace on ten
+        intervals; the greedy-stays-ahead proof and its exchange-argument form,
+        applied to the traced instance; the \(\Theta(n\log n)\) cost; the
+        weighted variant, where every greedy rule fails and dynamic programming
+        takes over; and interval partitioning (assign all intervals to as few
+        rooms as possible) with its own trace and the depth lower bound.
+      </div>
+
+      <p class="lead">
+        One room, many requests, each with a fixed start and a fixed finish, and
+        no way to move them: how many can you honour? The answer is a four-line
+        loop that is easy to write and easy to get wrong, because several natural
+        rules for choosing the next request are plainly sensible and plainly
+        incorrect. This handout kills three of them with explicit instances,
+        proves the fourth correct, and then changes the question twice: by
+        attaching money to the requests (which breaks greed entirely) and by
+        demanding that every request be honoured (which changes the rule but
+        keeps greed).
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#prob">The problem and the conventions</a></li>
+          <li><a href="#rules">Three rules that fail</a></li>
+          <li><a href="#algo">Earliest finish time: the algorithm</a></li>
+          <li><a href="#trace">A full trace</a></li>
+          <li><a href="#proof">Why it is optimal: greedy stays ahead</a></li>
+          <li><a href="#cost">Cost</a></li>
+          <li><a href="#weighted">The weighted variant</a></li>
+          <li><a href="#partition">Interval partitioning</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="prob">1. The problem and the conventions</h2>
+      <div class="def">
+        <span class="tag">Definition (interval scheduling, activity selection)</span>
+        Given \(n\) intervals \(x_1, \dots, x_n\), where \(x_i\) has a start
+        \(s_i\) and a finish \(f_i > s_i\), call two intervals
+        <strong>compatible</strong> if they do not overlap, and a set
+        <strong>feasible</strong> if its intervals are pairwise compatible.
+        The <strong>interval scheduling</strong> problem asks for a feasible set
+        of maximum <em>size</em>. The same problem is called
+        <strong>activity selection</strong> when the intervals are requests for
+        one resource: one room, one machine, one lecture hall.
+      </div>
+      <div class="def">
+        <span class="tag">Convention (half-open intervals)</span>
+        Intervals are <strong>half-open</strong>, \([s, f)\): the interval owns
+        its start instant and releases the resource at \(f\). So
+        \([1,4)\) and \([4,7)\) are compatible, while \([1,4)\) and \([3,5)\) are
+        not. Formally \(x_i\) and \(x_j\) are compatible exactly when
+        \(f_i \le s_j\) or \(f_j \le s_i\). With
+        <em>closed</em> intervals \([s,f]\) a shared endpoint counts as an
+        overlap and the answers change; Exercise 2 reruns this handout&rsquo;s
+        main instance under that convention.
+      </div>
+      <p>
+        Nothing here optimizes total busy time, or fairness, or which requests
+        are honoured: the objective is a raw count. That matters, because as
+        soon as requests carry different values the greedy rule below stops
+        working (<a href="#weighted">section 7</a>).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="rules">2. Three rules that fail</h2>
+      <p>
+        Every greedy algorithm is a loop that repeatedly commits to whatever some
+        fixed rule calls best (the
+        <a href="paradigm-greedy-method.html">Greedy Method</a> handout develops
+        the pattern). Here the loop is fixed and only the rule is in question:
+        <em>which</em> interval do you take next? Four rules suggest themselves,
+        three of them wrong, and the fastest way to find that out is to try to
+        break each one on a small instance before attempting a proof.
+      </p>
+
+      <h3>2.1 Shortest first</h3>
+      <p>
+        Rule: repeatedly take the shortest remaining interval, then discard
+        everything that conflicts with it. The motivation is that short
+        intervals consume little of the resource. Three intervals refute it:
+      </p>
+<pre>       t 0  1  2  3  4  5  6  7  8  9  10 11 12
+       A [================)                            <span class="cm">[0,6),  length 6</span>
+       B                [====)                         <span class="cm">[5,7),  length 2</span>
+       C                   [================)          <span class="cm">[6,12), length 6</span></pre>
+      <p>
+        \(B\) is the shortest, so the rule takes it, and \(B\) conflicts with
+        both \(A\) (they share \([5,6)\)) and \(C\) (they share \([6,7)\)),
+        leaving nothing. The rule returns <strong>1</strong> interval. But
+        \(A\) and \(C\) are compatible: \(f_A = 6 \le 6 = s_C\), so the optimum
+        is <strong>2</strong>. The short interval is cheap in duration and
+        expensive in <em>position</em>: it straddles a boundary and kills two
+        neighbours. Exercise 5 chains this gadget into a family where
+        shortest-first returns half of the optimum.
+      </p>
+
+      <h3>2.2 Fewest conflicts</h3>
+      <p>
+        Rule: count, for each remaining interval, how many remaining intervals
+        conflict with it; take one with the fewest; discard its conflicts;
+        recount and repeat. This rule is the sharpest of the three, since it
+        directly minimizes the damage each choice does, and it survives the
+        instances that kill the others (on the shortest-first picture above,
+        \(A\) and \(C\) have one conflict each and \(B\) has two, so it takes
+        \(A\), then \(C\)). It still fails, but breaking it takes a deliberately
+        built instance; this one uses eleven intervals, and a search over random
+        instances of ten or fewer found none:
+      </p>
+<pre>       t 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20
+       A [==========)                                                     <span class="cm">conflicts: 3</span>
+       B    [=============)                                               <span class="cm">conflicts: 4</span>
+       C       [==========)                                               <span class="cm">conflicts: 4</span>
+       D          [=======)                                               <span class="cm">conflicts: 4</span>
+       E             [=======)                                            <span class="cm">conflicts: 4</span>
+       M                   [================)                             <span class="cm">conflicts: 2</span>
+       F                               [================)                 <span class="cm">conflicts: 4</span>
+       S                                        [=============)           <span class="cm">conflicts: 4</span>
+       R                                              [==========)        <span class="cm">conflicts: 4</span>
+       Q                                           [================)     <span class="cm">conflicts: 4</span>
+       P                                                 [==========)     <span class="cm">conflicts: 3</span></pre>
+      <p>
+        The instance is built out of three parts. On the left, \(A, B, C, D\)
+        all contain the instant \(3\), so they pairwise conflict; on the right,
+        \(S, R, Q, P\) all contain \(17\) and pairwise conflict. Each of those
+        eight intervals therefore starts with at least three conflicts. In the
+        middle, \(M = [6,12)\) conflicts with exactly two intervals, \(E\) and
+        \(F\), and that is the fewest in the instance, so the rule takes \(M\)
+        first, with no tie to break.
+      </p>
+      <p>
+        Taking \(M\) deletes both \(E\) and \(F\), and \(E\) and \(F\) are the
+        only two intervals that bridge the left group to the right group. What
+        remains is two cliques of four mutually conflicting intervals, each
+        contributing exactly one interval, so the rule finishes with
+        \(\{M, \text{one of } A..D, \text{one of } P..S\}\):
+        <strong>3</strong> intervals. The optimum is \(A, E, F, P =
+        [0,4), [4,7), [10,16), [16,20)\), pairwise compatible at the touching
+        endpoints \(4\), \(16\), and with a gap between \(7\) and \(10\):
+        <strong>4</strong>. Counting conflicts measures how much an interval
+        overlaps, not what it <em>blocks</em>, and \(M\) blocks the only bridge.
+      </p>
+
+      <h3>2.3 Earliest start</h3>
+      <p>
+        Rule: sort by start time and take every interval compatible with what is
+        already chosen. This is the rule people write first, because it is what
+        &ldquo;first come, first served&rdquo; means. One long interval destroys
+        it:
+      </p>
+<pre>       t 0  1  2  3  4  5  6  7  8  9  10
+       P [============================)          <span class="cm">[0,10)</span>
+       Q    [=)                                  <span class="cm">[1,2)</span>
+       R          [=)                            <span class="cm">[3,4)</span>
+       S                [=)                      <span class="cm">[5,6)</span></pre>
+      <p>
+        \(P\) starts first, so the rule commits to it, and \(P\) overlaps
+        everything else: <strong>1</strong> interval against an optimum of
+        <strong>3</strong> (\(Q, R, S\)). The defect is that a start time says
+        nothing about when the resource comes <em>back</em>. Stretch \(P\) and
+        the rule gets arbitrarily bad: with \(P = [0, 2m)\) and \(m\) unit
+        intervals inside it, the rule returns \(1\) and the optimum is \(m\).
+      </p>
+
+      <h3>2.4 The rule that survives</h3>
+      <div class="def">
+        <span class="tag">The earliest-finish-time (EFT) rule</span>
+        Among the intervals still compatible with everything chosen so far, take
+        the one that <strong>finishes earliest</strong>.
+      </div>
+      <p>
+        The three failures all share a diagnosis: they optimize something
+        (duration, overlap count, start time) other than the quantity the
+        problem actually spends, which is <em>the instant the resource becomes
+        free again</em>. Finishing early is the only choice that leaves the
+        largest possible remainder of the timeline for everything still
+        unscheduled, and <a href="#proof">section 5</a> turns that sentence into
+        a proof. Failing to break a rule is not a proof, so the sentence is
+        needed: fewest-conflicts survives dozens of small instances and is still
+        wrong.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="algo">3. Earliest finish time: the algorithm</h2>
+      <p>
+        Sorting by finish time once makes the rule trivial to apply: after the
+        sort, the compatible interval with the earliest finish is simply the next
+        one in the array whose start is at least the finish of the last accepted
+        interval. The whole state of the algorithm is that single number.
+      </p>
+      <div class="code-tabs" data-snippet="intervals/select">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">struct Interval { int start, finish, id; };   // half-open [start, finish)
+
+// Earliest-finish-time greedy: a maximum-size set of pairwise compatible
+// intervals, returned in finish order. O(n log n) for the sort, O(n) after.
+vector&lt;Interval&gt; selectIntervals(vector&lt;Interval&gt; v) {
+    sort(v.begin(), v.end(),
+         [](const Interval&amp; a, const Interval&amp; b) { return a.finish &lt; b.finish; });
+    vector&lt;Interval&gt; chosen;
+    int lastFinish = INT_MIN;                 // resource free since forever
+    for (const Interval&amp; x : v) {
+        if (x.start &gt;= lastFinish) {          // compatible with ALL chosen so far
+            chosen.push_back(x);
+            lastFinish = x.finish;            // the only state carried forward
+        }                                     // else: rejected, forever
+    }
+    return chosen;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>record Interval(int start, int finish, int id) { }   // half-open [start, finish)
+
+// Earliest-finish-time greedy: a maximum-size set of pairwise compatible
+// intervals, returned in finish order.
+static List&lt;Interval&gt; selectIntervals(List&lt;Interval&gt; v) {
+    List&lt;Interval&gt; sorted = new ArrayList&lt;&gt;(v);
+    sorted.sort(Comparator.comparingInt(Interval::finish));
+    List&lt;Interval&gt; chosen = new ArrayList&lt;&gt;();
+    int lastFinish = Integer.MIN_VALUE;       // resource free since forever
+    for (Interval x : sorted) {
+        if (x.start() &gt;= lastFinish) {        // compatible with ALL chosen so far
+            chosen.add(x);
+            lastFinish = x.finish();          // the only state carried forward
+        }                                     // else: rejected, forever
+    }
+    return chosen;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Intervals are half-open (start, finish) pairs, finish &gt; start.
+
+def select_intervals(intervals):
+    """Earliest-finish-time greedy: a maximum-size compatible subset,
+    returned in finish order. O(n log n) for the sort, O(n) after."""
+    chosen = []
+    last_finish = float("-inf")               # resource free since forever
+    for start, finish in sorted(intervals, key=lambda x: x[1]):
+        if start &gt;= last_finish:              # compatible with ALL chosen so far
+            chosen.append((start, finish))
+            last_finish = finish              # the only state carried forward
+        # else: rejected, forever
+    return chosen</pre>
+<pre class="ct-pane" data-lang="rs" hidden>#[derive(Clone, Copy)]
+struct Interval { start: i32, finish: i32, id: usize }   // half-open
+
+// Earliest-finish-time greedy: a maximum-size set of pairwise compatible
+// intervals, returned in finish order.
+fn select_intervals(mut v: Vec&lt;Interval&gt;) -&gt; Vec&lt;Interval&gt; {
+    v.sort_by_key(|x| x.finish);
+    let mut chosen = Vec::new();
+    let mut last_finish = i32::MIN;           // resource free since forever
+    for x in v {
+        if x.start &gt;= last_finish {           // compatible with ALL chosen so far
+            chosen.push(x);
+            last_finish = x.finish;           // the only state carried forward
+        }                                     // else: rejected, forever
+    }
+    chosen
+}</pre>
+<p class="ct-src">source: <code>code/intervals/select.cpp &middot; code/intervals/select.java &middot; code/intervals/select.py &middot; code/intervals/select.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Two details decide correctness. The comparison is
+        <code>start &gt;= lastFinish</code>, not <code>&gt;</code>: that is the
+        half-open convention, and flipping it silently changes the answer.
+        And the test compares against the last accepted finish only. That is
+        enough, because the accepted intervals are processed in increasing
+        finish order, so the latest finish among them is also the largest: an
+        interval starting at or after it starts after all of them. There are
+        exactly three branches to exercise: the first acceptance (with the
+        sentinel <code>lastFinish</code>), an acceptance, and a rejection; the
+        boundary case \(s = \texttt{lastFinish}\) sits inside the acceptance
+        branch and is the one worth testing deliberately.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">4. A full trace</h2>
+      <p>
+        Ten requests for one room, in the order they arrived:
+      </p>
+<pre>       t 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+       a    [=======)                                <span class="cm">[1,4)</span>
+       b          [====)                             <span class="cm">[3,5)</span>
+       c [================)                          <span class="cm">[0,6)</span>
+       d             [=======)                       <span class="cm">[4,7)</span>
+       e                      [====)                 <span class="cm">[7,9)</span>
+       f                [==========)                 <span class="cm">[5,9)</span>
+       g                   [==========)              <span class="cm">[6,10)</span>
+       h                         [=======)           <span class="cm">[8,11)</span>
+       i                         [==========)        <span class="cm">[8,12)</span>
+       j                                  [====)     <span class="cm">[11,13)</span></pre>
+      <p>
+        Sorting by finish time gives \(a(4), b(5), c(6), d(7), f(9), e(9),
+        g(10), h(11), i(12), j(13)\), the number in parentheses being the finish
+        time. Intervals \(f\) and \(e\) tie at \(9\); the tie is broken here by
+        the smaller start, and Exercise 3 shows the choice cannot change the
+        size of the answer. The scan, one row per interval considered:
+      </p>
+      <table class="trace">
+        <tr>
+          <th>step</th><th>interval</th><th>\([s,f)\)</th>
+          <th><code>lastFinish</code></th><th>test \(s \ge\) last</th>
+          <th>decision</th><th>schedule after</th>
+        </tr>
+        <tr><td class="num">1</td><td>\(a\)</td><td>\([1,4)\)</td><td class="num">\(-\infty\)</td>
+          <td>\(1 \ge -\infty\) &#10003;</td><td class="new">ACCEPT</td><td>\(a\)</td></tr>
+        <tr><td class="num">2</td><td>\(b\)</td><td>\([3,5)\)</td><td class="num">4</td>
+          <td>\(3 \ge 4\) &#10007;</td><td>reject (overlaps \(a\) on \([3,4)\))</td><td>\(a\)</td></tr>
+        <tr><td class="num">3</td><td>\(c\)</td><td>\([0,6)\)</td><td class="num">4</td>
+          <td>\(0 \ge 4\) &#10007;</td><td>reject (started before \(a\) finished)</td><td>\(a\)</td></tr>
+        <tr><td class="num">4</td><td>\(d\)</td><td>\([4,7)\)</td><td class="num">4</td>
+          <td>\(4 \ge 4\) &#10003;</td><td class="new">ACCEPT (touching endpoint)</td><td>\(a, d\)</td></tr>
+        <tr><td class="num">5</td><td>\(f\)</td><td>\([5,9)\)</td><td class="num">7</td>
+          <td>\(5 \ge 7\) &#10007;</td><td>reject (overlaps \(d\) on \([5,7)\))</td><td>\(a, d\)</td></tr>
+        <tr><td class="num">6</td><td>\(e\)</td><td>\([7,9)\)</td><td class="num">7</td>
+          <td>\(7 \ge 7\) &#10003;</td><td class="new">ACCEPT (touching endpoint)</td><td>\(a, d, e\)</td></tr>
+        <tr><td class="num">7</td><td>\(g\)</td><td>\([6,10)\)</td><td class="num">9</td>
+          <td>\(6 \ge 9\) &#10007;</td><td>reject (overlaps \(d\) and \(e\))</td><td>\(a, d, e\)</td></tr>
+        <tr><td class="num">8</td><td>\(h\)</td><td>\([8,11)\)</td><td class="num">9</td>
+          <td>\(8 \ge 9\) &#10007;</td><td>reject (overlaps \(e\) on \([8,9)\))</td><td>\(a, d, e\)</td></tr>
+        <tr><td class="num">9</td><td>\(i\)</td><td>\([8,12)\)</td><td class="num">9</td>
+          <td>\(8 \ge 9\) &#10007;</td><td>reject (overlaps \(e\) on \([8,9)\))</td><td>\(a, d, e\)</td></tr>
+        <tr><td class="num">10</td><td>\(j\)</td><td>\([11,13)\)</td><td class="num">9</td>
+          <td>\(11 \ge 9\) &#10003;</td><td class="new">ACCEPT</td><td>\(a, d, e, j\)</td></tr>
+      </table>
+      <p>
+        Result: \(\{a, d, e, j\}\), four of the ten requests, with
+        finishes \(4, 7, 9, 13\). Every branch appears: the first acceptance
+        (step 1), plain acceptance (step 10), acceptance at a touching endpoint
+        \(s = \texttt{lastFinish}\) (steps 4 and 6), rejection by an interval
+        that started earlier and runs long (step 3), and rejection by ordinary
+        overlap (steps 2, 5, 7, 8, 9). Exhaustive search confirms that
+        \(4\) is optimal and that there is exactly one other optimal set,
+        \(\{a, d, h, j\}\), obtained by taking \(h\) instead of \(e\).
+      </p>
+      <div class="aside">
+        <span class="tag">What the trace does not do</span>
+        The greedy never revisits a rejection. Interval \(c = [0,6)\) is
+        rejected at step 3 although at that instant only \(a\) has been
+        accepted, and \(c\) never gets another chance even though a schedule
+        built around \(c\) (say \(c, e, j\)) is perfectly feasible. That
+        schedule has size \(3\), which is exactly the point: the rejections are
+        safe, and the next section proves it.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="proof">5. Why it is optimal: greedy stays ahead</h2>
+      <p>
+        The proof technique is the one named in the
+        <a href="paradigm-greedy-method.html">Greedy Method</a> handout, in its
+        <em>stays-ahead</em> form: instead of transforming an optimal solution
+        into the greedy one, show that after every step the greedy solution is at
+        least as far along as any other, by a measure chosen to make the
+        induction go through. Here the measure is the finish time of the
+        \(r\)-th accepted interval, and &ldquo;ahead&rdquo; means
+        <em>smaller</em>.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (EFT is optimal)</span>
+        Let \(a_1, \dots, a_k\) be the intervals the earliest-finish-time greedy
+        accepts, in the order accepted, and let \(o_1, \dots, o_m\) be any
+        feasible set sorted by finish time. Then \(k \ge m\).
+        <div class="proof">
+          <strong>Step 1 (greedy stays ahead).</strong> Claim: for every
+          \(r \le \min(k,m)\), \(\ f(a_r) \le f(o_r)\).<br>
+          <em>Base \(r=1\).</em> The greedy accepts the interval with the
+          smallest finish time in the whole instance, so \(f(a_1) \le f(o_1)\).<br>
+          <em>Step.</em> Assume \(f(a_{r-1}) \le f(o_{r-1})\). Because \(O\) is
+          feasible and sorted by finish, \(s(o_r) \ge f(o_{r-1})\), and by the
+          hypothesis \(f(o_{r-1}) \ge f(a_{r-1})\), so
+          \(s(o_r) \ge f(a_{r-1})\): the interval \(o_r\) is compatible with
+          everything the greedy has accepted so far, so it is one of the
+          candidates the greedy was choosing among at step \(r\). The greedy
+          takes the candidate with the smallest finish time, hence
+          \(f(a_r) \le f(o_r)\).<br>
+          <strong>Step 2 (the greedy does not stop early).</strong> Suppose
+          \(m > k\). Then \(o_{k+1}\) exists, and
+          \(s(o_{k+1}) \ge f(o_k) \ge f(a_k)\) by Step 1, so \(o_{k+1}\) is
+          compatible with all of \(a_1, \dots, a_k\). But the greedy examines
+          every interval and stopped with \(k\) accepted, meaning no remaining
+          interval passed the test: contradiction. Hence \(m \le k\), and the
+          greedy set is of maximum size.
+          <span class="qed">&#9633;</span>
+        </div>
+      </div>
+      <p>
+        The theorem says nothing about <em>which</em> maximum-size set is
+        returned, only that its size is maximum; the traced instance has two
+        optimal sets and the greedy returns one of them.
+      </p>
+
+      <h3>The claim on the traced instance</h3>
+      <p>
+        The greedy returned \(a, d, e, j\) with finishes \(4, 7, 9, 13\). The
+        instance has exactly two feasible sets of size \(4\), so the
+        stays-ahead inequality can be checked against all of them, position by
+        position:
+      </p>
+      <table class="trace">
+        <tr><th>\(r\)</th><th>greedy \(a_r\)</th><th>\(f(a_r)\)</th>
+          <th>other optimum \(o_r\)</th><th>\(f(o_r)\)</th><th>\(f(a_r) \le f(o_r)\)</th></tr>
+        <tr><td class="num">1</td><td>\(a\)</td><td class="num">4</td><td>\(a\)</td><td class="num">4</td><td class="num">&#10003;</td></tr>
+        <tr><td class="num">2</td><td>\(d\)</td><td class="num">7</td><td>\(d\)</td><td class="num">7</td><td class="num">&#10003;</td></tr>
+        <tr><td class="num">3</td><td>\(e\)</td><td class="num">9</td><td>\(h\)</td><td class="num">11</td><td class="num">&#10003;</td></tr>
+        <tr><td class="num">4</td><td>\(j\)</td><td class="num">13</td><td>\(j\)</td><td class="num">13</td><td class="num">&#10003;</td></tr>
+      </table>
+      <p>
+        Position \(3\) is where the slack appears: the greedy is two time units
+        ahead after its third acceptance. That slack is what Step 2 spends. In
+        this instance the room is free from \(9\) onwards for the greedy and only
+        from \(11\) onwards for the alternative, and both can still fit \(j\); had
+        there been a request \([10, 11)\), the greedy would have taken it and the
+        alternative could not have.
+      </p>
+      <div class="aside">
+        <span class="tag">The same fact as an exchange argument</span>
+        Stays-ahead can be replaced by the swap form. Let \(g\) be the interval
+        finishing earliest overall and \(O\) an optimal set that does not contain
+        \(g\). Its first interval \(o_1\) satisfies \(f(o_1) \ge f(g)\), so
+        removing \(o_1\) and inserting \(g\) leaves a set of the same size that
+        is still feasible: every other member of \(O\) starts at or after
+        \(f(o_1) \ge f(g)\). So some optimal solution contains the greedy choice
+        (the greedy-choice property). Deleting \(g\) and every interval
+        conflicting with it leaves a smaller instance of the same problem whose
+        optimum extends this choice (optimal substructure), and induction
+        finishes the argument. Both proofs are standard; stays-ahead is usually
+        shorter for scheduling problems because the &ldquo;ahead&rdquo; measure
+        is right there in the input.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">6. Cost</h2>
+      <p>
+        The algorithm is a sort followed by a scan, so the cost is the sum of the
+        two, and the two are not comparable in size.
+      </p>
+      <ul>
+        <li><strong>The scan is \(\Theta(n)\).</strong> The loop body runs once
+          per interval and does a constant amount of work: one comparison, one
+          conditional append, one assignment. It never looks back at an earlier
+          interval, because the whole history is compressed into
+          <code>lastFinish</code>.</li>
+        <li><strong>The sort is \(\Theta(n \log n)\)</strong> with any
+          comparison-based method (<a href="../sorting/algo-mergesort.html">Mergesort</a>,
+          heapsort, or an introsort-backed library <code>sort</code>), and no
+          comparison-based method can do better in general: that is the
+          <a href="../sorting/foundation-sorting-lower-bound.html">sorting lower
+          bound</a>.</li>
+      </ul>
+      <p>
+        Total: \(\Theta(n \log n)\) time and \(\Theta(1)\) extra space beyond the
+        sorted array and the output (\(\Theta(k)\) for the \(k\) chosen
+        intervals, or \(\Theta(1)\) if only the count is wanted). Two cases beat
+        the bound, both by attacking the sort rather than the algorithm:
+      </p>
+      <ul>
+        <li>if the input is already in finish order (a log of completed jobs, for
+          instance), the scan alone answers the question in \(\Theta(n)\);</li>
+        <li>if finish times are integers in a bounded range \([0, M)\), counting
+          or radix sort orders them in \(\Theta(n + M)\)
+          (<a href="../sorting/algo-counting-radix-sort.html">Counting and Radix
+          Sort</a>), giving \(\Theta(n + M)\) overall, which is linear when
+          \(M = O(n)\).</li>
+      </ul>
+      <p>
+        For contrast, brute force examines all \(2^n\) subsets and checks each
+        for feasibility: \(1024\) subsets on the ten intervals of
+        <a href="#trace">section 4</a>, against \(10\) loop iterations after the
+        sort. The
+        <a href="../foundations/foundation-asymptotic-notation.html">Asymptotic
+        Notation</a> handout defines the \(\Theta\) used here.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="weighted">7. The weighted variant</h2>
+      <div class="def">
+        <span class="tag">Definition (weighted interval scheduling)</span>
+        Each interval \(x_i\) additionally carries a weight \(w_i > 0\)
+        (a fee, a priority, a length). Find a feasible set of maximum
+        <strong>total weight</strong>. Setting every \(w_i = 1\) recovers the
+        unweighted problem.
+      </div>
+      <p>
+        The earliest-finish-time rule ignores weights, so it can be beaten by a
+        single valuable interval. Six requests with fees:
+      </p>
+<pre>       t 0  1  2  3  4  5  6  7  8  9  10
+       1 [=======)                          <span class="cm">[0,3),  w = 3</span>
+       2    [=======)                       <span class="cm">[1,4),  w = 2</span>
+       3             [====)                 <span class="cm">[4,6),  w = 4</span>
+       4          [==========)              <span class="cm">[3,7),  w = 6</span>
+       5                [==========)        <span class="cm">[5,9),  w = 3</span>
+       6                      [=======)     <span class="cm">[7,10), w = 5</span></pre>
+      <p>
+        The EFT greedy takes \(1, 3, 6\) (finishes \(3, 6, 10\)), three intervals
+        worth \(3 + 4 + 5 = 12\). The optimum is \(1, 4, 6\), also three
+        intervals, worth \(3 + 6 + 5 = 14\): the greedy took the cheap \(3\)
+        because it ends sooner than the valuable \(4\). Nor does the obvious
+        repair work. &ldquo;Heaviest first&rdquo; fails on three intervals:
+        \(X = [0,10)\) with \(w = 10\), \(Y = [0,4)\) with \(w = 6\), and
+        \(Z = [5,9)\) with \(w = 6\); it takes \(X\) for \(10\), while
+        \(Y + Z = 12\). The greedy-choice property is gone, and with it the
+        whole approach.
+      </p>
+      <h3>The dynamic-programming formulation</h3>
+      <p>
+        What survives is optimal substructure, which is what dynamic programming
+        needs (the <a href="../dp/paradigm-dp-method.html">Dynamic Programming
+        Method</a> handout states the two conditions). Sort by finish time and
+        number the intervals \(1, \dots, n\), so \(f_1 \le f_2 \le \dots \le
+        f_n\). Define
+      </p>
+      <div class="def">
+        <span class="tag">Definition (the predecessor \(p(j)\))</span>
+        \(p(j)\) is the largest index \(i < j\) with \(f_i \le s_j\), and
+        \(p(j) = 0\) if no such index exists: the last interval, in finish
+        order, that is compatible with \(x_j\). Because the intervals are sorted
+        by finish, <em>every</em> \(i \le p(j)\) is compatible with \(x_j\) as
+        well, so one number summarizes the entire compatible prefix.
+      </div>
+      <p>
+        Let \(\mathrm{OPT}(j)\) be the maximum total weight achievable using
+        only intervals \(1, \dots, j\). The last interval either is or is not in
+        the optimal set, and those two cases are exhaustive:
+      </p>
+      \[
+        \mathrm{OPT}(j) = \max\bigl(\,\underbrace{w_j + \mathrm{OPT}(p(j))}_{\text{take } x_j},
+        \ \underbrace{\mathrm{OPT}(j-1)}_{\text{skip } x_j}\,\bigr),
+        \qquad \mathrm{OPT}(0) = 0 .
+      \]
+      <p>
+        Taking \(x_j\) forbids everything from \(p(j)+1\) to \(j-1\), which is
+        exactly why \(p(j)\) is defined the way it is. Filling the table left to
+        right on the six intervals above (\(p\) computed by binary search):
+      </p>
+      <table class="trace">
+        <tr><th>\(j\)</th><th>\([s_j, f_j)\)</th><th>\(w_j\)</th><th>\(p(j)\)</th>
+          <th>take: \(w_j + \mathrm{OPT}(p(j))\)</th><th>skip: \(\mathrm{OPT}(j-1)\)</th>
+          <th>\(\mathrm{OPT}(j)\)</th></tr>
+        <tr><td class="num">1</td><td>\([0,3)\)</td><td class="num">3</td><td class="num">0</td>
+          <td>\(3 + 0 = 3\)</td><td>\(0\)</td><td class="new">3 (take)</td></tr>
+        <tr><td class="num">2</td><td>\([1,4)\)</td><td class="num">2</td><td class="num">0</td>
+          <td>\(2 + 0 = 2\)</td><td>\(3\)</td><td class="num">3 (skip)</td></tr>
+        <tr><td class="num">3</td><td>\([4,6)\)</td><td class="num">4</td><td class="num">2</td>
+          <td>\(4 + 3 = 7\)</td><td>\(3\)</td><td class="new">7 (take)</td></tr>
+        <tr><td class="num">4</td><td>\([3,7)\)</td><td class="num">6</td><td class="num">1</td>
+          <td>\(6 + 3 = 9\)</td><td>\(7\)</td><td class="new">9 (take)</td></tr>
+        <tr><td class="num">5</td><td>\([5,9)\)</td><td class="num">3</td><td class="num">2</td>
+          <td>\(3 + 3 = 6\)</td><td>\(9\)</td><td class="num">9 (skip)</td></tr>
+        <tr><td class="num">6</td><td>\([7,10)\)</td><td class="num">5</td><td class="num">4</td>
+          <td>\(5 + 9 = 14\)</td><td>\(9\)</td><td class="new">14 (take)</td></tr>
+      </table>
+      <p>
+        \(\mathrm{OPT}(6) = 14\), above the greedy&rsquo;s \(12\). The set is
+        recovered by walking the table backwards from \(j = 6\): the take branch
+        won, so \(6\) is in the solution and the walk jumps to
+        \(p(6) = 4\); the take branch won there too, so \(4\) is in, and the walk
+        jumps to \(p(4) = 1\); \(1\) is in, and \(p(1) = 0\) ends it. Solution
+        \(\{1, 4, 6\}\), weight \(3 + 6 + 5 = 14\), matching the table.
+      </p>
+      <p>
+        Cost: \(\Theta(n \log n)\) for the sort, \(\Theta(n \log n)\) to compute
+        all \(p(j)\) by binary search over the finish times (or \(\Theta(n)\) by
+        merging two sorted lists of endpoints), and \(\Theta(n)\) for the table,
+        so \(\Theta(n \log n)\) overall with \(\Theta(n)\) space. The
+        unweighted problem is the special case \(w_i = 1\), where the greedy
+        reaches the same answer in the same asymptotic time and constant space,
+        which is the usual trade: greed is cheaper when it is licensed, and this
+        table-filling is what it costs to do without the licence. The
+        <a href="../dp/paradigm-dp-method.html">Dynamic Programming Method</a>
+        handout develops the technique in general, and
+        <a href="../dp/algo-knapsack.html">Knapsack</a> is the other standard
+        problem where a natural greedy rule has a counterexample and this same
+        take-or-skip recurrence rescues it.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="partition">8. Interval partitioning</h2>
+      <div class="def">
+        <span class="tag">Definition (interval partitioning)</span>
+        Given \(n\) intervals, assign <em>every</em> interval to a resource
+        (&ldquo;room&rdquo;) so that intervals sharing a room are pairwise
+        compatible, using as few rooms as possible. No request is refused;
+        the cost is the number of rooms.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (depth)</span>
+        The <strong>depth</strong> of a set of intervals is the maximum number
+        of them that contain a common instant: \(\max_t |\{i : s_i \le t < f_i\}|\).
+      </div>
+      <p>
+        Same picture, different question, and the two answers are different
+        numbers. On the ten intervals of <a href="#trace">section 4</a>, count
+        how many bars a vertical line crosses at each instant:
+      </p>
+<pre>       t 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+       a    [=======)
+       b          [====)
+       c [================)
+       d             [=======)
+       e                      [====)
+       f                [==========)
+       g                   [==========)
+       h                         [=======)
+       i                         [==========)
+       j                                  [====)
+    live 1  2  2  3  3  3  3  3  5  3  2  2  1  0</pre>
+      <p>
+        The peak is \(5\), at \(t = 8\), where \(f, g, h, i\) and \(e\) are all
+        live. So this instance needs at least \(5\) rooms, while only \(4\) of
+        its requests fit into one.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (depth is a lower bound)</span>
+        Any valid assignment uses at least \(\text{depth}\) rooms.
+        <div class="proof">
+          If \(d\) intervals all contain the instant \(t\), then every two of
+          them overlap (both contain \(t\)), so no two may share a room. Those
+          \(d\) intervals therefore occupy \(d\) distinct rooms.
+          <span class="qed">&#9633;</span>
+        </div>
+      </div>
+      <p>
+        The greedy sorts by <em>start</em> time (not finish time: this is a
+        different problem) and places each interval in a room that has already
+        come free, opening a new room only if none has. Which free room to reuse
+        does not affect the room count; keeping the rooms in a min-heap keyed by
+        the time they come free makes the query &ldquo;is any room free?&rdquo;
+        cost \(O(\log n)\), since the earliest-freeing room is the heap&rsquo;s
+        root (the <a href="../heaps/ds-heaps-pq.html">Heaps and Priority
+        Queues</a> handout).
+      </p>
+      <div class="code-tabs" data-snippet="intervals/partition">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Interval partitioning: assign every interval to a room, minimizing rooms.
+// Returns room[i] for each interval, and the number of rooms used.
+pair&lt;vector&lt;int&gt;, int&gt; partitionIntervals(vector&lt;Interval&gt; v) {
+    sort(v.begin(), v.end(),                       // by START time
+         [](const Interval&amp; a, const Interval&amp; b) { return a.start &lt; b.start; });
+    <span class="cm">// min-heap of (time the room comes free, room index)</span>
+    priority_queue&lt;pair&lt;int,int&gt;, vector&lt;pair&lt;int,int&gt;&gt;, greater&lt;&gt;&gt; free;
+    vector&lt;int&gt; room(v.size());
+    int rooms = 0;
+    for (const Interval&amp; x : v) {
+        if (!free.empty() &amp;&amp; free.top().first &lt;= x.start) {
+            auto [t, r] = free.top(); free.pop();   <span class="cm">// reuse the earliest-freeing room</span>
+            room[x.id] = r;
+            free.push({x.finish, r});
+        } else {
+            room[x.id] = rooms;                     <span class="cm">// all busy: open a new room</span>
+            free.push({x.finish, rooms});
+            ++rooms;
+        }
+    }
+    return {room, rooms};
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Interval partitioning: assign every interval to a room, minimizing rooms.
+static int partitionIntervals(List&lt;Interval&gt; v, int[] room) {
+    List&lt;Interval&gt; sorted = new ArrayList&lt;&gt;(v);
+    sorted.sort(Comparator.comparingInt(Interval::start));   // by START time
+    // min-heap of {time the room comes free, room index}
+    PriorityQueue&lt;int[]&gt; free = new PriorityQueue&lt;&gt;((p, q) -&gt; p[0] - q[0]);
+    int rooms = 0;
+    for (Interval x : sorted) {
+        if (!free.isEmpty() &amp;&amp; free.peek()[0] &lt;= x.start()) {
+            int[] slot = free.poll();                // reuse the earliest-freeing room
+            room[x.id()] = slot[1];
+            free.add(new int[]{ x.finish(), slot[1] });
+        } else {
+            room[x.id()] = rooms;                    // all busy: open a new room
+            free.add(new int[]{ x.finish(), rooms });
+            rooms++;
+        }
+    }
+    return rooms;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>import heapq
+
+def partition_intervals(intervals):
+    """Assign every (start, finish) to a room, minimizing the room count.
+    Returns (room_of_interval, rooms_used)."""
+    free = []                                  # min-heap of (free_at, room)
+    room_of = {}
+    rooms = 0
+    for start, finish in sorted(intervals, key=lambda x: x[0]):   # by START
+        if free and free[0][0] &lt;= start:
+            _, r = heapq.heappop(free)         # reuse the earliest-freeing room
+        else:
+            r, rooms = rooms, rooms + 1        # all busy: open a new room
+        room_of[(start, finish)] = r
+        heapq.heappush(free, (finish, r))
+    return room_of, rooms</pre>
+<pre class="ct-pane" data-lang="rs" hidden>use std::collections::BinaryHeap;
+use std::cmp::Reverse;
+
+// Interval partitioning: assign every interval to a room, minimizing rooms.
+fn partition_intervals(mut v: Vec&lt;Interval&gt;) -&gt; (Vec&lt;usize&gt;, usize) {
+    v.sort_by_key(|x| x.start);                        // by START time
+    // min-heap (via Reverse) of (time the room comes free, room index)
+    let mut free: BinaryHeap&lt;Reverse&lt;(i32, usize)&gt;&gt; = BinaryHeap::new();
+    let mut room = vec![0usize; v.len()];
+    let mut rooms = 0usize;
+    for x in &amp;v {
+        let r = match free.peek() {
+            Some(&amp;Reverse((t, r))) if t &lt;= x.start =&gt; { free.pop(); r }  // reuse
+            _ =&gt; { rooms += 1; rooms - 1 }                               // open
+        };
+        room[x.id] = r;
+        free.push(Reverse((x.finish, r)));
+    }
+    (room, rooms)
+}</pre>
+<p class="ct-src">source: <code>code/intervals/partition.cpp &middot; code/intervals/partition.java &middot; code/intervals/partition.py &middot; code/intervals/partition.rs</code></p>
+<!--/ct--></div>
+
+      <h3>The trace</h3>
+      <p>
+        Sorted by start time the ten intervals come in the order
+        \(c(0), a(1), b(3), d(4), f(5), g(6), e(7), h(8), i(8), j(11)\), the
+        number in parentheses being the start time; \(h\) and \(i\) tie at
+        \(8\) and are separated by finish time. The heap column lists
+        <code>(free at, room)</code> pairs, smallest first, after the
+        row&rsquo;s assignment:
+      </p>
+      <table class="trace">
+        <tr><th>step</th><th>interval</th><th>\([s,f)\)</th><th>earliest free room</th>
+          <th>action</th><th>heap after</th></tr>
+        <tr><td class="num">1</td><td>\(c\)</td><td>\([0,6)\)</td><td>none</td>
+          <td class="new">open \(R_1\)</td><td class="pq">(6,R1)</td></tr>
+        <tr><td class="num">2</td><td>\(a\)</td><td>\([1,4)\)</td><td>\(R_1\) at \(6 > 1\)</td>
+          <td class="new">open \(R_2\)</td><td class="pq">(4,R2) (6,R1)</td></tr>
+        <tr><td class="num">3</td><td>\(b\)</td><td>\([3,5)\)</td><td>\(R_2\) at \(4 > 3\)</td>
+          <td class="new">open \(R_3\)</td><td class="pq">(4,R2) (5,R3) (6,R1)</td></tr>
+        <tr><td class="num">4</td><td>\(d\)</td><td>\([4,7)\)</td><td>\(R_2\) at \(4 \le 4\)</td>
+          <td>reuse \(R_2\)</td><td class="pq">(5,R3) (6,R1) (7,R2)</td></tr>
+        <tr><td class="num">5</td><td>\(f\)</td><td>\([5,9)\)</td><td>\(R_3\) at \(5 \le 5\)</td>
+          <td>reuse \(R_3\)</td><td class="pq">(6,R1) (7,R2) (9,R3)</td></tr>
+        <tr><td class="num">6</td><td>\(g\)</td><td>\([6,10)\)</td><td>\(R_1\) at \(6 \le 6\)</td>
+          <td>reuse \(R_1\)</td><td class="pq">(7,R2) (9,R3) (10,R1)</td></tr>
+        <tr><td class="num">7</td><td>\(e\)</td><td>\([7,9)\)</td><td>\(R_2\) at \(7 \le 7\)</td>
+          <td>reuse \(R_2\)</td><td class="pq">(9,R2) (9,R3) (10,R1)</td></tr>
+        <tr><td class="num">8</td><td>\(h\)</td><td>\([8,11)\)</td><td>\(R_2\) at \(9 > 8\)</td>
+          <td class="new">open \(R_4\)</td><td class="pq">(9,R2) (9,R3) (10,R1) (11,R4)</td></tr>
+        <tr><td class="num">9</td><td>\(i\)</td><td>\([8,12)\)</td><td>\(R_2\) at \(9 > 8\)</td>
+          <td class="new">open \(R_5\)</td><td class="pq">(9,R2) (9,R3) (10,R1) (11,R4) (12,R5)</td></tr>
+        <tr><td class="num">10</td><td>\(j\)</td><td>\([11,13)\)</td><td>\(R_2\) at \(9 \le 11\)</td>
+          <td>reuse \(R_2\)</td><td class="pq">(9,R3) (10,R1) (11,R4) (12,R5) (13,R2)</td></tr>
+      </table>
+      <p>
+        Five rooms, matching the depth, so the assignment is optimal by the
+        lemma. The rooms end up holding
+        \(R_1 = \{c, g\}\), \(R_2 = \{a, d, e, j\}\), \(R_3 = \{b, f\}\),
+        \(R_4 = \{h\}\), \(R_5 = \{i\}\), and each of those lists is compatible
+        end to end. Both branches occur repeatedly (steps 1, 2, 3, 8, 9 open a
+        room; steps 4, 5, 6, 7, 10 reuse one), including the boundary case
+        \(\text{free} = s\) exactly (steps 4, 5, 6, 7) and the case where a room
+        is free but not the earliest-freeing one (step 10, where \(R_3\) is free
+        at \(9\) and \(R_2\), also free, is the one the heap hands back).
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (the greedy uses exactly depth rooms)</span>
+        The start-order greedy opens \(d\) rooms, where \(d\) is the depth, and
+        no assignment uses fewer.
+        <div class="proof">
+          Every room is used legally: a room is reused only when the interval
+          it last held finished at or before the new interval&rsquo;s start, and
+          since intervals are processed in start order, later arrivals only
+          extend that room&rsquo;s chain forward.<br>
+          Now suppose the greedy opens room number \(m\) while placing interval
+          \(x\), which starts at \(s\). It opens a room only because all
+          \(m-1\) existing rooms are busy, that is, each holds an interval whose
+          finish is strictly greater than \(s\). Each of those intervals also
+          started at or before \(s\) (start order), so each of them contains the
+          instant \(s\). Together with \(x\), that is \(m\) intervals containing
+          \(s\), so \(d \ge m\). Applying this to the last room opened gives
+          \(d \ge (\text{rooms used})\), and the lemma gives
+          \((\text{rooms used}) \ge d\) for <em>every</em> assignment. The two
+          meet.
+          <span class="qed">&#9633;</span>
+        </div>
+      </div>
+      <p>
+        Cost: \(\Theta(n \log n)\) for the sort, plus \(n\) heap operations of
+        \(O(\log n)\) each on a heap that never holds more than \(d \le n\)
+        entries, so \(\Theta(n \log n)\) in total and \(\Theta(n)\) space. As a
+        by-product the algorithm computes the depth without ever building the
+        <code>live</code> row.
+      </p>
+      <div class="aside">
+        <span class="tag">Why start order, and not finish order</span>
+        The proof of the theorem uses start order twice, and only there: it needs
+        every busy room to be busy with an interval that <em>contains</em> \(s\),
+        which requires that every already-placed interval started at or before
+        \(s\). Under finish order that is false, so the counting argument
+        collapses. Note also that the two greedies in this handout answer
+        different questions and cannot be substituted for each other: the
+        selection greedy refuses six of these ten requests, and the partitioning
+        greedy refuses none.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">9. Where this sits</h2>
+      <p>
+        Interval scheduling is the standard first example of the greedy method,
+        because the wrong rules are so plausible and the right one has a
+        three-line proof. The
+        <a href="paradigm-greedy-method.html">Greedy Method</a> handout gives
+        the general pattern (greedy-choice property plus optimal substructure,
+        proved by exchange or stays-ahead), sketches this problem as one of its
+        examples, and collects the classic failures.
+        <a href="algo-huffman-coding.html">Huffman Coding</a> is the other
+        greedy in this catalog that builds its answer from scratch rather than
+        over a graph, and it needs a genuine exchange argument rather than a
+        stays-ahead one. The graph greedies,
+        <a href="../graphs/algo-dijkstra.html">Dijkstra</a>,
+        <a href="../graphs/algo-prim.html">Prim</a>, and
+        <a href="../graphs/algo-kruskal.html">Kruskal</a>, all share this
+        handout&rsquo;s shape: sort or heap-order the candidates, sweep once,
+        commit irrevocably.
+      </p>
+      <p>
+        In the other direction,
+        <a href="../dp/paradigm-dp-method.html">Dynamic Programming</a> takes
+        over exactly where the weights appear, and
+        <a href="../dp/algo-knapsack.html">Knapsack</a> is the neighbouring
+        problem with the same failure mode. The supporting machinery is
+        <a href="../sorting/algo-mergesort.html">Mergesort</a> (or any
+        \(\Theta(n\log n)\) sort) for the ordering step and
+        <a href="../heaps/ds-heaps-pq.html">Heaps and Priority Queues</a> for
+        the room heap in section 8.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">10. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Run the earliest-finish-time greedy on
+          \(A[1,3)\), \(B[0,4)\), \(C[3,6)\), \(D[5,7)\), \(E[2,7)\),
+          \(F[6,9)\), \(G[8,10)\). Give the finish-sorted order, the decision for
+          each interval with its reason, and the resulting set. How many
+          maximum-size sets does this instance have?
+          <details>
+            <summary>solution</summary>
+            Finish order: \(A(3), B(4), C(6), E(7), D(7), F(9), G(10)\)
+            (\(E\) and \(D\) tie at \(7\); the smaller start goes first).
+            <br>\(A\): first, ACCEPT, <code>lastFinish</code> \(= 3\).
+            <br>\(B[0,4)\): \(0 \ge 3\) is false, reject (it started before
+            \(A\) finished).
+            <br>\(C[3,6)\): \(3 \ge 3\), ACCEPT at a touching endpoint,
+            <code>lastFinish</code> \(= 6\).
+            <br>\(E[2,7)\): \(2 \ge 6\) false, reject.
+            <br>\(D[5,7)\): \(5 \ge 6\) false, reject.
+            <br>\(F[6,9)\): \(6 \ge 6\), ACCEPT, <code>lastFinish</code> \(= 9\).
+            <br>\(G[8,10)\): \(8 \ge 9\) false, reject.
+            <br>Result \(\{A, C, F\}\), size \(3\). Exhaustive search finds
+            four maximum-size sets: \(\{A,C,F\}\), \(\{A,C,G\}\),
+            \(\{A,D,G\}\), \(\{B,D,G\}\). The theorem promises the size, not
+            the set.
+          </details>
+        </li>
+        <li>
+          Rerun the ten-interval instance of <a href="#trace">section 4</a>
+          under the <em>closed</em>-interval convention, where \([s_i,f_i]\) and
+          \([s_j,f_j]\) conflict when they share even a single instant (so the
+          test becomes \(s > \texttt{lastFinish}\)). What does the greedy return,
+          and what is the optimum? Which acceptances from the original trace
+          disappear, and why?
+          <details>
+            <summary>solution</summary>
+            Same finish order \(a, b, c, d, f, e, g, h, i, j\). \(a\) is
+            accepted (<code>lastFinish</code> \(= 4\)); \(b(3)\) and \(c(0)\)
+            are rejected as before; \(d[4,7]\) is now <em>rejected</em>, because
+            \(4 > 4\) is false and \(a\) still owns the instant \(4\);
+            \(f[5,9]\) has \(5 > 4\) and is ACCEPTED
+            (<code>lastFinish</code> \(= 9\)); \(e[7,9]\), \(g[6,10]\),
+            \(h[8,11]\), \(i[8,12]\) all start at or before \(9\) and are
+            rejected; \(j[11,13]\) has \(11 > 9\) and is accepted. Result
+            \(\{a, f, j\}\), size \(3\), and exhaustive search confirms \(3\) is
+            optimal under this convention (there are six optimal sets, among
+            them \(\{a,e,j\}\) and \(\{c,e,j\}\)). The two touching-endpoint
+            acceptances of the original trace (\(d\) at \(4\) and \(e\) at
+            \(7\)) are exactly what is lost: the answer drops from \(4\) to
+            \(3\). The algorithm is unchanged apart from one comparison
+            operator, which is why the convention must be stated before any
+            number is quoted.
+          </details>
+        </li>
+        <li>
+          When several intervals finish at the same time, the sort may present
+          them in any order. Prove that the size of the greedy&rsquo;s answer
+          does not depend on how such ties are broken. Illustrate with \(e\) and
+          \(f\) in the section 4 trace.
+          <details>
+            <summary>solution</summary>
+            Every tie-breaking order still implements the earliest-finish-time
+            rule: at each step the interval chosen has the smallest finish time
+            among the compatible candidates, which is all the optimality proof
+            uses (the proof never assumes the candidate is unique). So each
+            variant returns a maximum-size set, and all maximum-size sets have
+            the same size by definition. Only the identity of the set can
+            change. In section 4, \(f[5,9)\) and \(e[7,9)\) both finish at \(9\).
+            With \(f\) first, \(f\) is rejected (\(5 < 7\)) and \(e\) accepted;
+            with \(e\) first, \(e\) is accepted (\(7 \ge 7\)) and \(f\) is then
+            rejected. Either way one interval finishing at \(9\) joins the
+            schedule, and the answer is \(\{a,d,e,j\}\) with size \(4\).
+          </details>
+        </li>
+        <li>
+          Consider the <em>latest-start-time</em> rule: repeatedly take the
+          compatible interval that starts <em>latest</em>, building the schedule
+          from the end of the timeline backwards. Prove it is optimal. What does
+          it return on the section 4 instance?
+          <details>
+            <summary>solution</summary>
+            Reflect the timeline: map each interval \([s,f)\) to
+            \((-f, -s]\), that is, negate every coordinate and swap the roles of
+            start and finish. Compatibility is preserved (two intervals overlap
+            if and only if their reflections do), the reflected problem is
+            interval scheduling again, and an interval with the latest start in
+            the original has the earliest finish in the reflection. So
+            latest-start-first <em>is</em> earliest-finish-first on the reflected
+            instance and inherits its optimality. (Handled directly, the same
+            stays-ahead induction works with the measure &ldquo;the start time of
+            the \(r\)-th interval chosen, from the right,&rdquo; where ahead
+            means larger.) On the section 4 instance it takes \(j[11,13)\),
+            then \(h[8,11)\) (the latest start among intervals finishing by
+            \(11\)), then \(d[4,7)\), then \(a[1,4)\): the set
+            \(\{a, d, h, j\}\), which is the other optimal solution, of size
+            \(4\). The mirror rule finds the mirror answer.
+          </details>
+        </li>
+        <li>
+          Generalize the shortest-first counterexample of section 2.1 into a
+          family: for every \(m\), build an instance where shortest-first
+          returns \(m\) intervals and the optimum is \(2m\). Verify it for
+          \(m = 3\).
+          <details>
+            <summary>solution</summary>
+            Repeat the gadget in disjoint blocks. For \(i = 0, \dots, m-1\)
+            put block \(i\) in the window \([10i, 10i+10)\) with three
+            intervals: \(A_i = [10i,\ 10i{+}4)\) and \(B_i = [10i{+}5,\
+            10i{+}9)\), both of length \(4\), and the straddler
+            \(S_i = [10i{+}3,\ 10i{+}6)\) of length \(3\). Within a block
+            \(S_i\) overlaps both \(A_i\) (on \([10i{+}3, 10i{+}4)\)) and
+            \(B_i\) (on \([10i{+}5, 10i{+}6)\)), and different blocks never
+            interact. Shortest-first takes every \(S_i\) first (length \(3\)
+            beats length \(4\)), and the \(S_i\) are mutually compatible, so it
+            ends with \(m\) intervals and every \(A_i, B_i\) deleted. But all
+            \(2m\) of the \(A_i, B_i\) are pairwise compatible, so the optimum
+            is \(2m\), which the earliest-finish greedy finds. For \(m = 3\) the
+            nine intervals are \([0,4), [5,9), [3,6)\), \([10,14), [15,19),
+            [13,16)\), \([20,24), [25,29), [23,26)\); shortest-first returns
+            \(\{S_0, S_1, S_2\}\), size \(3\), and the greedy returns
+            \(\{A_0, B_0, A_1, B_1, A_2, B_2\}\), size \(6\). The ratio is
+            \(1/2\), and no instance makes shortest-first worse than that: an
+            interval \(x\) it picks is the shortest still available, and if
+            three intervals of an optimal solution conflicted with \(x\), the
+            middle one of the three would have to lie strictly inside \(x\)
+            (the three are pairwise disjoint and all meet \(x\)), hence be
+            shorter, a contradiction. So every pick destroys at most two
+            optimal intervals.
+          </details>
+        </li>
+        <li>
+          Weighted instance: \(1[0,4)\ w{=}5\), \(2[2,6)\ w{=}4\),
+          \(3[5,8)\ w{=}3\), \(4[6,10)\ w{=}7\), \(5[9,12)\ w{=}2\)
+          (already in finish order). Compute every \(p(j)\), fill the
+          \(\mathrm{OPT}\) table, recover the optimal set, and compare it with
+          what the unweighted earliest-finish greedy would take.
+          <details>
+            <summary>solution</summary>
+            Predecessors: \(p(1) = 0\) (nothing finishes by \(0\));
+            \(p(2) = 0\) (nothing finishes by \(2\); interval \(1\) finishes at
+            \(4 > 2\)); \(p(3) = 1\) (\(f_1 = 4 \le 5\), \(f_2 = 6 > 5\));
+            \(p(4) = 2\) (\(f_2 = 6 \le 6\), \(f_3 = 8 > 6\));
+            \(p(5) = 3\) (\(f_3 = 8 \le 9\), \(f_4 = 10 > 9\)).
+            <br>\(\mathrm{OPT}(0) = 0\).
+            <br>\(\mathrm{OPT}(1) = \max(5 + 0,\ 0) = 5\) (take).
+            <br>\(\mathrm{OPT}(2) = \max(4 + 0,\ 5) = 5\) (skip).
+            <br>\(\mathrm{OPT}(3) = \max(3 + 5,\ 5) = 8\) (take).
+            <br>\(\mathrm{OPT}(4) = \max(7 + 5,\ 8) = 12\) (take).
+            <br>\(\mathrm{OPT}(5) = \max(2 + 8,\ 12) = 12\) (skip).
+            <br>Traceback from \(j=5\): skip; at \(j=4\) take, jump to
+            \(p(4) = 2\); at \(j=2\) the skip branch won, so move to \(j=1\);
+            at \(j=1\) take, jump to \(p(1) = 0\). Solution \(\{1, 4\}\), weight
+            \(5 + 7 = 12\). The unweighted greedy takes \(1[0,4)\), then
+            \(3[5,8)\), then \(5[9,12)\): three intervals but weight
+            \(5 + 3 + 2 = 10\). More intervals, less money.
+          </details>
+        </li>
+        <li>
+          Interval partitioning on \(p[0,5)\), \(q[1,3)\), \(r[2,8)\),
+          \(s[4,9)\), \(t[6,10)\), \(u[7,11)\), \(v[10,13)\): compute the depth
+          and the instant where it occurs, run the greedy, and report the room
+          assignment. Could a cleverer algorithm ever use fewer rooms than the
+          depth, or could the greedy ever use more?
+          <details>
+            <summary>solution</summary>
+            Live counts at \(t = 0, 1, \dots, 12\) are
+            \(1, 2, 3, 2, 3, 2, 3, 4, 3, 2, 2, 1, 1\), so the depth is \(4\), at
+            \(t = 7\), where \(r, s, t, u\) are all live. Start order is
+            \(p, q, r, s, t, u, v\). \(p[0,5)\) opens \(R_1\) (free at \(5\));
+            \(q[1,3)\) finds \(R_1\) busy and opens \(R_2\) (free at \(3\));
+            \(r[2,8)\) finds the earliest free time \(3 > 2\) and opens \(R_3\)
+            (free at \(8\)); \(s[4,9)\) reuses \(R_2\) (free at \(3 \le 4\));
+            \(t[6,10)\) reuses \(R_1\) (free at \(5 \le 6\)); \(u[7,11)\) sees
+            earliest free time \(8 > 7\) and opens \(R_4\); \(v[10,13)\) reuses
+            \(R_3\) (free at \(8 \le 10\)). Four rooms:
+            \(R_1 = \{p, t\}\), \(R_2 = \{q, s\}\), \(R_3 = \{r, v\}\),
+            \(R_4 = \{u\}\). Neither deviation is possible: the lemma says no
+            assignment beats the depth (the \(4\) intervals live at \(t = 7\)
+            pairwise conflict), and the theorem says the greedy never exceeds it
+            (when it opens room \(m\), \(m\) intervals are live at that instant).
+            The greedy is exactly optimal here, not approximately.
+          </details>
+        </li>
+        <li>
+          In the fewest-conflicts instance of section 2.2, why does making the
+          left and right groups four intervals each matter? Show that the
+          construction breaks if each group has only two intervals.
+          <details>
+            <summary>solution</summary>
+            The construction needs \(M\) to be the <em>unique</em> minimum, and
+            \(M\) has two conflicts (\(E\) and \(F\)). Every other interval must
+            therefore have at least three. A group of \(k\) mutually conflicting
+            intervals gives each of its members \(k-1\) conflicts from inside the
+            group, so \(k = 4\) buys the three conflicts that \(A\) and \(P\)
+            (which touch nothing outside their groups) need; the others,
+            \(B, C, D, Q, R, S\), also conflict with \(E\) or \(F\) and reach
+            four. Cut both groups to two (keep \(A, B\) on the left and
+            \(Q, P\) on the right) and the counts become \(A{:}1\), \(P{:}1\),
+            everything else \(2\); the rule starts with \(A\) or \(P\), which
+            are both in the optimum, and finishes with \(A, E, F, P\), the
+            optimal four. The trap \(M\) never looks best.
+            More generally the rule only fails when the interval that blocks the
+            optimum has locally few conflicts, which forces the rest of the
+            instance to be densely tangled; that is why the counterexample needs
+            eleven intervals rather than three.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Interval Scheduling v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,690 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: 2-3 Trees.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>2-3 Trees - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom: 2px solid var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      h2.part {
+        font-size: 22.5px; margin: 46px 0 10px; padding: 10px 14px;
+        background: var(--box); border: 1px solid var(--line);
+        border-left: 4px solid var(--accent); border-radius: 8px;
+      }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>2-3 Trees</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        A 2-3 tree is a search tree whose nodes hold one or two keys and whose
+        leaves all lie at the same depth. Insertion absorbs a new key into a
+        leaf and splits a full node by promoting its middle key, so the tree
+        grows at the root and never needs a rotation; deletion mirrors this
+        with borrow and merge. The perfect-balance invariant pins the height
+        between \(\log_3 n\) and \(\log_2 n\), a worst-case
+        \(\Theta(\log n)\) guarantee for search, insert, and delete. With
+        worked insertion traces, figures, correctness proofs, links to the
+        interactive demo, and exercises.
+      </div>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#multiway">From rotations to fatter nodes</a></li>
+          <li><a href="#search">Searching a 2-3 tree</a></li>
+          <li><a href="#insert">Insertion: split and promote</a></li>
+          <li><a href="#delete">Deletion: borrow and merge</a></li>
+          <li><a href="#ex-23">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <p class="lead">
+        The <a href="ds-avl-trees.html">AVL tree</a> won a \(\Theta(\log n)\)
+        guarantee for the binary search tree by keeping it nearly balanced:
+        every node&rsquo;s balance factor pinned to \(\{-1,0,+1\}\), and any
+        violation repaired by a <strong>rotation</strong>. That is one
+        strategy, not the only one. The <strong>2-3 tree</strong> reaches the
+        <em>same</em> guarantee by a completely different mechanism: let a
+        node hold one or two keys, keep every leaf at the same depth, and grow
+        the tree <strong>upward</strong> by splitting. The
+        <a href="ds-red-black-trees.html">red-black BST</a> is how real code
+        implements this idea, and <a href="ds-b-trees.html">B-trees</a> are how
+        databases scale it to disk; all three share one move: split a full
+        node and send its middle key up.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="multiway">1. From rotations to fatter nodes</h2>
+      <p>
+        The AVL tree (the <a href="ds-avl-trees.html"><em>AVL Trees</em></a> handout) keeps a <em>binary</em> tree balanced: one
+        invariant (balance factor \(\in\{-1,0,+1\}\)), restored after each update by
+        rotations, buying a height of at most \(1.44\log_2 n\), a guarantee.
+        It works, but the rotations are fiddly: four cases on insert
+        (<code>LL</code>, <code>RR</code>, <code>LR</code>, <code>RL</code>), and a
+        deletion can cascade rotations all the way up the path. AVL fixes imbalance
+        <em>after</em> it happens. What if a tree could be built so that imbalance
+        never happens at all?
+      </p>
+      <p>
+        The shift is to allow a node to hold <strong>more than one key</strong> and
+        have <strong>more than two children</strong>. Then a new key can be absorbed
+        <em>into</em> an existing node rather than grown onto a lopsided path, and
+        balance becomes a property we get by construction instead of one we repair.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (2-3 tree)</span>
+        A <strong>2-3 tree</strong> is a search tree in which every internal node is
+        one of two kinds. A <strong>2-node</strong> holds one key and has two
+        children (an ordinary BST node). A <strong>3-node</strong> holds two keys
+        \(a \lt c\) and has <em>three</em> children: the subtree of keys \(\lt a\),
+        the subtree of keys strictly between \(a\) and \(c\), and the subtree of keys
+        \(\gt c\). Every leaf is required to lie at the <em>same depth</em>.
+      </div>
+      <pre>   2-node (1 key)            3-node (2 keys, a &lt; c)
+       [ b ]                    [ a | c ]
+       /   \                   /    |    \
+    &lt; b     &gt; b            &lt; a   a..c    &gt; c</pre>
+      <p>
+        A 3-node is the genuinely new thing: two keys guarding three doors. Reading
+        one just extends the BST rule: instead of &ldquo;left or right,&rdquo;
+        it is &ldquo;left, middle, or right&rdquo; depending on how the search key
+        compares to the two stored keys.
+      </p>
+      <div class="thm">
+        <span class="tag">Invariant (perfect balance)</span>
+        A 2-3 tree keeps <em>every</em> leaf at the <em>same</em> depth, at all
+        times: no &ldquo;\(\pm 1\) slack&rdquo; as in AVL. Consequently its
+        height \(h\) satisfies \(\log_3 n \le h \le \log_2 n\), so a 2-3 tree is
+        \(\Theta(\log n)\) tall, guaranteed, for any sequence of insertions.
+      </div>
+      <div class="proof">
+        <strong>Proof (of the height bounds).</strong> A tree of height \(h\) with
+        every leaf at depth \(h\) has between \(2^{h+1}-1\) nodes (all 2-nodes,
+        branching factor 2) and, packing every node with two keys and three
+        children, at most \(3^{h+1}-1\) key-slots. Turning that around on the number
+        of keys \(n\): the sparsest 2-3 tree of \(n\) keys is all 2-nodes, a perfect
+        binary tree of height \(\ge \log_2(n+1)-1\); the densest is all 3-nodes, of
+        height \(\le \log_3(n+1)-1\). Both bounds are \(\Theta(\log n)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This is a <em>stronger</em> balance condition than AVL&rsquo;s, yet,
+        remarkably, it is <em>easier</em> to maintain, because of how
+        insertion works (&sect;3). The one-sentence reason, worth planting now: a
+        2-3 tree <strong>grows at the root, not the leaves</strong>. A BST adds a new
+        <em>leaf</em>, so one side can sink deeper and the tree tilts; a 2-3 tree
+        pushes growth <em>upward</em>, adding a level at the very top, which lowers
+        every leaf by one simultaneously. The &ldquo;same depth&rdquo; invariant is
+        preserved by construction, never patched.
+      </p>
+      <div class="aside">
+        <span class="tag">A family, not one tree</span>
+        Sedgewick &amp; Wayne (&sect;3.3) treat the 2-3 tree chiefly as a stepping
+        stone: it is conceptually clean but awkward to code directly (two node types,
+        much pointer surgery), so its real value is that it <em>explains</em> the
+        <a href="ds-red-black-trees.html">red-black BST</a>, which is the balanced tree real libraries ship.
+        Everything in this family (2-3, red-black, B-trees) is the one
+        mechanism &ldquo;split a full node, promote its middle key,&rdquo; tuned to a
+        different node width and a different level of the memory hierarchy.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="search">2. Searching a 2-3 tree</h2>
+      <p>
+        Search is the easy half, and it is essentially BST search with one more door
+        to choose from at a 3-node. Compare the target against the key(s) in the
+        current node and descend into the one child whose key range contains it;
+        stop when you match a stored key or fall off at a leaf.
+      </p>
+      <figure>
+        <svg viewBox="0 0 460 210" role="img" aria-label="A 2-3 tree of height 2 with all leaves on the bottom level. The root is a 2-node holding 50. Its left child is a 3-node holding 20 and 35, whose three leaf children hold 10; 25 and 30; and 40 and 45. Its right child is a 3-node holding 70 and 85, whose three leaf children hold 60 and 65; 75 and 80; and 90 and 95. The node holding 70 and 85 and the leaf holding 60 and 65 are highlighted green, marking the search path for the key 65: right from the root, then left from the 3-node.">
+          <g stroke="#4a5163" stroke-width="1.5" fill="none">
+            <line x1="215" y1="42" x2="120" y2="92"/>
+            <line x1="240" y1="42" x2="335" y2="92"/>
+            <line x1="95"  y1="112" x2="45"  y2="168"/>
+            <line x1="112" y1="118" x2="112" y2="164"/>
+            <line x1="128" y1="112" x2="180" y2="168"/>
+            <line x1="318" y1="112" x2="268" y2="168"/>
+            <line x1="335" y1="118" x2="335" y2="164"/>
+            <line x1="352" y1="112" x2="404" y2="168"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="600"
+             text-anchor="middle">
+            <!-- root 2-node -->
+            <rect x="205" y="20" width="44" height="26" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+            <text x="227" y="38">50</text>
+            <!-- left 3-node -->
+            <rect x="78" y="90" width="68" height="26" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+            <line x1="112" y1="90" x2="112" y2="116" stroke="#c8ccd6" stroke-width="1"/>
+            <text x="95" y="108">20</text><text x="129" y="108">35</text>
+            <!-- right 3-node (search path highlight) -->
+            <rect x="301" y="90" width="68" height="26" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+            <line x1="335" y1="90" x2="335" y2="116" stroke="#0a7d4d" stroke-width="1"/>
+            <text x="318" y="108" fill="#0a7d4d">70</text><text x="352" y="108" fill="#0a7d4d">85</text>
+            <!-- leaves -->
+            <rect x="24"  y="166" width="42" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/><text x="45"  y="183">10</text>
+            <rect x="86"  y="166" width="52" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/><line x1="112" y1="166" x2="112" y2="190" stroke="#c8ccd6" stroke-width="1"/><text x="99" y="183">25</text><text x="125" y="183">30</text>
+            <rect x="158" y="166" width="52" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/><line x1="184" y1="166" x2="184" y2="190" stroke="#c8ccd6" stroke-width="1"/><text x="171" y="183">40</text><text x="197" y="183">45</text>
+            <rect x="242" y="166" width="52" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><line x1="268" y1="166" x2="268" y2="190" stroke="#0a7d4d" stroke-width="1"/><text x="255" y="183" fill="#0a7d4d">60</text><text x="281" y="183" fill="#0a7d4d">65</text>
+            <rect x="314" y="166" width="52" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/><line x1="340" y1="166" x2="340" y2="190" stroke="#c8ccd6" stroke-width="1"/><text x="327" y="183">75</text><text x="353" y="183">80</text>
+            <rect x="386" y="166" width="52" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/><line x1="412" y1="166" x2="412" y2="190" stroke="#c8ccd6" stroke-width="1"/><text x="399" y="183">90</text><text x="425" y="183">95</text>
+          </g>
+        </svg>
+        <figcaption>
+          A 2-3 tree, all leaves at depth 2. To search for \(65\): \(65 \gt 50\) go
+          right to the 3-node \([70\,|\,85]\); \(65 \lt 70\) go to its left child, the
+          leaf \([60\,|\,65]\); \(65\) matches: found (green path). A miss, say
+          \(68\), takes the same route but \(68\) is neither \(60\) nor \(65\), so it
+          falls off at that leaf, exactly a BST miss, in \(\Theta(\log n)\)
+          work either way.
+        </figcaption>
+      </figure>
+      <p>
+        Search cost is one comparison group per level, so it is \(\Theta(h) =
+        \Theta(\log n)\). The catch versus a plain BST is that a 3-node may cost two
+        key comparisons rather than one; the win is not raw comparisons but that
+        <em>balance is automatic</em> and stays that way under updates, which is the
+        subject of the next two sections.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=two-three">2-3 tree demo</a>. The tree above is
+        the demo&rsquo;s starting shape; search for a present key and a missing one
+        and watch the &ldquo;pick a door&rdquo; descent. The same box does insertion
+        and deletion, used in &sect;3 and &sect;4.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="insert">3. Insertion: split and promote</h2>
+      <p>
+        Search down for the new key as usual; since it is not present, the search
+        ends at a <strong>leaf</strong>. We insert <em>there</em>, but never
+        as a new, deeper leaf (that would break &ldquo;all leaves same depth&rdquo;).
+        Instead we <strong>absorb</strong> the key into the leaf. Two cases follow
+        from whether that leaf has room.
+      </p>
+      <h3>Case 1. Into a 2-node: just grow it</h3>
+      <p>
+        A 2-node has a free slot, so it simply becomes a 3-node. Nothing moves and no
+        height changes: inserting \(15\) into the leaf \([10]\) yields \([10\,|\,15]\).
+        Half of all leaf insertions are this trivial.
+      </p>
+      <h3>Case 2. Into a 3-node: it overflows, so split</h3>
+      <p>
+        A 3-node is already full. Adding a key makes a momentary
+        <strong>4-node</strong> (three keys), which the tree does not allow, so we
+        <strong>split</strong> it: the <em>middle</em> of the three keys moves up
+        into the parent, and the node breaks into two 2-nodes holding the smaller and
+        the larger key. The middle is the only choice that preserves order:
+        everything below it goes left, everything above it goes right, and it becomes
+        their guard in the parent.
+      </p>
+      <figure>
+        <svg viewBox="0 0 500 200" role="img" aria-label="Splitting a 3-node when 40 is inserted into the full leaf holding 30 and 50. On the left, a single wide box labeled 'temp 4-node' holds the three keys 30, 40, 50 in order, with the middle key 40 highlighted red. An arrow points to the right picture: 40 has been promoted into a new 2-node of its own, drawn above and highlighted green, with the 2-node holding 30 as its left child and the 2-node holding 50 as its right child.">
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+            <!-- before: temp 4-node -->
+            <rect x="24" y="82" width="150" height="30" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+            <line x1="74"  y1="82" x2="74"  y2="112" stroke="#c8ccd6" stroke-width="1"/>
+            <line x1="124" y1="82" x2="124" y2="112" stroke="#c8ccd6" stroke-width="1"/>
+            <rect x="74" y="82" width="50" height="30" rx="0" fill="#fbeaea" stroke="none"/>
+            <line x1="74"  y1="82" x2="74"  y2="112" stroke="#c8ccd6" stroke-width="1"/>
+            <line x1="124" y1="82" x2="124" y2="112" stroke="#c8ccd6" stroke-width="1"/>
+            <rect x="24" y="82" width="150" height="30" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+            <text x="49"  y="102">30</text>
+            <text x="99"  y="102" fill="#c0392b" font-weight="700">40</text>
+            <text x="149" y="102">50</text>
+            <text x="99" y="132" font-family="system-ui" font-size="11.5" fill="#5c6270">temp 4-node</text>
+            <!-- arrow -->
+            <text x="228" y="102" font-size="22" fill="#5c6270">&#8594;</text>
+            <!-- after: 40 promoted -->
+            <line x1="382" y1="58" x2="345" y2="128" stroke="#4a5163" stroke-width="1.5"/>
+            <line x1="402" y1="58" x2="440" y2="128" stroke="#4a5163" stroke-width="1.5"/>
+            <rect x="368" y="30" width="48" height="28" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+            <text x="392" y="49" fill="#0a7d4d" font-weight="700">40</text>
+            <rect x="320" y="128" width="46" height="28" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+            <text x="343" y="147">30</text>
+            <rect x="418" y="128" width="46" height="28" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+            <text x="441" y="147">50</text>
+          </g>
+        </svg>
+        <figcaption>
+          Inserting \(40\) into the full leaf \([30\,|\,50]\). The temporary 4-node
+          \([30\,|\,40\,|\,50]\) splits: its middle key \(40\) promotes (green), and
+          \(30\) and \(50\) remain as two 2-nodes. In-order \(30,40,50\) is untouched.
+          Locally the node did not get taller, but the parent just gained a key.
+        </figcaption>
+      </figure>
+      <p>
+        Because the promoted key joins the parent, the parent may <em>itself</em>
+        overflow, split, and promote again: a cascade that can ripple to the
+        root. This is the crux of the whole design:
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (growth is only at the root)</span>
+        A 2-3 tree gains height only when the <strong>root</strong> splits: the
+        promoted middle key becomes a brand-new root with the two halves as its
+        children. Since the new level is added at the <em>top</em>, every leaf drops
+        one level together, so all leaves remain at a common depth. This is the only
+        way a 2-3 tree grows taller, and it needs no rotation.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> A split at a non-root node moves one key up but leaves
+        the number of levels below unchanged and touches no leaf&rsquo;s depth. The
+        only split with nowhere to promote is a split of the root; there we create a
+        new root whose two children are the halves, adding exactly one level above
+        <em>all</em> existing nodes. Every root-to-leaf path lengthens by one, so if
+        the leaves were at a common depth before, they are at a common (one greater)
+        depth after. Any other insertion (Case 1, or a split that stops below the
+        root) leaves all leaf depths unchanged. By induction the invariant holds after
+        every insertion. <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a worked insertion sequence)</span>
+        Insert \(50, 30, 70, 10, 20\) into an empty 2-3 tree:
+        <pre>  50  &rarr;  [50]
+  30  &rarr;  [30|50]
+  70  &rarr;  [30|50|70]  overflow &rArr; promote 50
+             &rArr; root [50] over leaves [30] [70]
+  10  &rarr;  into [30] &rArr; [10|30]
+  20  &rarr;  [10|20|30]  overflow &rArr; promote 20
+             &rArr; root [20|50] over [10] [30] [70]</pre>
+        The two splits show both cases: \(70\) splits a leaf whose promotion creates
+        the very first second level, and \(20\) splits a leaf and promotes into a root
+        that had room, widening it to \([20\,|\,50]\). All three leaves finish at
+        depth 1.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a cascade to a new root)</span>
+        Insert \(25\) into a tree whose root is <em>already</em> full:
+        <pre>  before:        [ 30 | 60 ]
+                /      |      \
+          [10|20]  [40|50]  [70|80]
+
+  25 &rarr; leaf [10|20] overflows: temp [10|20|25], promote 20
+  root [30|60] now overflows: temp [20|30|60], promote 30
+
+  after:            [ 30 ]
+                  /        \
+              [ 20 ]      [ 60 ]
+             /     \      /     \
+          [10]    [25]  [40|50] [70|80]</pre>
+        One insertion, <strong>two splits</strong>: the leaf splits (promoting \(20\)),
+        the root then splits (promoting \(30\) into a new root), and the tree grows
+        from two levels to three, every leaf still landing at depth 2. Note that
+        \([40\,|\,50]\) and \([70\,|\,80]\) never moved: only the path from the changed
+        leaf up to the root was touched, which is why an insertion is
+        \(\Theta(\log n)\) even when the tree &ldquo;grew.&rdquo;
+      </div>
+      <p>
+        In every case the cost is a search down (\(\Theta(\log n)\)) plus at most one
+        split per level on the way back up, each split being \(O(1)\) pointer work.
+        Insertion is \(\Theta(\log n)\), and we never wrote a rotation. This
+        split-and-promote rule is exactly what recurs, wider, in B-trees (the
+        <a href="ds-b-trees.html"><em>B-Trees &amp; B+ Trees</em></a> handout), and,
+        encoded with a colour bit, in red-black trees (the
+        <a href="ds-red-black-trees.html"><em>Red-Black Trees</em></a> handout).
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=two-three">2-3 tree demo</a>. Insert into a full
+        leaf and watch the temporary 4-node (highlighted), the middle key promoting,
+        and the node splitting into two 2-nodes; keep inserting until the root itself
+        splits and the whole tree gains a level while every leaf stays level. Contrast
+        with the AVL demo of the <a href="ds-avl-trees.html"><em>AVL Trees</em></a> handout: the same \(\Theta(\log n)\) outcome, zero
+        rotations.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="delete">4. Deletion: borrow and merge</h2>
+      <p>
+        Deletion is the mirror image of insertion: <strong>merge and demote</strong>
+        in place of split and promote. There is more casework but no new idea, and it
+        rests on the same discipline: act only at a leaf.
+      </p>
+      <p>
+        <strong>Step 1: get down to a leaf.</strong> If the key sits in an internal
+        node, swap it with its in-order predecessor (the rightmost key of its left
+        subtree, always a leaf), and delete that copy instead: the same trick
+        every BST-family delete uses (the Hibbard delete of <a href="ds-trees-bst.html"><em>Trees &amp; Binary Search Trees</em></a> reached for the
+        successor; either side works). Removal therefore always happens at a leaf.
+      </p>
+      <p>
+        <strong>Step 2: fix underflow.</strong> Removing a key from a leaf that held
+        only one key leaves it empty (an <em>underflow</em>). Two repairs, chosen by
+        what the siblings can spare:
+      </p>
+      <ul>
+        <li>
+          <strong>Borrow</strong> if a sibling has two keys to spare: rotate a key
+          through the parent. Deleting \(10\) from \([10]\) under a parent \([30]\)
+          whose other child \([40\,|\,50]\) is a 3-node, the parent&rsquo;s \(30\)
+          drops into the empty node and the sibling&rsquo;s \(40\) rises to replace it: a single, local move, and the tree&rsquo;s shape above is untouched.
+        </li>
+        <li>
+          <strong>Merge</strong> if every sibling is already at the minimum (one key):
+          pull the parent&rsquo;s separating key down and fuse it with a sibling into a
+          single 3-node. The parent <em>loses</em> a key, which may underflow the
+          parent in turn, cascading upward. If the merge empties the root, the
+          root&rsquo;s only child becomes the new root and the tree <strong>shrinks</strong>
+          a level, the exact mirror of a root split.
+        </li>
+      </ul>
+      <div class="ex">
+        <span class="tag">Example (borrow left, borrow right, merge)</span>
+        The three leaf repairs on one small tree, each starting from the shape
+        shown. Which repair fires is decided entirely by what the
+        <em>siblings</em> hold.
+        <pre>  borrow from the LEFT sibling:
+
+     [ 30 | 60 ]           delete 40, so the leaf [40] empties. Its left
+    /     |     \          sibling [10|20] is a 3-node and can spare a key.
+ [10|20] [40]  [70|80]
+
+  The parent&rsquo;s separator 30 drops into the empty leaf and the sibling&rsquo;s
+  LARGEST key 20 rises to replace it as the separator:
+
+     [ 20 | 60 ]           in-order 10, 20, 30, 60, 70, 80: still sorted,
+    /     |     \          all leaves still at depth 1, nothing above moved.
+  [10]  [30]   [70|80]</pre>
+        <pre>  borrow from the RIGHT sibling:
+
+     [ 30 | 60 ]           delete 40 again, but now the left sibling [10] is
+    /     |     \          itself at the minimum; the right sibling is not.
+  [10]   [40]  [70|80]
+
+  The parent&rsquo;s other separator 60 drops into the empty leaf and the right
+  sibling&rsquo;s SMALLEST key 70 rises:
+
+     [ 30 | 70 ]           in-order 10, 30, 60, 70, 80.
+    /     |     \
+  [10]   [60]   [80]</pre>
+        <pre>  MERGE, when no sibling can spare anything:
+
+     [ 30 | 60 ]           delete 40; both siblings hold one key each, so
+    /     |     \          there is nothing to borrow.
+  [10]   [40]   [80]
+
+  Pull the separator 30 down and fuse it with the left sibling into a single
+  3-node. The parent loses a key, but it was a 3-node, so it survives as a
+  2-node and the cascade stops there:
+
+        [ 60 ]             in-order 10, 30, 60, 80; the tree kept its height
+       /      \            because the parent still had a key to give.
+   [10|30]    [80]</pre>
+        Borrow is always preferred when it is available: it is purely local
+        (only the underflowing leaf, one sibling, and one parent key change) and
+        it can never propagate, because the parent keeps the same number of
+        keys. Only a merge takes a key <em>away</em> from the parent, and only a
+        merge can therefore cascade.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a merge that cascades and shrinks the root)</span>
+        The mirror of the root split. Start from a tree of height \(2\) made
+        entirely of 2-nodes, the sparsest 2-3 tree there is, and delete \(10\).
+        <pre>  start:          [ 50 ]                    every leaf at depth 2
+                 /      \
+             [ 30 ]     [ 70 ]
+            /     \     /     \
+         [10]   [40] [60]   [80]
+
+  1. the leaf [10] empties; its only sibling [40] holds one key, so merge:
+     pull the separator 30 down, fuse into [30|40]. The node that held 30
+     is now EMPTY, so the underflow has moved up one level.
+
+  2. that empty internal node&rsquo;s sibling is [70], also at the minimum, so
+     merge again: pull the root&rsquo;s 50 down and fuse, producing [50|70] whose
+     three children are [30|40], [60], and [80].
+
+  3. the root is now empty. Its only child becomes the new root:
+
+               [ 50 | 70 ]                 every leaf at depth 1
+              /     |     \
+        [30|40]   [60]    [80]</pre>
+        One deletion, two merges, and the tree lost a level. Height falls only
+        here, at the root, exactly as it rises only at the root during
+        insertion, and every leaf drops one level together so the common-depth
+        invariant survives. In-order before and after: \(10,30,40,50,60,70,80\)
+        and \(30,40,50,60,70,80\).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (deleting a key that sits in an internal node)</span>
+        Step 1 of the recipe, made concrete. Delete \(30\), a separator in the
+        root, from the tree of the first example.
+        <pre>     [ 30 | 60 ]          the in-order predecessor of 30 is the rightmost
+    /     |     \         key of the subtree just left of it: the 20 in
+ [10|20] [40]  [70|80]    the leaf [10|20].
+
+  Copy 20 up over the 30, then delete the leaf&rsquo;s copy of 20. That leaf was
+  a 3-node, so it drops to [10] without underflowing and no repair is needed:
+
+     [ 20 | 60 ]          in-order 10, 20, 40, 60, 70, 80: 30 is gone and
+    /     |     \         the order is intact.
+  [10]   [40]  [70|80]</pre>
+        Had that leaf been the 2-node \([20]\) instead, removing the copy would
+        have emptied it, and one of the three leaf repairs above would have
+        followed. Every deletion reduces to this: reach a leaf, remove there,
+        then borrow or merge upward.
+      </div>
+      <p>
+        Both moves are \(O(1)\), applied along a single root-to-leaf path, so deletion
+        is \(\Theta(\log n)\) like insertion. The full case analysis (which sibling,
+        which side, cascading merges) is why 2-3 code is fussy to write by hand;
+        precisely the fussiness the red-black encoding of the <a href="ds-red-black-trees.html"><em>Red-Black Trees</em></a> handout tames into a
+        handful of uniform recolour-and-rotate moves.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=two-three">2-3 tree demo</a>: the same box
+        has a <strong>Delete</strong> button. Delete a key from a rich leaf to see a
+        borrow, then delete enough neighbours to force a merge, and keep going until a
+        merge empties the root and the tree loses a level.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex-23">5. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Insert \(60, 20, 80, 10, 40, 50\), in that order, into an initially empty
+          2-3 tree. Draw the final tree and give every leaf&rsquo;s depth.
+          <details>
+            <summary>solution</summary>
+            \(60 \to [60]\); \(20 \to [20\,|\,60]\); \(80 \to [20\,|\,60\,|\,80]\)
+            overflows, promote \(60\) to root \([60]\) over leaves \([20]\) and
+            \([80]\). \(10 \to [10\,|\,20]\). \(40\): descend to leaf \([10\,|\,20]\),
+            overflow \([10\,|\,20\,|\,40]\), promote \(20\) into the root, which
+            becomes \([20\,|\,60]\); its children are \([10], [40], [80]\). \(50\):
+            \(20 \lt 50 \lt 60\) so descend to the middle child \([40]\), a 2-node,
+            giving \([40\,|\,50]\). Final:
+            <pre>        [ 20 | 60 ]
+       /     |     \
+    [10]  [40|50]  [80]</pre>
+            All three leaves are at depth 1.
+          </details>
+        </li>
+        <li>
+          Explain, in your own words, why a 2-3 tree grows only at the root and why
+          that single fact keeps all leaves at the same depth, and contrast it
+          with why a plain BST can become unbalanced.
+          <details>
+            <summary>solution</summary>
+            A split promotes its middle key to the parent, which either has room (the
+            split stops) or overflows and splits in turn. The only split with nowhere to
+            promote is a split of the root, which manufactures a new root one level above
+            everything else. Adding a level at the <em>top</em> lengthens every
+            root-to-leaf path by exactly one, so a common leaf depth stays common. A BST,
+            by contrast, only ever adds a new <em>leaf</em>, deepening one path while
+            leaving the others untouched; repeated one-sided inserts then tilt it toward
+            a chain of height \(n-1\). Grow-up preserves balance; grow-down does not.
+          </details>
+        </li>
+        <li>
+          Take the tree built in exercise 1, root \([20\,|\,60]\) over the leaves
+          \([10]\), \([40\,|\,50]\), \([80]\). Delete \(10\), then delete \(40\)
+          from the result. Name the repair used at each step and draw both trees.
+          <details>
+            <summary>solution</summary>
+            <strong>Delete 10.</strong> The leaf \([10]\) empties. It has no left
+            sibling, and its right sibling \([40\,|\,50]\) is a 3-node, so
+            <em>borrow right</em>: the parent&rsquo;s separator \(20\) drops into
+            the empty leaf and the sibling&rsquo;s smallest key \(40\) rises to
+            replace it.
+            <pre>     [ 40 | 60 ]
+    /     |     \
+  [20]   [50]   [80]</pre>
+            <strong>Delete 40.</strong> Now \(40\) sits in an internal node, so
+            first swap in its in-order predecessor, the rightmost key to its
+            left, which is \(20\); the root becomes \([20\,|\,60]\) and the leaf
+            \([20]\) must give up its copy, emptying it. Its only sibling on that
+            side, \([50]\), holds one key, so no borrow is possible: <em>merge</em>,
+            pulling the separator \(20\) down to fuse into \([20\,|\,50]\). The
+            root loses \(20\) and becomes the 2-node \([60]\).
+            <pre>        [ 60 ]
+       /      \
+   [20|50]    [80]</pre>
+            In-order is \(20,50,60,80\), and both leaves are still at depth 1.
+          </details>
+        </li>
+        <li>
+          In a 2-3 tree of height \(h\), what is the largest number of splits a
+          single insertion can cause, and the largest number of merges a single
+          deletion can cause? Why can a borrow never cascade, while a merge can?
+          <details>
+            <summary>solution</summary>
+            A root-to-leaf path holds \(h+1\) nodes. An insertion can split every
+            one of them, at most \(h+1\) splits, the last being the root split
+            that adds a level. A deletion can merge at every level above the leaf,
+            at most \(h\) merges, the last of which may empty the root and remove
+            a level. A borrow moves one key from a sibling into the underflowing
+            node <em>through</em> the parent and hands the parent a replacement
+            separator in the same motion, so the parent&rsquo;s key count is
+            unchanged and no node above can underflow: the repair stops
+            immediately. A merge instead pulls a separator <em>out</em> of the
+            parent, so the parent loses a key and may itself fall to zero,
+            passing the same problem up one level.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; 2-3 Trees v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+  </body>
+</html>

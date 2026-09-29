@@ -1,0 +1,743 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Red-Black Trees.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Red-Black Trees - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom: 2px solid var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      h2.part {
+        font-size: 22.5px; margin: 46px 0 10px; padding: 10px 14px;
+        background: var(--box); border: 1px solid var(--line);
+        border-left: 4px solid var(--accent); border-radius: 8px;
+      }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Red-Black Trees</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        A red-black BST represents a 2-3 tree as an ordinary binary search
+        tree, using one colour bit per link to mark the glue inside a 3-node.
+        Three constant-time moves (rotate left, rotate right, flip colours)
+        maintain the correspondence, and insertion is BST insertion plus these
+        fix-ups applied bottom-up. Collapsing the red links recovers the 2-3
+        tree, which bounds the height by \(2\log_2 n\): a worst-case
+        \(\Theta(\log n)\) guarantee with a single node type, which is why
+        standard-library ordered maps use it. With figures, the height proof,
+        tabbed code, a link to the interactive demo, and exercises.
+      </div>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#redblack">Red-black BSTs: a 2-3 tree in binary</a></li>
+          <li><a href="#moves">The three restoring moves</a></li>
+          <li><a href="#rb-height">Why the height is \(\Theta(\log n)\)</a></li>
+          <li><a href="#ex-redblack">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <p class="lead">
+        The <a href="ds-avl-trees.html">AVL tree</a> keeps a binary search tree
+        balanced with rotations; the <a href="ds-two-three-trees.html">2-3
+        tree</a> reaches the same \(\Theta(\log n)\) guarantee by splitting
+        full nodes and promoting their middle keys, but it is awkward to code
+        directly. The <strong>red-black BST</strong> closes that gap: an
+        ordinary binary search tree with one colour bit per link that encodes
+        a 2-3 tree exactly, inheriting its balance while keeping a single node
+        type. It is the balanced tree real libraries ship.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="redblack">1. Red-black BSTs: a 2-3 tree in binary</h2>
+      <p>
+        The <a href="ds-two-three-trees.html">2-3 tree</a> is elegant but painful to implement: two node types, split logic,
+        promotion, new roots: many cases and much pointer surgery. In real code
+        we would rather have <em>one</em> node type. The idea, due to Sedgewick, is to
+        represent a 2-3 tree as an ordinary <strong>binary</strong> tree, using a
+        single <strong>colour bit</strong> on each link to remember where the 3-nodes
+        were.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (left-leaning red-black BST)</span>
+        A <strong>left-leaning red-black BST</strong> is a BST whose links are coloured
+        red or black so that: (1) red links <strong>lean left</strong> (no
+        right-leaning red link); (2) no node has two red links in a row; and (3)
+        <strong>black balance</strong> holds: every root-to-null path crosses the
+        same number of black links. By convention a node&rsquo;s stored colour is the
+        colour of the link <em>to its parent</em>, and the root link is black.
+      </div>
+      <p>
+        A red link is the &ldquo;glue&rdquo; inside a 3-node. A 3-node \([a\,|\,c]\)
+        becomes two BST nodes joined by a red link; a 2-node is a plain black-linked
+        node. Read a red link as &ldquo;these two nodes are really one 3-node,&rdquo;
+        and the three invariants become the 2-3 rules in disguise: &ldquo;no two reds
+        in a row&rdquo; is &ldquo;no node has a third key&rdquo; (the 4-node we must
+        split), and &ldquo;equal black-height&rdquo; is &ldquo;all 2-3 leaves at the
+        same depth.&rdquo;
+      </p>
+      <figure>
+        <svg viewBox="0 0 520 220" role="img" aria-label="The 2-3 to red-black correspondence. On the left, labeled 'one 3-node': a single 3-node holding 30 and 50 with three leaf children holding 10, 40, and 70, in left-to-right order. An arrow points to the right picture, the same five keys as a binary tree: 50 is the root, joined to its left child 30 by a thick red link labeled 'red link' (30 is drawn in red); 30 has left child 10 and right child 40; 50 has right child 70; every other link is black. In-order traversal gives 10, 30, 40, 50, 70 in both pictures.">
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="600" text-anchor="middle">
+            <!-- LEFT: 3-node with three children -->
+            <g stroke="#4a5163" stroke-width="1.5" fill="none">
+              <line x1="55"  y1="60" x2="40"  y2="150"/>
+              <line x1="85"  y1="62" x2="85"  y2="150"/>
+              <line x1="115" y1="60" x2="130" y2="150"/>
+            </g>
+            <rect x="46" y="32" width="78" height="28" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+            <line x1="85" y1="32" x2="85" y2="60" stroke="#c8ccd6" stroke-width="1"/>
+            <text x="66" y="51">30</text><text x="104" y="51">50</text>
+            <circle cx="40"  cy="164" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="40"  y="169">10</text>
+            <circle cx="85"  cy="164" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="85"  y="169">40</text>
+            <circle cx="130" cy="164" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="130" y="169">70</text>
+            <text x="85" y="200" font-size="11.5" font-weight="400" fill="#5c6270">one 3-node</text>
+            <!-- arrow -->
+            <text x="240" y="112" font-size="22" font-weight="400" fill="#5c6270">&#8594;</text>
+            <!-- RIGHT: binary encoding -->
+            <line x1="368" y1="52" x2="330" y2="108" stroke="#c0392b" stroke-width="4"/>   <!-- red 50->30 -->
+            <line x1="384" y1="54" x2="430" y2="108" stroke="#4a5163" stroke-width="1.6"/> <!-- black 50->70 -->
+            <line x1="315" y1="128" x2="295" y2="168" stroke="#4a5163" stroke-width="1.6"/><!-- 30->10 -->
+            <line x1="333" y1="128" x2="360" y2="168" stroke="#4a5163" stroke-width="1.6"/><!-- 30->40 -->
+            <circle cx="376" cy="40"  r="17" fill="#fff" stroke="#2a2d36" stroke-width="1.7"/><text x="376" y="45">50</text>
+            <circle cx="322" cy="112" r="17" fill="#fff" stroke="#c0392b" stroke-width="2.2"/><text x="322" y="117" fill="#c0392b">30</text>
+            <circle cx="430" cy="112" r="17" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/><text x="430" y="117">70</text>
+            <circle cx="288" cy="182" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="288" y="187">10</text>
+            <circle cx="366" cy="182" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="366" y="187">40</text>
+            <text x="352" y="80" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="start">red link</text>
+          </g>
+        </svg>
+        <figcaption>
+          The 2-3 &harr; red-black correspondence. The 3-node \([30\,|\,50]\) with
+          children \(10, 40, 70\) becomes the binary tree with \(50\) black at the
+          root, a <span style="color:#c0392b;font-weight:700">red</span> left link to
+          \(30\) (that red link <em>is</em> the 3-node&rsquo;s glue), and children
+          \(10, 40, 70\) hung underneath. In-order is \(10, 30, 40, 50, 70\) in both.
+          Collapsing the red link back into its parent recovers the 3-node exactly.
+        </figcaption>
+      </figure>
+      <!-- ============================================================ -->
+      <h2 id="moves">2. The three restoring moves</h2>
+      <p>
+        Insertion is a normal BST insert with the new link coloured <strong>red</strong>
+        (a new key always tries to join an existing node as a 3-node), followed by a
+        walk back up applying whichever of three constant-time fix-ups restores the
+        invariants:
+      </p>
+      <pre>  right child red, left child black   &rarr;  rotateLeft
+  left red AND its left child red     &rarr;  rotateRight
+  both children red                   &rarr;  flipColors</pre>
+      <p>
+        <code>rotateLeft</code> and <code>rotateRight</code> are the order-preserving
+        pointer surgery of the <a href="ds-avl-trees.html"><em>AVL Trees</em></a> handout, with one extra line to carry the colour;
+        <code>flipColors</code> is the encoding of a 2-3 split. A node with two red
+        children is a temporary 4-node, and flipping all three colours pushes the
+        middle key up (the node turns red, &ldquo;joining its parent&rdquo;) while its
+        two children become independent black 2-nodes: precisely
+        &ldquo;promote the middle and split,&rdquo; expressed in colour. If the parent
+        now has two reds of its own, the flip cascades upward exactly as the 2-3 split
+        did.
+      </p>
+      <div class="code-tabs" data-snippet="trees/redblack-ops">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Left-leaning red-black BST: the three constant-time moves that maintain a
+// 2-3 tree&#x27;s shape. A node&#x27;s `red` flag = the colour of the link to its PARENT;
+// a null link counts as black.
+struct Node { int key; Node *left = nullptr, *right = nullptr; bool red = true; };
+
+bool isRed(Node* h) { return h &amp;&amp; h-&gt;red; }    // null links are black
+
+Node* rotateLeft(Node* h) {        // h&#x27;s right link leans red; lean it left
+    Node* x = h-&gt;right;
+    h-&gt;right = x-&gt;left;
+    x-&gt;left  = h;
+    x-&gt;red = h-&gt;red;               // x inherits h&#x27;s colour
+    h-&gt;red = true;                 // h is now glued under x by a red link
+    return x;                      // x is the new subtree root
+}
+
+Node* rotateRight(Node* h) {       // mirror image of rotateLeft
+    Node* x = h-&gt;left;
+    h-&gt;left  = x-&gt;right;
+    x-&gt;right = h;
+    x-&gt;red = h-&gt;red;
+    h-&gt;red = true;
+    return x;
+}
+
+void flipColors(Node* h) {         // two red children = a temporary 4-node
+    h-&gt;red        = !h-&gt;red;       // push the middle key UP (h &quot;promotes&quot;)
+    h-&gt;left-&gt;red  = !h-&gt;left-&gt;red; // the two children become black 2-nodes
+    h-&gt;right-&gt;red = !h-&gt;right-&gt;red;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Left-leaning red-black BST: the three constant-time moves. A node&#x27;s `red`
+// flag = the colour of the link to its PARENT; a null link counts as black.
+static class Node {
+    int key; Node left, right; boolean red = true;
+    Node(int k) { key = k; }
+}
+
+static boolean isRed(Node h) { return h != null &amp;&amp; h.red; }
+
+static Node rotateLeft(Node h) {      // right link leans red -&gt; lean it left
+    Node x = h.right;
+    h.right = x.left;
+    x.left  = h;
+    x.red = h.red;                     // x inherits h&#x27;s colour
+    h.red = true;                      // h is now glued under x by a red link
+    return x;
+}
+
+static Node rotateRight(Node h) {     // mirror image of rotateLeft
+    Node x = h.left;
+    h.left  = x.right;
+    x.right = h;
+    x.red = h.red;
+    h.red = true;
+    return x;
+}
+
+static void flipColors(Node h) {      // two red children = a temporary 4-node
+    h.red       = !h.red;              // push the middle key UP (h &quot;promotes&quot;)
+    h.left.red  = !h.left.red;         // children become black 2-nodes
+    h.right.red = !h.right.red;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Left-leaning red-black BST: the three constant-time moves. A node&#x27;s `red`
+# flag = the colour of the link to its PARENT; a missing link counts as black.
+class Node:
+    def __init__(self, key):
+        self.key = key
+        self.left = self.right = None
+        self.red = True
+
+def is_red(h):                       # None links are black
+    return h is not None and h.red
+
+def rotate_left(h):                  # right link leans red -&gt; lean it left
+    x = h.right
+    h.right = x.left
+    x.left = h
+    x.red, h.red = h.red, True       # x inherits h&#x27;s colour; h turns red
+    return x                         # x is the new subtree root
+
+def rotate_right(h):                 # mirror image of rotate_left
+    x = h.left
+    h.left = x.right
+    x.right = h
+    x.red, h.red = h.red, True
+    return x
+
+def flip_colors(h):                  # two red children = a temporary 4-node
+    h.red = not h.red                # push the middle key UP (h &quot;promotes&quot;)
+    h.left.red = not h.left.red      # children become black 2-nodes
+    h.right.red = not h.right.red</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Left-leaning red-black BST moves. `red` = colour of the link to the PARENT;
+// a None link counts as black. Children are Option&lt;Box&lt;Node&gt;&gt;, so we take/put
+// the boxes to move subtrees around without aliasing.
+type Link = Option&lt;Box&lt;Node&gt;&gt;;
+struct Node { key: i32, left: Link, right: Link, red: bool }
+
+fn is_red(h: &amp;Link) -&gt; bool { h.as_ref().map_or(false, |n| n.red) }
+
+fn rotate_left(mut h: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {   // right link leans red
+    let mut x = h.right.take().unwrap();
+    h.right = x.left.take();
+    x.red = h.red;                 // x inherits h&#x27;s colour
+    h.red = true;                  // h is now glued under x by a red link
+    x.left = Some(h);
+    x                              // x is the new subtree root
+}
+
+fn rotate_right(mut h: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {  // mirror image
+    let mut x = h.left.take().unwrap();
+    h.left = x.right.take();
+    x.red = h.red;
+    h.red = true;
+    x.right = Some(h);
+    x
+}
+
+fn flip_colors(h: &amp;mut Box&lt;Node&gt;) {               // two red children = 4-node
+    h.red = !h.red;                               // push the middle key up
+    if let Some(l) = h.left.as_mut() { l.red = !l.red; }
+    if let Some(r) = h.right.as_mut() { r.red = !r.red; }
+}</pre>
+<p class="ct-src">source: <code>code/trees/redblack-ops.cpp &middot; code/trees/redblack-ops.java &middot; code/trees/redblack-ops.py &middot; code/trees/redblack-ops.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Only nodes move in a rotation; the in-order sequence is unchanged, exactly as
+        for the rotations of the <a href="ds-avl-trees.html"><em>AVL Trees</em></a> handout. &ldquo;Left-leaning&rdquo; is what keeps the case count at three
+        rather than the classic red-black tree&rsquo;s six (Sedgewick&rsquo;s
+        simplification), and it is why the whole of insertion is BST-insert plus
+        these three \(O(1)\) moves applied bottom-up.
+      </p>
+
+      <h3>Insertion: BST insert, then the three moves</h3>
+      <p>
+        Search ignores colours entirely: a red-black BST <em>is</em> a binary search
+        tree, so <code>get</code> is the unchanged descent of the
+        <a href="ds-trees-bst.html"><em>Trees &amp; Binary Search Trees</em></a>
+        handout, a hit on an equal key and a miss when it falls off a null link.
+        Insertion is that same descent, a new node attached by a
+        <strong>red</strong> link, and then the three moves tested in a fixed order
+        at every node on the way back up.
+      </p>
+      <div class="code-tabs" data-snippet="trees/redblack-insert">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// LLRB insert: an ordinary BST insert whose new link is RED, then the three
+// moves tested in this order at every node on the way back up. The order
+// matters: leaning left first turns the other two tests into simple ones.
+Node* fixUp(Node* h) {
+    if (isRed(h-&gt;right) &amp;&amp; !isRed(h-&gt;left))     h = rotateLeft(h);   // lean left
+    if (isRed(h-&gt;left) &amp;&amp; isRed(h-&gt;left-&gt;left)) h = rotateRight(h);  // two reds
+    if (isRed(h-&gt;left) &amp;&amp; isRed(h-&gt;right))      flipColors(h);       // 4-node
+    return h;
+}
+Node* put(Node* h, int key) {
+    if (!h) return new Node{key};              // new node: its link is red
+    if      (key &lt; h-&gt;key) h-&gt;left  = put(h-&gt;left,  key);
+    else if (key &gt; h-&gt;key) h-&gt;right = put(h-&gt;right, key);
+    return fixUp(h);                           // restore the three invariants
+}
+void insert(Node*&amp; root, int key) {
+    root = put(root, key);
+    root-&gt;red = false;                         // the root link is always black
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// LLRB insert: an ordinary BST insert whose new link is RED, then the three
+// moves tested in this order at every node on the way back up.
+static Node fixUp(Node h) {
+    if (isRed(h.right) &amp;&amp; !isRed(h.left))    h = rotateLeft(h);    // lean left
+    if (isRed(h.left) &amp;&amp; isRed(h.left.left)) h = rotateRight(h);   // two reds
+    if (isRed(h.left) &amp;&amp; isRed(h.right))     flipColors(h);        // 4-node
+    return h;
+}
+static Node put(Node h, int key) {
+    if (h == null) return new Node(key);       // new node: its link is red
+    if      (key &lt; h.key) h.left  = put(h.left,  key);
+    else if (key &gt; h.key) h.right = put(h.right, key);
+    return fixUp(h);                           // restore the three invariants
+}
+static Node insert(Node root, int key) {
+    root = put(root, key);
+    root.red = false;                          // the root link is always black
+    return root;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># LLRB insert: an ordinary BST insert whose new link is RED, then the three
+# moves tested in this order at every node on the way back up.
+def fix_up(h):
+    if is_red(h.right) and not is_red(h.left):
+        h = rotate_left(h)                     # lean the red link left
+    if is_red(h.left) and is_red(h.left.left):
+        h = rotate_right(h)                    # two reds in a row
+    if is_red(h.left) and is_red(h.right):
+        flip_colors(h)                         # split the temporary 4-node
+    return h
+
+def put(h, key):
+    if h is None:
+        return Node(key)                       # new node: its link is red
+    if key &lt; h.key:
+        h.left = put(h.left, key)
+    elif key &gt; h.key:
+        h.right = put(h.right, key)
+    return fix_up(h)                           # restore the three invariants
+
+def insert(root, key):
+    root = put(root, key)
+    root.red = False                           # the root link is always black
+    return root</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// LLRB insert over owned links. take() moves a child out so it can be rotated
+// and put back; the three moves are tested in the same fixed order.
+fn fix_up(mut h: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {
+    if is_red(&amp;h.right) &amp;&amp; !is_red(&amp;h.left) { h = rotate_left(h); }
+    if is_red(&amp;h.left) &amp;&amp; is_red(&amp;h.left.as_ref().unwrap().left) {
+        h = rotate_right(h);
+    }
+    if is_red(&amp;h.left) &amp;&amp; is_red(&amp;h.right) { flip_colors(&amp;mut h); }
+    h
+}
+fn put(h: Link, key: i32) -&gt; Box&lt;Node&gt; {
+    let mut n = match h {
+        None =&gt; return Box::new(                // new node: its link is red
+            Node { key, left: None, right: None, red: true }),
+        Some(n) =&gt; n,
+    };
+    if      key &lt; n.key { n.left  = Some(put(n.left.take(),  key)); }
+    else if key &gt; n.key { n.right = Some(put(n.right.take(), key)); }
+    fix_up(n)
+}
+fn insert(root: Link, key: i32) -&gt; Link {
+    let mut r = put(root, key);
+    r.red = false;                             // the root link is always black
+    Some(r)
+}</pre>
+<p class="ct-src">source: <code>code/trees/redblack-insert.cpp &middot; code/trees/redblack-insert.java &middot; code/trees/redblack-insert.py &middot; code/trees/redblack-insert.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Three tests, in that order, at every node on the path. Everything below is
+        a trace of which of them fire, and when.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (each of the three moves, from one 3-node)</span>
+        Start each time from the same two keys, the 3-node \([30\,|\,50]\), which
+        in this encoding is \(50\) black at the root with a red left link to
+        \(30\). Where the new key falls relative to those two decides the
+        fix-up, and the three possibilities are exactly the three moves. Write
+        \(x\)<span class="mono">B</span> and \(x\)<span class="mono">R</span> for a
+        node reached by a black or a red link.
+        <pre>  start:  50B          new key 70 (LARGER than both)
+         /             70 attaches as 50&rsquo;s red right child, so 50 now has
+      30R              two red children: a temporary 4-node [30|50|70].
+                       Test 1 fails (the left child is red too), test 2 fails
+                       (30 has no left child), test 3 fires:
+
+    flipColors(50)  &rarr;  50 turns red, 30 and 70 turn black; the root link is
+                        then forced black again:      50B(30B, 70B)
+
+  start:  50B          new key 10 (SMALLER than both)
+         /             10 attaches as 30&rsquo;s red left child: two red links in a
+      30R              row, 50-30 and 30-10. At node 30 nothing fires. At 50,
+                       test 1 fails, test 2 fires (left red, its left red):
+
+    rotateRight(50) &rarr;  30 rises with red children 10 and 50, which is again a
+    flipColors(30)      4-node, so test 3 fires:      30B(10B, 50B)
+
+  start:  50B          new key 40 (BETWEEN them)
+         /             40 attaches as 30&rsquo;s red right child. At node 30 test 1
+      30R              fires (red right, black left):
+
+    rotateLeft(30)  &rarr;  now 50 has red left 40 whose left 30 is red, so at 50
+    rotateRight(50)     test 2 fires, and the result has two red children:
+    flipColors(40)                                    40B(30B, 50B)</pre>
+        All three land on the same shape a 2-3 tree would: the middle of the
+        three keys black at the top with the other two as black children, which
+        is the split of a 4-node with its middle key promoted. In-order is
+        \(30,50,70\), \(10,30,50\), and \(30,40,50\) respectively, and every
+        root-to-null path crosses two black links in all three results.
+      </div>
+      <p>
+        The moves are applied at every node of the path, so a fix-up at one level
+        can create work for the level above it: a <code>flipColors</code> turns its
+        node red, and that red link may now lean the wrong way at the parent. That
+        is the red-black spelling of a 2-3 split cascading upward.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr>
+            <th class="lab">insert</th><th>attaches as</th><th>fix-ups, bottom-up</th>
+            <th>tree after</th><th>height</th>
+          </tr>
+          <tr><td class="set">10</td><td class="lab">the root</td><td class="inf">&middot;</td><td class="lab">10B</td><td>0</td></tr>
+          <tr><td class="set">20</td><td class="lab">red right of 10</td><td class="upd">rotateLeft(10)</td><td class="lab">20B(10R, &middot;)</td><td>1</td></tr>
+          <tr><td class="set">30</td><td class="lab">red right of 20</td><td class="upd">flipColors(20)</td><td class="lab">20B(10B, 30B)</td><td>1</td></tr>
+          <tr><td class="set">40</td><td class="lab">red right of 30</td><td class="upd">rotateLeft(30)</td><td class="lab">20B(10B, 40B(30R, &middot;))</td><td>2</td></tr>
+          <tr><td class="set">50</td><td class="lab">red right of 40</td><td class="upd">flipColors(40), then rotateLeft(20)</td><td class="lab">40B(20R(10B, 30B), 50B)</td><td>2</td></tr>
+        </table>
+        <figcaption>
+          Inserting \(10,20,30,40,50\) in ascending order, the input that turns a
+          plain BST into a path. Each row lists every move that fired, innermost
+          first. The last row is the propagating case: the flip at \(40\) turns
+          \(40\) red, so when the recursion returns to \(20\) that node has a
+          red <em>right</em> link and a black left one, and test 1 fires there
+          too. Five ascending keys, height \(2\), and every root-to-null path
+          crosses the same two black links.
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=redblack">Red-black BST demo</a>. Red links are
+        drawn thick and red: each is a glued 3-node. Insert an ascending run
+        \(10, 20, 30, \dots\) to trigger every fix-up: a <code>rotateLeft</code> leans
+        a red link left, a <code>flipColors</code> splits a 4-node and pushes a red up.
+        Every root-to-null path keeps the same number of black links, and the tree
+        never exceeds \(2\log_2 n\) tall no matter the insertion order. (The demo&rsquo;s
+        Delete button works too; deletion is the same three moves applied both on the
+        way down (borrowing a red onto a black-linked child before descending)
+        and on the way back up, which is why it is roughly twice the casework of insert
+        yet uses no new primitive.)
+      </div>
+      <!-- ============================================================ -->
+      <h2 id="rb-height">3. Why the height is \(\Theta(\log n)\)</h2>
+      <div class="thm">
+        <span class="tag">Theorem (red-black height)</span>
+        A red-black BST on \(n\) keys has height at most \(2\log_2 n\), so search,
+        insert, and delete are \(\Theta(\log n)\) for any insertion order.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Let \(b\) be the number of black links on a
+        root-to-null path, the same on every path by black balance (invariant
+        3). Collapse each red link into its parent: two nodes glued by a red link merge
+        into one 2-3 node, recovering the very 2-3 tree this encoding came from. The
+        black links are exactly that 2-3 tree&rsquo;s edges, so \(b\) equals the 2-3
+        tree&rsquo;s height, which by the height bounds in the <a href="ds-two-three-trees.html"><em>2-3 Trees</em></a> handout is at most \(\log_2 n\); hence
+        \(b \le \log_2 n\). Now count all links on a path. Between any two black links
+        invariant 2 permits at most one red (two in a row is the violation
+        <code>flipColors</code> removes), so the total number of links is at most
+        \(2b\). Therefore the height is at most \(2b \le 2\log_2 n\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The bound is looser than AVL&rsquo;s \(1.44\log_2 n\) (a red-black tree
+        can be up to twice as tall) but still \(\Theta(\log n)\), and it is
+        reached with far fewer restructuring operations per update. That trade is why a
+        red-black BST, being just one node type plus one colour bit, is the balanced
+        tree real libraries ship: C++&rsquo;s <code>std::map</code> and
+        <code>std::set</code>, Java&rsquo;s <code>TreeMap</code> and
+        <code>TreeSet</code>, and the Linux kernel&rsquo;s scheduler among them.
+      </p>
+      <div class="aside">
+        <span class="tag">The correspondence is the whole point</span>
+        &ldquo;2-3 trees are balanced&rdquo; (the <a href="ds-two-three-trees.html"><em>2-3 Trees</em></a> handout) and &ldquo;red-black trees are
+        \(\Theta(\log n)\)&rdquo; (here) are the <em>same</em> fact, seen through the
+        collapse-the-red-links map. This is Sedgewick &amp; Wayne&rsquo;s central
+        insight: do not analyse the red-black tree directly: recognise it as a
+        2-3 tree in a costume and inherit everything already proved. Cormen et al.
+        develop the classic (not-left-leaning) red-black tree from five colour axioms
+        instead; the two agree on the \(\Theta(\log n)\) guarantee and differ mainly in
+        how many cases the code must handle.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex-redblack">4. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Convert the 2-3 tree whose root is the 3-node \([40\,|\,80]\) with children
+          \([20], [60], [100]\) into a left-leaning red-black BST. Give each
+          node&rsquo;s colour and its parent link.
+          <details>
+            <summary>solution</summary>
+            The root 3-node \([40\,|\,80]\) becomes \(80\) (black, since it is the root)
+            with a <em>red</em> left link to \(40\). The three subtrees hang under the
+            two keys by range: \(20\) (\(\lt 40\)) is \(40\)&rsquo;s left child, \(60\)
+            (\(40\!-\!80\)) is \(40\)&rsquo;s right child, and \(100\) (\(\gt 80\)) is
+            \(80\)&rsquo;s right child; all three are black. In-order \(20,40,60,80,100\)
+            matches the 2-3 tree, and collapsing the one red link \(40\!-\!80\) recovers
+            the original 3-node.
+          </details>
+        </li>
+        <li>
+          Prove that a left-leaning red-black BST on \(n\) keys has height at most
+          \(2\log_2 n\), using the correspondence with 2-3 trees.
+          <details>
+            <summary>solution</summary>
+            Let \(b\) be the number of black links on any root-to-null path; black
+            balance makes \(b\) the same on every path. Collapsing each red link into its
+            parent merges each red-glued pair into one 2-3 node and turns the black links
+            into the edges of a 2-3 tree, so \(b\) equals that 2-3 tree&rsquo;s height,
+            which is at most \(\log_2 n\) (the all-2-nodes worst case; see the
+            <a href="ds-two-three-trees.html"><em>2-3 Trees</em></a> handout); thus
+            \(b \le \log_2 n\). Between two consecutive black links at most one red link
+            can appear (invariant 2 forbids two reds in a row), so a path has at most
+            \(2b\) links total. Hence height \(\le 2b \le 2\log_2 n\).
+          </details>
+        </li>
+        <li>
+          Insert the keys \(S, E, A, R, C\), in that order, into an empty
+          left-leaning red-black BST. List the moves each insertion fires and
+          draw the final tree with its link colours.
+          <details>
+            <summary>solution</summary>
+            <strong>S</strong>: the root, black. <strong>E</strong>: \(E \lt S\),
+            so a red left link; it leans left, there are no two reds in a row and
+            no two red children, so no move fires. <strong>A</strong>: \(A \lt E\),
+            a red left link under \(E\), giving the two reds in a row \(S\!-\!E\)
+            and \(E\!-\!A\). Nothing fires at \(E\); at \(S\) the second test
+            fires, <code>rotateRight(S)</code>, lifting \(E\) with red children
+            \(A\) and \(S\), which the third test then splits,
+            <code>flipColors(E)</code>. The tree is \(E\) black with black
+            children \(A\) and \(S\). <strong>R</strong>: \(R \lt S\), a red left
+            link under \(S\); it already leans left, so no move.
+            <strong>C</strong>: \(C \gt A\), a red <em>right</em> link under
+            \(A\), so the first test fires, <code>rotateLeft(A)</code>, leaving
+            \(C\) black in \(A\)&rsquo;s place with \(A\) as its red left child.
+            <pre>            E (black root)
+           /            \
+        C (black)      S (black)
+       /              /
+     A (RED)        R (RED)</pre>
+            In-order is \(A,C,E,R,S\); every root-to-null path crosses two black
+            links; and collapsing the two red links recovers the 2-3 tree with
+            root \([E]\) over the 3-nodes \([A\,|\,C]\) and \([R\,|\,S]\).
+          </details>
+        </li>
+        <li>
+          Show that <code>flipColors</code> and the two rotations all preserve
+          black balance, so an insertion can never break invariant 3.
+          <details>
+            <summary>solution</summary>
+            <code>flipColors</code> turns the two child links from red to black
+            and the node&rsquo;s own parent link from black to red. Any
+            root-to-null path through this node uses the parent link and exactly
+            one of the two child links, so it loses one black link at the top and
+            gains one just below: the count is unchanged, and paths that avoid
+            the node are untouched. For a rotation, the two nodes involved
+            exchange colours (\(x\) inherits \(h\)&rsquo;s colour and \(h\)
+            becomes red), and the subtree that changes parent moves across a link
+            of the same colour it had before, so every path through the subtree
+            still crosses the same number of black links. Since the new link of
+            an insertion is red, it adds no black link anywhere either, which is
+            why black balance is the one invariant an insertion never has to
+            repair.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Red-Black Trees v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

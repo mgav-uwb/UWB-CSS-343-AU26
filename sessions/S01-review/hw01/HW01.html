@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!-- CANVAS NOTE: relative links only resolve on the course site; when pasting
+     into Canvas, swap hrefs for the Canvas URLs. -->
+<!-- CSS 343 · Homework 1 instructions. Student-facing: NO solutions. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 1: C++, Recursion, Counting · CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:46px clamp(20px,6vw,60px) 60px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:25px;line-height:1.25;margin:0 0 4px}
+  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 18px;border-bottom:1px solid var(--line);padding-bottom:16px}
+  h2{font-size:19px;margin:30px 0 8px;border-bottom:1px solid #edf0f4;padding-bottom:4px}
+  p{margin:10px 0} a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  .def,.aside{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .aside .tag{color:var(--warn)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:system-ui,sans-serif;font-size:15px}
+  .meta b{color:var(--accent)}
+  ol,ul{margin:8px 0;padding-left:24px} li{margin:7px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-family:system-ui,sans-serif;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#f0f2f6}
+  table.pts td:nth-child(2){text-align:center;font-weight:700;white-space:nowrap}
+  footer{margin-top:38px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px;font-family:system-ui,sans-serif}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Homework 1: C++, Recursion, Counting</h1>
+  <div class="subtitle">CSS 343 · Week 1 · Lecture 1 (Review of C++, Recursion, and Counting)</div>
+  <div class="def"><span class="tag">At a glance</span>
+    <div class="meta">
+      <span><b>Format:</b> individual</span>
+      <span><b>Language:</b> C++17</span>
+      <span><b>Starter:</b> <a href="hw01.cpp"><code>hw01.cpp</code></a></span>
+      <span><b>Submit:</b> your finished <code>hw01.cpp</code></span>
+      <span><b>Due:</b> Sun Oct 4, 11:59 PM</span>
+    </div>
+  </div>
+  <p>This homework practices the three things Lecture 1 reviewed: a class that owns heap
+  memory, recursion on a list and on an array, and counting how often a line of code runs.
+  The starter gives the data structures, the loop version of 3-sum, and a
+  <strong>self-running test battery</strong>. You fill in seven <code>TODO</code>s.
+  Quiz 1 (Monday Oct 5) asks about the same material.</p>
+
+  <h2>Tasks</h2>
+  <table>
+    <tr><th>TODO</th><th>Function</th><th>What it must do</th></tr>
+    <tr><td>1</td><td><code>~IntList()</code></td><td>Free every node the list owns.</td></tr>
+    <tr><td>2</td><td><code>IntList(const IntList&amp;)</code></td><td>Build an independent copy: the same keys in the same order, in nodes of its own.</td></tr>
+    <tr><td>3</td><td><code>operator=</code></td><td>Release the old nodes, then copy. Assigning a list to itself leaves it unchanged.</td></tr>
+    <tr><td>4</td><td><code>length</code></td><td>The number of nodes in a chain. Recursive, no loops.</td></tr>
+    <tr><td>5</td><td><code>contains</code></td><td>Whether a chain holds a key. Recursive, no loops.</td></tr>
+    <tr><td>6</td><td><code>bsearch</code></td><td>Binary search on a sorted array, recursive, adding 1 to <code>probes</code> each time an element is compared with the key.</td></tr>
+    <tr><td>7</td><td><code>countK</code></td><td>The number of ways to choose <em>k</em> elements from <code>a[start..]</code> that sum to a target, adding 1 to <code>checks</code> each time a complete choice is tested.</td></tr>
+  </table>
+  <p>The full contract of each function is in the comment above it in the starter.</p>
+
+  <h2>The tests run themselves</h2>
+  <pre>g++ -std=c++17 -g hw01.cpp -o hw01 &amp;&amp; ./hw01</pre>
+  <ul>
+    <li><strong>T1 to T3</strong> the Rule of Three, checked by counting the nodes that are alive</li>
+    <li><strong>T4, T5</strong> <code>length</code> and <code>contains</code></li>
+    <li><strong>T6</strong> binary search: the right index, and the right number of probes (4 for the 15-key array of the lecture)</li>
+    <li><strong>T7</strong> <em>k</em>-sum: the same answers as the loop version, and the same number of checks (120, 1140 and 9880 at <em>n</em> = 10, 20 and 40)</li>
+  </ul>
+  <p>Each check prints <code>[PASS]</code> or <code>[FAIL]</code>. The unmodified starter
+  compiles and fails most of them. A crash at the end of T2 usually means two lists are
+  sharing one chain of nodes.</p>
+
+  <div class="aside"><span class="tag">Build on the lab</span>
+    Code is graded on the CSS Linux lab with <code>g++ -std=c++17</code>. Build and run
+    there at least once before you submit; the
+    <a href="../../../guides/guide-computing-environment.html"><strong>Computing Environment</strong></a>
+    guide has the login and file-transfer commands. Code that does not compile on the
+    lab receives no points.
+  </div>
+
+  <div class="aside"><span class="tag">Memory: practice this week</span>
+    When all tests pass, run <code>valgrind --leak-check=full ./hw01</code> on the lab and
+    read the report. A clean run ends with <strong>All heap blocks were freed</strong> and
+    <strong>ERROR SUMMARY: 0 errors</strong>. The report is not graded on this homework.
+    It is graded on every programming assignment. See the
+    <a href="../../../guides/guide-valgrind.html"><strong>Valgrind</strong></a> guide.
+  </div>
+
+  <h2>Grading (10 pts)</h2>
+  <table class="pts">
+    <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
+    <tr><td>Compiles (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>does not compile: 0</td></tr>
+    <tr><td>Rule of Three (TODO 1 to 3)</td><td>3</td><td rowspan="4">checked by our own test harness, on inputs different from the battery's</td></tr>
+    <tr><td><code>length</code>, <code>contains</code> (TODO 4, 5)</td><td>1</td></tr>
+    <tr><td><code>bsearch</code> (TODO 6): results and probe counts</td><td>2</td></tr>
+    <tr><td><code>countK</code> (TODO 7): results and check counts</td><td>2</td></tr>
+    <tr><td>Your test battery passes (T1 to T7)</td><td>2</td><td>all: 2 · most: 1</td></tr>
+  </table>
+  <p>Homework is 8% of the course grade, with the lowest two homework scores dropped.</p>
+
+  <h2>Reading</h2>
+  <ul>
+    <li><a href="../../../textbook/foundations/foundation-recursion.html">Recursion &amp; Induction</a> in the course text: the call stack, structural recursion, and solving recurrences by unrolling.</li>
+    <li><a href="../index.html">Lecture 1</a>: the slides, with the code for every function in this homework's style.</li>
+  </ul>
+
+  <h2>Submit</h2>
+  <p>Your finished <code>hw01.cpp</code> on Canvas, as a single file; resubmissions are
+  allowed until the deadline. <strong>Due Sun Oct 4, 11:59 PM.</strong> A late token
+  extends this deadline by 48 hours.</p>
+  <footer>CSS 343 · Autumn 2026 · Homework 1 · prepared by Dr. Marcel Gavriliu.</footer>
+</div>
+</body>
+</html>

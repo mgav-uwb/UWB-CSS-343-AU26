@@ -1,0 +1,1723 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Hashing.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hashing - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22;
+        --dim: #5c6270;
+        --line: #d7dbe3;
+        --bg: #ffffff;
+        --accent: #0a7d4d;
+        --accentbg: #eaf6ef;
+        --box: #f6f8fb;
+        --warn: #9a5b00;
+        --warnbg: #fff5e6;
+        --demo: #6b40d8;
+        --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #eef0f4;
+        color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px;
+        margin: 28px auto;
+        background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002;
+        border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic;
+        margin: 0 0 26px; border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.92em; background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 13px; line-height: 1.5; background: #f6f8fb;
+        border: 1px solid var(--line); border-left: 3px solid #b9c0d0;
+        border-radius: 6px; padding: 12px 14px; margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); }
+      .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; }
+      .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); }
+      .demo a { color: var(--demo); font-weight: 600; }
+      .proof {
+        margin: 10px 0 4px; padding-left: 14px;
+        border-left: 2px solid var(--line); color: #2c2f37;
+      }
+      .proof .qed { float: right; }
+      table {
+        border-collapse: collapse; width: 100%; margin: 14px 0;
+        font-family: system-ui, sans-serif; font-size: 14.5px;
+      }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption {
+        font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim);
+        margin: 7px auto 0; max-width: 92%;
+      }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary {
+        cursor: pointer; color: var(--accent);
+        font-family: system-ui, sans-serif; font-size: 14px;
+      }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; }
+      li { margin: 5px 0; }
+      footer {
+        margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px;
+        color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif;
+      }
+      .toc {
+        font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box);
+        border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0;
+      }
+      .toc ol { margin: 4px 0; padding-left: 22px; }
+      .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      /* static state-stack figure (lib/core/state-stack.js renders into it;
+         styles copied from lib/core/lib.css .u-stack* so the handout stays
+         self-styled; do NOT pull all of lib.css into a document page) */
+      figure.stackfig { margin: 1.5em 0; }
+      figure.stackfig figcaption { font-size: 0.85em; color: var(--dim); margin-top: 8px; }
+      .u-stack { font: 14px system-ui, sans-serif; }
+      .u-stack-tbl { display: flex; }
+      .u-stack-cell { width: 46px; height: 38px; border: 1px solid #b9c0d0; border-left: none; display: flex; align-items: center; justify-content: center; font: 600 14px ui-monospace, Menlo, monospace; background: #fff; position: relative; color: #1a1c22; }
+      .u-stack-cell:first-child { border-left: 1px solid #b9c0d0; border-radius: 6px 0 0 6px; }
+      .u-stack-cell:last-child { border-radius: 0 6px 6px 0; }
+      .u-stack-cell.u-new { background: #7c5cff; border-color: #7c5cff; color: #fff; font-weight: 700; }
+      .u-stack-cell.u-probe { background: #fff5e9; }
+      .u-stack-cell.u-probe::after { content: "✗"; position: absolute; top: 1px; right: 4px; font-size: 10px; color: #e8590c; }
+      .u-stack-cell.u-tomb { background: #eceef2; color: #8a93a6; }
+      .u-stack-idx { display: flex; margin: 2px 0 0; }
+      .u-stack-idx span { width: 46px; text-align: center; font: 500 11px ui-monospace, Menlo, monospace; color: #9aa3b5; }
+      .u-stack-act { font: 500 13px ui-monospace, Menlo, monospace; color: #3a3f4d; background: #f3f0ff; border-left: 3px solid #7c5cff; padding: 5px 10px; border-radius: 0 6px 6px 0; margin: 10px 0 6px; }
+      .u-stack-act.fail { background: #fdeaea; border-left-color: #b3261e; color: #7a1c16; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; }
+        details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Hashing</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        Computing an array index from a key instead of comparing keys: hash
+        functions and what makes them good, why collisions are unavoidable, the
+        two resolution families (separate chaining and open addressing), the
+        probing invariant that explains search and deletion, clustering and
+        better probe sequences, the load factor and resizing, the cost analysis,
+        and when to prefer a hash table over a balanced tree. With worked
+        examples, proofs, links to the interactive demos, and exercises.
+      </div>
+
+      <p class="lead">
+        Every symbol table we have built so far (a sorted array, a
+        balanced binary search tree) finds a key by <em>comparing</em> it
+        against stored keys, and the best of them answer a query in
+        \(\Theta(\log n)\) time. A hash table makes a different bet: instead of
+        comparing, it <em>computes</em> from the key an index into an ordinary
+        array and jumps straight there, aiming for \(\Theta(1)\). The bet has a
+        price: two keys can compute the same index (a
+        <strong>collision</strong>), and the keys end up scattered rather than
+        ordered. Paying that price gracefully is the whole subject of
+        this handout.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#idea">Computing an index instead of comparing keys</a></li>
+          <li><a href="#collisions">Collisions are unavoidable</a></li>
+          <li><a href="#hashfns">Hash functions</a></li>
+          <li><a href="#chaining">Separate chaining</a></li>
+          <li><a href="#probing">Open addressing: linear probing</a></li>
+          <li><a href="#clustering">Clustering and better probe sequences</a></li>
+          <li><a href="#load">Load factor and resizing</a></li>
+          <li><a href="#analysis">Cost, and when to use a hash table</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="idea">1. Computing an index instead of comparing keys</h2>
+      <p>
+        Suppose, impossibly, that every key were already a small integer in the
+        range \(0,1,\dots,M-1\). Then no data structure is needed at all: an
+        array \(a\) of length \(M\) is a perfect symbol table. To store the value
+        \(x\) under key \(k\) you write <code>a[k] = x</code>; to look it up you
+        read <code>a[k]</code>. Both are a single array access, \(\Theta(1)\), and
+        nothing could be faster. This is called <strong>direct addressing</strong>,
+        and it is the ideal that hashing approximates.
+      </p>
+      <p>
+        Real keys are not small integers. They are strings, 64-bit numbers,
+        structs, objects, drawn from a <em>universe</em> \(U\) of possible
+        keys that is astronomically larger than any array we can afford. There
+        are \(2^{64}\) possible 64-bit integers and vastly more possible strings;
+        we cannot allocate one array slot per possible key. A hash table shrinks
+        this universe down to an affordable array of size \(M\) by way of a
+        function.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (hash function, hash table)</span>
+        A <strong>hash function</strong> is a function \(h : U \to \{0,1,\dots,M-1\}\)
+        that maps every possible key to an index in a fixed range. A
+        <strong>hash table</strong> is an array \(T\) of \(M\) slots together
+        with a hash function \(h\). To operate on key \(k\), compute the
+        <strong>home slot</strong> \(h(k)\) and go there; \(\alpha = n/M\), the
+        number of stored keys divided by the number of slots, is the
+        <strong>load factor</strong>.
+      </div>
+      <p>
+        Insertion, search, and deletion all begin the same way: apply \(h\) to
+        the key, obtaining an index, and act at that index. If no two stored keys
+        ever share a home slot, every operation is one array access. Here is the
+        whole idea on a tiny table with \(M = 10\) and \(h(k) = k \bmod 10\):
+      </p>
+      <pre>  insert 25  &rarr; slot 5      T:
+  insert 33  &rarr; slot 3      [ _ _ _ 33 _ 25 _ 47 _ _ ]
+  insert 47  &rarr; slot 7        0 1 2 3  4 5  6 7  8 9
+
+  search 47  &rarr; h(47)=7, read slot 7; done, one access.</pre>
+      <p>
+        An array plus a function. That is the entire structure. Two costs come
+        with the design, and both run through the rest of the handout. The first
+        is that different keys can hash to the same slot: we saw only
+        non-colliding keys above, but \(h(25) = h(35) = 5\), and the next section
+        proves such clashes cannot be avoided. The second is subtler and
+        permanent: a good hash function <em>scatters</em> keys across the array
+        with no relation to their order, so a hash table cannot answer
+        &ldquo;what is the smallest key?&rdquo; or &ldquo;list the keys between
+        \(a\) and \(b\)&rdquo; without scanning everything. Speed is bought by
+        giving up order. We return to that trade in
+        <a href="#analysis">&sect;8</a>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="collisions">2. Collisions are unavoidable</h2>
+      <p>
+        A <strong>collision</strong> is a pair of distinct keys \(k_1 \ne k_2\)
+        with \(h(k_1) = h(k_2)\). Collisions are not a sign of a bad hash
+        function or a full table; they are forced by counting, and they arrive
+        far sooner than intuition suggests. Two arguments make this precise.
+      </p>
+
+      <h3>Pigeonhole: some collision exists in principle</h3>
+      <div class="thm">
+        <span class="tag">Proposition (pigeonhole)</span>
+        If the key universe \(U\) has more than \(M\) elements, then every hash
+        function \(h : U \to \{0,\dots,M-1\}\) maps some two distinct keys to the
+        same slot.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The function \(h\) assigns each of the
+        \(|U| &gt; M\) keys one of \(M\) slots. If no two keys shared a slot,
+        \(h\) would be injective, and an injective function from a set of size
+        \(|U|\) into a set of size \(M\) requires \(|U| \le M\). Since
+        \(|U| &gt; M\), \(h\) is not injective: two distinct keys share a slot.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This holds before a single key is inserted and no matter how clever \(h\)
+        is: the universe of possible keys dwarfs \(M\), so <em>some</em> pair
+        must collide. Pigeonhole tells us collisions exist. It does not tell us
+        they matter in practice; perhaps the specific keys we store avoid
+        every colliding pair. The birthday calculation removes that hope.
+      </p>
+
+      <h3>The birthday phenomenon: collisions arrive at \(\sqrt{M}\)</h3>
+      <p>
+        Model a good hash function by the <em>uniform hashing</em> idealization:
+        each key is equally likely to land in any of the \(M\) slots,
+        independently of the others (we examine this assumption in
+        <a href="#hashfns">&sect;3</a>). Insert \(n\) keys one at a time and ask:
+        what is the probability that no collision has occurred? The \(i\)-th key,
+        \(i = 0,1,\dots,n-1\), must miss the \(i\) slots already occupied, which
+        happens with probability \((M-i)/M = 1 - i/M\). Since the keys are
+        independent,
+      </p>
+      \[
+        P(\text{no collision after } n) =
+        \prod_{i=0}^{n-1}\Bigl(1 - \frac{i}{M}\Bigr).
+      \]
+      <p>
+        To read off when this drops to one half, take the approximation
+        \(1 - x \approx e^{-x}\), valid for small \(x\) (its error is
+        \(O(x^2)\)):
+      </p>
+      \[
+        \prod_{i=0}^{n-1}\Bigl(1 - \frac{i}{M}\Bigr)
+        \;\approx\; \prod_{i=0}^{n-1} e^{-i/M}
+        \;=\; \exp\!\Bigl(-\frac{1}{M}\sum_{i=0}^{n-1} i\Bigr)
+        \;=\; \exp\!\Bigl(-\frac{n(n-1)}{2M}\Bigr),
+      \]
+      <p>
+        using \(\sum_{i=0}^{n-1} i = n(n-1)/2\). Setting the exponent equal to
+        \(-\ln 2\) locates the half-way point:
+        \(\;n(n-1)/(2M) = \ln 2\), so \(n(n-1) = 2\ln 2 \cdot M \approx 1.386\,M\),
+        and for large \(M\),
+      </p>
+      \[
+        n \;\approx\; \sqrt{2\ln 2}\,\sqrt{M} \;\approx\; 1.18\,\sqrt{M}.
+      \]
+      <div class="ex">
+        <span class="tag">Example</span>
+        With \(M = 365\) slots, a collision becomes more likely than not once
+        \(n \approx 1.18\sqrt{365} \approx 22.5\), that is, at \(23\) keys. This
+        is the classic &ldquo;birthday paradox&rdquo;: in a room of 23 people two
+        very likely share a birthday. The reason it feels paradoxical is that the
+        collision probability is driven by the number of <em>pairs</em> of keys,
+        \(\binom{n}{2} \approx n^2/2\), not the number of keys \(n\), which
+        is why the threshold is \(\sqrt{M}\), not \(M\).
+      </div>
+      <p>
+        The lesson for hashing is blunt. Even a lightly loaded table (one
+        holding only about \(\sqrt{M}\) keys, a load factor near zero)
+        already collides. Collisions are not a corner case to be engineered away;
+        they are the main path. The rest of the handout is about handling them
+        cheaply. There are two families of strategy: give each slot a secondary
+        structure that absorbs its colliders (<em>separate chaining</em>,
+        <a href="#chaining">&sect;4</a>), or keep every key in the array and send
+        colliders to other slots (<em>open addressing</em>,
+        <a href="#probing">&sect;5</a>). Both are only as good as the hash
+        function feeding them, so we treat hash functions first.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="hashfns">3. Hash functions</h2>
+      <p>A hash function suitable for a table has four requirements.</p>
+      <ol>
+        <li><strong>Deterministic.</strong> The same key must always produce the
+          same index; otherwise a key stored in one place is sought in
+          another. (A table may pick a random <em>seed</em> once at creation and
+          then hash deterministically with it; see <a href="#analysis">&sect;8</a>.)</li>
+        <li><strong>Uniform.</strong> It should spread keys evenly across
+          \(\{0,\dots,M-1\}\), so that no slot attracts a disproportionate share.
+          This is the property that governs performance.</li>
+        <li><strong>Fast.</strong> Computing \(h(k)\) should be \(O(1)\) (or
+          \(O(\text{length})\) for a variable-length key like a string), since it
+          runs on every operation.</li>
+        <li><strong>Uses the whole key.</strong> Every part of the key should
+          influence the result, so that structured keys do not clump.</li>
+      </ol>
+      <p>
+        Determinism and speed are easy. Uniformity is the hard, load-bearing
+        one, and &ldquo;uses the whole key&rdquo; is how we get it in practice.
+      </p>
+
+      <h3>Modular hashing, and why \(M\) should be prime</h3>
+      <p>
+        For integer keys the workhorse hash is \(h(k) = k \bmod M\). It is
+        deterministic and \(O(1)\); whether it is uniform depends critically on
+        \(M\).
+      </p>
+      <div class="ex">
+        <span class="tag">Example</span>
+        With \(M = 97\) (a prime), \(h(12345) = 12345 \bmod 97 = 26\), since
+        \(97 \times 127 = 12319\) and \(12345 - 12319 = 26\).
+      </div>
+      <div class="aside">
+        <span class="tag">Choose \(M\) prime</span>
+        If \(M = 2^p\), then \(k \bmod M\) is literally the low \(p\) bits of
+        \(k\): the high bits are discarded, so any structure they carry is
+        thrown away. Real keys have structure: memory addresses are multiples of
+        4 or 8, record IDs step by a fixed stride. Suppose every key is a
+        multiple of \(4\) and \(M = 8\); then \(k \bmod 8 \in \{0,4\}\) always,
+        and half the table is dead while two slots take every key. A prime \(M\)
+        shares no factor with such strides, so \(k \bmod M\) mixes contributions
+        from all the bits of \(k\) and the keys spread out. (Powers of ten fail
+        the same way on the low decimal digits.) The one exception is when the
+        hash <em>before</em> the mod is already a well-scrambled value; then any
+        \(M\) is fine, and libraries often use \(M = 2^p\) with a scrambling
+        step, because a mask is faster than a division.
+      </div>
+
+      <h3>Hashing strings with Horner&rsquo;s method</h3>
+      <p>
+        A string is a sequence of characters \(s_0 s_1 \cdots s_{L-1}\). Treat it
+        as the digits of a number in some base \(R\) (a small prime such as
+        \(31\)) and reduce modulo \(M\):
+      </p>
+      \[
+        h(s) = \bigl(s_0 R^{L-1} + s_1 R^{L-2} + \cdots + s_{L-1}\bigr) \bmod M.
+      \]
+      <p>
+        Evaluated directly this overflows and is slow, but <strong>Horner&rsquo;s
+        method</strong> computes it in one left-to-right pass, reducing modulo
+        \(M\) at every step so the running value never overflows:
+      </p>
+      <div class="code-tabs" data-snippet="hashing/horner">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Horner&#x27;s method: fold a string into one index, base R = 31.
+int hash(const string&amp; s, int M) {
+    long h = 0;
+    for (char c : s)
+        h = (R * h + c) % M;     // reduce each step; no overflow
+    return (int)h;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Horner&#x27;s method: fold a string into one index, base R = 31.
+static int hash(String s, int M) {
+    long h = 0;
+    for (char c : s.toCharArray())
+        h = (R * h + c) % M;     // reduce each step; no overflow
+    return (int) h;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Horner&#x27;s method: fold a string into one index, base R = 31.
+def hash_str(s, M):
+    h = 0
+    for c in s:
+        h = (R * h + ord(c)) % M   # reduce each step
+    return h</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Horner&#x27;s method: fold a string into one index, base R = 31.
+fn hash(s: &amp;str, m: i64) -&gt; i64 {
+    let mut h: i64 = 0;
+    for c in s.chars() {
+        h = (R * h + c as i64) % m;   // reduce each step
+    }
+    h
+}</pre>
+<p class="ct-src">source: <code>code/hashing/horner.cpp &middot; code/hashing/horner.java &middot; code/hashing/horner.py &middot; code/hashing/horner.rs</code></p>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (hashing &ldquo;CAT&rdquo;)</span>
+        Take \(R = 31\), \(M = 100\), and ASCII codes
+        \(\texttt{C}=67,\ \texttt{A}=65,\ \texttt{T}=84\). The running value:
+        <pre>  h = 0
+  'C':  h = (31&middot;0   + 67) mod 100 = 67
+  'A':  h = (31&middot;67  + 65) mod 100 = (2077 + 65) mod 100 = 42
+  'T':  h = (31&middot;42  + 84) mod 100 = (1302 + 84) mod 100 = 86
+  &rarr; slot 86</pre>
+        Every character reaches the final value: change one letter and the
+        result moves. That sensitivity is exactly the uniformity we want. The
+        pass is \(O(L)\), one multiply-add-mod per character; this is in
+        essence Java&rsquo;s <code>String.hashCode</code>.
+      </div>
+      <div class="aside">
+        <span class="tag">Why the &ldquo;digits&rdquo; may exceed the base</span>
+        Something should look wrong: in ordinary base-\(R\) notation a digit must
+        satisfy \(0 \le d &lt; R\), and a value of \(R\) or more is illegal:
+        you <em>carry</em> it into the next position. Yet our &ldquo;digits&rdquo;
+        are character codes (ASCII \(0\)&ndash;\(127\), or Unicode code
+        points up to \(1{,}114{,}111\)), almost all far larger than
+        \(R = 31\), and we never carry. That is fine, because the digit-size rule
+        exists to make a numeral <strong>unique</strong> (a bijection between
+        numbers and digit strings), and a hash does not want uniqueness. This
+        whole handout is built on inputs colliding, and \(\bmod M\) forces
+        collisions regardless, so we drop the constraint and keep only what
+        a hash actually needs: each position carries a distinct, well-mixed weight
+        \(R^{\,i}\), so every character influences the result and altering or
+        reordering characters moves it. Any \(R &gt; 1\) achieves that; an
+        <em>odd</em> \(R\) such as \(31\) also stays coprime to a power-of-two
+        modulus, which mixes the low bits. Whether \(R\) happens to be smaller
+        than some character code is irrelevant: the only requirement, for a
+        code value of <em>any</em> size, is that the step
+        \(h = (R\,h + c)\bmod M\) be well-defined arithmetic, and it is.
+        <br><span class="note">(One consequence of dropping the rule: the wide
+        value is not injective even before \(\bmod M\): a large code in a
+        low position can equal a smaller code plus a multiple of \(R\) one
+        position up. That is a harmless pre-collision, not a defect; \(R^{\,i}\)
+        still scatters the positions across the integer&rsquo;s range, and we were
+        going to tolerate collisions anyway.)</span>
+      </div>
+
+      <h3>Two stages: hashCode, then compress</h3>
+      <p>
+        Real libraries split the work in two. The <em>type</em> of the key knows
+        how to turn a value into a wide integer (Java&rsquo;s
+        <code>hashCode()</code>, C++&rsquo;s <code>std::hash&lt;T&gt;</code>),
+        and the <em>table</em> knows its size \(M\) and compresses that
+        integer into a slot with \(\bmod\, M\):
+      </p>
+      <pre>index = (obj.hashCode() &amp; 0x7fffffff) % M;   <span class="cm">// mask the sign bit</span></pre>
+      <p>
+        The mask <code>&amp; 0x7fffffff</code> clears the sign bit so that a
+        negative <code>hashCode</code> does not produce a negative index. When
+        you hash your own struct, combine the fields the same way a string
+        combines its characters (multiply the running hash by a small
+        constant and add the next field), so that, for a point,
+        \((1,2)\) and \((2,1)\) differ:
+      </p>
+      <div class="code-tabs" data-snippet="hashing/custom-hash">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// A custom hash for your own key type combines the fields
+// so that (1,2) and (2,1) differ. Equal keys must hash equally.
+struct PointHash {
+    size_t operator()(const Point&amp; p) const {
+        return hash&lt;int&gt;()(p.x) * 31 + hash&lt;int&gt;()(p.y);
+    }
+};
+unordered_map&lt;Point, int, PointHash&gt; m;</pre>
+<pre class="ct-pane" data-lang="java" hidden>// A record derives equals/hashCode from its fields; override
+// hashCode to combine them. Equal keys must hash equally.
+record Point(int x, int y) {
+    @Override public int hashCode() {
+        return Integer.hashCode(x) * 31 + Integer.hashCode(y);
+    }
+}
+Map&lt;Point, Integer&gt; m = new HashMap&lt;&gt;();</pre>
+<pre class="ct-pane" data-lang="py" hidden># Define __hash__ and __eq__ together; hashing a tuple of the
+# fields is the idiomatic combine. Equal keys must hash equally.
+class Point:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+    def __hash__(self):
+        return hash((self.x, self.y))
+    def __eq__(self, other):
+        return (self.x, self.y) == (other.x, other.y)
+
+m = {}          # a dict keyed by Point</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// derive(Hash) combines the fields automatically; Eq is required
+// alongside it. Equal keys hash equally by construction.
+use std::collections::HashMap;
+
+#[derive(PartialEq, Eq, Hash)]
+struct Point { x: i32, y: i32 }
+
+let mut m: HashMap&lt;Point, i32&gt; = HashMap::new();</pre>
+<p class="ct-src">source: <code>code/hashing/custom-hash.cpp &middot; code/hashing/custom-hash.java &middot; code/hashing/custom-hash.py &middot; code/hashing/custom-hash.rs</code></p>
+<!--/ct--></div>
+      <div class="aside">
+        <span class="tag">The hashCode contract</span>
+        Equal keys <strong>must</strong> have equal hashes: if
+        <code>a == b</code>, then <code>h(a) == h(b)</code>. Violating this is a
+        silent bug: two equal keys hash to different slots, and a lookup
+        for one never finds the other. The converse is <em>not</em> required and
+        cannot be guaranteed: unequal keys with equal hashes are simply a
+        collision, which the table already handles. So a correct (if useless)
+        hash could return \(0\) for everything; it is slow, not wrong.
+      </div>
+
+      <h3>A bad hash, and the assumption behind all the analysis</h3>
+      <p>
+        The classic mistake is a hash that ignores part of the key, such as
+        hashing a name by its first letter only:
+        \(h(\texttt{"Alice"}) = h(\texttt{"Aaron"}) = h(\texttt{"Amy"}) = 0\).
+        It is deterministic and fast, but not uniform: every name beginning with
+        &lsquo;A&rsquo; lands in one slot. Real data has structure, and a hash
+        that discards part of the key inherits that structure as clumping, and
+        clumping turns \(\Theta(1)\) into \(\Theta(n)\).
+      </p>
+      <div class="def">
+        <span class="tag">Definition (uniform hashing assumption)</span>
+        Every &ldquo;expected \(\Theta(1)\)&rdquo; statement in this handout
+        assumes <strong>uniform hashing</strong>: each key is equally likely to
+        hash to any of the \(M\) slots, independently of the other keys. A good
+        hash function makes this approximately true; a bad one clumps keys and
+        the analysis fails.
+      </div>
+      <p>
+        This is the hashing analogue of the &ldquo;random binary search
+        tree&rdquo; assumption from the <a href="../trees/ds-trees-bst.html"><em>Trees &amp;
+        Binary Search Trees</em></a> handout: an idealization about the
+        <em>distribution</em> of keys that lets us reason about the average case.
+        It is worth stating plainly because it is the hidden premise under every
+        \(\alpha\)-based formula that follows: the analysis is only ever
+        as good as the hash function.
+      </p>
+
+      <h3>Real-world hash functions: FNV-1a and multiplicative hashing</h3>
+      <p>
+        Horner&rsquo;s polynomial hash above is honest and teachable, but the
+        code that ships in language runtimes and databases reaches for functions
+        engineered to mix bits faster and more thoroughly. Two workhorses are
+        worth knowing by name, because between them they cover the two shapes of
+        key you actually hash: byte strings and integers.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (FNV-1a)</span>
+        <strong>FNV-1a</strong> (Fowler&ndash;Noll&ndash;Vo) folds a byte stream
+        into a fixed-width integer. Starting from a fixed <em>offset basis</em>,
+        for each byte it <em>first</em> XORs the byte into the accumulator and
+        <em>then</em> multiplies by a fixed <em>FNV prime</em>, letting overflow
+        wrap:
+        \[ h \leftarrow (h \oplus b)\cdot p \pmod{2^{64}}. \]
+        The 64-bit constants are the offset basis
+        \(\texttt{0xcbf29ce484222325}\) and the prime
+        \(p = 2^{40} + 2^8 + 0\texttt{xb3} = \texttt{0x100000001b3}\). The
+        &ldquo;1a&rdquo; ordering (XOR before multiply) mixes each
+        byte before the next arrives and distributes better than the original
+        FNV-1, at no extra cost.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (Knuth multiplicative / Fibonacci hashing)</span>
+        For an integer key \(k\) and a table of size \(2^p\),
+        <strong>multiplicative hashing</strong> multiplies by a constant
+        \(A\) close to \(2^{w}/\varphi\) (with \(w\) the word width and
+        \(\varphi = \tfrac{1+\sqrt5}{2}\) the golden ratio), then keeps the top
+        \(p\) bits of the low \(w\)-bit product:
+        \[ h(k) = \left\lfloor \tfrac{(k \cdot A) \bmod 2^{w}}{2^{\,w-p}} \right\rfloor. \]
+        For \(w = 32\) the constant is \(A = \texttt{0x9E3779B9} = 2654435769\).
+        Choosing \(A\) from the golden ratio makes consecutive keys land
+        maximally far apart (the same equidistribution that governs a sunflower&rsquo;s
+        seeds), so it resists the clustering that a power-of-two modulus alone
+        would cause.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (worked hashes)</span>
+        FNV-1a of <code>"Hi"</code>, one byte at a time:
+        <pre>  start:          14695981039346656037
+  byte 'H' (72):  (h XOR 72) * prime = 12638232280532398647
+  byte 'i' (105): (h XOR 105) * prime =   659600357151446458</pre>
+        And Fibonacci hashing the eight consecutive keys \(1,2,\dots,8\) into a
+        \(16\)-slot table gives slots \(9, 3, 13, 7, 1, 11, 5, 15\): eight
+        distinct slots, spread across the table with no run of neighbors, exactly
+        the anti-clustering the constant is chosen for.
+      </div>
+      <div class="code-tabs" data-snippet="hashing/real-world">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// FNV-1a folds a byte stream into a 64-bit hash: XOR each byte in,
+// THEN multiply by the FNV prime. Doing the XOR first (the &quot;1a&quot;
+// order) mixes every byte before the next one arrives.
+uint64_t fnv1a(const string&amp; key) {
+    uint64_t h = 0xcbf29ce484222325ULL;      // 64-bit offset basis
+    for (unsigned char b : key)
+        h = (h ^ b) * 0x100000001b3ULL;      // XOR, then * FNV prime
+    return h;                                // unsigned overflow is defined
+}
+
+// Knuth multiplicative (&quot;Fibonacci&quot;) hashing: map an integer key into
+// a table of size 2^p using the HIGH bits of k * (2^32 / golden ratio).
+uint32_t fib_hash(uint32_t k, int p) {
+    return (k * 0x9E3779B9u) &gt;&gt; (32 - p);    // 0x9E3779B9 = round(2^32/phi)
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// FNV-1a over the UTF-8 bytes. Java has no unsigned long, but the
+// wrap-around arithmetic is identical in two&#x27;s complement, so the
+// bit pattern matches the C++ and Rust versions exactly.
+static long fnv1a(String key) {
+    long h = 0xcbf29ce484222325L;                    // offset basis (as bits)
+    for (byte b : key.getBytes(StandardCharsets.UTF_8))
+        h = (h ^ (b &amp; 0xff)) * 0x100000001b3L;       // &amp; 0xff: byte as unsigned
+    return h;
+}
+
+// Fibonacci hashing into a table of size 2^p. &gt;&gt;&gt; is the UNSIGNED
+// shift, so the top p bits fall cleanly into [0, 2^p).
+static int fibHash(int k, int p) {
+    return (k * 0x9E3779B9) &gt;&gt;&gt; (32 - p);            // round(2^32 / phi)
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># FNV-1a over the raw bytes. Python ints are unbounded, so we AND
+# with a 64-bit mask each step to emulate the hardware overflow the
+# other languages get for free.
+MASK64 = 0xFFFFFFFFFFFFFFFF
+def fnv1a(key: str) -&gt; int:
+    h = 0xcbf29ce484222325                       # 64-bit offset basis
+    for b in key.encode(&quot;utf-8&quot;):
+        h = ((h ^ b) * 0x100000001b3) &amp; MASK64   # XOR, then * FNV prime
+    return h
+
+# Knuth multiplicative (&quot;Fibonacci&quot;) hashing into a table of size 2**p,
+# taking the high bits of k * (2**32 / golden ratio).
+def fib_hash(k: int, p: int) -&gt; int:
+    return ((k * 0x9E3779B9) &amp; 0xFFFFFFFF) &gt;&gt; (32 - p)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// FNV-1a with wrapping arithmetic: wrapping_mul makes the 64-bit
+// overflow explicit and panic-free (a plain * would panic in debug
+// builds). XOR each byte in, then multiply by the FNV prime.
+fn fnv1a(key: &amp;str) -&gt; u64 {
+    let mut h: u64 = 0xcbf2_9ce4_8422_2325;          // offset basis
+    for b in key.bytes() {
+        h = (h ^ b as u64).wrapping_mul(0x100_0000_01b3);
+    }
+    h
+}
+
+// Fibonacci hashing into a table of size 2^p, using the high bits of
+// k * (2^32 / golden ratio).
+fn fib_hash(k: u32, p: u32) -&gt; u32 {
+    k.wrapping_mul(0x9E37_79B9) &gt;&gt; (32 - p)          // round(2^32 / phi)
+}</pre>
+<p class="ct-src">source: <code>code/hashing/real-world.cpp &middot; code/hashing/real-world.java &middot; code/hashing/real-world.py &middot; code/hashing/real-world.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Both are fast, but neither is a strong <em>mixer</em>: change
+        <code>"cat"</code> to <code>"cau"</code> (a one-bit change in one byte)
+        and FNV-1a flips only \(6\) of its \(64\) output bits, short of the
+        &ldquo;flip about half&rdquo; <em>avalanche</em> a cryptographic-strength
+        hash guarantees. Dedicated non-cryptographic hashes such as MurmurHash
+        and xxHash add a few <em>finalizer</em> steps (extra shifts, XORs, and
+        multiplies) to reach full avalanche while staying far faster than SHA-256.
+      </p>
+      <div class="note">
+        For a hash <em>table</em>, mediocre avalanche is usually fine: you
+        need approximate uniformity, not unpredictability. The exception is
+        adversarial input: a caller who can choose keys that all collide turns
+        your \(\Theta(1)\) table into a \(\Theta(n)\) list on purpose (a
+        <em>hash-flooding</em> denial of service). Language runtimes defend with
+        a <em>seeded</em> hash (commonly SipHash) whose per-process
+        random seed the attacker cannot see. More on choosing a hash for the job
+        in <a href="#analysis">&sect;8</a>.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="chaining">4. Separate chaining</h2>
+      <p>
+        The first and most robust way to resolve collisions is
+        <strong>separate chaining</strong>: make each array slot the head of a
+        linked list (a <em>chain</em>) holding every key that
+        hashes there. Colliders simply join the same chain; no key is ever turned
+        away, and the array cannot &ldquo;fill up.&rdquo;
+      </p>
+      <pre>  M = 5,  h(k) = k mod 5,  keys 12, 17, 22, 5:
+
+  [0] &rarr; 5                5 mod 5 = 0
+  [1]
+  [2] &rarr; 12 &rarr; 17 &rarr; 22   all &equiv; 2 (mod 5)
+  [3]
+  [4]</pre>
+      <p>
+        The three keys \(12, 17, 22\) are all congruent to \(2 \pmod 5\), so they
+        share bucket \(2\)&rsquo;s chain; \(5\) sits alone in bucket \(0\); the
+        rest stay empty, which is fine. Each operation is one hash followed by a
+        linked-list operation on <em>one</em> short chain, never touching the
+        other \(M-1\) buckets:
+      </p>
+      <pre>  search(k):  i = h(k); walk the chain at T[i] comparing keys
+  insert(k):  i = h(k); scan the chain for a duplicate,
+              then link k in (O(1) once you are there)
+  delete(k):  i = h(k); find k in the chain, UNLINK it</pre>
+      <p>
+        Deletion is a plain splice: find the node and remove it, and no other key
+        moves. Hold that thought: open addressing will make deletion
+        genuinely subtle.
+      </p>
+
+      <h3>Load factor and the expected chain length</h3>
+      <p>
+        The cost of every chaining operation is dominated by the length of the
+        chain it walks, so we compute the expected chain length. Recall the load
+        factor \(\alpha = n/M\).
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (expected chain length)</span>
+        Under uniform hashing, the expected number of keys in any given bucket is
+        exactly \(\alpha = n/M\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Fix a bucket \(b\). For each stored key \(k_j\)
+        (\(j = 1,\dots,n\)) let \(X_j = 1\) if \(h(k_j) = b\) and \(0\) otherwise.
+        Under uniform hashing \(P(X_j = 1) = 1/M\), so \(E[X_j] = 1/M\). The
+        length of bucket \(b\)&rsquo;s chain is \(X = \sum_{j=1}^n X_j\), and by
+        linearity of expectation
+        \(E[X] = \sum_{j=1}^n E[X_j] = n\cdot\frac1M = \frac nM = \alpha.\)
+        (Linearity needs no independence; only \(E[X_j]=1/M\) is used.)
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Two consequences follow. A search that <em>misses</em> must walk the
+        entire chain, about \(\alpha\) comparisons on average. A search that
+        <em>hits</em> stops at its key, which sits about halfway down its chain on
+        average, costing about \(1 + \alpha/2\). Both are \(\Theta(1 + \alpha)\).
+        So as long as we keep \(\alpha = O(1)\) (a bounded number of keys
+        per slot), every operation is expected \(\Theta(1)\). Read that
+        premise carefully: \(\alpha = n/M\) is <em>not</em> automatically a
+        constant, because \(n\) is out of our hands: the user keeps
+        inserting. &ldquo;Keep \(\alpha = O(1)\)&rdquo; is therefore a <em>thing we
+        do</em>, not something that happens for free: we hold \(\alpha\) bounded by
+        growing \(M\) to match \(n\), which is exactly what resizing does
+        (<a href="#load">&sect;7</a>). With \(M\) fixed while \(n\) grows,
+        chaining degrades linearly in \(\alpha\), gracefully but surely,
+        which is why even chaining eventually resizes.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a chaining table, and an insert)</span>
+        With \(M = 7\), \(h(k) = k \bmod 7\), storing the odd keys \(1,3,\dots,21\):
+        <pre>  [0] &rarr; 7 &rarr; 21     [1] &rarr; 1 &rarr; 15     [2] &rarr; 9
+  [3] &rarr; 3 &rarr; 17     [4] &rarr; 11          [5] &rarr; 5 &rarr; 19
+  [6] &rarr; 13</pre>
+        Now insert \(50\). Its home is \(h(50) = 50 \bmod 7 = 1\). Walking
+        bucket \(1\): \(1 \ne 50\), \(15 \ne 50\) (two comparisons, no
+        duplicate), then link: <code>[1] &rarr; 1 &rarr; 15 &rarr; 50</code>.
+        The chain reaches length \(3\); every other bucket is untouched.
+        Search that same bucket both ways: <code>search(15)</code> hashes to
+        \(1\) and walks the chain, \(1 \ne 15\), then \(15\) &check;, a
+        <em>hit</em> after two comparisons; <code>search(29)</code>
+        (\(29 \bmod 7 = 1\)) walks \(1, 15, 50\) and falls off the end of the
+        chain, a <em>miss</em> after three comparisons. A hit stops at its key,
+        partway down the chain on average; a miss must exhaust the whole chain,
+        which is the \(\alpha\)-versus-\(1+\alpha/2\) gap in the proposition
+        above. Here
+        \(\alpha = 11/7 \approx 1.57\) before the insert and \(12/7 \approx 1.71\)
+        after: comfortably above \(1\), which chaining tolerates.
+        <br><span class="note">(The step \(2\) between consecutive odd keys is
+        coprime to \(7\), so the keys cycle through all seven buckets before
+        wrapping and pairing up: the same &ldquo;relatively prime spreads
+        keys&rdquo; fact behind choosing \(M\) prime.)</span>
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=hash-chain">Separate-chaining demo</a>.
+        The chains hang below their buckets. Search walks one chain and never
+        touches the others; delete unlinks a single node and nothing else moves.
+        Insert a few keys that share a bucket (29, 36, 43 all hash to \(1\)) and
+        watch one chain grow: that is \(\alpha\) at work.
+      </div>
+
+      <h3>The chaining ledger</h3>
+      <p>
+        Chaining&rsquo;s strengths are robustness and simple deletion: the table
+        never fills, \(\alpha\) may pass \(1\) with only linear slowdown, and a
+        delete is a one-line unlink. Its costs are memory and cache behavior:
+        every chain node is a separate heap allocation carrying a
+        <code>next</code> pointer, and following those pointers jumps around
+        memory, defeating the cache. Open addressing is the mirror image
+        (no pointers, cache-friendly), but it can fill up, and its deletion
+        is anything but a one-liner.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="probing">5. Open addressing: linear probing</h2>
+      <p>
+        <strong>Open addressing</strong> keeps every key in the array itself. On
+        a collision it <em>probes</em> a deterministic sequence of alternate
+        slots until it finds an empty one. The simplest probe sequence is
+        <strong>linear probing</strong>: try \(h(k)\), then \(h(k)+1\), then
+        \(h(k)+2\), and so on, all modulo \(M\), walking forward until an empty
+        slot appears. The key lives where the walk stops.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a cluster forms)</span>
+        With \(M = 11\), \(h(k) = k \bmod 11\), insert \(14, 25, 36\):
+        <pre>  h(14) = 3  &rarr; slot 3 (empty)              place 14    1 probe
+  h(25) = 3  &rarr; 3 taken (14) &rarr; 4 (empty)    place 25    2 probes
+  h(36) = 3  &rarr; 3, 4 taken  &rarr; 5 (empty)    place 36    3 probes
+
+  [ _ _ _ 14 25 36 _ _ _ _ _ ]
+    0 1 2  3  4  5</pre>
+        The three keys differ by exactly \(11\), so they share the home slot
+        \(3\) (keys a multiple of \(M\) apart always do), and they line up in a
+        contiguous run, a <strong>cluster</strong>, at slots
+        \(3,4,5\). Unlike chaining, where colliders join a list off their home,
+        open addressing <em>displaces</em> colliders into other slots: a key can
+        occupy a slot that is some other key&rsquo;s home. This cluster is the
+        running example for search and deletion below.
+        <br>Watch the probe column: each collider pays one probe more than the
+        one before it, because it must walk the whole run built so far. The
+        cost then leaks onto keys that never collided with anything. Consider
+        inserting the key \(4\), whose home \(h(4) = 4\) no stored key hashes
+        to: slot \(4\) holds \(25\) (displaced from \(3\)), slot \(5\) holds
+        \(36\) (displaced from \(3\)), and only slot \(6\) is free, so \(4\)
+        would cost three probes and stretch the run to \(3\)&ndash;\(6\). (We
+        leave it out, so the running table below stays \(14, 25, 36\).)
+        A cluster taxes
+        every home slot it covers, not just the home that created it, and the
+        tax grows with its length. <a href="#clustering">&sect;6</a> turns that
+        observation into the growth law.
+      </div>
+
+      <h3>The probing invariant</h3>
+      <p>
+        One sentence explains everything open addressing does: search
+        correctness, the deletion problem, and both of its fixes.
+      </p>
+      <div class="def">
+        <span class="tag">The probing invariant</span>
+        From a key&rsquo;s home slot \(h(k)\) up to where \(k\) actually sits,
+        every slot on the probe sequence is <strong>occupied</strong>. Equivalently:
+        <em>there is no empty slot inside a cluster</em>.
+      </div>
+      <p>Everything follows from this invariant.</p>
+      <ul>
+        <li><strong>Insert maintains it</strong> by construction: it places \(k\)
+          in the <em>first</em> empty slot of \(k\)&rsquo;s probe run, so the run
+          from the home to \(k\) stays gap-free.</li>
+        <li><strong>Search relies on it.</strong> Follow the same probe sequence,
+          comparing keys; the first empty slot <em>proves</em> the key is absent,
+          because a key homed at or before this point would, by the invariant,
+          have filled this slot rather than leaving it empty.</li>
+        <li><strong>Deletion threatens it.</strong> Emptying a slot in the middle
+          of a cluster punches a hole, and a hole is exactly what search
+          reads as &ldquo;absent.&rdquo;</li>
+      </ul>
+      <pre>search(k):
+    i = h(k)
+    while T[i] is occupied:
+        if T[i] == k: return FOUND
+        i = (i + 1) mod M          <span class="cm">// next slot</span>
+    return NOT FOUND               <span class="cm">// empty slot &rArr; k absent</span></pre>
+      <div class="ex">
+        <span class="tag">Example (search: hit versus miss)</span>
+        In the cluster <code>[ _ _ _ 14 25 36 _ ... ]</code>:
+        <pre>  search 36:  h=3 &rarr; 14&ne;36 &rarr; 25&ne;36 &rarr; 36 &check;   (3 probes, HIT)
+  search 47:  h=3 &rarr; 14 &rarr; 25 &rarr; 36 &rarr; slot 6
+              slot 6 EMPTY &rArr; NOT FOUND        (4 probes, MISS)</pre>
+        (\(47 \bmod 11 = 3\), the same home.) Both rides start at slot \(3\). The
+        hit stops on its key; the miss must walk the entire cluster before the
+        empty slot at \(6\) certifies absence. Misses are systematically pricier
+        than hits (a gap the analysis in <a href="#load">&sect;7</a> makes
+        exact), and both costs scale with the cluster&rsquo;s length, which
+        is the number to control.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the probe walk wraps around)</span>
+        The <code>mod M</code> in the probe step matters at the array&rsquo;s far
+        end. Continue in the same table (\(M = 11\), the cluster \(14, 25, 36\)
+        at slots \(3\)&ndash;\(5\)) and insert \(21\), then \(32\):
+        <pre>  h(21) = 10 &rarr; slot 10 (empty)                       place 21
+  h(32) = 10 &rarr; 10 taken (21) &rarr; (10+1) mod 11 = 0    place 32
+
+  [ 32 _ _ 14 25 36 _ _ _ _ 21 ]
+    0        3  4  5           10</pre>
+        The probe after slot \(10\) is slot \(0\), not slot \(11\): the walk
+        wraps to the front of the array, and the cluster \(21, 32\) spans the
+        seam. Search follows the same wrapped path:
+        <code>search(32)</code> starts at \(h(32) = 10\), finds \(21 \ne 32\),
+        wraps to slot \(0\), and hits. Forgetting the <code>mod</code> here
+        (probing <code>i + 1</code> instead of <code>(i + 1) mod M</code>) walks
+        off the end of the array precisely when the table&rsquo;s tail is
+        occupied, a bug that stays invisible until a key hashes near \(M-1\).
+      </div>
+
+      <h3>The deletion problem, and two fixes</h3>
+      <p>
+        Delete a key by naively emptying its slot and the invariant breaks:
+      </p>
+      <pre>  [ _ _ _ 14 25 36 _ ]     naive delete 14:
+    0 1 2  3  4  5         [ _ _ _ __ 25 36 _ ]
+
+  search 25:  h(25)=3 &rarr; slot 3 now EMPTY &rarr; "not found"   &cross;</pre>
+      <p>
+        The key \(25\) is still physically in the table at slot \(4\), but the
+        hole at slot \(3\) stops the search before it gets there. The invariant
+        (no hole inside a cluster) predicted this exactly:
+        emptying a mid-cluster slot hides every key that probed past it. Chaining
+        had no such trouble; open addressing needs one of two repairs.
+      </p>
+      <ol>
+        <li><strong>Tombstones.</strong> Instead of emptying the slot, mark it
+          <em>deleted</em>. Searches treat a tombstone as occupied (walk through
+          it, so probe paths survive); inserts treat it as free (may reuse it).
+          Simple, but tombstones accumulate and lengthen probe runs until the
+          table is rebuilt at the next resize (<a href="#load">&sect;7</a>).</li>
+        <li><strong>Re-insert the cluster.</strong> Empty the slot, then remove
+          and re-insert every key that follows the hole in the same cluster,
+          rebuilding the run gap-free:
+          <pre>  delete 14:  [ _ _ _ __ 25 36 _ ]  &rarr; re-insert 25, then 36
+              [ _ _ _ 25 36 _ _ ]   &check; invariant restored</pre>
+          Tracing it: \(25\) rehashes to home \(3\), now free, so it slides home;
+          \(36\) rehashes to \(3\) (taken by \(25\)) and probes to \(4\). Keys can
+          end up <em>closer</em> to home than before the delete.</li>
+      </ol>
+      <div class="ex">
+        <span class="tag">Example (tombstone delete, step by step)</span>
+        The same table (\(M = 11\), the cluster \(14, 25, 36\) at slots
+        \(3, 4, 5\), every one of them homed at \(3\)). Delete the
+        <em>middle</em> key, \(25\), and compare the two ways of vacating slot
+        \(4\). Write &dagger; for a tombstone.
+        <pre>  start:            [ _ _ _ 14 25 36 _ _ _ _ _ ]
+                      0 1 2  3  4  5  6
+
+  BLANK slot 4:     [ _ _ _ 14 __ 36 _ _ _ _ _ ]
+    search 36:  h(36) = 3 &rarr; slot 3: 14 &ne; 36
+                          &rarr; slot 4: EMPTY &rArr; NOT FOUND   &cross;
+                (2 probes, wrong: 36 is sitting at slot 5)
+
+  TOMBSTONE slot 4: [ _ _ _ 14 &dagger;  36 _ _ _ _ _ ]
+    search 36:  h(36) = 3 &rarr; slot 3: 14 &ne; 36
+                          &rarr; slot 4: &dagger; occupied-for-search, walk on
+                          &rarr; slot 5: 36 &check; FOUND         (3 probes)
+    search 47:  h(47) = 3 &rarr; 14 &rarr; &dagger; &rarr; 36 &rarr; slot 6: EMPTY
+                          &rArr; NOT FOUND                    (4 probes)
+    insert 47:  h(47) = 3 &rarr; 14 &rarr; &dagger; (remember slot 4)
+                          &rarr; 36 &rarr; slot 6 EMPTY: 47 is absent,
+                so place it in the remembered tombstone slot 4
+                      [ _ _ _ 14 47 36 _ _ _ _ _ ]</pre>
+        Four lines, four behaviors. Blanking loses \(36\): the search stops at
+        the hole and reports absent while the key is two slots away. The
+        tombstone is a &ldquo;keep going&rdquo; sign, so the same search reaches
+        \(36\) and pays one wasted probe for the privilege. A search that really
+        does miss still may not stop at &dagger;; it must reach a genuine
+        <code>EMPTY</code>, which is why tombstones cost probes on every
+        subsequent operation. And insert reads &dagger; as free space, but only
+        after finishing the probe walk to an <code>EMPTY</code>: stopping early
+        at &dagger; and writing there would store a second copy of a key already
+        further down the run. Reclaiming the slot returns the run to length
+        \(3\).
+      </div>
+      <div class="aside">
+        <span class="tag">Why not swap in the last key and shrink?</span>
+        That trick deletes from an unordered array in \(O(1)\), and it is exactly
+        how you delete from a chaining bucket backed by a dynamic array, so
+        the instinct is good. It fails in open addressing because there is no
+        independent per-home group to swap within. One shared array braids every
+        home&rsquo;s probe run together, and a slot need not be &ldquo;owned&rdquo;
+        by the key that hashes to it (linear probing parks displaced keys in
+        whatever slot was free). Any key you relocate may be a <strong>bridge</strong>
+        that some other key probed past; move it and blank the vacated slot, and
+        you have re-created the same mid-cluster hole as a naive delete, stranding
+        whatever relied on that bridge. And to even <em>find</em> &ldquo;the last
+        key of this home&rsquo;s run&rdquo; you must walk the cluster anyway,
+        at which point fix 2 is doing strictly more useful work for the same walk.
+        Fix 2 <em>is</em> the disciplined form of &ldquo;pull a later key into the
+        hole&rdquo;: it moves a key only when its home \(h(k)\) lets it legally
+        slide up, and closes the gap step by step so no bridge is ever severed.
+      </div>
+      <div class="aside">
+        <span class="tag">What is a tombstone, concretely?</span>
+        A tombstone is a slot <em>state</em>, not a key value. The clean
+        implementation gives every slot a two-bit state
+        (<code>EMPTY</code> / <code>OCCUPIED</code> / <code>DELETED</code>),
+        and search stops only at <code>EMPTY</code>. Reserving an in-band key
+        value (<code>-1</code>, <code>INT_MIN</code>) works only when the key
+        domain has a value to sacrifice. Real tables do both: CPython&rsquo;s
+        dict historically parked a reserved <code>dummy</code> sentinel object
+        in deleted slots; Google&rsquo;s <code>dense_hash_map</code> makes
+        <em>you</em> reserve an &ldquo;empty key&rdquo; and a &ldquo;deleted
+        key&rdquo;; Swiss tables (Abseil, Rust&rsquo;s hashbrown) keep a separate
+        control byte per slot with dedicated codes for <em>empty</em> and
+        <em>deleted</em>.
+        <br><span class="note">(Tombstones also count against the load factor:
+        a table that deletes heavily fills with ghosts and must rehash to
+        evict them, one reason heavy-delete workloads often prefer chaining.)</span>
+      </div>
+      <figure class="stackfig">
+        <div id="tombstone-lifecycle"></div>
+        <figcaption>The tombstone lifecycle at \(M = 11\): three colliders
+        (\(14, 25, 36\), all homing to slot \(3\)) build a run; deleting the
+        middle one leaves a marker (&dagger;) that searches still walk:
+        the survivor search pays a probe but keeps its answer, the failed search
+        must walk the marker before it may stop; and the final insert
+        reclaims it.</figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=hash-lp">Linear-probing demo</a> (with
+        resize and cluster-preserving delete). Insert keys sharing a home and
+        watch the cluster grow; delete a key at the front of a cluster and watch
+        the tail re-insert so no probe path breaks; then search a displaced key
+        to confirm it is still reachable. Compare the one-line unlink of the
+        chaining demo with this cluster rebuild: the contrast is the whole
+        point of the deletion story.
+      </div>
+
+      <h3>Chaining versus probing</h3>
+      <table>
+        <tr><th></th><th>separate chaining</th><th>linear probing</th></tr>
+        <tr><td>colliders go</td><td>into the chain</td><td>into other slots</td></tr>
+        <tr><td>memory</td><td>a pointer per node</td><td><strong>just the array</strong></td></tr>
+        <tr><td>cache</td><td>pointer-chasing, poor</td><td>adjacent probes, <strong>great</strong></td></tr>
+        <tr><td>delete</td><td><strong>unlink, trivial</strong></td><td>tombstone or re-insert</td></tr>
+        <tr><td>can fill up</td><td>never (\(\alpha\) may exceed \(1\))</td><td>hard stop at \(\alpha = 1\)</td></tr>
+      </table>
+      <p>
+        At a low load factor open addressing often wins in practice despite the
+        deletion headache, because its probes touch adjacent memory that the
+        cache and prefetcher have already loaded, while each chain hop is a
+        likely cache miss. The catch is that as the table fills, linear
+        probing&rsquo;s clusters blow up first, the subject of the next
+        section.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="clustering">6. Clustering and better probe sequences</h2>
+      <p>
+        Linear probing has a specific weakness: long clusters not only slow the
+        keys that land in them, they <em>grow faster the longer they get</em>.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (primary clustering)</span>
+        A cluster occupying a run of \(L\) slots grows on the next insertion with
+        probability about \((L+2)/M\), which increases with \(L\).
+      </div>
+      <div class="proof">
+        <strong>Sketch.</strong> A newly inserted key extends the cluster
+        whenever its home slot falls anywhere among the \(L\) occupied slots
+        (it then probes forward to the cluster&rsquo;s far end) or on the single
+        empty slot immediately before the run (it lands there, joining the run).
+        That is \(L + 1\) home slots that grow the cluster on its high side, plus
+        the empty slot at the low end, giving \(L+2\) of the \(M\) home slots.
+        Under uniform hashing each home is equally likely, so the growth
+        probability is about \((L+2)/M\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This is a rich-get-richer effect: a longer cluster is a larger target, so
+        it grows faster, and adjacent clusters merge into longer ones. It is
+        called <em>primary clustering</em>, and it makes linear probing worse
+        than a hypothetical scheme whose probes were spread uniformly at random.
+        There are two escapes: spread the probe sequence so colliders scatter
+        (this section), or keep \(\alpha\) low so clusters stay short
+        (<a href="#load">&sect;7</a>). Both are used.
+      </p>
+
+      <h3>Quadratic probing</h3>
+      <p>
+        Probe at increasing <em>squared</em> offsets:
+        \(\bigl(h(k) + i^2\bigr) \bmod M\) for \(i = 1, 2, 3, \dots\), giving
+        offsets \(1, 4, 9, 16, \dots\). The growing jumps scatter colliders out
+        of the neighborhood rather than extending a run, so primary clustering
+        disappears. A residual weakness remains: two keys with the <em>same</em>
+        home slot follow the identical jump sequence, so they still collide
+        repeatedly, called <em>secondary clustering</em>. And there is a
+        reachability caveat: quadratic probing is only guaranteed to find an
+        empty slot when \(M\) is prime and \(\alpha &lt; \tfrac12\).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (quadratic probing)</span>
+        \(M = 11\), \(h(k) = k \bmod 11\); insert \(22, 33, 44, 55, 66\), all
+        homed at slot \(0\) (multiples of \(11\)):
+        <pre>  22 &rarr; 0 empty                                   place 22
+  33 &rarr; 0 taken; 0+1&sup2; = 1                        place 33
+  44 &rarr; 0 taken, 1 taken; 0+2&sup2; = 4               place 44
+  55 &rarr; 0, 1, 4 taken; 0+3&sup2; = 9                  place 55
+  66 &rarr; 0, 1, 4, 9 taken; (0+4&sup2;) mod 11 = 5      place 66
+
+  [ 22 33 _ _ 44 66 _ _ _ 55 _ ]
+    0  1      4  5        9</pre>
+        Under linear probing these five keys would fill the contiguous run
+        \(0\)&ndash;\(4\); here the growing offsets \(1, 4, 9, 16\) scatter them
+        (the last jump wrapping, \(16 \bmod 11 = 5\)), and no run forms:
+        primary clustering is gone. Secondary clustering is visible too: every
+        \(0\)-homed key retraces the <em>same</em> offset sequence, so each new
+        collider pays one more probe than the last (\(33\) probed \(2\) slots,
+        \(44\) three, \(55\) four, \(66\) five). A key homed anywhere else is
+        unaffected: \(h(7) = 7\) is empty and \(7\) would land in one probe.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a quadratic probe wraps past the end)</span>
+        Continue in that table and insert \(21\), then \(32\), both homed at
+        slot \(10\), the last slot:
+        <pre>  before:  [ 22 33 _ _ 44 66 _ _ _ 55 _ ]
+             0  1        4  5        9  10
+
+  21 &rarr; h = 10, slot 10 empty                        place 21
+  32 &rarr; h = 10, taken (21)
+        i = 1: (10 + 1&sup2;) mod 11 = 11 mod 11 = 0, taken (22)
+        i = 2: (10 + 2&sup2;) mod 11 = 14 mod 11 = 3, empty   place 32
+
+  after:   [ 22 33 _ 32 44 66 _ _ _ 55 21 ]
+             0  1    3  4  5        9  10</pre>
+        The offset \(1\) carries \(32\) off the end of the array to slot \(0\),
+        and the offset \(4\) carries it round again to slot \(3\): the
+        <code>mod M</code> is doing the same wrapping job it does under linear
+        probing, only in longer strides. Note also that \(32\) lands nowhere
+        near its home, so a search for it must retrace the identical
+        \(+1, +4\) sequence from slot \(10\); an implementation that tests
+        \(h(k) + i^2\) without the modulus reads past the array here.
+      </div>
+
+      <h3>Double hashing</h3>
+      <p>
+        Use a second hash function to choose the <em>step size</em>:
+        \(\bigl(h(k) + i \cdot h_2(k)\bigr) \bmod M\). A common choice is
+        \(h_2(k) = q - (k \bmod q)\) for a prime \(q &lt; M\), which is never
+        zero. Now two keys colliding at the same home slot generally have
+        different steps, so they part ways: this removes secondary
+        clustering too and behaves closest to the uniform-hashing ideal. Two
+        conditions matter: \(h_2\) must never return \(0\) (a step of zero loops
+        in place forever), and \(h_2(k)\) should be relatively prime to \(M\) so
+        the probe sequence reaches every slot, another reason \(M\) is
+        prime. The cost is a second hash per operation.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (double hashing)</span>
+        \(M = 11\) (prime), \(h(x) = x \bmod 11\), \(h_2(x) = 7 - (x \bmod 7)\).
+        Insert \(89, 18, 40, 29\):
+        <pre>  89 &rarr; 89 mod 11 = 1                   [ _ 89 _ _ _ _ _ _ _ _ _ ]
+  18 &rarr; 18 mod 11 = 7                   [ _ 89 _ _ _ _ _ 18 _ _ _ ]
+  40 &rarr; 40 mod 11 = 7 taken;
+        h2(40) = 7 &minus; (40 mod 7) = 2   (7 + 2) mod 11 = 9  &rarr; slot 9
+  29 &rarr; 29 mod 11 = 7 taken;
+        h2(29) = 7 &minus; (29 mod 7) = 6   (7 + 6) mod 11 = 2  &rarr; slot 2</pre>
+        Both \(40\) and \(29\) collide with \(18\) at slot \(7\), but they step
+        by \(2\) and \(6\) into entirely different regions of the table
+        (\(40 \bmod 7 = 5\) so \(h_2 = 2\); \(29 \bmod 7 = 1\) so \(h_2 = 6\)).
+        No cluster forms; under linear probing these keys would already be
+        piling up at slots \(7,8,9\).
+        <br>\(29\) also shows the wrap: \(7 + 6 = 13\) runs off the end of an
+        \(11\)-slot array, and \(13 \bmod 11 = 2\) brings it back to the front.
+        A key needing two steps wraps twice. Insert \(51\) into the same table
+        (\(51 \bmod 11 = 7\), \(51 \bmod 7 = 2\), so \(h_2(51) = 5\)):
+        <pre>  51 &rarr; i = 0: slot 7,  taken (18)
+        i = 1: (7 + 1&middot;5) mod 11 = 12 mod 11 = 1, taken (89)
+        i = 2: (7 + 2&middot;5) mod 11 = 17 mod 11 = 6, empty   place 51
+
+  [ _ 89 29 _ _ _ 51 18 _ 40 _ ]
+    0 1  2        6  7    9</pre>
+        Each step of \(5\) crosses the seam, and because \(5\) and \(11\) are
+        relatively prime the sequence \(7, 1, 6, 0, 5, \dots\) would visit every
+        one of the \(11\) slots before repeating, so a free slot is always
+        found while one exists. That is the guarantee \(M\) prime buys: with a
+        step sharing a factor with \(M\) (say a step of \(4\) in a table of size
+        \(8\)) the walk cycles through only \(M/\gcd\) slots and can loop
+        forever past a table that is not full.
+      </div>
+      <p>
+        How rare is a repeat? Two keys follow the same probe sequence only when
+        <em>both</em> hashes collide (probability on the order of
+        \(1/M^2\), not \(1/M\)), which is why double hashing tracks the
+        uniform-hashing ideal so closely.
+      </p>
+      <table>
+        <tr><th>method</th><th>step</th><th>clustering</th></tr>
+        <tr><td>linear</td><td>\(+1\)</td><td>primary (worst)</td></tr>
+        <tr><td>quadratic</td><td>\(+i^2\)</td><td>secondary</td></tr>
+        <tr><td>double</td><td>\(+\,i\cdot h_2(k)\)</td><td>essentially none (best)</td></tr>
+      </table>
+      <p>
+        Curiously, most high-performance libraries still choose <em>linear</em>
+        probing. With a strong hash function keeping clusters short at a low
+        \(\alpha\), linear probing&rsquo;s superb cache behavior (every
+        probe rides the same cache line) beats the better statistical
+        distribution of double hashing, whose every probe is a random memory
+        jump. It is a recurring lesson: asymptotic niceness competes with machine
+        reality, and the machine often wins.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="load">7. Load factor and resizing</h2>
+      <p>
+        The load factor \(\alpha = n/M\) governs every open-addressing cost. We
+        first find the cost under an idealized model, then state Knuth&rsquo;s
+        exact result for linear probing, then keep \(\alpha\) bounded by
+        resizing.
+      </p>
+      <p>
+        One structural point before the analysis, because it changes the
+        <em>stakes</em> of resizing. In chaining, resizing is a tuning choice:
+        the table never fills, \(\alpha\) may pass \(1\), and letting it drift
+        just makes chains longer. In open addressing it is <strong>mandatory</strong>.
+        Each slot holds at most one key, so \(n \le M\) and \(\alpha \le 1\)
+        always; at \(\alpha = 1\) the array is full and the next insert has
+        nowhere to probe: it simply fails. And the empty slots are not
+        waste, they are <em>load-bearing</em>: a search or insert walks the probe
+        sequence until it hits an empty slot, which is the &ldquo;stop, not
+        here&rdquo; signal, so the unused space is the working room the algorithm
+        needs to terminate. A near-full open-addressing table has almost no such
+        room, which is precisely the \(1/(1-\alpha)\) blow-up derived next.
+      </p>
+
+      <h3>The idealized probe cost: a geometric series</h3>
+      <p>
+        Idealize the probe sequence as landing on independent slots, each
+        occupied with probability \(\alpha\). A search miss keeps probing until
+        it hits an empty slot; the number of probes is a geometric random
+        variable. The probability of needing at least \(i\) probes is
+        \(\alpha^{\,i-1}\) (the first \(i-1\) slots all occupied), so
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (idealized miss cost)</span>
+        Under uniform probing, the expected number of probes for an unsuccessful
+        search is
+        \[
+          E[\text{probes}] = \sum_{i=0}^{\infty} \alpha^{\,i}
+          = 1 + \alpha + \alpha^2 + \cdots = \frac{1}{1-\alpha},
+          \qquad 0 \le \alpha &lt; 1.
+        \]
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The first probe always happens. The \((i+1)\)-th
+        probe happens exactly when the first \(i\) probed slots were all occupied,
+        an event of probability \(\alpha^{\,i}\) under the independence
+        idealization. Summing the geometric series
+        \(\sum_{i \ge 0}\alpha^{\,i} = 1/(1-\alpha)\) gives the expected count.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This single series shapes every open-addressing cost. The blow-up as
+        \(\alpha \to 1\) is the wall:
+      </p>
+      <table>
+        <tr><th>\(\alpha\)</th><td>0.25</td><td>0.5</td><td>0.75</td><td>0.9</td></tr>
+        <tr><th>\(1/(1-\alpha)\)</th><td>1.3</td><td>2</td><td>4</td><td>10</td></tr>
+      </table>
+      <p>
+        At \(\alpha = 0.9\) a miss already averages ten probes; at \(\alpha = 1\)
+        the series diverges: a full table means an endless walk.
+      </p>
+
+      <h3>Knuth&rsquo;s numbers for linear probing</h3>
+      <p>
+        Linear probing is <em>worse</em> than the idealized model because
+        clustering correlates the slots: a probe that lands in a cluster
+        is followed by more full slots than chance would predict. Knuth&rsquo;s
+        1962 analysis (a founding result of the field) gives the exact expected
+        probe counts:
+      </p>
+      \[
+        \text{hit} \approx \tfrac12\Bigl(1 + \frac{1}{1-\alpha}\Bigr),
+        \qquad
+        \text{miss} \approx \tfrac12\Bigl(1 + \frac{1}{(1-\alpha)^2}\Bigr).
+      \]
+      <table>
+        <tr><th>\(\alpha\)</th><th>hit</th><th>miss</th></tr>
+        <tr><td>0.5</td><td>1.5</td><td>2.5</td></tr>
+        <tr><td>0.9</td><td>5.5</td><td>50.5</td></tr>
+      </table>
+      <p>
+        Note the <em>square</em> in the miss cost: at \(\alpha = 0.9\) a miss
+        averages fifty probes. This is the quantitative form of &ldquo;clusters
+        snowball,&rdquo; and it forces the load-factor ceiling below.
+      </p>
+      <div class="aside">
+        <span class="tag">Where Knuth&rsquo;s numbers come from (two steps)</span>
+        <strong>Why the miss cost squares.</strong> Under uniform hashing a miss
+        costs about \(1/(1-\alpha)\). Linear probing is worse because clusters
+        bite <em>twice</em>: a random home slot lands inside a cluster with
+        probability proportional to its <em>length</em>, and the walk to the
+        cluster&rsquo;s end also costs proportional to its <em>length</em>:
+        a length\(^2\) weighting over the cluster distribution, which
+        squares the uniform-hashing factor:
+        \[ \text{miss} \approx \tfrac{1}{2}\!\left(1 + \tfrac{1}{(1-\alpha)^2}\right). \]
+        <strong>Why the hit cost is the average of past misses.</strong> A
+        successful search retraces exactly the probe path its key walked on the
+        day it was <em>inserted</em>, and an insert costs a miss at
+        <em>that day&rsquo;s</em> load factor. Averaging the miss cost over the
+        table&rsquo;s history \(x = 0 \ldots \alpha\):
+        \[ \text{hit} \approx \frac{1}{\alpha}\int_0^{\alpha} \tfrac{1}{2}\!\left(1 + \tfrac{1}{(1-x)^2}\right) dx
+           \;=\; \tfrac{1}{2}\!\left(1 + \tfrac{1}{1-\alpha}\right). \]
+        No new idea enters in step two: the hit formula is bookkeeping on
+        top of the miss formula. <span class="note">(Check the integral:
+        \(\int_0^{\alpha} \frac{dx}{(1-x)^2} = \frac{1}{1-\alpha} - 1 = \frac{\alpha}{1-\alpha}\),
+        so the average is \(\tfrac{1}{2}\bigl(1 + \tfrac{1}{1-\alpha}\bigr)\)
+        exactly.)</span>
+      </div>
+
+      <h3>Load-factor ceilings</h3>
+      <table>
+        <tr><th>scheme</th><th>keep \(\alpha\) below</th></tr>
+        <tr><td>separate chaining</td><td>\(\approx 1\) (a little more is fine)</td></tr>
+        <tr><td>double hashing</td><td>\(\approx 0.7\)</td></tr>
+        <tr><td>linear probing</td><td>\(\approx 0.5\)</td></tr>
+      </table>
+      <p>
+        These are not magic constants; each is where the scheme&rsquo;s cost
+        formula starts to hurt. Chaining degrades linearly in \(\alpha\) (gentle),
+        double hashing tracks the ideal \(1/(1-\alpha)\), and linear probing pays
+        the squared miss cost, so it needs the most headroom. Java&rsquo;s
+        <code>HashMap</code> (chaining) resizes at \(0.75\); many open-addressing
+        tables resize at \(0.5\). When the load factor crosses the ceiling, grow
+        the table.
+      </p>
+
+      <h3>Resizing (rehashing)</h3>
+      <pre>if (2 * n &gt;= M) {              <span class="cm">// alpha reached 1/2</span>
+    M = 2 * M;                 <span class="cm">// double the array</span>
+    rehash every key into the new table
+}</pre>
+      <p>
+        A resize cannot copy slots, because each key&rsquo;s index is
+        \(h(k) \bmod M\) and \(M\) has changed; every key must be hashed anew into
+        the larger table. That is \(\Theta(n)\) work. It helps to see that \(M\) is
+        a single number wearing three hats at once (the array&rsquo;s
+        <em>size</em>, the count of <em>distinct hash values</em> \(0..M-1\), and
+        the <em>modulus</em> in \(h(k)\bmod M\)), because the hash
+        function&rsquo;s job is to map any key into a valid index, so its output
+        range must equal the set of slots. Growing the table is thus not just
+        &ldquo;allocate more room and copy&rdquo;; it is adopting a <em>wider hash
+        function</em>, under which a key&rsquo;s index genuinely changes
+        (\(33 \bmod 10 = 3\) but \(33 \bmod 20 = 13\)), which is why we must
+        rehash rather than copy. But <em>doubling</em> makes
+        it amortized \(\Theta(1)\) per insertion, by the same argument that makes
+        a dynamic array&rsquo;s <code>push_back</code> amortized \(\Theta(1)\):
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (amortized \(\Theta(1)\) inserts)</span>
+        With table doubling at a fixed load-factor threshold, a sequence of \(n\)
+        insertions into an initially small table costs \(\Theta(n)\) total, hence
+        \(\Theta(1)\) amortized per insertion.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Each insertion does \(\Theta(1)\) work outside of
+        resizes. The resizes happen at table sizes
+        \(M_0, 2M_0, 4M_0, \dots, 2^t M_0\) up to the final size, and the resize
+        at size \(2^j M_0\) rehashes the \(\Theta(2^j M_0)\) keys then present.
+        The total resize work is
+        \(\sum_{j=0}^{t} \Theta(2^j M_0) = \Theta(2^{t+1} M_0) = \Theta(M)\), a
+        geometric sum dominated by its last term, and \(M = \Theta(n)\) at the
+        threshold. So all resizes together cost \(\Theta(n)\), and adding the
+        \(\Theta(n)\) of per-insert work gives \(\Theta(n)\) total, i.e.
+        \(\Theta(1)\) amortized. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        A welcome side effect: the wider hash function also <em>dissolves</em>
+        existing collisions: two keys that collided at \(M\) usually hash to
+        different slots at \(2M\). (Halving the table when it becomes sparse keeps
+        memory bounded, by the same accounting.)
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a resize, key by key)</span>
+        Linear probing, doubling when \(2n \ge M\), starting at \(M = 5\) with
+        \(h(k) = k \bmod 5\). Insert \(6, 11, 16\), all \(\equiv 1 \pmod 5\):
+        <pre>  6  &rarr; slot 1 (empty)                 [ _ 6 11 16 _ ]
+  11 &rarr; 1 taken &rarr; 2                     0 1 2  3
+  16 &rarr; 1, 2 taken &rarr; 3
+
+  now n = 3, 2n = 6 &ge; 5: grow to M = 10 and REHASH, old array
+  left to right, under the new h(k) = k mod 10:
+
+  6  &rarr; 6 mod 10 = 6 (empty)           [ _ 11 _ _ _ _ 6 16 _ _ ]
+  11 &rarr; 11 mod 10 = 1 (empty)            0 1          6 7
+  16 &rarr; 16 mod 10 = 6 taken &rarr; 7</pre>
+        No slot is copied; each key recomputes its home under the wider modulus
+        and lands somewhere new. The collision between \(6\) and \(11\)
+        dissolves (\(6 \equiv 11 \pmod 5\) but \(6 \not\equiv 11 \pmod{10}\)),
+        so \(11\) slides to its own home; \(6\) and \(16\) differ by \(10\), a
+        multiple of the <em>new</em> size, so they still collide and a two-slot
+        cluster survives at \(6, 7\). The load factor falls from \(3/5\) back to
+        \(3/10\), and the next inserts have working room again.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=hash-lp">Linear-probing demo</a>:
+        insert keys until \(\alpha\) crosses \(\tfrac12\) and watch the array
+        double and every key re-scatter to a new \(h(k) \bmod 2M\). Keys that
+        shared a slot at the old size land apart at the new one, and the load
+        factor readout drops back to about \(\tfrac14\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="analysis">8. Cost, and when to use a hash table</h2>
+      <p>
+        Under uniform hashing with a bounded load factor, all three operations
+        are expected \(\Theta(1)\); the worst case is \(\Theta(n)\).
+      </p>
+      <table>
+        <tr><th>operation</th><th>expected</th><th>worst case</th></tr>
+        <tr><td>search / insert / delete</td><td><strong>\(\Theta(1)\)</strong></td><td>\(\Theta(n)\)</td></tr>
+      </table>
+      <p>
+        The worst case (every key in one chain or one cluster)
+        requires a bad hash function or a deliberate adversary; it does not arise
+        by chance with a good hash. The distinction matters in practice: an
+        attacker who knows the hash can send keys engineered to all collide,
+        turning every operation \(\Theta(n)\) and the whole server to a crawl.
+        This <em>hash-flooding</em> denial-of-service attack was real enough
+        (CVEs in PHP, Java, Python around 2011) that language runtimes now choose
+        a random hash seed per process, so the colliding keys cannot be
+        precomputed.
+      </p>
+
+      <h3>Hashing versus a balanced tree</h3>
+      <table>
+        <tr><th></th><th>hash table</th><th>balanced BST</th></tr>
+        <tr><td>search / insert / delete</td><td><strong>\(\Theta(1)\)</strong> expected</td><td>\(\Theta(\log n)\)</td></tr>
+        <tr><td>worst case</td><td>\(\Theta(n)\)</td><td><strong>\(\Theta(\log n)\)</strong></td></tr>
+        <tr><td>ordered ops (min, max, floor, range)</td><td><strong>no</strong></td><td><strong>yes</strong></td></tr>
+        <tr><td>iterate in sorted order</td><td>no</td><td>yes</td></tr>
+      </table>
+      <p>
+        Hashing wins on raw lookup speed; the balanced tree wins on <em>order</em>
+        and on a <em>guaranteed</em> worst case. The moment a problem needs
+        &ldquo;the smallest key at least \(x\),&rdquo; a sorted range, in-order
+        iteration, or a hard real-time bound, a hash table cannot help:
+        its keys are scattered <em>by design</em>, which is precisely what a
+        uniform hash does. Choosing a data structure is choosing which queries
+        are cheap. This is exactly the split between C++&rsquo;s two associative
+        containers:
+      </p>
+      <table>
+        <tr><th></th><th><code>std::map</code></th><th><code>std::unordered_map</code></th></tr>
+        <tr><td>engine</td><td>red-black tree</td><td>hash table</td></tr>
+        <tr><td>lookup</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(1)\) expected</td></tr>
+        <tr><td>iteration</td><td>sorted</td><td>arbitrary order</td></tr>
+        <tr><td>requires</td><td><code>operator&lt;</code></td><td><code>std::hash</code> and <code>==</code></td></tr>
+      </table>
+      <p>
+        Same interface, opposite engines. Python&rsquo;s <code>dict</code> and
+        Java&rsquo;s <code>HashMap</code> are hash tables; <code>std::map</code>
+        and Java&rsquo;s <code>TreeMap</code> are trees. Pick by whether you need
+        order.
+      </p>
+
+      <h3>Hash functions in the wild, and common pitfalls</h3>
+      <p>
+        Different jobs want different hashes, all honoring the same
+        &ldquo;key \(\to\) number&rdquo; contract. Language runtimes use fast,
+        well-distributed, <em>seeded</em> hashes to resist hash-flooding.
+        Large-scale data work and deduplication use fast non-cryptographic
+        hashes such as MurmurHash or xxHash. Integrity and security use
+        cryptographic hashes such as SHA-256, which are slow but make it
+        computationally infeasible to <em>find</em> a collision, a
+        property tables do not need and do not pay for. The recurring bugs:
+      </p>
+      <ul>
+        <li>a <strong>poor hash</strong> that clumps keys: still correct,
+          just \(\Theta(n)\), and silent until the data grows;</li>
+        <li>forgetting to <strong>resize</strong>, so \(\alpha\) climbs and
+          everything slows;</li>
+        <li>an open-addressing <strong>delete that merely empties a slot</strong>,
+          losing displaced keys (the invariant of <a href="#probing">&sect;5</a>);</li>
+        <li>equal objects with <strong>unequal hashes</strong>: lookups
+          miss, a genuine bug. (Unequal objects with equal hashes are fine: that
+          is just a collision.)</li>
+      </ul>
+
+      <h3>The symbol-table landscape</h3>
+      <p>Each symbol table in the course is one row of this table.</p>
+      <table>
+        <tr><th>structure</th><th>search</th><th>ordered?</th></tr>
+        <tr><td>unsorted list</td><td>\(\Theta(n)\)</td><td>no</td></tr>
+        <tr><td>sorted array</td><td>\(\Theta(\log n)\)</td><td>yes</td></tr>
+        <tr><td>balanced BST</td><td>\(\Theta(\log n)\)</td><td><strong>yes</strong></td></tr>
+        <tr><td>hash table</td><td><strong>\(\Theta(1)\)</strong> expected</td><td>no</td></tr>
+      </table>
+      <p>
+        A hash table computes where a key lives instead of comparing to find it,
+        buying \(\Theta(1)\) expected lookup at the cost of order. Keep the load
+        factor bounded by resizing, feed it a good hash, and it is the fastest
+        dictionary there is; reach for a balanced tree the moment a
+        query needs the keys in order.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          A table uses \(M = 11\) and \(h(k) = k \bmod 11\) with linear probing.
+          Starting from an empty table, insert \(22, 33, 44, 1\) in this order.
+          Show the final array and the number of probes each insert took.
+          <details>
+            <summary>solution</summary>
+            \(h(22)=0,\ h(33)=0,\ h(44)=0,\ h(1)=1\).
+            \(22\) takes slot \(0\) (1 probe). \(33\) finds \(0\) full, probes to
+            \(1\) (2 probes). \(44\) finds \(0,1\) full, probes to \(2\)
+            (3 probes). \(1\) has home \(1\), which is full (holds \(33\)), probes
+            to \(2\) (full, \(44\)), then \(3\) (empty); 3 probes. Final:
+            <code>[22 33 44 1 _ _ _ _ _ _ _]</code>. Note that \(1\), whose home
+            was \(1\), got displaced all the way to slot \(3\) by the cluster the
+            multiples of \(11\) built: primary clustering in miniature.
+          </details>
+        </li>
+        <li>
+          Repeat the previous insert sequence \(22, 33, 44, 1\) with
+          <em>separate chaining</em> instead. Show the buckets, and compare the
+          worst-case number of key comparisons for a search against the linear
+          probing result.
+          <details>
+            <summary>solution</summary>
+            Buckets: <code>[0] &rarr; 22 &rarr; 33 &rarr; 44</code>,
+            <code>[1] &rarr; 1</code>, all others empty. A search that misses at
+            home \(0\) walks the length-3 chain (3 comparisons); at home \(1\),
+            one comparison. With linear probing the same keys formed one cluster
+            of length \(4\) (slots \(0\)&ndash;\(3\)), so a miss homed at \(0\)
+            walks all four occupied slots plus the empty one. Chaining confines a
+            key&rsquo;s cost to its own bucket; probing lets one home slot&rsquo;s
+            overflow lengthen the search for keys homed elsewhere in the cluster.
+          </details>
+        </li>
+        <li>
+          Explain why \(M = 2^p\) is a poor table size for \(h(k) = k \bmod M\)
+          when the keys are memory addresses (all multiples of \(8\)).
+          <details>
+            <summary>solution</summary>
+            \(k \bmod 2^p\) is the low \(p\) bits of \(k\). If every key is a
+            multiple of \(8 = 2^3\), its low three bits are \(0\), so
+            \(k \bmod 2^p\) is always a multiple of \(8\): only the slots
+            \(0, 8, 16, \dots\) are ever used, and \(7/8\) of the table is dead.
+            A prime \(M\) shares no factor with \(8\), so \(k \bmod M\) takes all
+            residues and the addresses spread across the whole table.
+          </details>
+        </li>
+        <li>
+          Under uniform hashing, what is the expected number of keys that hash to
+          <em>slot 0 specifically</em> when \(n = M\) (so \(\alpha = 1\))? What is
+          the expected number of <em>empty</em> slots, approximately?
+          <details>
+            <summary>solution</summary>
+            Expected keys in slot \(0\) is \(\alpha = n/M = 1\), by the
+            expected-chain-length proposition. A given slot is empty when all
+            \(n = M\) keys miss it: probability \((1 - 1/M)^M \approx e^{-1}\).
+            By linearity over the \(M\) slots, the expected number of empty slots
+            is about \(M/e \approx 0.37\,M\): even at \(\alpha = 1\), more
+            than a third of the slots hold no key, while others hold several.
+            Uniform does not mean even.
+          </details>
+        </li>
+        <li>
+          A linear-probing table doubles when \(2n \ge M\). You insert \(N\) keys
+          into an initially size-\(2\) table with no deletes. In terms of \(N\),
+          how many total key-rehash operations do all the resizes perform?
+          <details>
+            <summary>solution</summary>
+            Resizes occur at \(M = 2, 4, 8, \dots\); the resize from \(M\) to
+            \(2M\) rehashes the \(\approx M/2\) keys present. The counts form a
+            geometric series \(1 + 2 + 4 + \cdots\) whose last term is
+            \(\Theta(N)\), so the total is \(\Theta(N)\), and hence
+            \(\Theta(1)\) amortized per insert. Concretely the sum is at most
+            \(2N\): each key is rehashed at most once per doubling, and the
+            doublings past a key&rsquo;s insertion form a geometric series
+            summing to less than twice the final size.
+          </details>
+        </li>
+        <li>
+          At load factor \(\alpha = 0.75\), compare the expected miss cost of an
+          idealized uniform-probing table with that of linear probing, using the
+          formulas from <a href="#load">&sect;7</a>.
+          <details>
+            <summary>solution</summary>
+            Idealized: \(1/(1-\alpha) = 1/0.25 = 4\) probes. Linear probing:
+            \(\tfrac12(1 + 1/(1-\alpha)^2) = \tfrac12(1 + 16) = 8.5\) probes. The
+            square in the linear-probing miss cost roughly doubles the work at
+            this load; at \(\alpha = 0.9\) the gap is \(10\) versus \(50.5\).
+            This is why linear probing wants \(\alpha \le \tfrac12\) while the
+            idealized (double-hashing-like) scheme tolerates more.
+          </details>
+        </li>
+        <li>
+          You store a set of \(3\)-D integer points and hash a point \((x,y,z)\)
+          by \(x\) alone. The program is correct but slow on real data. Diagnose
+          the problem in terms of the four hash-function requirements, and give a
+          one-line fix.
+          <details>
+            <summary>solution</summary>
+            The hash is deterministic, fast, and (in isolation) fine, but it does
+            not <em>use the whole key</em>: all points sharing an \(x\)-coordinate
+            collide, and real point sets often share coordinates (points on a
+            vertical line or plane), so those keys clump into long chains or
+            clusters: the uniformity requirement fails and lookups drift
+            toward \(\Theta(n)\). Fix: combine all three fields, e.g.
+            <code>((x*31 + y)*31 + z)</code>, so every coordinate influences the
+            slot.
+          </details>
+        </li>
+        <li>
+          True or false, with a one-sentence justification: &ldquo;If two keys
+          have the same hash code, the hash table is broken.&rdquo;
+          <details>
+            <summary>solution</summary>
+            False. Equal hash codes for <em>distinct</em> keys are simply a
+            collision, which every resolution strategy is designed to handle; the
+            table is only broken if <em>equal</em> keys produce <em>different</em>
+            hash codes, which violates the hashCode contract and makes lookups
+            miss.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Hashing v1.0 &middot; prepared by
+        Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+    <!-- Tombstone-lifecycle figure (§5): a STATIC state-stack rendered by the
+         demo library: each operation's end state, stacked, markers derived
+         from the trace (see lib/core/state-stack.js). -->
+    <script type="module">
+      import { renderStateStack, OpenAddressing } from "../lib/index.js";
+      renderStateStack(document.getElementById("tombstone-lifecycle"), {
+        make: () => new OpenAddressing(11, { probe: "linear", resizeAt: Infinity, deleteMode: "tombstone" }),
+        build: [14, 25, 36],
+        steps: [
+          { run: (s) => s.remove(25), caption: "delete 25 → tombstone at slot 4 (probe paths through 4 survive)" },
+          { run: (s) => s.search(36), caption: "search 36 · h(36) = 3 → 14, † (keep going), 36 ✓; the tombstone cost a probe, not the answer" },
+          { run: (s) => s.search(47) },
+          { run: (s) => s.insert(47), caption: "insert 47 · h(47) = 3 → the remembered tombstone slot 4 is reused" },
+        ],
+      });
+    </script>
+  </body>
+</html>

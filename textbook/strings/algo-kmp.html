@@ -1,0 +1,971 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Knuth–Morris–Pratt.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Knuth&ndash;Morris&ndash;Pratt - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Knuth&ndash;Morris&ndash;Pratt</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Substring search with a guarantee: a mismatch after a partial match
+        does not erase what was learned, and the failure function precomputes
+        exactly how much of the match survives. The table, its four-line
+        build, the never-back-up scan, correctness via borders, the linear
+        bound, and Sedgewick&rsquo;s DFA view, the bridge to regular
+        expressions. With worked traces, full implementations, the race demo,
+        and exercises.
+      </div>
+
+      <p class="lead">
+        Brute-force substring search (<a href="foundation-substring-search.html"><em>Substring
+        Search: The Problem &amp; Baselines</em></a>) re-examines text
+        characters after every partial match, and pays \(\Theta(nm)\) in the
+        worst case. The <strong>Knuth&ndash;Morris&ndash;Pratt (KMP)</strong>
+        algorithm eliminates the re-reading. The key observation: when a mismatch occurs
+        after matching \(j\) characters, those last \(j\) text characters are
+        not unknown: they equal the pattern&rsquo;s first \(j\)
+        characters, which we know perfectly well. So instead of rewinding the
+        text, slide the <em>pattern</em> forward to the next alignment
+        consistent with what was just matched, and resume. The text pointer
+        \(i\) <strong>never decreases</strong>; on a mismatch only the pattern
+        pointer \(j\) falls back.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#insight">The insight, and the failure function</a></li>
+          <li><a href="#build">Building the table, and the search</a></li>
+          <li><a href="#borders">Why the fall-back is right: borders</a></li>
+          <li><a href="#cost">Cost, the DFA view, and the demo</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="insight">1. The insight, and the failure function</h2>
+      <div class="ex">
+        <span class="tag">Example (the key insight)</span>
+        <pre>  text:     A B A B A B C &hellip;
+  pattern:  A B A B C
+                    &uarr; mismatch at pattern[4]</pre>
+        We matched <code>ABAB</code> and failed at <code>pattern[4]</code>.
+        Brute force would slide by one and re-read from <code>text[1]</code>.
+        But look at what was matched: <code>AB</code> is a <em>prefix</em> of
+        the pattern that is also a <em>suffix</em> of the matched
+        <code>ABAB</code>. Slide the pattern so that prefix re-aligns under the
+        text&rsquo;s last two matched characters, resume comparing at
+        <code>pattern[2]</code>, and never move \(i\) back. The
+        &ldquo;how much of my partial match survives&rdquo; number is what KMP
+        precomputes, for every mismatch position, before ever touching the
+        text.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (failure function)</span>
+        For a pattern \(P\) of length \(m\), the <strong>failure
+        function</strong> is the array
+        \[
+          \mathit{fail}[j] = \text{length of the longest }\textit{proper}\text{
+          prefix of } P[0..j] \text{ that is also a suffix of } P[0..j],
+        \]
+        for \(j = 0, \dots, m-1\), where \(P[0..j]\) means the first \(j+1\)
+        characters (inclusive). &ldquo;Proper&rdquo; excludes the whole string,
+        so \(\mathit{fail}[0] = 0\) always. Reading: <em>if my partial match
+        ends at \(P[j]\) and then breaks, \(\mathit{fail}[j]\) matched
+        characters survive.</em> After matching \(j\) characters, a mismatch
+        sends the pattern pointer to \(j = \mathit{fail}[j-1]\), and the
+        text pointer stays put.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (failure function, worked)</span>
+        Pattern <code>AABAA</code>:
+        <table class="trace">
+          <tr><td class="lab">j</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+          <tr><td class="lab">P[j]</td><td class="cell">A</td><td class="cell">A</td><td class="cell">B</td><td class="cell">A</td><td class="cell">A</td></tr>
+          <tr><td class="lab">fail[j]</td><td>0</td><td>1</td><td>0</td><td>1</td><td>2</td></tr>
+        </table>
+        Walk it: \(\mathit{fail}[1] = 1\) (prefix <code>A</code> = suffix
+        <code>A</code> of <code>AA</code>); \(\mathit{fail}[2] = 0\)
+        (<code>AAB</code> ends in <code>B</code>, no prefix survives);
+        \(\mathit{fail}[3] = 1\) (<code>AABA</code> ends with the prefix
+        <code>A</code>); \(\mathit{fail}[4] = 2\) (<code>AABAA</code> ends with
+        the prefix <code>AA</code>). So a mismatch after matching all of
+        <code>AABAA</code> falls back to \(j = \mathit{fail}[4] = 2\): the
+        <code>AA</code> the text just supplied re-serves as the pattern&rsquo;s
+        first two characters.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a second table: the exam classic)</span>
+        Pattern <code>ABABAC</code>:
+        <table class="trace">
+          <tr><td class="lab">j</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+          <tr><td class="lab">P[j]</td><td class="cell">A</td><td class="cell">B</td><td class="cell">A</td><td class="cell">B</td><td class="cell">A</td><td class="cell">C</td></tr>
+          <tr><td class="lab">fail[j]</td><td>0</td><td>0</td><td>1</td><td>2</td><td>3</td><td>0</td></tr>
+        </table>
+        The <code>ABAB</code> self-overlap grows the entries \(1, 2, 3\)
+        (prefixes <code>A</code>, <code>AB</code>, <code>ABA</code> re-appear
+        as suffixes), and the final <code>C</code> matches no prefix, resetting
+        to \(0\). A mismatch at \(j = 5\) (after matching
+        <code>ABABA</code>) falls back to
+        \(j = \mathit{fail}[4] = 3\): the <code>ABA</code> prefix re-aligns
+        under the text&rsquo;s last three matched characters. Fill in one of
+        these tables by hand; it is the standard exam question on KMP.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="build">2. Building the table, and the search</h2>
+      <p>
+        The failure function is computed by matching the pattern against
+        <em>itself</em>: a running index \(k\) tracks the current longest
+        prefix-suffix, growing by one when the next character extends it and
+        falling back through the (partially built) table when it does not: the same never-back-up logic, applied to the pattern. The build
+        is \(\Theta(m)\); then the scan reads each text character with the same
+        extend-or-fall-back step. Both loops below are four lines long, and
+        getting the build loop right is the crux of implementing KMP: trace it once on <code>AABAA</code>.
+      </p>
+      <div class="code-tabs" data-snippet="strings/kmp">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Failure function: fail[j] = length of the longest proper prefix of the
+// pattern&#x27;s first j+1 characters that is also a suffix of them. Built by
+// matching the pattern against ITSELF: k falls back through the very table
+// under construction. Theta(m).
+vector&lt;int&gt; failureFn(const string&amp; p) {
+    int m = p.size();
+    vector&lt;int&gt; fail(m, 0);
+    int k = 0;                             // length of the current prefix-suffix
+    for (int j = 1; j &lt; m; j++) {
+        while (k &gt; 0 &amp;&amp; p[j] != p[k]) k = fail[k - 1];  // shrink until it extends
+        if (p[j] == p[k]) k++;             // extend the prefix-suffix
+        fail[j] = k;
+    }
+    return fail;
+}
+
+// KMP search: the text pointer i NEVER decreases; on a mismatch only the
+// pattern pointer j falls back, via the table. Theta(n) scan after the
+// Theta(m) build: Theta(n + m) total, guaranteed.
+int kmpSearch(const string&amp; t, const string&amp; p) {
+    vector&lt;int&gt; fail = failureFn(p);
+    int j = 0;                             // characters matched so far
+    for (int i = 0; i &lt; (int)t.size(); i++) {
+        while (j &gt; 0 &amp;&amp; t[i] != p[j]) j = fail[j - 1];  // fall back in the pattern
+        if (t[i] == p[j]) j++;             // extend the partial match
+        if (j == (int)p.size()) return i - j + 1;       // full match: report start
+    }
+    return -1;                             // no occurrence
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Failure function: fail[j] = length of the longest proper prefix of the
+// pattern&#x27;s first j+1 characters that is also a suffix of them. Built by
+// matching the pattern against ITSELF: k falls back through the very table
+// under construction. Theta(m).
+static int[] failureFn(String p) {
+    int m = p.length();
+    int[] fail = new int[m];
+    int k = 0;                             // length of the current prefix-suffix
+    for (int j = 1; j &lt; m; j++) {
+        while (k &gt; 0 &amp;&amp; p.charAt(j) != p.charAt(k)) k = fail[k - 1];
+        if (p.charAt(j) == p.charAt(k)) k++;   // extend the prefix-suffix
+        fail[j] = k;
+    }
+    return fail;
+}
+
+// KMP search: the text pointer i NEVER decreases; on a mismatch only the
+// pattern pointer j falls back, via the table. Theta(n) scan after the
+// Theta(m) build: Theta(n + m) total, guaranteed.
+static int kmpSearch(String t, String p) {
+    int[] fail = failureFn(p);
+    int j = 0;                             // characters matched so far
+    for (int i = 0; i &lt; t.length(); i++) {
+        while (j &gt; 0 &amp;&amp; t.charAt(i) != p.charAt(j)) j = fail[j - 1];
+        if (t.charAt(i) == p.charAt(j)) j++;   // extend the partial match
+        if (j == p.length()) return i - j + 1; // full match: report start
+    }
+    return -1;                             // no occurrence
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Failure function: fail[j] = length of the longest proper prefix of the
+# pattern&#x27;s first j+1 characters that is also a suffix of them. Built by
+# matching the pattern against ITSELF: k falls back through the very table
+# under construction. Theta(m).
+def failure_fn(p):
+    m = len(p)
+    fail = [0] * m
+    k = 0                                  # length of the current prefix-suffix
+    for j in range(1, m):
+        while k &gt; 0 and p[j] != p[k]:      # shrink until it extends
+            k = fail[k - 1]
+        if p[j] == p[k]:                   # extend the prefix-suffix
+            k += 1
+        fail[j] = k
+    return fail
+
+# KMP search: the text pointer i NEVER decreases; on a mismatch only the
+# pattern pointer j falls back, via the table. Theta(n) scan after the
+# Theta(m) build: Theta(n + m) total, guaranteed.
+def kmp_search(t, p):
+    fail = failure_fn(p)
+    j = 0                                  # characters matched so far
+    for i in range(len(t)):
+        while j &gt; 0 and t[i] != p[j]:      # fall back in the pattern
+            j = fail[j - 1]
+        if t[i] == p[j]:                   # extend the partial match
+            j += 1
+        if j == len(p):                    # full match: report start index
+            return i - j + 1
+    return -1                              # no occurrence</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Failure function: fail[j] = length of the longest proper prefix of the
+// pattern&#x27;s first j+1 characters that is also a suffix of them. Built by
+// matching the pattern against ITSELF: k falls back through the very table
+// under construction. O(m).
+fn failure_fn(p: &amp;str) -&gt; Vec&lt;usize&gt; {
+    let p = p.as_bytes();
+    let mut fail = vec![0usize; p.len()];
+    let mut k = 0;                         // length of the current prefix-suffix
+    for j in 1..p.len() {
+        while k &gt; 0 &amp;&amp; p[j] != p[k] { k = fail[k - 1]; }  // shrink until extends
+        if p[j] == p[k] { k += 1; }        // extend the prefix-suffix
+        fail[j] = k;
+    }
+    fail
+}
+
+// KMP search: the text pointer i NEVER decreases; on a mismatch only the
+// pattern pointer j falls back, via the table. O(n) scan after the O(m)
+// build: O(n + m) total, guaranteed.
+fn kmp_search(t: &amp;str, p: &amp;str) -&gt; i32 {
+    let fail = failure_fn(p);
+    let (t, p) = (t.as_bytes(), p.as_bytes());
+    let mut j = 0;                         // characters matched so far
+    for i in 0..t.len() {
+        while j &gt; 0 &amp;&amp; t[i] != p[j] { j = fail[j - 1]; }  // fall back in pattern
+        if t[i] == p[j] { j += 1; }        // extend the partial match
+        if j == p.len() { return (i + 1 - j) as i32; }    // full match: start
+    }
+    -1                                     // no occurrence
+}</pre>
+<p class="ct-src">source: <code>code/strings/kmp.cpp &middot; code/strings/kmp.java &middot; code/strings/kmp.py &middot; code/strings/kmp.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Between them the two loops have exactly six outcomes, and a correct
+        hand-trace has to produce all six. One step of the <strong>build</strong>
+        loop (one value of \(j\)) ends in one of four ways:
+      </p>
+      <ol>
+        <li><strong>Extend from \(k = 0\):</strong> the while loop does not run,
+          \(P[0] = P[j]\), so \(\mathit{fail}[j] = 1\).</li>
+        <li><strong>Extend from \(k &gt; 0\):</strong> the while loop does not
+          run, \(P[k] = P[j]\), so \(\mathit{fail}[j] = k+1\): the current
+          prefix-suffix grows by one at the cost of one comparison.</li>
+        <li><strong>Fall back, then extend:</strong> \(P[k] \ne P[j]\), so \(k\)
+          walks down the chain \(\mathit{fail}[k-1], \dots\) until some
+          candidate does extend; \(\mathit{fail}[j]\) is that shorter
+          candidate \(+\,1\).</li>
+        <li><strong>Fall back to \(0\) and die:</strong> the chain reaches
+          \(k = 0\) and even \(P[0] \ne P[j]\), so
+          \(\mathit{fail}[j] = 0\): no border of \(P[0..j-1]\) extends.</li>
+      </ol>
+      <p>
+        One step of the <strong>search</strong> loop (one text character) ends
+        in one of these:
+      </p>
+      <ol start="5">
+        <li><strong>Match:</strong> \(t[i] = P[j]\), so \(j\) grows; if it
+          reaches \(m\), report the occurrence at \(i - j + 1\).</li>
+        <li><strong>Mismatch with \(j &gt; 0\):</strong> \(j\) drops to
+          \(\mathit{fail}[j-1]\) and the <em>same</em> \(t[i]\) is tried
+          again, possibly several times down the chain, possibly all the way to
+          \(j = 0\). The text pointer does not move.</li>
+        <li><strong>Mismatch with \(j = 0\):</strong> nothing is matched, so
+          there is nothing to fall back to; the while loop is skipped, the
+          <code>if</code> fails, and \(i\) advances with \(j\) still \(0\).
+          This is the brute-force step, and it is the only mismatch that
+          consumes a text character.</li>
+      </ol>
+      <div class="ex">
+        <span class="tag">Example (the build loop, every step)</span>
+        Pattern <code>AABAAC</code> (\(m = 6\)), the pattern searched for in
+        &sect;4&rsquo;s full run. <em>k in</em> is the value \(k\) holds on
+        entry to iteration \(j\) (namely \(\mathit{fail}[j-1]\)); the tests
+        column lists the inner-loop comparisons in the order the code makes
+        them:
+        <table class="trace">
+          <tr><th class="lab">j</th><th>P[j]</th><th>k in</th><th>tests, in order</th><th>fail[j]</th><th>case</th></tr>
+          <tr><td class="lab">1</td><td class="cell">A</td><td>0</td>
+            <td class="lt">P[0] = A = A: extend</td><td>1</td><td>1</td></tr>
+          <tr><td class="lab">2</td><td class="cell">B</td><td>1</td>
+            <td class="piv">P[1] = A &ne; B: k = fail[0] = 0; P[0] = A &ne; B</td><td>0</td><td>4</td></tr>
+          <tr><td class="lab">3</td><td class="cell">A</td><td>0</td>
+            <td class="lt">P[0] = A = A: extend</td><td>1</td><td>1</td></tr>
+          <tr><td class="lab">4</td><td class="cell">A</td><td>1</td>
+            <td class="lt">P[1] = A = A: extend</td><td>2</td><td>2</td></tr>
+          <tr><td class="lab">5</td><td class="cell">C</td><td>2</td>
+            <td class="piv">P[2] = B &ne; C: k = fail[1] = 1; P[1] = A &ne; C: k = fail[0] = 0; P[0] = A &ne; C</td><td>0</td><td>4</td></tr>
+        </table>
+        Finished table: \(\mathit{fail} = [0, 1, 0, 1, 2, 0]\)
+        (\(\mathit{fail}[0] = 0\) by definition, never computed by the loop).
+        Read the two interesting rows. At \(j = 2\) the running prefix-suffix
+        <code>A</code> cannot survive a <code>B</code>, one fall-back empties
+        it, and the last test proves that even the single character
+        <code>A</code> does not start with <code>B</code>. At \(j = 5\) the
+        chain is longer: the borders of the five matched characters
+        <code>AABAA</code> are \(2, 1, 0\), and <code>C</code> extends none of
+        them, so three tests establish \(\mathit{fail}[5] = 0\) exhaustively.
+        Case 3 (fall back, then extend) does not arise in a pattern this
+        short; it is worked in &sect;3, where <code>AABAAABAAAABAAAB</code>
+        falls from \(k = 6\) to \(2\) to \(1\) and the last candidate accepts.
+        Eight comparisons in total for a six-character pattern, inside the
+        \(2m = 12\) bound proved in &sect;4.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="borders">3. Why the fall-back is right: borders</h2>
+      <p>
+        Both loops contain the same suspicious-looking move: on a mismatch,
+        jump to \(\mathit{fail}[k-1]\) and try again. Why is <em>that</em> the
+        right amount to fall back: why not one less, and how do we know
+        nothing in between was skipped that could have worked? Both questions
+        have the same answer, and it is worth naming the object it rests on.
+      </p>
+      <div class="def" id="border">
+        <span class="tag">Definition (border)</span>
+        A <strong>border</strong> of a string is a <em>proper</em> prefix that
+        is also a suffix. In this vocabulary the failure function reads:
+        \(\mathit{fail}[j]\) is the length of the <em>longest border</em> of
+        \(P[0..j]\). One string can have several borders (<code>ABABA</code> has three: <code>ABA</code>, <code>A</code>, and the
+        empty string), and both correctness arguments below come down to
+        enumerating <em>all</em> of them.
+      </div>
+      <div class="thm">
+        <span class="tag">Lemma (the fall-back chain visits every border)</span>
+        Let \(S\) be a string whose longest border \(C\) has length \(k\).
+        Then the borders of \(S\) are exactly: \(C\) itself, and the borders
+        of \(C\). Consequently the chain
+        \[
+          k,\;\; \mathit{fail}[k-1],\;\; \mathit{fail}[\mathit{fail}[k-1]-1],\;\;
+          \dots,\;\; 0
+        \]
+        lists <em>all</em> border lengths of \(S\), in strictly decreasing
+        order: no length strictly between two consecutive chain values
+        can be a border.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Two directions.
+        <em>A border of \(C\) is a border of \(S\):</em> a prefix of \(C\) is
+        a prefix of \(S\) (prefix of a prefix), and a suffix of \(C\) is a
+        suffix of \(S\) (suffix of a suffix). <em>Every border of \(S\)
+        shorter than \(C\) is a border of \(C\):</em> let \(B\) be such a
+        border, \(|B| &lt; k\). \(B\) and \(C\) are both prefixes of \(S\), so
+        the shorter is a prefix of the longer: \(B\) is a prefix of \(C\).
+        \(B\) and \(C\) are both suffixes of \(S\), so likewise \(B\) is a
+        suffix of \(C\). Hence \(B\) is a border of \(C\). So below \(C\), the
+        borders of \(S\) and of \(C\) are the same set, and repeating
+        the argument inside \(C\) (whose longest border has length
+        \(\mathit{fail}[k-1]\)) walks down through every border and nothing
+        else. <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the chain, checked by hand)</span>
+        Take \(S = \) <code>ABABA</code>, the first five characters of
+        the exam-classic pattern <code>ABABAC</code>, whose table row reads
+        \(\mathit{fail} = [0, 0, 1, 2, 3, 0]\). The chain starts at its
+        longest border, \(\mathit{fail}[4] = 3\):
+        <pre>  chain:  3  &rarr;  fail[2] = 1  &rarr;  fail[0] = 0
+  ABABA&rsquo;s borders:   ABA (3)    A (1)    &epsilon; (0)</pre>
+        Exactly the three borders, longest first. And the lemma says why
+        length \(2\) is <em>legitimately</em> absent from the chain: a border
+        of length \(2\) would have to be a border of <code>ABA</code> (every
+        shorter border lives inside the longest one), and <code>ABA</code>&rsquo;s
+        longest border is <code>A</code>, length \(1\), so no border of
+        length \(2\) exists, and skipping from \(3\) to \(1\) skips nothing
+        real.
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (the build loop is correct)</span>
+        In <code>failureFn</code>, the while loop
+        <code>while (k &gt; 0 &amp;&amp; p[j] != p[k]) k = fail[k-1]</code>
+        computes \(\mathit{fail}[j]\) exactly.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> What could \(\mathit{fail}[j]\) be? A nonzero
+        border of \(P[0..j]\) ends at \(P[j]\), so it is some border of
+        \(P[0..j-1]\) <em>extended by one character</em>: a border of
+        length \(\ell\) extends precisely when \(P[\ell] = P[j]\), giving a
+        border of length \(\ell + 1\). So the candidates for
+        \(\mathit{fail}[j]\) are: <em>(some border \(\ell\) of
+        \(P[0..j-1]\) with \(P[\ell] = P[j]\)) \(+ 1\)</em>, or \(0\) if no
+        border extends. Entering iteration \(j\), the variable \(k\) holds
+        \(\mathit{fail}[j-1]\) (the longest border of \(P[0..j-1]\)), and the while loop walks the chain of the Lemma: it tests the
+        borders of \(P[0..j-1]\) <strong>in strictly decreasing order,
+        missing none</strong>, and stops at the first one that extends. The
+        first to extend is the longest that extends, so
+        \(\mathit{fail}[j] = k+1\) is the longest border of \(P[0..j]\).
+        (If the chain bottoms out at \(k=0\) and even \(P[0] \ne P[j]\), no
+        border extends and \(\mathit{fail}[j] = 0\).)
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (one build step, both outcomes)</span>
+        <em>All candidates die.</em> Pattern <code>ABABAC</code>, last step
+        \(j = 5\), where \(k\) enters holding \(\mathit{fail}[4] = 3\):
+        <pre>  k = 3:  P[3] = B &ne; C   &rarr; fall back, k = fail[2] = 1
+  k = 1:  P[1] = B &ne; C   &rarr; fall back, k = fail[0] = 0
+  k = 0:  P[0] = A &ne; C   &rarr; no border extends: fail[5] = 0</pre>
+        Three tests, one per border of <code>ABABA</code>: the loop
+        proved no border extends by <code>C</code>, so \(0\) is not a guess
+        but an exhaustive check.
+        <em>A shorter candidate wins.</em> Pattern
+        <code>AABAAABAAAABAAAB</code>, whose finished table is
+        \(\mathit{fail} = [0,1,0,1,2,2,3,4,5,6,2,3,4,5,6,7]\). The
+        interesting step is \(j = 10\): \(k\) enters holding
+        \(\mathit{fail}[9] = 6\), and the borders of the ten matched
+        characters <code>AABAAABAAA</code> are <code>AABAAA</code> (6),
+        <code>AA</code> (2), <code>A</code> (1), \(\epsilon\); lengths
+        \(3, 4, 5\) are not borders, and the chain never touches them:
+        <pre>  k = 6:  P[6] = B &ne; A   &rarr; fall back, k = fail[5] = 2
+  k = 2:  P[2] = B &ne; A   &rarr; fall back, k = fail[1] = 1
+  k = 1:  P[1] = A = A    &rarr; extends: fail[10] = k + 1 = 2
+
+  (j = 11, k enters as fail[10] = 2)
+  k = 2:  P[2] = B = B    &rarr; extends: fail[11] = k + 1 = 3</pre>
+        Drawn as alignments: each candidate \(k\) slides a fresh copy
+        of the pattern so that its first \(k\) characters sit under the last
+        \(k\) already matched, and the cell compared is \(P[k]\) under
+        \(P[j]\):
+        <pre>  P:        A A B A A A B A A A A B A A A B
+                                &uarr; j = 10
+  k = 6:            A A B A A A B      AABAAA re-aligned; P[6] = B &ne; A  &#10007;
+  k = 2:                    A A B      AA re-aligned; P[2] = B &ne; A  &#10007;
+  k = 1:                      A A      A  re-aligned; P[1] = A = A  &#10003;
+                                  &uarr; j = 11
+  k = 2:                      A A B    AA (= fail[10]); P[2] = B = B  &#10003;</pre>
+        TWO fall-backs, and neither runs to \(k = 0\): the border
+        <code>AABAAA</code> refuses to extend, so does <code>AA</code>, and
+        <code>A</code> accepts: \(\mathit{fail}[10] = 2\), reached by
+        visiting exactly the borders \(6 \to 2 \to 1\) and skipping
+        \(5, 4, 3\) on the Lemma&rsquo;s authority, not on faith. And keeping
+        that \(k\) pays off immediately: \(j = 11\) enters with the
+        <code>AA</code> border in hand, one comparison grows it to
+        <code>AAB</code>, and the next four steps ride the same wave with one
+        comparison each: \(\mathit{fail}[12..15] = 4, 5, 6, 7\).
+        Check the end of it: the pattern indeed ends with
+        <code>AABAAAB</code>, its own first seven characters.
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (the search loop is correct)</span>
+        In <code>kmpSearch</code>, suppose the scan has matched \(j &gt; 0\)
+        characters: the pattern is aligned at text position
+        \(i - j\), and \(t[i]\ne P[j]\). Then any occurrence of \(P\) starting
+        after the current alignment, up to and including \(i\), must begin at
+        \(i - \ell\) for some <em>border length</em> \(\ell\) of
+        \(P[0..j-1]\); the while loop
+        <code>while (j &gt; 0 &amp;&amp; t[i] != p[j]) j = fail[j-1]</code>
+        tries exactly those alignments, nearest first, and every alignment it
+        jumps over is impossible.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Consider a candidate alignment
+        \(s'\) with \(i - j &lt; s' \le i\), and suppose an occurrence starts
+        there. Its first \(i - s'\) characters occupy text positions
+        \(s' .. i-1\), all inside the region the scan already matched,
+        where \(t[i-j..i-1] = P[0..j-1]\). So the occurrence needs
+        \(P[0..i-s'-1]\) (a prefix of the pattern) to equal
+        \(t[s'..i-1]\) (a suffix of the matched region, i.e.&nbsp;a suffix of
+        \(P[0..j-1]\)): the length \(\ell = i - s'\) must be a
+        <strong>border</strong> of \(P[0..j-1]\). Setting
+        \(j = \mathit{fail}[j-1]\) moves the alignment to
+        \(i - \mathit{fail}[j-1]\) (the candidate given by the
+        <em>longest</em> border, the smallest possible forward slide), and repeating walks the Lemma&rsquo;s chain: all viable alignments,
+        in left-to-right order. Each is then judged by comparing
+        \(t[i]\) with the new \(P[j]\); on failure the next border is tried.
+        Alignments between two chain stops correspond to lengths that are not
+        borders, so they cannot even agree with the text already read: the loop skips them without a single comparison, on evidence computed
+        from the pattern alone at build time. If the chain reaches
+        \(j = 0\), every alignment up to \(i\) is ruled out and the scan
+        continues by comparing \(t[i]\) with \(P[0]\) (alignment \(i\)
+        itself); alignments beyond \(i\) are untouched and remain available
+        to later iterations. <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the skipped alignments, drawn)</span>
+        Pattern <code>AABAAC</code> in text <code>AABAABAAC</code>, the
+        same pair as the full run below. The scan matches
+        <code>AABAA</code> at alignment \(0\), then hits
+        \(t[5] = \)<code>B</code> \(\ne\) <code>C</code>\( = P[5]\):
+        <pre>  text:      A A B A A B A A C
+  align 0:   A A B A A C           &#10007; matched AABAA, then C &ne; B at text[5]
+  align 1:     A A B A A C         is AABA a border of AABAA? no, skipped
+  align 2:       A A B A A C       is AAB a border? no, skipped
+  align 3:         A A B A A C     is AA a border? YES: the loop&rsquo;s first stop</pre>
+        The borders of <code>AABAA</code> are \(2, 1, 0\), so the only
+        alignments worth trying are \(5-2=3\), \(5-1=4\), \(5-0=5\). The loop
+        takes one step, \(j = \mathit{fail}[4] = 2\) (alignment \(3\)),
+        compares \(t[5] = \)<code>B</code> with \(P[2] = \)<code>B</code> (a match), and the scan carries on to find the occurrence
+        at index \(3\). Alignments \(1\) and \(2\) were rejected without
+        reading a single text character: their impossibility was already a
+        fact about the pattern. That is the whole trick of KMP: the
+        table is a precomputed proof about \(P\), spent one mismatch at a
+        time against \(t\).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a shorter border rescues the search)</span>
+        Above, the loop&rsquo;s <em>first</em> stop already matched. It need
+        not: a stop is only a <em>candidate</em>, judged by comparing
+        \(t[i]\) against the new \(P[j]\), and when it fails the loop falls
+        to the next shorter border, without moving \(i\). Pattern
+        <code>AABAAB</code> (table \(\mathit{fail} = [0,1,0,1,2,3]\)) in text
+        <code>AABAAABAAB</code>. The scan matches <code>AABAA</code> at
+        alignment \(0\), then hits \(t[5] = \)<code>A</code> \(\ne\)
+        <code>B</code>\( = P[5]\), and the matched prefix is again
+        <code>AABAA</code>, borders \(2, 1, 0\):
+        <pre>  text:      A A B A A A B A A B
+  align 0:   A A B A A B           &#10007; matched AABAA, then B &ne; A at text[5]
+  align 3:         A A B A A B     border AA: P[2] = B vs A  &#10007;; fall again
+  align 4:           A A B A A B   border A:  P[1] = A vs A  &#10003;; j = 2, scan on</pre>
+        Two stops this time: the longest border&rsquo;s candidate
+        (alignment \(3\)) fails on the very next character, the loop falls
+        once more to \(j = \mathit{fail}[1] = 1\), and the shorter
+        border&rsquo;s candidate (alignment \(4\)) accepts \(t[5]\), leaving
+        \(j = 2\). The scan then just keeps going (\(t[6..9] = \)
+        <code>BAAB</code> matches \(P[2..5]\)), and completes the
+        occurrence at index \(4\): <em>exactly the alignment the second
+        fall-back chose</em>. The shorter border was not a consolation prize;
+        it was the real occurrence, and \(i\) never moved backward while the
+        loop found it. (This is the search-side twin of the build
+        example&rsquo;s \(j = 10\) step above: the same walk down a
+        matched prefix&rsquo;s borders, longest first, stopping at the first
+        that fits.)
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">4. Cost, the DFA view, and the demo</h2>
+      <div class="thm">
+        <span class="tag">Proposition (KMP cost)</span>
+        KMP makes at most \(2n\) character comparisons in the scan, after a
+        \(\Theta(m)\) preprocessing pass: \(\Theta(n + m)\) total,
+        <em>guaranteed</em>, on every input.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Bound the scan&rsquo;s comparisons by watching
+        the quantity \(i - j\) (the pattern&rsquo;s current alignment) and
+        \(i\) itself. Each comparison ends in one of two ways. A
+        <em>match</em> advances \(i\) by one, and \(i\) only ever
+        increases, so at most \(n\) comparisons are matches. A
+        <em>mismatch</em> with \(j &gt; 0\) drops \(j\) to
+        \(\mathit{fail}[j-1] &lt; j\) while \(i\) stays, so the alignment
+        \(i - j\) strictly increases; a mismatch at \(j = 0\) advances \(i\),
+        which also increases \(i - j\). The alignment starts at \(0\), never
+        decreases, and cannot exceed \(n\), so at most \(n\) comparisons are
+        mismatches. Total: at most \(2n\) comparisons, and the text pointer
+        never moved backward. The same argument applied to the build loop
+        (pattern against itself) gives \(2m\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a full KMP run)</span>
+        Pattern <code>AABAAC</code>, whose table is
+        \(\mathit{fail} = [0, 1, 0, 1, 2, 0]\); text <code>AABAABAAC</code>
+        (\(n = 9\)). Every comparison of the scan, in order:
+        <table class="trace">
+          <tr><th class="lab">#</th><th>i</th><th>j</th><th>text[i]</th><th>P[j]</th><th>outcome</th></tr>
+          <tr><td class="lab">1</td><td>0</td><td>0</td><td class="cell">A</td><td class="cell">A</td><td class="lt">match: i=1, j=1</td></tr>
+          <tr><td class="lab">2</td><td>1</td><td>1</td><td class="cell">A</td><td class="cell">A</td><td class="lt">match: i=2, j=2</td></tr>
+          <tr><td class="lab">3</td><td>2</td><td>2</td><td class="cell">B</td><td class="cell">B</td><td class="lt">match: i=3, j=3</td></tr>
+          <tr><td class="lab">4</td><td>3</td><td>3</td><td class="cell">A</td><td class="cell">A</td><td class="lt">match: i=4, j=4</td></tr>
+          <tr><td class="lab">5</td><td>4</td><td>4</td><td class="cell">A</td><td class="cell">A</td><td class="lt">match: i=5, j=5</td></tr>
+          <tr><td class="lab">6</td><td>5</td><td>5</td><td class="cell">B</td><td class="cell">C</td><td class="piv">mismatch: j = fail[4] = 2, i STAYS at 5</td></tr>
+          <tr><td class="lab">7</td><td>5</td><td>2</td><td class="cell">B</td><td class="cell">B</td><td class="lt">match: i=6, j=3</td></tr>
+          <tr><td class="lab">8</td><td>6</td><td>3</td><td class="cell">A</td><td class="cell">A</td><td class="lt">match: i=7, j=4</td></tr>
+          <tr><td class="lab">9</td><td>7</td><td>4</td><td class="cell">A</td><td class="cell">A</td><td class="lt">match: i=8, j=5</td></tr>
+          <tr><td class="lab">10</td><td>8</td><td>5</td><td class="cell">C</td><td class="cell">C</td><td class="lt">match; j=6=m: FOUND at 8&minus;6+1&hellip;</td></tr>
+        </table>
+        &hellip;that is, at index \(i - j + 1 = 3\):
+        <code>text[3..8] = AABAAC</code>. Ten comparisons, one fall-back, and
+        the payoff visible in row 6: after matching <code>AABAA</code>, the
+        <code>C</code>-versus-<code>B</code> mismatch sets
+        \(j = \mathit{fail}[4] = 2\) (the matched suffix
+        <code>AA</code> re-serves as the pattern&rsquo;s prefix), and
+        \(i\) stays at \(5\). <code>text[0..4]</code> is never read again.
+        (Brute force on this same pair tries four alignments and makes \(15\)
+        comparisons: its six extra are all re-examinations of text
+        characters KMP read once.)
+      </div>
+      <p>
+        That run shows cases 5 and 6 of &sect;2 with a chain of length one. The
+        remaining two, a chain that runs all the way down to \(j = 0\) and a
+        mismatch <em>at</em> \(j = 0\), appear when the text supplies a
+        character the pattern does not contain at all:
+      </p>
+      <div class="ex">
+        <span class="tag">Example (the chain empties, and the \(j=0\) step)</span>
+        Same pattern <code>AABAAC</code>,
+        \(\mathit{fail} = [0, 1, 0, 1, 2, 0]\); text
+        <code>AABAAXAABAAC</code> (\(n = 12\)). The scan again matches
+        <code>AABAA</code>, but this time the offending character is
+        <code>X</code>, which occurs nowhere in the pattern:
+        <table class="trace">
+          <tr><th class="lab">#</th><th>i</th><th>j</th><th>text[i]</th><th>P[j]</th><th>outcome</th></tr>
+          <tr><td class="lab">1&ndash;5</td><td>0&ndash;4</td><td>0&ndash;4</td><td class="cell">AABAA</td><td class="cell">AABAA</td><td class="lt">five matches: i=5, j=5</td></tr>
+          <tr><td class="lab">6</td><td>5</td><td>5</td><td class="cell">X</td><td class="cell">C</td><td class="piv">mismatch: j = fail[4] = 2, i stays</td></tr>
+          <tr><td class="lab">7</td><td>5</td><td>2</td><td class="cell">X</td><td class="cell">B</td><td class="piv">mismatch: j = fail[1] = 1, i stays</td></tr>
+          <tr><td class="lab">8</td><td>5</td><td>1</td><td class="cell">X</td><td class="cell">A</td><td class="piv">mismatch: j = fail[0] = 0, i stays</td></tr>
+          <tr><td class="lab">9</td><td>5</td><td>0</td><td class="cell">X</td><td class="cell">A</td><td class="piv">mismatch at j = 0: i advances to 6, j stays 0</td></tr>
+          <tr><td class="lab">10&ndash;15</td><td>6&ndash;11</td><td>0&ndash;5</td><td class="cell">AABAAC</td><td class="cell">AABAAC</td><td class="lt">six matches; j=6=m: FOUND at 6</td></tr>
+        </table>
+        Comparisons \(6, 7, 8\) are case 6 three times over: the chain walks
+        the borders \(2 \to 1 \to 0\) of the matched <code>AABAA</code>, each
+        step re-testing the <em>same</em> \(t[5]\) against a shorter alignment,
+        with \(i\) frozen. Those three stops are the alignments
+        \(5-2 = 3\), \(5-1 = 4\), \(5-0 = 5\). When the chain empties, the
+        while loop&rsquo;s guard \(j &gt; 0\) fails and comparison \(9\) is
+        case 7: the pattern is now aligned at \(i\) itself, nothing is
+        matched, so the mismatch simply consumes the text character and the
+        scan restarts from \(t[6]\). Fifteen comparisons in all, and \(i\)
+        never moved backward, even while four consecutive comparisons happened
+        at \(i = 5\). Note also what did <em>not</em> happen: alignments
+        \(1\) and \(2\) were never tested, because lengths \(4\) and \(3\) are
+        not borders of <code>AABAA</code>; the table ruled them out at build
+        time.
+      </div>
+      <div class="aside">
+        <span class="tag">Sedgewick&rsquo;s DFA view</span>
+        Sedgewick presents the same precomputation as a full
+        <strong>deterministic finite automaton (DFA)</strong> over the pattern:
+        a 2-D table \(\mathit{dfa}[c][j]\) giving, for <em>every</em> alphabet
+        character \(c\) and pattern state \(j\), the next state directly. The
+        scan then has no fall-back loop at all: one array lookup per
+        text character, \(j = \mathit{dfa}[t[i]][j]\). The build costs
+        \(\Theta(Rm)\) (one entry per character&ndash;state pair) instead of
+        \(\Theta(m)\), buying a perfectly branch-free \(\Theta(n)\) scan. It is
+        the identical algorithm with the fall-backs tabulated in advance, and it is this handout&rsquo;s bridge to
+        <a href="algo-regex-automata.html"><em>Regular Expressions &amp; Automata</em></a>, where the
+        &ldquo;pattern&rdquo; itself generalizes from one string to a whole
+        <em>language</em> and the automaton becomes the star.
+      </div>
+      <div class="aside">
+        <span class="tag">First match, all matches</span>
+        The code above returns the <em>first</em> occurrence.
+        Find-and-replace-all, <code>grep -c</code>, and hit-highlighting need
+        <em>every</em> occurrence, and the change is one line: on a full match,
+        instead of returning, record the index, set
+        \(j = \mathit{fail}[m-1]\), and keep scanning. That fall-back (rather
+        than \(j = 0\)) correctly finds <em>overlapping</em> occurrences (the two <code>AA</code>s inside <code>AAA</code>), and
+        since \(i\) still never backs up, reporting all matches is still
+        \(\Theta(n + m)\).
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=string-search">Substring-search race</a>.
+        The <strong>Run menu picks a pairing</strong>: BF vs KMP, BF
+        vs Boyer, KMP vs Boyer (<a href="algo-boyer-moore.html">Boyer&ndash;Moore</a>&rsquo;s bad-character rule, comparing
+        right-to-left, its <code>right[]</code> table drawn under the
+        pattern). The two chosen searchers run the <em>same</em>
+        text side by side in lockstep, one comparison per tick, every
+        occurrence found and counted. The <strong>text is typed straight
+        into the left panel</strong> (long prose is fine; <code>A^40B</code>
+        expands), the value box takes only the <strong>pattern</strong>
+        (spaces allowed, case ignored), and the KMP panel draws
+        <code>fail[]</code> under the pattern. A thin frame outlines the
+        window of text the pattern currently covers, and playback paces
+        itself: it hurries over first-letter misses and slows wherever a
+        partial match is being extended or torn down. The bold filled chip is
+        the comparison in flight (at \(t[i]\) and \(P[j]\)
+        simultaneously), and the tinted run is the current partial
+        match, highlighted in the text <em>and</em> the pattern; on a
+        fall-back it shortens in place while \(i\)&rsquo;s chip stands still,
+        with the consulted <code>fail[]</code> cell in amber. The counting is
+        deliberately honest: KMP&rsquo;s panel splits its total into
+        <strong>cmp + tbl</strong> (character comparisons plus
+        failure-table consultations), because a fall-back is a memory
+        read and a jump, work a compare-only counter would hide. On this
+        handout&rsquo;s running pair
+        <code>ABABABCABABABCAB</code>&nbsp;/&nbsp;<code>ABABC</code> both find
+        \(2\) matches, at \(32\) total ops against \(18 + 4 = 22\); the
+        adversarial <code>A^40B</code>&nbsp;/&nbsp;<code>A^6B</code> reads
+        \(245\) against \(75 + 35 = 110\) (a \(2.2\times\) win even on
+        honest totals), and KMP freezes, finished, while brute force is
+        still re-scanning. The <strong>examples&hellip;</strong> menu loads
+        both of &sect;3&rsquo;s drawn diagrams (including
+        <code>AABAAABAAB</code>&nbsp;/&nbsp;<code>AABAAB</code>, the
+        shorter-border rescue), an overlapping-matches case
+        (<code>AA</code> in <code>A^6</code>: five hits, because a full match
+        continues with \(j = \mathit{fail}[m-1]\)), and a <strong>DNA</strong>
+        run on real data: <code>GATC</code> (the Sau3AI restriction
+        site) in the first \(1150\) bases of the human mitochondrial
+        reference sequence (rCRS, NC_012920), \(3\) cut sites found. On the
+        DNA, <strong>brute force beats both clever algorithms</strong>:
+        \(1364\) against KMP&rsquo;s \(1315 + 168 = 1483\) and
+        Boyer&ndash;Moore&rsquo;s \(1000 + 707 = 1707\). A 4-letter alphabet
+        defeats them symmetrically: <code>GATC</code>&rsquo;s lack of
+        self-overlap (\(\mathit{fail} = [0,0,0,0]\)) means KMP&rsquo;s table
+        never saves a comparison while every teardown costs a read, and every
+        text character occurs somewhere in <code>GATC</code>, so the
+        bad-character leap never comes (the average shift is barely \(2\)).
+        On the <em>prose</em> the tables turn: Boyer&ndash;Moore reads only
+        \(158\) of the \(807\) characters (\(+\,91\) table reads
+        \(= 249\) ops) against brute force&rsquo;s \(897\): <a href="algo-boyer-moore.html">Boyer&ndash;Moore</a>&rsquo;s sublinear claim, live on screen. That is the honest
+        shape of the family: brute force wins small alphabets,
+        Boyer&ndash;Moore wins real text, and KMP&rsquo;s prize is the
+        <em>worst-case guarantee</em> plus the never-back-up property the
+        next paragraph turns into streaming: the one thing
+        Boyer&ndash;Moore, re-reading inside every window, cannot offer.
+      </div>
+      <p>
+        Scaled up, the gap is not academic: on an all-<code>A</code>s text with
+        \(n = 10^6\) and \(m = 1000\), brute force makes about
+        \(n \cdot m = 10^9\) comparisons and KMP about \(n + m \approx 10^6\): a thousandfold difference on a megabyte of data. And because
+        the text pointer never retreats, KMP reads its input strictly left to
+        right, once: it runs happily on a <em>stream</em> it cannot rewind (network traffic, a pipe, a file too big to buffer), which
+        no algorithm that backs up or looks ahead can do.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">5. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Compute the failure function of <code>AAAA</code> and of
+          <code>ABCABD</code>.
+          <details>
+            <summary>solution</summary>
+            <code>AAAA</code>: \([0, 1, 2, 3]\); each added
+            <code>A</code> extends the self-overlap by one (the longest proper
+            prefix of \(j+1\) <code>A</code>s that is also a suffix is
+            \(j\) <code>A</code>s). <code>ABCABD</code>:
+            \([0, 0, 0, 1, 2, 0]\); <code>B</code> and <code>C</code>
+            match no prefix; then <code>A</code>, <code>B</code> rebuild the
+            overlap to \(1, 2\) (<code>AB</code> is both prefix and suffix of
+            <code>ABCAB</code>); the final <code>D</code> fails against
+            \(P[2] = \texttt{C}\), falls back to \(\mathit{fail}[1] = 0\),
+            fails against \(P[0] = \texttt{A}\), and settles at \(0\).
+          </details>
+        </li>
+        <li>
+          KMP is searching for <code>ABABC</code>
+          (\(\mathit{fail} = [0, 0, 1, 2, 0]\)) in
+          <code>ABABABCABABABCAB</code>. The first four comparisons match
+          <code>ABAB</code>; comparison five finds
+          \(\texttt{text}[4] = \texttt{A} \ne \texttt{C} = P[4]\). What exactly happens next,
+          and why is it safe not to move \(i\)?
+          <details>
+            <summary>solution</summary>
+            The mismatch after \(j = 4\) matched characters sets
+            \(j = \mathit{fail}[3] = 2\) while \(i\) stays at \(4\): the next
+            comparison is <code>text[4] = A</code> against
+            \(P[2] = \texttt{A}\) (a match), and the scan
+            proceeds to find the full match at index \(2\) after \(8\) total
+            comparisons. It is safe because the matched text
+            <code>text[0..3] = ABAB</code> is known: its suffix
+            <code>AB</code> equals the pattern&rsquo;s prefix
+            <code>AB</code>, so the only alignment worth trying next is the
+            one where that prefix re-uses the last two matched text characters: everything the fall-back skipped provably cannot match.
+            The text characters before \(i = 4\) never need re-reading.
+          </details>
+        </li>
+        <li>
+          Run the build loop on <code>AABAAA</code>, showing for each \(j\) the
+          value \(k\) holds on entry, the inner-loop tests, and
+          \(\mathit{fail}[j]\). Which step is case 3 of &sect;2 (fall back,
+          then extend), and how does its answer differ from the same step for
+          <code>AABAAC</code>?
+          <details>
+            <summary>solution</summary>
+            <table class="trace">
+              <tr><th class="lab">j</th><th>P[j]</th><th>k in</th><th>tests</th><th>fail[j]</th></tr>
+              <tr><td class="lab">1</td><td class="cell">A</td><td>0</td><td class="lt">P[0] = A = A</td><td>1</td></tr>
+              <tr><td class="lab">2</td><td class="cell">B</td><td>1</td><td class="piv">P[1] = A &ne; B: k = fail[0] = 0; P[0] = A &ne; B</td><td>0</td></tr>
+              <tr><td class="lab">3</td><td class="cell">A</td><td>0</td><td class="lt">P[0] = A = A</td><td>1</td></tr>
+              <tr><td class="lab">4</td><td class="cell">A</td><td>1</td><td class="lt">P[1] = A = A</td><td>2</td></tr>
+              <tr><td class="lab">5</td><td class="cell">A</td><td>2</td><td class="piv">P[2] = B &ne; A: k = fail[1] = 1; P[1] = A = A</td><td>2</td></tr>
+            </table>
+            \(\mathit{fail} = [0,1,0,1,2,2]\). Step \(j = 5\) is case 3: the
+            longest candidate, the border <code>AA</code> of
+            <code>AABAA</code>, does not extend by <code>A</code> (it would
+            need \(P[2] = \texttt{B}\) to be <code>A</code>), the chain falls
+            to the border <code>A</code>, and <em>that</em> one extends, giving
+            \(\mathit{fail}[5] = 1 + 1 = 2\). For <code>AABAAC</code> the same
+            step walks the same chain but nothing extends, so it runs on to
+            \(k = 0\) and yields \(0\): same borders, different last character,
+            opposite endings.
+          </details>
+        </li>
+        <li>
+          Search for <code>ABABAC</code>
+          (\(\mathit{fail} = [0,0,1,2,3,0]\)) in
+          <code>ABABABABAC</code>. How many comparisons does the scan make,
+          how many of them are mismatches, and at which text positions does
+          \(i\) stand still?
+          <details>
+            <summary>solution</summary>
+            Twelve comparisons, two of them mismatches, both at \(j = 5\)
+            (\(P[5] = \texttt{C}\) against a <code>B</code>), at \(i = 5\) and
+            \(i = 7\). Each sets \(j = \mathit{fail}[4] = 3\) with \(i\)
+            frozen, and the very next comparison,
+            \(t[i] = \texttt{B}\) against \(P[3] = \texttt{B}\), succeeds, so
+            the chain stops at its first stop both times (case 6 with a
+            one-step chain). The match is found at index \(4\) on comparison
+            \(12\). The three characters <code>ABA</code> already matched are
+            reused twice without being re-read: brute force would restart at
+            \(i = 1\) and make \(20\) comparisons over five alignments.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Knuth&ndash;Morris&ndash;Pratt v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

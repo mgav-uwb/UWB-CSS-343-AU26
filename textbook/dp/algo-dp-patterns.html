@@ -1,0 +1,1028 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: DP Patterns: Grid, Interval, Coin Change & LIS.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DP Patterns: Grid, Interval, Coin Change &amp; LIS - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h2.part { font-size: 23px; margin: 48px 0 8px; padding-top: 22px; border-top: 2px solid var(--line); }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+      <h1>DP Patterns: Grid, Interval, Coin Change &amp; LIS</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
+      </div>
+      <div class="src">
+        The remaining DP table shapes: grid DP (cheapest and counted monotone
+        paths through a cost grid), interval DP (matrix-chain multiplication
+        and optimal binary search trees, where the state is a range and the
+        transition scans every split point), and two more one-dimensional DPs,
+        coin change and the longest increasing subsequence, each with the
+        state-design lesson it teaches. A summary table indexes the shapes. The
+        method itself is the <a href="paradigm-dp-method.html">Dynamic Programming
+        Method</a> handout. With a demo and exercises.
+      </div>
+
+      <p class="lead">
+        Most DP tables have one of a few shapes, and recognizing the shape
+        hands you the state and the fill order, the two hardest steps of the
+        recipe (the <a href="paradigm-dp-method.html">Dynamic Programming Method</a>
+        handout). This handout completes the shape library: grids, where the
+        table mirrors the input; intervals, where a cell is a range; and two
+        more one-dimensional tables, coin change and the longest increasing
+        subsequence.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#grid">Grid DP and interval DP</a></li>
+          <li><a href="#oned">Two more one-dimensional DPs: coin change and LIS</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="grid">1. Grid DP and interval DP</h2>
+      <p>
+        Knapsack and edit distance (the <a href="algo-knapsack.html">0/1
+        Knapsack</a> and <a href="algo-edit-distance.html">Edit Distance</a>
+        handouts) are both &ldquo;2-D table, few fixed neighbors&rdquo; DPs. Two more shapes complete the pattern library: grids,
+        where the table <em>is</em> the input, and intervals, where a cell is a
+        <em>range</em> and the transition scans every split point.
+      </p>
+      <h3>Grid DP: paths through a cost grid</h3>
+      <div class="def">
+        <span class="tag">Definition (minimum-cost path)</span>
+        Given a grid of nonnegative cell costs, move from the top-left to the
+        bottom-right corner stepping only <strong>right or down</strong>, minimizing
+        the total cost of cells visited. The DP is
+        \[
+          \mathit{dp}[i][j] = \mathit{cost}[i][j] + \min\bigl(\mathit{dp}[i-1][j],\;
+          \mathit{dp}[i][j-1]\bigr),
+        \]
+        with the top-left cell as base case and edge cells reading their only
+        available neighbor.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a 3&times;3 grid)</span>
+        <table class="trace">
+          <tr><th class="lab">cost</th><th></th><th></th><th></th>
+              <th class="lab" style="border-left:3px double var(--line)">dp</th><th></th><th></th><th></th></tr>
+          <tr><td class="lab"></td><td class="cell">1</td><td class="cell">3</td><td class="cell">1</td>
+              <td class="lab" style="border-left:3px double var(--line)"></td><td class="cell lt">1</td><td class="cell lt">4</td><td class="cell lt">5</td></tr>
+          <tr><td class="lab"></td><td class="cell">1</td><td class="cell">5</td><td class="cell">1</td>
+              <td class="lab" style="border-left:3px double var(--line)"></td><td class="cell">2</td><td class="cell">7</td><td class="cell lt">6</td></tr>
+          <tr><td class="lab"></td><td class="cell">4</td><td class="cell">2</td><td class="cell">1</td>
+              <td class="lab" style="border-left:3px double var(--line)"></td><td class="cell">6</td><td class="cell">8</td><td class="cell lt piv">7</td></tr>
+        </table>
+        Each \(dp\) cell adds its own cost to the cheaper of the cell above and the
+        cell to the left: \(dp[1][2] = 1 + \min(5, 7) = 6\), and the corner
+        \(dp[2][2] = 1 + \min(6, 8) = 7\) is the minimum path cost. The highlighted
+        cells are the optimal path \(1 \to 3 \to 1 \to 1 \to 1\) (right, right,
+        down, down), total \(7\), recovered, as always, by tracing back
+        through whichever neighbor produced each cell.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the same grid, cell by cell)</span>
+        <p>
+          A grid DP has three kinds of cell, and all three occur in nine cells.
+          The origin has no predecessor at all. An <strong>edge</strong> cell has
+          exactly one: a top-row cell can only be reached from its left, a
+          left-column cell only from above, so there is no minimum to take. Only an
+          <strong>interior</strong> cell reads two neighbors and chooses. Filling
+          row by row, left to right, every predecessor is ready when it is read.
+        </p>
+        <table class="trace">
+          <tr><th class="lab">cell</th><th>cost</th><th>case</th>
+              <th>up<br />\(dp[i{-}1][j]\)</th><th>left<br />\(dp[i][j{-}1]\)</th>
+              <th>\(dp[i][j]\)</th><th>arithmetic</th></tr>
+          <tr><td class="lab">dp[0][0]</td><td class="cell">1</td><td>origin</td>
+              <td class="cell">&ndash;</td><td class="cell">&ndash;</td>
+              <td class="cell new">1</td><td class="lab">base case: the cost itself</td></tr>
+          <tr><td class="lab">dp[0][1]</td><td class="cell">3</td><td>top edge</td>
+              <td class="cell">&ndash;</td><td class="cell lt">1</td>
+              <td class="cell new">4</td><td class="lab">\(3 + 1\), left is the only source</td></tr>
+          <tr><td class="lab">dp[0][2]</td><td class="cell">1</td><td>top edge</td>
+              <td class="cell">&ndash;</td><td class="cell lt">4</td>
+              <td class="cell new">5</td><td class="lab">\(1 + 4\), left is the only source</td></tr>
+          <tr><td class="lab">dp[1][0]</td><td class="cell">1</td><td>left edge</td>
+              <td class="cell lt">1</td><td class="cell">&ndash;</td>
+              <td class="cell new">2</td><td class="lab">\(1 + 1\), up is the only source</td></tr>
+          <tr><td class="lab">dp[1][1]</td><td class="cell">5</td><td>interior</td>
+              <td class="cell">4</td><td class="cell lt">2</td>
+              <td class="cell new">7</td><td class="lab">\(5 + \min(4, 2) = 7\), left wins</td></tr>
+          <tr><td class="lab">dp[1][2]</td><td class="cell">1</td><td>interior</td>
+              <td class="cell lt">5</td><td class="cell">7</td>
+              <td class="cell new">6</td><td class="lab">\(1 + \min(5, 7) = 6\), up wins</td></tr>
+          <tr><td class="lab">dp[2][0]</td><td class="cell">4</td><td>left edge</td>
+              <td class="cell lt">2</td><td class="cell">&ndash;</td>
+              <td class="cell new">6</td><td class="lab">\(4 + 2\), up is the only source</td></tr>
+          <tr><td class="lab">dp[2][1]</td><td class="cell">2</td><td>interior</td>
+              <td class="cell">7</td><td class="cell lt">6</td>
+              <td class="cell new">8</td><td class="lab">\(2 + \min(7, 6) = 8\), left wins</td></tr>
+          <tr><td class="lab">dp[2][2]</td><td class="cell">1</td><td>interior</td>
+              <td class="cell lt">6</td><td class="cell">8</td>
+              <td class="cell new">7</td><td class="lab">\(1 + \min(6, 8) = 7\), up wins</td></tr>
+        </table>
+        <p style="margin-bottom:0">
+          Both interior outcomes appear: left wins at \(dp[1][1]\) and
+          \(dp[2][1]\), up wins at \(dp[1][2]\) and \(dp[2][2]\). Note that
+          \(dp[1][1] = 7\) is never used by the answer, and that the expensive
+          \(5\) in the middle of the grid is exactly what the optimal path routes
+          around. In code the two edge cases are usually folded away by padding the
+          table with a border of \(\infty\) (for a minimum) or by initializing row
+          \(0\) and column \(0\) with running sums; both are the same statement that
+          a missing neighbor must never win the \(\min\).
+        </p>
+      </div>
+      <p>
+        The same table flexes to relatives by changing only the combine step.
+        <strong>Counting</strong> monotone paths sums instead of minimizing,
+        \(\mathit{dp}[i][j] = \mathit{dp}[i-1][j] + \mathit{dp}[i][j-1]\), with the
+        edges at \(1\): on a \(3\times 3\) grid the rows fill \(1\,1\,1\) /
+        \(1\,2\,3\) / \(1\,3\,6\), and the corner&rsquo;s \(6 = \binom{4}{2}\)
+        counts the arrangements of two rights and two downs: the DP
+        rediscovers a binomial coefficient. <strong>Obstacles</strong> force a
+        cell&rsquo;s count to \(0\) (or its cost to \(\infty\)); extra move
+        directions just add source neighbors. Robot-path planning, seam carving in
+        image resizing, and dynamic-time-warping all ride this one shape.
+      </p>
+      <div class="code-tabs" data-snippet="dp/griddp">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Grid DP. Cheapest right/down path through a grid of nonnegative costs.
+// The two edge loops exist so that no interior min ever reads a missing
+// neighbor. Theta(mn) time and space.
+int minCostPath(const vector&lt;vector&lt;int&gt;&gt;&amp; cost) {
+    int m = cost.size(), n = cost[0].size();
+    vector&lt;vector&lt;int&gt;&gt; dp(m, vector&lt;int&gt;(n));
+    dp[0][0] = cost[0][0];                             // origin: no predecessor
+    for (int j = 1; j &lt; n; j++)
+        dp[0][j] = cost[0][j] + dp[0][j-1];            // top edge: left only
+    for (int i = 1; i &lt; m; i++)
+        dp[i][0] = cost[i][0] + dp[i-1][0];            // left edge: up only
+    for (int i = 1; i &lt; m; i++)
+        for (int j = 1; j &lt; n; j++)
+            dp[i][j] = cost[i][j] + min(dp[i-1][j],    // interior: choose
+                                        dp[i][j-1]);
+    return dp[m-1][n-1];
+}
+
+// Same cells, same order, sum instead of min: how many monotone paths reach
+// the corner. A blocked cell contributes 0, erasing every path through it.
+long long countPaths(const vector&lt;vector&lt;bool&gt;&gt;&amp; blocked) {
+    int m = blocked.size(), n = blocked[0].size();
+    vector&lt;vector&lt;long long&gt;&gt; dp(m, vector&lt;long long&gt;(n, 0));
+    for (int i = 0; i &lt; m; i++)
+        for (int j = 0; j &lt; n; j++) {
+            if (blocked[i][j]) continue;               // stays 0
+            if (i == 0 &amp;&amp; j == 0) { dp[0][0] = 1; continue; }
+            dp[i][j] = (i ? dp[i-1][j] : 0) + (j ? dp[i][j-1] : 0);
+        }
+    return dp[m-1][n-1];
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Grid DP. Cheapest right/down path through a grid of nonnegative costs.
+// The two edge loops exist so that no interior min ever reads a missing
+// neighbor. Theta(mn) time and space.
+static int minCostPath(int[][] cost) {
+    int m = cost.length, n = cost[0].length;
+    int[][] dp = new int[m][n];
+    dp[0][0] = cost[0][0];                             // origin: no predecessor
+    for (int j = 1; j &lt; n; j++)
+        dp[0][j] = cost[0][j] + dp[0][j-1];            // top edge: left only
+    for (int i = 1; i &lt; m; i++)
+        dp[i][0] = cost[i][0] + dp[i-1][0];            // left edge: up only
+    for (int i = 1; i &lt; m; i++)
+        for (int j = 1; j &lt; n; j++)
+            dp[i][j] = cost[i][j] + Math.min(dp[i-1][j],   // interior: choose
+                                             dp[i][j-1]);
+    return dp[m-1][n-1];
+}
+
+// Same cells, same order, sum instead of min: how many monotone paths reach
+// the corner. A blocked cell contributes 0, erasing every path through it.
+static long countPaths(boolean[][] blocked) {
+    int m = blocked.length, n = blocked[0].length;
+    long[][] dp = new long[m][n];
+    for (int i = 0; i &lt; m; i++)
+        for (int j = 0; j &lt; n; j++) {
+            if (blocked[i][j]) continue;               // stays 0
+            if (i == 0 &amp;&amp; j == 0) { dp[0][0] = 1; continue; }
+            dp[i][j] = (i &gt; 0 ? dp[i-1][j] : 0) + (j &gt; 0 ? dp[i][j-1] : 0);
+        }
+    return dp[m-1][n-1];
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Grid DP. Cheapest right/down path through a grid of nonnegative costs.
+# The two edge loops exist so that no interior min ever reads a missing
+# neighbor. Theta(mn) time and space.
+def min_cost_path(cost):
+    m, n = len(cost), len(cost[0])
+    dp = [[0] * n for _ in range(m)]
+    dp[0][0] = cost[0][0]                              # origin: no predecessor
+    for j in range(1, n):
+        dp[0][j] = cost[0][j] + dp[0][j - 1]           # top edge: left only
+    for i in range(1, m):
+        dp[i][0] = cost[i][0] + dp[i - 1][0]           # left edge: up only
+    for i in range(1, m):
+        for j in range(1, n):
+            dp[i][j] = cost[i][j] + min(dp[i - 1][j],  # interior: choose
+                                        dp[i][j - 1])
+    return dp[m - 1][n - 1]
+
+# Same cells, same order, sum instead of min: how many monotone paths reach
+# the corner. A blocked cell contributes 0, erasing every path through it.
+def count_paths(blocked):
+    m, n = len(blocked), len(blocked[0])
+    dp = [[0] * n for _ in range(m)]
+    for i in range(m):
+        for j in range(n):
+            if blocked[i][j]:
+                continue                               # stays 0
+            if i == 0 and j == 0:
+                dp[0][0] = 1
+                continue
+            dp[i][j] = (dp[i-1][j] if i else 0) + (dp[i][j-1] if j else 0)
+    return dp[m - 1][n - 1]</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Grid DP. Cheapest right/down path through a grid of nonnegative costs.
+// The two edge loops exist so that no interior min ever reads a missing
+// neighbor. Theta(mn) time and space.
+fn min_cost_path(cost: &amp;[Vec&lt;u64&gt;]) -&gt; u64 {
+    let (m, n) = (cost.len(), cost[0].len());
+    let mut dp = vec![vec![0u64; n]; m];
+    dp[0][0] = cost[0][0];                             // origin: no predecessor
+    for j in 1..n { dp[0][j] = cost[0][j] + dp[0][j - 1]; }   // top edge
+    for i in 1..m { dp[i][0] = cost[i][0] + dp[i - 1][0]; }   // left edge
+    for i in 1..m {
+        for j in 1..n {
+            dp[i][j] = cost[i][j] + dp[i - 1][j].min(dp[i][j - 1]);
+        }
+    }
+    dp[m - 1][n - 1]
+}
+
+// Same cells, same order, sum instead of min: how many monotone paths reach
+// the corner. A blocked cell contributes 0, erasing every path through it.
+fn count_paths(blocked: &amp;[Vec&lt;bool&gt;]) -&gt; u64 {
+    let (m, n) = (blocked.len(), blocked[0].len());
+    let mut dp = vec![vec![0u64; n]; m];
+    for i in 0..m {
+        for j in 0..n {
+            if blocked[i][j] { continue; }             // stays 0
+            if i == 0 &amp;&amp; j == 0 { dp[0][0] = 1; continue; }
+            let up = if i &gt; 0 { dp[i - 1][j] } else { 0 };
+            let left = if j &gt; 0 { dp[i][j - 1] } else { 0 };
+            dp[i][j] = up + left;
+        }
+    }
+    dp[m - 1][n - 1]
+}</pre>
+<p class="ct-src">source: <code>code/dp/griddp.cpp &middot; code/dp/griddp.java &middot; code/dp/griddp.py &middot; code/dp/griddp.rs</code></p>
+<!--/ct--></div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=grid-dp">Grid DP demo</a>. One
+        \(3\times 3\) table, two objectives: <em>Cheapest path</em> fills
+        \(\mathit{dp}[i][j] = \mathit{cost}[i][j] + \min(\text{up},
+        \text{left})\) and traces the winning route back in green;
+        <em>Count paths</em> fills the same cells in the same order with a sum
+        instead of a min, which is the whole point of the shape. The default
+        grid is the worked example above (answer \(7\)); the all-ones preset
+        counts \(6 = \binom{4}{2}\) monotone paths; and the wall preset
+        blocks the center cell, dropping the count to \(2\) (exercise 1
+        below).
+      </div>
+      <h3>Interval DP: the state is a range</h3>
+      <div class="def">
+        <span class="tag">Definition (interval DP)</span>
+        In <strong>interval DP</strong> the subproblem is a contiguous range
+        \([i, j]\) of the input, and the transition optimizes over the <strong>split
+        point</strong> \(k\):
+        \[
+          \mathit{dp}[i][j] = \min_{i \le k &lt; j}\bigl(\mathit{dp}[i][k] +
+          \mathit{dp}[k+1][j] + \mathit{cost}(i, j, k)\bigr),
+        \]
+        filled in order of increasing range length. With \(\Theta(n^2)\) ranges and
+        \(\Theta(n)\) splits each, interval DPs typically cost \(\Theta(n^3)\).
+      </div>
+      <p>
+        The canonical instance is <strong>matrix-chain multiplication</strong>.
+        Matrix multiplication is associative (every parenthesization of
+        \(A_1 A_2 \cdots A_n\) gives the same product) but not equally
+        <em>priced</em>: multiplying a \(p \times q\) by a \(q \times r\) matrix
+        costs \(p\,q\,r\) scalar multiplications, and the order changes the totals
+        wildly. For \(A\ (10{\times}30)\), \(B\ (30{\times}5)\),
+        \(C\ (5{\times}60)\):
+      </p>
+      <pre>  (AB)C :  10&middot;30&middot;5  +  10&middot;5&middot;60  =  1500 +  3000  =   4,500
+  A(BC) :  30&middot;5&middot;60  + 10&middot;30&middot;60  =  9000 + 18000  =  27,000     6&times; worse</pre>
+      <p>
+        The last-decision question is <em>which multiplication happens last</em>,
+        the outermost split \(k\):
+        \[
+          \mathit{dp}[i][j] = \min_{i \le k &lt; j}\bigl(\mathit{dp}[i][k] +
+          \mathit{dp}[k+1][j] + \mathit{rows}_i \cdot \mathit{cols}_k \cdot
+          \mathit{cols}_j\bigr),
+        \]
+        the two halves optimally parenthesized by induction plus the cost of the
+        final multiply. Base case: a single matrix costs \(0\). \(\Theta(n^3)\)
+        overall, and the traceback (store the winning \(k\) per range)
+        recovers the parenthesization itself.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (one interval DP filled completely)</span>
+        <p>
+          Three matrices leave only two parenthesizations, so the split loop never
+          really runs. Add a fourth, \(D\ (60{\times}10)\), to the chain above:
+          \(A\ (10{\times}30)\), \(B\ (30{\times}5)\), \(C\ (5{\times}60)\),
+          \(D\ (60{\times}10)\). Write the shared dimensions as
+          \(p = [10, 30, 5, 60, 10]\), so matrix \(i\) is
+          \(p_{i-1} \times p_i\) and the final multiply for a range \([i,j]\) split
+          at \(k\) costs \(p_{i-1}\, p_k\, p_j\). Ranges are filled in order of
+          increasing length; \(dp[i][i] = 0\), since one matrix needs no multiply.
+        </p>
+        <table class="trace">
+          <tr><th class="lab">range</th><th>len</th><th>split \(k\)</th>
+              <th>\(dp[i][k]\)</th><th>\(dp[k{+}1][j]\)</th>
+              <th>final multiply</th><th>total</th></tr>
+          <tr><td class="lab">dp[1][2]</td><td>2</td><td class="cell">1</td>
+              <td class="cell">0</td><td class="cell">0</td>
+              <td class="lab">\(10\cdot 30\cdot 5 = 1500\)</td><td class="cell new lt">1500</td></tr>
+          <tr><td class="lab">dp[2][3]</td><td>2</td><td class="cell">2</td>
+              <td class="cell">0</td><td class="cell">0</td>
+              <td class="lab">\(30\cdot 5\cdot 60 = 9000\)</td><td class="cell new lt">9000</td></tr>
+          <tr><td class="lab">dp[3][4]</td><td>2</td><td class="cell">3</td>
+              <td class="cell">0</td><td class="cell">0</td>
+              <td class="lab">\(5\cdot 60\cdot 10 = 3000\)</td><td class="cell new lt">3000</td></tr>
+          <tr><td class="lab">dp[1][3]</td><td>3</td><td class="cell">1</td>
+              <td class="cell">0</td><td class="cell">9000</td>
+              <td class="lab">\(10\cdot 30\cdot 60 = 18000\)</td><td class="cell">27000</td></tr>
+          <tr><td class="lab"></td><td></td><td class="cell">2</td>
+              <td class="cell">1500</td><td class="cell">0</td>
+              <td class="lab">\(10\cdot 5\cdot 60 = 3000\)</td><td class="cell new lt">4500</td></tr>
+          <tr><td class="lab">dp[2][4]</td><td>3</td><td class="cell">2</td>
+              <td class="cell">0</td><td class="cell">3000</td>
+              <td class="lab">\(30\cdot 5\cdot 10 = 1500\)</td><td class="cell new lt">4500</td></tr>
+          <tr><td class="lab"></td><td></td><td class="cell">3</td>
+              <td class="cell">9000</td><td class="cell">0</td>
+              <td class="lab">\(30\cdot 60\cdot 10 = 18000\)</td><td class="cell">27000</td></tr>
+          <tr><td class="lab">dp[1][4]</td><td>4</td><td class="cell">1</td>
+              <td class="cell">0</td><td class="cell">4500</td>
+              <td class="lab">\(10\cdot 30\cdot 10 = 3000\)</td><td class="cell">7500</td></tr>
+          <tr><td class="lab"></td><td></td><td class="cell">2</td>
+              <td class="cell">1500</td><td class="cell">3000</td>
+              <td class="lab">\(10\cdot 5\cdot 10 = 500\)</td><td class="cell new lt piv">5000</td></tr>
+          <tr><td class="lab"></td><td></td><td class="cell">3</td>
+              <td class="cell">4500</td><td class="cell">0</td>
+              <td class="lab">\(10\cdot 60\cdot 10 = 6000\)</td><td class="cell">10500</td></tr>
+        </table>
+        <p>
+          The answer is \(dp[1][4] = 5000\) at split \(k = 2\), which reads
+          \((AB)(CD)\): multiply \(AB\) for \(1500\), multiply \(CD\) for \(3000\),
+          then combine the \(10{\times}5\) and \(5{\times}10\) results for \(500\).
+          Following the stored splits into each half (\(dp[1][2]\) at \(k=1\),
+          \(dp[3][4]\) at \(k=3\)) confirms there is nothing left to bracket.
+        </p>
+        <p style="margin-bottom:0">
+          Three things the fill makes visible. The split loop genuinely searches:
+          at \(dp[1][4]\) the three candidates are \(7500\), \(5000\), \(10500\),
+          and the winner is the middle one, so neither the leftmost nor the
+          rightmost split is a safe guess. The fill order must be by length, not by
+          row: \(dp[1][4]\) reads \(dp[1][2]\), \(dp[1][3]\), \(dp[3][4]\) and
+          \(dp[2][4]\), all shorter ranges, and all already final. And the winning
+          outer split is not the winning inner one: \(dp[1][3]\) alone prefers
+          \(k = 2\) at cost \(4500\), yet the full chain does not use \(dp[1][3]\)
+          at all. Optimal substructure says every <em>used</em> sub-range is solved
+          optimally, not that every optimally solved sub-range gets used. Ten split
+          evaluations for four matrices; the brute force over parenthesizations
+          would consider \(C_3 = 5\) of them here and Catalan-many in general.
+        </p>
+      </div>
+      <p>
+        The triple loop that produces that table (range length outermost, range
+        start next, split point innermost) and the traceback that turns the stored
+        splits into printed parentheses are given in full, in all four languages, in
+        the <a href="algo-matrix-chain.html">Matrix-Chain Multiplication</a>
+        handout.
+      </p>
+      <p>
+        The same shape gives the <strong>optimal binary search tree (BST)</strong>:
+        given keys with known access frequencies, \( \mathit{dp}[i][j]\) is the
+        cheapest expected search cost of a BST over keys \(i..j\), and the split is
+        <em>which key becomes the root</em>, with
+        \(\sum_{k=i}^{j}\mathit{freq}(k)\) added because choosing any root sinks
+        every key in the range one level deeper. Frequently-searched keys settle
+        near the root: the reason a balanced tree
+        (the <a href="../trees/ds-trees-bst.html">Trees &amp; Binary Search Trees</a> handout) is <em>not</em> optimal under
+        skewed access, and the principle behind frequency-weighted index structures
+        in real databases. Interval DP is the trickiest of the shapes (the
+        fill order is by range <em>length</em>, not row order), but the recipe
+        is unchanged: state, transition, base, order, answer.
+      </p>
+      <table>
+        <tr><th>shape</th><th>state</th><th>transition reads</th><th>typical cost</th><th>examples</th></tr>
+        <tr><td><strong>1-D</strong></td><td>\(dp[i]\)</td><td>earlier indices</td><td>\(\Theta(n)\)&ndash;\(\Theta(n^2)\)</td><td>Fibonacci, rod cutting, coin change, LIS</td></tr>
+        <tr><td><strong>2-D grid</strong></td><td>\(dp[i][j]\)</td><td>up / left / diagonal (fixed few)</td><td>\(\Theta(mn)\)</td><td>LCS, edit distance, knapsack, grid paths</td></tr>
+        <tr><td><strong>interval</strong></td><td>\(dp[i][j]\) = range</td><td>all splits \(k\) in \((i, j)\)</td><td>\(\Theta(n^3)\)</td><td>matrix chain, optimal BST</td></tr>
+      </table>
+      <p>
+        This little table is a working index for the DP handouts: a new problem
+        that mentions one sequence or amount is probably 1-D; two sequences, or a
+        sequence against a capacity, a 2-D grid; &ldquo;the best way to bracket /
+        order / root a range,&rdquo; interval. Recognizing the shape hands you the
+        state and the fill order, the two hardest steps, for free.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="oned">2. Two more one-dimensional DPs: coin change and LIS</h2>
+      <h3>Coin change, revisited</h3>
+      <p>
+        The <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout showed greedy coin change
+        failing on the system \(\{1, 3, 4\}\): making \(6\), greedy grabs the \(4\)
+        and finishes \(4 + 1 + 1\), three coins, when two \(3\)s suffice. The DP fix
+        is one line: state = the amount, transition = try every coin as the
+        <em>last</em> coin used:
+        \[
+          \mathit{dp}[a] = 1 + \min_{\,c \,\le\, a}\; \mathit{dp}[a - c],
+          \qquad \mathit{dp}[0] = 0.
+        \]
+      </p>
+      <div class="ex">
+        <span class="tag">Example (coins {1, 3, 4}, amounts 0&ndash;6)</span>
+        <table class="trace">
+          <tr><th class="lab">a</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+          <tr><td class="lab">dp[a]</td>
+            <td class="cell">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell">1</td><td class="cell">1</td><td class="cell">2</td><td class="cell lt">2</td></tr>
+        </table>
+        \(dp[6]\) tries a last coin of \(1\) (\(1 + dp[5] = 3\)), of \(3\)
+        (\(1 + dp[3] = 2\)), and of \(4\) (\(1 + dp[2] = 3\)), and keeps \(2\):
+        the \(3 + 3\) that greedy missed. Cost \(\Theta(a \cdot k)\) for
+        \(k\) coin kinds; and note the family resemblance: this is
+        <em>unbounded knapsack</em> (the <a href="algo-knapsack.html">0/1
+        Knapsack</a> handout&rsquo;s aside) with values minimized
+        instead of maximized: a coin can be reused, so the transition stays
+        within the same &ldquo;row.&rdquo;
+      </div>
+      <p>
+        Written as stated, the recurrence quietly assumes an amount is always
+        payable. It is not: drop the \(1\)-coin and most amounts become
+        unreachable. The fix is a sentinel, and it has to be handled in two places.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (coins {3, 5}: the unreachable amounts)</span>
+        <p>
+          Initialize \(\mathit{dp}[0] = 0\) and every other entry to \(\infty\).
+          A candidate coin \(c\) is usable at amount \(a\) only if \(c \le a\)
+          <em>and</em> \(\mathit{dp}[a - c] \ne \infty\); if no candidate survives,
+          the cell stays \(\infty\), meaning &ldquo;no set of coins sums to
+          \(a\).&rdquo;
+        </p>
+        <table class="trace">
+          <tr><th class="lab">a</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
+          <tr><td class="lab">dp[a]</td>
+            <td class="cell">0</td><td class="cell piv">&infin;</td><td class="cell piv">&infin;</td>
+            <td class="cell">1</td><td class="cell piv">&infin;</td><td class="cell">1</td>
+            <td class="cell">2</td><td class="cell piv">&infin;</td><td class="cell lt">2</td></tr>
+        </table>
+        <p>Cell by cell:</p>
+        <ul>
+          <li>\(a = 1, 2\): both coins exceed the amount, no candidate at all, so
+            \(\mathit{dp} = \infty\).</li>
+          <li>\(a = 3\): coin \(3\) gives \(1 + \mathit{dp}[0] = 1\). Coin \(5\) is
+            too large. \(\mathit{dp}[3] = 1\).</li>
+          <li>\(a = 4\): coin \(3\) fits by size but lands on
+            \(\mathit{dp}[1] = \infty\), so it is not usable; coin \(5\) is too
+            large. \(\mathit{dp}[4] = \infty\). This is the case a naive
+            \(1 + \min(\ldots)\) gets wrong: adding \(1\) to \(\infty\) and storing
+            the result would report a finite-looking count for an impossible
+            amount, and that wrong value would then propagate into
+            \(\mathit{dp}[7]\) and beyond.</li>
+          <li>\(a = 5\): coin \(3\) lands on \(\mathit{dp}[2] = \infty\); coin
+            \(5\) gives \(1 + \mathit{dp}[0] = 1\). \(\mathit{dp}[5] = 1\).</li>
+          <li>\(a = 6\): coin \(3\) gives \(1 + \mathit{dp}[3] = 2\); coin \(5\)
+            lands on \(\mathit{dp}[1] = \infty\). \(\mathit{dp}[6] = 2\).</li>
+          <li>\(a = 7\): coin \(3\) lands on \(\mathit{dp}[4] = \infty\), coin
+            \(5\) on \(\mathit{dp}[2] = \infty\). \(\mathit{dp}[7] = \infty\).</li>
+          <li>\(a = 8\): coin \(3\) gives \(1 + \mathit{dp}[5] = 2\), coin \(5\)
+            gives \(1 + \mathit{dp}[3] = 2\). A tie; \(\mathit{dp}[8] = 2\), by
+            \(3 + 5\) either way.</li>
+        </ul>
+        <p style="margin-bottom:0">
+          The unreachable amounts are \(1, 2, 4, 7\), and every amount from \(8\)
+          upward is payable, since \(8, 9, 10\) are and any larger amount reduces to
+          one of them by removing a \(3\). In an implementation the sentinel is
+          usually a large integer rather than a floating \(\infty\); pick one big
+          enough to lose every \(\min\) but small enough that \(1 + \text{sentinel}\)
+          does not overflow, and test for it before using a neighbor. Reporting the
+          impossible case is part of the answer, not an error.
+        </p>
+      </div>
+      <div class="code-tabs" data-snippet="dp/coinchange">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Coin change. dp[a] = fewest coins summing to a, or NONE if a is unreachable.
+// A coin is usable at a only if it fits AND the amount it leaves is reachable;
+// skipping that second test would invent counts for impossible amounts.
+// Theta(amount * coins.size()) time, Theta(amount) space.
+const int NONE = -1;
+int coinChange(const vector&lt;int&gt;&amp; coins, int amount) {
+    vector&lt;int&gt; dp(amount + 1, NONE);
+    dp[0] = 0;                                       // base: no coins needed
+    for (int a = 1; a &lt;= amount; a++)
+        for (int c : coins)
+            if (c &lt;= a &amp;&amp; dp[a - c] != NONE &amp;&amp;
+                (dp[a] == NONE || dp[a - c] + 1 &lt; dp[a]))
+                dp[a] = dp[a - c] + 1;               // this coin used last
+    return dp[amount];                               // NONE: not payable
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Coin change. dp[a] = fewest coins summing to a, or NONE if a is unreachable.
+// A coin is usable at a only if it fits AND the amount it leaves is reachable;
+// skipping that second test would invent counts for impossible amounts.
+// Theta(amount * coins.length) time, Theta(amount) space.
+static final int NONE = -1;
+static int coinChange(int[] coins, int amount) {
+    int[] dp = new int[amount + 1];
+    Arrays.fill(dp, NONE);
+    dp[0] = 0;                                       // base: no coins needed
+    for (int a = 1; a &lt;= amount; a++)
+        for (int c : coins)
+            if (c &lt;= a &amp;&amp; dp[a - c] != NONE
+                    &amp;&amp; (dp[a] == NONE || dp[a - c] + 1 &lt; dp[a]))
+                dp[a] = dp[a - c] + 1;               // this coin used last
+    return dp[amount];                               // NONE: not payable
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Coin change. dp[a] = fewest coins summing to a, or None if a is unreachable.
+# A coin is usable at a only if it fits AND the amount it leaves is reachable;
+# skipping that second test would invent counts for impossible amounts.
+# Theta(amount * len(coins)) time, Theta(amount) space.
+def coin_change(coins, amount):
+    dp = [None] * (amount + 1)
+    dp[0] = 0                                        # base: no coins needed
+    for a in range(1, amount + 1):
+        for c in coins:
+            if c &lt;= a and dp[a - c] is not None and \
+                    (dp[a] is None or dp[a - c] + 1 &lt; dp[a]):
+                dp[a] = dp[a - c] + 1                # this coin used last
+    return dp[amount]                                # None: not payable</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Coin change. dp[a] = fewest coins summing to a, or None if a is unreachable.
+// A coin is usable at a only if it fits AND the amount it leaves is reachable;
+// skipping that second test would invent counts for impossible amounts.
+// Theta(amount * coins.len()) time, Theta(amount) space.
+fn coin_change(coins: &amp;[usize], amount: usize) -&gt; Option&lt;usize&gt; {
+    let mut dp: Vec&lt;Option&lt;usize&gt;&gt; = vec![None; amount + 1];
+    dp[0] = Some(0);                                 // base: no coins needed
+    for a in 1..=amount {
+        for &amp;c in coins {
+            if c &lt;= a {
+                if let Some(prev) = dp[a - c] {      // reachable remainder
+                    dp[a] = Some(match dp[a] {
+                        Some(cur) =&gt; cur.min(prev + 1),
+                        None =&gt; prev + 1,
+                    });
+                }
+            }
+        }
+    }
+    dp[amount]                                       // None: not payable
+}</pre>
+<p class="ct-src">source: <code>code/dp/coinchange.cpp &middot; code/dp/coinchange.java &middot; code/dp/coinchange.py &middot; code/dp/coinchange.rs</code></p>
+<!--/ct--></div>
+      <h3>Longest increasing subsequence</h3>
+      <div class="def">
+        <span class="tag">Definition (LIS)</span>
+        The <strong>longest increasing subsequence</strong> (LIS) of an array is the
+        longest subsequence (order kept, gaps allowed; the
+        <a href="algo-longest-common-subsequence.html">Longest Common
+        Subsequence</a> handout&rsquo;s distinction) whose values strictly
+        increase. The DP state is the subtle
+        part: let \(\mathit{dp}[i]\) be the length of the longest increasing
+        subsequence <em>ending exactly at index \(i\)</em>; then
+        \[
+          \mathit{dp}[i] = 1 + \max\{\, \mathit{dp}[j] : j &lt; i,\; a[j] &lt; a[i] \,\}
+          \qquad (\text{or } 1 \text{ if no such } j),
+        \]
+        and the answer is \(\max_i \mathit{dp}[i]\), anywhere in the array.
+      </div>
+      <div class="ex">
+        <span class="tag">Example</span>
+        <table class="trace">
+          <tr><td class="lab">a[i]</td>
+            <td class="cell">3</td><td class="cell">1</td><td class="cell">4</td><td class="cell">1</td><td class="cell">5</td><td class="cell">9</td><td class="cell">2</td><td class="cell">6</td></tr>
+          <tr><td class="lab">dp[i]</td>
+            <td class="cell">1</td><td class="cell">1</td><td class="cell">2</td><td class="cell">1</td><td class="cell">3</td><td class="cell lt">4</td><td class="cell">2</td><td class="cell lt">4</td></tr>
+        </table>
+        Each \(dp[i]\) extends the best earlier subsequence ending in a smaller
+        value: \(dp[4] = 3\) via \(1, 4, 5\) (or \(3,4,5\)), \(dp[5] = 4\) via
+        \(1, 4, 5, 9\), and \(dp[7] = 4\) via \(1, 4, 5, 6\). The LIS length is
+        \(4\); tracing back from either maximum recovers \(1\ 4\ 5\ 9\) or
+        \(1\ 4\ 5\ 6\).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the same array, index by index)</span>
+        <p>
+          Every index takes one of two branches. If some earlier index holds a
+          strictly smaller value, \(a[i]\) <strong>extends</strong> the best such
+          subsequence. If none does, there is nothing to extend and \(a[i\,]\)
+          <strong>starts a new</strong> subsequence of length \(1\). The inner loop
+          scans all of \(j < i\) and keeps the largest \(dp[j]\) among the
+          admissible ones.
+        </p>
+        <table class="trace">
+          <tr><th class="lab">\(i\)</th><th>\(a[i]\)</th>
+              <th>admissible \(j\) (\(a[j] &lt; a[i]\)), as \(a[j]{:}\,dp[j]\)</th>
+              <th>branch</th><th>\(dp[i]\)</th></tr>
+          <tr><td class="lab">0</td><td class="cell">3</td>
+              <td class="lab">none (no earlier index)</td>
+              <td>start new</td><td class="cell new">1</td></tr>
+          <tr><td class="lab">1</td><td class="cell">1</td>
+              <td class="lab">none (\(3 \not&lt; 1\))</td>
+              <td>start new</td><td class="cell new">1</td></tr>
+          <tr><td class="lab">2</td><td class="cell">4</td>
+              <td class="lab">3:1, 1:1 &rarr; best 1</td>
+              <td>extend</td><td class="cell new">2</td></tr>
+          <tr><td class="lab">3</td><td class="cell">1</td>
+              <td class="lab">none (3, 4 too large; \(1 \not&lt; 1\), strict)</td>
+              <td>start new</td><td class="cell new">1</td></tr>
+          <tr><td class="lab">4</td><td class="cell">5</td>
+              <td class="lab">3:1, 1:1, 4:2, 1:1 &rarr; best 2</td>
+              <td>extend</td><td class="cell new">3</td></tr>
+          <tr><td class="lab">5</td><td class="cell">9</td>
+              <td class="lab">3:1, 1:1, 4:2, 1:1, 5:3 &rarr; best 3</td>
+              <td>extend</td><td class="cell new lt">4</td></tr>
+          <tr><td class="lab">6</td><td class="cell">2</td>
+              <td class="lab">1:1, 1:1 &rarr; best 1</td>
+              <td>extend</td><td class="cell new">2</td></tr>
+          <tr><td class="lab">7</td><td class="cell">6</td>
+              <td class="lab">3:1, 1:1, 4:2, 1:1, 5:3, 2:2 &rarr; best 3</td>
+              <td>extend</td><td class="cell new lt">4</td></tr>
+        </table>
+        <p style="margin-bottom:0">
+          Three indices start new (\(0\), \(1\), \(3\)) and five extend. Index
+          \(3\) is the instructive one: two earlier values are admissible-looking
+          neighbors in position but not in value, and the equal value \(1\) at
+          index \(1\) is rejected because the comparison is <em>strict</em>, which
+          is what makes the subsequence increasing rather than non-decreasing. Index
+          \(6\) shows that extending is not the same as improving: \(a[6] = 2\)
+          extends to length \(2\), well below the \(4\) already found, yet it is
+          worth recording, because index \(7\) later scans it. Finally, note that
+          \(dp[7] = 4\) does not come from \(dp[5] = 4\): \(9 \not&lt; 6\), so the
+          longest run through \(9\) is a dead end for \(6\). The answer is
+          \(\max_i dp[i] = 4\), and it is attained twice.
+        </p>
+      </div>
+      <div class="code-tabs" data-snippet="dp/lis">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Longest increasing subsequence. dp[i] = length of the longest strictly
+// increasing subsequence ENDING AT i. Initializing to 1 is the start-new
+// branch; the inner loop is the extend branch. Theta(n^2) time, Theta(n) space.
+int lis(const vector&lt;int&gt;&amp; a) {
+    int n = a.size(), best = 0;
+    vector&lt;int&gt; dp(n, 1), from(n, -1);              // from[i]: predecessor index
+    for (int i = 0; i &lt; n; i++) {
+        for (int j = 0; j &lt; i; j++)
+            if (a[j] &lt; a[i] &amp;&amp; dp[j] + 1 &gt; dp[i]) { // strict: increasing
+                dp[i] = dp[j] + 1;                  // extend the run ending at j
+                from[i] = j;
+            }
+        best = max(best, dp[i]);                    // answer lives anywhere
+    }
+    return best;                                    // 0 on an empty array
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Longest increasing subsequence. dp[i] = length of the longest strictly
+// increasing subsequence ENDING AT i. Initializing to 1 is the start-new
+// branch; the inner loop is the extend branch. Theta(n^2) time, Theta(n) space.
+static int lis(int[] a) {
+    int n = a.length, best = 0;
+    int[] dp = new int[n], from = new int[n];
+    Arrays.fill(dp, 1);
+    Arrays.fill(from, -1);                          // from[i]: predecessor index
+    for (int i = 0; i &lt; n; i++) {
+        for (int j = 0; j &lt; i; j++)
+            if (a[j] &lt; a[i] &amp;&amp; dp[j] + 1 &gt; dp[i]) { // strict: increasing
+                dp[i] = dp[j] + 1;                  // extend the run ending at j
+                from[i] = j;
+            }
+        best = Math.max(best, dp[i]);               // answer lives anywhere
+    }
+    return best;                                    // 0 on an empty array
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Longest increasing subsequence. dp[i] = length of the longest strictly
+# increasing subsequence ENDING AT i. Initializing to 1 is the start-new
+# branch; the inner loop is the extend branch. Theta(n^2) time, Theta(n) space.
+def lis(a):
+    n = len(a)
+    dp = [1] * n                                    # start-new is always legal
+    frm = [-1] * n                                  # frm[i]: predecessor index
+    best = 0
+    for i in range(n):
+        for j in range(i):
+            if a[j] &lt; a[i] and dp[j] + 1 &gt; dp[i]:   # strict: increasing
+                dp[i] = dp[j] + 1                   # extend the run ending at j
+                frm[i] = j
+        best = max(best, dp[i])                     # answer lives anywhere
+    return best                                     # 0 on an empty array</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Longest increasing subsequence. dp[i] = length of the longest strictly
+// increasing subsequence ENDING AT i. Initializing to 1 is the start-new
+// branch; the inner loop is the extend branch. Theta(n^2) time, Theta(n) space.
+fn lis(a: &amp;[i64]) -&gt; usize {
+    let n = a.len();
+    let mut dp = vec![1usize; n];                   // start-new is always legal
+    let mut from = vec![usize::MAX; n];             // predecessor index
+    let mut best = 0;
+    for i in 0..n {
+        for j in 0..i {
+            if a[j] &lt; a[i] &amp;&amp; dp[j] + 1 &gt; dp[i] {   // strict: increasing
+                dp[i] = dp[j] + 1;                  // extend the run ending at j
+                from[i] = j;
+            }
+        }
+        best = best.max(dp[i]);                     // answer lives anywhere
+    }
+    best                                            // 0 on an empty array
+}</pre>
+<p class="ct-src">source: <code>code/dp/lis.cpp &middot; code/dp/lis.java &middot; code/dp/lis.py &middot; code/dp/lis.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Why &ldquo;ending at \(i\)&rdquo; rather than &ldquo;within the first \(i\)
+        elements&rdquo;? Because the recurrence must know whether the subsequence
+        can be <em>extended</em> by \(a[i]\), and only the value it ends on decides
+        that; a prefix-based state discards exactly the information the
+        transition needs. This is the DP
+        recipe&rsquo;s advice (the <a href="paradigm-dp-method.html#recipe">Dynamic
+        Programming Method</a> handout) made concrete: when the
+        recurrence needs a fact the state does not carry, redefine (or extend) the
+        state. The double loop is \(\Theta(n^2)\); a refinement that keeps, for each
+        length, the smallest possible tail value and binary-searches each element
+        into place (&ldquo;patience sorting&rdquo;) achieves \(\Theta(n \log n)\),
+        a nice marriage of DP thinking with the searching toolkit, worth
+        knowing by name. LIS itself shows up as longest chains of nested boxes,
+        compatible version upgrades, and one-axis scheduling.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">3. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Count the monotone (right/down) paths across a \(3\times 3\) grid when
+          the <em>center</em> cell is blocked. Show the filled table.
+          <details>
+            <summary>solution</summary>
+            Sum-of-neighbors with the blocked cell forced to \(0\):
+            <pre>   1  1  1
+   1  0  1
+   1  1  2</pre>
+            The corner counts \(2\) paths (down the left edge then across, or
+            across the top then down the right edge), versus \(6\) unblocked
+            (&sect;1). Every path through the center (\(6 - 2 = 4\) of them)
+            is erased by that single \(0\), because the zero propagates
+            through every sum that would have used it.
+          </details>
+        </li>
+        <li>
+          Matrices \(A\ (5{\times}10)\), \(B\ (10{\times}2)\), \(C\ (2{\times}20)\).
+          Compute the scalar-multiplication cost of both parenthesizations of
+          \(ABC\) and verify that the interval-DP recurrence of &sect;1 picks the
+          cheaper one.
+          <details>
+            <summary>solution</summary>
+            \((AB)C\): \(AB\) costs \(5 \cdot 10 \cdot 2 = 100\) and yields
+            \(5{\times}2\); times \(C\) costs \(5 \cdot 2 \cdot 20 = 200\); total
+            \(300\). \(A(BC)\): \(BC\) costs \(10 \cdot 2 \cdot 20 = 400\) and
+            yields \(10{\times}20\); times \(A\) costs \(5 \cdot 10 \cdot 20 =
+            1000\); total \(1400\). The DP: \(dp[1][2] = 100\), \(dp[2][3] = 400\)
+            (adjacent pairs have one order), and
+            \(dp[1][3] = \min(k{=}1:\; 0 + 400 + 1000,\;\; k{=}2:\; 100 + 0 + 200)
+            = \min(1400, 300) = 300\), split \(k = 2\): multiply \(AB\)
+            first. A \(4.7\times\) cost gap on three small matrices; on long chains
+            the gap grows unboundedly, which is why the \(\Theta(n^3)\) DP pays.
+          </details>
+        </li>
+        <li>
+          Coin change, DP-style: with coin values \(\{1, 3, 4\}\), let
+          \(dp[a]\) be the minimum number of coins summing to amount \(a\).
+          Write the recurrence, fill \(dp[0..6]\), and show that greedy
+          (largest coin first) is beaten at \(a = 6\).
+          <details>
+            <summary>solution</summary>
+            Recurrence (case on the <em>last</em> coin used):
+            \(dp[0] = 0\) and
+            \(dp[a] = 1 + \min\{\,dp[a - c] : c \in \{1,3,4\},\, c \le a\,\}\).
+            Filling upward: \(dp[1] = 1\) (coin \(1\)); \(dp[2] = 2\)
+            (\(1{+}1\)); \(dp[3] = 1\) (coin \(3\)); \(dp[4] = 1\) (coin \(4\));
+            \(dp[5] = 2\) (\(4{+}1\) or \(1{+}4\)); \(dp[6] = 2\) via
+            \(dp[3] + 1\): two \(3\)-coins. So \(dp[0..6] =
+            0, 1, 2, 1, 1, 2, 2\). Greedy at \(a = 6\) takes \(4\), then must
+            cover \(2\) with \(1 + 1\): three coins against DP&rsquo;s two,
+            the same \(\{1,3,4\}\) counterexample that sank greedy in the
+            <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout,
+            now actually <em>solved</em>. Cost: \(n\) states
+            \(\times\) \(O(1)\) transition (three coins) \(= \Theta(n)\).
+          </details>
+        </li>
+        <li>
+          Coins \(\{1, 4, 5\}\), amount \(8\). What does greedy
+          (largest-coin-first) produce? Fill \(\mathit{dp}[0..8]\) and give the
+          optimal count.
+          <details>
+            <summary>solution</summary>
+            Greedy: \(5\), then three \(1\)s: four coins. The DP table:
+            <pre>  a:      0  1  2  3  4  5  6  7  8
+  dp[a]:  0  1  2  3  1  1  2  3  2</pre>
+            \(\mathit{dp}[8]\) tries last coins \(1\) (\(1 + dp[7] = 4\)), \(4\)
+            (\(1 + dp[4] = 2\)), and \(5\) (\(1 + dp[3] = 4\)): the optimum is
+            \(2\), namely \(4 + 4\). Greedy&rsquo;s first grab of the \(5\) leaves
+            the amount \(3\), reachable only by ones, the standard
+            non-canonical-coin-system failure, and the DP examines all last coins
+            instead of committing.
+          </details>
+        </li>
+        <li>
+          Compute the LIS length of \([10, 9, 2, 5, 3, 7, 101, 18]\), showing the
+          \(dp\) array. Then explain concretely what breaks if the state is defined
+          as &ldquo;\(dp[i]\) = LIS length within the first \(i\) elements&rdquo;
+          instead of &ldquo;ending at \(i\).&rdquo;
+          <details>
+            <summary>solution</summary>
+            <pre>  a[i]:   10   9   2   5   3   7  101  18
+  dp[i]:   1   1   1   2   2   3    4   4</pre>
+            The maximum is \(4\), achieved by \(2, 5, 7, 101\) (or \(2, 3, 7,
+            18\), or \(2, 5, 7, 18\)). With the prefix state, consider extending by
+            the next element: knowing only &ldquo;the first \(6\) elements contain
+            an increasing subsequence of length \(3\)&rdquo; does not say whether
+            <em>that</em> subsequence ends below \(101\) or below \(18\); the
+            recurrence cannot decide extendability, because the state discarded the
+            ending value. &ldquo;Ending at \(i\)&rdquo; carries exactly the needed
+            fact (the last value is \(a[i]\)) at the price of taking a final max
+            over all \(i\). When a recurrence will not close, enrich the state,
+            the first line of the capstone checklist (the
+            <a href="paradigm-dp-method.html#capstone">Dynamic Programming Method</a>
+            handout).
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; DP Patterns: Grid, Interval, Coin Change &amp; LIS v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

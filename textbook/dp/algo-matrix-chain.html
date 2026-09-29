@@ -1,0 +1,975 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Matrix-Chain Multiplication.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Matrix-Chain Multiplication - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h2.part { font-size: 23px; margin: 48px 0 8px; padding-top: 22px; border-top: 2px solid var(--line); }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+      <h1>Matrix-Chain Multiplication</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
+      </div>
+      <div class="src">
+        Matrix-chain multiplication, the canonical interval dynamic program: why
+        associativity fixes the product but not its price, the last-decision
+        derivation of the subproblem (the outermost split \(k\)), the recurrence
+        with its optimal-substructure proof, the \(m\) and \(s\) tables filled
+        diagonal by diagonal for \(p = (5, 4, 6, 2, 7)\) with every
+        candidate&rsquo;s arithmetic shown, the traceback that rebuilds
+        \(((A_1(A_2A_3))A_4)\), the \(\Theta(n^3)\) time and \(\Theta(n^2)\)
+        space counted rather than asserted, and code in four languages. The
+        method itself is the
+        <a href="paradigm-dp-method.html">Dynamic Programming Method</a> handout;
+        the shape is catalogued in
+        <a href="algo-dp-patterns.html#grid">DP Patterns</a>. With exercises.
+      </div>
+
+      <p class="lead">
+        Matrix multiplication is associative: \((AB)C\) and \(A(BC)\) are the
+        same matrix, entry for entry. It is not, however, equally
+        <em>priced</em>: the two orders can differ by a factor of six on three
+        small matrices, and by unbounded factors on longer chains. Choosing the
+        cheapest bracketing is an optimization over a number of candidates that
+        grows exponentially, and it is solved by a dynamic program whose state
+        is a <em>range</em> of the chain. That state shape is called interval
+        dynamic programming (DP), and this problem is its canonical instance.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#cost">The cost of a parenthesization</a></li>
+          <li><a href="#sub">Finding the subproblem: the outermost split</a></li>
+          <li><a href="#code">The algorithm</a></li>
+          <li><a href="#table">The table, filled diagonal by diagonal</a></li>
+          <li><a href="#back">The split table and the traceback</a></li>
+          <li><a href="#cost3">Cost: \(\Theta(n^3)\) time, \(\Theta(n^2)\) space</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">1. The cost of a parenthesization</h2>
+      <p>
+        Fix the unit of work first. The standard triple-loop algorithm computes
+        each of the \(p \cdot r\) output entries as a dot product of length
+        \(q\), so it performs \(p\,q\,r\) scalar multiplications.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (cost of one multiply)</span>
+        Multiplying a \(p \times q\) matrix by a \(q \times r\) matrix costs
+        \(p\,q\,r\) <strong>scalar multiplications</strong> and produces a
+        \(p \times r\) matrix. The inner dimensions must agree; the outer
+        dimensions of the result are inherited from the operands.
+      </div>
+      <p>
+        Now chain them. A chain \(A_1 A_2 \cdots A_n\) is described entirely by
+        one dimension vector \(p = (p_0, p_1, \ldots, p_n)\), with
+        \(A_i\) of shape \(p_{i-1} \times p_i\). Because a bracketing only
+        reorders <em>which</em> products are formed, never which matrices are
+        adjacent, every intermediate result \(A_i \cdots A_j\) has shape
+        \(p_{i-1} \times p_j\) no matter how it was bracketed. That is the fact
+        the whole dynamic program rests on: <em>the shape of a range does not
+        depend on how the range is parenthesized, only its price does.</em>
+      </p>
+      <div class="ex">
+        <span class="tag">Example (three matrices, two orders)</span>
+        \(A\ (10{\times}30)\), \(B\ (30{\times}5)\), \(C\ (5{\times}60)\).
+        <pre>  (AB)C :  AB costs 10&middot;30&middot;5 = 1500, giving 10&times;5;  (AB)C costs 10&middot;5&middot;60  =  3000
+           total  1500 +  3000 =   4,500
+
+  A(BC) :  BC costs 30&middot;5&middot;60 = 9000, giving 30&times;60; A(BC) costs 10&middot;30&middot;60 = 18000
+           total  9000 + 18000 =  27,000      6&times; worse</pre>
+        Both compute the same \(10 \times 60\) matrix. The difference is that
+        \((AB)C\) squeezes the chain down to \(10 \times 5\) before touching the
+        wide \(C\), while \(A(BC)\) first inflates the middle to \(30 \times 60\)
+        and then pays for that width twice.
+      </div>
+      <p>
+        With four matrices there are five bracketings, and their prices spread
+        further.
+      </p>
+      <div class="def">
+        <span class="tag">The running instance</span>
+        \(p = (5, 4, 6, 2, 7)\), that is
+        \(A_1\ (5{\times}4)\), \(A_2\ (4{\times}6)\), \(A_3\ (6{\times}2)\),
+        \(A_4\ (2{\times}7)\). Its five bracketings:
+      </div>
+      <table class="trace">
+        <tr><th>parenthesization</th><th>arithmetic</th><th>total</th></tr>
+        <tr><td class="cell">((A1(A2A3))A4)</td><td class="cell">4&middot;6&middot;2 + 5&middot;4&middot;2 + 5&middot;2&middot;7 = 48 + 40 + 70</td><td class="cell lt">158</td></tr>
+        <tr><td class="cell">(A1((A2A3)A4))</td><td class="cell">4&middot;6&middot;2 + 4&middot;2&middot;7 + 5&middot;4&middot;7 = 48 + 56 + 140</td><td class="cell">244</td></tr>
+        <tr><td class="cell">(((A1A2)A3)A4)</td><td class="cell">5&middot;4&middot;6 + 5&middot;6&middot;2 + 5&middot;2&middot;7 = 120 + 60 + 70</td><td class="cell">250</td></tr>
+        <tr><td class="cell">(A1(A2(A3A4)))</td><td class="cell">6&middot;2&middot;7 + 4&middot;6&middot;7 + 5&middot;4&middot;7 = 84 + 168 + 140</td><td class="cell">392</td></tr>
+        <tr><td class="cell">((A1A2)(A3A4))</td><td class="cell">5&middot;4&middot;6 + 6&middot;2&middot;7 + 5&middot;6&middot;7 = 120 + 84 + 210</td><td class="cell piv">414</td></tr>
+      </table>
+      <p>
+        The best order costs \(158\) and the worst \(414\), a factor of
+        \(2.6\) with no matrix larger than \(6 \times 7\). Nothing in the raw
+        dimension list announces the winner: the cheapest bracketing is neither
+        strictly left-to-right nor strictly right-to-left nor the balanced
+        split, and the balanced split is the <em>worst</em> of the five.
+      </p>
+      <div class="def">
+        <span class="tag">Problem (matrix-chain multiplication)</span>
+        Given a dimension vector \(p = (p_0, \ldots, p_n)\) describing a chain
+        \(A_1 \cdots A_n\), find a full parenthesization of the product
+        minimizing the total number of scalar multiplications. The output is the
+        bracketing, not the product: no matrix entries are ever touched.
+      </div>
+      <div class="aside">
+        <span class="tag">Why not enumerate</span>
+        The number of full parenthesizations of \(n\) matrices is the Catalan
+        number \(P(n) = C_{n-1} = \frac{1}{n}\binom{2n-2}{n-1}\), because
+        choosing the outermost split at \(k\) and recursing gives
+        \(P(n) = \sum_{k=1}^{n-1} P(k)\,P(n-k)\), the Catalan recurrence, with
+        \(P(1) = 1\). That is \(1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862,
+        16796\) for \(n = 1, \ldots, 11\), and it grows like
+        \(\Theta(4^n / n^{3/2})\). Enumerating is hopeless past a chain of a
+        couple of dozen; the same recurrence, read as a DP instead of a count,
+        solves the problem in \(\Theta(n^3)\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="sub">2. Finding the subproblem: the outermost split</h2>
+      <p>
+        Do not start by guessing a table. Start from the
+        <a href="paradigm-dp-method.html#recipe">Dynamic Programming Method</a>
+        handout&rsquo;s first question: <em>what is the last decision the
+        algorithm makes, and what is left to decide once it is fixed?</em>
+      </p>
+      <p>
+        A full parenthesization of \(A_1 \cdots A_n\) is a tree, and its root is
+        one multiplication: the final one, which combines the product of some
+        prefix with the product of the matching suffix. So there is an index
+        \(k\), with \(1 \le k &lt; n\), such that the last multiply is
+        \[
+          (A_1 \cdots A_k) \times (A_{k+1} \cdots A_n).
+        \]
+        Fixing \(k\) is the last decision. Once it is fixed, two independent
+        questions remain: how to bracket \(A_1 \cdots A_k\), and how to bracket
+        \(A_{k+1} \cdots A_n\). Neither can influence the other, because the
+        shape of each side is already determined
+        (\(p_0 \times p_k\) and \(p_k \times p_n\)), so the price of the final
+        multiply, \(p_0\,p_k\,p_n\), is fixed by \(k\) alone.
+      </p>
+      <p>
+        Those two remaining questions are the same problem on a
+        <em>contiguous range</em> of the chain. That is the subproblem, and it
+        forces the state.
+      </p>
+      <div class="def">
+        <span class="tag">State</span>
+        \(m[i][j]\) = the minimum number of scalar multiplications needed to
+        compute \(A_i A_{i+1} \cdots A_j\), for \(1 \le i \le j \le n\).
+        The answer to the whole problem is \(m[1][n]\).
+      </div>
+      <p>
+        Note what the state is <em>not</em>. It is not indexed by a prefix
+        length, as in <a href="algo-rod-cutting.html">Rod Cutting</a>, and not by
+        a pair of positions in two different inputs, as in
+        <a href="algo-longest-common-subsequence.html">Longest Common
+        Subsequence</a>. Both indices point into the same sequence and together
+        name a window of it. A DP whose state is a range, and whose transition
+        chooses where to split that range, is an <strong>interval DP</strong>.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (matrix-chain recurrence)</span>
+        With \(A_i\) of shape \(p_{i-1} \times p_i\),
+        \[
+          m[i][j] \;=\;
+          \begin{cases}
+            0, & i = j, \\[4pt]
+            \displaystyle\min_{i \le k &lt; j}
+              \bigl(m[i][k] + m[k+1][j] + p_{i-1}\,p_k\,p_j\bigr), & i &lt; j.
+          \end{cases}
+        \]
+      </div>
+      <div class="proof">
+        <strong>Why this is correct (optimal substructure).</strong> A single
+        matrix requires no multiplication, so \(m[i][i] = 0\).
+        For \(i &lt; j\), consider any optimal parenthesization \(P\) of
+        \(A_i \cdots A_j\) and let \(k\) be its outermost split, so \(P\)
+        consists of a parenthesization \(P_L\) of \(A_i \cdots A_k\), a
+        parenthesization \(P_R\) of \(A_{k+1} \cdots A_j\), and one final
+        multiply. The operands of that final multiply have shapes
+        \(p_{i-1} \times p_k\) and \(p_k \times p_j\) regardless of \(P_L\) and
+        \(P_R\), so its price is exactly \(p_{i-1}\,p_k\,p_j\) and
+        \(\mathrm{cost}(P) = \mathrm{cost}(P_L) + \mathrm{cost}(P_R) +
+        p_{i-1}\,p_k\,p_j\).
+        Now suppose \(P_L\) were not optimal for \(A_i \cdots A_k\). Replacing it
+        by an optimal \(P_L'\) yields a valid parenthesization of
+        \(A_i \cdots A_j\) with the same \(k\) and the same final price, hence
+        strictly smaller total: contradiction. The same argument applies to
+        \(P_R\). So \(\mathrm{cost}(P) = m[i][k] + m[k+1][j] +
+        p_{i-1}\,p_k\,p_j\) for its own \(k\), which is one of the terms the
+        minimum ranges over; the minimum is therefore \(\le m[i][j]\).
+        Conversely each term of the minimum is achievable (glue optimal
+        bracketings of the two halves and multiply), so no term is smaller than
+        \(m[i][j]\). The two inequalities give equality.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Independence of the halves, given \(k\), is the whole content of that
+        proof: swapping in a cheaper bracketing of the left half changes neither
+        the shape of the left operand nor anything the right half does. The
+        subproblems also overlap, the second DP prerequisite: the range
+        \(A_2 A_3\) is needed by the \(k = 1\) candidate of \(A_1 A_2 A_3\), by
+        the \(k = 3\) candidate of \(A_2 A_3 A_4\), and again through both of
+        those inside \(A_1 \cdots A_4\). In general \([i, j]\) is a subproblem of
+        every wider range containing it, which is why a plain recursion revisits
+        it Catalan-many times while the table computes it once.
+      </p>
+      <div class="def">
+        <span class="tag">Fill order</span>
+        \(m[i][j]\) reads \(m[i][k]\) and \(m[k+1][j]\), both of which describe
+        <em>strictly shorter</em> ranges (\(k - i + 1 &lt; j - i + 1\) and
+        \(j - k &lt; j - i + 1\)). So the table must be filled in order of
+        increasing range length \(L = j - i + 1\): all ranges of length \(1\)
+        (the base cases), then \(2\), then \(3\), and so on. On the square
+        \(m\) table these are the diagonals above the main diagonal, filled
+        outward.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="code">3. The algorithm</h2>
+      <p>
+        Three pieces: the \(\Theta(n^2)\)-cell table \(m\), the parallel table
+        \(s\) recording which \(k\) won each cell, and a recursive printer that
+        turns \(s\) into a bracketing.
+      </p>
+      <div class="code-tabs" data-snippet="dp/matrixchain">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Matrix-chain order. p has n+1 entries; A_i is p[i-1] x p[i], i = 1..n.
+// m[i][j] = min scalar multiplications for A_i..A_j; s[i][j] = winning split.
+// Theta(n^3) time, Theta(n^2) space.
+int matrixChain(const vector&lt;int&gt;&amp; p,
+                vector&lt;vector&lt;int&gt;&gt;&amp; m, vector&lt;vector&lt;int&gt;&gt;&amp; s) {
+    int n = (int)p.size() - 1;
+    m.assign(n + 2, vector&lt;int&gt;(n + 2, 0));   // base case: m[i][i] = 0
+    s.assign(n + 2, vector&lt;int&gt;(n + 2, 0));
+    for (int L = 2; L &lt;= n; L++)              // range length, shortest first
+        for (int i = 1; i + L - 1 &lt;= n; i++) {
+            int j = i + L - 1;
+            m[i][j] = INT_MAX;
+            for (int k = i; k &lt; j; k++) {     // every outermost split
+                int c = m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j];
+                if (c &lt; m[i][j]) { m[i][j] = c; s[i][j] = k; }
+            }
+        }
+    return m[1][n];
+}
+
+// Traceback: s[i][j] names the last multiply of the range, so recurse on both
+// halves and wrap. Theta(n) calls, one per node of the parse tree.
+string parens(const vector&lt;vector&lt;int&gt;&gt;&amp; s, int i, int j) {
+    if (i == j) return "A" + to_string(i);
+    int k = s[i][j];
+    return "(" + parens(s, i, k) + parens(s, k + 1, j) + ")";
+}
+// p = {5,4,6,2,7}:  matrixChain -&gt; 158,  parens(s,1,4) -&gt; "((A1(A2A3))A4)"</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Matrix-chain order. p has n+1 entries; A_i is p[i-1] x p[i], i = 1..n.
+// m[i][j] = min scalar multiplications for A_i..A_j; s[i][j] = winning split.
+// Theta(n^3) time, Theta(n^2) space.
+static int matrixChain(int[] p, int[][] m, int[][] s) {
+    int n = p.length - 1;
+    for (int L = 2; L &lt;= n; L++)              // range length, shortest first
+        for (int i = 1; i + L - 1 &lt;= n; i++) {
+            int j = i + L - 1;
+            m[i][j] = Integer.MAX_VALUE;      // m[i][i] stays 0: the base case
+            for (int k = i; k &lt; j; k++) {     // every outermost split
+                int c = m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j];
+                if (c &lt; m[i][j]) { m[i][j] = c; s[i][j] = k; }
+            }
+        }
+    return m[1][n];
+}
+
+// Traceback: s[i][j] names the last multiply of the range, so recurse on both
+// halves and wrap. Theta(n) calls, one per node of the parse tree.
+static String parens(int[][] s, int i, int j) {
+    if (i == j) return "A" + i;
+    int k = s[i][j];
+    return "(" + parens(s, i, k) + parens(s, k + 1, j) + ")";
+}
+// p = {5,4,6,2,7}:  matrixChain -&gt; 158,  parens(s,1,4) -&gt; "((A1(A2A3))A4)"</pre>
+<pre class="ct-pane" data-lang="py" hidden># Matrix-chain order. p has n+1 entries; A_i is p[i-1] x p[i], i = 1..n.
+# m[i][j] = min scalar multiplications for A_i..A_j; s[i][j] = winning split.
+# Theta(n^3) time, Theta(n^2) space.
+def matrix_chain(p):
+    n = len(p) - 1
+    m = [[0] * (n + 2) for _ in range(n + 2)]     # base case: m[i][i] = 0
+    s = [[0] * (n + 2) for _ in range(n + 2)]
+    for L in range(2, n + 1):                     # range length, shortest first
+        for i in range(1, n - L + 2):
+            j = i + L - 1
+            m[i][j] = float("inf")
+            for k in range(i, j):                 # every outermost split
+                c = m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j]
+                if c &lt; m[i][j]:
+                    m[i][j], s[i][j] = c, k
+    return m[1][n], m, s
+
+# Traceback: s[i][j] names the last multiply of the range, so recurse on both
+# halves and wrap. Theta(n) calls, one per node of the parse tree.
+def parens(s, i, j):
+    if i == j:
+        return "A%d" % i
+    k = s[i][j]
+    return "(" + parens(s, i, k) + parens(s, k + 1, j) + ")"
+
+# p = [5,4,6,2,7]:  matrix_chain -&gt; 158,  parens(s,1,4) -&gt; "((A1(A2A3))A4)"</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Matrix-chain order. p has n+1 entries; A_i is p[i-1] x p[i], i = 1..n.
+// m[i][j] = min scalar multiplications for A_i..A_j; s[i][j] = winning split.
+// Theta(n^3) time, Theta(n^2) space.
+fn matrix_chain(p: &amp;[usize]) -&gt; (usize, Vec&lt;Vec&lt;usize&gt;&gt;, Vec&lt;Vec&lt;usize&gt;&gt;) {
+    let n = p.len() - 1;
+    let mut m = vec![vec![0usize; n + 2]; n + 2];   // base case: m[i][i] = 0
+    let mut s = vec![vec![0usize; n + 2]; n + 2];
+    for len in 2..=n {                              // range length, shortest first
+        for i in 1..=(n - len + 1) {
+            let j = i + len - 1;
+            m[i][j] = usize::MAX;
+            for k in i..j {                         // every outermost split
+                let c = m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j];
+                if c &lt; m[i][j] { m[i][j] = c; s[i][j] = k; }
+            }
+        }
+    }
+    (m[1][n], m, s)
+}
+
+// Traceback: s[i][j] names the last multiply of the range, so recurse on both
+// halves and wrap. Theta(n) calls, one per node of the parse tree.
+fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
+    if i == j { return format!("A{}", i); }
+    let k = s[i][j];
+    format!("({}{})", parens(s, i, k), parens(s, k + 1, j))
+}
+// p = [5,4,6,2,7]:  matrix_chain -&gt; 158,  parens(&amp;s,1,4) -&gt; "((A1(A2A3))A4)"</pre>
+<p class="ct-src">source: <code>code/dp/matrixchain.cpp &middot; code/dp/matrixchain.java &middot; code/dp/matrixchain.py &middot; code/dp/matrixchain.rs</code></p>
+<!--/ct--></div>
+      <div class="aside">
+        <span class="tag">Three index conventions to keep straight</span>
+        The dimension vector is \(0\)-based while the matrices are \(1\)-based;
+        the outer loop variable is the range <em>length</em>, not an endpoint;
+        and the split \(k\) belongs to the left half, so the halves are
+        \([i, k]\) and \([k+1, j]\), never \([i, k-1]\) and \([k, j]\). A quick
+        check on the price \(p_{i-1} p_k p_j\): it uses the rows of \(A_i\), the
+        columns of \(A_k\) (the shared inner dimension), and the columns of
+        \(A_j\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="table">4. The table, filled diagonal by diagonal</h2>
+      <p>
+        The running instance again: \(p = (5, 4, 6, 2, 7)\), so \(n = 4\) and
+        the matrices are \(A_1\ (5{\times}4)\), \(A_2\ (4{\times}6)\),
+        \(A_3\ (6{\times}2)\), \(A_4\ (2{\times}7)\). Only the upper triangle
+        \(i \le j\) is used.
+      </p>
+      <h3>Diagonal \(L = 1\): the base cases</h3>
+      <p>
+        A single matrix costs nothing:
+        \(m[1][1] = m[2][2] = m[3][3] = m[4][4] = 0\). This diagonal is written,
+        not computed.
+      </p>
+      <h3>Diagonal \(L = 2\): adjacent pairs, one candidate each</h3>
+      <p>
+        A range of two matrices admits exactly one split, so the minimum is over
+        a single term and each cell is the price of one multiply.
+      </p>
+      <table class="trace">
+        <tr><th class="lab">cell</th><th>only candidate \(k\)</th><th>\(m\)</th><th>\(s\)</th></tr>
+        <tr><td class="lab">m[1][2]</td><td class="cell">k=1: \(0 + 0 + p_0p_1p_2 = 5{\cdot}4{\cdot}6 = 120\)</td><td class="cell lt">120</td><td class="cell">1</td></tr>
+        <tr><td class="lab">m[2][3]</td><td class="cell">k=2: \(0 + 0 + p_1p_2p_3 = 4{\cdot}6{\cdot}2 = 48\)</td><td class="cell lt">48</td><td class="cell">2</td></tr>
+        <tr><td class="lab">m[3][4]</td><td class="cell">k=3: \(0 + 0 + p_2p_3p_4 = 6{\cdot}2{\cdot}7 = 84\)</td><td class="cell lt">84</td><td class="cell">3</td></tr>
+      </table>
+      <h3>Diagonal \(L = 3\): the first real competitions</h3>
+      <div class="ex">
+        <span class="tag">Example (every candidate for \(m[1][3]\))</span>
+        Range \(A_1A_2A_3\), so \(i = 1\), \(j = 3\), and \(k\) ranges over
+        \(1, 2\).
+        <table class="trace">
+          <tr><th>\(k\)</th><th>halves</th><th>\(m[1][k]\)</th><th>\(m[k{+}1][3]\)</th><th>final multiply \(p_0p_kp_3\)</th><th>total</th></tr>
+          <tr><td class="cell">1</td><td class="cell">\((A_1)(A_2A_3)\)</td><td class="cell">0</td><td class="cell">48</td><td class="cell">\(5{\cdot}4{\cdot}2 = 40\)</td><td class="cell lt">0 + 48 + 40 = 88</td></tr>
+          <tr><td class="cell">2</td><td class="cell">\((A_1A_2)(A_3)\)</td><td class="cell">120</td><td class="cell">0</td><td class="cell">\(5{\cdot}6{\cdot}2 = 60\)</td><td class="cell">120 + 0 + 60 = 180</td></tr>
+        </table>
+        \(m[1][3] = \min(88, 180) = 88\), \(s[1][3] = 1\). The split
+        \(k = 1\) wins by a factor of two: forming \(A_2A_3\) first collapses the
+        wide inner dimension \(6\) down to \(2\), and the outer multiply then
+        pays \(5 \cdot 4 \cdot 2\) instead of \(5 \cdot 6 \cdot 2\). Note that
+        \(k = 1\) wins even though its own sub-range \(A_2A_3\) (cost \(48\)) is
+        more expensive than \(k = 2\)&rsquo;s empty left sub-range: the cheaper
+        subproblem does not decide the cell, only the total does.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (every candidate for \(m[2][4]\))</span>
+        Range \(A_2A_3A_4\), so \(i = 2\), \(j = 4\), and \(k\) ranges over
+        \(2, 3\).
+        <table class="trace">
+          <tr><th>\(k\)</th><th>halves</th><th>\(m[2][k]\)</th><th>\(m[k{+}1][4]\)</th><th>final multiply \(p_1p_kp_4\)</th><th>total</th></tr>
+          <tr><td class="cell">2</td><td class="cell">\((A_2)(A_3A_4)\)</td><td class="cell">0</td><td class="cell">84</td><td class="cell">\(4{\cdot}6{\cdot}7 = 168\)</td><td class="cell">0 + 84 + 168 = 252</td></tr>
+          <tr><td class="cell">3</td><td class="cell">\((A_2A_3)(A_4)\)</td><td class="cell">48</td><td class="cell">0</td><td class="cell">\(4{\cdot}2{\cdot}7 = 56\)</td><td class="cell lt">48 + 0 + 56 = 104</td></tr>
+        </table>
+        \(m[2][4] = \min(252, 104) = 104\), \(s[2][4] = 3\). Here the
+        <em>other</em> split wins, in the mirror-image situation: forming
+        \(A_2A_3\) first collapses the inner dimension to \(2\) before the wide
+        \(7\)-column \(A_4\) is touched.
+      </div>
+      <h3>Diagonal \(L = 4\): the whole chain</h3>
+      <div class="ex">
+        <span class="tag">Example (every candidate for \(m[1][4]\))</span>
+        Range \(A_1A_2A_3A_4\), \(k \in \{1, 2, 3\}\); the final multiply always
+        costs \(p_0 p_k p_4 = 5 \cdot p_k \cdot 7\).
+        <table class="trace">
+          <tr><th>\(k\)</th><th>halves</th><th>\(m[1][k]\)</th><th>\(m[k{+}1][4]\)</th><th>final multiply \(5\,p_k\,7\)</th><th>total</th></tr>
+          <tr><td class="cell">1</td><td class="cell">\((A_1)(A_2A_3A_4)\)</td><td class="cell">0</td><td class="cell">104</td><td class="cell">\(5{\cdot}4{\cdot}7 = 140\)</td><td class="cell">0 + 104 + 140 = 244</td></tr>
+          <tr><td class="cell">2</td><td class="cell">\((A_1A_2)(A_3A_4)\)</td><td class="cell">120</td><td class="cell">84</td><td class="cell">\(5{\cdot}6{\cdot}7 = 210\)</td><td class="cell piv">120 + 84 + 210 = 414</td></tr>
+          <tr><td class="cell">3</td><td class="cell">\((A_1A_2A_3)(A_4)\)</td><td class="cell">88</td><td class="cell">0</td><td class="cell">\(5{\cdot}2{\cdot}7 = 70\)</td><td class="cell lt">88 + 0 + 70 = 158</td></tr>
+        </table>
+        \(m[1][4] = \min(244, 414, 158) = 158\), \(s[1][4] = 3\). Each of the
+        three candidates reads two cells computed on earlier diagonals and never
+        recomputes them; \(m[2][4] = 104\) and \(m[1][3] = 88\) each took two
+        candidates of their own, and those are consumed here for free.
+        The balanced split \(k = 2\) is the most expensive of the three, which
+        is the standing warning against assuming that dividing in the middle is
+        what a divide-and-conquer-looking recurrence wants.
+      </div>
+      <h3>The completed table</h3>
+      <p>
+        Rows are \(i\), columns are \(j\); the diagonal holds the base cases and
+        the lower triangle is unused. Read it outward from the diagonal, the
+        order it was filled.
+      </p>
+      <table class="trace">
+        <tr><th class="lab">\(m[i][j]\)</th><th>j=1</th><th>j=2</th><th>j=3</th><th>j=4</th></tr>
+        <tr><td class="lab">i=1</td><td class="cell">0</td><td class="cell">120</td><td class="cell">88</td><td class="cell lt">158</td></tr>
+        <tr><td class="lab">i=2</td><td class="cell">&middot;</td><td class="cell">0</td><td class="cell">48</td><td class="cell">104</td></tr>
+        <tr><td class="lab">i=3</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">0</td><td class="cell">84</td></tr>
+        <tr><td class="lab">i=4</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">0</td></tr>
+      </table>
+      <p>
+        Six cells were computed (the four base cases were written), from ten
+        candidate evaluations in all: \(1 + 1 + 1\) on the \(L = 2\) diagonal,
+        \(2 + 2\) on \(L = 3\), and \(3\) on \(L = 4\). Section
+        <a href="#cost3">6</a> shows that \(10\) is exactly
+        \(n(n^2-1)/6\) at \(n = 4\).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="back">5. The split table and the traceback</h2>
+      <p>
+        The \(m\) table answers &ldquo;how much.&rdquo; The bracketing itself is
+        recovered from the parallel table \(s\), filled by the one extra
+        assignment inside the <code>if</code>: \(s[i][j]\) is the \(k\) that won
+        the minimum for \([i, j]\).
+      </p>
+      <table class="trace">
+        <tr><th class="lab">\(s[i][j]\)</th><th>j=2</th><th>j=3</th><th>j=4</th></tr>
+        <tr><td class="lab">i=1</td><td class="cell">1</td><td class="cell">1</td><td class="cell lt">3</td></tr>
+        <tr><td class="lab">i=2</td><td class="cell">&middot;</td><td class="cell">2</td><td class="cell">3</td></tr>
+        <tr><td class="lab">i=3</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">3</td></tr>
+      </table>
+      <p>
+        The traceback is the recursion <code>parens</code>: at a range
+        \([i, j]\) with \(i &lt; j\), read \(k = s[i][j]\), print an open
+        parenthesis, recurse on \([i, k]\), recurse on \([k+1, j]\), print a
+        close parenthesis. Singleton ranges print their own name. Step by step
+        on the running instance:
+      </p>
+      <table class="trace">
+        <tr><th class="lab">step</th><th>call</th><th>\(s[i][j]\)</th><th>action</th><th>output so far</th></tr>
+        <tr><td class="lab">1</td><td class="cell">parens(1,4)</td><td class="cell">3</td><td>split into \([1,3]\) and \([4,4]\)</td><td class="cell">(</td></tr>
+        <tr><td class="lab">2</td><td class="cell">parens(1,3)</td><td class="cell">1</td><td>split into \([1,1]\) and \([2,3]\)</td><td class="cell">((</td></tr>
+        <tr><td class="lab">3</td><td class="cell">parens(1,1)</td><td class="cell">&ndash;</td><td>singleton, emit \(A_1\)</td><td class="cell">((A1</td></tr>
+        <tr><td class="lab">4</td><td class="cell">parens(2,3)</td><td class="cell">2</td><td>split into \([2,2]\) and \([3,3]\)</td><td class="cell">((A1(</td></tr>
+        <tr><td class="lab">5</td><td class="cell">parens(2,2)</td><td class="cell">&ndash;</td><td>singleton, emit \(A_2\)</td><td class="cell">((A1(A2</td></tr>
+        <tr><td class="lab">6</td><td class="cell">parens(3,3)</td><td class="cell">&ndash;</td><td>singleton, emit \(A_3\)</td><td class="cell">((A1(A2A3</td></tr>
+        <tr><td class="lab">7</td><td class="cell">&ndash;</td><td class="cell">&ndash;</td><td>close \([2,3]\), then close \([1,3]\)</td><td class="cell">((A1(A2A3))</td></tr>
+        <tr><td class="lab">8</td><td class="cell">parens(4,4)</td><td class="cell">&ndash;</td><td>singleton, emit \(A_4\)</td><td class="cell">((A1(A2A3))A4</td></tr>
+        <tr><td class="lab">9</td><td class="cell">&ndash;</td><td class="cell">&ndash;</td><td>close \([1,4]\)</td><td class="cell lt">((A1(A2A3))A4)</td></tr>
+      </table>
+      <div class="ex">
+        <span class="tag">Example (checking the reconstruction against the price)</span>
+        Execute \(((A_1(A_2A_3))A_4)\) and add up the bill:
+        <pre>  A2A3           :  4&middot;6&middot;2 =  48    giving 4&times;2
+  A1(A2A3)       :  5&middot;4&middot;2 =  40    giving 5&times;2
+  (A1(A2A3))A4   :  5&middot;2&middot;7 =  70    giving 5&times;7
+                    total  = 158</pre>
+        Which matches \(m[1][4] = 158\) and matches the first row of the
+        enumeration in &sect;1, confirming the DP found the true minimum over all
+        five bracketings and not merely a good one.
+      </div>
+      <div class="aside">
+        <span class="tag">Ties</span>
+        When two splits achieve the same minimum the code as written keeps the
+        first, because the update is a strict <code>&lt;</code>. Several
+        bracketings then have equal cost and any is correct. Where an exercise
+        asks for &ldquo;the&rdquo; parenthesization, either the instance has a
+        unique optimum or a tie-breaking rule is stated. The running instance
+        has no ties: its five bracketings cost \(158, 244, 250, 392, 414\), all
+        distinct.
+      </div>
+      <p>
+        Only \(s\) is needed for the traceback, and it is the same
+        record-the-winning-choice device used elsewhere in this catalog: the
+        <code>cut[]</code> array of <a href="algo-rod-cutting.html">Rod
+        Cutting</a>, the arrow table of
+        <a href="algo-longest-common-subsequence.html">Longest Common
+        Subsequence</a>, treated in general in
+        <a href="algo-traceback-space-saving.html#trace">Traceback and Space
+        Saving</a>. One difference matters: those tracebacks are loops walking a
+        single path back through the table, while this one is a
+        <em>recursion</em> that branches, because the solution is a tree rather
+        than a sequence. It visits \(2n - 1\) nodes (\(n\) leaves and \(n-1\)
+        internal splits), so it is \(\Theta(n)\).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cost3">6. Cost: \(\Theta(n^3)\) time, \(\Theta(n^2)\) space</h2>
+      <p>
+        Count the innermost operation, one candidate evaluation, which is a
+        constant number of array reads, two additions, two multiplications and a
+        comparison. The loops enumerate every triple \((i, j, k)\) with
+        \(1 \le i \le k &lt; j \le n\). A range of length \(L\) has \(L - 1\)
+        splits, and there are \(n - L + 1\) ranges of length \(L\), so the total
+        is
+        \[
+          T(n) \;=\; \sum_{L=2}^{n} (n - L + 1)(L - 1)
+          \;=\; \sum_{d=1}^{n-1} (n - d)\,d
+          \;=\; n\!\cdot\!\frac{(n-1)n}{2} - \frac{(n-1)n(2n-1)}{6}
+          \;=\; \frac{n^3 - n}{6},
+        \]
+        substituting \(d = L - 1\). Equivalently
+        \(T(n) = \binom{n+1}{3}\), the number of ways to choose the triple.
+        Checks: \(T(4) = (64 - 4)/6 = 10\), exactly the ten candidates counted
+        in &sect;4, and \(T(5) = (125-5)/6 = 20\), which is the count for the
+        five-matrix chain of exercise 3.
+      </p>
+      <p>
+        Since \(\frac{n^3-n}{6}\) is bounded above by \(\frac{n^3}{6}\) and
+        below by \(\frac{n^3}{12}\) for \(n \ge 2\), it is \(\Theta(n^3)\) by
+        the definition in
+        <a href="../foundations/foundation-asymptotic-notation.html">Asymptotic
+        Notation</a>. This is a tight bound, not an upper bound: the loops have
+        no early exit, so every instance of size \(n\) evaluates exactly
+        \((n^3-n)/6\) candidates. The traceback adds \(\Theta(n)\), which
+        disappears into the \(\Theta(n^3)\).
+      </p>
+      <p>
+        Space: two \((n+1) \times (n+1)\) tables, of which only the upper
+        triangles (\(\binom{n+1}{2}\) cells each) are ever read, so
+        \(\Theta(n^2)\) either way. Unlike
+        <a href="algo-longest-common-subsequence.html">Longest Common
+        Subsequence</a>, where the value table can be reduced to two rows, there
+        is no useful row-by-row compression here: the cell \(m[i][j]\) reads
+        \(m[i][k]\) along its own row and \(m[k+1][j]\) down its own column, so
+        an entire triangle is live at once. And \(s\) cannot be dropped without
+        losing the answer, since the bracketing is the deliverable.
+      </p>
+      <div class="aside">
+        <span class="tag">Two comparisons</span>
+        Against enumeration: at \(n = 20\) there are \(C_{19} =
+        1{,}767{,}263{,}190\) parenthesizations, against \((8000-20)/6 = 1330\)
+        candidate evaluations for the DP. Against the work being planned: a
+        single multiply in the chain typically costs far more than \(n^3\)
+        arithmetic for realistic dimensions, so planning the order is cheap
+        relative to executing it, which is why libraries and query planners do
+        it. The recurrence can also be run as a memoized recursion, in the
+        <a href="paradigm-dp-method.html#styles">Dynamic Programming Method</a>
+        handout&rsquo;s top-down style: identical bounds, no need to reason out
+        the diagonal fill order, at the price of \(\Theta(n)\) stack depth.
+        Bottom-up is preferred here because <em>every</em> cell of the triangle
+        is needed anyway, so skipping unreachable subproblems buys nothing.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">7. Where this sits</h2>
+      <p>
+        Matrix-chain multiplication is the canonical <strong>interval DP</strong>:
+        the state is a contiguous range \([i, j]\), the transition minimizes
+        over a split point \(k\) strictly inside it, the fill order is by
+        increasing range length, and the cost is \(\Theta(n^3)\) from
+        \(\Theta(n^2)\) ranges times \(\Theta(n)\) splits. That template, and
+        its place beside the one-dimensional and grid shapes, is
+        <a href="algo-dp-patterns.html#grid">DP Patterns: Grid, Interval, Coin
+        Change &amp; LIS</a>; the five-step recipe the derivation in &sect;2
+        followed (state, transition, base cases, order, answer) is
+        <a href="paradigm-dp-method.html#recipe">The Dynamic Programming
+        Method</a>.
+      </p>
+      <p>
+        Reading it against the other dynamic programs in the catalog sharpens
+        what is specific to intervals.
+        <a href="algo-rod-cutting.html">Rod Cutting</a> optimizes over a first
+        cut with a one-dimensional state and \(\Theta(n^2)\) work;
+        <a href="algo-longest-common-subsequence.html">Longest Common
+        Subsequence</a>, <a href="algo-edit-distance.html">Edit Distance</a>
+        and <a href="algo-knapsack.html">0/1 Knapsack</a> use two-dimensional
+        states with a constant number of predecessors per cell, hence
+        \(\Theta(mn)\). Only the interval shape has a variable-size minimum
+        inside the cell, and that inner loop is where the extra factor of \(n\)
+        comes from.
+      </p>
+      <p>
+        The same template solves the <strong>optimal binary search tree</strong>
+        problem: given keys with access frequencies, \(m[i][j]\) is the least
+        expected search cost of a binary search tree (BST) over keys \(i..j\) and
+        the split is which key becomes the root, with
+        \(\sum_{k=i}^{j} \mathrm{freq}(k)\) added because installing any root
+        pushes every key of the range one level deeper. That is the reason a
+        height-balanced tree, as in
+        <a href="../trees/ds-trees-bst.html">Trees &amp; Binary Search
+        Trees</a> and <a href="../trees/ds-avl-trees.html">AVL Trees</a>, is not
+        optimal under skewed access frequencies. Optimal polygon triangulation
+        is another member of the family.
+      </p>
+      <p>
+        The contrast with <a href="../greedy/paradigm-greedy-method.html">The
+        Greedy Method</a> closes the case for DP here. The plausible greedy rule
+        (repeatedly perform the cheapest currently available adjacent multiply)
+        is wrong, with a counterexample in exercise 2, because performing a cheap
+        multiply can leave behind an unfavourable shape. No exchange argument
+        goes through, so every split must be tried.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Fill both tables completely for \(p = (2, 3, 6, 4, 5)\), showing every
+          candidate on every diagonal, and give the parenthesization and its
+          verified cost.
+          <details>
+            <summary>solution</summary>
+            \(A_1\ (2{\times}3)\), \(A_2\ (3{\times}6)\), \(A_3\ (6{\times}4)\),
+            \(A_4\ (4{\times}5)\).
+            <br />\(L = 2\):
+            \(m[1][2] = 2{\cdot}3{\cdot}6 = 36\ (s{=}1)\);
+            \(m[2][3] = 3{\cdot}6{\cdot}4 = 72\ (s{=}2)\);
+            \(m[3][4] = 6{\cdot}4{\cdot}5 = 120\ (s{=}3)\).
+            <br />\(L = 3\):
+            \(m[1][3] = \min(k{=}1: 0 + 72 + 2{\cdot}3{\cdot}4 = 96,\;
+            k{=}2: 36 + 0 + 2{\cdot}6{\cdot}4 = 84) = 84\), \(s[1][3] = 2\);
+            \(m[2][4] = \min(k{=}2: 0 + 120 + 3{\cdot}6{\cdot}5 = 210,\;
+            k{=}3: 72 + 0 + 3{\cdot}4{\cdot}5 = 132) = 132\), \(s[2][4] = 3\).
+            <br />\(L = 4\):
+            \(m[1][4] = \min(k{=}1: 0 + 132 + 2{\cdot}3{\cdot}5 = 162,\;
+            k{=}2: 36 + 120 + 2{\cdot}6{\cdot}5 = 216,\;
+            k{=}3: 84 + 0 + 2{\cdot}4{\cdot}5 = 124) = 124\), \(s[1][4] = 3\).
+            <br />Traceback: \(s[1][4] = 3\) gives \(([1,3])(A_4)\);
+            \(s[1][3] = 2\) gives \(([1,2])(A_3)\); \(s[1][2] = 1\) gives
+            \(A_1A_2\). Result \((((A_1A_2)A_3)A_4)\), the fully
+            left-associated order. Check:
+            \(2{\cdot}3{\cdot}6 + 2{\cdot}6{\cdot}4 + 2{\cdot}4{\cdot}5 = 36 +
+            48 + 40 = 124\). Note this instance has the small dimension at the
+            <em>left end</em>, so keeping the running product only \(2\) rows
+            tall beats every alternative.
+          </details>
+        </li>
+        <li>
+          Consider the greedy rule &ldquo;repeatedly perform the cheapest
+          currently available adjacent multiply.&rdquo; Run it on
+          \(p = (6, 1, 8, 7, 5)\), then run the DP on the same instance, and
+          state where the greedy argument breaks.
+          <details>
+            <summary>solution</summary>
+            \(A_1\ (6{\times}1)\), \(A_2\ (1{\times}8)\), \(A_3\ (8{\times}7)\),
+            \(A_4\ (7{\times}5)\). Greedy: the three available multiplies cost
+            \(6{\cdot}1{\cdot}8 = 48\), \(1{\cdot}8{\cdot}7 = 56\) and
+            \(8{\cdot}7{\cdot}5 = 280\), so it takes \(A_1A_2\) for \(48\),
+            leaving a \(6 \times 8\) block. Now the choices are
+            \(6{\cdot}8{\cdot}7 = 336\) and \(8{\cdot}7{\cdot}5 = 280\); it
+            takes \(A_3A_4\) for \(280\), leaving \(6{\times}8\) times
+            \(8{\times}5\), which costs \(6{\cdot}8{\cdot}5 = 240\).
+            Greedy total: \(48 + 280 + 240 = 568\).
+            <br />DP. \(L = 2\): \(m[1][2] = 48\), \(m[2][3] = 56\),
+            \(m[3][4] = 280\).
+            \(L = 3\): \(m[1][3] = \min(0 + 56 + 6{\cdot}1{\cdot}7 = 98,\;
+            48 + 0 + 6{\cdot}8{\cdot}7 = 384) = 98\) at \(k = 1\);
+            \(m[2][4] = \min(0 + 280 + 1{\cdot}8{\cdot}5 = 320,\;
+            56 + 0 + 1{\cdot}7{\cdot}5 = 91) = 91\) at \(k = 3\).
+            \(L = 4\): \(m[1][4] = \min(k{=}1: 0 + 91 + 6{\cdot}1{\cdot}5 = 121,\;
+            k{=}2: 48 + 280 + 6{\cdot}8{\cdot}5 = 568,\;
+            k{=}3: 98 + 0 + 6{\cdot}7{\cdot}5 = 308) = 121\) at \(k = 1\),
+            giving \((A_1((A_2A_3)A_4))\), cost
+            \(1{\cdot}8{\cdot}7 + 1{\cdot}7{\cdot}5 + 6{\cdot}1{\cdot}5 = 56 +
+            35 + 30 = 121\).
+            <br />Greedy is \(568\) against the optimum \(121\), off by a factor
+            of \(4.7\), and note that the greedy answer is precisely the
+            \(k = 2\) candidate the DP rejects. The break: a cheap multiply is
+            not a safe one, because its <em>result shape</em> constrains
+            everything after it. Consuming \(A_1A_2\) destroys the \(1\), the
+            one small inner dimension in the chain, and every later multiply
+            then pays \(6\) or \(8\) where it could have paid \(1\). There is no
+            exchange argument turning an optimal solution into the greedy one,
+            which is the test in
+            <a href="../greedy/paradigm-greedy-method.html">The Greedy
+            Method</a>.
+          </details>
+        </li>
+        <li>
+          Extend the running instance with \(A_5\ (7{\times}3)\), so
+          \(p = (5, 4, 6, 2, 7, 3)\). Which previously computed cells can be
+          reused unchanged? Compute the new cells and the new optimum, and
+          confirm the candidate count against &sect;6.
+          <details>
+            <summary>solution</summary>
+            Every cell \(m[i][j]\) with \(j \le 4\) is unchanged, because the
+            recurrence for a range reads only \(p_{i-1}, \ldots, p_j\) and
+            cells inside that range; appending a matrix cannot affect them. So
+            \(m[1][2] = 120\), \(m[2][3] = 48\), \(m[3][4] = 84\),
+            \(m[1][3] = 88\), \(m[2][4] = 104\), \(m[1][4] = 158\) all carry
+            over. The new cells are those with \(j = 5\).
+            <br />\(L = 2\): \(m[4][5] = 2{\cdot}7{\cdot}3 = 42\), \(s = 4\).
+            <br />\(L = 3\): \(m[3][5] = \min(k{=}3: 0 + 42 + 6{\cdot}2{\cdot}3
+            = 78,\; k{=}4: 84 + 0 + 6{\cdot}7{\cdot}3 = 210) = 78\), \(s = 3\).
+            <br />\(L = 4\): \(m[2][5] = \min(k{=}2: 0 + 78 + 4{\cdot}6{\cdot}3
+            = 150,\; k{=}3: 48 + 42 + 4{\cdot}2{\cdot}3 = 114,\;
+            k{=}4: 104 + 0 + 4{\cdot}7{\cdot}3 = 188) = 114\), \(s = 3\).
+            <br />\(L = 5\): \(m[1][5] = \min(k{=}1: 0 + 114 + 5{\cdot}4{\cdot}3
+            = 174,\; k{=}2: 120 + 78 + 5{\cdot}6{\cdot}3 = 288,\;
+            k{=}3: 88 + 42 + 5{\cdot}2{\cdot}3 = 160,\;
+            k{=}4: 158 + 0 + 5{\cdot}7{\cdot}3 = 263) = 160\), \(s[1][5] = 3\).
+            <br />Traceback: \(s[1][5] = 3\) splits into \([1,3]\) and
+            \([4,5]\); \(s[1][3] = 1\) gives \((A_1(A_2A_3))\);
+            \(s[4][5] = 4\) gives \((A_4A_5)\). Result
+            \(((A_1(A_2A_3))(A_4A_5))\), cost
+            \(48 + 40 + 42 + 5{\cdot}2{\cdot}3 = 130 + 30 = 160\).
+            <br />Count: \(1{+}1{+}1{+}1\) candidates on \(L{=}2\),
+            \(2{+}2{+}2\) on \(L{=}3\), \(3{+}3\) on \(L{=}4\), \(4\) on
+            \(L{=}5\): \(4 + 6 + 6 + 4 = 20 = (5^3 - 5)/6\), as &sect;6 predicts.
+            Note that adding one matrix <em>lowered</em> nothing but raised the
+            total only from \(158\) to \(160\): \(A_5\) is cheap to append
+            because the running product is already \(5 \times 2\).
+          </details>
+        </li>
+        <li>
+          Change <code>min</code> to <code>max</code> throughout (and initialize
+          to \(-\infty\) instead of \(+\infty\)). Does the resulting algorithm
+          correctly compute the <em>most</em> expensive parenthesization? Prove
+          or refute, then run it on \(p = (5, 4, 6, 2, 7)\) and check the answer
+          against &sect;1.
+          <details>
+            <summary>solution</summary>
+            It is correct. The optimal-substructure proof of &sect;2 never uses
+            the direction of the comparison: it uses only that the total
+            decomposes as \(\mathrm{cost}(P_L) + \mathrm{cost}(P_R) +
+            p_{i-1}p_kp_j\) with the third term fixed by \(k\), and that the two
+            halves are independent given \(k\). Substituting a
+            <em>more</em> expensive bracketing of a half raises the total in the
+            same way, so a worst parenthesization restricts to worst
+            parenthesizations of its halves, and the argument runs verbatim with
+            every inequality reversed. Fill order and cost are unchanged.
+            <br />On the running instance:
+            \(L = 2\) is unchanged (single candidates): \(120, 48, 84\).
+            \(L = 3\): \(M[1][3] = \max(88, 180) = 180\) at \(k = 2\);
+            \(M[2][4] = \max(252, 104) = 252\) at \(k = 2\).
+            \(L = 4\): \(M[1][4] = \max(k{=}1: 0 + 252 + 140 = 392,\;
+            k{=}2: 120 + 84 + 210 = 414,\;
+            k{=}3: 180 + 0 + 70 = 250) = 414\) at \(k = 2\), giving
+            \(((A_1A_2)(A_3A_4))\).
+            That is exactly the worst row of the &sect;1 enumeration, and the
+            three candidate totals \(392, 414, 250\) are the three worst
+            bracketings of the five. (Note the \(k=1\) and \(k=3\) candidates
+            changed value from the min run, because they now read the
+            <em>maximizing</em> sub-cells \(M[2][4] = 252\) and
+            \(M[1][3] = 180\).)
+          </details>
+        </li>
+        <li>
+          The code loops over range length. Suppose someone rewrites it in the
+          obvious row-major order, <code>for i in 1..n: for j in i+1..n:</code>,
+          keeping the same body. Trace what goes wrong on the running instance,
+          and identify the first cell that is computed from stale data. Is
+          there any correct loop order that is not by increasing length?
+          <details>
+            <summary>solution</summary>
+            Row-major visits \(m[1][2], m[1][3], m[1][4], m[2][3], m[2][4],
+            m[3][4]\). The first cell is fine: \(m[1][2] = 120\). The second,
+            \(m[1][3]\), needs \(m[2][3]\), which has not been computed and
+            still holds its initial \(0\). Its \(k = 1\) candidate is therefore
+            evaluated as \(0 + 0 + 40 = 40\) instead of \(0 + 48 + 40 = 88\), so
+            \(m[1][3]\) is set to \(\min(40, 180) = 40\): wrong, and wrong in
+            the dangerous direction, since a spuriously small value will not be
+            corrected later and propagates. \(m[1][4]\) then reads both the
+            stale \(m[1][3] = 40\) and the still-uncomputed \(m[2][4] = 0\) and
+            reports \(\min(0+0+140,\;120+0+210,\;40+0+70) = 110\), below the
+            true optimum \(158\), which is impossible for a genuine
+            parenthesization.
+            <br />Yes, other correct orders exist. The only requirement is that
+            every cell be computed after all strictly shorter ranges it reads,
+            so any linear extension of that dependency order works. Two
+            practical ones: iterate \(i\) from \(n\) down to \(1\) and, inside,
+            \(j\) from \(i+1\) up to \(n\) (each cell then reads \(m[i][k]\)
+            already done on the current row and \(m[k+1][j]\) from a row with a
+            larger index, already finished); or run the memoized top-down
+            recursion, which discovers a valid order by itself. The
+            length-indexed loop is preferred because the reason it is correct is
+            visible in the loop bounds.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Matrix-Chain Multiplication v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

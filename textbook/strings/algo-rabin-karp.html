@@ -1,0 +1,1049 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Rabin–Karp.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rabin&ndash;Karp - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Rabin&ndash;Karp</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Substring search by fingerprint: hash the pattern once, then slide a
+        window across the text carrying a rolling polynomial hash that updates
+        in constant time, and compare characters only when two fingerprints
+        agree. The Horner fingerprint, the rolling update derived and traced
+        modulo a small prime (spurious hits included), the Monte Carlo and Las
+        Vegas variants, the multi-pattern scan, the expected \(\Theta(n+m)\)
+        bound with its collision argument, and the \(\Theta(nm)\) worst case.
+        With full implementations and exercises.
+      </div>
+
+      <p class="lead">
+        Brute-force substring search compares characters
+        (<a href="foundation-substring-search.html"><em>Substring Search: The
+        Problem &amp; Baselines</em></a>);
+        <a href="algo-kmp.html"><em>Knuth&ndash;Morris&ndash;Pratt</em></a> and
+        <a href="algo-boyer-moore.html"><em>Boyer&ndash;Moore</em></a> compare
+        characters more cleverly. <strong>Rabin&ndash;Karp</strong> mostly does
+        not compare characters at all: it compares <em>numbers</em>, one number
+        per window of the text, each computed from the previous one in constant
+        time. It is <a href="../hashing/ds-hashing.html"><em>Hashing</em></a>
+        turned on the substring-search problem, and it is the one member of the
+        family that scales to searching for thousands of patterns in a single
+        pass.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#idea">Fingerprints instead of character comparisons</a></li>
+          <li><a href="#hash">The fingerprint: a polynomial hash by Horner&rsquo;s method</a></li>
+          <li><a href="#roll">The rolling update, derived</a></li>
+          <li><a href="#algo">The algorithm</a></li>
+          <li><a href="#trace">A full trace, spurious hits included</a></li>
+          <li><a href="#cases">Every case the scan can take</a></li>
+          <li><a href="#variants">Monte Carlo, Las Vegas, and many patterns at once</a></li>
+          <li><a href="#cost">Cost, and how often a fingerprint lies</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="idea">1. Fingerprints instead of character comparisons</h2>
+      <p>
+        The problem is the standard one: given a <strong>text</strong>
+        \(T[0..n-1]\) and a <strong>pattern</strong> \(P[0..m-1]\), find the
+        first index \(i\) with \(T[i..i+m-1] = P\), or report that none exists.
+        Brute force answers it by comparing the pattern against each of the
+        \(n-m+1\) windows character by character, up to \(m\) comparisons per
+        window: \(\Theta(nm)\) in the worst case.
+      </p>
+      <p>
+        Suppose every string had a short numeric summary, cheap to compare,
+        such that different summaries certainly mean different strings. The
+        scan could then reject a window with one integer comparison instead of
+        up to \(m\) character comparisons. That summary is a hash value, and
+        in this setting it has a name.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (fingerprint)</span>
+        A <strong>fingerprint</strong> of a string \(s\) is a hash value
+        \(h(s)\) in a small range, used as a proxy for \(s\) in equality tests.
+        It is <em>sound as a rejector</em>: \(h(s) \ne h(u)\) implies
+        \(s \ne u\). It is not sound as an acceptor: \(h(s) = h(u)\) leaves
+        \(s = u\) merely likely, because a hash maps many strings to each value
+        (<a href="../hashing/ds-hashing.html"><em>Hashing</em></a>: collisions
+        are unavoidable).
+      </div>
+      <div class="def">
+        <span class="tag">Definition (spurious hit)</span>
+        A <strong>spurious hit</strong> (also <em>false hit</em>) is a window
+        \(T[i..i+m-1] \ne P\) whose fingerprint nevertheless equals the
+        pattern&rsquo;s. Since a fingerprint cannot rule a hit in, every hit
+        must be <strong>verified</strong> by comparing the window against the
+        pattern character by character; verification is what turns a spurious
+        hit into a rejection rather than a wrong answer.
+      </div>
+      <p>
+        Two obstacles stand between that idea and an algorithm. First, computing
+        each window&rsquo;s fingerprint from scratch reads \(m\) characters, so
+        \(n-m+1\) windows would cost \(\Theta(nm)\): exactly what was to be
+        avoided. The fingerprint must therefore be <em>rollable</em>, updatable
+        in \(O(1)\) when the window slides one position. Second, spurious hits
+        cost \(m\) character comparisons each, so the fingerprint must collide
+        rarely enough that they are negligible. Rabin&ndash;Karp&rsquo;s
+        polynomial hash modulo a prime meets both requirements.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="hash">2. The fingerprint: a polynomial hash by Horner&rsquo;s method</h2>
+      <p>
+        Read a string of length \(m\) as an \(m\)-digit number written in base
+        \(R\), where \(R\) is the alphabet size (or any base at least as large
+        as the largest character code), and reduce it modulo a prime \(Q\):
+      </p>
+      \[
+        h(s) \;=\; \bigl(s_0 R^{m-1} + s_1 R^{m-2} + \cdots + s_{m-2} R + s_{m-1}\bigr)
+        \bmod Q .
+      \]
+      <p>
+        The full number \(s_0 R^{m-1} + \cdots + s_{m-1}\) has as many digits as
+        the string has characters, so for any realistic \(m\) it overflows a
+        machine word long before it can be compared.
+        <strong>Horner&rsquo;s method</strong> avoids ever forming it: factor the
+        polynomial as
+        \(\bigl(\cdots((s_0 R + s_1) R + s_2)\cdots\bigr) R + s_{m-1}\)
+        and reduce modulo \(Q\) at every step, which is legitimate because
+        \((a + b) \bmod Q\) and \((a \cdot b) \bmod Q\) depend only on
+        \(a \bmod Q\) and \(b \bmod Q\). Every intermediate value then stays
+        below \(Q\), and one left-to-right pass of \(m\) multiply-add-reduce
+        steps produces the fingerprint. This is the same string hash as in
+        <a href="../hashing/ds-hashing.html"><em>Hashing</em></a>, with the base
+        and modulus named explicitly because the rolling update needs them.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (Horner, worked)</span>
+        Take the digit alphabet, so \(R = 10\), and the deliberately tiny prime
+        \(Q = 13\) (small enough that collisions show up in a short trace). The
+        pattern is <code>26535</code>, so \(m = 5\):
+        <pre>  h = 0
+  read 2:   h = (10&middot;0 + 2) mod 13 =   2 mod 13 =  2
+  read 6:   h = (10&middot;2 + 6) mod 13 =  26 mod 13 =  0
+  read 5:   h = (10&middot;0 + 5) mod 13 =   5 mod 13 =  5
+  read 3:   h = (10&middot;5 + 3) mod 13 =  53 mod 13 =  1
+  read 5:   h = (10&middot;1 + 5) mod 13 =  15 mod 13 =  2
+  fingerprint of the pattern:  h(P) = 2</pre>
+        The check on the arithmetic: \(26535 = 13 \cdot 2041 + 2\), so
+        \(26535 \bmod 13 = 2\), which is what the running reduction produced.
+        Horner&rsquo;s method never held \(26535\); it never held anything
+        larger than \(10 \cdot 12 + 9 = 129\).
+      </div>
+      <div class="aside">
+        <span class="tag">Why a prime modulus, and how large</span>
+        A prime \(Q\) spreads the polynomial values evenly over
+        \(\{0, \dots, Q-1\}\); a composite modulus (\(2^k\) especially) lets
+        common factors of \(R\) and \(Q\) collapse whole families of strings
+        onto the same value, exactly as in
+        <a href="../hashing/ds-hashing.html"><em>Hashing</em></a>. The size of
+        \(Q\) is a tuning knob, not a correctness condition: &sect;8 shows that
+        spurious hits arrive at a rate of about \(1\) per \(Q\) windows, so
+        production code picks \(Q\) large (a prime near \(2^{31}\), or near
+        \(2^{61}\) with 128-bit intermediate products) and the whole issue
+        disappears. The traces here use \(Q = 13\) precisely so that it does
+        not disappear.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="roll">3. The rolling update, derived</h2>
+      <p>
+        Write \(x_i\) for the numeric value of the window starting at \(i\),
+        before reduction:
+      </p>
+      \[
+        x_i \;=\; T[i] R^{m-1} + T[i+1] R^{m-2} + \cdots + T[i+m-1].
+      \]
+      <p>
+        Sliding one position to the right drops the leading term
+        \(T[i] R^{m-1}\), shifts every remaining term up one power of \(R\), and
+        appends the entering character \(T[i+m]\) in the units place:
+      </p>
+      \[
+        x_{i+1} \;=\; \bigl(x_i - T[i] \cdot R^{m-1}\bigr) \cdot R \;+\; T[i+m].
+      \]
+      <p>
+        This is an identity on integers, and reduction modulo \(Q\) preserves
+        it, so the same formula computes \(h_{i+1} = x_{i+1} \bmod Q\) from
+        \(h_i = x_i \bmod Q\):
+      </p>
+      \[
+        h_{i+1} \;=\; \bigl(\,(h_i - T[i]\cdot \mathit{RM}) \cdot R + T[i+m]\,\bigr)
+        \bmod Q,
+        \qquad \mathit{RM} = R^{\,m-1} \bmod Q .
+      \]
+      <p>
+        Three constant-time operations (one subtraction, one multiply-add, one
+        reduction) advance the window, whatever \(m\) is. The constant
+        \(\mathit{RM}\) is computed once during preprocessing, by \(m-1\)
+        multiply-and-reduce steps (or by fast modular exponentiation), never by
+        forming \(R^{m-1}\) itself.
+      </p>
+      <div class="aside">
+        <span class="tag">The subtraction can go negative</span>
+        \(h_i - T[i] \cdot \mathit{RM}\) is a difference of residues and is
+        routinely negative. In Python, <code>%</code> already returns a
+        non-negative result, but in C++, Java and Rust the <code>%</code>
+        operator takes the sign of the dividend, so a negative intermediate
+        would poison the fingerprint and, if used as an array index anywhere,
+        the program. The fix is to add a multiple of \(Q\) before reducing. The
+        idiom used below reduces the product first, so that
+        \(T[i] \cdot \mathit{RM} \bmod Q\) lies in \([0, Q)\), and then adds a
+        single \(Q\):
+        <pre>  h = (h + Q - (T[i] * RM) % Q) % Q;   // in [0, Q): one +Q suffices
+  h = (h * R + T[i+m]) % Q;</pre>
+        Writing <code>h = (h - T[i]*RM) % Q</code> and hoping is the single most
+        common bug in a hand-written Rabin&ndash;Karp.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (one roll, worked)</span>
+        Still \(R = 10\), \(Q = 13\), \(m = 5\), so
+        \(\mathit{RM} = 10^4 \bmod 13 = 10000 \bmod 13 = 3\) (since
+        \(13 \cdot 769 = 9997\)). The window <code>31415</code> has
+        \(h = 31415 \bmod 13 = 7\) (Horner: \(3, 5, 2, 8, 7\)). Slide it right
+        by one, dropping <code>3</code> and admitting <code>9</code>, to reach
+        the window <code>14159</code>:
+        <pre>  drop:   7 &minus; 3&middot;3 = &minus;2      &rarr;  &minus;2 + 13 = 11
+  shift and admit:  11&middot;10 + 9 = 119   &rarr;  119 mod 13 = 2   (13&middot;9 = 117)
+  check:  14159 mod 13 = 2      (13&middot;1089 = 14157)   &#10003;</pre>
+        Constant work, and the answer agrees with hashing <code>14159</code>
+        from scratch, which is the whole point.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="algo">4. The algorithm</h2>
+      <p>
+        Preprocessing computes \(\mathit{RM}\) and the pattern&rsquo;s
+        fingerprint, then hashes the first window. The scan compares
+        fingerprints, verifies on equality, and rolls. The code below is the Las
+        Vegas form (always correct, expected linear time); &sect;7 gives the
+        Monte Carlo form, which is the same code with the verification call
+        deleted.
+      </p>
+      <div class="code-tabs" data-snippet="strings/rabin-karp">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Rabin-Karp. R = alphabet size (base), Q = a large prime modulus.
+// Fingerprint: h(s) = (s[0]*R^(m-1) + ... + s[m-1]) mod Q, by Horner.
+static const long R = 256, Q = 1000000007L;
+
+// Horner: fold the first k characters of s into one residue mod Q.
+long hashOf(const string&amp; s, int k) {
+    long h = 0;
+    for (int j = 0; j &lt; k; j++)
+        h = (R * h + (unsigned char)s[j]) % Q;   // reduce each step
+    return h;
+}
+
+int rkSearch(const string&amp; t, const string&amp; p) {
+    int n = t.size(), m = p.size();
+    if (m &gt; n) return -1;                        // no window exists
+
+    long RM = 1;                                 // RM = R^(m-1) mod Q
+    for (int j = 1; j &lt;= m - 1; j++) RM = (R * RM) % Q;
+    long hp = hashOf(p, m);                      // pattern fingerprint
+    long h  = hashOf(t, m);                      // first window, T[0..m-1]
+
+    for (int i = 0; ; i++) {
+        if (h == hp) {                           // fingerprints agree: VERIFY
+            int j = 0;
+            while (j &lt; m &amp;&amp; t[i + j] == p[j]) j++;
+            if (j == m) return i;                // true match
+        }                                        // else: spurious hit, go on
+        if (i == n - m) break;                   // last window done
+        // roll: drop t[i], shift, admit t[i+m]; +Q keeps the residue positive
+        h = (h + Q - (RM * (unsigned char)t[i]) % Q) % Q;
+        h = (h * R + (unsigned char)t[i + m]) % Q;
+    }
+    return -1;                                   // no occurrence
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Rabin-Karp. R = alphabet size (base), Q = a large prime modulus.
+// Fingerprint: h(s) = (s[0]*R^(m-1) + ... + s[m-1]) mod Q, by Horner.
+static final long R = 256, Q = 1000000007L;
+
+// Horner: fold the first k characters of s into one residue mod Q.
+static long hashOf(String s, int k) {
+    long h = 0;
+    for (int j = 0; j &lt; k; j++)
+        h = (R * h + s.charAt(j)) % Q;           // reduce each step
+    return h;
+}
+
+static int rkSearch(String t, String p) {
+    int n = t.length(), m = p.length();
+    if (m &gt; n) return -1;                        // no window exists
+
+    long RM = 1;                                 // RM = R^(m-1) mod Q
+    for (int j = 1; j &lt;= m - 1; j++) RM = (R * RM) % Q;
+    long hp = hashOf(p, m);                      // pattern fingerprint
+    long h  = hashOf(t, m);                      // first window, T[0..m-1]
+
+    for (int i = 0; ; i++) {
+        if (h == hp) {                           // fingerprints agree: VERIFY
+            int j = 0;
+            while (j &lt; m &amp;&amp; t.charAt(i + j) == p.charAt(j)) j++;
+            if (j == m) return i;                // true match
+        }                                        // else: spurious hit, go on
+        if (i == n - m) break;                   // last window done
+        // roll: drop t[i], shift, admit t[i+m]; +Q keeps the residue positive
+        h = (h + Q - (RM * t.charAt(i)) % Q) % Q;
+        h = (h * R + t.charAt(i + m)) % Q;
+    }
+    return -1;                                   // no occurrence
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Rabin-Karp. R = alphabet size (base), Q = a large prime modulus.
+# Fingerprint: h(s) = (s[0]*R^(m-1) + ... + s[m-1]) mod Q, by Horner.
+R, Q = 256, 1_000_000_007
+
+def hash_of(s, k):
+    """Horner: fold the first k characters of s into one residue mod Q."""
+    h = 0
+    for j in range(k):
+        h = (R * h + ord(s[j])) % Q              # reduce each step
+    return h
+
+def rk_search(t, p):
+    n, m = len(t), len(p)
+    if m &gt; n:
+        return -1                                # no window exists
+
+    RM = pow(R, m - 1, Q)                        # RM = R^(m-1) mod Q
+    hp = hash_of(p, m)                           # pattern fingerprint
+    h  = hash_of(t, m)                           # first window, t[0..m-1]
+
+    for i in range(n - m + 1):
+        if h == hp:                              # fingerprints agree: VERIFY
+            if t[i:i + m] == p:
+                return i                         # true match
+        if i == n - m:                           # last window done
+            break
+        # roll: drop t[i], shift, admit t[i+m]   (Python % is never negative)
+        h = ((h - ord(t[i]) * RM) * R + ord(t[i + m])) % Q
+    return -1                                    # no occurrence</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Rabin-Karp. R = alphabet size (base), Q = a large prime modulus.
+// Fingerprint: h(s) = (s[0]*R^(m-1) + ... + s[m-1]) mod Q, by Horner.
+const R: u64 = 256;
+const Q: u64 = 1_000_000_007;
+
+// Horner: fold the first k bytes of s into one residue mod Q.
+fn hash_of(s: &amp;[u8], k: usize) -&gt; u64 {
+    let mut h = 0u64;
+    for j in 0..k {
+        h = (R * h + s[j] as u64) % Q;           // reduce each step
+    }
+    h
+}
+
+fn rk_search(t: &amp;str, p: &amp;str) -&gt; i32 {
+    let (t, p) = (t.as_bytes(), p.as_bytes());
+    let (n, m) = (t.len(), p.len());
+    if m &gt; n { return -1; }                      // no window exists
+
+    let mut rm = 1u64;                           // rm = R^(m-1) mod Q
+    for _ in 1..m { rm = (R * rm) % Q; }
+    let hp = hash_of(p, m);                      // pattern fingerprint
+    let mut h = hash_of(t, m);                   // first window, t[0..m-1]
+
+    for i in 0..=(n - m) {
+        if h == hp &amp;&amp; &amp;t[i..i + m] == p {         // agree: VERIFY
+            return i as i32;                     // true match
+        }                                        // else: spurious hit, go on
+        if i == n - m { break; }                 // last window done
+        // roll: drop t[i], shift, admit t[i+m]; +Q keeps the residue positive
+        h = (h + Q - (rm * t[i] as u64) % Q) % Q;
+        h = (h * R + t[i + m] as u64) % Q;
+    }
+    -1                                           // no occurrence
+}</pre>
+<p class="ct-src">source: <code>code/strings/rabin-karp.cpp &middot; code/strings/rabin-karp.java &middot; code/strings/rabin-karp.py &middot; code/strings/rabin-karp.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The loop structure is worth a second look: the roll must not run after
+        the last window (there is no \(T[i+m]\) to admit), so the break sits
+        between the test and the roll rather than in the loop header. Note also
+        that the text pointer never moves backward <em>during the scan</em>;
+        only verification re-reads characters, and only at a hit.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">5. A full trace, spurious hits included</h2>
+      <p>
+        Text \(T = \) <code>3141592653589793</code> (\(n = 16\)), pattern
+        \(P = \) <code>26535</code> (\(m = 5\)), base \(R = 10\), modulus
+        \(Q = 13\), so \(\mathit{RM} = 3\) and \(h(P) = 2\) from &sect;2. The
+        pattern occurs at index \(6\). Because \(Q = 13\) is absurdly small,
+        the scan meets two spurious hits before it; that is the point of the
+        example.
+      </p>
+      <table class="trace">
+        <tr>
+          <th class="lab">i</th><th>window</th><th>h</th><th>h(P)</th>
+          <th>fingerprints</th><th>action</th><th>char cmps</th>
+        </tr>
+        <tr><td class="lab">0</td><td class="cell">31415</td><td>7</td><td>2</td>
+          <td>differ</td><td>reject without looking at a character</td><td>0</td></tr>
+        <tr><td class="lab">1</td><td class="cell piv">14159</td><td class="piv">2</td><td>2</td>
+          <td class="piv">agree</td><td class="piv">verify: <code>1</code> vs <code>2</code> fails at once: <strong>spurious hit</strong></td><td>1</td></tr>
+        <tr><td class="lab">2</td><td class="cell">41592</td><td>5</td><td>2</td>
+          <td>differ</td><td>reject</td><td>0</td></tr>
+        <tr><td class="lab">3</td><td class="cell">15926</td><td>1</td><td>2</td>
+          <td>differ</td><td>reject</td><td>0</td></tr>
+        <tr><td class="lab">4</td><td class="cell">59265</td><td>11</td><td>2</td>
+          <td>differ</td><td>reject</td><td>0</td></tr>
+        <tr><td class="lab">5</td><td class="cell piv">92653</td><td class="piv">2</td><td>2</td>
+          <td class="piv">agree</td><td class="piv">verify: <code>9</code> vs <code>2</code> fails at once: <strong>spurious hit</strong></td><td>1</td></tr>
+        <tr><td class="lab">6</td><td class="cell lt">26535</td><td class="lt">2</td><td>2</td>
+          <td class="lt">agree</td><td class="lt">verify: all five match: <strong>report index 6</strong></td><td>5</td></tr>
+      </table>
+      <p>
+        Every fingerprint in the third column comes from the previous one by the
+        rolling update of &sect;3, and every one of these subtractions goes
+        negative, so the correction of the &sect;3 aside fires at each step
+        (at \(i = 5\) the raw value is \(-25\), and one \(+Q\) is not enough:
+        the code&rsquo;s reduce-the-product-first idiom is what keeps a single
+        \(+Q\) sufficient):
+      </p>
+      <pre>  i=0 &rarr; 1:  drop 3:  7 &minus; 3&middot;3 = &minus;2   &rarr; 11;   11&middot;10 + 9 = 119  &rarr; 119 mod 13 =  2
+  i=1 &rarr; 2:  drop 1:  2 &minus; 1&middot;3 = &minus;1   &rarr; 12;   12&middot;10 + 2 = 122  &rarr; 122 mod 13 =  5
+  i=2 &rarr; 3:  drop 4:  5 &minus; 4&middot;3 = &minus;7   &rarr;  6;    6&middot;10 + 6 =  66  &rarr;  66 mod 13 =  1
+  i=3 &rarr; 4:  drop 1:  1 &minus; 1&middot;3 = &minus;2   &rarr; 11;   11&middot;10 + 5 = 115  &rarr; 115 mod 13 = 11
+  i=4 &rarr; 5:  drop 5: 11 &minus; 5&middot;3 = &minus;4   &rarr;  9;    9&middot;10 + 3 =  93  &rarr;  93 mod 13 =  2
+  i=5 &rarr; 6:  drop 9:  2 &minus; 9&middot;3 = &minus;25  &rarr;  1;    1&middot;10 + 5 =  15  &rarr;  15 mod 13 =  2</pre>
+      <p>
+        Each line can be checked against the window it produces:
+        \(14159 \bmod 13 = 2\), \(41592 \bmod 13 = 5\),
+        \(15926 \bmod 13 = 1\), \(59265 \bmod 13 = 11\),
+        \(92653 \bmod 13 = 2\), \(26535 \bmod 13 = 2\). The rolling update and
+        recomputation from scratch agree at every position, as the derivation
+        of &sect;3 says they must.
+      </p>
+      <p>
+        The tally: \(5\) Horner steps for the pattern, \(5\) for the first
+        window, \(6\) rolls of three operations each, and \(7\) character
+        comparisons in total (one at each spurious hit, five at the match).
+        Brute force on the same instance makes \(11\) character comparisons, so
+        Rabin&ndash;Karp does not win on a sixteen-character text with a small
+        modulus; what the trace shows is the <em>shape</em> of the cost, which
+        is \(\Theta(n)\) arithmetic plus verification, with verification the
+        only term that can misbehave.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (the same instance, with a sane modulus)</span>
+        Keep everything but change \(Q\) to \(997\). Then
+        \(h(P) = 26535 \bmod 997 = 613\), and the three windows that collided
+        at \(Q = 13\) separate cleanly:
+        <table class="trace">
+          <tr><th class="lab">window</th><th class="cell">14159</th><th class="cell">26535</th><th class="cell">89793</th></tr>
+          <tr><td class="lab">h mod 13</td><td class="piv">2</td><td class="piv">2</td><td class="piv">2</td></tr>
+          <tr><td class="lab">h mod 997</td><td>201</td><td class="lt">613</td><td>63</td></tr>
+        </table>
+        With \(Q = 997\) the scan has exactly one fingerprint hit, at index
+        \(6\), and it is the true match: \(5\) character comparisons for the
+        whole search. The window <code>89793</code> at index \(11\), which the
+        \(Q = 13\) scan would also have flagged had it continued past the
+        match, is rejected by arithmetic alone.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="cases">6. Every case the scan can take</h2>
+      <p>
+        One window is disposed of in exactly one of these ways, and a correct
+        implementation (and a correct hand-trace) has to handle all of them:
+      </p>
+      <ol>
+        <li>
+          <strong>Fingerprints differ.</strong> The window cannot equal the
+          pattern (a fingerprint is sound as a rejector), so it is discarded
+          with <em>zero</em> character comparisons. This is the common case and
+          the source of the speed. Trace rows \(i = 0, 2, 3, 4\).
+        </li>
+        <li>
+          <strong>Fingerprints agree, verification succeeds.</strong> A true
+          occurrence: report \(i\) (or record it and continue, if all
+          occurrences are wanted). Costs \(m\) comparisons. Trace row
+          \(i = 6\).
+        </li>
+        <li>
+          <strong>Fingerprints agree, verification fails.</strong> A spurious
+          hit: the window is discarded and the scan continues. Costs between
+          \(1\) and \(m\) comparisons, and in practice usually \(1\), since two
+          unequal strings typically differ early. Trace rows \(i = 1, 5\), both
+          failing on the first character.
+        </li>
+        <li>
+          <strong>No window exists</strong> (\(m &gt; n\)). Return &ldquo;not
+          found&rdquo; before hashing anything; without this guard the first
+          window&rsquo;s Horner loop reads past the end of the text.
+        </li>
+        <li>
+          <strong>The last window</strong> (\(i = n - m\)). It must be tested,
+          but must not be rolled: there is no entering character \(T[i+m]\).
+          This is why the break sits mid-loop in &sect;4.
+        </li>
+        <li>
+          <strong>The intermediate residue goes negative</strong>
+          (\(h_i &lt; T[i] \cdot \mathit{RM} \bmod Q\)). Correct by adding
+          \(Q\) before reducing, as in the &sect;3 aside. Every roll in the
+          &sect;5 trace takes this branch.
+        </li>
+      </ol>
+      <p>
+        Case 3 is the one that distinguishes Rabin&ndash;Karp from the other
+        searchers: it is the only case whose <em>frequency</em>, rather than
+        whose cost, depends on the input and the choice of \(Q\), and it is
+        therefore the case the cost analysis of &sect;8 has to bound.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (case 3 at full cost)</span>
+        Verification is cheap when two strings differ early and expensive when
+        they differ late. Searching for <code>AAAAB</code> in
+        <code>AAAAAAAAAA</code>, a spurious hit on a window <code>AAAAA</code>
+        would compare four matching <code>A</code>s before failing on the
+        fifth: the full \(m\) comparisons wasted. An adversary who knows
+        \(Q\) can arrange exactly that at every window, which is where the
+        \(\Theta(nm)\) worst case of &sect;8 comes from.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="variants">7. Monte Carlo, Las Vegas, and many patterns at once</h2>
+      <p>
+        Verification is the only place the algorithm touches characters, and
+        deleting it produces a different (and faster) algorithm with a different
+        guarantee. The two names are the standard vocabulary for randomized
+        algorithms.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (Monte Carlo, Las Vegas)</span>
+        A <strong>Monte Carlo</strong> algorithm has a fixed running time and
+        may return a wrong answer, with a probability the designer can bound.
+        A <strong>Las Vegas</strong> algorithm is always correct and has a
+        running time that is a random variable, bounded in expectation.
+      </div>
+      <table>
+        <tr><th>variant</th><th>on a fingerprint hit</th><th>running time</th><th>correctness</th></tr>
+        <tr><td>Monte Carlo</td><td>report the match, no check</td><td>\(\Theta(n+m)\) always</td><td>may report a spurious hit as a match; probability \(\approx n/Q\)</td></tr>
+        <tr><td>Las Vegas</td><td>verify character by character</td><td>\(\Theta(n+m)\) expected, \(\Theta(nm)\) worst</td><td>always correct</td></tr>
+      </table>
+      <p>
+        The Monte Carlo version is not a toy. With \(Q\) a prime near
+        \(2^{61}\), scanning \(n = 10^6\) characters carries an error
+        probability of about \(10^6 / (2^{61}-1) \approx 4 \times 10^{-13}\),
+        and it buys the one property Las Vegas cannot offer: a hard time bound.
+        It is the version used when the text is a stream too large to re-read,
+        where verification would be impossible anyway. The Las Vegas version is
+        the default everywhere else, and is what &sect;4 implements: a spurious
+        hit costs time, never correctness. The same pair of options appears in
+        <a href="../hashing/ds-bloom-filters.html"><em>Bloom Filters</em></a>
+        (a Monte Carlo membership test with one-sided error) and in
+        <a href="../sorting/algo-quicksort.html"><em>Quicksort</em></a> with a
+        random pivot (Las Vegas: always sorted, expected \(\Theta(n \log n)\)).
+      </p>
+      <h3>Many patterns in one pass</h3>
+      <p>
+        Rabin&ndash;Karp&rsquo;s distinctive strength appears when there are
+        \(k\) patterns to look for, all of the same length \(m\). Hash all of
+        them into a hash set (or a map from fingerprint to the list of patterns
+        with that fingerprint), then run the same single rolling scan and test
+        each window&rsquo;s fingerprint against the <em>set</em>: expected
+        \(O(1)\) per window, so the whole search costs
+        \(\Theta(n + km)\) expected, independent of \(k\) in the scan itself.
+        <a href="algo-kmp.html">Knuth&ndash;Morris&ndash;Pratt</a> and
+        <a href="algo-boyer-moore.html">Boyer&ndash;Moore</a> have no such
+        trick: each pattern needs its own tables and its own pass, costing
+        \(\Theta(kn)\). This is the engine inside plagiarism detectors
+        (fingerprint every \(m\)-word window of the submission, look each up in
+        the corpus index) and signature scanners (thousands of malware
+        signatures, one pass over the file).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (three patterns, one scan)</span>
+        Text <code>3141592653589793</code>, patterns
+        <code>14159</code>, <code>26535</code>, <code>89793</code>, with
+        \(R = 10\), \(Q = 997\). Preprocessing builds the fingerprint set
+        \(\{201, 613, 63\}\) (the three values computed in &sect;5). The scan
+        rolls one hash across the text and looks it up:
+        <pre>  window  1:  14159   h = 201  &isin; set  &rarr;  verify against 14159  &rarr;  match at 1
+  window  6:  26535   h = 613  &isin; set  &rarr;  verify against 26535  &rarr;  match at 6
+  window 11:  89793   h =  63  &isin; set  &rarr;  verify against 89793  &rarr;  match at 11
+  (the other nine windows: h &notin; set, rejected with no character comparisons)</pre>
+        Three patterns, one pass, twelve hash lookups, fifteen character
+        comparisons. Adding a thousand more patterns of length \(5\) would not
+        change the scan at all, only the size of the set.
+      </div>
+      <div class="aside">
+        <span class="tag">Patterns of different lengths</span>
+        The rolling hash is tied to a single window width, so \(k\) patterns of
+        \(d\) distinct lengths need \(d\) rolling hashes maintained in parallel
+        (still one pass over the text, \(d\) constant-time updates per
+        position). When \(d\) is large, the multi-pattern problem is usually
+        handed to an automaton-based method instead
+        (<a href="algo-regex-automata.html"><em>Regular Expressions &amp;
+        Automata</em></a>), which handles all lengths in one machine.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">8. Cost, and how often a fingerprint lies</h2>
+      <p>
+        Preprocessing is \(\Theta(m)\): \(m-1\) multiply-reduce steps for
+        \(\mathit{RM}\), \(m\) Horner steps for \(h(P)\), \(m\) more for the
+        first window. The scan performs \(n-m\) rolls of \(O(1)\) arithmetic
+        each, plus one integer comparison per window, plus verification. The
+        first two terms are \(\Theta(n+m)\) unconditionally. Everything
+        interesting is in the third.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (worst case \(\Theta(nm)\))</span>
+        The Las Vegas version makes \(\Theta(nm)\) character comparisons in the
+        worst case.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Take \(P = \texttt{A}^m\) and
+        \(T = \texttt{A}^n\) and ask for <em>all</em> occurrences. Every one of
+        the \(n-m+1\) windows equals the pattern, so every window is verified in
+        full: \((n-m+1)\,m = \Theta(nm)\) comparisons. This instance is honest
+        rather than adversarial (the output itself has \(n-m+1\) entries), but
+        the same bound is reachable with no occurrences at all: since \(Q\) is a
+        fixed public constant in most implementations, an adversary can solve
+        for windows whose polynomial value is congruent to \(h(P)\) modulo \(Q\)
+        while differing from \(P\) only in the last character, making every
+        window a spurious hit costing \(m\) comparisons.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        So the linear bound must be a statement about typical, not worst-case,
+        behavior, and it is obtained by modelling the fingerprint as random.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (expected cost \(\Theta(n+m)\))</span>
+        Model the fingerprint as a uniformly random value in
+        \(\{0, 1, \dots, Q-1\}\), independently for each window that differs
+        from the pattern. Then the expected number of spurious hits in a scan
+        is at most \(n/Q\), the expected number of character comparisons spent
+        on them is at most \(nm/Q\), and the total expected running time is
+        \(\Theta(n + m + nm/Q)\), which is \(\Theta(n+m)\) whenever
+        \(Q \ge m\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Fix a window \(i\) with
+        \(T[i..i+m-1] \ne P\). Under the model, its fingerprint equals \(h(P)\)
+        with probability \(1/Q\). Let \(X_i\) be the indicator of that event.
+        The number of spurious hits is \(X = \sum_i X_i\) over at most \(n\)
+        windows, and by linearity of expectation (which needs no independence),
+        \(\mathbb{E}[X] \le n/Q\). Each spurious hit costs at most \(m\)
+        character comparisons, so the expected verification work is at most
+        \(mn/Q\). Adding the unconditional \(\Theta(n+m)\) of preprocessing and
+        rolling, plus the \(m\) comparisons of the single successful
+        verification, gives \(\Theta(n + m + nm/Q)\). If \(Q \ge m\) then
+        \(nm/Q \le n\) and the whole expression is \(\Theta(n+m)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The proposition makes the choice of \(Q\) concrete. For
+        \(n = 10^6\) and \(m = 100\):
+      </p>
+      <table>
+        <tr><th>\(Q\)</th><th>expected spurious hits \(\approx n/Q\)</th><th>expected wasted comparisons \(\le nm/Q\)</th></tr>
+        <tr><td>\(997\)</td><td>\(\approx 1003\)</td><td>\(\approx 10^5\) (a tenth of the scan)</td></tr>
+        <tr><td>\(1{,}000{,}003\)</td><td>\(\approx 1.0\)</td><td>\(\approx 100\)</td></tr>
+        <tr><td>\(2^{31}-1 = 2{,}147{,}483{,}647\)</td><td>\(\approx 0.00047\)</td><td>\(\approx 0.047\)</td></tr>
+      </table>
+      <p>
+        At a 32-bit prime the expected number of spurious hits over a
+        megabyte of text is under one in two thousand: verification effectively
+        never runs, and the measured cost is the rolling scan alone.
+      </p>
+      <div class="aside">
+        <span class="tag">What the uniformity assumption is doing</span>
+        Real fingerprints are not random; they are a fixed function of the text,
+        and for a fixed \(Q\) an adversary can defeat them (the second half of
+        the worst-case proof). Two honest positions are available. The
+        <em>empirical</em> one: on inputs that are not adversarial the model
+        predicts well. Scanning \(200\) random \(1000\)-digit texts for a random
+        \(5\)-digit pattern (\(996\) windows each) produced an average of
+        \(76.1\) spurious hits per text at \(Q = 13\) against a predicted
+        \(996/13 = 76.6\), and \(0.95\) at \(Q = 997\) against a predicted
+        \(0.999\). The <em>rigorous</em> one: choose \(Q\) at random from a
+        large set of primes at run time. A window differing from the pattern
+        gives a nonzero difference of polynomial values, bounded by \(R^m\), so
+        that difference has fewer than \(m \log_2 R\) prime factors; a
+        fingerprint collision requires the chosen \(Q\) to be one of them, an
+        event of probability at most \(m \log_2 R / \pi(N)\) when \(Q\) is drawn
+        uniformly from the \(\pi(N)\) primes below \(N\). That version has no
+        bad inputs, only unlucky draws, which is the same move as choosing a
+        random pivot in <a href="../sorting/algo-quicksort.html">Quicksort</a>
+        or a random hash function in
+        <a href="../hashing/ds-hashing.html">Hashing</a>.
+      </div>
+      <p>
+        Space is \(\Theta(1)\) beyond the input: a handful of integers, with no
+        table proportional to \(m\) (unlike
+        <a href="algo-kmp.html">Knuth&ndash;Morris&ndash;Pratt</a>&rsquo;s
+        failure function) or to the alphabet (unlike
+        <a href="algo-boyer-moore.html">Boyer&ndash;Moore</a>&rsquo;s skip
+        table). The scan is also single-pass and forward-only apart from
+        verification, so it runs on a stream with an \(m\)-character buffer,
+        and in the Monte Carlo form with no buffer at all.
+      </p>
+      <h3>Where this sits</h3>
+      <p>
+        The problem statement, the brute-force baseline and the comparison
+        table for the whole family are in
+        <a href="foundation-substring-search.html"><em>Substring Search: The
+        Problem &amp; Baselines</em></a>. The two comparison-based fast
+        searchers are
+        <a href="algo-kmp.html"><em>Knuth&ndash;Morris&ndash;Pratt</em></a>
+        (guaranteed \(\Theta(n+m)\), never backs up, the right call when a hard
+        bound is required) and
+        <a href="algo-boyer-moore.html"><em>Boyer&ndash;Moore</em></a>
+        (sublinear on typical text, the usual choice for a single pattern in a
+        file). The fingerprint itself, the reason a prime modulus is used, and
+        the collision arithmetic all come from
+        <a href="../hashing/ds-hashing.html"><em>Hashing</em></a>;
+        <a href="../hashing/ds-bloom-filters.html"><em>Bloom Filters</em></a>
+        is the other place in the catalog where a hash is trusted without
+        verification and the error probability is engineered rather than
+        eliminated. When the same text will be searched many times for many
+        patterns, the right move is to preprocess the <em>text</em> instead of
+        the pattern:
+        <a href="ds-suffix-arrays.html"><em>Suffix Arrays</em></a> and
+        <a href="ds-tries.html"><em>Tries &amp; Ternary Search Trees</em></a>.
+        And when the target is a whole family of strings rather than one fixed
+        string, the problem becomes pattern matching against a language:
+        <a href="algo-regex-automata.html"><em>Regular Expressions &amp;
+        Automata</em></a>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Using \(R = 10\) and \(Q = 997\), the window <code>31415</code> has
+          fingerprint \(31415 \bmod 997 = 508\). Roll it one position to the
+          right (drop <code>3</code>, admit <code>9</code>) using the update of
+          &sect;3, and check the answer against a direct computation.
+          <details>
+            <summary>solution</summary>
+            \(\mathit{RM} = 10^4 \bmod 997 = 10000 - 10 \cdot 997 = 10000 -
+            9970 = 30\). The update:
+            \((508 - 3 \cdot 30) = 508 - 90 = 418\), then
+            \(418 \cdot 10 + 9 = 4189\), and
+            \(4189 \bmod 997 = 4189 - 4 \cdot 997 = 4189 - 3988 = 201\).
+            Direct: \(14159 \bmod 997 = 14159 - 14 \cdot 997 = 14159 - 13958
+            = 201\). They agree. Note that this particular subtraction stayed
+            positive; the \(+Q\) correction of &sect;3 is still mandatory,
+            because whether it stays positive depends entirely on the
+            characters involved (every roll in the &sect;5 trace went negative).
+          </details>
+        </li>
+        <li>
+          A student writes the roll as
+          <code>h = (h - t[i]*RM) % Q; h = (h*R + t[i+m]) % Q;</code> in Java
+          and reports that the search sometimes misses occurrences that are
+          plainly there. Diagnose the bug precisely, and explain why the same
+          two lines are correct in Python.
+          <details>
+            <summary>solution</summary>
+            In Java (as in C++ and Rust) <code>%</code> is the remainder
+            operation, which takes the sign of the dividend, so when
+            \(h &lt; T[i] \cdot \mathit{RM}\) the first line stores a negative
+            value. The stored residue is then \(h' - Q\) instead of \(h'\), and
+            every subsequent roll propagates the error, so the window
+            fingerprints stop matching the pattern&rsquo;s and true occurrences
+            are silently skipped. (The bug is intermittent because a text whose
+            leading characters are small may never trigger a negative
+            intermediate.) The fix is
+            <code>h = (h + Q - (RM*t[i]) % Q) % Q;</code>: reducing the product
+            first puts it in \([0, Q)\), so adding one \(Q\) is enough to make
+            the difference non-negative. Python&rsquo;s <code>%</code>
+            implements mathematical modulo and always returns a result with the
+            sign of the divisor, so <code>(-25) % 13</code> is \(1\), not
+            \(-12\), and the naive lines are already correct there.
+          </details>
+        </li>
+        <li>
+          With \(R = 10\) and \(Q = 13\), &sect;5 found that the windows
+          <code>14159</code>, <code>26535</code> and <code>89793</code> all have
+          fingerprint \(2\). How many spurious hits would the scan of &sect;5
+          report if it were asked for <em>all</em> occurrences rather than the
+          first, and how many character comparisons would each cost?
+          <details>
+            <summary>solution</summary>
+            Continuing past index \(6\), the remaining windows are
+            <code>65358</code> (\(h = 7\)), <code>53589</code> (\(3\)),
+            <code>35897</code> (\(4\)), <code>58979</code> (\(11\)) and
+            <code>89793</code> (\(2\)). Only the last is a hit, so the full scan
+            has \(4\) fingerprint hits in all: spurious ones at \(i = 1, 5, 11\)
+            and the true match at \(i = 6\). Each spurious hit fails on its
+            first character (<code>1</code>, <code>9</code> and <code>8</code>
+            against the pattern&rsquo;s <code>2</code>), so each costs exactly
+            \(1\) comparison: \(3\) wasted comparisons plus \(5\) for the match.
+            Against the prediction \(n/Q \approx 12/13 \approx 0.92\) spurious
+            hits, three is high; \(12\) windows is far too small a sample for
+            the expectation to mean much, and \(Q = 13\) is far too small a
+            modulus for anything but a trace.
+          </details>
+        </li>
+        <li>
+          A plagiarism detector fingerprints every \(5\)-word window of a
+          \(2000\)-word submission and looks each fingerprint up in a set of
+          \(10^7\) fingerprints drawn from a corpus, using \(Q = 2^{31}-1\).
+          Estimate the expected number of spurious hits for one submission.
+          What changes if the corpus set is replaced by a Bloom filter?
+          <details>
+            <summary>solution</summary>
+            There are \(1996\) windows, and each has \(10^7\) chances to
+            collide with a corpus fingerprint, each of probability
+            \(1/Q\) under the uniform model: expected spurious hits
+            \(\approx 1996 \times 10^7 / (2^{31}-1) \approx 9.3\): about ten
+            wasted verifications per submission, negligible against the scan,
+            and all of them caught. The lesson is that the relevant ratio is
+            not \(n/Q\) but (windows \(\times\) patterns)\(/Q\): a large
+            pattern set eats into the modulus budget, so \(Q\) must grow with
+            it. Replacing the set by a
+            <a href="../hashing/ds-bloom-filters.html">Bloom filter</a> adds a
+            <em>second</em>, independent source of false positives (the
+            filter&rsquo;s own one-sided error) on top of the fingerprint
+            collisions; both are still caught by the same verification step,
+            so correctness is unaffected and the memory saving is usually the
+            better trade.
+          </details>
+        </li>
+        <li>
+          Give a text and pattern on which the Las Vegas version makes
+          \(\Theta(nm)\) character comparisons even though the fingerprint
+          never once lies, and explain why this does not contradict the
+          expected-cost proposition of &sect;8.
+          <details>
+            <summary>solution</summary>
+            \(P = \texttt{A}^m\), \(T = \texttt{A}^n\), asking for all
+            occurrences. Every window truly equals the pattern, so every
+            fingerprint hit is genuine and every verification succeeds after
+            \(m\) comparisons: \((n-m+1)m = \Theta(nm)\) with zero spurious
+            hits. There is no contradiction because the proposition bounds only
+            the work spent on <em>spurious</em> hits; work spent confirming real
+            occurrences is output-dependent, and here the output has
+            \(n-m+1\) entries, so \(\Theta(nm)\) is unavoidable for any
+            algorithm that reports each occurrence by verifying it. Asking only
+            for the first occurrence costs \(m\) comparisons on this instance.
+          </details>
+        </li>
+        <li>
+          A firewall must scan a non-seekable stream at line rate for \(3000\)
+          fixed \(64\)-byte signatures. Argue for a variant of
+          Rabin&ndash;Karp, and say what the other members of the family would
+          cost here.
+          <details>
+            <summary>solution</summary>
+            Monte Carlo Rabin&ndash;Karp over the set of \(3000\) fingerprints.
+            One rolling hash and one hash-set lookup per byte gives a hard
+            \(O(1)\)-per-byte bound with no buffering and no re-reading, which
+            is what line rate requires; the Las Vegas version cannot promise
+            that, since verification would need the last \(64\) bytes buffered
+            <em>and</em> its cost is only bounded in expectation. With
+            \(Q\) near \(2^{61}\) the probability of a false alarm is about
+            \(3000 \cdot n / 2^{61}\), negligible for any \(n\) a firewall will
+            see in its lifetime, and a false alarm here is a packet flagged for
+            inspection rather than an incorrect answer, so the one-sided error
+            costs nothing but a rare extra check.
+            <a href="algo-kmp.html">Knuth&ndash;Morris&ndash;Pratt</a> gives the
+            hard bound for <em>one</em> pattern, but \(3000\) of them means
+            \(3000\) failure functions and \(3000\) parallel scans:
+            \(\Theta(kn)\).
+            <a href="algo-boyer-moore.html">Boyer&ndash;Moore</a> needs an
+            \(m\)-byte lookahead and has a \(\Theta(nm)\) worst case, so an
+            adversary can break line rate deliberately. Brute force fails on
+            both counts at once.
+          </details>
+        </li>
+        <li>
+          Adapt Rabin&ndash;Karp to two dimensions: find an
+          \(m \times m\) pattern block inside an \(n \times n\) image, treating
+          pixel values as characters. What is the cost?
+          <details>
+            <summary>solution</summary>
+            Apply the one-dimensional idea twice. First, for each row of the
+            image, roll a horizontal hash of width \(m\) across it, producing an
+            array \(H[r][c]\) = fingerprint of the \(m\) pixels starting at
+            \((r, c)\); this costs \(\Theta(n^2)\) in total, \(O(1)\) per
+            position. Now treat each column of \(H\) as a string over the
+            alphabet of fingerprints and roll a <em>vertical</em> hash of height
+            \(m\) down it, combining \(m\) consecutive row-fingerprints into one
+            block fingerprint, again \(O(1)\) per position and
+            \(\Theta(n^2)\) overall. Compare each block fingerprint against the
+            pattern block&rsquo;s (computed the same way) and verify hits by
+            comparing \(m^2\) pixels. Total: \(\Theta(n^2 + m^2)\) expected,
+            versus \(\Theta(n^2 m^2)\) for the brute-force block comparison.
+            The composition works because the second hash never needs the
+            underlying pixels, only the first hash&rsquo;s values, which is
+            exactly the property that a rolling hash of a rolling hash is still
+            rollable.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Rabin&ndash;Karp v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

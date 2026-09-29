@@ -1,0 +1,556 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Breadth-First Search.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Breadth-First Search - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      /* static run tables (rendered by lib/core/trace-table.js; styles copied
+         from lib/core/lib.css .u-ttable so the handout stays self-styled) */
+      .u-ttable { border-collapse: collapse; font: 500 12.5px ui-monospace, Menlo, monospace; color: #1a1c22; margin: 10px auto; }
+      .u-ttable th { font: 700 11px system-ui; letter-spacing: 0.05em; text-transform: uppercase; color: #66708a; background: #f3f0ff; border: 1px solid #e2dcff; padding: 4px 9px; }
+      .u-ttable td { border: 1px solid #eceef2; padding: 4px 9px; text-align: center; white-space: nowrap; }
+      .u-ttable .u-tt-num { color: #9aa3b5; }
+      .u-ttable .u-tt-act { text-align: left; color: #3a3f4d; }
+      .u-ttable tbody tr:last-child td { background: #f4fbf7; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Breadth-First Search</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Swap depth-first search&rsquo;s stack for a queue and the search fans out
+        in rings, computing fewest-edge paths in unweighted graphs. The
+        algorithm and the mark-on-enqueue rule, proofs of the queue invariant
+        and of shortest distances, the frontier view that unifies DFS, BFS,
+        Dijkstra, and A*, grids as implicit graphs, and the graph toolkit. With
+        a machine-generated trace, links to the interactive demos, and
+        exercises.
+      </div>
+
+      <p class="lead">
+        Graph vocabulary and the adjacency-list representation this handout
+        builds on are in <a href="ds-graph-representations.html"><em>Graphs:
+        Vocabulary &amp; Representations</em></a>, along with the running
+        directed graph used by the worked examples and the demo (adjacency list
+        \(0\to\{1,3,5\}\), \(1\to\{2,3\}\), \(2\to\{3\}\), \(3\to\{4,7\}\),
+        \(4\to\{5,7\}\), \(5\to\{6\}\)); depth-first search itself is in
+        <a href="algo-dfs.html"><em>Depth-First Search</em></a>.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#bfs">Breadth-first search</a></li>
+          <li><a href="#shortest">Why the distances are shortest</a></li>
+          <li><a href="#frontier">DFS versus BFS, and one loop behind both</a></li>
+          <li><a href="#grids">Grids are implicit graphs</a></li>
+          <li><a href="#toolkit">The graph toolkit</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="bfs">1. Breadth-first search</h2>
+      <p>
+        <strong>Breadth-first search</strong> visits all vertices at distance
+        \(1\) from the start, then all at distance \(2\), and so on,
+        expanding in rings. Swap <a href="algo-dfs.html">DFS</a>&rsquo;s stack for a
+        <em>queue</em> (FIFO) and
+        the search fans out level by level instead of diving. That single change
+        makes BFS compute shortest paths in unweighted graphs, which we now prove.
+      </p>
+      <div class="code-tabs" data-snippet="graphs/bfs">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">void bfs(Graph&amp; g, int s) {
+    queue&lt;int&gt; q; q.push(s);
+    vector&lt;bool&gt; seen(g.V, false); seen[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();     // visit u
+        for (int v : g.adj[u])
+            if (!seen[v]) {
+                seen[v] = true;         // mark on ENQUEUE
+                q.push(v);
+            }
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>void bfs(Graph g, int s) {
+    Queue&lt;Integer&gt; q = new ArrayDeque&lt;&gt;();
+    q.add(s);
+    boolean[] seen = new boolean[g.V];
+    seen[s] = true;
+    while (!q.isEmpty()) {
+        int u = q.poll();               // visit u
+        for (int v : g.adj.get(u))
+            if (!seen[v]) {
+                seen[v] = true;         // mark on ENQUEUE
+                q.add(v);
+            }
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>from collections import deque
+
+def bfs(g, s):
+    q = deque([s])
+    seen = [False] * g.V
+    seen[s] = True
+    while q:
+        u = q.popleft()                 # visit u
+        for v in g.adj[u]:
+            if not seen[v]:
+                seen[v] = True          # mark on ENQUEUE
+                q.append(v)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>use std::collections::VecDeque;
+
+fn bfs(g: &amp;Graph, s: usize) {
+    let mut q = VecDeque::from([s]);
+    let mut seen = vec![false; g.adj.len()];
+    seen[s] = true;
+    while let Some(u) = q.pop_front() {  // visit u
+        for &amp;v in &amp;g.adj[u] {
+            if !seen[v] {
+                seen[v] = true;          // mark on ENQUEUE
+                q.push_back(v);
+            }
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/bfs.cpp &middot; code/graphs/bfs.java &middot; code/graphs/bfs.py &middot; code/graphs/bfs.rs</code></p>
+<!--/ct--></div>
+      <div class="aside">
+        <span class="tag">Mark on enqueue, not on dequeue</span>
+        A vertex must be marked the instant it is <em>enqueued</em>, not when it
+        is later dequeued. Otherwise two different neighbors could each enqueue it
+        before either is processed, so it enters the queue twice, is processed
+        twice, and receives a wrong distance. In the diamond both \(1\) and \(2\)
+        point at \(3\); marking on enqueue guarantees each vertex is queued
+        exactly once, essential for correctness and for the
+        \(\Theta(V+E)\) bound (the same \(V + \sum\deg\) sum as DFS).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a BFS trace)</span>
+        The directed diamond \(0\to1,\ 0\to2,\ 1\to3,\ 2\to3\), one row per
+        step, generated from the demo engine&rsquo;s own trace, so it
+        matches the interactive demo step for step:
+        <div id="bfs-run-table" style="overflow-x:auto"></div>
+        BFS pops \(0\), fans out to \(1\) and \(2\) (layer \(1\)), then reaches
+        \(3\) (layer \(2\)). Vertex \(3\) is discovered from \(1\) first; when
+        \(2\) later sees it, it is already queued, so \(2\)&rsquo;s edge is
+        skipped. The distances \(0,1,1,2\) are the fewest-edge counts.
+        (<a href="algo-dfs.html">DFS</a> on the
+        same graph gave \(0\ 1\ 3\ 2\): same edges, different frontier,
+        different order.)
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the three dequeue cases, on the running graph)</span>
+        Each dequeue scans the vertex&rsquo;s whole neighbor list, and the
+        neighbors can be all new, a mix of new and seen, or all already seen. A
+        single run of BFS from \(0\) on the running graph (lists ascending)
+        meets all three; the queue is shown after each step:
+        <pre>  pop 0: enqueue 1, 3, 5             queue [1 3 5]    all new
+  pop 1: enqueue 2; 3 seen, SKIP     queue [3 5 2]    a mix
+  pop 3: enqueue 4, 7                queue [5 2 4 7]  all new
+  pop 5: enqueue 6                   queue [2 4 7 6]
+  pop 2: 3 seen, SKIP                queue [4 7 6]    nothing new
+  pop 4: 5 and 7 seen, SKIP both     queue [7 6]
+  pop 7, pop 6: no out-neighbors     queue empty
+
+  visit order  0 1 3 5 2 4 7 6
+  distances    0:0    1:1 3:1 5:1    2:2 4:2 6:2 7:2</pre>
+        The rings \(\{0\}\), \(\{1,3,5\}\), \(\{2,4,6,7\}\) come out in order,
+        and every skipped edge points at a vertex an earlier or current ring
+        already claimed. The choice of start can also strand vertices: from
+        \(2\) the search reaches only \(\{2,3,4,5,6,7\}\); vertices \(0\) and
+        \(1\) have no incoming path from \(2\), are never enqueued, and end
+        with no distance at all (conventionally \(\infty\)): like DFS, BFS
+        visits exactly the reachable set.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="shortest">2. Why the distances are shortest</h2>
+      <p>The proof rests on a structural invariant of the queue.</p>
+      <div class="thm">
+        <span class="tag">Lemma (the queue is sorted by distance)</span>
+        At every moment, the vertices in the queue have distances that take at
+        most two consecutive values \(d\) and \(d+1\), with all the \(d\)s ahead
+        of all the \(d+1\)s. Consequently vertices are dequeued in non-decreasing
+        order of distance.
+      </div>
+      <div class="proof">
+        <strong>Proof (induction on the steps).</strong> Initially the queue is
+        \([s]\), one value. Assume it reads \([\,d\ \cdots\ d\mid d{+}1\ \cdots\
+        d{+}1\,]\). Dequeuing the front, a distance-\(d\) vertex \(u\), we enqueue
+        its undiscovered neighbors; each such neighbor is reached by one edge from
+        a distance-\(d\) vertex, so it is assigned distance \(d+1\) and appended
+        at the back, preserving the shape. Once the last \(d\) is dequeued the
+        queue holds only \((d+1)\)s, and the argument repeats with \(d\) advanced.
+        No third value ever appears before the current ones are gone.
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (BFS shortest paths)</span>
+        For every vertex \(v\) reachable from \(s\), the label \(\texttt{dist}[v]\)
+        computed by BFS equals \(\delta(v)\), the length of a fewest-edge path
+        from \(s\) to \(v\).
+      </div>
+      <div class="proof">
+        <strong>Proof (two inequalities).</strong>
+        (\(\ge\)) BFS assigns \(\texttt{dist}[v]\) only by following actual edges,
+        so there is a real \(s\to v\) path of exactly \(\texttt{dist}[v]\) edges;
+        no real path can be shorter than the shortest, giving
+        \(\texttt{dist}[v] \ge \delta(v)\). <br>
+        (\(\le\)) Take a shortest path
+        \(s = v_0 \to v_1 \to \cdots \to v_k = v\) with \(k = \delta(v)\), and
+        show \(\texttt{dist}[v_i] \le i\) by induction. It holds for \(v_0\)
+        (\(\texttt{dist}[s]=0\)). Assume \(\texttt{dist}[v_{i-1}] \le i-1\). When
+        \(v_{i-1}\) is dequeued it scans the edge to \(v_i\); either \(v_i\) is
+        still undiscovered, so it is discovered now with
+        \(\texttt{dist}[v_i] = \texttt{dist}[v_{i-1}] + 1 \le i\), or it was
+        discovered earlier, and by the queue lemma an earlier discovery means a
+        distance no larger, so again \(\texttt{dist}[v_i] \le i\). Thus
+        \(\texttt{dist}[v] = \texttt{dist}[v_k] \le k = \delta(v)\). The two
+        inequalities give \(\texttt{dist}[v] = \delta(v)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The argument uses that every edge adds exactly one to the distance; it
+        breaks the moment edges carry different weights, which is why weighted
+        shortest paths need a different algorithm (Dijkstra; see
+        <a href="algo-dijkstra.html"><em>Dijkstra&rsquo;s Algorithm</em></a>).
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=graph">BFS demo</a>. Run BFS from \(0\) and
+        read the distance labels ring by ring; on the running graph they fill in
+        as \(\{0\}\), \(\{1,3,5\}\), \(\{2,4,6,7\}\), so
+        \(\texttt{dist}[6] = \texttt{dist}[7] = 2\): every vertex sits
+        within two edges of \(0\). Then run DFS from the same
+        start without rebuilding, and compare: ring-by-ring versus
+        dive-and-backtrack on identical edges is the whole contrast between the
+        two searches. Or watch both at once: the
+        <a href="../../lib/demo.html?ds=search-race">BFS-vs-DFS race</a> runs them
+        side by side in lockstep, each panel&rsquo;s title carrying its live
+        frontier (the queue vs the stack).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="frontier">3. DFS versus BFS, and one loop behind both</h2>
+      <table>
+        <tr><th></th><th>DFS</th><th>BFS</th></tr>
+        <tr><td>frontier</td><td>stack / recursion</td><td>queue</td></tr>
+        <tr><td>shape</td><td>deep, then backtrack</td><td>wide, in layers</td></tr>
+        <tr><td>finds</td><td>reachability, cycles, topo order</td><td><strong>shortest (unweighted)</strong></td></tr>
+        <tr><td>memory</td><td>\(O(\text{longest path})\)</td><td>\(O(\text{widest layer})\)</td></tr>
+        <tr><td>cost</td><td>\(\Theta(V+E)\)</td><td>\(\Theta(V+E)\)</td></tr>
+      </table>
+      <p>
+        They are the same algorithm with a different frontier container. Making
+        that explicit reveals a whole family:
+      </p>
+      <pre>Frontier f;  f.add(start);
+while (!f.empty()) {
+    u = f.remove();
+    if (done[u]) continue;          <span class="cm">// skip a stale duplicate</span>
+    done[u] = true;                 <span class="cm">// finalize u on REMOVE</span>
+    for (v : adj[u])
+        if (!done[v]) f.add(v);
+}</pre>
+      <table>
+        <tr><th>frontier</th><th>removes</th><th>you get</th></tr>
+        <tr><td>stack (LIFO)</td><td>deepest first</td><td>DFS</td></tr>
+        <tr><td>queue (FIFO)</td><td>oldest first</td><td>BFS</td></tr>
+        <tr><td>priority queue by path cost</td><td>cheapest first</td><td>Dijkstra (<a href="algo-dijkstra.html">weighted shortest paths</a>)</td></tr>
+        <tr><td>priority queue by a heuristic</td><td>most promising first</td><td>A* (games, AI)</td></tr>
+      </table>
+      <p>
+        One detail is load-bearing: a vertex is finalized when it <em>leaves</em>
+        the frontier, not when it enters, and the frontier may briefly hold
+        duplicates that the <code>continue</code> skips. For a stack or queue that
+        is cosmetic; for the priority-queue rows it is the whole game:
+        finalizing a vertex the moment it is added would lock in the first cost
+        seen, which is the classic bug Dijkstra must avoid. When you meet a new
+        graph problem, the question is less &ldquo;which algorithm?&rdquo; than
+        &ldquo;what should the frontier prioritize?&rdquo;
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="grids">4. Grids are implicit graphs</h2>
+      <p>
+        A grid or maze is a graph whose vertices are cells and whose edges join
+        each cell to its four neighbors, but you never build the adjacency
+        list. The neighbors of cell \((r,c)\) are \((r\pm1, c)\) and
+        \((r, c\pm1)\), computed on the fly, skipping walls. The same BFS code
+        then gives the fewest moves from a start cell to every reachable cell:
+        the workhorse behind maze solving, game pathfinding, and image
+        flood-fill.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="toolkit">5. The graph toolkit</h2>
+      <p>Five reductions cover most graph problems you will meet:</p>
+      <ul>
+        <li><strong>represent</strong>: adjacency list, \(\Theta(V+E)\)
+          space (<a href="ds-graph-representations.html"><em>Graphs: Vocabulary
+          &amp; Representations</em></a>);</li>
+        <li><strong>explore</strong>: a stack gives
+          <a href="algo-dfs.html">DFS</a>, a queue gives BFS,
+          a priority queue gives Dijkstra
+          (<a href="algo-dijkstra.html"><em>Dijkstra&rsquo;s Algorithm</em></a>);</li>
+        <li><strong>fewest-edge paths</strong> in an unweighted graph: BFS
+          distance labels (proved shortest);</li>
+        <li><strong>schedule a DAG</strong>: Kahn&rsquo;s algorithm or DFS
+          reverse post-order (both proved correct, both \(\Theta(V+E)\), in the
+          <a href="algo-topological-sort.html"><em>Topological Sort</em></a>
+          handout);</li>
+        <li><strong>detect a cycle</strong>: a DFS back edge, or Kahn
+          stopping short of \(V\).</li>
+      </ul>
+      <p>
+        The frontier table is also the map forward: replace the queue with a
+        priority queue keyed by accumulated path cost and BFS becomes
+        Dijkstra&rsquo;s shortest-path algorithm; that is what
+        <a href="algo-dijkstra.html"><em>Dijkstra&rsquo;s Algorithm</em></a> builds,
+        on the priority queue of the
+        <a href="../heaps/ds-heaps-pq.html"><em>Heaps &amp; Priority
+        Queues</em></a> handout.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">6. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Explain why marking a BFS vertex on <em>dequeue</em> rather than on
+          <em>enqueue</em> can produce a wrong distance, using the diamond as your
+          example.
+          <details>
+            <summary>solution</summary>
+            Both \(1\) and \(2\) point at \(3\). With mark-on-dequeue, processing
+            \(1\) enqueues \(3\), and then processing \(2\) sees \(3\) still
+            unmarked and enqueues it again. Vertex \(3\) now sits in the queue
+            twice and is processed twice; worse, on a larger graph a second,
+            longer path could overwrite \(3\)&rsquo;s distance. Marking on enqueue
+            makes each vertex enter the queue exactly once, preserving both the
+            distance and the \(\Theta(V+E)\) bound.
+          </details>
+        </li>
+        <li>
+          Give a small digraph on which DFS from some start and BFS from the same
+          start produce <em>different</em> visit orders, and one on which they
+          produce the <em>same</em> order.
+          <details>
+            <summary>solution</summary>
+            Different: the diamond (DFS gives \(0\ 1\ 3\ 2\), BFS gives
+            \(0\ 1\ 2\ 3\)). Same: any simple directed path
+            \(0 \to 1 \to 2 \to \cdots\); both must visit
+            \(0, 1, 2, \dots\) in that one order, since each vertex has a single
+            out-neighbor and there is only one way forward. (More generally the
+            orders coincide whenever the reachable subgraph is a path.)
+          </details>
+        </li>
+        <li>
+          A maze is an \(r \times c\) grid of open cells and walls. Argue that BFS
+          from the entrance finds the fewest-moves path to the exit, and give its
+          running time in terms of the number of cells.
+          <details>
+            <summary>solution</summary>
+            Model each open cell as a vertex and each pair of orthogonally
+            adjacent open cells as an unweighted edge; a &ldquo;move&rdquo; is one
+            edge. BFS distances equal fewest-edge distances (the shortest-path
+            theorem), so \(\texttt{dist}[\text{exit}]\) is the minimum number of
+            moves, and the BFS tree gives an actual shortest path. There are at
+            most \(rc\) cells and \(O(rc)\) edges (each cell has \(\le 4\)
+            neighbors), so BFS runs in \(\Theta(rc)\), linear in the grid.
+            The neighbors are computed from coordinates, so no adjacency list is
+            built.
+          </details>
+        </li>
+        <li>
+          Run BFS from \(4\) on the running graph, lists ascending. Give the
+          queue after each dequeue, the distances, and the vertices that finish
+          with no distance; then say which dequeues found all-new neighbors,
+          which a mix, and which nothing new.
+          <details>
+            <summary>solution</summary>
+            <pre>  pop 4: enqueue 5, 7            queue [5 7]    all new
+  pop 5: enqueue 6               queue [7 6]    all new
+  pop 7: no out-neighbors        queue [6]
+  pop 6: no out-neighbors        queue empty
+
+  visit order  4 5 7 6
+  distances    4:0    5:1 7:1    6:2</pre>
+            Vertices \(0, 1, 2, 3\) have no path from \(4\), are never
+            enqueued, and keep distance \(\infty\). No dequeue here meets an
+            already-seen neighbor, because the reachable part
+            \(4\to\{5,7\}\), \(5\to\{6\}\) is a tree: the skip case needs two
+            different paths into one vertex, as \(1\) and \(2\) both reaching
+            \(3\) provide when the search starts at \(0\).
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Breadth-First Search v1.0 &middot;
+        prepared by Dr. Marcel Gavriliu.
+        Typeset with MathJax; interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+    <!-- Run table: generated by the demo library FROM ITS OWN TRACES, so the
+         numbers cannot drift from what the interactive demos show
+         (lib/core/trace-table.js). -->
+    <script type="module">
+      import { Graph, renderTraceTable } from "../../lib/index.js";
+      // BFS on the diamond (§1)
+      {
+        const g = new Graph(); g.build([0, 1, 0, 2, 1, 3, 2, 3]);
+        renderTraceTable(document.getElementById("bfs-run-table"), {
+          trace: g.bfs(0),
+          cols: [
+            { label: "queue", get: (f) => `[${f.snapshot.frontier.items.join(" ")}]` },
+            ...[0, 1, 2, 3].map((v) => ({ label: `d(${v})`, get: (f) => f.highlight?.dist?.[v] ?? "–" })),
+            { label: "visit order", get: (f) => (f.highlight?.nodes?.done ?? []).join(" ") },
+          ],
+        });
+      }
+    </script>
+  </body>
+</html>

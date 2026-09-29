@@ -1,0 +1,1390 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Recursion & Induction.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recursion &amp; Induction - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Recursion &amp; Induction</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        The reference for the recursive reasoning the rest of the course text
+        assumes. Base case and recursive case; the call stack traced frame by
+        frame; structural recursion as the pattern behind every tree algorithm;
+        mathematical induction and strong induction, each stated and used in full
+        proofs of program correctness; converting a recursion to a loop with an
+        explicit stack; tail recursion; the four ways recursion goes wrong
+        (missing base case, non-decreasing argument, exponential recomputation,
+        stack overflow); and solving simple recurrences by unrolling.
+      </div>
+
+      <p class="lead">
+        A recursive procedure solves a problem by calling itself on a smaller
+        instance of the same problem. That one idea carries most of this
+        course: the tree operations, the divide-and-conquer sorts, the
+        graph traversals, and the dynamic-programming recurrences are all written
+        recursively first and analysed recursively afterwards. Two questions
+        follow immediately, and this handout answers both. <em>Why does a
+        recursive procedure terminate and return the right answer?</em> The
+        answer is induction, the proof technique that is the mirror image of
+        recursion. <em>What does it cost?</em> The answer is a recurrence, an
+        equation that describes a function&rsquo;s cost in terms of itself, and
+        which is solved by the same unrolling that the recursion performs.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#cases">Base case and recursive case</a></li>
+          <li><a href="#stack">The call stack, frame by frame</a></li>
+          <li><a href="#trees">Structural recursion on trees</a></li>
+          <li><a href="#induction">Mathematical induction</a></li>
+          <li><a href="#strong">Strong induction and structural induction</a></li>
+          <li><a href="#recur">Solving recurrences by unrolling</a></li>
+          <li><a href="#iterate">Recursion to iteration: explicit stacks and tail calls</a></li>
+          <li><a href="#fail">Four ways recursion goes wrong</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="cases">1. Base case and recursive case</h2>
+      <p>
+        A recursive definition has exactly two obligations. It must say what the
+        answer is for inputs small enough to answer outright, and it must say how
+        to build the answer for a larger input from answers to strictly smaller
+        inputs. The factorial function is the standard first example:
+        \[
+          n! \;=\;
+          \begin{cases}
+            1 & \text{if } n \le 1 \quad \text{(base case)}\\[2pt]
+            n \cdot (n-1)! & \text{if } n \gt 1 \quad \text{(recursive case)}
+          \end{cases}
+        \]
+      </p>
+      <div class="def">
+        <span class="tag">Definition (base case, recursive case, recursion invariant)</span>
+        The <strong>base case</strong> of a recursive procedure is an input it
+        answers without calling itself. The <strong>recursive case</strong>
+        answers an input by combining results of calls on other inputs. Those
+        calls must satisfy a <strong>progress measure</strong>: a quantity that
+        is a non-negative integer, is strictly smaller in every recursive call
+        than in the current call, and reaches a base case when it can shrink no
+        further. For <code>fact(n)</code> the measure is \(n\) itself.
+      </div>
+      <p>
+        The two obligations divide the work of proving a recursive procedure
+        correct into two matching parts, which is precisely what induction
+        (&sect;4) formalises: the base case of the proof handles the base case of
+        the code, and the inductive step handles the recursive case, granting
+        itself the assumption that the recursive calls already work. That
+        assumption is not optimism. It is what induction licenses.
+      </p>
+      <div class="aside">
+        <span class="tag">The one rule of writing recursive code</span>
+        Write the recursive call assuming it already returns the correct answer
+        for its smaller input, then check only two things: that the base case is
+        right, and that the progress measure strictly decreases. Do not attempt
+        to trace the call chain in your head; the whole point of the technique is
+        that you do not have to. The traces in this handout exist to make the
+        machinery visible once, not to be the way you reason day to day.
+      </div>
+      <div class="code-tabs" data-snippet="recursion/factorial">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Factorial and a recursive sum: one base case, one recursive case each.
+long fact(int n) {
+    if (n &lt;= 1) return 1;              // BASE CASE: answered outright
+    return n * fact(n - 1);            // RECURSIVE CASE: n strictly decreases
+}
+
+// sum(n) = n + (n-1) + ... + 1, and sum(0) = 0.
+long sum(int n) {
+    if (n == 0) return 0;              // BASE CASE
+    return n + sum(n - 1);             // RECURSIVE CASE
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Factorial and a recursive sum: one base case, one recursive case each.
+static long fact(int n) {
+    if (n &lt;= 1) return 1;              // BASE CASE: answered outright
+    return n * fact(n - 1);            // RECURSIVE CASE: n strictly decreases
+}
+
+// sum(n) = n + (n-1) + ... + 1, and sum(0) = 0.
+static long sum(int n) {
+    if (n == 0) return 0;              // BASE CASE
+    return n + sum(n - 1);             // RECURSIVE CASE
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Factorial and a recursive sum: one base case, one recursive case each.
+def fact(n):
+    if n &lt;= 1:                         # BASE CASE: answered outright
+        return 1
+    return n * fact(n - 1)             # RECURSIVE CASE: n strictly decreases
+
+# sum(n) = n + (n-1) + ... + 1, and sum(0) = 0.
+def sum_to(n):
+    if n == 0:                         # BASE CASE
+        return 0
+    return n + sum_to(n - 1)           # RECURSIVE CASE</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Factorial and a recursive sum: one base case, one recursive case each.
+fn fact(n: u64) -&gt; u64 {
+    if n &lt;= 1 { return 1; }            // BASE CASE: answered outright
+    n * fact(n - 1)                    // RECURSIVE CASE: n strictly decreases
+}
+
+// sum(n) = n + (n-1) + ... + 1, and sum(0) = 0.
+fn sum_to(n: u64) -&gt; u64 {
+    if n == 0 { return 0; }            // BASE CASE
+    n + sum_to(n - 1)                  // RECURSIVE CASE
+}</pre>
+<p class="ct-src">source: <code>code/recursion/factorial.cpp &middot; code/recursion/factorial.java &middot; code/recursion/factorial.py &middot; code/recursion/factorial.rs</code></p>
+<!--/ct--></div>
+
+      <!-- ============================================================ -->
+      <h2 id="stack">2. The call stack, frame by frame</h2>
+      <p>
+        A recursive call is an ordinary function call, and the machine implements
+        it the ordinary way: it pushes a <strong>stack frame</strong> holding the
+        call&rsquo;s parameters, its local variables, and the address to return
+        to. The frame stays live for as long as the call is unfinished, which for
+        recursion means <em>while its own recursive call is running</em>. Frames
+        therefore accumulate on the way down and are released, innermost first, on
+        the way back up.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (stack frame, recursion depth)</span>
+        A <strong>stack frame</strong> (activation record) is the block of stack
+        memory belonging to one in-progress call. The <strong>recursion
+        depth</strong> is the largest number of frames of the recursive procedure
+        that are live at the same instant.
+      </div>
+      <p>
+        Here is every push and pop of <code>fact(4)</code>, eight events in the
+        order the machine performs them. Read the top half downward (the descent
+        to the base case) and the bottom half upward (the multiplications, which
+        all happen on the way out).
+      </p>
+      <table class="trace">
+        <tr>
+          <th>step</th><th>event</th><th>frame</th><th>depth</th>
+          <th>frames live (top first)</th><th>returns</th>
+        </tr>
+        <tr><td>1</td><td>push</td><td class="lab"><code>fact(4)</code></td><td>1</td><td class="lab">4</td><td class="inf">&middot;</td></tr>
+        <tr><td>2</td><td>push</td><td class="lab"><code>fact(3)</code></td><td>2</td><td class="lab">3, 4</td><td class="inf">&middot;</td></tr>
+        <tr><td>3</td><td>push</td><td class="lab"><code>fact(2)</code></td><td>3</td><td class="lab">2, 3, 4</td><td class="inf">&middot;</td></tr>
+        <tr><td>4</td><td>push</td><td class="lab"><code>fact(1)</code></td><td class="upd">4</td><td class="lab">1, 2, 3, 4</td><td class="inf">&middot;</td></tr>
+        <tr><td>5</td><td>pop</td><td class="lab"><code>fact(1)</code> base</td><td>4</td><td class="lab">2, 3, 4</td><td class="set">1</td></tr>
+        <tr><td>6</td><td>pop</td><td class="lab"><code>fact(2)</code></td><td>3</td><td class="lab">3, 4</td><td class="set">2 &times; 1 = 2</td></tr>
+        <tr><td>7</td><td>pop</td><td class="lab"><code>fact(3)</code></td><td>2</td><td class="lab">4</td><td class="set">3 &times; 2 = 6</td></tr>
+        <tr><td>8</td><td>pop</td><td class="lab"><code>fact(4)</code></td><td>1</td><td class="lab">(empty)</td><td class="set">4 &times; 6 = 24</td></tr>
+      </table>
+      <p>
+        Three facts are visible in the table and worth naming. First, the
+        <strong>base case is reached once</strong>, at step 4, and it is the only
+        step that produces a value without a multiplication. Second, every
+        multiplication happens <strong>after</strong> the recursive call returns:
+        the expression <code>n * fact(n - 1)</code> cannot be evaluated until the
+        call finishes, which is exactly why the frame must stay live. Third, the
+        peak depth is 4, one frame per level, so <code>fact(n)</code> holds
+        \(n\) frames at its deepest point.
+      </p>
+      <figure>
+        <svg viewBox="0 0 470 210" role="img" aria-label="The call stack of fact(4): four frames pushed downward from fact(4) to fact(1), then popped upward returning 1, 2, 6, 24.">
+          <g font-family="system-ui, sans-serif">
+            <g text-anchor="middle" font-size="13">
+              <rect x="90" y="20"  width="180" height="34" fill="#eef4fc" stroke="#2a2d36" stroke-width="1.3"/>
+              <rect x="90" y="58"  width="180" height="34" fill="#eef4fc" stroke="#2a2d36" stroke-width="1.3"/>
+              <rect x="90" y="96"  width="180" height="34" fill="#eef4fc" stroke="#2a2d36" stroke-width="1.3"/>
+              <rect x="90" y="134" width="180" height="34" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.3"/>
+              <text x="180" y="42">fact(4): n = 4</text>
+              <text x="180" y="80">fact(3): n = 3</text>
+              <text x="180" y="118">fact(2): n = 2</text>
+              <text x="180" y="156">fact(1): base case</text>
+            </g>
+            <g stroke="#9a5b00" stroke-width="1.5" fill="none">
+              <line x1="72" y1="26" x2="72" y2="160" marker-end="url(#rdown)"/>
+            </g>
+            <g stroke="#0a7d4d" stroke-width="1.5" fill="none">
+              <line x1="292" y1="160" x2="292" y2="26" marker-end="url(#rup)"/>
+            </g>
+            <defs>
+              <marker id="rdown" markerWidth="9" markerHeight="9" refX="4" refY="7" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,0 L4,8 Z" fill="#9a5b00"/>
+              </marker>
+              <marker id="rup" markerWidth="9" markerHeight="9" refX="4" refY="7" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,0 L4,8 Z" fill="#0a7d4d"/>
+              </marker>
+            </defs>
+            <g font-size="12">
+              <text x="62" y="98" fill="#9a5b00" transform="rotate(-90 62 98)" text-anchor="middle">pushes: n decreases</text>
+              <g fill="#0a7d4d" text-anchor="start">
+                <text x="300" y="160">1</text>
+                <text x="300" y="122">2</text>
+                <text x="300" y="84">6</text>
+                <text x="300" y="46">24</text>
+              </g>
+            </g>
+            <text x="90" y="192" font-size="12" fill="#5c6270">depth 4 = 4 live frames; every multiplication happens on the way back up</text>
+          </g>
+        </svg>
+        <figcaption>
+          The stack at its deepest moment (step 4), with the values returned as
+          each frame pops. The descent carries the parameters down; the ascent
+          carries the results back up.
+        </figcaption>
+      </figure>
+      <p>
+        Frames are not free. Recursion depth <em>is</em> the auxiliary space of a
+        recursive procedure, so <code>fact(n)</code> costs \(\Theta(n)\) stack
+        space to produce one number, and a recursion over a structure costs as
+        much stack as the structure is deep. The
+        <a href="foundation-space-complexity.html"><em>Space Complexity</em></a>
+        handout develops that accounting, including what happens when the depth
+        exceeds the (bounded) stack region; &sect;8 below returns to the crash.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="trees">3. Structural recursion on trees</h2>
+      <p>
+        Recursion on an integer shrinks a number. <strong>Structural
+        recursion</strong> shrinks a <em>structure</em>, and it is the reason
+        tree code is short. A binary tree is itself defined recursively: a tree
+        is either empty, or a node holding a key together with two subtrees. A
+        function over a tree is written by answering the same two obligations
+        against that definition: what is the answer for the empty tree, and how
+        is the answer for a node assembled from the answers for its two subtrees.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (structural recursion)</span>
+        A <strong>structurally recursive</strong> function on an inductively
+        defined type gives one case per constructor of the type, and recurses only
+        on the immediate substructures of its argument. For binary trees: a case
+        for the empty tree (the base case), and a case for a node that calls
+        itself on <code>left</code> and <code>right</code>. The progress measure
+        is the number of nodes, which strictly decreases in each call, so
+        termination is automatic.
+      </div>
+      <div class="code-tabs" data-snippet="recursion/tree-recursion">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">struct Node { int key; Node* left; Node* right; };
+
+// Empty tree has 0 nodes; a node has 1 plus what its two subtrees have.
+int size(Node* t) {
+    if (t == nullptr) return 0;                         // base case
+    return 1 + size(t-&gt;left) + size(t-&gt;right);          // combine
+}
+
+// In-order: left subtree, this key, right subtree. On a BST this is sorted.
+void inorder(Node* t, std::vector&lt;int&gt;&amp; out) {
+    if (t == nullptr) return;                           // base case
+    inorder(t-&gt;left, out);
+    out.push_back(t-&gt;key);                              // visit
+    inorder(t-&gt;right, out);
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>class Node { int key; Node left, right; }
+
+// Empty tree has 0 nodes; a node has 1 plus what its two subtrees have.
+static int size(Node t) {
+    if (t == null) return 0;                            // base case
+    return 1 + size(t.left) + size(t.right);            // combine
+}
+
+// In-order: left subtree, this key, right subtree. On a BST this is sorted.
+static void inorder(Node t, List&lt;Integer&gt; out) {
+    if (t == null) return;                              // base case
+    inorder(t.left, out);
+    out.add(t.key);                                     // visit
+    inorder(t.right, out);
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>class Node:
+    def __init__(self, key):
+        self.key, self.left, self.right = key, None, None
+
+# Empty tree has 0 nodes; a node has 1 plus what its two subtrees have.
+def size(t):
+    if t is None:                                       # base case
+        return 0
+    return 1 + size(t.left) + size(t.right)             # combine
+
+# In-order: left subtree, this key, right subtree. On a BST this is sorted.
+def inorder(t, out):
+    if t is None:                                       # base case
+        return
+    inorder(t.left, out)
+    out.append(t.key)                                   # visit
+    inorder(t.right, out)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>struct Node { key: i32, left: Link, right: Link }
+type Link = Option&lt;Box&lt;Node&gt;&gt;;
+
+// Empty tree has 0 nodes; a node has 1 plus what its two subtrees have.
+fn size(t: &amp;Link) -&gt; usize {
+    match t {
+        None =&gt; 0,                                      // base case
+        Some(n) =&gt; 1 + size(&amp;n.left) + size(&amp;n.right),  // combine
+    }
+}
+
+// In-order: left subtree, this key, right subtree. On a BST this is sorted.
+fn inorder(t: &amp;Link, out: &amp;mut Vec&lt;i32&gt;) {
+    if let Some(n) = t {
+        inorder(&amp;n.left, out);
+        out.push(n.key);                                // visit
+        inorder(&amp;n.right, out);
+    }
+}</pre>
+<p class="ct-src">source: <code>code/recursion/tree-recursion.cpp &middot; code/recursion/tree-recursion.java &middot; code/recursion/tree-recursion.py &middot; code/recursion/tree-recursion.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Take the binary search tree built by inserting
+        50, 30, 70, 20, 40, 60, 80 in that order, which is the perfectly balanced
+        tree of seven nodes:
+      </p>
+      <figure>
+        <svg viewBox="0 0 420 170" role="img" aria-label="A balanced binary search tree: root 50 with children 30 and 70; 30 has children 20 and 40; 70 has children 60 and 80.">
+          <g font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">
+            <g stroke="#5c6270" stroke-width="1.3">
+              <line x1="210" y1="34" x2="120" y2="76"/><line x1="210" y1="34" x2="300" y2="76"/>
+              <line x1="120" y1="86" x2="70"  y2="128"/><line x1="120" y1="86" x2="170" y2="128"/>
+              <line x1="300" y1="86" x2="250" y2="128"/><line x1="300" y1="86" x2="350" y2="128"/>
+            </g>
+            <g fill="#eef4fc" stroke="#2a2d36" stroke-width="1.3">
+              <circle cx="210" cy="26" r="17"/><circle cx="120" cy="86" r="17"/><circle cx="300" cy="86" r="17"/>
+            </g>
+            <g fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.3">
+              <circle cx="70" cy="140" r="17"/><circle cx="170" cy="140" r="17"/>
+              <circle cx="250" cy="140" r="17"/><circle cx="350" cy="140" r="17"/>
+            </g>
+            <g fill="#1a1c22">
+              <text x="210" y="31">50</text><text x="120" y="91">30</text><text x="300" y="91">70</text>
+              <text x="70" y="145">20</text><text x="170" y="145">40</text>
+              <text x="250" y="145">60</text><text x="350" y="145">80</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          Seven nodes, height 2 (measured in edges). The green leaves each have
+          two empty subtrees, which are the base cases of every recursion below.
+        </figcaption>
+      </figure>
+      <p>
+        The trace below is <code>size(root)</code> in full: every call entered and
+        every value returned, in execution order. Calls on empty subtrees are
+        written <code>size(nil)</code> and return 0 immediately. There are 7
+        node calls, 8 empty-subtree calls, and 15 calls in total, which is the
+        general rule for a binary tree of \(n\) nodes: \(n\) internal calls and
+        \(n+1\) null calls (&sect;5 proves the leaf-count identity behind it).
+      </p>
+      <table class="trace">
+        <tr><th>step</th><th>event</th><th>call</th><th>depth</th><th>value</th><th>reading</th></tr>
+        <tr><td>1</td><td>call</td><td class="lab"><code>size(50)</code></td><td>1</td><td class="inf">&middot;</td><td class="lab">descend left</td></tr>
+        <tr><td>2</td><td>call</td><td class="lab"><code>size(30)</code></td><td>2</td><td class="inf">&middot;</td><td class="lab">descend left</td></tr>
+        <tr><td>3</td><td>call</td><td class="lab"><code>size(20)</code></td><td>3</td><td class="inf">&middot;</td><td class="lab">descend left</td></tr>
+        <tr><td>4</td><td>call/return</td><td class="lab"><code>size(nil)</code></td><td>4</td><td class="set">0</td><td class="lab">20&rsquo;s left is empty</td></tr>
+        <tr><td>5</td><td>call/return</td><td class="lab"><code>size(nil)</code></td><td>4</td><td class="set">0</td><td class="lab">20&rsquo;s right is empty</td></tr>
+        <tr><td>6</td><td>return</td><td class="lab"><code>size(20)</code></td><td>3</td><td class="upd">1</td><td class="lab">\(1+0+0\)</td></tr>
+        <tr><td>7</td><td>call</td><td class="lab"><code>size(40)</code></td><td>3</td><td class="inf">&middot;</td><td class="lab">30&rsquo;s right subtree</td></tr>
+        <tr><td>8&ndash;9</td><td>call/return</td><td class="lab"><code>size(nil)</code> &times; 2</td><td>4</td><td class="set">0, 0</td><td class="lab">40 is a leaf</td></tr>
+        <tr><td>10</td><td>return</td><td class="lab"><code>size(40)</code></td><td>3</td><td class="upd">1</td><td class="lab">\(1+0+0\)</td></tr>
+        <tr><td>11</td><td>return</td><td class="lab"><code>size(30)</code></td><td>2</td><td class="upd">3</td><td class="lab">\(1+1+1\)</td></tr>
+        <tr><td>12</td><td>call</td><td class="lab"><code>size(70)</code></td><td>2</td><td class="inf">&middot;</td><td class="lab">50&rsquo;s right subtree</td></tr>
+        <tr><td>13</td><td>call</td><td class="lab"><code>size(60)</code></td><td>3</td><td class="inf">&middot;</td><td class="lab">descend left</td></tr>
+        <tr><td>14&ndash;15</td><td>call/return</td><td class="lab"><code>size(nil)</code> &times; 2</td><td>4</td><td class="set">0, 0</td><td class="lab">60 is a leaf</td></tr>
+        <tr><td>16</td><td>return</td><td class="lab"><code>size(60)</code></td><td>3</td><td class="upd">1</td><td class="lab">\(1+0+0\)</td></tr>
+        <tr><td>17</td><td>call</td><td class="lab"><code>size(80)</code></td><td>3</td><td class="inf">&middot;</td><td class="lab">70&rsquo;s right subtree</td></tr>
+        <tr><td>18&ndash;19</td><td>call/return</td><td class="lab"><code>size(nil)</code> &times; 2</td><td>4</td><td class="set">0, 0</td><td class="lab">80 is a leaf</td></tr>
+        <tr><td>20</td><td>return</td><td class="lab"><code>size(80)</code></td><td>3</td><td class="upd">1</td><td class="lab">\(1+0+0\)</td></tr>
+        <tr><td>21</td><td>return</td><td class="lab"><code>size(70)</code></td><td>2</td><td class="upd">3</td><td class="lab">\(1+1+1\)</td></tr>
+        <tr><td>22</td><td>return</td><td class="lab"><code>size(50)</code></td><td>1</td><td class="upd">7</td><td class="lab">\(1+3+3\)</td></tr>
+      </table>
+      <p>
+        Every case of the definition appears: the empty tree (steps 4, 5, 8, 9,
+        14, 15, 18, 19), a node with two empty subtrees (steps 6, 10, 16, 20), and
+        an internal node combining two non-trivial results (steps 11, 21, 22).
+        The same shape computes anything else about the tree: height is
+        \(1 + \max\) of the subtree heights with \(-1\) for the empty tree (which
+        returns 2 here, measured in edges), and <code>inorder</code> returns
+        20, 30, 40, 50, 60, 70, 80: sorted, because an in-order walk of a binary
+        search tree visits keys in increasing order.
+        The maximum depth reached is 4, which is the tree height 2 plus the root
+        level plus the null level, so the stack cost is \(\Theta(h)\) and not
+        \(\Theta(n)\). Balanced trees keep \(h = \Theta(\log n)\); the
+        <a href="../trees/ds-trees-bst.html"><em>Binary Search Trees</em></a>
+        handout builds these operations out in full, and every one of them is a
+        structural recursion of exactly this shape.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="induction">4. Mathematical induction</h2>
+      <p>
+        Induction proves a statement about every natural number by proving two
+        smaller statements, in the same shape as a base case and a recursive
+        case.
+      </p>
+      <div class="thm">
+        <span class="tag">Principle (mathematical induction)</span>
+        Let \(P(n)\) be a statement about the natural number \(n\), and let
+        \(n_0\) be an integer. If
+        <br /><em>(base)</em> \(P(n_0)\) holds, and
+        <br /><em>(step)</em> for every \(n \gt n_0\), \(P(n-1)\) implies \(P(n)\),
+        <br />then \(P(n)\) holds for every \(n \ge n_0\).
+      </div>
+      <div class="proof">
+        <strong>Why it is sound.</strong> Suppose the two hypotheses hold but
+        \(P(m)\) fails for some \(m \ge n_0\). Then the set of counterexamples
+        \(S = \{m \ge n_0 : P(m) \text{ is false}\}\) is a non-empty set of
+        integers bounded below by \(n_0\), so by the well-ordering principle it
+        has a least element \(k\). Since \(P(n_0)\) holds, \(k \gt n_0\), so
+        \(k - 1 \ge n_0\), and by minimality of \(k\) the statement \(P(k-1)\)
+        holds. The step then gives \(P(k)\), contradicting \(k \in S\). Hence
+        \(S\) is empty. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The assumption \(P(n-1)\) used inside the step is the <strong>inductive
+        hypothesis</strong>. Naming it explicitly, and saying exactly where it is
+        used, is what distinguishes a proof from a plausible story.
+      </p>
+
+      <h3>A summation identity</h3>
+      <div class="thm">
+        <span class="tag">Theorem 1</span>
+        For every integer \(n \ge 0\),
+        \(\displaystyle\sum_{k=1}^{n} k = \frac{n(n+1)}{2}\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> By induction on \(n\), with \(P(n)\) the equation
+        \(\sum_{k=1}^{n} k = n(n+1)/2\).
+        <br /><em>Base (\(n = 0\)).</em> The empty sum is \(0\), and
+        \(0 \cdot 1 / 2 = 0\). So \(P(0)\) holds.
+        <br /><em>Step.</em> Let \(n \ge 1\) and assume \(P(n-1)\), that is
+        \(\sum_{k=1}^{n-1} k = (n-1)n/2\). Split the last term off the sum and
+        apply that hypothesis:
+        \[
+          \sum_{k=1}^{n} k \;=\; \Bigl(\sum_{k=1}^{n-1} k\Bigr) + n
+          \;\overset{\text{IH}}{=}\; \frac{(n-1)n}{2} + n
+          \;=\; \frac{(n-1)n + 2n}{2}
+          \;=\; \frac{n(n-1+2)}{2}
+          \;=\; \frac{n(n+1)}{2},
+        \]
+        which is \(P(n)\). By induction \(P(n)\) holds for all \(n \ge 0\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The step used the hypothesis at exactly one place, marked IH. Every honest
+        inductive proof can point at that place. This identity is not an
+        ornament: it is the closed form for the \(1 + 2 + \cdots + n\) comparison
+        count of the quadratic sorts and of the \(\Theta(n^2)\) loop patterns
+        counted in
+        <a href="foundation-time-analysis.html"><em>Analysis of Algorithms:
+        Time</em></a>.
+      </p>
+
+      <h3>Correctness of a recursive procedure</h3>
+      <p>
+        The same machinery proves code correct. The claim to prove is a
+        <em>specification</em>: for every input in the domain, the call returns the
+        stated value (and terminates).
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem 2 (correctness of <code>sum</code>)</span>
+        For every integer \(n \ge 0\), the call <code>sum(n)</code> from &sect;1
+        terminates and returns \(n(n+1)/2\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> By induction on \(n\).
+        <br /><em>Base (\(n = 0\)).</em> The test <code>n == 0</code> succeeds,
+        so the call returns \(0\) without recursing. It terminates, and
+        \(0 = 0 \cdot 1/2\), as claimed.
+        <br /><em>Step.</em> Let \(n \ge 1\) and assume the claim for \(n-1\):
+        <code>sum(n-1)</code> terminates and returns \((n-1)n/2\). Executing
+        <code>sum(n)</code>, the test <code>n == 0</code> fails, so the code
+        evaluates <code>n + sum(n - 1)</code>. Its argument \(n-1\) is
+        \(\ge 0\), so the hypothesis applies: the inner call terminates with
+        value \((n-1)n/2\), hence <code>sum(n)</code> terminates and returns
+        \[
+          n + \frac{(n-1)n}{2} \;=\; \frac{2n + n^2 - n}{2} \;=\;
+          \frac{n^2+n}{2} \;=\; \frac{n(n+1)}{2}.
+        \]
+        By induction the claim holds for every \(n \ge 0\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Notice the exact correspondence: the proof&rsquo;s base case argues about
+        the code&rsquo;s base case, and the proof&rsquo;s step argues about the
+        code&rsquo;s recursive case, using the hypothesis precisely where the code
+        makes the recursive call. Termination came along for free because the
+        argument \(n\) is a non-negative integer that strictly decreases: that is
+        the progress measure of &sect;1 doing its job, and it is the part a proof
+        must never skip.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="strong">5. Strong induction and structural induction</h2>
+      <p>
+        Ordinary induction hands the step exactly one assumption, \(P(n-1)\). That
+        is enough when the code recurses on \(n-1\). It is not enough when the
+        code recurses on \(\lfloor n/2 \rfloor\), or on two subtrees of unknown
+        sizes: the hypothesis available is about the wrong instance. Strong
+        induction fixes this by granting the step <em>all</em> the smaller cases.
+      </p>
+      <div class="thm">
+        <span class="tag">Principle (strong induction)</span>
+        Let \(P(n)\) be a statement about the natural number \(n\). If for every
+        \(n \ge n_0\),
+        \[
+          \bigl(P(m) \text{ holds for all } n_0 \le m \lt n\bigr)
+          \;\Longrightarrow\; P(n),
+        \]
+        then \(P(n)\) holds for every \(n \ge n_0\).
+      </div>
+      <div class="proof">
+        <strong>Why it is sound.</strong> The same well-ordering argument. If the
+        set \(S\) of counterexamples \(\ge n_0\) were non-empty it would have a
+        least element \(k\); by minimality every \(m\) with \(n_0 \le m \lt k\)
+        satisfies \(P(m)\), so the hypothesis yields \(P(k)\), a contradiction.
+        (No separate base case is stated because at \(n = n_0\) the assumption is
+        vacuous, so the implication <em>is</em> the base case. In practice one
+        still writes the base case out, because that is where the vacuous
+        assumption forces an outright argument.)
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Strong induction is what divide-and-conquer proofs need. A procedure that
+        splits its input in half appeals to a claim about size
+        \(\lfloor n/2 \rfloor\), which ordinary induction never offers when
+        \(n \gt 2\). A procedure that recurses on two subtrees appeals to claims
+        about two sizes that are only known to be smaller than \(n\), not to be
+        \(n-1\). Both are handled at once by assuming everything below \(n\).
+      </p>
+
+      <h3>A worked proof: fast exponentiation</h3>
+      <p>
+        Fast exponentiation (also called exponentiation by squaring) computes
+        \(x^n\) with about \(\log_2 n\) multiplications instead of \(n\), by
+        squaring the result for the halved exponent:
+      </p>
+      <pre>  long power(long x, int n) {
+      if (n == 0) return 1;                 <span class="cm">// base case</span>
+      long h = power(x, n / 2);             <span class="cm">// integer division: floor(n/2)</span>
+      if (n % 2 == 0) return h * h;         <span class="cm">// even: x^n = (x^(n/2))^2</span>
+      return h * h * x;                     <span class="cm">// odd: x^n = (x^floor(n/2))^2 * x</span>
+  }</pre>
+      <div class="thm">
+        <span class="tag">Theorem 3 (correctness of <code>power</code>)</span>
+        For every integer \(n \ge 0\) and every \(x\), <code>power(x, n)</code>
+        terminates and returns \(x^n\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> By strong induction on \(n\). Assume the claim for
+        every \(m\) with \(0 \le m \lt n\).
+        <br /><em>Base (\(n = 0\)).</em> The first test succeeds and the call
+        returns \(1 = x^0\), with no recursion.
+        <br /><em>Step (\(n \ge 1\)).</em> Let \(h = \lfloor n/2 \rfloor\). Then
+        \(0 \le h \lt n\) (for \(n \ge 1\), \(\lfloor n/2 \rfloor \le n/2 \lt n\)),
+        so the inductive hypothesis applies to \(h\): the recursive call
+        terminates and returns \(x^{h}\). Two cases remain, exactly the two the
+        code distinguishes.
+        <br /><em>Case \(n\) even.</em> Then \(n = 2h\), and the code returns
+        \(x^{h} \cdot x^{h} = x^{2h} = x^{n}\).
+        <br /><em>Case \(n\) odd.</em> Then \(n = 2h+1\), and the code returns
+        \(x^{h} \cdot x^{h} \cdot x = x^{2h+1} = x^{n}\).
+        In both cases the returned value is \(x^n\) and the call terminates,
+        because the single recursive call terminates by hypothesis. By strong
+        induction the claim holds for all \(n \ge 0\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Ordinary induction cannot run this argument: at \(n = 13\) it would supply
+        a fact about \(12\), while the code needs a fact about \(6\). The trace of
+        <code>power(3, 13)</code> shows the halving chain and both cases in
+        action:
+      </p>
+      <table class="trace">
+        <tr><th>step</th><th>call</th><th>\(n\)</th><th>parity</th><th>returns</th><th>check</th></tr>
+        <tr><td>1</td><td class="lab">enter</td><td>13</td><td>odd</td><td class="inf">&middot;</td><td class="lab">needs \(3^{6}\)</td></tr>
+        <tr><td>2</td><td class="lab">enter</td><td>6</td><td>even</td><td class="inf">&middot;</td><td class="lab">needs \(3^{3}\)</td></tr>
+        <tr><td>3</td><td class="lab">enter</td><td>3</td><td>odd</td><td class="inf">&middot;</td><td class="lab">needs \(3^{1}\)</td></tr>
+        <tr><td>4</td><td class="lab">enter</td><td>1</td><td>odd</td><td class="inf">&middot;</td><td class="lab">needs \(3^{0}\)</td></tr>
+        <tr><td>5</td><td class="lab">enter/return</td><td>0</td><td class="lab">base</td><td class="set">1</td><td class="lab">\(3^0\)</td></tr>
+        <tr><td>6</td><td class="lab">return</td><td>1</td><td>odd</td><td class="upd">\(1 \cdot 1 \cdot 3 = 3\)</td><td class="lab">\(3^1\)</td></tr>
+        <tr><td>7</td><td class="lab">return</td><td>3</td><td>odd</td><td class="upd">\(3 \cdot 3 \cdot 3 = 27\)</td><td class="lab">\(3^3\)</td></tr>
+        <tr><td>8</td><td class="lab">return</td><td>6</td><td>even</td><td class="upd">\(27 \cdot 27 = 729\)</td><td class="lab">\(3^6\)</td></tr>
+        <tr><td>9</td><td class="lab">return</td><td>13</td><td>odd</td><td class="upd">\(729^2 \cdot 3 = 1{,}594{,}323\)</td><td class="lab">\(3^{13}\)</td></tr>
+      </table>
+      <p>
+        Five frames, seven multiplications, against the twelve multiplications a
+        naive loop would perform. The frame count is
+        \(\lfloor \log_2 n \rfloor + 2\) (here \(3 + 2 = 5\)), because each call
+        halves \(n\); &sect;6 derives that count from the recurrence.
+      </p>
+
+      <h3>Structural induction on trees</h3>
+      <p>
+        For a recursively defined structure the same principle takes a form with
+        no arithmetic in it: prove the claim for the empty tree, and prove it for
+        a node assuming it for both subtrees. This is strong induction with the
+        number of nodes as the measure, since both subtrees are strictly smaller
+        than the whole.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem 4 (null links)</span>
+        A binary tree with \(n \ge 0\) nodes has exactly \(n+1\) empty subtrees
+        (null links).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> By structural induction on the tree \(T\), with
+        \(L(T)\) the number of empty subtrees and \(n(T)\) the number of nodes.
+        <br /><em>Base.</em> \(T\) empty: \(n(T) = 0\) and \(T\) is itself one
+        empty subtree, so \(L(T) = 1 = n(T) + 1\).
+        <br /><em>Step.</em> \(T\) is a node with subtrees \(A\) and \(B\). Every
+        empty subtree of \(T\) lies in \(A\) or in \(B\) and in exactly one of
+        them, so \(L(T) = L(A) + L(B)\). Both \(A\) and \(B\) have fewer nodes
+        than \(T\), so the hypothesis gives \(L(A) = n(A)+1\) and
+        \(L(B) = n(B)+1\). Hence
+        \[
+          L(T) = \bigl(n(A)+1\bigr) + \bigl(n(B)+1\bigr)
+               = \bigl(n(A) + n(B) + 1\bigr) + 1 = n(T) + 1 ,
+        \]
+        using \(n(T) = n(A)+n(B)+1\). By structural induction the claim holds for
+        every binary tree. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The \(n = 7\) tree of &sect;3 therefore has 8 empty subtrees, which is
+        exactly the 8 <code>size(nil)</code> calls counted in that trace, and 15
+        calls in total. The identity is why a null-checking recursion over a tree
+        of \(n\) nodes makes \(2n+1\) calls, and it is the counting fact behind
+        the space accounting of red-black and 2-3 trees.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="recur">6. Solving recurrences by unrolling</h2>
+      <p>
+        The cost of a recursive procedure is itself described recursively: the
+        work at this call, plus the cost of the calls it makes. Such an equation
+        is a <strong>recurrence</strong>, and solving it means finding a closed
+        form.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (recurrence, unrolling)</span>
+        A <strong>recurrence</strong> defines \(T(n)\), the cost on input size
+        \(n\), in terms of \(T\) at smaller sizes together with a
+        non-recursive term for the work done at the current call, plus a base
+        value for the smallest size. <strong>Unrolling</strong> (also called the
+        substitution or iteration method) solves it by repeatedly replacing
+        \(T\) on the right-hand side with its own definition, spotting the pattern
+        after \(i\) substitutions, choosing the \(i\) that reaches the base case,
+        and summing.
+      </div>
+
+      <h3>Linear recursion: \(T(n) = T(n-1) + c\)</h3>
+      <p>
+        This is <code>fact</code> and <code>sum</code>: constant work per call,
+        one call per level, with \(T(0) = 0\). Unroll it:
+        \[
+          T(n) = T(n-1) + c = T(n-2) + 2c = T(n-3) + 3c
+               = \cdots = T(n-i) + i\,c .
+        \]
+        The base case is reached when \(n - i = 0\), that is \(i = n\), giving
+        \(T(n) = T(0) + nc = cn = \Theta(n)\). Reading the same equation as a
+        <em>depth</em> rather than a count of operations gives the \(n\) frames of
+        the &sect;2 trace.
+      </p>
+
+      <h3>Halving: \(T(n) = T(n/2) + c\)</h3>
+      <p>
+        This is <code>power</code>, and binary search: one call on half the input,
+        constant work per call, \(T(1) = 0\). Unroll:
+        \[
+          T(n) = T(n/2) + c = T(n/4) + 2c = \cdots = T(n/2^i) + i\,c .
+        \]
+        The base is reached when \(n/2^i = 1\), that is \(i = \log_2 n\), so
+        \(T(n) = c\log_2 n = \Theta(\log n)\). For \(n = 1024\) the unrolled
+        count is exactly 10 levels, and for <code>power(3, 13)</code> the chain
+        \(13 \to 6 \to 3 \to 1 \to 0\) is
+        \(\lfloor \log_2 13 \rfloor + 2 = 5\) calls.
+      </p>
+
+      <h3>Divide and conquer: \(T(n) = 2T(n/2) + n\)</h3>
+      <p>
+        This is mergesort: two half-size calls plus linear merging work, with
+        \(T(1) = 0\). Unrolling now produces a growing number of terms, so it is
+        clearest to sum level by level. At level \(i\) there are \(2^i\)
+        subproblems of size \(n/2^i\), each doing \(n/2^i\) units of work, for a
+        level total of exactly \(n\):
+        \[
+          T(n) = \underbrace{n}_{\text{level }0} + \underbrace{2 \cdot \tfrac n2}_{\text{level }1}
+               + \underbrace{4 \cdot \tfrac n4}_{\text{level }2} + \cdots
+               = \sum_{i=0}^{\log_2 n - 1} n \;=\; n \log_2 n .
+        \]
+        The recursion stops at level \(\log_2 n\), where the subproblems have size
+        1 and cost nothing, so there are \(\log_2 n\) levels each contributing
+        \(n\): \(T(n) = \Theta(n \log n)\). At \(n = 8\) this is
+        \(8 + 2\cdot 4 + 4 \cdot 2 = 24 = 8 \log_2 8\), and at \(n = 1024\) it is
+        \(10{,}240\).
+      </p>
+
+      <h3>Branching without shrinking enough: \(T(n) = 2T(n-1) + 1\)</h3>
+      <p>
+        Two calls, each only one smaller. This is the Towers of Hanoi move count,
+        with \(T(0) = 0\). Unroll:
+        \[
+          T(n) = 2T(n-1) + 1 = 4T(n-2) + 2 + 1 = 8T(n-3) + 4 + 2 + 1
+               = 2^i T(n-i) + \sum_{j=0}^{i-1} 2^j .
+        \]
+        At \(i = n\) the first term is \(2^n T(0) = 0\) and the sum is the
+        geometric series \(2^n - 1\), so \(T(n) = 2^n - 1 = \Theta(2^n)\). The
+        move counts for \(n = 1,\dots,10\) are
+        1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, which are \(2^n - 1\) exactly.
+      </p>
+      <table>
+        <tr><th>recurrence</th><th>solution</th><th>appears in</th></tr>
+        <tr><td>\(T(n) = T(n-1) + c\)</td><td>\(\Theta(n)\)</td><td>factorial, list traversal, linear search</td></tr>
+        <tr><td>\(T(n) = T(n/2) + c\)</td><td>\(\Theta(\log n)\)</td><td>binary search, fast exponentiation, BST search when balanced</td></tr>
+        <tr><td>\(T(n) = 2T(n/2) + c\)</td><td>\(\Theta(n)\)</td><td>tree traversal, tree size and height</td></tr>
+        <tr><td>\(T(n) = 2T(n/2) + n\)</td><td>\(\Theta(n \log n)\)</td><td>mergesort, quicksort with balanced splits</td></tr>
+        <tr><td>\(T(n) = T(n-1) + n\)</td><td>\(\Theta(n^2)\)</td><td>quicksort worst case, selection sort</td></tr>
+        <tr><td>\(T(n) = 2T(n-1) + c\)</td><td>\(\Theta(2^n)\)</td><td>Towers of Hanoi, subset enumeration</td></tr>
+      </table>
+      <p>
+        The third row deserves a note, because it is the one that surprises: two
+        half-size calls with <em>constant</em> combining work is linear, not
+        logarithmic. Summing by levels, level \(i\) has \(2^i\) calls each costing
+        \(c\), so the total is \(c(1 + 2 + 4 + \cdots + n) = c(2n-1) =
+        \Theta(n)\): the geometric series is dominated by its <em>last</em> term,
+        the leaves. That is why <code>size</code> on a tree of \(n\) nodes costs
+        \(\Theta(n)\) even though the tree is only \(\Theta(\log n)\) deep, as the
+        15-call count of &sect;3 confirms.
+      </p>
+      <p>
+        Unrolling handles every recurrence in the table, but it becomes tedious
+        once the split is uneven or the combining work is some \(n^k\). The
+        <strong>master theorem</strong> packages the level-summing argument into a
+        formula covering all recurrences of the form \(T(n) = aT(n/b) + f(n)\);
+        it is stated and proved in
+        <a href="../sorting/paradigm-divide-and-conquer.html"><em>The
+        Divide-and-Conquer Method</em></a>, alongside the recursion-tree picture
+        that the level sums above are drawing informally.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="iterate">7. Recursion to iteration: explicit stacks and tail calls</h2>
+      <p>
+        Any recursion can be rewritten as a loop, because the only thing the
+        runtime adds is a stack. Converting by hand is worth doing when the
+        recursion is too deep for the call stack, or when the language charges too
+        much per call. There are two conversions, and which one applies depends on
+        whether the procedure does any work after its recursive call returns.
+      </p>
+
+      <h3>Tail recursion</h3>
+      <div class="def">
+        <span class="tag">Definition (tail call, tail recursion)</span>
+        A call is a <strong>tail call</strong> if its result is returned
+        immediately, with no further computation in the caller. A procedure is
+        <strong>tail recursive</strong> if every recursive call it makes is a
+        tail call. Since nothing in the frame is needed after such a call, the
+        frame can be reused rather than stacked, turning the recursion into a
+        loop that runs in \(\Theta(1)\) stack space (a transformation called
+        tail-call optimisation).
+      </div>
+      <p>
+        <code>sum(n)</code> as written in &sect;1 is <em>not</em> tail recursive:
+        it computes <code>n + sum(n - 1)</code>, so the addition waits for the
+        call, and the frame must survive. Adding an
+        <strong>accumulator</strong> parameter moves that pending work to before
+        the call and makes it a tail call:
+      </p>
+      <pre>  long sum(int n)              { return n == 0 ? 0 : n + sum(n - 1); }        <span class="cm">// NOT tail: adds after</span>
+  long sumTail(int n, long a)  { return n == 0 ? a : sumTail(n - 1, a + n); } <span class="cm">// tail: nothing after</span>
+
+  long sumLoop(int n) {                                <span class="cm">// the same procedure as a loop</span>
+      long a = 0;
+      while (n != 0) { a = a + n; n = n - 1; }         <span class="cm">// parameters become variables</span>
+      return a;
+  }</pre>
+      <p>
+        The rewrite is mechanical: the parameters of the tail-recursive version
+        become the loop&rsquo;s variables, the base-case test becomes the loop
+        exit, and the arguments of the tail call become the assignments at the
+        bottom of the body. All three return the same value on every input; the
+        third uses one frame instead of \(n\).
+      </p>
+      <div class="aside">
+        <span class="tag">Do not rely on the compiler for this</span>
+        C++ compilers usually perform tail-call optimisation at <code>-O2</code>,
+        but the standard does not require it, so a tail-recursive C++ function may
+        still consume \(\Theta(n)\) stack in a debug build. Java does not perform
+        it at all, and CPython does not either: CPython&rsquo;s default recursion
+        limit is 1000 frames, so a plain recursive factorial raises
+        <code>RecursionError</code> just short of \(n = 1000\). When depth is
+        proportional to input size and the input can be large, convert to a loop
+        yourself.
+      </div>
+
+      <h3>Non-tail recursion: carry the stack yourself</h3>
+      <p>
+        When work remains after the recursive call, as in tree traversal, the
+        conversion needs an explicit stack that stores what the frames were
+        storing. In-order traversal is the standard case: push nodes while walking
+        left, then pop, visit, and turn right.
+      </p>
+      <div class="code-tabs" data-snippet="recursion/inorder-iterative">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// In-order traversal with an EXPLICIT stack: same output, no recursion.
+// The stack holds the nodes whose key has not been visited yet.
+void inorderIterative(Node* root, std::vector&lt;int&gt;&amp; out) {
+    std::stack&lt;Node*&gt; st;
+    Node* cur = root;
+    while (cur != nullptr || !st.empty()) {
+        if (cur != nullptr) {
+            st.push(cur);            // remember this node, its key is still owed
+            cur = cur-&gt;left;         // ... after the whole left subtree
+        } else {
+            cur = st.top(); st.pop();
+            out.push_back(cur-&gt;key); // visit
+            cur = cur-&gt;right;        // then the right subtree
+        }
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// In-order traversal with an EXPLICIT stack: same output, no recursion.
+static void inorderIterative(Node root, List&lt;Integer&gt; out) {
+    Deque&lt;Node&gt; st = new ArrayDeque&lt;&gt;();
+    Node cur = root;
+    while (cur != null || !st.isEmpty()) {
+        if (cur != null) {
+            st.push(cur);            // remember this node, its key is still owed
+            cur = cur.left;          // ... after the whole left subtree
+        } else {
+            cur = st.pop();
+            out.add(cur.key);        // visit
+            cur = cur.right;         // then the right subtree
+        }
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># In-order traversal with an EXPLICIT stack: same output, no recursion.
+def inorder_iterative(root):
+    out, st, cur = [], [], root
+    while cur is not None or st:
+        if cur is not None:
+            st.append(cur)           # remember this node, its key is still owed
+            cur = cur.left           # ... after the whole left subtree
+        else:
+            cur = st.pop()
+            out.append(cur.key)      # visit
+            cur = cur.right          # then the right subtree
+    return out</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// In-order traversal with an EXPLICIT stack (indices into an arena, because
+// Rust&#x27;s ownership rules make raw parent pointers awkward).
+fn inorder_iterative(arena: &amp;[NodeA], root: Option&lt;usize&gt;) -&gt; Vec&lt;i32&gt; {
+    let (mut out, mut st, mut cur) = (Vec::new(), Vec::new(), root);
+    while cur.is_some() || !st.is_empty() {
+        if let Some(i) = cur {
+            st.push(i);              // remember this node, its key is still owed
+            cur = arena[i].left;     // ... after the whole left subtree
+        } else {
+            let i = st.pop().unwrap();
+            out.push(arena[i].key);  // visit
+            cur = arena[i].right;    // then the right subtree
+        }
+    }
+    out
+}</pre>
+<p class="ct-src">source: <code>code/recursion/inorder-iterative.cpp &middot; code/recursion/inorder-iterative.java &middot; code/recursion/inorder-iterative.py &middot; code/recursion/inorder-iterative.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Every step on the &sect;3 tree, with the explicit stack shown from bottom
+        to top. Both branches of the <code>if</code> appear: the descend branch at
+        steps 1, 2, 3, 6, 9, 10, 13, and the pop-and-visit branch at the rest.
+      </p>
+      <table class="trace">
+        <tr><th>step</th><th>cur</th><th>action</th><th>stack (bottom &rarr; top)</th><th>output</th></tr>
+        <tr><td>1</td><td>50</td><td class="lab">push 50, go left</td><td class="lab">50</td><td class="lab">(empty)</td></tr>
+        <tr><td>2</td><td>30</td><td class="lab">push 30, go left</td><td class="lab">50, 30</td><td class="lab">(empty)</td></tr>
+        <tr><td>3</td><td>20</td><td class="lab">push 20, go left</td><td class="lab">50, 30, 20</td><td class="lab">(empty)</td></tr>
+        <tr><td>4</td><td class="inf">nil</td><td class="lab">pop 20, visit, go right</td><td class="lab">50, 30</td><td class="set">20</td></tr>
+        <tr><td>5</td><td class="inf">nil</td><td class="lab">pop 30, visit, go right</td><td class="lab">50</td><td class="set">20, 30</td></tr>
+        <tr><td>6</td><td>40</td><td class="lab">push 40, go left</td><td class="lab">50, 40</td><td class="lab">20, 30</td></tr>
+        <tr><td>7</td><td class="inf">nil</td><td class="lab">pop 40, visit, go right</td><td class="lab">50</td><td class="set">20, 30, 40</td></tr>
+        <tr><td>8</td><td class="inf">nil</td><td class="lab">pop 50, visit, go right</td><td class="lab">(empty)</td><td class="set">20, 30, 40, 50</td></tr>
+        <tr><td>9</td><td>70</td><td class="lab">push 70, go left</td><td class="lab">70</td><td class="lab">20, 30, 40, 50</td></tr>
+        <tr><td>10</td><td>60</td><td class="lab">push 60, go left</td><td class="lab">70, 60</td><td class="lab">20, 30, 40, 50</td></tr>
+        <tr><td>11</td><td class="inf">nil</td><td class="lab">pop 60, visit, go right</td><td class="lab">70</td><td class="set">&hellip;, 60</td></tr>
+        <tr><td>12</td><td class="inf">nil</td><td class="lab">pop 70, visit, go right</td><td class="lab">(empty)</td><td class="set">&hellip;, 60, 70</td></tr>
+        <tr><td>13</td><td>80</td><td class="lab">push 80, go left</td><td class="lab">80</td><td class="lab">&hellip;, 60, 70</td></tr>
+        <tr><td>14</td><td class="inf">nil</td><td class="lab">pop 80, visit, go right</td><td class="lab">(empty)</td><td class="set">&hellip;, 70, 80</td></tr>
+      </table>
+      <p>
+        The loop halts at step 14 with <code>cur</code> null and the stack empty,
+        having produced 20, 30, 40, 50, 60, 70, 80: the same sequence the
+        recursive version produced, in 14 steps. The explicit stack peaks at 3
+        entries, which is the height 2 plus one, matching the recursive
+        version&rsquo;s peak depth. The conversion moves the memory from the call
+        stack to the heap; it does not reduce the amount, and the point of doing
+        it is that a heap-allocated stack can grow to millions of entries where
+        the call stack cannot.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="fail">8. Four ways recursion goes wrong</h2>
+
+      <h3>(a) Missing base case</h3>
+      <p>
+        With no case that returns without recursing, the descent never stops. The
+        frames accumulate until the stack region is exhausted and the program is
+        killed by a stack overflow (a segmentation fault in C++, a
+        <code>StackOverflowError</code> in Java, a <code>RecursionError</code> in
+        Python).
+      </p>
+      <pre>  long factBad(int n) {
+      return n * factBad(n - 1);      <span class="cm">// no base case: n goes 4, 3, 2, 1, 0, -1, -2, ...</span>
+  }</pre>
+      <p>
+        The subtler version has a base case that some inputs step over.
+        <code>if (n == 1) return 1;</code> is fine for positive \(n\) and
+        catastrophic for <code>factBad(0)</code>, which descends through
+        \(-1, -2, \dots\) and never tests true. Guard with \(\le\), not \(=\), so
+        the base case catches everything at or below it.
+      </p>
+
+      <h3>(b) The argument does not decrease</h3>
+      <p>
+        A base case is useless if the recursive call fails to move toward it. The
+        classic instance is an off-by-one in binary search, passing
+        <code>mid</code> instead of <code>mid - 1</code> or <code>mid + 1</code>:
+      </p>
+      <pre>  int searchBad(int a[], int x, int lo, int hi) {
+      if (lo &gt; hi) return -1;
+      int mid = (lo + hi) / 2;
+      if (a[mid] == x) return mid;
+      if (x &lt; a[mid]) return searchBad(a, x, lo, mid);      <span class="cm">// BUG: should be mid - 1</span>
+      return searchBad(a, x, mid, hi);                      <span class="cm">// BUG: should be mid + 1</span>
+  }</pre>
+      <p>
+        Searching for 4 in <code>{1, 3, 5, 7, 9}</code> starting from
+        \((lo,hi) = (0,4)\) produces the interval sequence
+        \((0,4)\), \((0,2)\), \((1,2)\), \((1,2)\), \((1,2)\), forever: at
+        \(lo = 1, hi = 2\) the midpoint is \(\lfloor 3/2 \rfloor = 1\), the key 4
+        exceeds \(a[1] = 3\), so \(lo\) is set to \(mid = 1\), which is where it
+        already was. The interval stops shrinking, <code>lo &gt; hi</code> is never
+        reached, and the program overflows the stack. With <code>mid - 1</code>
+        and <code>mid + 1</code> the interval loses at least the midpoint on every
+        call, so its width is a genuine progress measure and the same search
+        correctly returns \(-1\).
+      </p>
+      <div class="aside">
+        <span class="tag">The check that catches both (a) and (b)</span>
+        Name the progress measure out loud, and confirm three things about it:
+        it is a non-negative integer, it is strictly smaller in every recursive
+        call, and the base case triggers whenever it can no longer shrink.
+        <code>factBad</code> fails the third check, <code>searchBad</code> fails
+        the second.
+      </div>
+
+      <h3>(c) Recomputation blowup</h3>
+      <p>
+        This failure produces correct answers, slowly enough to be useless. The
+        textbook case is the Fibonacci recurrence transcribed directly into code:
+      </p>
+      <pre>  long fib(int n) {
+      if (n &lt; 2) return n;                 <span class="cm">// base cases: fib(0)=0, fib(1)=1</span>
+      return fib(n - 1) + fib(n - 2);      <span class="cm">// two calls, each barely smaller</span>
+  }</pre>
+      <p>
+        The subproblems overlap: <code>fib(5)</code> calls <code>fib(3)</code>
+        twice, <code>fib(2)</code> three times, and <code>fib(1)</code> five
+        times, recomputing each from scratch. Let \(C(n)\) be the number of calls;
+        then \(C(0) = C(1) = 1\) and \(C(n) = 1 + C(n-1) + C(n-2)\), whose
+        solution is \(C(n) = 2F(n+1) - 1\) where \(F\) is Fibonacci itself. The
+        call count therefore grows like the Fibonacci numbers, that is like
+        \(\varphi^n\) with \(\varphi \approx 1.618\), which is exponential:
+      </p>
+      <table>
+        <tr><th>\(n\)</th><th>calls, plain recursion</th><th>calls, memoised</th></tr>
+        <tr><td>5</td><td>15</td><td>9</td></tr>
+        <tr><td>10</td><td>177</td><td>19</td></tr>
+        <tr><td>20</td><td>21,891</td><td>39</td></tr>
+        <tr><td>30</td><td>2,692,537</td><td>59</td></tr>
+        <tr><td>40</td><td>331,160,281</td><td>79</td></tr>
+      </table>
+      <p>
+        Adding a table of already-computed values (memoisation) collapses the
+        count to \(2n - 1\) calls, because each of the \(n\) distinct subproblems
+        is solved once and every later request is a table hit. The fix is not
+        specific to Fibonacci: whenever a recursion revisits the same subproblem
+        along different branches, storing subresults converts exponential time to
+        the number of distinct subproblems. That observation is the whole content
+        of <a href="../dp/paradigm-dp-method.html"><em>The Dynamic Programming
+        Method</em></a>, which develops memoisation and its bottom-up counterpart
+        systematically. Note the contrast with mergesort&rsquo;s
+        \(T(n) = 2T(n/2) + n\): two calls are not the problem, calls on
+        <em>overlapping</em> subproblems are.
+      </p>
+
+      <h3>(d) Depth that exceeds the stack</h3>
+      <p>
+        The last failure is a correct, terminating recursion whose depth is simply
+        too large. A traversal of a balanced tree of a million nodes is about 20
+        frames deep and safe; the same traversal of a tree that has degenerated
+        into a chain of a million nodes is a million frames deep and crashes. So
+        does a linear recursion over a long list. The remedies are the ones this
+        handout has already covered: bound the depth by keeping the structure
+        balanced (see
+        <a href="../trees/ds-avl-trees.html"><em>AVL Trees</em></a>), or move the
+        stack off the call stack by hand (&sect;7). The cost model for the frames
+        themselves is in
+        <a href="foundation-space-complexity.html"><em>Space Complexity</em></a>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">9. Where this sits</h2>
+      <p>
+        Recursion is the writing technique and induction is the proof technique
+        for most of the catalog. The tree operations of
+        <a href="../trees/ds-trees-bst.html"><em>Binary Search Trees</em></a> and
+        the balance arguments of
+        <a href="../trees/ds-avl-trees.html"><em>AVL Trees</em></a> are structural
+        recursion and structural induction throughout.
+        <a href="../sorting/paradigm-divide-and-conquer.html"><em>The
+        Divide-and-Conquer Method</em></a> generalises &sect;6 into the master
+        theorem and applies it to
+        <a href="../sorting/algo-mergesort.html"><em>Mergesort</em></a> and
+        <a href="../sorting/algo-quicksort.html"><em>Quicksort</em></a>.
+        <a href="../dp/paradigm-dp-method.html"><em>The Dynamic Programming
+        Method</em></a> is the systematic cure for &sect;8(c).
+        <a href="../graphs/algo-dfs.html"><em>Depth-First Search</em></a> is
+        structural recursion over a graph, where the extra difficulty is that the
+        structure has cycles, so a visited set replaces the automatic progress
+        measure that trees provide.
+      </p>
+      <p>
+        On the analysis side, the recurrences of &sect;6 are the cost equations
+        whose solutions are expressed in the notation of
+        <a href="foundation-asymptotic-notation.html"><em>Asymptotic
+        Notation</em></a> and measured in
+        <a href="foundation-time-analysis.html"><em>Analysis of Algorithms:
+        Time</em></a>; the frames of &sect;2 are the stack term of
+        <a href="foundation-space-complexity.html"><em>Space Complexity</em></a>.
+        Induction also underlies arguments that are not about recursive code at
+        all: the decision-tree bound of
+        <a href="../sorting/foundation-sorting-lower-bound.html"><em>The Sorting
+        Lower Bound</em></a> and the potential arguments of
+        <a href="foundation-amortized-analysis.html"><em>Amortized
+        Analysis</em></a> are both inductions in disguise.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">10. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Write out the full push/pop trace of <code>sum(3)</code> for the
+          <code>sum</code> of &sect;1, giving the value each frame returns, and
+          state the peak depth.
+          <details>
+            <summary>solution</summary>
+            Push <code>sum(3)</code> (depth 1), push <code>sum(2)</code>
+            (depth 2), push <code>sum(1)</code> (depth 3), push
+            <code>sum(0)</code> (depth 4, peak). Then pop
+            <code>sum(0)</code> returning 0; pop <code>sum(1)</code> returning
+            \(1 + 0 = 1\); pop <code>sum(2)</code> returning \(2 + 1 = 3\); pop
+            <code>sum(3)</code> returning \(3 + 3 = 6\). Peak depth is
+            \(n+1 = 4\) frames (one more than <code>fact</code>&rsquo;s \(n\),
+            because this base case is \(n = 0\) rather than \(n \le 1\)), and
+            \(6 = 3\cdot 4/2\) agrees with Theorem 2. Every addition happens
+            during the pops.
+          </details>
+        </li>
+        <li>
+          Prove by induction that \(\sum_{k=0}^{n} 2^k = 2^{n+1} - 1\) for all
+          \(n \ge 0\), and say where the identity is used in &sect;6.
+          <details>
+            <summary>solution</summary>
+            <em>Base (\(n=0\)).</em> The left side is \(2^0 = 1\); the right side
+            is \(2^1 - 1 = 1\).
+            <em>Step.</em> Let \(n \ge 1\) and assume
+            \(\sum_{k=0}^{n-1} 2^k = 2^{n} - 1\). Then
+            \(\sum_{k=0}^{n} 2^k = \bigl(\sum_{k=0}^{n-1} 2^k\bigr) + 2^n
+            \overset{\text{IH}}{=} (2^n - 1) + 2^n = 2\cdot 2^n - 1 = 2^{n+1}-1\).
+            By induction the identity holds for all \(n \ge 0\). It is the
+            geometric sum that closes the Hanoi unrolling
+            (\(\sum_{j=0}^{n-1}2^j = 2^n - 1\)) and the level sum that makes
+            \(T(n) = 2T(n/2) + c\) linear rather than logarithmic.
+          </details>
+        </li>
+        <li>
+          Explain why Theorem 3 (correctness of <code>power</code>) cannot be
+          proved by ordinary induction as stated, and identify the single line of
+          the proof that needs the strong hypothesis.
+          <details>
+            <summary>solution</summary>
+            Ordinary induction supplies only \(P(n-1)\) in the step. The code
+            recurses on \(\lfloor n/2 \rfloor\), which equals \(n-1\) only for
+            \(n \in \{1, 2\}\); for \(n = 13\) the hypothesis on hand would concern
+            12 while the proof needs 6. The line that needs strong induction is
+            &ldquo;\(0 \le h \lt n\), so the inductive hypothesis applies to
+            \(h\)&rdquo;: it invokes \(P\) at an arbitrary smaller value, which
+            only the strong form grants. (One can recover ordinary induction by
+            restating the claim as \(Q(n) =\) &ldquo;\(P(m)\) for all
+            \(m \le n\)&rdquo;, which is the standard way of showing the two
+            principles have equal strength; that reformulation is itself the
+            strong hypothesis in disguise.)
+          </details>
+        </li>
+        <li>
+          Unroll \(T(n) = T(n-1) + n\) with \(T(0) = 0\) to a closed form, and
+          name an algorithm with this cost.
+          <details>
+            <summary>solution</summary>
+            \(T(n) = T(n-1) + n = T(n-2) + (n-1) + n = \cdots =
+            T(n-i) + \sum_{j=n-i+1}^{n} j\). Taking \(i = n\) reaches
+            \(T(0) = 0\) and leaves \(T(n) = \sum_{j=1}^{n} j = n(n+1)/2\) by
+            Theorem 1, so \(T(n) = \Theta(n^2)\). This is quicksort&rsquo;s
+            worst case, where each partition peels off a single element and
+            leaves \(n-1\) behind, and it is also the comparison count of
+            selection sort.
+          </details>
+        </li>
+        <li>
+          The recursion \(T(n) = 2T(n/2) + c\) and the recursion
+          \(T(n) = 2T(n/2) + n\) differ only in the work done per call, yet their
+          solutions are \(\Theta(n)\) and \(\Theta(n\log n)\). Explain the
+          difference by summing levels, and say which level dominates in each.
+          <details>
+            <summary>solution</summary>
+            Both recursion trees have \(\log_2 n\) levels, with \(2^i\)
+            subproblems of size \(n/2^i\) at level \(i\). With combining work
+            \(c\), level \(i\) costs \(c\,2^i\), so the level costs form a
+            geometric series that doubles: the total \(c(2n-1)\) is dominated by
+            the <em>last</em> level (the \(n\) leaves), giving \(\Theta(n)\). With
+            combining work equal to the subproblem size, level \(i\) costs
+            \(2^i \cdot n/2^i = n\), the same at every level, so no level
+            dominates and the total is (number of levels) \(\times\, n = n\log_2
+            n\). Uniform level costs are the signature of the \(n\log n\) sorts;
+            geometrically growing level costs are the signature of leaf-dominated
+            linear traversals.
+          </details>
+        </li>
+        <li>
+          Convert this recursion to a loop, and state the stack space of each
+          version:
+          <code>int gcd(int a, int b) { return b == 0 ? a : gcd(b, a % b); }</code>.
+          <details>
+            <summary>solution</summary>
+            Every recursive call is a tail call (its value is returned directly),
+            so the conversion is the mechanical one of &sect;7: parameters become
+            variables, the base test becomes the loop exit, the call arguments
+            become the updates.
+            <code>int gcd(int a, int b) { while (b != 0) { int t = a % b; a = b; b = t; } return a; }</code>.
+            The recursive version uses one frame per call, and the number of calls
+            is \(O(\log(\min(a,b)))\) since the remainder at least halves every
+            two steps, so its stack is \(O(\log \min(a,b))\); the loop uses
+            \(\Theta(1)\). A compiler performing tail-call optimisation would
+            produce the loop from the recursive source, but the standard does not
+            require it.
+          </details>
+        </li>
+        <li>
+          For the &sect;3 tree, hand-execute the explicit-stack traversal but with
+          the two branches of the <code>if</code> swapped (visit on push instead
+          of on pop). What order comes out, and what has been computed?
+          <details>
+            <summary>solution</summary>
+            Appending the key at push time and still descending left gives
+            50, 30, 20, 40, 70, 60, 80: a <strong>pre-order</strong> traversal
+            (node, then left subtree, then right subtree). Nothing else changes,
+            because the stack still records the nodes whose right subtrees are
+            owed. The lesson is that the three classic traversals differ only in
+            <em>when</em> the visit happens relative to the two recursive calls:
+            before both (pre-order), between them (in-order), after both
+            (post-order). Only in-order yields sorted output on a binary search
+            tree; the pre-order output above is not sorted.
+          </details>
+        </li>
+        <li>
+          A student memoises <code>fib</code> and reports that <code>fib(40)</code>
+          now returns instantly, then claims &ldquo;memoisation makes any
+          exponential recursion fast&rdquo;. Give a recursion where memoisation
+          does not help, and state the property that decides the matter.
+          <details>
+            <summary>solution</summary>
+            Towers of Hanoi: \(T(n) = 2T(n-1) + 1\) makes \(2^n - 1\) moves, and
+            every call is on a <em>distinct</em> problem instance (a different
+            disk count with a different peg assignment), so a table of subresults
+            never scores a hit and the count is unchanged. The deciding property
+            is <strong>overlapping subproblems</strong>: memoisation reduces the
+            running time to (number of <em>distinct</em> subproblems) \(\times\)
+            (work per subproblem). Fibonacci has \(n\) distinct subproblems
+            reached exponentially often, so the win is from \(2F(n+1)-1\) calls
+            down to \(2n-1\). Hanoi&rsquo;s exponential count is the size of its
+            output (it really must make \(2^n - 1\) moves), which no table can
+            shrink. The same distinction separates the problems that
+            <a href="../dp/paradigm-dp-method.html"><em>The Dynamic Programming
+            Method</em></a> solves from those it does not.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Recursion &amp; Induction v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

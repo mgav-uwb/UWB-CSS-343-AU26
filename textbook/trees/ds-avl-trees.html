@@ -1,0 +1,1505 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: AVL Trees.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AVL Trees - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom: 2px solid var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      h2.part {
+        font-size: 22.5px; margin: 46px 0 10px; padding: 10px 14px;
+        background: var(--box); border: 1px solid var(--line);
+        border-left: 4px solid var(--accent); border-radius: 8px;
+      }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>AVL Trees</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        A binary search tree is fast on average but can degrade to a
+        \(\Theta(n)\) path on sorted input. The AVL tree fixes that with one
+        local invariant: every node&rsquo;s two subtrees differ in height by at
+        most one, restored after every update by \(O(1)\) rotations. A
+        Fibonacci argument proves that this rule forces height
+        \(\le 1.44\log_2 n\), a <em>worst-case</em> \(\Theta(\log n)\)
+        guarantee for search, insert, and delete. With the four rotation cases
+        drawn and verified, worked insertion traces, correctness proofs, links
+        to the interactive demos, and exercises.
+      </div>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#guarantee">From average to guarantee</a></li>
+          <li><a href="#invariant">The height-balance invariant</a></li>
+          <li><a href="#rotations">Rotations: the order-preserving move</a></li>
+          <li><a href="#cases">The four rebalancing cases</a></li>
+          <li><a href="#insertion">Insertion and rebalancing</a></li>
+          <li><a href="#deletion">Deletion</a></li>
+          <li><a href="#height">Why the height is \(\Theta(\log n)\)</a></li>
+          <li><a href="#ex-avl">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <p class="lead">
+        The <a href="ds-trees-bst.html"><em>Trees &amp; Binary Search Trees</em></a> handout built the binary search tree and proved a single equation about
+        it: every operation walks one root-to-leaf path, so its cost is
+        \(\Theta(\text{height})\). That was good news and bad news at once. A
+        random tree is about \(1.39\log_2 n\) tall, but height is not something the
+        BST controls, and the worst case is a disaster: feed it keys in sorted
+        order and each new key hangs off the rightmost node, building a
+        \(\Theta(n)\) path: a linked list wearing a tree&rsquo;s clothes. An
+        <strong>AVL tree</strong> refuses to let that happen. It adds one
+        <em>local</em> rule that each node can check on its own, restores the rule
+        after every insertion or deletion with a constant-time pointer move called
+        a <strong>rotation</strong>, and in exchange turns \(\Theta(\log n)\) from
+        an average into a <strong>promise</strong> that holds for every input,
+        adversarial ones included.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="guarantee">1. From average to guarantee</h2>
+      <p>
+        Recall the one fact <em>Trees &amp; Binary Search Trees</em> rested everything on: in a binary search
+        tree, search, insert, and delete each follow a single path from the root
+        down, so all three cost \(\Theta(h)\), where \(h\) is the tree&rsquo;s
+        height. A binary tree on \(n\) nodes has height anywhere from
+        \(\lfloor\log_2 n\rfloor\) (bushy and balanced) to \(n-1\) (a single
+        path). The entire game is to keep \(h\) small.
+      </p>
+      <p>
+        The BST does not play that game. Insert the keys \(1,2,3,4,5\) in order:
+        each is the largest so far, so it becomes the right child of the previous
+        one, and the tree is a downward staircase.
+      </p>
+      <pre>  1
+   \
+    2
+     \
+      3        height = n &minus; 1
+       \       search / insert / delete = &Theta;(n)
+        4
+         \
+          5</pre>
+      <p>
+        Sorted or reverse-sorted input is not exotic: it is exactly what you
+        get from a database returning rows in key order, or from a stream of
+        timestamps, or from IDs handed out in sequence. On any such input the plain
+        BST collapses to a linked list, and its logarithmic average means nothing.
+        We proved in <em>Trees &amp; Binary Search Trees</em> that a <em>random</em> BST is shallow, but you rarely
+        control the insertion order, and Hibbard deletions skew even a good tree
+        toward \(\sqrt n\) depth over time. A structure you ship has to survive its
+        worst input, not just its average one.
+      </p>
+      <p>
+        The ideal would be a <strong>perfectly balanced</strong> tree, every leaf
+        at depth \(\lfloor\log_2 n\rfloor\). But perfect balance is too rigid to
+        maintain: one insertion can force a \(\Theta(n)\) rebuild of a large
+        subtree, and one insert should not cost that. AVL&rsquo;s insight is to
+        <em>relax</em> perfect balance by just a little (a bounded wobble at
+        each node) so that the tree is cheap to repair after every update
+        yet still provably \(\Theta(\log n)\) tall.
+      </p>
+      <figure>
+        <svg viewBox="0 0 460 250" role="img" aria-label="Two trees built from the keys 1 through 7. Left, labeled 'plain BST: height 6': the keys inserted in sorted order form a single right-leaning path; 1 is the root, its right child is 2, whose right child is 3, and so on down to 7, giving height 6. Right, labeled 'AVL: height 2': the same keys as a perfectly bushy AVL tree; 4 is the root with left child 2 and right child 6; 2 has children 1 and 3; 6 has children 5 and 7.">
+          <g stroke="#4a5163" stroke-width="1.6" fill="none">
+            <line x1="55" y1="30" x2="80" y2="62"/>
+            <line x1="80" y1="62" x2="105" y2="94"/>
+            <line x1="105" y1="94" x2="130" y2="126"/>
+            <line x1="130" y1="126" x2="155" y2="158"/>
+            <line x1="155" y1="158" x2="180" y2="190"/>
+            <line x1="180" y1="190" x2="205" y2="222"/>
+            <line x1="350" y1="30" x2="310" y2="80"/>
+            <line x1="350" y1="30" x2="390" y2="80"/>
+            <line x1="310" y1="80" x2="285" y2="135"/>
+            <line x1="310" y1="80" x2="335" y2="135"/>
+            <line x1="390" y1="80" x2="365" y2="135"/>
+            <line x1="390" y1="80" x2="415" y2="135"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.5">
+              <circle cx="55" cy="30" r="14"/> <circle cx="80" cy="62" r="14"/>
+              <circle cx="105" cy="94" r="14"/> <circle cx="130" cy="126" r="14"/>
+              <circle cx="155" cy="158" r="14"/> <circle cx="180" cy="190" r="14"/>
+              <circle cx="205" cy="222" r="14"/>
+              <circle cx="350" cy="30" r="14"/> <circle cx="310" cy="80" r="14"/>
+              <circle cx="390" cy="80" r="14"/> <circle cx="285" cy="135" r="14"/>
+              <circle cx="335" cy="135" r="14"/> <circle cx="365" cy="135" r="14"/>
+              <circle cx="415" cy="135" r="14"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="55" y="35">1</text> <text x="80" y="67">2</text>
+              <text x="105" y="99">3</text> <text x="130" y="131">4</text>
+              <text x="155" y="163">5</text> <text x="180" y="195">6</text>
+              <text x="205" y="227">7</text>
+              <text x="350" y="35">4</text> <text x="310" y="85">2</text>
+              <text x="390" y="85">6</text> <text x="285" y="140">1</text>
+              <text x="335" y="140">3</text> <text x="365" y="140">5</text>
+              <text x="415" y="140">7</text>
+            </g>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" fill="#5c6270" text-anchor="middle">
+            <text x="120" y="248">plain BST: height 6</text>
+            <text x="350" y="248">AVL: height 2</text>
+          </g>
+        </svg>
+        <figcaption>
+          The same seven keys \(1,\dots,7\), inserted in the same sorted order. The
+          plain BST (left) grows one level per key into a height-\(6\) path; the
+          AVL tree (right) rotates as it goes and stays perfectly bushy at height
+          \(2\). This is the whole motivation in one picture.
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=bst-vs-avl">plain BST vs. AVL</a>. Insert the
+        same keys \(1\dots16\) into both trees in lockstep and watch them diverge:
+        the plain BST grows a height-\(15\) path while the AVL stays flat at height
+        \(4\). Step key-by-key, or sweep the whole sequence at once. The gap you see
+        is exactly the guarantee this handout builds.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="invariant">2. The height-balance invariant</h2>
+      <p>
+        <strong>AVL</strong> is named for Adelson-Velsky and Landis, who in 1962
+        gave the first self-balancing binary search tree. Its rule is a small
+        strengthening of the ordinary tree: keep every node&rsquo;s two subtrees
+        close in height.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (balance factor, AVL invariant)</span>
+        For a node \(x\), define its <strong>balance factor</strong>
+        \[ \mathrm{bf}(x) = \text{height}(x.\text{left}) - \text{height}(x.\text{right}), \]
+        with the convention \(\text{height}(\text{null}) = -1\) and a leaf having
+        height \(0\). A binary search tree is <strong>AVL-balanced</strong> when
+        \(\mathrm{bf}(x) \in \{-1,0,+1\}\) at <em>every</em> node;
+        equivalently, \(|\mathrm{bf}(x)| \le 1\) everywhere.
+      </div>
+      <p>
+        The balance factor is just the node&rsquo;s lean: positive means the left
+        subtree is taller, negative means the right is taller, zero means they tie.
+        The invariant allows a lean of one but forbids a lean of two. This is
+        precisely the <em>balanced</em> shape of <em>Trees &amp; Binary Search Trees</em> (heights differing by at
+        most one at every node), now maintained as a live invariant rather than
+        merely observed. The textbooks that call the property
+        <em>height-balanced</em> mean the same thing.
+      </p>
+      <pre>   bf = 0        bf = +1        bf = +2  &larr; illegal
+     o             o               o
+    / \           /               /
+   o   o         o               o
+                                 /
+                                o</pre>
+      <p>
+        The rightmost tree leans left by two: its left subtree has height \(1\) and
+        its right subtree is empty (height \(-1\)), so \(\mathrm{bf} = 1 - (-1) =
+        +2\). That is the situation an AVL tree must never rest in; whenever an
+        update produces it, a rotation (&sect;3) repairs it before the operation
+        returns.
+      </p>
+      <p>
+        AVL is <em>not</em> perfectly balanced; it is merely balanced. The
+        \(\pm 1\) of slack is deliberate: it is loose enough to restore in \(O(1)\)
+        work per level, yet (as &sect;7 proves) tight enough to force height
+        \(\Theta(\log n)\). Perfect balance would be stricter than we can afford;
+        this is exactly as strict as we need.
+      </p>
+
+      <h3>Storing the height</h3>
+      <p>
+        Rather than recompute subtree heights on demand, each node caches its own
+        height in one extra integer field, updated in \(O(1)\) whenever its
+        children change. Two null-safe helpers do all the arithmetic:
+      </p>
+      <pre>  struct Node {
+      int   key;
+      Node* left  = nullptr;
+      Node* right = nullptr;
+      int   height = 0;          <span class="cm">// leaf = 0, null = -1</span>
+  };
+  int  height(Node* t){ return t ? t-&gt;height : -1; }
+  int  bf(Node* t){ return height(t-&gt;left) - height(t-&gt;right); }
+  void fix(Node* t){ t-&gt;height = 1 + max(height(t-&gt;left), height(t-&gt;right)); }</pre>
+      <p>
+        One extra <code>int</code> per node is the entire space cost of balance.
+        <code>fix</code> recomputes a node&rsquo;s height from its children&rsquo;s
+        cached heights, and <code>bf</code> reads their difference; both are
+        \(O(1)\) and are called on the way back up an update. Verifying that a whole
+        tree is AVL is the recursive &ldquo;act on the node, recurse on the
+        subtrees&rdquo; pattern of <em>Trees &amp; Binary Search Trees</em>:
+      </p>
+      <pre>  bool isAVL(Node* t) {
+      if (!t) return true;                  <span class="cm">// empty is AVL</span>
+      if (abs(bf(t)) &gt; 1) return false;      <span class="cm">// this node violates</span>
+      return isAVL(t-&gt;left) &amp;&amp; isAVL(t-&gt;right);
+  }</pre>
+
+      <h3>Only the update path can break</h3>
+      <p>
+        The reason repair is cheap: an insertion or deletion changes subtree
+        heights only along the single root-to-leaf path it walked. Every subtree
+        hanging off to the side of that path is untouched, so its balance factors
+        cannot change. Only nodes <em>on the path</em> can reach \(\mathrm{bf} =
+        \pm 2\), and so we need only re-check and repair on the way back up that one
+        path, never anywhere else. That is what makes the fix \(O(\text{height})\)
+        rather than \(O(n)\), and it is why a single upward pass suffices.
+      </p>
+      <div class="aside">
+        <span class="tag">Why a local rule is enough</span>
+        It is not obvious that a rule each node checks about only its own two
+        children can control the height of the <em>whole</em> tree. That it does is
+        the small miracle of balanced search trees, and it recurs for every family
+        in the course: red-black trees, 2-3 and B-trees (the
+        <a href="ds-two-three-trees.html">2-3 Trees</a>,
+        <a href="ds-b-trees.html">B-Trees &amp; B+ Trees</a>, and
+        <a href="ds-red-black-trees.html">Red-Black Trees</a> handouts) all pick a
+        different local invariant and restore it bottom-up. Open Data Structures
+        (Morin) calls this the &ldquo;template&rdquo; for balance; AVL is its
+        cleanest instance because the invariant is simply a bound on a height
+        difference.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="rotations">3. Rotations: the order-preserving move</h2>
+      <p>
+        A <strong>rotation</strong> re-hangs a parent and one of its children,
+        changing their heights (which is how it repairs balance) while leaving the
+        left-to-right order of every key unchanged (which is how it keeps the tree
+        a valid BST). It is the only structural move an AVL tree ever makes, and it
+        is \(O(1)\): a few pointer writes and two height updates.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (right and left rotation)</span>
+        A <strong>right rotation</strong> at \(y\) takes \(y\)&rsquo;s left child
+        \(x\) and lifts it above \(y\); \(x\)&rsquo;s right subtree \(B\) re-hangs
+        as \(y\)&rsquo;s new left subtree. A <strong>left rotation</strong> at
+        \(x\) is the mirror image, lifting the right child. In both, only the
+        <em>middle</em> subtree changes parent.
+      </div>
+      <figure>
+        <svg viewBox="0 0 470 190" role="img" aria-label="A right rotation at node y, before and after. Before: y is the subtree root with balance factor plus 2; its left child is x with balance factor plus 1, and its right subtree is the triangle C. Node x has left subtree A and right subtree B. An arrow labeled rotateRight(y) points to the after picture: x is now the subtree root with left subtree A and right child y; y now has left subtree B (the subtree that moved over from x's right side) and right subtree C. Both x and y show balance factor 0.">
+          <!-- before -->
+          <g stroke="#4a5163" stroke-width="1.6" fill="none">
+            <line x1="110" y1="32" x2="72" y2="84"/>
+            <line x1="110" y1="32" x2="150" y2="70"/>
+            <line x1="72" y1="84" x2="44" y2="132"/>
+            <line x1="72" y1="84" x2="100" y2="132"/>
+          </g>
+          <g fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4">
+            <path d="M150,70 L135,102 L165,102 Z"/>
+            <path d="M44,132 L29,164 L59,164 Z"/>
+            <path d="M100,132 L85,164 L115,164 Z"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" fill="#3a3f4a" text-anchor="middle">
+            <text x="150" y="94">C</text> <text x="44" y="156">A</text> <text x="100" y="156">B</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.5">
+              <circle cx="110" cy="32" r="14"/> <circle cx="72" cy="84" r="14"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="110" y="37">y</text> <text x="72" y="89">x</text>
+            </g>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#9a5b00" text-anchor="middle">
+            <text x="132" y="28">+2</text> <text x="94" y="80">+1</text>
+          </g>
+          <!-- arrow -->
+          <text x="230" y="112" font-family="system-ui, sans-serif" font-size="26" fill="#5c6270" text-anchor="middle">&rarr;</text>
+          <text x="230" y="130" font-family="system-ui, sans-serif" font-size="11.5" fill="#5c6270" text-anchor="middle">rotateRight(y)</text>
+          <!-- after -->
+          <g stroke="#4a5163" stroke-width="1.6" fill="none">
+            <line x1="352" y1="32" x2="312" y2="70"/>
+            <line x1="352" y1="32" x2="392" y2="84"/>
+            <line x1="392" y1="84" x2="364" y2="132"/>
+            <line x1="392" y1="84" x2="420" y2="132"/>
+          </g>
+          <g fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4">
+            <path d="M312,70 L297,102 L327,102 Z"/>
+            <path d="M364,132 L349,164 L379,164 Z"/>
+            <path d="M420,132 L405,164 L435,164 Z"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" fill="#3a3f4a" text-anchor="middle">
+            <text x="312" y="94">A</text> <text x="364" y="156">B</text> <text x="420" y="156">C</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.5">
+              <circle cx="352" cy="32" r="14"/> <circle cx="392" cy="84" r="14"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="352" y="37">x</text> <text x="392" y="89">y</text>
+            </g>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">
+            <text x="374" y="28">0</text> <text x="414" y="80">0</text>
+          </g>
+        </svg>
+        <figcaption>
+          The <strong>LL</strong> case, fixed by a single right rotation. Before,
+          \(y\) is left-heavy at \(\mathrm{bf}=+2\) and its left child \(x\) leans
+          the same way (\(+1\)). The middle subtree \(B\) swings from \(x\)&rsquo;s
+          right to \(y\)&rsquo;s left; \(x\) rises, \(y\) sinks. Read either tree
+          left to right and the in-order sequence is identical: \(A\;x\;B\;y\;C\).
+          Afterward both nodes are balanced and the subtree is back to the height
+          it had before the insertion.
+        </figcaption>
+      </figure>
+      <p>
+        The order-preservation is worth seeing explicitly. In both trees above, an
+        in-order traversal visits \(A\), then \(x\), then \(B\), then \(y\), then
+        \(C\). The rotation moves <em>structure</em>, never <em>order</em>,
+        so search still works after any rotation, which is exactly why rotations
+        are the legal move. The one subtree that changes parent is \(B\), the keys
+        that lie between \(x\) and \(y\); in code this is the single line
+        <code>y.left = x.right</code>, and the whole subtree follows that one
+        pointer.
+      </p>
+      <div class="code-tabs" data-snippet="trees/avl-rotate">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// AVL rotations. Each re-hangs one parent/child pair, updates the two heights,
+// and returns the new subtree root. O(1) work; the in-order sequence is
+// unchanged, so the tree stays a valid BST. (Node stores an int height field.)
+int height(Node* t) { return t ? t-&gt;height : -1; }   // null has height -1
+void fix(Node* t) {                                   // recompute from children
+    t-&gt;height = 1 + max(height(t-&gt;left), height(t-&gt;right));
+}
+Node* rotateRight(Node* y) {      // LL fix: left child x rises, y sinks
+    Node* x = y-&gt;left;
+    y-&gt;left = x-&gt;right;           // B (keys between x and y) re-hangs under y
+    x-&gt;right = y;
+    fix(y); fix(x);               // y is now lower, so recompute its height first
+    return x;                     // x is the new root of this subtree
+}
+Node* rotateLeft(Node* x) {       // RR fix: the exact mirror of rotateRight
+    Node* y = x-&gt;right;
+    x-&gt;right = y-&gt;left;           // B re-hangs under x
+    y-&gt;left = x;
+    fix(x); fix(y);
+    return y;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// AVL rotations. Each re-hangs one parent/child pair, updates the two heights,
+// and returns the new subtree root. O(1); the in-order sequence is unchanged.
+static int height(Node t) { return t == null ? -1 : t.height; }   // null: -1
+static void fix(Node t) {                              // recompute from children
+    t.height = 1 + Math.max(height(t.left), height(t.right));
+}
+static Node rotateRight(Node y) {   // LL fix: left child x rises, y sinks
+    Node x = y.left;
+    y.left = x.right;               // B (keys between x and y) re-hangs under y
+    x.right = y;
+    fix(y); fix(x);                 // y is now lower, so fix its height first
+    return x;                       // x is the new subtree root
+}
+static Node rotateLeft(Node x) {    // RR fix: the mirror of rotateRight
+    Node y = x.right;
+    x.right = y.left;               // B re-hangs under x
+    y.left = x;
+    fix(x); fix(y);
+    return y;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># AVL rotations. Each re-hangs one parent/child pair, updates the two heights,
+# and returns the new subtree root. O(1); the in-order sequence is unchanged.
+def height(t):                 # null (None) has height -1
+    return t.height if t else -1
+
+def fix(t):                    # recompute this node&#x27;s height from its children
+    t.height = 1 + max(height(t.left), height(t.right))
+
+def rotate_right(y):           # LL fix: left child x rises, y sinks
+    x = y.left
+    y.left = x.right           # B (keys between x and y) re-hangs under y
+    x.right = y
+    fix(y); fix(x)             # y is now lower, so fix its height first
+    return x                   # x is the new subtree root
+
+def rotate_left(x):            # RR fix: the mirror of rotate_right
+    y = x.right
+    x.right = y.left           # B re-hangs under x
+    y.left = x
+    fix(x); fix(y)
+    return y</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// AVL rotations over an owned-subtree link. Each re-hangs one parent/child pair,
+// updates the two heights, and returns the new subtree root. O(1); the in-order
+// sequence is unchanged. (Node has left, right: Link and height: i32.)
+type Link = Option&lt;Box&lt;Node&gt;&gt;;
+
+fn height(t: &amp;Link) -&gt; i32 { t.as_ref().map_or(-1, |n| n.height) }   // null: -1
+fn fix(n: &amp;mut Node) {                             // recompute from children
+    n.height = 1 + height(&amp;n.left).max(height(&amp;n.right));
+}
+fn rotate_right(mut y: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {   // LL fix: left child x rises
+    let mut x = y.left.take().unwrap();
+    y.left = x.right.take();                        // B re-hangs under y
+    fix(&amp;mut y);                                    // y is now lower: fix first
+    x.right = Some(y);
+    fix(&amp;mut x);
+    x                                               // x is the new subtree root
+}
+fn rotate_left(mut x: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {    // RR fix: mirror of the above
+    let mut y = x.right.take().unwrap();
+    x.right = y.left.take();                        // B re-hangs under x
+    fix(&amp;mut x);
+    y.left = Some(x);
+    fix(&amp;mut y);
+    y
+}</pre>
+<p class="ct-src">source: <code>code/trees/avl-rotate.cpp &middot; code/trees/avl-rotate.java &middot; code/trees/avl-rotate.py &middot; code/trees/avl-rotate.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The order of the two <code>fix</code> calls matters: after the rotation
+        \(y\) sits <em>below</em> \(x\), so we must recompute \(y\)&rsquo;s cached
+        height first, then \(x\)&rsquo;s, which reads it. Each routine returns the
+        new root of the rotated subtree so the caller can re-link it into place.
+        The left rotation is the exact mirror (swap every
+        <code>left</code>/<code>right</code>) and it repairs the
+        symmetric <strong>RR</strong> case, where a node and its right child both
+        lean right.
+      </p>
+      <figure>
+        <svg viewBox="0 0 470 190" role="img" aria-label="A left rotation at node x, the mirror of the right rotation, before and after. Before: x is the subtree root with balance factor minus 2; its left subtree is the triangle A and its right child is y with balance factor minus 1. Node y has left subtree B and right subtree C. An arrow labeled rotateLeft(x) points to the after picture: y is now the subtree root with right subtree C and left child x; x keeps left subtree A and gains right subtree B (the subtree that moved over from y's left side). Both x and y show balance factor 0.">
+          <!-- before -->
+          <g stroke="#4a5163" stroke-width="1.6" fill="none">
+            <line x1="100" y1="32" x2="62" y2="70"/>
+            <line x1="100" y1="32" x2="138" y2="84"/>
+            <line x1="138" y1="84" x2="110" y2="132"/>
+            <line x1="138" y1="84" x2="166" y2="132"/>
+          </g>
+          <g fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4">
+            <path d="M62,70 L47,102 L77,102 Z"/>
+            <path d="M110,132 L95,164 L125,164 Z"/>
+            <path d="M166,132 L151,164 L181,164 Z"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" fill="#3a3f4a" text-anchor="middle">
+            <text x="62" y="94">A</text> <text x="110" y="156">B</text> <text x="166" y="156">C</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.5">
+              <circle cx="100" cy="32" r="14"/> <circle cx="138" cy="84" r="14"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="100" y="37">x</text> <text x="138" y="89">y</text>
+            </g>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#9a5b00" text-anchor="middle">
+            <text x="78" y="28">&minus;2</text> <text x="160" y="80">&minus;1</text>
+          </g>
+          <!-- arrow -->
+          <text x="230" y="112" font-family="system-ui, sans-serif" font-size="26" fill="#5c6270" text-anchor="middle">&rarr;</text>
+          <text x="230" y="130" font-family="system-ui, sans-serif" font-size="11.5" fill="#5c6270" text-anchor="middle">rotateLeft(x)</text>
+          <!-- after -->
+          <g stroke="#4a5163" stroke-width="1.6" fill="none">
+            <line x1="360" y1="32" x2="320" y2="84"/>
+            <line x1="360" y1="32" x2="400" y2="70"/>
+            <line x1="320" y1="84" x2="292" y2="132"/>
+            <line x1="320" y1="84" x2="348" y2="132"/>
+          </g>
+          <g fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4">
+            <path d="M400,70 L385,102 L415,102 Z"/>
+            <path d="M292,132 L277,164 L307,164 Z"/>
+            <path d="M348,132 L333,164 L363,164 Z"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" fill="#3a3f4a" text-anchor="middle">
+            <text x="400" y="94">C</text> <text x="292" y="156">A</text> <text x="348" y="156">B</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.5">
+              <circle cx="360" cy="32" r="14"/> <circle cx="320" cy="84" r="14"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="360" y="37">y</text> <text x="320" y="89">x</text>
+            </g>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">
+            <text x="382" y="28">0</text> <text x="300" y="80">0</text>
+          </g>
+        </svg>
+        <figcaption>
+          The <strong>RR</strong> case, fixed by a single left rotation, the
+          mirror of the figure above. In-order both sides: \(A\;x\;B\;y\;C\). This
+          is the self-correction of the sorted-ascending \(1,2,3\) input that ruined
+          the plain BST in &sect;1.
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=avl">AVL sandbox</a>. Click any node and rotate
+        it: only that subtree reshapes, and the in-order strip along the bottom
+        never changes: the middle subtree (highlighted) is the one child that
+        swings to the other node. A free rotation can <em>unbalance</em> the tree,
+        so watch the balance factors move; &sect;5 applies rotations selectively, to
+        <em>restore</em> balance.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="cases">4. The four rebalancing cases</h2>
+      <p>
+        When an update drives some node \(z\) to \(\mathrm{bf} = \pm 2\), the shape
+        of the imbalance (and hence the repair) is named by the
+        direction of the two steps from \(z\) down toward the taller side. Follow
+        the <em>taller child</em> (the sign of the balance factor), then follow
+        <em>its</em> taller child; the two directions give the case.
+      </p>
+      <table>
+        <tr><th>case</th><th>the two steps below \(z\)</th><th>trigger (\(z\) then its child)</th><th>fix</th></tr>
+        <tr><td><strong>LL</strong></td><td>left, then left</td><td>\(\mathrm{bf}(z)=+2\), \(\mathrm{bf}(z.\text{left})\ge 0\)</td><td>single <strong>right</strong> rotation at \(z\)</td></tr>
+        <tr><td><strong>RR</strong></td><td>right, then right</td><td>\(\mathrm{bf}(z)=-2\), \(\mathrm{bf}(z.\text{right})\le 0\)</td><td>single <strong>left</strong> rotation at \(z\)</td></tr>
+        <tr><td><strong>LR</strong></td><td>left, then right</td><td>\(\mathrm{bf}(z)=+2\), \(\mathrm{bf}(z.\text{left})\lt 0\)</td><td><strong>double</strong>: left at \(z.\text{left}\), then right at \(z\)</td></tr>
+        <tr><td><strong>RL</strong></td><td>right, then left</td><td>\(\mathrm{bf}(z)=-2\), \(\mathrm{bf}(z.\text{right})\gt 0\)</td><td><strong>double</strong>: right at \(z.\text{right}\), then left at \(z\)</td></tr>
+      </table>
+      <p>
+        A <em>straight</em> lean (LL or RR) is fixed by one rotation, as the two
+        figures of &sect;3 showed. A <em>kinked</em> lean (LR or RL), where the
+        node leans one way but its taller child leans the other, cannot be
+        fixed by a single rotation, which would only move the kink to the other
+        side. First rotate the child to straighten the kink into an LL or RR, then
+        finish with the single rotation. Two \(O(1)\) rotations in all.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (LL and RR on concrete keys)</span>
+        The two straight cases, each with the balance factors that select it.
+        <strong>LL.</strong> The tree \(30(20(10,25),\,40)\) is AVL, with heights
+        \(30\!:\!2\), \(20\!:\!1\), and \(0\) at the three leaves. Insert \(5\): it
+        descends \(30 \to 20 \to 10\) and hangs as \(10\)&rsquo;s left child. On the
+        way up, \(10\)&rsquo;s height becomes \(1\), \(20\)&rsquo;s becomes \(2\),
+        and \(30\) reaches \(\mathrm{bf} = 2 - 0 = +2\) while its left child \(20\)
+        has \(\mathrm{bf} = 1 - 0 = +1 \ge 0\): left then left, an LL, fixed by one
+        right rotation at \(30\).
+        <pre>        30                                  20
+       /  \        rotateRight(30)        /  \
+     20    40      --------------&gt;      10    30
+    /  \                               /     /  \
+  10    25                            5    25    40
+  /
+ 5</pre>
+        Afterwards every balance factor is \(0\) except \(10\)&rsquo;s \(+1\), and
+        the subtree is height \(2\) again, exactly its height before the insert.
+        <strong>RR.</strong> The mirror: in \(30(20,\,40(35,50))\) insert \(60\),
+        which hangs as \(50\)&rsquo;s right child. Then \(50\) has height \(1\),
+        \(40\) has height \(2\), and \(30\) reaches \(\mathrm{bf} = 0 - 2 = -2\)
+        with its right child \(40\) at \(\mathrm{bf} = 0 - 1 = -1 \le 0\): right
+        then right, an RR, fixed by one left rotation at \(30\).
+        <pre>     30                                    40
+    /  \          rotateLeft(30)          /  \
+  20    40        -------------&gt;        30    50
+       /  \                            /  \     \
+     35    50                        20    35    60
+             \
+              60</pre>
+        In-order is \(5,10,20,25,30,40\) before and after the first fix, and
+        \(20,30,35,40,50,60\) before and after the second: the rotation moved
+        structure, not order.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (LR: a double rotation, with subtrees)</span>
+        Start from the balanced tree \(30(10(5,20),\,40)\) and insert \(25\). It
+        descends \(30 \to 10 \to 20\) and becomes \(20\)&rsquo;s right child, which
+        pushes \(30\) to \(\mathrm{bf}=+2\) while its left child \(10\) leans right
+        (\(\mathrm{bf}=-1\)): a left-then-right kink. A left rotation at
+        \(10\) straightens it into an LL, and a right rotation at \(30\) finishes.
+        <figure>
+          <svg viewBox="0 0 660 200" role="img" aria-label="An LR double rotation in three panels. Panel one, after inserting 25: root 30 with balance factor plus 2 has left child 10 and right child 40; 10 has left child 5 and right child 20; 20 has right child 25, the new key, so the left child leans right. An arrow labeled rotateLeft(10) points to panel two: 30 is still the root at balance factor plus 2, but its left child is now 20; 20 has left child 10 and right child 25, and 10 has left child 5; the kink is now a straight left-left line. An arrow labeled rotateRight(30) points to panel three, the balanced result: 20 is the root at balance factor 0, with left child 10 and right child 30; 10 has left child 5, and 30 has left child 25 and right child 40.">
+            <!-- panel A -->
+            <g stroke="#4a5163" stroke-width="1.5" fill="none">
+              <line x1="90" y1="26" x2="58" y2="70"/> <line x1="90" y1="26" x2="126" y2="70"/>
+              <line x1="58" y1="70" x2="36" y2="114"/> <line x1="58" y1="70" x2="90" y2="114"/>
+              <line x1="90" y1="114" x2="112" y2="156"/>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+              <g fill="#fff" stroke="#2a2d36" stroke-width="1.4">
+                <circle cx="90" cy="26" r="13"/> <circle cx="58" cy="70" r="13"/>
+                <circle cx="126" cy="70" r="13"/> <circle cx="36" cy="114" r="13"/>
+                <circle cx="90" cy="114" r="13"/> <circle cx="112" cy="156" r="13"/>
+              </g>
+              <g fill="#1a1c22" stroke="none">
+                <text x="90" y="30">30</text> <text x="58" y="74">10</text>
+                <text x="126" y="74">40</text> <text x="36" y="118">5</text>
+                <text x="90" y="118">20</text> <text x="112" y="160">25</text>
+              </g>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#9a5b00" text-anchor="middle">
+              <text x="110" y="22">+2</text> <text x="110" y="112">+1</text>
+            </g>
+            <text x="168" y="92" font-family="system-ui, sans-serif" font-size="22" fill="#5c6270" text-anchor="middle">&rarr;</text>
+            <text x="168" y="108" font-family="system-ui, sans-serif" font-size="10.5" fill="#5c6270" text-anchor="middle">rotateLeft(10)</text>
+            <!-- panel B -->
+            <g stroke="#4a5163" stroke-width="1.5" fill="none">
+              <line x1="348" y1="26" x2="316" y2="70"/> <line x1="348" y1="26" x2="384" y2="70"/>
+              <line x1="316" y1="70" x2="294" y2="114"/> <line x1="316" y1="70" x2="338" y2="114"/>
+              <line x1="294" y1="114" x2="274" y2="156"/>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+              <g fill="#fff" stroke="#2a2d36" stroke-width="1.4">
+                <circle cx="348" cy="26" r="13"/> <circle cx="316" cy="70" r="13"/>
+                <circle cx="384" cy="70" r="13"/> <circle cx="294" cy="114" r="13"/>
+                <circle cx="338" cy="114" r="13"/> <circle cx="274" cy="156" r="13"/>
+              </g>
+              <g fill="#1a1c22" stroke="none">
+                <text x="348" y="30">30</text> <text x="316" y="74">20</text>
+                <text x="384" y="74">40</text> <text x="294" y="118">10</text>
+                <text x="338" y="118">25</text> <text x="274" y="160">5</text>
+              </g>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#9a5b00" text-anchor="middle">
+              <text x="368" y="22">+2</text>
+            </g>
+            <text x="426" y="92" font-family="system-ui, sans-serif" font-size="22" fill="#5c6270" text-anchor="middle">&rarr;</text>
+            <text x="426" y="108" font-family="system-ui, sans-serif" font-size="10.5" fill="#5c6270" text-anchor="middle">rotateRight(30)</text>
+            <!-- panel C -->
+            <g stroke="#4a5163" stroke-width="1.5" fill="none">
+              <line x1="548" y1="26" x2="516" y2="70"/> <line x1="548" y1="26" x2="582" y2="70"/>
+              <line x1="516" y1="70" x2="494" y2="114"/>
+              <line x1="582" y1="70" x2="560" y2="114"/> <line x1="582" y1="70" x2="606" y2="114"/>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+              <g fill="#fff" stroke="#2a2d36" stroke-width="1.4">
+                <circle cx="548" cy="26" r="13"/> <circle cx="516" cy="70" r="13"/>
+                <circle cx="582" cy="70" r="13"/> <circle cx="494" cy="114" r="13"/>
+                <circle cx="560" cy="114" r="13"/> <circle cx="606" cy="114" r="13"/>
+              </g>
+              <g fill="#1a1c22" stroke="none">
+                <text x="548" y="30">20</text> <text x="516" y="74">10</text>
+                <text x="582" y="74">30</text> <text x="494" y="118">5</text>
+                <text x="560" y="118">25</text> <text x="606" y="118">40</text>
+              </g>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#0a7d4d" text-anchor="middle">
+              <text x="568" y="22">0</text>
+            </g>
+          </svg>
+          <figcaption>
+            LR fix on keys \(5,10,20,25,30,40\) after inserting \(25\). Left
+            rotation at the child \(10\) turns the kink into a straight LL; right
+            rotation at \(30\) balances it. In-order throughout:
+            \(5,10,20,25,30,40\). The RL case is the exact mirror.
+          </figcaption>
+        </figure>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (RL: the mirror double)</span>
+        Symmetrically, from \(30(20,\,50(40,55))\) insert \(35\): it lands as
+        \(40\)&rsquo;s left child, driving \(30\) to \(\mathrm{bf}=-2\) with its
+        right child \(50\) leaning left (a right-then-left kink). A right rotation
+        at \(50\) straightens it into RR; a left rotation at \(30\) finishes.
+        <figure>
+          <svg viewBox="0 0 660 200" role="img" aria-label="An RL double rotation in three panels, the mirror of the LR case. Panel one, after inserting 35: root 30 with balance factor minus 2 has left child 20 and right child 50; 50 has balance factor plus 1 with left child 40 and right child 55; 40 has left child 35, the new key, so the right child leans left. An arrow labeled rotateRight(50) points to panel two: 30 is still the root at balance factor minus 2, but its right child is now 40; 40 has left child 35 and right child 50, and 50 has right child 55; the kink is now a straight right-right line. An arrow labeled rotateLeft(30) points to panel three, the balanced result: 40 is the root at balance factor 0, with left child 30 and right child 50; 30 has left child 20 and right child 35, and 50 has right child 55.">
+            <!-- panel A -->
+            <g stroke="#4a5163" stroke-width="1.5" fill="none">
+              <line x1="90" y1="26" x2="58" y2="70"/> <line x1="90" y1="26" x2="122" y2="70"/>
+              <line x1="122" y1="70" x2="100" y2="114"/> <line x1="122" y1="70" x2="144" y2="114"/>
+              <line x1="100" y1="114" x2="78" y2="156"/>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+              <g fill="#fff" stroke="#2a2d36" stroke-width="1.4">
+                <circle cx="90" cy="26" r="13"/> <circle cx="58" cy="70" r="13"/>
+                <circle cx="122" cy="70" r="13"/> <circle cx="100" cy="114" r="13"/>
+                <circle cx="144" cy="114" r="13"/> <circle cx="78" cy="156" r="13"/>
+              </g>
+              <g fill="#1a1c22" stroke="none">
+                <text x="90" y="30">30</text> <text x="58" y="74">20</text>
+                <text x="122" y="74">50</text> <text x="100" y="118">40</text>
+                <text x="144" y="118">55</text> <text x="78" y="160">35</text>
+              </g>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#9a5b00" text-anchor="middle">
+              <text x="110" y="22">&minus;2</text> <text x="142" y="70">+1</text>
+            </g>
+            <text x="182" y="92" font-family="system-ui, sans-serif" font-size="22" fill="#5c6270" text-anchor="middle">&rarr;</text>
+            <text x="182" y="108" font-family="system-ui, sans-serif" font-size="10.5" fill="#5c6270" text-anchor="middle">rotateRight(50)</text>
+            <!-- panel B -->
+            <g stroke="#4a5163" stroke-width="1.5" fill="none">
+              <line x1="348" y1="26" x2="316" y2="70"/> <line x1="348" y1="26" x2="380" y2="70"/>
+              <line x1="380" y1="70" x2="358" y2="114"/> <line x1="380" y1="70" x2="402" y2="114"/>
+              <line x1="402" y1="114" x2="424" y2="156"/>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+              <g fill="#fff" stroke="#2a2d36" stroke-width="1.4">
+                <circle cx="348" cy="26" r="13"/> <circle cx="316" cy="70" r="13"/>
+                <circle cx="380" cy="70" r="13"/> <circle cx="358" cy="114" r="13"/>
+                <circle cx="402" cy="114" r="13"/> <circle cx="424" cy="156" r="13"/>
+              </g>
+              <g fill="#1a1c22" stroke="none">
+                <text x="348" y="30">30</text> <text x="316" y="74">20</text>
+                <text x="380" y="74">40</text> <text x="358" y="118">35</text>
+                <text x="402" y="118">50</text> <text x="424" y="160">55</text>
+              </g>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#9a5b00" text-anchor="middle">
+              <text x="368" y="22">&minus;2</text>
+            </g>
+            <text x="452" y="92" font-family="system-ui, sans-serif" font-size="22" fill="#5c6270" text-anchor="middle">&rarr;</text>
+            <text x="452" y="108" font-family="system-ui, sans-serif" font-size="10.5" fill="#5c6270" text-anchor="middle">rotateLeft(30)</text>
+            <!-- panel C -->
+            <g stroke="#4a5163" stroke-width="1.5" fill="none">
+              <line x1="588" y1="26" x2="556" y2="70"/> <line x1="588" y1="26" x2="622" y2="70"/>
+              <line x1="556" y1="70" x2="534" y2="114"/> <line x1="556" y1="70" x2="578" y2="114"/>
+              <line x1="622" y1="70" x2="644" y2="114"/>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+              <g fill="#fff" stroke="#2a2d36" stroke-width="1.4">
+                <circle cx="588" cy="26" r="13"/> <circle cx="556" cy="70" r="13"/>
+                <circle cx="622" cy="70" r="13"/> <circle cx="534" cy="114" r="13"/>
+                <circle cx="578" cy="114" r="13"/> <circle cx="644" cy="114" r="13"/>
+              </g>
+              <g fill="#1a1c22" stroke="none">
+                <text x="588" y="30">40</text> <text x="556" y="74">30</text>
+                <text x="622" y="74">50</text> <text x="534" y="118">20</text>
+                <text x="578" y="118">35</text> <text x="644" y="118">55</text>
+              </g>
+            </g>
+            <g font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#0a7d4d" text-anchor="middle">
+              <text x="608" y="22">0</text>
+            </g>
+          </svg>
+          <figcaption>
+            RL fix on keys \(20,30,35,40,50,55\) after inserting \(35\). Right
+            rotation at the child \(50\) turns the kink into a straight RR; left
+            rotation at \(30\) balances it. In-order throughout:
+            \(20,30,35,40,50,55\).
+          </figcaption>
+        </figure>
+      </div>
+      <p>
+        All four cases are dispatched by one small function. The sign of
+        \(\mathrm{bf}(z)\) picks the heavy side; the sign of the heavy
+        child&rsquo;s balance factor distinguishes the single case from the double
+        and, if double, straightens the kink first:
+      </p>
+      <div class="code-tabs" data-snippet="trees/avl-insert">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// AVL insert: descend like a plain BST, then on the way back up recompute each
+// height and, at the first node whose balance factor reaches +/-2, rotate. The
+// balance factor bf = height(left) - height(right); positive means left-heavy.
+int bf(Node* t) { return height(t-&gt;left) - height(t-&gt;right); }
+
+Node* rebalance(Node* t) {
+    fix(t);
+    if (bf(t) &gt; 1) {                      // left-heavy: LL or LR
+        if (bf(t-&gt;left) &lt; 0)              // LR: left child leans right -&gt; straighten
+            t-&gt;left = rotateLeft(t-&gt;left);
+        return rotateRight(t);            // now a plain LL
+    }
+    if (bf(t) &lt; -1) {                     // right-heavy: RR or RL
+        if (bf(t-&gt;right) &gt; 0)             // RL: right child leans left -&gt; straighten
+            t-&gt;right = rotateRight(t-&gt;right);
+        return rotateLeft(t);             // now a plain RR
+    }
+    return t;                             // |bf| &lt;= 1: already balanced
+}
+Node* insert(Node* t, int key) {
+    if (!t) return new Node(key);         // new leaf, height 0
+    if      (key &lt; t-&gt;key) t-&gt;left  = insert(t-&gt;left,  key);
+    else if (key &gt; t-&gt;key) t-&gt;right = insert(t-&gt;right, key);
+    else return t;                        // duplicate key: nothing to do
+    return rebalance(t);                  // fix heights + rotate on the way up
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// AVL insert: descend like a plain BST, then on the way back up recompute each
+// height and, at the first node whose balance factor reaches +/-2, rotate. The
+// balance factor bf = height(left) - height(right); positive means left-heavy.
+static int bf(Node t) { return height(t.left) - height(t.right); }
+
+static Node rebalance(Node t) {
+    fix(t);
+    if (bf(t) &gt; 1) {                      // left-heavy: LL or LR
+        if (bf(t.left) &lt; 0)               // LR: left child leans right -&gt; straighten
+            t.left = rotateLeft(t.left);
+        return rotateRight(t);            // now a plain LL
+    }
+    if (bf(t) &lt; -1) {                     // right-heavy: RR or RL
+        if (bf(t.right) &gt; 0)              // RL: right child leans left -&gt; straighten
+            t.right = rotateRight(t.right);
+        return rotateLeft(t);             // now a plain RR
+    }
+    return t;                             // |bf| &lt;= 1: already balanced
+}
+static Node insert(Node t, int key) {
+    if (t == null) return new Node(key);  // new leaf, height 0
+    if      (key &lt; t.key) t.left  = insert(t.left,  key);
+    else if (key &gt; t.key) t.right = insert(t.right, key);
+    else return t;                        // duplicate key: nothing to do
+    return rebalance(t);                  // fix heights + rotate on the way up
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># AVL insert: descend like a plain BST, then on the way back up recompute each
+# height and, at the first node whose balance factor reaches +/-2, rotate. The
+# balance factor bf = height(left) - height(right); positive means left-heavy.
+def bf(t):
+    return height(t.left) - height(t.right)
+
+def rebalance(t):
+    fix(t)
+    if bf(t) &gt; 1:                          # left-heavy: LL or LR
+        if bf(t.left) &lt; 0:                 # LR: left child leans right -&gt; straighten
+            t.left = rotate_left(t.left)
+        return rotate_right(t)             # now a plain LL
+    if bf(t) &lt; -1:                         # right-heavy: RR or RL
+        if bf(t.right) &gt; 0:                # RL: right child leans left -&gt; straighten
+            t.right = rotate_right(t.right)
+        return rotate_left(t)              # now a plain RR
+    return t                               # |bf| &lt;= 1: already balanced
+
+def insert(t, key):
+    if t is None:
+        return Node(key)                   # new leaf, height 0
+    if key &lt; t.key:
+        t.left = insert(t.left, key)
+    elif key &gt; t.key:
+        t.right = insert(t.right, key)
+    else:
+        return t                           # duplicate key: nothing to do
+    return rebalance(t)                    # fix heights + rotate on the way up</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// AVL insert over an owned link: descend like a plain BST, then rebalance on the
+// way back up. The balance factor bf = height(left) - height(right); positive
+// means left-heavy. take() moves a child out so it can be rotated and put back.
+fn bf(n: &amp;Node) -&gt; i32 { height(&amp;n.left) - height(&amp;n.right) }
+
+fn rebalance(mut t: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {
+    fix(&amp;mut t);
+    if bf(&amp;t) &gt; 1 {                                    // left-heavy: LL or LR
+        if bf(t.left.as_ref().unwrap()) &lt; 0 {         // LR: straighten first
+            t.left = Some(rotate_left(t.left.take().unwrap()));
+        }
+        return rotate_right(t);                        // now a plain LL
+    }
+    if bf(&amp;t) &lt; -1 {                                   // right-heavy: RR or RL
+        if bf(t.right.as_ref().unwrap()) &gt; 0 {        // RL: straighten first
+            t.right = Some(rotate_right(t.right.take().unwrap()));
+        }
+        return rotate_left(t);                         // now a plain RR
+    }
+    t                                                  // |bf| &lt;= 1: balanced
+}
+fn insert(t: Link, key: i32) -&gt; Link {
+    match t {
+        None =&gt; Some(Box::new(Node::new(key))),        // new leaf, height 0
+        Some(mut n) =&gt; {
+            if key &lt; n.key { n.left = insert(n.left.take(), key); }
+            else if key &gt; n.key { n.right = insert(n.right.take(), key); }
+            else { return Some(n); }                   // duplicate key
+            Some(rebalance(n))                          // rotate on the way up
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/avl-insert.cpp &middot; code/trees/avl-insert.java &middot; code/trees/avl-insert.py &middot; code/trees/avl-insert.rs</code></p>
+<!--/ct--></div>
+      <p>
+        <code>rebalance</code> is the same four-case tool for both insertion (below)
+        and deletion (&sect;6); nothing new is needed for either.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="insertion">5. Insertion and rebalancing</h2>
+      <p>
+        AVL insertion is ordinary BST insertion plus one call on the way back up.
+        The recursion gives the upward pass for free: the return trip up the call
+        stack <em>is</em> the walk back up the search path.
+      </p>
+      <ol>
+        <li>descend and place the new key at a leaf, exactly as a plain BST would;</li>
+        <li>returning up the path, <code>fix</code> each node&rsquo;s cached height;</li>
+        <li>at the first node whose balance factor reaches \(\pm 2\), apply the one
+          rotation (single or double) that its case calls for.</li>
+      </ol>
+      <p>
+        That is the whole algorithm; the <code>insert</code> function in the tabbed
+        listing above is the recursive BST insert of <em>Trees &amp; Binary Search Trees</em> with
+        <code>return rebalance(t)</code> in place of the plain return.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (one rotation suffices for insert)</span>
+        A single insertion into an AVL tree provokes at most one rebalancing
+        rotation (counting a double rotation as one repair).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Inserting a leaf increases the height of a subtree
+        by at most \(1\), and only along the search path. Let \(z\) be the
+        <em>lowest</em> node that becomes unbalanced (\(\mathrm{bf}=\pm 2\)); below
+        \(z\) everything is still AVL. Before the insert, \(z\)&rsquo;s subtree had
+        some height \(H\); the insert made it \(H+1\). The rotation at \(z\)
+        (as the figures of &sect;3&ndash;4 show) produces a balanced
+        subtree of height exactly \(H\) again, its pre-insert height. Every ancestor
+        of \(z\) therefore sees the same subtree height it saw before the insertion,
+        so no ancestor&rsquo;s balance factor changed, and none can be violated. One
+        rotation restores the entire tree. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This height-restoration is the crucial AVL fact, and it is special to
+        insertion; deletion (&sect;6) behaves differently. It is also why AVL
+        insertion is genuinely cheap: \(O(\log n)\) to descend and retrace, plus
+        \(O(1)\) for the single rotation.
+      </p>
+
+      <div class="ex">
+        <span class="tag">Example (the common case: no rotation at all)</span>
+        Most insertions rotate nothing; they only refresh cached heights. In
+        \(30(20(10,25),\,40)\) insert \(45\). It descends \(30 \to 40\) (one
+        comparison at each) and hangs as \(40\)&rsquo;s right child. On the way up
+        the recursion visits exactly the two nodes of that path:
+        <table class="trace">
+          <tr>
+            <th class="lab">node, coming back up</th><th>height before</th>
+            <th>height after</th><th>bf after</th><th>action</th>
+          </tr>
+          <tr><td class="lab">40</td><td>0</td><td class="upd">1</td><td>\(-1 - 0 = -1\)</td><td class="lab">height updated, balanced</td></tr>
+          <tr><td class="lab">30 (root)</td><td>2</td><td>2</td><td>\(1 - 1 = 0\)</td><td class="lab">height unchanged, balanced</td></tr>
+        </table>
+        No \(\pm 2\) appears, so <code>rebalance</code> returns each node
+        untouched and the tree is \(30(20(10,25),\,40(\_,45))\). Note the root did
+        not even change height: once a node&rsquo;s height stops changing, no
+        ancestor above it can become unbalanced by this insert, which is why the
+        upward pass is cheap even when it does run to the root.
+      </div>
+
+      <h3>A worked trace: insert \(1,\dots,7\) in order</h3>
+      <p>
+        Sorted input is the plain BST&rsquo;s worst case; watch the AVL defuse it.
+        Each ascending key over-balances the right spine, and one left rotation at
+        the lowest \(\pm 2\) node pulls it back. Reading the table, only four of the
+        seven inserts trigger a rotation, and the height never exceeds \(2\).
+      </p>
+      <figure>
+        <table class="trace">
+          <tr>
+            <th class="lab">insert</th><th>lands as</th><th>lowest \(\pm 2\) node</th>
+            <th>case</th><th>rotation</th><th>height after</th>
+          </tr>
+          <tr><td class="lab">1</td><td>root</td><td class="inf">&middot;</td><td class="inf">&middot;</td><td class="inf">&middot;</td><td>0</td></tr>
+          <tr><td class="lab">2</td><td>right of 1</td><td class="inf">&middot;</td><td class="inf">&middot;</td><td class="inf">&middot;</td><td>1</td></tr>
+          <tr><td class="lab">3</td><td>right of 2</td><td class="set">1</td><td>RR</td><td class="upd">rotateLeft(1)</td><td>1</td></tr>
+          <tr><td class="lab">4</td><td>right of 3</td><td class="inf">&middot;</td><td class="inf">&middot;</td><td class="inf">&middot;</td><td>2</td></tr>
+          <tr><td class="lab">5</td><td>right of 4</td><td class="set">3</td><td>RR</td><td class="upd">rotateLeft(3)</td><td>2</td></tr>
+          <tr><td class="lab">6</td><td>right of 5</td><td class="set">2</td><td>RR</td><td class="upd">rotateLeft(2)</td><td>2</td></tr>
+          <tr><td class="lab">7</td><td>right of 6</td><td class="set">5</td><td>RR</td><td class="upd">rotateLeft(5)</td><td>2</td></tr>
+        </table>
+        <figcaption>
+          Inserting \(1,\dots,7\) into an AVL tree. After key \(3\) the tree is
+          \(2(1,3)\); after \(5\) it is \(2(1,4(3,5))\); after \(6\) a left
+          rotation at the root \(2\) yields \(4(2(1,3),5(\_,6))\); after \(7\) a
+          left rotation at \(5\) gives the perfect tree \(4(2(1,3),6(5,7))\) of
+          height \(2\). Seven worst-case inserts, and never a path.
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=avl">AVL sandbox</a>. Insert a key and watch the
+        three phases: descend, plain-insert the leaf, then recompute balance factors
+        up the path. The demo pauses at the node that hits \(\pm 2\) so you can
+        predict which rotation the case calls for before it fires. Feed it
+        \(1,2,3,\dots\) in order and confirm the height climbs like \(\log_2 n\),
+        not like \(n\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="deletion">6. Deletion</h2>
+      <p>
+        Deletion begins exactly as in the plain BST of <em>Trees &amp; Binary Search Trees</em>. To remove a node:
+      </p>
+      <ul>
+        <li>with <strong>zero or one child</strong>, splice it out (replace it by
+          its lone child, or by null);</li>
+        <li>with <strong>two children</strong>, copy its in-order successor&rsquo;s
+          key up into it, then delete that successor from the right subtree (the
+          successor has at most one child, reducing to the easy case).</li>
+      </ul>
+      <p>
+        Then, on the way back up, <code>fix</code> heights and <code>rebalance</code>
+        each node with the very same four-case dispatch as insertion. The
+        <code>erase</code> code is the leak-safe deletion of <em>Trees &amp; Binary Search Trees</em> with
+        <code>return rebalance(t)</code> replacing the plain return.
+      </p>
+      <div class="aside">
+        <span class="tag">Deletion can rotate at every level</span>
+        Here is the one real difference from insertion. A rotation on insert
+        <em>restores</em> the subtree&rsquo;s pre-insert height, so the fix stops at
+        the first violator. A deletion instead <em>shortens</em> a subtree, and the
+        rebalancing rotation can shorten it further, which may unbalance the
+        <em>parent</em>, which may then need its own rotation, and so on up the path.
+        A single deletion can therefore trigger up to \(O(\log n)\) rotations
+        (one per level) rather than just one. It is still \(O(\log n)\)
+        total, because the path is only \(O(\log n)\) tall, so the worst-case cost
+        of delete matches insert; only the rotation <em>count</em> differs.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (a delete that rotates)</span>
+        In the AVL tree \(3(1,\,4(\_,5))\), delete the leaf \(1\). The right side is
+        now two taller than the empty left side, so \(3\) reaches
+        \(\mathrm{bf}=-2\) with its right child \(4\) leaning right: an RR
+        case. A single <code>rotateLeft(3)</code> restores balance, giving
+        \(4(3,5)\).
+        <pre>     3              3 (bf &minus;2)        4
+    / \      &rarr;        \        &rarr;     / \
+   1   4                4              3   5
+        \                \
+         5                5</pre>
+        In a taller tree the shortening could cascade further up; here it stops
+        after one rotation.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="height">7. Why the height is \(\Theta(\log n)\)</h2>
+      <p>
+        Everything so far keeps the invariant cheaply; now we cash it in for the
+        height bound that is the point of the whole construction. The lower bound is
+        immediate: any binary tree on \(n\) nodes has height at least
+        \(\log_2 n\), since \(k\) levels hold at most \(2^{k+1}-1\) nodes. The work
+        is the upper bound: how <em>tall</em> can the \(\pm 1\) slack let an AVL
+        tree grow?
+      </p>
+      <p>
+        Turn the question around. Instead of asking the most height for \(n\) nodes,
+        ask the <em>fewest nodes</em> that a legal AVL tree of a given height \(h\)
+        can have; call it \(N(h)\). If even the thinnest height-\(h\) tree
+        needs many nodes, then a tree with few nodes cannot be tall.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (minimum-size AVL tree)</span>
+        The fewest nodes in an AVL tree of height \(h\) is
+        \[ N(h) = 1 + N(h-1) + N(h-2), \qquad N(-1)=0,\; N(0)=1. \]
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> A height-\(h\) tree has a root plus two subtrees, at
+        least one of which must have height \(h-1\) to make the whole tree height
+        \(h\). To use as few nodes as possible, make that tall subtree a minimal
+        tree of height \(h-1\) (using \(N(h-1)\) nodes) and make the other subtree
+        as <em>short</em> as the invariant permits. The invariant allows the two
+        subtree heights to differ by at most \(1\), so the shortest the other may be
+        is \(h-2\), using \(N(h-2)\) nodes. Adding the root gives
+        \(N(h)=1+N(h-1)+N(h-2)\). The bases: an empty tree (height \(-1\)) has
+        \(0\) nodes and a single node (height \(0\)) has \(1\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <figure>
+        <svg viewBox="0 0 470 200" role="img" aria-label="The four smallest AVL trees of heights 0 through 3, drawn as unlabeled circles. Height 0: a single node, N equals 1. Height 1: a root with one left child, N equals 2. Height 2: a root whose left child has a left child of its own and whose right child is a leaf, N equals 4. Height 3: a root whose left subtree is the four-node height-2 shape and whose right subtree is the two-node height-1 shape, N equals 7. In every tree the root's two subtrees are the minimal trees of heights h minus 1 and h minus 2, the most lopsided shape the AVL invariant allows.">
+          <!-- h=0 -->
+          <g font-family="system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">
+            <circle cx="40" cy="40" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+          </g>
+          <!-- h=1 -->
+          <g stroke="#4a5163" stroke-width="1.5" fill="none"><line x1="120" y1="30" x2="102" y2="66"/></g>
+          <g><circle cx="120" cy="30" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+             <circle cx="102" cy="66" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/></g>
+          <!-- h=2 -->
+          <g stroke="#4a5163" stroke-width="1.5" fill="none">
+            <line x1="230" y1="28" x2="210" y2="66"/> <line x1="230" y1="28" x2="252" y2="66"/>
+            <line x1="210" y1="66" x2="194" y2="104"/>
+          </g>
+          <g>
+            <circle cx="230" cy="28" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+            <circle cx="210" cy="66" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+            <circle cx="252" cy="66" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+            <circle cx="194" cy="104" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+          </g>
+          <!-- h=3 -->
+          <g stroke="#4a5163" stroke-width="1.5" fill="none">
+            <line x1="390" y1="24" x2="360" y2="62"/> <line x1="390" y1="24" x2="422" y2="62"/>
+            <line x1="360" y1="62" x2="340" y2="100"/> <line x1="360" y1="62" x2="378" y2="100"/>
+            <line x1="340" y1="100" x2="326" y2="138"/>
+            <line x1="422" y1="62" x2="408" y2="100"/>
+          </g>
+          <g>
+            <circle cx="390" cy="24" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+            <circle cx="360" cy="62" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+            <circle cx="422" cy="62" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+            <circle cx="340" cy="100" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+            <circle cx="378" cy="100" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+            <circle cx="326" cy="138" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+            <circle cx="408" cy="100" r="10" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12.5" fill="#5c6270" text-anchor="middle">
+            <text x="40" y="180">h=0</text> <text x="111" y="180">h=1</text>
+            <text x="222" y="180">h=2</text> <text x="375" y="180">h=3</text>
+            <text x="40" y="196">N=1</text> <text x="111" y="196">N=2</text>
+            <text x="222" y="196">N=4</text> <text x="375" y="196">N=7</text>
+          </g>
+        </svg>
+        <figcaption>
+          The minimum-size (&ldquo;Fibonacci&rdquo;) AVL trees. Each is a root over
+          the two smallest legal subtrees, of heights \(h-1\) and \(h-2\),
+          the most lopsided the \(\pm 1\) invariant allows, giving node
+          counts \(1,2,4,7,\dots\).
+        </figcaption>
+      </figure>
+      <p>
+        That recurrence is the Fibonacci recurrence in disguise. Tabulate it:
+      </p>
+      <pre>  h      :  0   1   2   3    4    5    6    7
+  N(h)   :  1   2   4   7   12   20   33   54
+  N(h)+1 :  2   3   5   8   13   21   34   55   &larr; Fibonacci</pre>
+      <p>
+        The pesky \(+1\) is the only thing hiding the pattern. Set
+        \(M(h) = N(h)+1\). Then
+        \[
+          M(h) = N(h)+1 = \bigl(N(h-1)+N(h-2)+1\bigr)+1
+                = \bigl(N(h-1)+1\bigr)+\bigl(N(h-2)+1\bigr) = M(h-1)+M(h-2),
+        \]
+        pure Fibonacci, with \(M(0)=2\) and \(M(1)=3\). Matching against
+        \(F_1=F_2=1,\,F_3=2,\,F_4=3,\dots\) gives \(M(h)=F_{h+3}\), so
+        \(N(h)=F_{h+3}-1\). What we actually need is a clean lower bound on
+        \(N(h)\), and Fibonacci grows like the golden ratio
+        \(\varphi = \tfrac{1+\sqrt5}{2}\approx 1.618\).
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (AVL height bound)</span>
+        An AVL tree with \(n\) nodes has height
+        \[ h \;\le\; \log_\varphi n \;=\; \frac{\log_2 n}{\log_2 \varphi}
+          \;\approx\; 1.44\,\log_2 n, \]
+        and therefore height \(\Theta(\log n)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> First, \(N(h) \ge \varphi^{\,h}\), by induction on
+        \(h\). Bases: \(N(0)=1=\varphi^0\) and \(N(1)=2\ge\varphi\). For the step,
+        using \(\varphi^2=\varphi+1\),
+        \[
+          N(h) = 1 + N(h-1) + N(h-2)
+               \;\ge\; 1 + \varphi^{\,h-1} + \varphi^{\,h-2}
+               = 1 + \varphi^{\,h-2}(\varphi+1)
+               = 1 + \varphi^{\,h}
+               \;\gt\; \varphi^{\,h}.
+        \]
+        Now any AVL tree of height \(h\) has at least \(N(h)\) nodes, so
+        \(n \ge N(h) \ge \varphi^{\,h}\). Taking \(\log_\varphi\) of both sides,
+        \(h \le \log_\varphi n\); converting the base,
+        \(\log_\varphi n = \log_2 n / \log_2 \varphi\) and
+        \(1/\log_2\varphi = 1/0.694\ldots \approx 1.44\). Combined with the
+        universal lower bound \(h \ge \log_2 n\), the height is pinned to
+        \(\log_2 n \le h \le 1.44\log_2 n\), i.e. \(\Theta(\log n)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="aside">
+        <span class="tag">Where the \(1.44\) comes from</span>
+        The constant \(1/\log_2\varphi \approx 1.4405\) is the price of the \(\pm 1\)
+        wobble: a perfectly balanced tree would achieve \(1.00\log_2 n\). Knuth
+        named the minimum-size trees <em>Fibonacci trees</em> for exactly the
+        recurrence above; Binet&rsquo;s formula sharpens the estimate to
+        \(N(h)\approx 1.894\,\varphi^{\,h}\), but the crude \(N(h)\ge\varphi^{\,h}\)
+        is all the height bound needs. Every extra unit of height multiplies the
+        minimum node count by another factor of \(\varphi\).
+      </div>
+      <p>
+        The consequence is the guarantee promised in &sect;1. Because each of
+        search, insert, and delete walks one path, and the path is now at most
+        \(1.44\log_2 n\), all three are \(\Theta(\log n)\) in the
+        <em>worst</em> case, for any sequence of operations, adversarial input
+        included.
+      </p>
+      <table>
+        <tr><th>operation</th><th>plain BST (worst)</th><th>AVL (worst)</th></tr>
+        <tr><td>search</td><td>\(\Theta(n)\)</td><td><strong>\(\Theta(\log n)\)</strong></td></tr>
+        <tr><td>insert</td><td>\(\Theta(n)\)</td><td><strong>\(\Theta(\log n)\)</strong></td></tr>
+        <tr><td>delete</td><td>\(\Theta(n)\)</td><td><strong>\(\Theta(\log n)\)</strong></td></tr>
+      </table>
+      <p>
+        The plain BST gave \(\Theta(\log n)\) only on average; AVL gives it as a
+        worst-case promise. To feel the difference concretely, take \(n = 10^9\): a
+        plain BST fed sorted keys can take a billion comparisons for one lookup,
+        while an AVL tree takes at most \(1.44\log_2 10^9 \approx 43\): a few
+        dozen nodes touched, guaranteed, no matter the input. The price is modest: a
+        single extra integer per node, one rotation per insert (up to \(O(\log n)\)
+        per delete), and a handful of \(O(1)\) checks on the way up.
+      </p>
+      <div class="aside">
+        <span class="tag">The template for every balanced tree</span>
+        AVL is one instance of a universal recipe: (1) pick a <em>local</em>
+        invariant that bounds height; (2) after each update, restore it with
+        \(O(1)\) rotations, bottom-up; (3) prove the invariant forces
+        \(\Theta(\log n)\) height. The 2-3, B-, and red-black trees (the
+        <a href="ds-two-three-trees.html">2-3 Trees</a>,
+        <a href="ds-b-trees.html">B-Trees &amp; B+ Trees</a>, and
+        <a href="ds-red-black-trees.html">Red-Black Trees</a> handouts)
+        change only the <em>invariant</em>: a red-black tree admits height up
+        to \(2\log_2 n\), looser than AVL&rsquo;s \(1.44\log_2 n\) but with cheaper
+        updates, which is why <code>std::map</code> uses red-black while
+        read-mostly indexes lean toward the stricter AVL. Same goal, different local
+        rule. And it is balanced trees like these that make the ordered-map and
+        priority structures the rest of the course relies on run in guaranteed
+        logarithmic time.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex-avl">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Give the balance factor of every node in the tree \(8(4(2,6),\,9)\)
+          (root \(8\), left child \(4\) with children \(2,6\), right child \(9\)),
+          and say whether it is AVL.
+          <details>
+            <summary>solution</summary>
+            Leaves \(2,6,9\) have height \(0\) and balance factor \(0\). Node \(4\)
+            has two height-\(0\) children, so height \(1\), \(\mathrm{bf}=0\). Node
+            \(8\) has left subtree (rooted at \(4\)) of height \(1\) and right child
+            \(9\) of height \(0\), so \(\mathrm{bf}(8) = 1 - 0 = +1\). Every balance
+            factor is in \(\{-1,0,+1\}\), so the tree is AVL. (Extend the left side
+            one node deeper, say insert \(1\) below \(2\), and
+            \(\mathrm{bf}(8)\) tips to \(+2\), triggering a rotation.)
+          </details>
+        </li>
+        <li>
+          Insert \(50,25,10\) in that order into an empty AVL tree. Name the case,
+          the rotation, and the resulting tree.
+          <details>
+            <summary>solution</summary>
+            \(50\) is the root; \(25\) becomes its left child; \(10\) becomes
+            \(25\)&rsquo;s left child. Now \(\mathrm{bf}(50)=+2\) and its left child
+            \(25\) leans left (\(\mathrm{bf}=+1\)): a straight <strong>LL</strong>
+            case. A single <code>rotateRight(50)</code> lifts \(25\), giving
+            \(25(10,50)\), balanced with height \(1\). This is the sorted-descending
+            mirror of the \(1,2,3\) example.
+          </details>
+        </li>
+        <li>
+          Insert \(10,20,15\) into an empty AVL tree. Identify the case and give the
+          two rotations and the final tree.
+          <details>
+            <summary>solution</summary>
+            \(10\) root, \(20\) its right child, then \(15\) goes right of \(10\)
+            and left of \(20\), landing as \(20\)&rsquo;s left child. Now
+            \(\mathrm{bf}(10)=-2\) while its right child \(20\) leans left
+            (\(\mathrm{bf}=+1\)): a kinked <strong>RL</strong> case. First
+            <code>rotateRight(20)</code> straightens it (making \(15\) the right
+            child of \(10\) with \(20\) below), then <code>rotateLeft(10)</code>
+            finishes, giving \(15(10,20)\). In-order \(10,15,20\) throughout.
+          </details>
+        </li>
+        <li>
+          What is the maximum height of an AVL tree with \(20\) nodes? With
+          \(n=54\) nodes?
+          <details>
+            <summary>solution</summary>
+            Use the minimum-size table \(N(h)=1,2,4,7,12,20,33,54\) for
+            \(h=0,\dots,7\). A tree of height \(h\) needs at least \(N(h)\) nodes, so
+            the tallest tree with \(n\) nodes has the largest \(h\) with
+            \(N(h)\le n\). For \(n=20\): \(N(5)=20\le 20\) but \(N(6)=33\gt 20\), so
+            the maximum height is \(5\). For \(n=54\): \(N(7)=54\le 54\) but
+            \(N(8)=88\gt 54\), so the maximum height is \(7\). (A \(54\)-node tree of
+            height \(7\) is exactly the minimum-size tree of that height.)
+          </details>
+        </li>
+        <li>
+          Prove that AVL insertion needs at most one rotation but AVL deletion may
+          need one at every level of the path. What structural fact distinguishes
+          the two?
+          <details>
+            <summary>solution</summary>
+            The distinguishing fact is what the rotation does to the subtree&rsquo;s
+            height. On insertion, the rotation at the lowest violator restores the
+            subtree to its <em>pre-insert</em> height (&sect;5), so every ancestor
+            sees an unchanged child height and none can become unbalanced;
+            one rotation ends it. On deletion, the removal shortens a subtree, and
+            the rebalancing rotation shortens it further; this reduced height can
+            propagate to the parent, unbalancing it, and so on up the path. Each
+            level may thus need its own rotation, for up to \(O(\log n)\) rotations,
+            though the total cost stays \(O(\log n)\) since the path is that tall.
+          </details>
+        </li>
+        <li>
+          A balance factor is stored as a small integer. Some implementations store
+          only \(\mathrm{bf}\in\{-1,0,+1\}\) per node instead of a full height. What
+          is saved, and what becomes harder?
+          <details>
+            <summary>solution</summary>
+            Storing only the balance factor needs two bits per node instead of a
+            full <code>int</code> height, saving space. The cost is bookkeeping:
+            after a rotation you must update balance factors from case analysis
+            (the several sub-cases of how the inserted key&rsquo;s subtree changed)
+            rather than simply recomputing <code>1 + max(height(left),
+            height(right))</code> from cached child heights. The height-field version
+            in this handout trades a little space for markedly simpler, less
+            error-prone code, which is why it is the teaching default.
+          </details>
+        </li>
+        <li>
+          Explain why the height bound uses \(\varphi^{\,h}\) rather than, say,
+          \(2^{h}\). What would go wrong if AVL required <em>perfect</em> balance
+          instead?
+          <details>
+            <summary>solution</summary>
+            The minimum-size AVL tree is deliberately lopsided (subtree
+            heights \(h-1\) and \(h-2\)) so its node count grows like
+            \(\varphi^{\,h}\), not \(2^{h}\); a perfectly balanced tree of height
+            \(h\) would have \(\sim 2^{h}\) nodes, giving the better constant
+            \(1.00\log_2 n\). But requiring perfect balance would make the invariant
+            impossible to maintain in \(O(\log n)\): a single insert could force a
+            \(\Theta(n)\) rebuild of a large subtree to keep every leaf at the same
+            depth. AVL accepts the weaker \(\varphi^{\,h}\) growth (constant
+            \(1.44\)) precisely to buy \(O(1)\)-per-level, one-rotation repair. The
+            slack is what makes it maintainable.
+          </details>
+        </li>
+        <li>
+          True or false, with justification: &ldquo;If a binary search tree has
+          height \(\le 1.44\log_2 n\), then it is an AVL tree.&rdquo;
+          <details>
+            <summary>solution</summary>
+            False. The height bound is a <em>consequence</em> of the AVL invariant,
+            not equivalent to it: a tree can respect the global height bound yet
+            still contain a node whose two subtrees differ in height by \(2\),
+            violating the invariant. Take \(8\bigl(4(2,6),\,12\bigr)\) where the
+            right child \(12\) has a right child \(14\), which has a right child
+            \(16\): seven nodes, height \(3\), and
+            \(3 \le 1.44\log_2 7 \approx 4.04\), so the height bound holds. But
+            \(\mathrm{bf}(12) = \text{height}(\text{null}) - \text{height}(14\text{'s
+            subtree}) = -1 - 1 = -2\), so the tree is not AVL. The invariant is a
+            per-node condition; a global height bound cannot imply it.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; AVL Trees v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

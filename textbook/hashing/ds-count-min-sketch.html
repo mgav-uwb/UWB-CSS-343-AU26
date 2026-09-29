@@ -1,0 +1,1268 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Count-Min Sketch.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Count-Min Sketch - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22;
+        --dim: #5c6270;
+        --line: #d7dbe3;
+        --bg: #ffffff;
+        --accent: #0a7d4d;
+        --accentbg: #eaf6ef;
+        --box: #f6f8fb;
+        --warn: #9a5b00;
+        --warnbg: #fff5e6;
+        --demo: #6b40d8;
+        --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #eef0f4;
+        color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px;
+        margin: 28px auto;
+        background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002;
+        border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic;
+        margin: 0 0 26px; border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.92em; background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 13px; line-height: 1.5; background: #f6f8fb;
+        border: 1px solid var(--line); border-left: 3px solid #b9c0d0;
+        border-radius: 6px; padding: 12px 14px; margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); }
+      .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; }
+      .aside .tag { color: var(--warn); }
+      .proof {
+        margin: 10px 0 4px; padding-left: 14px;
+        border-left: 2px solid var(--line); color: #2c2f37;
+      }
+      .proof .qed { float: right; }
+      table {
+        border-collapse: collapse; width: 100%; margin: 14px 0;
+        font-family: system-ui, sans-serif; font-size: 14.5px;
+      }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption {
+        font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim);
+        margin: 7px auto 0; max-width: 92%;
+      }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary {
+        cursor: pointer; color: var(--accent);
+        font-family: system-ui, sans-serif; font-size: 14px;
+      }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; }
+      li { margin: 5px 0; }
+      footer {
+        margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px;
+        color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif;
+      }
+      .toc {
+        font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box);
+        border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0;
+      }
+      .toc ol { margin: 4px 0; padding-left: 22px; }
+      .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; }
+        details summary { display: none; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+    <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Count-Min Sketch</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        Frequency estimation for streams in space that does not grow with the
+        number of distinct items: the \(d \times w\) counter matrix with one
+        pairwise-independent hash function per row, update as \(d\)
+        increments, estimate as the minimum over the \(d\) rows, a full trace
+        of twelve updates on a \(3 \times 8\) sketch with stated hash
+        functions (heavy hitter estimated exactly, a rare item overestimated
+        by collisions, a phantom count for an item never seen), the
+        never-underestimates guarantee proved, the \((\varepsilon, \delta)\)
+        error bound proved from Markov&rsquo;s inequality with the sizing
+        \(w = \lceil e/\varepsilon \rceil\) and
+        \(d = \lceil \ln(1/\delta) \rceil\), the heavy-hitters application,
+        and the comparison with Bloom filters and hash tables. With worked
+        examples, proofs, and exercises.
+      </div>
+
+      <p class="lead">
+        A router sees ten million packets a minute and someone asks which
+        source addresses are flooding the link. A search engine sees a billion
+        queries a day and someone asks how often a given query was issued. The
+        exact answer is a hash table from item to counter
+        (<a href="ds-hashing.html"><em>Hashing</em></a>), and its space grows
+        with the number of <em>distinct</em> items, which in these settings is
+        the thing that is too large to hold. A <strong>count-min sketch</strong>
+        gives up exactness to escape that growth: a fixed grid of counters,
+        sized before the stream starts and never resized, that answers
+        &ldquo;how many times has \(x\) appeared?&rdquo; with a number that is
+        never too small and is too large by a bounded amount with high
+        probability. This handout is that structure: how it updates, why the
+        minimum over its rows is the right answer to report, and how to size
+        the grid for an error target you choose.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#problem">Counting a stream you cannot store</a></li>
+          <li><a href="#structure">The structure: \(d\) rows of \(w\) counters</a></li>
+          <li><a href="#ops">Update and estimate, in code</a></li>
+          <li><a href="#trace">A sketch traced update by update</a></li>
+          <li><a href="#est">Reading the sketch: five estimates</a></li>
+          <li><a href="#onesided">The sketch never underestimates</a></li>
+          <li><a href="#bound">The \((\varepsilon,\delta)\) bound and how to size the grid</a></li>
+          <li><a href="#hh">Heavy hitters</a></li>
+          <li><a href="#cost">Cost, and the comparison table</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="problem">1. Counting a stream you cannot store</h2>
+      <div class="def">
+        <span class="tag">Definition (stream, frequency vector)</span>
+        A <strong>stream</strong> is a sequence
+        \(x_1, x_2, \dots, x_N\) of items drawn from a universe \(U\),
+        presented one at a time, each seen once, in an order you do not
+        control. Its <strong>frequency vector</strong> is the array
+        \(a = (a_x)_{x \in U}\) where \(a_x\) counts the occurrences of \(x\).
+        The <strong>point query</strong> asks, for a given \(x\), for the value
+        \(a_x\). Note \(\sum_{x} a_x = N\), the length of the stream, which is
+        also written \(\lVert a \rVert_1\).
+      </div>
+      <p>
+        The exact solution is immediate: a hash table keyed by item, one
+        counter per key, incremented on arrival. It is optimal in time and
+        wrong in space. If \(U\) is the set of 128-bit IPv6 (Internet Protocol
+        version 6) addresses, or the set of all search strings, then storing
+        one entry per distinct item observed means storing the keys, and there
+        can be hundreds of millions of them. Space proportional to the number
+        of distinct items is exactly the resource that a monitoring process
+        sitting inside a router or a log pipeline does not have.
+      </p>
+      <p>
+        So relax the requirement. Three relaxations are on the table, and the
+        count-min sketch takes the third.
+      </p>
+      <ul>
+        <li><strong>Answer for only some items.</strong> Track a fixed list of
+          items of interest. Cheap and useless when the interesting items are
+          the ones you did not know to list.</li>
+        <li><strong>Sample the stream.</strong> Keep every thousandth item and
+          multiply. The estimate for a frequent item is decent; for a rare
+          item it is almost always zero, and the error is two-sided (a sampled
+          count can land above or below the truth).</li>
+        <li><strong>Keep a lossy summary of every item.</strong> Hash each
+          arrival into a small array of counters shared by all items, and
+          accept that the counters mix items together. Every item contributes
+          to the summary, so nothing is missed, and the mixing is what keeps
+          the array small. The error is one-sided: the mixing can only add.</li>
+      </ul>
+      <div class="def">
+        <span class="tag">Definition (sketch)</span>
+        A <strong>sketch</strong> of a stream is a summary data structure whose
+        size is fixed in advance, independent of the stream length \(N\) and of
+        the number of distinct items, that supports a specified query with a
+        quantified error guarantee. Sketches are <strong>linear</strong>: the
+        sketch of a concatenated stream is a cell-by-cell combination of the
+        sketches of its parts, so they can be built in parallel and merged.
+      </div>
+      <p>
+        The <a href="ds-bloom-filters.html"><em>Bloom Filters</em></a> handout
+        treats the sketch for the membership question (is \(a_x &gt; 0\)?).
+        The count-min sketch answers the quantitative version (what is
+        \(a_x\)?) with the same ingredients: a small array, a handful of hash
+        functions, and an error that goes in one direction only.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="structure">2. The structure: \(d\) rows of \(w\) counters</h2>
+      <div class="def">
+        <span class="tag">Definition (count-min sketch)</span>
+        A <strong>count-min sketch</strong> with depth \(d\) and width \(w\) is
+        a matrix \(C[0..d-1][0..w-1]\) of integer counters, initially all
+        \(0\), together with \(d\) hash functions
+        \(h_0, h_1, \dots, h_{d-1}\), each mapping \(U\) into
+        \(\{0, 1, \dots, w-1\}\), one per row, drawn independently from a
+        pairwise-independent family. The operations are
+        <ul>
+          <li><strong>update(\(x\), \(c\))</strong>: for each row \(j\), add
+            \(c\) to \(C[j][h_j(x)]\). An arrival in the stream is
+            <code>update(x, 1)</code>.</li>
+          <li><strong>estimate(\(x\))</strong>: report
+            \(\hat a_x = \min_{0 \le j &lt; d} C[j][h_j(x)]\).</li>
+        </ul>
+      </div>
+      <p>
+        Row \(j\) on its own is a complete, very crude counting scheme: it
+        partitions the universe into \(w\) buckets by \(h_j\) and keeps the
+        total for each bucket. Reading \(C[j][h_j(x)]\) gives \(a_x\) plus the
+        counts of every other item that \(h_j\) sends to the same bucket. That
+        is an <em>overestimate</em>, and never anything else, because all
+        counts are non-negative. The whole design follows from this one
+        observation: each row is an independent upper bound on \(a_x\), so
+        \(d\) rows give \(d\) upper bounds, and the smallest of them is the
+        best one available. Hence &ldquo;count&rdquo; (each row counts) and
+        &ldquo;min&rdquo; (the rows are combined by minimum).
+      </p>
+      <div class="def">
+        <span class="tag">Definition (pairwise independence)</span>
+        A family \(\mathcal H\) of functions \(U \to \{0,\dots,w-1\}\) is
+        <strong>pairwise independent</strong> if for a uniformly random
+        \(h \in \mathcal H\) and any two distinct \(x \ne y\) and any two
+        values \(i, k\),
+        \[ \Pr[\,h(x) = i \ \text{and}\ h(y) = k\,] = \frac{1}{w^2}. \]
+        The consequence the analysis uses is weaker and is called
+        <strong>universality</strong>: for \(x \ne y\),
+        \(\Pr[h(x) = h(y)] \le 1/w\). A concrete family: pick a prime
+        \(p &gt; |U|\), draw \(a \in \{1,\dots,p-1\}\) and
+        \(b \in \{0,\dots,p-1\}\) uniformly, and set
+        \[ h_{a,b}(x) \;=\; \bigl((a x + b) \bmod p\bigr) \bmod w. \]
+      </div>
+      <p>
+        Two remarks on that family. First, the final \(\bmod\ w\) is only
+        exactly uniform when \(w\) divides \(p\), which it does not; the
+        residues \(0, \dots, (p \bmod w) - 1\) receive one extra preimage
+        each. The standard bound absorbs this and still gives
+        \(\Pr[h(x) = h(y)] \le 1/w\) for \(x \ne y\), which is precisely the
+        quantity <a href="#bound">&sect;7</a> consumes. Second, the \(d\) rows
+        must use <em>independently drawn</em> pairs \((a_j, b_j)\); the proof
+        multiplies the \(d\) failure probabilities together, and that step is
+        the only place independence across rows is needed. Within a row,
+        pairwise independence suffices: no stronger property of the hash
+        function is ever used.
+      </p>
+      <p>
+        The parameters are chosen once, before any data arrives, and never
+        change. There is no load factor, no resizing, no rehashing: feeding
+        the sketch more items degrades its accuracy smoothly rather than its
+        performance at all. That is the trade against a hash table, where
+        space follows the data and accuracy is perfect.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ops">3. Update and estimate, in code</h2>
+      <p>
+        Both operations are the same three lines: hash the item once per row,
+        then touch the \(d\) cells. Update adds; estimate takes a minimum.
+      </p>
+      <div class="code-tabs" data-snippet="hashing/countmin">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Count-min sketch: d rows of w counters, one hash function per row,
+// h_j(x) = ((a_j*x + b_j) mod p) mod w with p prime and (a_j, b_j)
+// drawn independently per row.
+struct CountMinSketch {
+    vector&lt;vector&lt;long long&gt;&gt; C;      // d x w counters, all 0
+    vector&lt;long long&gt; a, b;           // hash coefficients, one pair per row
+    int d, w;
+    static const long long P = 2305843009213693951LL;  // 2^61 - 1, prime
+
+    CountMinSketch(int d, int w) : C(d, vector&lt;long long&gt;(w, 0)), d(d), w(w) {
+        for (int j = 0; j &lt; d; j++) {         // draw the row hashes once
+            a.push_back(1 + randomBelow(P - 1));
+            b.push_back(randomBelow(P));
+        }
+    }
+    int hash(int j, long long x) const {
+        return (int)((((__int128)a[j] * x + b[j]) % P) % w);
+    }
+    void update(long long x, long long c) {   // c = 1 for one arrival
+        for (int j = 0; j &lt; d; j++)
+            C[j][hash(j, x)] += c;            // d increments, no branching
+    }
+    long long estimate(long long x) const {
+        long long best = C[0][hash(0, x)];
+        for (int j = 1; j &lt; d; j++)
+            best = min(best, C[j][hash(j, x)]);  // tightest upper bound
+        return best;
+    }
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Count-min sketch: d rows of w counters, one hash function per row,
+// h_j(x) = ((a_j*x + b_j) mod p) mod w with p prime and (a_j, b_j)
+// drawn independently per row.
+class CountMinSketch {
+    private final long[][] C;             // d x w counters, all 0
+    private final long[] a, b;            // hash coefficients, one pair per row
+    private final int d, w;
+    private static final long P = 2305843009213693951L;  // 2^61 - 1, prime
+
+    CountMinSketch(int d, int w) {
+        this.d = d; this.w = w;
+        C = new long[d][w];
+        a = new long[d]; b = new long[d];
+        Random r = new Random();
+        for (int j = 0; j &lt; d; j++) {     // draw the row hashes once
+            a[j] = 1 + Math.floorMod(r.nextLong(), P - 1);
+            b[j] = Math.floorMod(r.nextLong(), P);
+        }
+    }
+    private int hash(int j, long x) {
+        return (int) (Math.floorMod(a[j] * x + b[j], P) % w);
+    }
+    void update(long x, long c) {         // c = 1 for one arrival
+        for (int j = 0; j &lt; d; j++)
+            C[j][hash(j, x)] += c;        // d increments, no branching
+    }
+    long estimate(long x) {
+        long best = C[0][hash(0, x)];
+        for (int j = 1; j &lt; d; j++)
+            best = Math.min(best, C[j][hash(j, x)]);  // tightest upper bound
+        return best;
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Count-min sketch: d rows of w counters, one hash function per row,
+# h_j(x) = ((a_j*x + b_j) mod p) mod w with p prime and (a_j, b_j)
+# drawn independently per row.
+import random
+
+class CountMinSketch:
+    P = (1 &lt;&lt; 61) - 1                       # prime modulus
+
+    def __init__(self, d, w):
+        self.d, self.w = d, w
+        self.C = [[0] * w for _ in range(d)]        # d x w counters, all 0
+        self.ab = [(random.randrange(1, self.P), random.randrange(self.P))
+                   for _ in range(d)]               # one (a, b) pair per row
+
+    def _cells(self, x):
+        return [(j, ((a * x + b) % self.P) % self.w)
+                for j, (a, b) in enumerate(self.ab)]
+
+    def update(self, x, c=1):                       # c = 1 for one arrival
+        for j, i in self._cells(x):
+            self.C[j][i] += c                       # d increments
+
+    def estimate(self, x):
+        return min(self.C[j][i] for j, i in self._cells(x))  # tightest bound</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Count-min sketch: d rows of w counters, one hash function per row,
+// h_j(x) = ((a_j*x + b_j) mod p) mod w with p prime and (a_j, b_j)
+// drawn independently per row.
+const P: u128 = 2305843009213693951; // 2^61 - 1, prime
+
+struct CountMinSketch { c: Vec&lt;Vec&lt;i64&gt;&gt;, ab: Vec&lt;(u128, u128)&gt;, d: usize, w: usize }
+
+impl CountMinSketch {
+    fn new(d: usize, w: usize) -&gt; Self {
+        let ab = (0..d).map(|_| (1 + rand_below(P - 1), rand_below(P))).collect();
+        CountMinSketch { c: vec![vec![0; w]; d], ab, d, w }
+    }
+    fn cell(&amp;self, j: usize, x: u128) -&gt; usize {
+        let (a, b) = self.ab[j];
+        (((a * x + b) % P) % self.w as u128) as usize
+    }
+    fn update(&amp;mut self, x: u128, c: i64) {          // c = 1 for one arrival
+        for j in 0..self.d {
+            let i = self.cell(j, x);
+            self.c[j][i] += c;                       // d increments
+        }
+    }
+    fn estimate(&amp;self, x: u128) -&gt; i64 {
+        (0..self.d).map(|j| self.c[j][self.cell(j, x)]).min().unwrap()
+    }
+}</pre>
+<p class="ct-src">source: <code>code/hashing/countmin.cpp &middot; code/hashing/countmin.java &middot; code/hashing/countmin.py &middot; code/hashing/countmin.rs</code></p>
+<!--/ct--></div>
+      <p class="note">
+        Neither loop has a branch, a probe sequence, or a resize check. Both
+        run exactly \(d\) iterations, whatever the item and whatever the state
+        of the sketch. Compare the query loop of a Bloom filter, which can
+        exit early on a zero bit: the sketch has no early exit, because the
+        minimum is not known until all \(d\) cells are read.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">4. A sketch traced update by update</h2>
+      <p>
+        Take \(d = 3\) and \(w = 8\), so the sketch is a \(3 \times 8\) grid of
+        \(24\) counters. Items are integer identifiers in
+        \(U = \{0,\dots,100\}\); take \(p = 101\) and fix the three row hashes
+      </p>
+      \[
+        h_0(x) = \bigl((3x + 7) \bmod 101\bigr) \bmod 8, \quad
+        h_1(x) = \bigl((5x + 2) \bmod 101\bigr) \bmod 8, \quad
+        h_2(x) = \bigl((11x + 5) \bmod 101\bigr) \bmod 8.
+      \]
+      <p>
+        The stream has \(N = 12\) arrivals over four distinct items:
+      </p>
+      <pre>  t :   1   2   3   4   5   6   7   8   9  10  11  12
+  x :  19  33  44  19  58  19  33  44  19  19  33  19
+
+  true counts:   a[19] = 6    a[33] = 3    a[44] = 2    a[58] = 1</pre>
+      <p>
+        Each item touches one cell per row; compute those cells once, since
+        they never change:
+      </p>
+      <table>
+        <tr><th>item \(x\)</th><th>\(h_0(x)\)</th><th>\(h_1(x)\)</th><th>\(h_2(x)\)</th><th>cells touched</th></tr>
+        <tr><td>19</td><td>\((3\cdot19+7) \bmod 101 = 64\), \(64 \bmod 8 = 0\)</td><td>\(97 \bmod 8 = 1\)</td><td>\(12 \bmod 8 = 4\)</td><td>\(C[0][0],\ C[1][1],\ C[2][4]\)</td></tr>
+        <tr><td>33</td><td>\(5 \bmod 8 = 5\)</td><td>\(66 \bmod 8 = 2\)</td><td>\(65 \bmod 8 = 1\)</td><td>\(C[0][5],\ C[1][2],\ C[2][1]\)</td></tr>
+        <tr><td>44</td><td>\(38 \bmod 8 = 6\)</td><td>\(20 \bmod 8 = 4\)</td><td>\(85 \bmod 8 = 5\)</td><td>\(C[0][6],\ C[1][4],\ C[2][5]\)</td></tr>
+        <tr><td>58</td><td>\(80 \bmod 8 = 0\)</td><td>\(90 \bmod 8 = 2\)</td><td>\(37 \bmod 8 = 5\)</td><td>\(C[0][0],\ C[1][2],\ C[2][5]\)</td></tr>
+      </table>
+      <p>
+        Read the last row against the three above it: item \(58\) collides
+        with \(19\) in row \(0\), with \(33\) in row \(1\), and with \(44\) in
+        row \(2\). It shares a cell with a different item in every single row.
+        That is unlucky, and it is what makes \(58\) the instructive case in
+        <a href="#est">&sect;5</a>. Items \(19, 33, 44\) collide with nothing
+        but \(58\).
+      </p>
+
+      <h3>The twelve updates</h3>
+      <p>
+        Each line shows the three cells the arrival increments and their values
+        after the increment.
+      </p>
+      <pre>  t=1   x=19    C[0][0] -> 1    C[1][1] -> 1    C[2][4] -> 1     three fresh cells
+  t=2   x=33    C[0][5] -> 1    C[1][2] -> 1    C[2][1] -> 1     three fresh cells
+  t=3   x=44    C[0][6] -> 1    C[1][4] -> 1    C[2][5] -> 1     three fresh cells
+  t=4   x=19    C[0][0] -> 2    C[1][1] -> 2    C[2][4] -> 2     repeat item: its own cells
+  t=5   x=58    C[0][0] -> 3    C[1][2] -> 2    C[2][5] -> 2     COLLIDES in all 3 rows
+  t=6   x=19    C[0][0] -> 4    C[1][1] -> 3    C[2][4] -> 3
+  t=7   x=33    C[0][5] -> 2    C[1][2] -> 3    C[2][1] -> 2
+  t=8   x=44    C[0][6] -> 2    C[1][4] -> 2    C[2][5] -> 3
+  t=9   x=19    C[0][0] -> 5    C[1][1] -> 4    C[2][4] -> 4
+  t=10  x=19    C[0][0] -> 6    C[1][1] -> 5    C[2][4] -> 5
+  t=11  x=33    C[0][5] -> 3    C[1][2] -> 4    C[2][1] -> 3
+  t=12  x=19    C[0][0] -> 7    C[1][1] -> 6    C[2][4] -> 6</pre>
+      <p>
+        Three kinds of update appear, and they exhaust the cases. At \(t = 1,
+        2, 3\) an item arrives for the first time and finds all three of its
+        cells at \(0\). At \(t = 4\) (and \(6, 7, \dots\)) an item that has
+        arrived before increments its own cells, which already hold its own
+        earlier arrivals: nothing is shared, and all three cells stay equal to
+        the item&rsquo;s true count so far. At \(t = 5\), item \(58\) arrives
+        and lands on cells that <em>other</em> items have been filling.
+        \(C[0][0]\) goes from \(2\) to \(3\), but the \(2\) belongs to \(19\);
+        after this update the cell means &ldquo;two arrivals of \(19\) plus one
+        of \(58\)&rdquo; and the sketch has no way to say which is which. This
+        is the only source of error in the entire structure.
+      </p>
+
+      <h3>Snapshots of the grid</h3>
+      <pre>  after t=4 (19,33,44,19 seen)             after t=5 (58 has arrived)
+        col: 0  1  2  3  4  5  6  7             col: 0  1  2  3  4  5  6  7
+  row 0:     2  0  0  0  0  1  1  0       row 0:     3  0  0  0  0  1  1  0
+  row 1:     0  2  1  0  1  0  0  0       row 1:     0  2  2  0  1  0  0  0
+  row 2:     0  1  0  0  2  1  0  0       row 2:     0  1  0  0  2  2  0  0
+  row sums:  4  4  4                      row sums:  5  5  5</pre>
+      <pre>  final grid, after all 12 updates
+        col:  0  1  2  3  4  5  6  7
+  row 0:      7  0  0  0  0  3  2  0        sum = 12
+  row 1:      0  6  4  0  2  0  0  0        sum = 12
+  row 2:      0  3  0  0  6  3  0  0        sum = 12</pre>
+      <div class="aside">
+        <span class="tag">An invariant worth checking</span>
+        Every row sums to \(N\), the number of arrivals, because each arrival
+        adds exactly \(1\) to exactly one cell of each row. This holds after
+        every update, not just at the end, and it is the cheapest sanity check
+        on an implementation: if a row sum drifts from the update count, a hash
+        function is returning an out-of-range index or a row is being skipped.
+        The three row sums above are \(12, 12, 12\) as required.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="est">5. Reading the sketch: five estimates</h2>
+      <p>
+        Estimating is three lookups and a minimum. Each row&rsquo;s cell is one
+        upper bound on \(a_x\); the reported value is the smallest.
+      </p>
+
+      <h3>A heavy hitter: \(x = 19\), true count \(6\)</h3>
+      <pre>  cells:  C[0][0] = 7    C[1][1] = 6    C[2][4] = 6
+  estimate = min(7, 6, 6) = 6                      EXACT
+
+  why row 0 is inflated: 58 also hashes to C[0][0], contributing its 1 arrival
+  rows 1 and 2 hold 19's arrivals and nothing else</pre>
+      <p>
+        This is the minimum doing its job. One row is polluted and reports
+        \(7\); two rows are clean and report \(6\). Taking the minimum ignores
+        the polluted row automatically, without knowing which row is polluted
+        or that any row is. A single row of a sketch would answer \(7\) a third
+        of the time here; three rows answer \(6\).
+      </p>
+
+      <h3>A mid-frequency item: \(x = 33\), true count \(3\)</h3>
+      <pre>  cells:  C[0][5] = 3    C[1][2] = 4    C[2][1] = 3
+  estimate = min(3, 4, 3) = 3                      EXACT
+
+  row 1 is inflated by 58's single arrival at C[1][2]</pre>
+
+      <h3>A low-frequency item: \(x = 44\), true count \(2\)</h3>
+      <pre>  cells:  C[0][6] = 2    C[1][4] = 2    C[2][5] = 3
+  estimate = min(2, 2, 3) = 2                      EXACT
+
+  row 2 is inflated: C[2][5] holds 44's 2 arrivals plus 58's 1</pre>
+
+      <h3>A rare item drowned by collisions: \(x = 58\), true count \(1\)</h3>
+      <pre>  cells:  C[0][0] = 7    C[1][2] = 4    C[2][5] = 3
+                (1+6)         (1+3)         (1+2)
+  estimate = min(7, 4, 3) = 3                      OVERESTIMATE by 2</pre>
+      <p>
+        No row is clean, because \(58\) collides with some other item in every
+        row: with \(19\) (count \(6\)) in row \(0\), with \(33\) (count \(3\))
+        in row \(1\), with \(44\) (count \(2\)) in row \(2\). Each cell equals
+        \(a_{58}\) plus the noise from its row&rsquo;s collision partner, so
+        the three row estimates are \(1 + 6\), \(1 + 3\), \(1 + 2\), and the
+        minimum picks the row whose collision partner is smallest. The reported
+        \(3\) is wrong by \(2\), and observe what the minimum bought: without
+        it, a single-row sketch would have been wrong by \(6\) with probability
+        \(1/3\). The minimum does not eliminate error; it selects the least of
+        the \(d\) errors on offer.
+      </p>
+      <p>
+        Notice also which items hurt. The noise in a cell is the total count of
+        the colliding items, so a rare item that shares a cell with a heavy
+        hitter is estimated terribly, while a heavy hitter that shares a cell
+        with a rare item is barely affected. The sketch is accurate exactly
+        where accuracy matters most: on large counts, whose relative error is
+        small because the noise a collision adds does not scale with the count
+        being estimated. This asymmetry is the content of the bound in
+        <a href="#bound">&sect;7</a>, which limits the <em>absolute</em> error
+        to a fraction of \(N\).
+      </p>
+
+      <h3>Items never in the stream</h3>
+      <pre>  x = 20:  h = (3, 1, 7)    cells:  C[0][3] = 0   C[1][1] = 6   C[2][7] = 0
+           estimate = min(0, 6, 0) = 0                 CORRECT (a[20] = 0)
+
+  x = 11:  h = (0, 1, 1)    cells:  C[0][0] = 7   C[1][1] = 6   C[2][1] = 3
+           estimate = min(7, 6, 3) = 3                 PHANTOM (a[11] = 0)</pre>
+      <p>
+        Two absent items, two different answers. Item \(20\) has a zero cell in
+        rows \(0\) and \(2\), and one zero cell is a proof of absence, exactly
+        as in a Bloom filter. Item \(11\) is less lucky: its row-\(0\) cell is
+        shared with \(19\), its row-\(1\) cell with \(19\) again, its row-\(2\)
+        cell with \(33\), and all three are non-zero, so the sketch reports a
+        count of \(3\) for an item that never arrived. This is the count-min
+        analogue of a Bloom filter false positive, and it is the same
+        phenomenon: a signature assembled from other items&rsquo; contributions.
+        Sweeping all \(97\) items of \(U\) that are absent from this stream,
+        \(94\) estimate to \(0\) and exactly three (\(11, 18, 27\)) return a
+        phantom count, of \(3, 2, 2\) respectively.
+      </p>
+      <p class="note">
+        Every counter, estimate, and sweep in &sect;4 and &sect;5 was produced
+        by executing the definition of &sect;2 on the stated hash functions and
+        stream, not by hand arithmetic.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="onesided">6. The sketch never underestimates</h2>
+      <p>
+        Every observation above showed an estimate at or above the truth. That
+        is not luck; it is a theorem, and it holds for every item, every
+        stream, and every choice of hash functions, with no probability
+        attached.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (one-sided error)</span>
+        For a stream of non-negative updates, for every item \(x\) and at every
+        moment,
+        \[ \hat a_x \;\ge\; a_x. \]
+        The count-min sketch never reports a count smaller than the true one.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Fix a row \(j\) and let \(i = h_j(x)\). Every
+        update processed so far was an <code>update(y, c)</code> with
+        \(c \ge 0\), and it added \(c\) to \(C[j][h_j(y)]\), one cell of row
+        \(j\). Group these contributions by the item: the total added to cell
+        \(C[j][i]\) is
+        \[ C[j][i] \;=\; \sum_{y \,:\, h_j(y) = i} a_y
+                    \;=\; a_x \;+\!\!\sum_{y \ne x,\; h_j(y) = i}\!\! a_y, \]
+        where \(x\) may be split off because \(h_j(x) = i\) by definition of
+        \(i\). Each \(a_y\) in the remaining sum is non-negative, so the sum is
+        non-negative and \(C[j][i] \ge a_x\). The row \(j\) was arbitrary, so
+        all \(d\) cells consulted by <code>estimate(x)</code> are at least
+        \(a_x\), and therefore so is their minimum.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The proof consumes exactly two facts, and it is worth naming them
+        because each one fails in an identifiable situation.
+      </p>
+      <ul>
+        <li><strong>Determinism of \(h_j\).</strong> The cell read at estimate
+          time is the same cell written at update time. Any hash that is
+          re-seeded, or that depends on insertion order or on the sketch state,
+          destroys the guarantee immediately.</li>
+        <li><strong>Non-negativity of the updates.</strong> The
+          &ldquo;cash-register model&rdquo; (counts only go up) and the
+          &ldquo;strict turnstile model&rdquo; (decrements allowed, but every
+          true count \(a_y\) stays \(\ge 0\)) both satisfy it. The
+          <em>general</em> turnstile model, where some \(a_y\) may be negative,
+          does not: a negative \(a_y\) in the sum above can drag \(C[j][i]\)
+          below \(a_x\), producing an underestimate. Exercise 7 builds one.</li>
+      </ul>
+      <p>
+        Because the error is one-sided and non-negative, it is convenient to
+        name it: write \(X_{j,x} = C[j][h_j(x)] - a_x \ge 0\) for the noise in
+        row \(j\), so that
+        \(\hat a_x = a_x + \min_j X_{j,x}\). Bounding the error is now exactly
+        the problem of bounding \(\min_j X_{j,x}\).
+      </p>
+      <div class="aside">
+        <span class="tag">Why the minimum, and not the mean or the median</span>
+        Each row gives an upper bound on \(a_x\); the minimum is the tightest
+        of the \(d\) bounds, and it is still a valid upper bound, so it can
+        only improve on any single row. The mean and the maximum are both
+        valid numbers to report but neither is ever better and both are usually
+        worse: on item \(58\) above the rows are \(7, 4, 3\), whose mean is
+        \(4.67\) and maximum \(7\), against the minimum&rsquo;s \(3\) (truth
+        \(1\)). The mean is not even an upper bound on the tightest available
+        estimate, so it can be beaten by a row you already computed. The
+        median enters only when negative updates are allowed, where the
+        one-sided argument collapses and the sketch has to be rebuilt around a
+        symmetric estimator (the count-median sketch); with non-negative
+        updates the minimum is strictly the best combiner of the \(d\) rows.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="bound">7. The \((\varepsilon,\delta)\) bound and how to size the grid</h2>
+      <p>
+        One-sided error says the estimate is never too small. The bound below
+        says how much too large it can be, and with what probability. Two
+        parameters name the target: \(\varepsilon\) is the tolerated error,
+        measured as a fraction of the stream length \(N\), and \(\delta\) is
+        the probability of exceeding it.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (count-min guarantee)</span>
+        Build a sketch with
+        \[ w = \Bigl\lceil \frac{e}{\varepsilon} \Bigr\rceil, \qquad
+           d = \Bigl\lceil \ln\frac{1}{\delta} \Bigr\rceil, \]
+        using row hashes drawn independently from a universal family. Then for
+        every item \(x\), after any stream of non-negative updates with
+        \(N = \sum_y a_y\),
+        \[ a_x \;\le\; \hat a_x, \qquad\text{and}\qquad
+           \Pr\bigl[\, \hat a_x \;&gt;\; a_x + \varepsilon N \,\bigr] \;\le\; \delta. \]
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The left inequality is
+        <a href="#onesided">&sect;6</a>. For the right one, fix \(x\) and a row
+        \(j\), and write the noise from &sect;6 as a sum over the other items,
+        \[ X_{j,x} \;=\; \sum_{y \ne x} a_y \cdot Z_y, \qquad
+           Z_y = \begin{cases} 1 & \text{if } h_j(y) = h_j(x), \\
+                               0 & \text{otherwise.}\end{cases} \]
+        By universality, \(\Pr[Z_y = 1] = \Pr[h_j(y) = h_j(x)] \le 1/w\), so
+        \(\mathbb E[Z_y] \le 1/w\), and by linearity of expectation (no
+        independence between the \(Z_y\) is needed here),
+        \[ \mathbb E[X_{j,x}] \;=\; \sum_{y \ne x} a_y\, \mathbb E[Z_y]
+           \;\le\; \frac{1}{w} \sum_{y \ne x} a_y
+           \;=\; \frac{N - a_x}{w} \;\le\; \frac{N}{w}. \]
+        \(X_{j,x}\) is non-negative, so Markov&rsquo;s inequality applies:
+        for any \(t &gt; 0\), \(\Pr[X_{j,x} \ge t] \le \mathbb E[X_{j,x}]/t\).
+        Take \(t = \varepsilon N\):
+        \[ \Pr\bigl[X_{j,x} \ge \varepsilon N\bigr]
+           \;\le\; \frac{N/w}{\varepsilon N} \;=\; \frac{1}{\varepsilon w}
+           \;\le\; \frac{1}{\varepsilon \cdot (e/\varepsilon)} \;=\; \frac1e, \]
+        using \(w \ge e/\varepsilon\). This is one row. The reported error is
+        \(\min_j X_{j,x}\), which exceeds \(\varepsilon N\) only if
+        <em>every</em> row&rsquo;s noise does. The rows use independently drawn
+        hash functions, so those \(d\) events are independent and their
+        probabilities multiply:
+        \[ \Pr\bigl[\hat a_x &gt; a_x + \varepsilon N\bigr]
+           \;\le\; \Bigl(\frac1e\Bigr)^{d} \;=\; e^{-d}
+           \;\le\; e^{-\ln(1/\delta)} \;=\; \delta, \]
+        using \(d \ge \ln(1/\delta)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Read the two parameters separately, because they do separate jobs and
+        cost differently.
+      </p>
+      <ul>
+        <li><strong>\(w\) controls how wrong.</strong> Widening a row spreads
+          the same \(N\) arrivals over more cells, so the expected noise per
+          cell, \(N/w\), falls. The dependence is \(1/\varepsilon\): halving
+          the tolerated error doubles the width. This is the expensive
+          direction.</li>
+        <li><strong>\(d\) controls how often.</strong> Each extra row is an
+          extra independent chance for a clean cell, and the failure
+          probability is multiplied by \(1/e\) each time. The dependence is
+          \(\ln(1/\delta)\): dropping the failure probability by a factor of
+          \(10\) costs about \(2.3\) more rows. This is the cheap direction,
+          and it is why \(d\) is a single digit in practice while \(w\) is in
+          the hundreds or thousands.</li>
+      </ul>
+      <p>
+        Where does \(e\) come from? It is the choice that minimizes the total
+        number of cells \(w \cdot d\) for a fixed guarantee. With
+        \(w = c/\varepsilon\), one row fails with probability at most \(1/c\),
+        so \(d = \ln(1/\delta) / \ln c\) rows suffice and the grid holds
+        \(\frac{c}{\varepsilon} \cdot \frac{\ln(1/\delta)}{\ln c}\) cells. Only
+        the factor \(c / \ln c\) depends on \(c\), and \(c/\ln c\) is minimized
+        at \(c = e\). The constant is a space optimization, not a requirement:
+        \(c = 2\) or \(c = 4\) also works and costs about \(6\%\) more cells.
+      </p>
+      <p>
+        The sizing table, with counters taken as 4-byte integers:
+      </p>
+      <table>
+        <tr><th>\(\varepsilon\)</th><th>\(\delta\)</th><th>\(w = \lceil e/\varepsilon\rceil\)</th><th>\(d = \lceil \ln(1/\delta)\rceil\)</th><th>cells</th><th>space</th></tr>
+        <tr><td>0.1</td><td>0.05</td><td>28</td><td>3</td><td>84</td><td>336 B</td></tr>
+        <tr><td>0.01</td><td>0.01</td><td>272</td><td>5</td><td>1360</td><td>5.3 KB</td></tr>
+        <tr><td>0.001</td><td>0.001</td><td>2719</td><td>7</td><td>19033</td><td>74 KB</td></tr>
+        <tr><td>0.001</td><td>0.0001</td><td>2719</td><td>10</td><td>27190</td><td>106 KB</td></tr>
+      </table>
+      <p>
+        Read the second row concretely. Five kilobytes of counters answer point
+        queries on a stream of any length, over a universe of any size, with an
+        error of at most \(1\%\) of the stream length, failing at most \(1\%\)
+        of the time. Nothing in those five kilobytes depends on how many
+        distinct items were seen. That is the whole point of the structure, and
+        it is why &ldquo;sublinear&rdquo; is the right word: the space is not
+        merely smaller than the exact table, it does not grow with the data at
+        all (beyond the \(O(\log N)\) bits a counter needs so as not to
+        overflow).
+      </p>
+      <p>
+        Check the bound against the traced sketch of &sect;4. There \(w = 8\),
+        so \(\varepsilon = e/w = 0.340\), and \(d = 3\), so
+        \(\delta = e^{-3} = 0.050\). The error budget is
+        \(\varepsilon N = 0.340 \times 12 = 4.08\). The observed errors were
+        \(0\) for \(19\), \(0\) for \(33\), \(0\) for \(44\), \(2\) for
+        \(58\), and \(3, 2, 2\) for the three phantom items; every one is
+        within \(4.08\). At this size the guarantee is nearly vacuous, since an
+        error budget of \(4\) on a stream of \(12\) permits almost anything;
+        that is what \(w = 8\) buys. The bound only becomes interesting once
+        \(\varepsilon N\) is small relative to the counts of interest, which
+        means once \(w\) is large relative to \(N\) divided by those counts.
+      </p>
+      <div class="aside">
+        <span class="tag">How loose is the bound?</span>
+        Markov&rsquo;s inequality is the weakest tail bound there is, so the
+        theorem is pessimistic. Running the sketch on a stream of \(N =
+        100{,}000\) arrivals drawn from a Zipf distribution over \(20{,}000\)
+        keys, of which \(10{,}415\) distinct keys actually appeared, with
+        \(w = 272\) and \(d = 5\) (\(\varepsilon N \approx 999\)): the largest
+        error over all observed items was \(325\), the mean error was \(110\),
+        and <em>no</em> item exceeded the budget, though \(\delta = e^{-5}\)
+        permits about \(70\) of them to. Narrowing to \(w = 64, d = 3\)
+        (\(\varepsilon N \approx 4247\)) gave a largest error of \(7752\) and
+        four violations out of \(10{,}567\) items, against the \(\approx 526\)
+        the bound allows. In both directions the guarantee holds with a wide
+        margin, which is typical: the bound is a promise about the worst case
+        over all streams, and real streams are not adversarial.
+      </div>
+      <div class="aside">
+        <span class="tag">Conservative update</span>
+        A cheap improvement that keeps the one-sided guarantee. On
+        <code>update(x, 1)</code>, first read \(m = \hat a_x\), then set each
+        cell to \(\max(C[j][h_j(x)],\, m + 1)\) instead of incrementing it. No
+        cell is ever raised above what the item&rsquo;s own arrivals justify,
+        so no estimate can fall below the truth and &sect;6 survives; but cells
+        stop absorbing increments they do not need. On the traced stream this
+        changes the grid&rsquo;s row \(0\) from
+        <code>7 0 0 0 0 3 2 0</code> to <code>6 0 0 0 0 3 2 0</code> and drops
+        the estimate for \(58\) from \(3\) to \(2\), and the estimates for
+        \(19, 33, 44\) stay exact. The costs: an update now reads before it
+        writes (so it is no longer a blind write, which matters for concurrency
+        and for hardware pipelines), and the structure is no longer linear, so
+        two conservative sketches cannot be merged by adding them cell by cell.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="hh">8. Heavy hitters</h2>
+      <div class="def">
+        <span class="tag">Definition (heavy hitters)</span>
+        Given \(0 &lt; \varphi &lt; 1\), the <strong>\(\varphi\)-heavy
+        hitters</strong> of a stream are the items \(x\) with
+        \(a_x \ge \varphi N\). There are at most \(1/\varphi\) of them, since
+        their counts are non-negative and sum to at most \(N\).
+      </div>
+      <p>
+        This is the query behind &ldquo;which addresses are flooding the
+        link&rdquo; and &ldquo;which products are trending,&rdquo; and a sketch
+        alone cannot answer it. The reason is structural: like a Bloom filter,
+        a count-min sketch stores no keys, so it can score an item you hand it
+        but can never enumerate items. It must be paired with a candidate set.
+      </p>
+      <p>
+        The standard arrangement, one pass, small memory:
+      </p>
+      <ol>
+        <li>Keep a count-min sketch and a min-heap
+          (<a href="../heaps/ds-heaps-pq.html"><em>Heaps and Priority
+          Queues</em></a>) of at most \(k\) candidate items, keyed by their
+          current estimate.</li>
+        <li>On each arrival \(x\): <code>update(x, 1)</code>, then compute
+          \(\hat a_x\). If \(\hat a_x \ge \varphi N_{\text{so far}}\), insert
+          or refresh \(x\) in the heap; if the heap exceeds \(k\) entries,
+          extract the minimum.</li>
+        <li>At the end, report the heap entries whose estimate is at least
+          \(\varphi N\).</li>
+      </ol>
+      <p>
+        The heap is what supplies the keys; the sketch is what supplies the
+        counts without storing a counter per distinct item. Sizing \(k\)
+        slightly above \(1/\varphi\) is enough in practice, and the heap
+        contributes \(O(\log k)\) per arrival on top of the sketch&rsquo;s
+        \(O(d)\).
+      </p>
+      <p>
+        What the pairing guarantees follows from the two halves of the theorem
+        in <a href="#bound">&sect;7</a>:
+      </p>
+      <ul>
+        <li><strong>No heavy hitter is missed.</strong> If
+          \(a_x \ge \varphi N\) then \(\hat a_x \ge a_x \ge \varphi N\) with
+          certainty, so \(x\) passes the test at every point after its count
+          crosses the threshold. (It can still be evicted from a heap that is
+          too small, which is why \(k &gt; 1/\varphi\).)</li>
+        <li><strong>Nothing far below the threshold is reported.</strong> Any
+          reported \(x\) has \(\hat a_x \ge \varphi N\), and
+          \(\hat a_x \le a_x + \varepsilon N\) except with probability
+          \(\delta\), so \(a_x \ge (\varphi - \varepsilon) N\). Choosing
+          \(\varepsilon = \varphi/2\) makes this
+          \(a_x \ge \varphi N / 2\): the output is a superset of the true
+          heavy hitters containing nothing under half the threshold.</li>
+      </ul>
+      <p>
+        The traced sketch shows both halves, including the false report. Take
+        \(\varphi = 1/4\), so the threshold is \(\varphi N = 3\):
+      </p>
+      <table>
+        <tr><th>item</th><th>true \(a_x\)</th><th>estimate \(\hat a_x\)</th><th>\(\hat a_x \ge 3\)?</th><th>outcome</th></tr>
+        <tr><td>19</td><td>6</td><td>6</td><td>yes</td><td>true heavy hitter, reported</td></tr>
+        <tr><td>33</td><td>3</td><td>3</td><td>yes</td><td>true heavy hitter, reported</td></tr>
+        <tr><td>44</td><td>2</td><td>2</td><td>no</td><td>correctly not reported</td></tr>
+        <tr><td>58</td><td>1</td><td>3</td><td>yes</td><td>false report, caused by collisions</td></tr>
+      </table>
+      <p>
+        Item \(58\) is reported with a true count of \(1\) against a threshold
+        of \(3\), which looks like a violation of the second guarantee until
+        the sizing is checked: that guarantee promises
+        \(a_x \ge (\varphi - \varepsilon)N\), and here
+        \(\varepsilon = e/w = 0.34\) exceeds \(\varphi = 0.25\), so the promise
+        reads \(a_x \ge -1.08\) and says nothing. To make \(\varphi = 1/4\)
+        meaningful one needs \(\varepsilon = \varphi/2 = 1/8\), that is
+        \(w = \lceil 8e \rceil = 22\) columns rather than \(8\). The
+        false report is the predicted consequence of an undersized sketch, not
+        a defect in the method.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">9. Cost, and the comparison table</h2>
+      <table>
+        <tr><th>operation</th><th>cost</th><th>argument</th></tr>
+        <tr><td>update(\(x\), \(c\))</td><td>\(\Theta(d)\)</td><td>\(d\) hash evaluations, \(d\) additions; the loop is fixed-length, with no branch, probe sequence, or resize</td></tr>
+        <tr><td>estimate(\(x\))</td><td>\(\Theta(d)\)</td><td>the same \(d\) hashes and \(d\) reads, plus \(d-1\) comparisons; no early exit, since the minimum needs every cell</td></tr>
+        <tr><td>merge two sketches</td><td>\(\Theta(dw)\)</td><td>cell-by-cell addition; valid only for sketches with identical \(d\), \(w\), and hash functions</td></tr>
+        <tr><td>space</td><td>\(\Theta(dw)\) counters</td><td>\(\bigl\lceil \ln\frac1\delta \bigr\rceil \cdot \bigl\lceil \frac e\varepsilon \bigr\rceil\) counters of \(\lceil \log_2 N \rceil\) bits</td></tr>
+      </table>
+      <p>
+        Substituting the sizing makes the shape of the cost visible:
+        \[ \text{time per update} = \Theta\!\left(\ln\frac1\delta\right),
+           \qquad
+           \text{space} = \Theta\!\left(\frac1\varepsilon \ln\frac1\delta\right)
+           \text{ counters}. \]
+        Neither expression contains \(N\) or the number of distinct items.
+        Update time is a constant fixed at construction, so the structure keeps
+        up with a stream of any rate, and the per-item work is a handful of
+        multiply-mod operations and increments over \(d\) cache lines. The one
+        dependence on the data is the counter <em>width</em>: a counter must
+        hold up to \(N\), which costs \(\lceil \log_2 N \rceil\) bits, so the
+        space is \(\Theta\bigl(\frac1\varepsilon \ln\frac1\delta \log N\bigr)\)
+        bits, still exponentially smaller than the
+        \(\Theta(|U| \log N)\) bits of an exact counter array or the
+        \(\Theta(D(\log|U| + \log N))\) bits of an exact hash table over \(D\)
+        distinct items. (<a href="../foundations/foundation-space-complexity.html"><em>Space
+        Complexity</em></a> sets out that accounting.)
+      </p>
+      <p>
+        The three structures in this folder answer three different questions
+        with the same raw material, a small array plus a few hash functions:
+      </p>
+      <table>
+        <tr>
+          <th></th>
+          <th><a href="ds-hashing.html">hash table</a></th>
+          <th><a href="ds-bloom-filters.html">Bloom filter</a></th>
+          <th>count-min sketch</th>
+        </tr>
+        <tr><td>question answered</td><td>the value stored at \(x\)</td><td>is \(x\) present?</td><td>how many times did \(x\) occur?</td></tr>
+        <tr><td>answer quality</td><td>exact</td><td>&ldquo;no&rdquo; exact, &ldquo;maybe&rdquo; wrong with probability \(p\)</td><td>never too small; too large by \(&gt; \varepsilon N\) with probability \(\le \delta\)</td></tr>
+        <tr><td>cell contents</td><td>keys and values</td><td>bits</td><td>counters</td></tr>
+        <tr><td>stores keys</td><td>yes</td><td>no</td><td>no</td></tr>
+        <tr><td>space</td><td>grows with the number of distinct items</td><td>fixed; \(\approx 10\) bits per key at \(p = 1\%\)</td><td>fixed; independent of the number of distinct items</td></tr>
+        <tr><td>lookup cost</td><td>\(\Theta(1)\) expected</td><td>\(O(k)\), early exit on a zero bit</td><td>\(\Theta(d)\), no early exit</td></tr>
+        <tr><td>deletion</td><td>yes</td><td>no (counting variant restores it)</td><td>yes, as <code>update(x, -1)</code>, in the strict turnstile model</td></tr>
+        <tr><td>enumerate keys</td><td>yes</td><td>no</td><td>no</td></tr>
+        <tr><td>merge two structures</td><td>rehash everything</td><td>bitwise OR</td><td>cell-by-cell addition</td></tr>
+      </table>
+      <p>
+        The count-min sketch is what a Bloom filter becomes when its bits are
+        promoted to counters and its <code>AND</code> of bits to a
+        <code>min</code> of counts. Both keep no keys; both have one-sided
+        error; both refuse to enumerate. Where they part company is deletion,
+        and the reason is instructive. A Bloom filter cannot delete because a
+        bit does not record how many keys set it, so clearing it may erase
+        another key&rsquo;s evidence; a count-min sketch <em>can</em>, because
+        its cell holds the sum rather than the disjunction, and subtracting the
+        item&rsquo;s own contribution leaves the other items&rsquo;
+        contributions intact. Promoting the bit to a counter is exactly the
+        step that a counting Bloom filter takes to regain deletion, and it is
+        the step the count-min sketch takes for free by being about counts in
+        the first place.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">10. Where this sits</h2>
+      <p>
+        The prerequisite is
+        <a href="ds-hashing.html"><em>Hashing</em></a>: hash-function families,
+        universality, and the accounting of collisions all come from there, and
+        the sketch is the exact-counting hash table with the keys removed and
+        the collisions accepted rather than resolved. The nearest neighbour is
+        <a href="ds-bloom-filters.html"><em>Bloom Filters</em></a>, which
+        applies the same recipe to membership instead of frequency; the two
+        handouts are best read as a pair, since the count-min sketch replaces
+        the filter&rsquo;s bits by counters, its \(k\) hashes into one array by
+        \(d\) hashes into \(d\) separate rows, and its
+        <code>AND</code> by <code>min</code>. Both structures buy their small
+        fixed size with a probabilistic guarantee rather than an exact answer;
+        the space accounting that makes &ldquo;small&rdquo; precise is in
+        <a href="../foundations/foundation-space-complexity.html"><em>Space
+        Complexity</em></a>, and the heavy-hitters construction of
+        <a href="#hh">&sect;8</a> needs the min-heap of
+        <a href="../heaps/ds-heaps-pq.html"><em>Heaps and Priority
+        Queues</em></a>.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">11. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Three more arrivals of item \(58\) reach the sketch of
+          <a href="#trace">&sect;4</a> (so the stream becomes
+          \(N = 15\) with \(a_{58} = 4\)). Give the new grid, then the
+          estimates for all four items, and say which estimates changed and
+          why.
+          <details>
+            <summary>solution</summary>
+            Item \(58\) touches \(C[0][0], C[1][2], C[2][5]\), so those three
+            cells each gain \(3\):
+            <pre>        col:  0  1  2  3  4  5  6  7
+  row 0:     10  0  0  0  0  3  2  0     sum = 15
+  row 1:      0  6  7  0  2  0  0  0     sum = 15
+  row 2:      0  3  0  0  6  6  0  0     sum = 15</pre>
+            Estimates: \(\hat a_{19} = \min(10, 6, 6) = 6\) (true \(6\),
+            unchanged); \(\hat a_{33} = \min(3, 7, 3) = 3\) (true \(3\),
+            unchanged); \(\hat a_{44} = \min(2, 2, 6) = 2\) (true \(2\),
+            unchanged); \(\hat a_{58} = \min(10, 7, 6) = 6\) (true \(4\),
+            error \(2\)). Only \(58\)&rsquo;s estimate changed. The other three
+            items each have at least one row where \(58\) does not collide with
+            them, and the minimum reads that clean row, so extra arrivals of
+            \(58\) inflate one of their cells without moving their minimum.
+            Item \(58\) itself has no clean row, so its estimate absorbs the
+            noise of whichever partner is smallest: \(4 + 2 = 6\) from row
+            \(2\), where \(44\) is its partner.
+          </details>
+        </li>
+        <li>
+          Item \(11\) never appears in the stream of &sect;4, yet the sketch
+          estimates \(\hat a_{11} = 3\). Recompute its three cells from the
+          hash functions, identify which item contributes to each, and state
+          the general condition under which an absent item estimates to a
+          non-zero value.
+          <details>
+            <summary>solution</summary>
+            \(h_0(11) = (40 \bmod 101) \bmod 8 = 0\),
+            \(h_1(11) = (57) \bmod 8 = 1\),
+            \(h_2(11) = (25) \bmod 8 = 1\). The cells are
+            \(C[0][0] = 7\) (holding \(19\)&rsquo;s six arrivals and
+            \(58\)&rsquo;s one), \(C[1][1] = 6\) (holding \(19\)&rsquo;s six),
+            and \(C[2][1] = 3\) (holding \(33\)&rsquo;s three). The minimum is
+            \(3\). The general condition: an absent item estimates non-zero
+            precisely when it collides with some present item in <em>every</em>
+            one of the \(d\) rows, since a single collision-free row has a cell
+            of \(0\) and forces the minimum to \(0\). This is the same
+            all-\(d\)-rows-must-fail structure that the proof in &sect;7
+            exploits, and it is why the failure probability falls
+            exponentially in \(d\).
+          </details>
+        </li>
+        <li>
+          A colleague proposes reporting the mean of the \(d\) cells instead of
+          the minimum, arguing that averaging cancels noise. Evaluate the
+          proposal on items \(19\) and \(58\) of &sect;4, then give the general
+          argument for why no combiner of the \(d\) cells can beat the minimum
+          under non-negative updates.
+          <details>
+            <summary>solution</summary>
+            For \(19\) the cells are \(7, 6, 6\): mean \(6.33\), minimum
+            \(6\), truth \(6\). For \(58\) the cells are \(7, 4, 3\): mean
+            \(4.67\), minimum \(3\), truth \(1\). The mean is worse in both
+            cases, and it is worse for a reason: averaging cancels noise only
+            when the noise has both signs, and here every cell&rsquo;s noise is
+            \(\ge 0\), so averaging cannot cancel anything, it only mixes the
+            worst rows back into the answer. Generally, &sect;6 shows every
+            cell satisfies \(C[j][h_j(x)] \ge a_x\), so the truth lies at or
+            below all \(d\) cells, and the minimum is the smallest value
+            consistent with that. Any combiner reporting less than the minimum
+            can be made to underestimate (take a stream in which the minimum
+            cell is exact, which happens whenever one row is collision-free);
+            any combiner reporting more than the minimum is a strictly looser
+            upper bound. The minimum is therefore the unique best estimator
+            derivable from the \(d\) cells.
+          </details>
+        </li>
+        <li>
+          Size a sketch: a stream of \(N = 10^9\) events over an unknown number
+          of distinct keys, with an error target of at most \(10^{-4} N\)
+          failing at most \(1\) query in \(1000\). Give \(w\), \(d\), the cell
+          count, and the memory with 8-byte counters. Then compare with an
+          exact hash table over \(50\) million distinct 16-byte keys.
+          <details>
+            <summary>solution</summary>
+            \(\varepsilon = 10^{-4}\), so
+            \(w = \lceil e/10^{-4}\rceil = \lceil 27182.8\rceil = 27183\).
+            \(\delta = 10^{-3}\), so
+            \(d = \lceil \ln 1000\rceil = \lceil 6.908\rceil = 7\). Cells:
+            \(7 \times 27183 = 190{,}281\); at 8 bytes each,
+            \(1{,}522{,}248\) bytes \(\approx 1.45\) MB. The absolute error
+            budget is \(\varepsilon N = 10^{-4} \times 10^9 = 10^5\), so counts
+            below about \(10^5\) are not resolved, while a heavy hitter with a
+            count of \(10^7\) is estimated to within \(1\%\). The exact table
+            stores \(5 \times 10^7\) keys of 16 bytes plus an 8-byte counter,
+            at least \(1.2\) GB before any table overhead or pointer, so the
+            sketch is roughly \(800\times\) smaller, and it was sized without
+            knowing the number of distinct keys at all.
+          </details>
+        </li>
+        <li>
+          Two servers each sketch their own half of a stream with the same
+          \(d\), \(w\), and hash functions, producing grids \(C^A\) and
+          \(C^B\). Show that the cell-by-cell sum \(C^A + C^B\) is exactly the
+          grid the combined stream would have produced, and identify which of
+          the guarantees in &sect;6 and &sect;7 survive the merge.
+          <details>
+            <summary>solution</summary>
+            Fix a cell \((j, i)\). By the grouping in the proof of &sect;6,
+            \(C^A[j][i] = \sum_{y : h_j(y) = i} a^A_y\) and likewise for
+            \(B\), where \(a^A\) and \(a^B\) are the two frequency vectors.
+            The combined stream has frequency vector \(a = a^A + a^B\)
+            componentwise (an item&rsquo;s arrivals in the whole are its
+            arrivals in each part), so its cell holds
+            \(\sum_{y : h_j(y) = i} (a^A_y + a^B_y) = C^A[j][i] + C^B[j][i]\).
+            The grids are equal cell for cell, so the merged sketch is
+            indistinguishable from one built serially. Both guarantees survive
+            unchanged, since they are statements about a grid and the frequency
+            vector it came from: the merged grid is the grid of the combined
+            stream, so it never underestimates \(a_x\), and the
+            \((\varepsilon,\delta)\) bound holds with \(N = N_A + N_B\). The
+            requirement is that both sketches used the <em>same</em> hash
+            functions; independently seeded sketches cannot be merged, and
+            neither can conservatively updated ones (their cells are not sums).
+          </details>
+        </li>
+        <li>
+          Take the sketch of &sect;4 and process <code>update(19, -6)</code>,
+          removing every arrival of item \(19\). Give the resulting grid and
+          the estimates for all four items, and explain why the
+          never-underestimates guarantee still holds here.
+          <details>
+            <summary>solution</summary>
+            Item \(19\) touches \(C[0][0], C[1][1], C[2][4]\); subtract \(6\)
+            from each:
+            <pre>        col:  0  1  2  3  4  5  6  7
+  row 0:      1  0  0  0  0  3  2  0     sum = 6
+  row 1:      0  0  4  0  2  0  0  0     sum = 6
+  row 2:      0  3  0  0  0  3  0  0     sum = 6</pre>
+            Estimates: \(\hat a_{19} = \min(1, 0, 0) = 0\) (true \(0\));
+            \(\hat a_{33} = \min(3, 4, 3) = 3\) (true \(3\));
+            \(\hat a_{44} = \min(2, 2, 3) = 2\) (true \(2\));
+            \(\hat a_{58} = \min(1, 4, 3) = 1\) (true \(1\), now exact,
+            because row \(0\)&rsquo;s collision partner has left). Every
+            estimate is at or above the truth. The guarantee holds because the
+            proof of &sect;6 needs only that each true count \(a_y\) is
+            non-negative, not that each update is; after this decrement the
+            frequency vector is still non-negative (\(a_{19} = 0\)), so the
+            grouping \(C[j][i] = a_x + \sum_{y \ne x} a_y\) still has a
+            non-negative tail. This is the strict turnstile model.
+          </details>
+        </li>
+        <li>
+          Exhibit a two-item scenario in the general turnstile model (true
+          counts allowed to go negative) where the sketch underestimates.
+          Which step of the &sect;6 proof fails, and what does this say about
+          the correct estimator when negative counts are possible?
+          <details>
+            <summary>solution</summary>
+            Take \(w = 1\) so that everything collides in every row (any
+            \(w\) works; \(w = 1\) just removes the luck). Process
+            <code>update(P, 1)</code> and then
+            <code>update(Q, -5)</code>, so \(a_P = 1\) and \(a_Q = -5\). Every
+            cell holds \(1 + (-5) = -4\), so
+            \(\hat a_P = -4 &lt; 1 = a_P\): an underestimate, and by a wide
+            margin. The failing step is the last line of the &sect;6 proof:
+            the tail \(\sum_{y \ne P, \, h_j(y) = i} a_y\) equals \(-5\) and is
+            no longer non-negative, so \(C[j][i] \ge a_P\) does not follow.
+            With signed counts the error becomes two-sided and the minimum is
+            the wrong combiner (it now systematically picks the cell most
+            polluted by negative counts). The repair is to make the estimator
+            symmetric: keep the same grid but report the <em>median</em> of the
+            \(d\) cells, which is unbiased under two-sided noise. That is the
+            count-median sketch, and it pays for the symmetry with a larger
+            \(d\) (the analysis needs a Chernoff bound over the rows rather
+            than the single Markov step used here).
+          </details>
+        </li>
+        <li>
+          The bound in &sect;7 promises an error of at most \(\varepsilon N\)
+          for <em>every</em> item, including items whose true count is far
+          below \(\varepsilon N\). Explain why this makes the sketch useless
+          for rare items no matter how it is sized, then give the sharper form
+          of the expectation bound in the proof and say what it gives for a
+          heavy hitter holding a \(10\%\) share of a stream.
+          <details>
+            <summary>solution</summary>
+            The guarantee is on <em>absolute</em> error, so an item with
+            \(a_x \ll \varepsilon N\) can have its count multiplied many times
+            over and still satisfy the bound: item \(58\) in &sect;4 has
+            \(a_{58} = 1\) with a budget of \(4.08\), so an estimate of \(5\)
+            would be conforming and \(500\%\) wrong. Driving \(\varepsilon N\)
+            below the count of a rare item requires
+            \(w &gt; e N / a_x\), which for a genuinely rare item in a long
+            stream is a grid as large as the exact table it was meant to
+            replace. Rare items are not what the structure is for. The sharper
+            bound is already in the proof and was weakened one step early:
+            \(\mathbb E[X_{j,x}] \le (N - a_x)/w\), the noise coming only from
+            the <em>other</em> items. For a heavy hitter with
+            \(a_x = 0.1 N\) this is \(0.9 N/w\) rather than \(N/w\), a
+            \(10\%\) improvement in the error budget, and the improvement grows
+            with the item&rsquo;s share: an item holding half the stream sees
+            half the noise. The general statement is that the error is bounded
+            by \(\varepsilon\) times the stream mass <em>excluding</em> the
+            queried item, which is the form used when count-min is analysed
+            against the residual mass after the top-\(k\) items are removed.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Count-Min Sketch v1.0 &middot;
+        prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

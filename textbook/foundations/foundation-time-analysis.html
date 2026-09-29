@@ -1,0 +1,1051 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Analysis of Algorithms: Time.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Analysis of Algorithms: Time - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Analysis of Algorithms: Time</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        How long does a program take, and how do we answer scientifically rather
+        than by guessing? We fix a <em>cost model</em> and a <em>basic operation</em>,
+        count how often it runs, and read off the <em>order of growth</em>:
+        the function of \(n\) the cost is proportional to. Two independent routes
+        reach it: a <em>doubling experiment</em> that measures the exponent from
+        running-time ratios, and a <em>counting</em> argument that derives the same
+        exponent from the code. Tilde notation keeps the leading term and discards
+        the rest. The 3-SUM problem runs throughout, first as a \(\Theta(n^3)\)
+        triple loop and then, once analysis tells us where the waste is, as a
+        \(\Theta(n^2)\) sort-and-scan. With worked traces, verified numbers, code in
+        four languages, and exercises.
+      </div>
+
+      <p class="lead">
+        Every choice this course makes (which tree, which sort, which graph
+        algorithm) is ultimately a conversation about two costs:
+        <strong>time</strong> and <strong>space</strong>. This handout builds the
+        tools for the first. The trouble is that a program&rsquo;s running time seems
+        to depend on <em>everything</em>: the machine, the compiler, the input, the
+        phase of the moon. The escape is to stop asking &ldquo;how many seconds?&rdquo;
+        and ask instead &ldquo;how does the time <em>grow</em> as the input grows?&rdquo;
+        That question has a clean, machine-independent answer, the
+        <strong>order of growth</strong>, and we reach it two ways that must
+        agree: by <em>measuring</em> a running program and by <em>counting</em> a
+        single operation in its inner loop. When they agree we trust the result; when
+        they disagree, one of them is a bug. Along the way, the analysis will hand us
+        a faster algorithm for free. The formal \(O\), \(\Omega\), and \(\Theta\)
+        machinery that makes &ldquo;order of growth&rdquo; precise is developed in
+        <a href="foundation-asymptotic-notation.html">the Asymptotic Notation reading</a>; here
+        we stay close to the running time itself.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#model">Cost models and the basic operation</a></li>
+          <li><a href="#brute">A first algorithm: brute-force 3-SUM</a></li>
+          <li><a href="#observe">Observe: the doubling experiment</a></li>
+          <li><a href="#count">Model: counting the basic operation</a></li>
+          <li><a href="#classes">The order-of-growth classes</a></li>
+          <li><a href="#faster">Design: a faster 3-SUM</a></li>
+          <li><a href="#doubling">The doubling method, in practice</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="model">1. Cost models and the basic operation</h2>
+      <p>
+        We analyze running time the way a scientist studies any natural process:
+        <strong>observe</strong> (measure the time), <strong>hypothesize</strong> (a
+        model consistent with the data), <strong>predict</strong> (a new time from
+        the model), and <strong>verify</strong> (measure again and compare). Two
+        ground rules keep it honest: experiments must be <em>reproducible</em>, and
+        the model must be <em>falsifiable</em>: one missed prediction sinks it.
+        We never prove a running-time model correct, only consistent with everything
+        we have seen so far. The lucky part is that our experiment is free: to gather
+        data we just run the program.
+      </p>
+      <p>
+        A stopwatch, though, measures the wrong thing. Wall-clock time folds in the
+        processor, the language, the compiler flags, and whatever else the machine is
+        doing at that instant. To talk about the <em>algorithm</em> rather than one
+        run of one implementation, we count operations under a fixed
+        <strong>cost model</strong>.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (cost model, basic operation)</span>
+        A <strong>cost model</strong> declares which operations we count and charges
+        each a constant. The classic choice is the <strong>RAM model</strong>, in
+        which arithmetic, comparisons, and array accesses each cost \(O(1)\). A
+        <strong>basic operation</strong> is a single representative operation whose
+        repetition dominates the total work; we count how many times it runs as a
+        function of the input size \(n\), and take that count as a proxy for time.
+      </div>
+      <p>
+        The art is picking a basic operation whose count has the <em>same order of
+        growth</em> as the true running time, so that counting it and timing the
+        program tell the same story. If several operations run in lockstep
+        (say each loop iteration does one comparison and three array reads), any
+        one of them serves, because they differ only by a constant factor, and
+        constant factors are exactly what order-of-growth analysis discards.
+      </p>
+      <div class="aside">
+        <span class="tag">Why counting beats timing</span>
+        An operation count is <em>exact</em> and <em>machine-independent</em>: rerun
+        the program on a phone or a server and the count is identical, while the
+        seconds differ. Sedgewick &amp; Wayne make counting the primary tool and use
+        timing only to <em>validate</em> the count. We will do the same: count when
+        we can, time to check.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="brute">2. A first algorithm: brute-force 3-SUM</h2>
+      <p>
+        We need a concrete problem to practice on, and one problem anchors this whole
+        handout.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (the 3-SUM problem)</span>
+        Given an array of \(n\) integers, count the unordered triples
+        \((i,j,k)\) with \(i \lt j \lt k\) and
+        \(a[i] + a[j] + a[k] = 0\).
+      </div>
+      <p>
+        As stated it is a toy, but the shape is real: testing whether any three of
+        \(n\) points are collinear reduces to 3-SUM, and 3-SUM is the textbook
+        example of a problem for which <em>no</em> strongly sub-quadratic algorithm
+        is known: a genuine open question we return to in
+        <a href="#faster">&sect;6</a>. For now it is a clean target for analysis.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a small instance)</span>
+        On the eight-element array
+        <pre>  &minus;40  &minus;20  &minus;10   0   5  10  30  40</pre>
+        exactly four triples sum to zero:
+        \((\,{-}40, 10, 30\,)\), \((\,{-}40, 0, 40\,)\),
+        \((\,{-}20, {-}10, 30\,)\), and \((\,{-}10, 0, 10\,)\). Each is easy to
+        check (\(-40 + 10 + 30 = 0\), and so on), and a short search
+        confirms there are no others, so the answer is \(4\). This is the count our
+        algorithms must reproduce.
+      </div>
+      <p>
+        The direct idea is to <strong>enumerate every triple</strong>: one loop picks
+        \(i\), a nested loop picks \(j \gt i\), a third picks \(k \gt j\), and we test
+        the sum. The constraint \(i \lt j \lt k\) counts each triple exactly once;
+        it is what the loop bounds <code>i+1</code> and <code>j+1</code>
+        encode.
+      </p>
+      <div class="code-tabs" data-snippet="complexity/threesum-brute">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Brute-force 3-SUM: count unordered triples i&lt;j&lt;k with a[i]+a[j]+a[k]==0.
+// The inner-loop body runs C(n,3) ~ n^3/6 times -&gt; Theta(n^3).
+long count3(const vector&lt;int&gt;&amp; a) {
+    int n = a.size();
+    long cnt = 0, ops = 0;
+    for (int i = 0;   i &lt; n; i++)
+      for (int j = i+1; j &lt; n; j++)
+        for (int k = j+1; k &lt; n; k++) {
+            ops++;                         // one tick per triple tested
+            if (a[i] + a[j] + a[k] == 0)
+                cnt++;
+        }
+    return cnt;                            // ops ends at n(n-1)(n-2)/6
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Brute-force 3-SUM: count unordered triples i&lt;j&lt;k with a[i]+a[j]+a[k]==0.
+// The inner-loop body runs C(n,3) ~ n^3/6 times -&gt; Theta(n^3).
+static long count3(int[] a) {
+    int n = a.length;
+    long cnt = 0, ops = 0;
+    for (int i = 0;   i &lt; n; i++)
+      for (int j = i+1; j &lt; n; j++)
+        for (int k = j+1; k &lt; n; k++) {
+            ops++;                         // one tick per triple tested
+            if (a[i] + a[j] + a[k] == 0)
+                cnt++;
+        }
+    return cnt;                            // ops ends at n(n-1)(n-2)/6
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Brute-force 3-SUM: count unordered triples i&lt;j&lt;k with a[i]+a[j]+a[k]==0.
+# The inner-loop body runs C(n,3) ~ n^3/6 times -&gt; Theta(n^3).
+def count3(a):
+    n = len(a)
+    cnt = ops = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            for k in range(j + 1, n):
+                ops += 1                   # one tick per triple tested
+                if a[i] + a[j] + a[k] == 0:
+                    cnt += 1
+    return cnt                             # ops ends at n(n-1)(n-2)/6</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Brute-force 3-SUM: count unordered triples i&lt;j&lt;k with a[i]+a[j]+a[k]==0.
+// The inner-loop body runs C(n,3) ~ n^3/6 times -&gt; Theta(n^3).
+fn count3(a: &amp;[i64]) -&gt; i64 {
+    let n = a.len();
+    let mut cnt = 0i64;
+    for i in 0..n {
+        for j in (i + 1)..n {
+            for k in (j + 1)..n {          // one tick per triple tested
+                if a[i] + a[j] + a[k] == 0 {
+                    cnt += 1;
+                }
+            }
+        }
+    }
+    cnt                                    // body runs n(n-1)(n-2)/6 times
+}</pre>
+<p class="ct-src">source: <code>code/complexity/threesum-brute.cpp &middot; code/complexity/threesum-brute.java &middot; code/complexity/threesum-brute.py &middot; code/complexity/threesum-brute.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The code is correct almost by inspection: it literally examines every triple.
+        The interesting question is its cost, and here the choice of basic operation
+        is easy. Nearly all the work happens in the innermost loop body, which runs
+        once per triple; a single <code>ops++</code> there captures the total work,
+        and the three array reads it performs are a constant multiple of that. So we
+        count <strong>inner-loop executions</strong>, one tick per triple.
+      </p>
+      <div class="aside">
+        <span class="tag">Cost depends on \(n\), not the values</span>
+        Run <code>count3</code> on different arrays of the <em>same</em> size and the
+        running time barely moves: the loops execute the same number of times no
+        matter which integers are inside, because the values affect only the final
+        count, not how many triples are examined. So for this algorithm there is one
+        question: how does the cost grow with \(n\)? (Not every algorithm is so
+        input-insensitive; best-, worst-, and average-case analysis, where they
+        differ, is taken up with the formal notation.)
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="observe">3. Observe: the doubling experiment</h2>
+      <p>
+        Before deriving anything, we measure. Run <code>count3</code> on a random
+        input, then <strong>double \(n\)</strong> and run again, and again, recording
+        the operation count each time along with its <strong>ratio</strong> to the
+        previous line. The ratios are the whole point.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr>
+            <th class="lab">\(n\)</th><th>triples found</th>
+            <th>operations</th><th>ratio</th><th>time (s)</th><th>time ratio</th>
+          </tr>
+          <tr><td class="lab">250</td><td>0</td><td>2&thinsp;573&thinsp;000</td><td class="inf">&ndash;</td><td>0.001</td><td class="inf">&ndash;</td></tr>
+          <tr><td class="lab">500</td><td>8</td><td>20&thinsp;708&thinsp;500</td><td class="upd">8.05</td><td>0.010</td><td>7.83</td></tr>
+          <tr><td class="lab">1000</td><td>62</td><td>166&thinsp;167&thinsp;000</td><td class="upd">8.02</td><td>0.083</td><td>8.47</td></tr>
+          <tr><td class="lab">2000</td><td>512</td><td>1&thinsp;331&thinsp;334&thinsp;000</td><td class="upd">8.01</td><td>0.602</td><td>7.24</td></tr>
+        </table>
+        <figcaption>
+          The doubling experiment for brute-force 3-SUM. Each time \(n\) doubles the
+          operation count is multiplied by very nearly \(8\); the ratio (shaded)
+          settles on \(8\) from above. The wall-clock time tracks it but wobbles
+          (\(7.83, 8.47, 7.24\)) because other processes share the machine,
+          which is exactly why we trust the exact count over the noisy stopwatch.
+        </figcaption>
+      </figure>
+      <p>
+        The operation ratio converges cleanly on \(8\). What does an \(8\) mean?
+        Suppose the running time follows a power law \(T(n) = a\,n^b\). Then doubling
+        the input multiplies the time by a fixed factor that reveals \(b\):
+        \[
+          \frac{T(2n)}{T(n)} = \frac{a\,(2n)^b}{a\,n^b} = 2^b .
+        \]
+        The constant \(a\) cancels exactly, and the exponent falls out of the ratio.
+        A ratio of \(2 = 2^1\) means linear, \(4 = 2^2\) means quadratic, and
+        \(8 = 2^3\) means <strong>cubic</strong>: the ratio is the exponent in
+        disguise. Our measured \(8\) points straight at \(T(n) \sim a\,n^3\).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (predict, then verify)</span>
+        With \(b = 3\), the next doubling should again multiply operations by \(8\):
+        from \(n = 2000\) we predict \(n = 4000\) will cost about
+        \(8 \times 1{,}331{,}334{,}000 = 10{,}650{,}672{,}000\) operations. That is a
+        falsifiable forecast: run it and if the count misses, the cubic model
+        is wrong. (It does not miss; the exact value is
+        \(\binom{4000}{3} = 10{,}658{,}668{,}000\), within about \(0.08\%\) of the
+        prediction, the tiny gap coming from the lower-order terms we quantify next.)
+      </div>
+      <h3>Why a log-log plot exposes the exponent</h3>
+      <p>
+        The ratio test and its graphical cousin are the same fact seen twice. Take
+        logarithms of the power law \(T(n) = a\,n^b\) (write \(\lg\) for
+        \(\log_2\)):
+        \[
+          \lg T(n) = b\,\lg n + \lg a .
+        \]
+        That is the equation of a <strong>straight line</strong> in the coordinates
+        \((\lg n, \lg T)\) with <strong>slope \(b\)</strong>. So if you plot the
+        measured times on log-log axes and see a straight line, you have strong
+        evidence of a power law, and its slope is the order of growth,
+        discovered with no reasoning about the algorithm at all. Reading the slope off
+        the plot and reading the exponent off the doubling ratio are two ways to
+        recover the same \(b\).
+      </p>
+      <figure>
+        <svg viewBox="0 0 440 280" role="img" aria-label="A plot on log-log axes: the horizontal axis is labelled lg n and the vertical axis is labelled lg T(n). Four straight lines start from the same point at the lower left and fan upward with increasing steepness. From shallowest to steepest they are labelled log (slope approximately 0), linear (slope 1), quadratic (slope 2), and cubic (slope 3). On log-log axes a power law with exponent b is a straight line of slope b, so the steeper the line the larger the exponent.">
+          <g stroke="#4a5163" stroke-width="1.4" fill="none">
+            <line x1="62" y1="34" x2="62" y2="244"/>
+            <line x1="62" y1="244" x2="418" y2="244"/>
+          </g>
+          <g stroke="#0a7d4d" stroke-width="2.4" fill="none">
+            <line x1="62" y1="230" x2="300" y2="48"/>   <!-- cubic, slope ~3 -->
+            <line x1="62" y1="230" x2="300" y2="108"/>  <!-- quadratic -->
+            <line x1="62" y1="230" x2="300" y2="166"/>  <!-- linear -->
+            <line x1="62" y1="230" x2="300" y2="212"/>  <!-- logarithmic -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12.5" font-weight="700" fill="#0a7d4d">
+            <text x="306" y="50">cubic (slope 3)</text>
+            <text x="306" y="110">quadratic (2)</text>
+            <text x="306" y="168">linear (1)</text>
+            <text x="306" y="214">log (&asymp;0)</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" fill="#1a1c22">
+            <text x="30" y="42" transform="rotate(-90 30 42)">lg T(n)</text>
+            <text x="222" y="268" text-anchor="middle">lg n</text>
+          </g>
+        </svg>
+        <figcaption>
+          On log-log axes every power law \(n^b\) is a straight line of slope \(b\);
+          a steeper line means a larger exponent. The raw curves would only show
+          &ldquo;grows fast,&rdquo; but here the slope <em>is</em> the order of
+          growth. (Exponential \(2^n\) is <em>not</em> a power law and would curve
+          upward without ever straightening: the visual signature of a
+          non-polynomial cost.)
+        </figcaption>
+      </figure>
+      <p>
+        Measurement has now told us the exponent and given us a forecast, but
+        it cannot tell us <em>why</em> the exponent is \(3\). For that we leave the
+        stopwatch and count.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="count">4. Model: counting the basic operation</h2>
+      <p>
+        Knuth&rsquo;s framing of running time is a sum over the statements of a
+        program:
+        \[
+          \text{total time} \;=\; \sum_{\text{statements}}
+            (\text{cost}) \times (\text{frequency}) .
+        \]
+        The <strong>cost</strong> of a statement is a property of the machine and
+        compiler; the <strong>frequency</strong> (how often it runs) is
+        a property of the algorithm and its input. The costs are fixed constants we
+        do not care about; the frequency of the most-executed statement is where the
+        analysis actually lives.
+      </p>
+      <p>
+        For <code>count3</code> that statement is the inner-loop body, and its
+        frequency is a counting question straight out of discrete mathematics: how
+        many triples \(i \lt j \lt k\) are there? It is the number of ways to choose
+        \(3\) of \(n\) indices,
+        \[
+          \binom{n}{3} = \frac{n(n-1)(n-2)}{6}
+                       = \frac{n^3}{6} - \frac{n^2}{2} + \frac{n}{3} .
+        \]
+        No measurement, no fitting: pure combinatorics. And it matches the
+        experiment to the digit: at \(n = 1000\),
+        \[
+          \frac{10^9}{6} - \frac{10^6}{2} + \frac{1000}{3}
+            = 166{,}666{,}666.\overline{6} - 500{,}000 + 333.\overline{3}
+            = 166{,}167{,}000,
+        \]
+        exactly the operation count the experiment printed for \(n = 1000\).
+      </p>
+      <h3>Tilde: keep the leading term</h3>
+      <p>
+        The formula \(\frac{n^3}{6} - \frac{n^2}{2} + \frac{n}{3}\) is exact but
+        cluttered. At \(n = 1000\) the two trailing terms contribute
+        \(-500{,}000 + 333 \approx -499{,}667\), a rounding error beside the leading
+        \(\frac{n^3}{6} \approx 1.667 \times 10^8\). We formalize &ldquo;the rest is
+        negligible&rdquo; with tilde notation.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (tilde notation)</span>
+        We write \(f(n) \sim g(n)\), read &ldquo;\(f\) is asymptotic to \(g\),&rdquo;
+        when \(\displaystyle \lim_{n \to \infty} \frac{f(n)}{g(n)} = 1\). Tilde keeps
+        a function&rsquo;s leading term and discards everything that vanishes in
+        proportion to it.
+      </div>
+      <p>
+        The condition is exactly met here, because dividing the exact count by its
+        leading term gives
+        \[
+          \frac{\,n^3/6 - n^2/2 + n/3\,}{n^3/6}
+            = 1 - \frac{3}{n} + \frac{2}{n^2} \;\longrightarrow\; 1
+        \]
+        as \(n \to \infty\). So \(\binom{n}{3} \sim \frac{n^3}{6}\). Tilde is stronger
+        than order-of-growth: it keeps the constant \(\frac{1}{6}\), reporting not
+        just the shape but the coefficient of the leading term.
+      </p>
+      <div class="aside">
+        <span class="tag">The correction predicts the wobble</span>
+        The discarded \(-3/n\) term is not merely small: it explains the
+        experiment&rsquo;s approach to \(8\). The exact doubling ratio is
+        \(\dfrac{\binom{2n}{3}}{\binom{n}{3}} = \dfrac{4(2n-1)}{n-2}\), which gives
+        \(8.048,\ 8.024,\ 8.012\) at \(n = 250, 500, 1000\): the table&rsquo;s
+        \(8.05, 8.02, 8.01\) to the digit, closing on \(8\) from above exactly as the
+        \(-3/n\) correction predicts. The model explains even the imperfection of the
+        measurement.
+      </div>
+      <h3>Order of growth</h3>
+      <p>
+        Drop the constant as well and keep only the <em>shape</em> (the
+        function of \(n\) the cost is proportional to) and you have the
+        <strong>order of growth</strong>:
+      </p>
+      <table>
+        <tr><th>exact frequency</th><th>tilde</th><th>order of growth</th></tr>
+        <tr><td>\(n(n-1)(n-2)/6\)</td><td>\(\sim n^3/6\)</td><td>\(n^3\)</td></tr>
+        <tr><td>\(n^2/2 - n/2\)</td><td>\(\sim n^2/2\)</td><td>\(n^2\)</td></tr>
+        <tr><td>\(\lg n + 1\)</td><td>\(\sim \lg n\)</td><td>\(\lg n\)</td></tr>
+      </table>
+      <p>
+        Order of growth strips both the machine constant and the lower-order terms,
+        leaving the most portable description of cost there is: independent of
+        language, machine, and compiler. It is what lets a running-time analysis from
+        decades ago still apply to today&rsquo;s hardware.
+      </p>
+      <p>
+        Choosing a cost model whose count grows like the running time lets us state a
+        fact about the <em>algorithm</em>, not one implementation of it.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (3-SUM cost)</span>
+        Under the array-access cost model, brute-force 3-SUM makes
+        \(\sim n^3/2\) array accesses, and its running-time order of growth is
+        \(n^3\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The inner-loop body runs \(\binom{n}{3} \sim n^3/6\)
+        times, and each execution performs three array reads
+        \(a[i], a[j], a[k]\), for \(\sim 3 \cdot n^3/6 = n^3/2\) accesses. Since every
+        other statement (loop bookkeeping, the counter) runs at most a constant
+        multiple of that, the total work is \(\Theta(n^3)\), so the running time is
+        proportional to \(n^3\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Two independent routes have now reached the same place: the experiment
+        measured a log-log slope of \(3\) and a doubling ratio of \(8\); the count
+        derived \(\sim n^3/6\) triples from the code alone. Neither used the other,
+        and they agree, which is exactly the corroboration the scientific
+        method asks for. The order of growth of 3-SUM is \(n^3\), and it depends on
+        the algorithm (it examines all triples), not on the language or the machine.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="classes">5. The order-of-growth classes</h2>
+      <p>
+        Because we build programs from a few primitives (straight-line code,
+        loops, nesting, halving, recursion), the cost is almost always one of a
+        small handful of functions. This table is the vocabulary of the entire
+        course.
+      </p>
+      <table>
+        <tr><th>order</th><th>name</th><th>code shape</th><th>example</th></tr>
+        <tr><td>\(1\)</td><td>constant</td><td>a single statement</td><td>add two numbers</td></tr>
+        <tr><td>\(\lg n\)</td><td>logarithmic</td><td>halve each step</td><td>binary search</td></tr>
+        <tr><td>\(n\)</td><td>linear</td><td>one loop</td><td>find the maximum</td></tr>
+        <tr><td>\(n\lg n\)</td><td>linearithmic</td><td>divide &amp; conquer</td><td>mergesort</td></tr>
+        <tr><td>\(n^2\)</td><td>quadratic</td><td>double loop</td><td>check all pairs</td></tr>
+        <tr><td>\(n^3\)</td><td>cubic</td><td>triple loop</td><td>3-SUM</td></tr>
+        <tr><td>\(2^n\)</td><td>exponential</td><td>all subsets</td><td>exhaustive search</td></tr>
+      </table>
+      <p>
+        Each shape comes from a structural feature of the code. Work that does not
+        loop over the input is <strong>constant</strong>. A step that throws away a
+        constant fraction of the data (binary search halving its range)
+        is <strong>logarithmic</strong>. Touching each element a constant number of
+        times is <strong>linear</strong>. Splitting the input in half, recursing on
+        the pieces, and combining is <strong>linearithmic</strong>. Then the
+        expensive ones: every pair is <strong>quadratic</strong>, every triple is
+        <strong>cubic</strong>, every subset is <strong>exponential</strong>. Nesting
+        is what drives the exponent up, because nested loops multiply their counts
+        (&sect;6).
+      </p>
+      <div class="aside">
+        <span class="tag">The course-wide cheat sheet</span>
+        This seven-row table is the seed of the
+        <a href="../../media/big-o-cheatsheet.html">Big-O Cheat Sheet</a>, which grows it
+        into every structure and algorithm we meet, colored by growth. Each
+        handout adds a row; it is worth bookmarking now.
+      </div>
+      <h3>What the classes mean in seconds</h3>
+      <p>
+        The exponent is not an academic nicety: it decides feasibility. Take an
+        input of \(n = 10^6\) on a machine doing \(10^9\) operations per second:
+      </p>
+      <table>
+        <tr><th>growth</th><th>operations at \(n = 10^6\)</th><th>time</th></tr>
+        <tr><td>\(n\)</td><td>\(10^6\)</td><td>\(1\) ms</td></tr>
+        <tr><td>\(n\lg n\)</td><td>\(\approx 2 \times 10^7\)</td><td>\(\approx 20\) ms</td></tr>
+        <tr><td>\(n^2\)</td><td>\(10^{12}\)</td><td>\(\approx 17\) minutes</td></tr>
+        <tr><td>\(n^3\)</td><td>\(10^{18}\)</td><td>\(\approx 31\) years</td></tr>
+        <tr><td>\(2^n\)</td><td>\(2^{1{,}000{,}000}\)</td><td>beyond the age of the universe</td></tr>
+      </table>
+      <p>
+        Same machine, same language, every row: the difference between a millisecond
+        and seventeen minutes is a difference of <em>algorithm</em>, not hardware.
+        This is why the first question about a slow program should be &ldquo;is there
+        a better order of growth?&rdquo; before &ldquo;can I buy a faster
+        machine?&rdquo; At \(n = 10^6\) the quadratic and cubic algorithms are already
+        unusable, which is precisely the motivation to make 3-SUM faster.
+      </p>
+      <div class="aside">
+        <span class="tag">Where this becomes precise</span>
+        &ldquo;Proportional to,&rdquo; &ldquo;dominates,&rdquo; and &ldquo;order
+        of growth&rdquo; are made rigorous by the \(O\), \(\Omega\), and \(\Theta\)
+        set-definitions (\(O\) for an upper bound, \(\Omega\) for a lower
+        bound, \(\Theta\) for a matching pair) developed in
+        <a href="foundation-asymptotic-notation.html">the Asymptotic Notation reading</a>. In
+        this handout &ldquo;order of growth \(n^3\)&rdquo; and &ldquo;\(\Theta(n^3)\)&rdquo;
+        mean the same thing; there we prove the equivalence.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="faster">6. Design: a faster 3-SUM</h2>
+      <p>
+        Analysis is not only a report card; it is a design tool. We know 3-SUM is
+        \(n^3\) because it examines every triple. The instinct &ldquo;you <em>have</em>
+        to check every triple, so cubic is unavoidable&rdquo; is worth challenging,
+        because it is wrong. To see why, shrink the problem.
+      </p>
+      <h3>The warm-up: 2-SUM</h3>
+      <p>
+        Counting <em>pairs</em> that sum to zero is 3-SUM with one loop removed:
+        a double loop, order \(n^2\). But look at what the inner loop is really doing:
+        for each \(a[i]\), it asks &ldquo;is \(-a[i]\) somewhere in the array?&rdquo;
+        That is a <em>search</em>, and search is slow on unordered data but fast on
+        sorted data. If we <strong>sort once</strong> up front (\(n\lg n\)), each
+        &ldquo;is \(-a[i]\) present?&rdquo; becomes a binary search in \(\lg n\), and
+        the whole thing is \(n\lg n + n \cdot \lg n = 2\,n\lg n\), which is
+        \(n\lg n\): we spent a sort to knock 2-SUM from quadratic down to
+        linearithmic.
+      </p>
+      <p>
+        To add these costs correctly we need two rules, and they are the whole of
+        practical analysis.
+      </p>
+      <div class="thm">
+        <span class="tag">The sum rule and the product rule</span>
+        <strong>Sequential</strong> steps <em>add</em>, and the larger dominates:
+        \(f + g\) has the order of growth of whichever of \(f, g\) is larger.
+        <strong>Nested</strong> work <em>multiplies</em>: an outer loop of \(n\)
+        iterations each doing \(g(n)\) work costs \(n \cdot g(n)\).
+      </div>
+      <div class="proof">
+        <strong>Why.</strong> Sum rule: both costs are nonnegative, so
+        \(\max(f,g) \le f + g \le 2\max(f,g)\); the total is squeezed between
+        one and two times the larger cost, and a factor of \(2\) does not change
+        an order of growth. (The same squeeze, stated as
+        \(\max(f,g) \in \Theta(f+g)\), is proved from the formal definitions in
+        the exercises of
+        <a href="foundation-asymptotic-notation.html">the Asymptotic Notation
+        reading</a>.) Product rule: the inner work runs to completion once per
+        outer iteration, so the total is (number of iterations) \(\times\)
+        (work per iteration) \(= n \cdot g(n)\), a direct count.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The sum rule is why a cheap preprocessing pass is &ldquo;free&rdquo; next to a
+        dominant loop: \(n\lg n + n^2\) is just \(n^2\), and \(n + n^2\) is \(n^2\).
+        The product rule is why nesting drives the exponent: \(n\) iterations of
+        \(\lg n\)-work is \(n\lg n\), and \(n^2\) iterations of \(\lg n\)-work is
+        \(n^2\lg n\). Getting these two straight (sequential adds, nested
+        multiplies) is most of what analysis asks of you.
+      </p>
+      <h3>Lifting the idea to 3-SUM</h3>
+      <p>
+        The same lever works one dimension up. Sort the array; then for each
+        <em>pair</em> \(i \lt j\), binary-search for the third value
+        \(-(a[i] + a[j])\). By the rules this is
+        \(n\lg n + n^2 \cdot \lg n = n^2\lg n\), already down from \(n^3\).
+        But we can do better still, and remove the log, by replacing the search with a
+        <strong>two-pointer scan</strong>. Fix \(a[i]\); place <code>lo</code> just
+        after \(i\) and <code>hi</code> at the end, and walk them toward each other,
+        watching the sum \(s = a[i] + a[\texttt{lo}] + a[\texttt{hi}]\):
+      </p>
+      <ul>
+        <li>if \(s \lt 0\), the sum is too small, so advance <code>lo</code>;</li>
+        <li>if \(s \gt 0\), the sum is too big, so retreat <code>hi</code>;</li>
+        <li>if \(s = 0\), count the triple and move both inward.</li>
+      </ul>
+      <div class="code-tabs" data-snippet="complexity/threesum-fast">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Fast 3-SUM: sort (n log n), then for each i sweep two pointers over the
+// tail. Every step retires an index, so each sweep is &lt;= n -&gt; Theta(n^2).
+long count3fast(vector&lt;int&gt; a) {
+    sort(a.begin(), a.end());              // n log n preprocessing
+    int n = a.size();
+    long cnt = 0;
+    for (int i = 0; i &lt; n; i++) {          // fix a[i] ...
+        int lo = i + 1, hi = n - 1;        // ... two pointers on the tail
+        while (lo &lt; hi) {
+            int s = a[i] + a[lo] + a[hi];
+            if      (s &lt; 0) lo++;          // too small: advance lo
+            else if (s &gt; 0) hi--;          // too big:   retreat hi
+            else { cnt++; lo++; hi--; }    // hit 0 (distinct values)
+        }
+    }
+    return cnt;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Fast 3-SUM: sort (n log n), then for each i sweep two pointers over the
+// tail. Every step retires an index, so each sweep is &lt;= n -&gt; Theta(n^2).
+static long count3fast(int[] a) {
+    Arrays.sort(a);                        // n log n preprocessing
+    int n = a.length;
+    long cnt = 0;
+    for (int i = 0; i &lt; n; i++) {          // fix a[i] ...
+        int lo = i + 1, hi = n - 1;        // ... two pointers on the tail
+        while (lo &lt; hi) {
+            int s = a[i] + a[lo] + a[hi];
+            if      (s &lt; 0) lo++;          // too small: advance lo
+            else if (s &gt; 0) hi--;          // too big:   retreat hi
+            else { cnt++; lo++; hi--; }    // hit 0 (distinct values)
+        }
+    }
+    return cnt;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Fast 3-SUM: sort (n log n), then for each i sweep two pointers over the
+# tail. Every step retires an index, so each sweep is &lt;= n -&gt; Theta(n^2).
+def count3fast(a):
+    a = sorted(a)                          # n log n preprocessing
+    n = len(a)
+    cnt = 0
+    for i in range(n):                     # fix a[i] ...
+        lo, hi = i + 1, n - 1              # ... two pointers on the tail
+        while lo &lt; hi:
+            s = a[i] + a[lo] + a[hi]
+            if   s &lt; 0: lo += 1            # too small: advance lo
+            elif s &gt; 0: hi -= 1            # too big:   retreat hi
+            else:                          # hit 0 (distinct values)
+                cnt += 1; lo += 1; hi -= 1
+    return cnt</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Fast 3-SUM: sort (n log n), then for each i sweep two pointers over the
+// tail. Every step retires an index, so each sweep is &lt;= n -&gt; Theta(n^2).
+fn count3fast(mut a: Vec&lt;i64&gt;) -&gt; i64 {
+    a.sort();                              // n log n preprocessing
+    let n = a.len();
+    let mut cnt = 0i64;
+    for i in 0..n {                        // fix a[i] ...
+        let (mut lo, mut hi) = (i + 1, n - 1);
+        while lo &lt; hi {
+            let s = a[i] + a[lo] + a[hi];
+            if      s &lt; 0 { lo += 1; }     // too small: advance lo
+            else if s &gt; 0 { hi -= 1; }     // too big:   retreat hi
+            else { cnt += 1; lo += 1; hi -= 1; }  // hit 0
+        }
+    }
+    cnt
+}</pre>
+<p class="ct-src">source: <code>code/complexity/threesum-fast.cpp &middot; code/complexity/threesum-fast.java &middot; code/complexity/threesum-fast.py &middot; code/complexity/threesum-fast.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Why is the inner <code>while</code> loop only \(O(n)\)? Because each iteration
+        <em>permanently retires an index</em>. This is the first of many
+        &ldquo;each step discards a candidate, so the loop is linear&rdquo; arguments
+        in the course, and it deserves a proof.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (the two-pointer scan is correct and linear)</span>
+        For a fixed \(i\), the scan counts every pair \((\texttt{lo}, \texttt{hi})\)
+        with \(a[i] + a[\texttt{lo}] + a[\texttt{hi}] = 0\) and \(i \lt \texttt{lo}
+        \lt \texttt{hi}\), and performs at most \(n\) iterations.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The array is sorted. Suppose \(s \lt 0\). Then for
+        <em>every</em> index \(h' \le \texttt{hi}\) we have
+        \(a[\texttt{lo}] + a[h'] \le a[\texttt{lo}] + a[\texttt{hi}] \lt -a[i]\), so
+        no pair using the current <code>lo</code> can reach \(-a[i]\); the current
+        <code>lo</code> can be discarded forever, and advancing it loses no solution.
+        The case \(s \gt 0\) is the mirror image, retiring <code>hi</code>. When
+        \(s = 0\) the pair is a genuine solution, counted, after which both a
+        smaller-partner-for-<code>hi</code> and a larger-partner-for-<code>lo</code>
+        are impossible (values are distinct), so both pointers move. Every iteration
+        moves <code>lo</code> up or <code>hi</code> down by one, and they start \(n\)
+        apart at most, so the loop runs at most \(n\) times and terminates when they
+        cross. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Now add it up. The sort is \(n\lg n\). The outer loop runs \(n\) times, each
+        firing a scan of at most \(n\) iterations, so the scanning work is
+        \(n \cdot n = n^2\) by the product rule. By the sum rule
+        \(n\lg n + n^2 = n^2\): the sort vanishes beside the scans, and fast 3-SUM is
+        \(\Theta(n^2)\).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (the scan on the small instance)</span>
+        The array \(-40, -20, -10, 0, 5, 10, 30, 40\) is already sorted. Fix
+        \(i = 0\) (\(a[i] = -40\)), start \(\texttt{lo} = 1\), \(\texttt{hi} = 7\),
+        and walk:
+        <figure>
+          <table class="trace">
+            <tr>
+              <th class="lab">step</th>
+              <th>\(a[\texttt{lo}]\)</th><th>\(a[\texttt{hi}]\)</th>
+              <th>\(s\)</th><th>action</th>
+            </tr>
+            <tr><td class="lab">1</td><td>&minus;20</td><td>40</td><td class="inf">&minus;20</td><td class="lab">\(s\lt 0\): lo++</td></tr>
+            <tr><td class="lab">2</td><td>&minus;10</td><td>40</td><td class="inf">&minus;10</td><td class="lab">\(s\lt 0\): lo++</td></tr>
+            <tr><td class="lab">3</td><td>0</td><td>40</td><td class="set">0</td><td class="lab">count (&minus;40,0,40); lo++, hi&minus;&minus;</td></tr>
+            <tr><td class="lab">4</td><td>5</td><td>30</td><td class="inf">&minus;5</td><td class="lab">\(s\lt 0\): lo++</td></tr>
+            <tr><td class="lab">5</td><td>10</td><td>30</td><td class="set">0</td><td class="lab">count (&minus;40,10,30); lo++, hi&minus;&minus;</td></tr>
+          </table>
+          <figcaption>
+            The scan for \(i = 0\). After step 5, \(\texttt{lo} = 6\) and
+            \(\texttt{hi} = 5\) cross, so the scan stops, having found both triples
+            containing \(-40\), \((-40, 0, 40)\) and \((-40, 10, 30)\),
+            in five iterations rather than the \(\binom{7}{2} = 21\) pairs the brute
+            force would test. Repeating for \(i = 1, 2, \dots\) turns up the remaining
+            two triples, for the answer \(4\).
+          </figcaption>
+        </figure>
+      </div>
+      <p>
+        Same answer, same triples; only the work differs. The whole ladder:
+      </p>
+      <table>
+        <tr><th>algorithm</th><th>idea</th><th>order</th><th>doubling ratio</th></tr>
+        <tr><td>triple loop</td><td>test every triple</td><td>\(n^3\)</td><td>\(\times 8\)</td></tr>
+        <tr><td>sort + binary search</td><td>search for the third value</td><td>\(n^2\lg n\)</td><td>\(\times 4\) and a bit</td></tr>
+        <tr><td>sort + two pointers</td><td>retire an index per step</td><td>\(n^2\)</td><td>\(\times 4\)</td></tr>
+      </table>
+      <p>
+        The middle rung doubles by &ldquo;\(4\) and a bit&rdquo; because its
+        \(\lg n\) factor grows slowly with \(n\); the two-pointer rung is clean
+        \(n^2\), so it doubles by exactly \(4\). We turned a cubic algorithm into a
+        quadratic one not by cleverness at the keyboard but by letting the analysis
+        point at the waste.
+      </p>
+      <div class="aside">
+        <span class="tag">Knowing when to stop: lower bounds</span>
+        A <strong>lower bound</strong> is a floor no algorithm can beat. For 2-SUM,
+        \(n\lg n\) is a proven floor in the comparison model (the
+        <a href="../sorting/foundation-sorting-lower-bound.html">Sorting Lower Bound</a> handout proves a
+        lower bound of this kind). For 3-SUM, our \(n^2\) is essentially the floor:
+        only log-factor shavings are known (Gr&oslash;nlund&ndash;Pettie, 2014), and
+        the <em>3-SUM conjecture</em> holds that no \(n^{2-\varepsilon}\) algorithm
+        exists. When you can prove you are standing on the floor, stop
+        optimizing: that is what a lower bound buys you.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="doubling">7. The doubling method, in practice</h2>
+      <p>
+        The doubling experiment of &sect;3 is worth naming as a reusable tool, because
+        it extracts an algorithm&rsquo;s order of growth with almost no analysis. Run
+        the program at sizes \(n, 2n, 4n, \dots\), form the ratio of consecutive
+        running times, and read the exponent: a ratio settling on \(2^b\) means
+        \(T(n) \sim a\,n^b\). The derivation is the one line from &sect;3 (the
+        constant \(a\) cancels in the ratio and the lower-order terms fade), and
+        it needs no knowledge of the code&rsquo;s internals.
+      </p>
+      <p>
+        The same exponent decides whether faster hardware can rescue a slow algorithm.
+        Moore&rsquo;s Law historically doubled speed every couple of years. For an
+        \(n^b\) algorithm, a \(2\times\) machine grows the feasible input size by only
+        \(2^{1/b}\), and to <em>double</em> the input you need a \(2^b\times\) speedup,
+        i.e. \(b\) doublings of the hardware:
+      </p>
+      <table>
+        <tr><th>order</th><th>doubling ratio</th><th>a \(2\times\) machine grows \(n\) by</th><th>speedup to double \(n\)</th></tr>
+        <tr><td>\(n\) (linear)</td><td>\(2\)</td><td>\(\times 2\)</td><td>\(2\times\)</td></tr>
+        <tr><td>\(n^2\) (quadratic)</td><td>\(4\)</td><td>\(\times\sqrt{2} \approx 1.41\)</td><td>\(4\times\)</td></tr>
+        <tr><td>\(n^3\) (cubic)</td><td>\(8\)</td><td>\(\times\sqrt[3]{2} \approx 1.26\)</td><td>\(8\times\)</td></tr>
+        <tr><td>\(2^n\) (exponential)</td><td>&ndash;</td><td>\(+1\) element</td><td>impossible</td></tr>
+      </table>
+      <p>
+        Linear rides Moore&rsquo;s Law one for one; cubic falls steadily behind; and
+        exponential is immune: a machine twice as fast lets you add a
+        <em>single</em> element to the input, never double it. The exponent you read
+        off the doubling ratio is literally the number of hardware generations needed
+        to keep pace, which is why a better order of growth beats a faster machine.
+      </p>
+      <div class="aside">
+        <span class="tag">Pitfalls of the method</span>
+        The doubling method has two failure modes worth guarding against. First, the
+        input range may be <em>too small</em> for the asymptotics to show: at
+        tiny \(n\) the lower-order terms still matter and the ratio has not settled.
+        Second, you may accidentally measure a lucky <em>best-case</em> input rather
+        than a representative one, reporting an order of growth the algorithm does not
+        have in general. A ratio that keeps <em>climbing</em> instead of settling is a
+        useful alarm: the model is wrong, or there is a performance bug. Always drive
+        the experiment to sizes large enough that consecutive ratios agree.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          A program&rsquo;s measured running times at \(n = 1000, 2000, 4000, 8000\)
+          are \(0.5, 4.0, 32.0, 256.0\) seconds. What is its order of growth, and how
+          do you know?
+          <details>
+            <summary>solution</summary>
+            Each doubling of \(n\) multiplies the time by \(8\)
+            (\(4.0/0.5 = 8\), \(32/4 = 8\), \(256/32 = 8\)). A doubling ratio of
+            \(8 = 2^3\) means \(T(n) \sim a\,n^3\): the order of growth is \(n^3\)
+            (cubic), since \(T(2n)/T(n) = 2^b\) forces \(b = 3\).
+          </details>
+        </li>
+        <li>
+          Using the exact frequency \(\binom{n}{3}\), compute the operation count of
+          brute-force 3-SUM at \(n = 500\) and confirm it against the doubling table.
+          <details>
+            <summary>solution</summary>
+            \(\binom{500}{3} = \dfrac{500 \cdot 499 \cdot 498}{6}
+            = \dfrac{124{,}251{,}000}{6} = 20{,}708{,}500\), exactly the operation
+            count the experiment printed for \(n = 500\). The intermediate
+            \(500 \cdot 499 = 249{,}500\) and \(249{,}500 \cdot 498 = 124{,}251{,}000\).
+          </details>
+        </li>
+        <li>
+          Show that \(\dfrac{n^3}{6} - \dfrac{n^2}{2} + \dfrac{n}{3} \sim
+          \dfrac{n^3}{6}\) directly from the definition of tilde.
+          <details>
+            <summary>solution</summary>
+            Divide by the leading term:
+            \(\dfrac{n^3/6 - n^2/2 + n/3}{n^3/6}
+            = 1 - \dfrac{3}{n} + \dfrac{2}{n^2}\). As \(n \to \infty\) both
+            \(3/n\) and \(2/n^2\) tend to \(0\), so the ratio tends to \(1\), which is
+            exactly the condition \(f \sim g\). Hence the two are asymptotic.
+          </details>
+        </li>
+        <li>
+          Give the order of growth of each expression, naming the rule you used:
+          (a) \(n\lg n + n^2\); (b) \(n \cdot \lg n\) (a loop of \(n\) iterations,
+          each a binary search); (c) \(n^2 + 100n + 5000\).
+          <details>
+            <summary>solution</summary>
+            (a) \(n^2\), by the sum rule (sequential steps add; the larger term
+            \(n^2\) dominates \(n\lg n\)). (b) \(n\lg n\), by the product rule (nested
+            work multiplies: \(n\) iterations times \(\lg n\) each). (c) \(n^2\), by
+            the sum rule again: the linear and constant terms are dominated,
+            and constant factors are dropped.
+          </details>
+        </li>
+        <li>
+          Trace the two-pointer scan of fast 3-SUM for \(i = 1\) (\(a[i] = -20\)) on
+          the sorted array \(-40, -20, -10, 0, 5, 10, 30, 40\). Which triple(s) does
+          it find, and how many iterations does it take?
+          <details>
+            <summary>solution</summary>
+            Start \(\texttt{lo} = 2\ ({-}10)\), \(\texttt{hi} = 7\ (40)\).
+            (1) \(s = -20 - 10 + 40 = 10 \gt 0\): hi\(-\!-\) \(\to 6\ (30)\).
+            (2) \(s = -20 - 10 + 30 = 0\): count \((-20, -10, 30)\); lo++\(\to 3\ (0)\),
+            hi\(-\!-\)\(\to 5\ (10)\).
+            (3) \(s = -20 + 0 + 10 = -10 \lt 0\): lo++\(\to 4\ (5)\).
+            (4) \(s = -20 + 5 + 10 = -5 \lt 0\): lo++\(\to 5\). Now
+            \(\texttt{lo} = \texttt{hi} = 5\), the loop stops. It finds the single
+            triple \((-20, -10, 30)\) in four iterations.
+          </details>
+        </li>
+        <li>
+          On a \(10^9\) ops/sec machine, roughly how long does an \(n^2\) algorithm
+          take at \(n = 10^6\), and an \(n^3\) algorithm at the same \(n\)? Why does
+          this favor improving the order of growth over buying faster hardware?
+          <details>
+            <summary>solution</summary>
+            \(n^2 = 10^{12}\) operations \(/\,10^9\) per second \(= 10^3\) seconds
+            \(\approx 17\) minutes. \(n^3 = 10^{18}/10^9 = 10^9\) seconds
+            \(\approx 31\) years. Buying a \(1000\times\) faster machine would cut the
+            cubic case only from \(31\) years to about \(11\) days, while switching to
+            the \(n^2\) algorithm cuts it to \(17\) minutes on the original hardware:
+            a better exponent dwarfs any realistic constant-factor speedup at scale.
+          </details>
+        </li>
+        <li>
+          True or false, with justification: &ldquo;An algorithm that does
+          \(1000\,n\) operations is always faster than one that does \(n^2\)
+          operations.&rdquo;
+          <details>
+            <summary>solution</summary>
+            False. Order of growth is an <em>asymptotic</em> statement: \(1000\,n\) is
+            \(\Theta(n)\) and beats \(\Theta(n^2)\) for all sufficiently large \(n\),
+            but for small \(n\) the constant matters. Here \(1000\,n \lt n^2\) only
+            when \(n \gt 1000\); for \(n \le 1000\) the quadratic algorithm does fewer
+            operations. Order of growth predicts the winner <em>eventually</em>, not
+            at every size, which is why constant factors and input ranges still
+            deserve attention in practice.
+          </details>
+        </li>
+        <li>
+          Why do we count inner-loop executions (or array accesses) instead of timing
+          the program with a stopwatch, given that the stopwatch measures the thing we
+          actually care about?
+          <details>
+            <summary>solution</summary>
+            The operation count is exact, reproducible, and machine-independent: it is
+            identical on a laptop, a phone, or a server, and it isolates the
+            <em>algorithm</em> from the implementation, language, and hardware.
+            Wall-clock time folds in all of those plus interference from other
+            processes, so it wobbles (the table&rsquo;s \(7.83, 8.47, 7.24\)) even
+            when the underlying count is clean (\(8.05, 8.02, 8.01\)). We count to get
+            a precise, portable answer and time only to validate that the count
+            predicts reality: observe, then confirm.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Analysis of Algorithms: Time v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

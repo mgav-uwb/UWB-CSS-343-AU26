@@ -1,0 +1,544 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Rod Cutting.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rod Cutting - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h2.part { font-size: 23px; margin: 48px 0 8px; padding-top: 22px; border-top: 2px solid var(--line); }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+      <h1>Rod Cutting</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
+      </div>
+      <div class="src">
+        Rod cutting, the first full optimization DP: a maximization over every
+        first cut, the recurrence and its optimal-substructure proof, the
+        worked \(\Theta(n^2)\) table for the running instance (prices
+        \(1, 5, 8, 9\), optimum \(10\) by cutting \(2 + 2\)), the
+        <code>cut[]</code> record and the traceback that reads the cuts off it,
+        and complete code in four languages. The method itself (memoization,
+        tabulation, and the design recipe) is the
+        <a href="paradigm-dp-method.html">Dynamic Programming Method</a> handout. With
+        demos and exercises.
+      </div>
+
+      <p class="lead">
+        Dynamic programming solves a problem by trying every choice and caching
+        the overlapping subproblems; the method, its two implementations, and
+        its five-step recipe are the
+        <a href="paradigm-dp-method.html">Dynamic Programming Method</a> handout. Rod
+        cutting is the recipe&rsquo;s first optimization problem: no single
+        first cut is provably safe, so every one must be tried, and the
+        subproblems those trials generate overlap.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#rod">Rod cutting: optimizing over choices</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="rod">1. Rod cutting: optimizing over choices</h2>
+      <p>
+        Fibonacci (the <a href="paradigm-dp-method.html#fib">Dynamic Programming
+        Method</a> handout) has overlap but nothing to optimize.
+        <strong>Rod cutting</strong>
+        adds the missing ingredient, a <em>choice</em> at every step,
+        and with it the full shape of an optimization DP.
+      </p>
+      <div class="def">
+        <span class="tag">Problem (rod cutting)</span>
+        Given a rod of integer length \(n\) and a price list where a piece of
+        length \(i\) sells for \(\mathrm{price}[i]\), cut the rod into pieces
+        (zero or more cuts) to <strong>maximize</strong> the total selling price.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the running instance)</span>
+        Lengths \(1\)&ndash;\(4\) priced \(1, 5, 8, 9\), rod length \(n = 4\).
+        Selling the rod whole earns \(9\); cutting \(3 + 1\) earns \(8 + 1 = 9\);
+        but cutting into two length-\(2\) pieces earns \(5 + 5 = 10\): the
+        optimum, and nothing about the raw prices announces it.
+      </div>
+      <p>
+        A greedy attempt fails, exactly in the
+        <a href="../greedy/paradigm-greedy-method.html">Greedy
+        Method</a> handout&rsquo;s sense of a counterexample. The natural greedy rule
+        (cut the piece with the best price <em>per unit length</em> first)
+        computes the ratios \(1/1 = 1.0\), \(5/2 = 2.5\),
+        \(8/3 \approx 2.67\), \(9/4 = 2.25\), grabs the length-\(3\) piece, and is
+        left with a length-\(1\) remainder: total \(8 + 1 = 9 &lt; 10\). The
+        locally best ratio is not globally best because taking it constrains what
+        is left. Since the best first cut cannot be identified without solving the
+        rest of the rod, <em>every</em> first cut must be tried, and the
+        subproblems those trials generate overlap, which is DP&rsquo;s cue.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (rod-cutting recurrence)</span>
+        Let \(\mathrm{best}(\ell)\) be the maximum revenue for a rod of length
+        \(\ell\). Then \(\mathrm{best}(0) = 0\) and, for \(\ell \ge 1\),
+        \[
+          \mathrm{best}(\ell) \;=\; \max_{1 \le i \le \ell}
+          \bigl(\mathrm{price}[i] + \mathrm{best}(\ell - i)\bigr).
+        \]
+      </div>
+      <div class="proof">
+        <strong>Why this is correct (optimal substructure).</strong> Any optimal
+        cutting of a length-\(\ell\) rod has <em>some</em> first piece, of some
+        length \(i\); the rest of that solution cuts the remaining
+        \(\ell - i\). If that remainder were cut suboptimally, replacing it with an
+        optimal cutting of length \(\ell - i\) would raise the total,
+        contradicting optimality. So the optimum equals
+        \(\mathrm{price}[i] + \mathrm{best}(\ell - i)\) for its own first piece
+        \(i\), and taking the max over all \(i\) can only find it. The subproblems
+        overlap because \(\mathrm{best}(k)\) is needed along many different
+        first-cut paths; without a cache the recursion is
+        \(\Theta(2^n)\), with one it is \(n\) subproblems at \(O(n)\) each:
+        \(\Theta(n^2)\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        One new concern appears that Fibonacci never raised: the table stores the
+        optimal <em>value</em>, but we usually want the <em>cuts</em>. The fix is
+        two lines: record, at each length, which first cut won the max, then walk
+        the records backwards. Every optimization DP does this.
+      </p>
+      <div class="code-tabs" data-snippet="dp/rodcut">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Rod cutting, tabulated: best[len] = max over first cuts i of
+// price[i] + best[len-i], recording the winning i in cut[len] for the
+// traceback. n subproblems x O(n) choices each = Theta(n^2) time, Theta(n) space.
+int rodCut(const vector&lt;int&gt;&amp; price, int n, vector&lt;int&gt;&amp; cut) {
+    vector&lt;int&gt; best(n + 1, 0);           // base case: best[0] = 0 (empty rod)
+    cut.assign(n + 1, 0);
+    for (int len = 1; len &lt;= n; len++) {
+        int m = -1;
+        for (int i = 1; i &lt;= len; i++)    // try every first cut
+            if (price[i] + best[len - i] &gt; m) {
+                m = price[i] + best[len - i];
+                cut[len] = i;             // remember the choice that won
+            }
+        best[len] = m;                    // reuses smaller best[] -- the overlap
+    }
+    return best[n];
+}
+
+// Traceback: repeatedly take the recorded first cut until nothing is left.
+vector&lt;int&gt; pieces(const vector&lt;int&gt;&amp; cut, int n) {
+    vector&lt;int&gt; out;
+    while (n &gt; 0) {
+        out.push_back(cut[n]);            // the winning first cut at length n
+        n -= cut[n];                      // cut it off, continue on the rest
+    }
+    return out;                           // prices 1,5,8,9 at n=4: {2, 2}
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Rod cutting, tabulated: best[len] = max over first cuts i of
+// price[i] + best[len-i], recording the winning i in cut[len] for the
+// traceback. n subproblems x O(n) choices each = Theta(n^2) time, Theta(n) space.
+static int rodCut(int[] price, int n, int[] cut) {
+    int[] best = new int[n + 1];          // base case: best[0] = 0 (empty rod)
+    for (int len = 1; len &lt;= n; len++) {
+        int m = -1;
+        for (int i = 1; i &lt;= len; i++)    // try every first cut
+            if (price[i] + best[len - i] &gt; m) {
+                m = price[i] + best[len - i];
+                cut[len] = i;             // remember the choice that won
+            }
+        best[len] = m;                    // reuses smaller best[] -- the overlap
+    }
+    return best[n];
+}
+
+// Traceback: repeatedly take the recorded first cut until nothing is left.
+static List&lt;Integer&gt; pieces(int[] cut, int n) {
+    List&lt;Integer&gt; out = new ArrayList&lt;&gt;();
+    while (n &gt; 0) {
+        out.add(cut[n]);                  // the winning first cut at length n
+        n -= cut[n];                      // cut it off, continue on the rest
+    }
+    return out;                           // prices 1,5,8,9 at n=4: [2, 2]
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Rod cutting, tabulated: best[len] = max over first cuts i of
+# price[i] + best[len-i], recording the winning i in cut[len] for the
+# traceback. n subproblems x O(n) choices each = Theta(n^2) time, Theta(n) space.
+def rod_cut(price, n):                    # price[1..n]; price[0] unused
+    best = [0] * (n + 1)                  # base case: best[0] = 0 (empty rod)
+    cut = [0] * (n + 1)
+    for length in range(1, n + 1):
+        m = -1
+        for i in range(1, length + 1):    # try every first cut
+            if price[i] + best[length - i] &gt; m:
+                m = price[i] + best[length - i]
+                cut[length] = i           # remember the choice that won
+        best[length] = m                  # reuses smaller best[] -- the overlap
+    return best[n], cut
+
+# Traceback: repeatedly take the recorded first cut until nothing is left.
+def pieces(cut, n):
+    out = []
+    while n &gt; 0:
+        out.append(cut[n])                # the winning first cut at length n
+        n -= cut[n]                       # cut it off, continue on the rest
+    return out                            # prices 1,5,8,9 at n=4: [2, 2]</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Rod cutting, tabulated: best[len] = max over first cuts i of
+// price[i] + best[len-i], recording the winning i in cut[len] for the
+// traceback. n subproblems x O(n) choices each = Theta(n^2) time, Theta(n) space.
+fn rod_cut(price: &amp;[i32], n: usize) -&gt; (i32, Vec&lt;usize&gt;) {
+    let mut best = vec![0i32; n + 1];     // base case: best[0] = 0 (empty rod)
+    let mut cut = vec![0usize; n + 1];
+    for len in 1..=n {
+        let mut m = -1;
+        for i in 1..=len {                // try every first cut
+            if price[i] + best[len - i] &gt; m {
+                m = price[i] + best[len - i];
+                cut[len] = i;             // remember the choice that won
+            }
+        }
+        best[len] = m;                    // reuses smaller best[] -- the overlap
+    }
+    (best[n], cut)
+}
+
+// Traceback: repeatedly take the recorded first cut until nothing is left.
+fn pieces(cut: &amp;[usize], mut n: usize) -&gt; Vec&lt;usize&gt; {
+    let mut out = Vec::new();
+    while n &gt; 0 {
+        out.push(cut[n]);                 // the winning first cut at length n
+        n -= cut[n];                      // cut it off, continue on the rest
+    }
+    out                                   // prices 1,5,8,9 at n=4: [2, 2]
+}</pre>
+<p class="ct-src">source: <code>code/dp/rodcut.cpp &middot; code/dp/rodcut.java &middot; code/dp/rodcut.py &middot; code/dp/rodcut.rs</code></p>
+<!--/ct--></div>
+      <div class="ex">
+        <span class="tag">Example (the table, worked)</span>
+        Prices \(1, 5, 8, 9\) for lengths \(1\)&ndash;\(4\); every candidate at
+        every length, the winner in bold position:
+        <table class="trace">
+          <tr><th class="lab">len</th><th>candidates \(\mathrm{price}[i] + \mathrm{best}[len-i]\)</th><th>best</th><th>cut</th></tr>
+          <tr><td class="lab">0</td><td>(base case)</td><td class="cell">0</td><td class="cell">&ndash;</td></tr>
+          <tr><td class="lab">1</td><td class="cell">1+0 = 1</td><td class="cell lt">1</td><td class="cell">1</td></tr>
+          <tr><td class="lab">2</td><td class="cell">1+1 = 2 &middot; <strong>5+0 = 5</strong></td><td class="cell lt">5</td><td class="cell">2</td></tr>
+          <tr><td class="lab">3</td><td class="cell">1+5 = 6 &middot; 5+1 = 6 &middot; <strong>8+0 = 8</strong></td><td class="cell lt">8</td><td class="cell">3</td></tr>
+          <tr><td class="lab">4</td><td class="cell">1+8 = 9 &middot; <strong>5+5 = 10</strong> &middot; 8+1 = 9 &middot; 9+0 = 9</td><td class="cell lt">10</td><td class="cell">2</td></tr>
+        </table>
+        Notice \(\mathrm{best}[4]\) reuses \(\mathrm{best}[3]\),
+        \(\mathrm{best}[2]\), \(\mathrm{best}[1]\), the very cells
+        \(\mathrm{best}[3]\) also used. That sharing is the overlap; without the
+        table, \(\mathrm{best}[2]\) would be recomputed along every first-cut path,
+        exactly like naive Fibonacci&rsquo;s \(\mathrm{fib}(2)\).
+        The traceback then reads the cuts off the last column:
+        \(\mathrm{cut}[4] = 2\), so take a length-\(2\) piece, leaving length
+        \(2\); \(\mathrm{cut}[2] = 2\), take another, leaving \(0\). Cuts:
+        \(2 + 2\), value \(10\).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the inner scan at \(len = 4\), candidate by candidate)</span>
+        The table above reports each length&rsquo;s winner; here is the inner loop
+        that finds it, one candidate at a time, with the running maximum \(m\) and
+        the recorded cut after each test. The loop starts at \(m = -1\), so the
+        first candidate always improves; after that a candidate is kept only when
+        it is <em>strictly</em> greater:
+        <table class="trace">
+          <tr><th class="lab">\(i\)</th><th>\(\mathrm{price}[i] + \mathrm{best}[4-i]\)</th><th>vs \(m\)</th><th>\(m\) after</th><th>\(\mathrm{cut}[4]\) after</th></tr>
+          <tr><td class="lab">1</td><td class="cell">\(1 + \mathrm{best}[3] = 1 + 8 = 9\)</td><td>\(9 &gt; -1\): improves</td><td class="cell lt">9</td><td class="cell">1</td></tr>
+          <tr><td class="lab">2</td><td class="cell">\(5 + \mathrm{best}[2] = 5 + 5 = 10\)</td><td>\(10 &gt; 9\): improves</td><td class="cell lt">10</td><td class="cell">2</td></tr>
+          <tr><td class="lab">3</td><td class="cell">\(8 + \mathrm{best}[1] = 8 + 1 = 9\)</td><td>\(9 \le 10\): rejected</td><td class="cell">10</td><td class="cell">2</td></tr>
+          <tr><td class="lab">4</td><td class="cell">\(9 + \mathrm{best}[0] = 9 + 0 = 9\)</td><td>\(9 \le 10\): rejected</td><td class="cell">10</td><td class="cell">2</td></tr>
+        </table>
+        Both branches of the <code>if</code> appear here: two candidates improve the
+        running maximum and rewrite \(\mathrm{cut}[4]\), two do not and leave both
+        alone. The scan at \(len = 3\) adds the third possibility, a candidate that
+        <em>equals</em> the running maximum: \(i = 1\) sets \(m = 1 + 5 = 6\),
+        \(i = 2\) offers \(5 + 1 = 6\), and because the test is strict the tie is
+        rejected and \(\mathrm{cut}[3]\) stays \(1\) until \(i = 3\) wins outright
+        at \(8\).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the two extremes: cut everywhere, cut nowhere)</span>
+        The winning first cut can be any \(i\) from \(1\) to \(len\), and the two
+        endpoints are worth seeing on their own instances. Both are the same code
+        on the same recurrence; only the price list changed.
+        <p>
+          <strong>Every cut wins (\(\mathrm{cut}[len] = 1\) throughout).</strong>
+          Prices \(3, 5, 8, 9\): length \(1\) is so well paid that no longer piece
+          ever beats slicing one unit off.
+        </p>
+        <table class="trace">
+          <tr><th class="lab">len</th><th>candidates</th><th>best</th><th>cut</th></tr>
+          <tr><td class="lab">1</td><td class="cell"><strong>3+0 = 3</strong></td><td class="cell lt">3</td><td class="cell">1</td></tr>
+          <tr><td class="lab">2</td><td class="cell"><strong>3+3 = 6</strong> &middot; 5+0 = 5</td><td class="cell lt">6</td><td class="cell">1</td></tr>
+          <tr><td class="lab">3</td><td class="cell"><strong>3+6 = 9</strong> &middot; 5+3 = 8 &middot; 8+0 = 8</td><td class="cell lt">9</td><td class="cell">1</td></tr>
+          <tr><td class="lab">4</td><td class="cell"><strong>3+9 = 12</strong> &middot; 5+6 = 11 &middot; 8+3 = 11 &middot; 9+0 = 9</td><td class="cell lt">12</td><td class="cell">1</td></tr>
+        </table>
+        <p>
+          Traceback, four steps instead of two: \(\mathrm{cut}[4] = 1\) leaves
+          \(3\), \(\mathrm{cut}[3] = 1\) leaves \(2\), \(\mathrm{cut}[2] = 1\)
+          leaves \(1\), \(\mathrm{cut}[1] = 1\) leaves \(0\). Pieces
+          \(1{+}1{+}1{+}1\), value \(12\).
+        </p>
+        <p>
+          <strong>No cut wins (\(\mathrm{cut}[n] = n\)).</strong> Prices
+          \(1, 2, 3, 10\): the length-\(4\) price alone is worth more than any
+          way of splitting it.
+        </p>
+        <table class="trace">
+          <tr><th class="lab">len</th><th>candidates</th><th>best</th><th>cut</th></tr>
+          <tr><td class="lab">1</td><td class="cell"><strong>1+0 = 1</strong></td><td class="cell lt">1</td><td class="cell">1</td></tr>
+          <tr><td class="lab">2</td><td class="cell"><strong>1+1 = 2</strong> &middot; 2+0 = 2</td><td class="cell lt">2</td><td class="cell">1</td></tr>
+          <tr><td class="lab">3</td><td class="cell"><strong>1+2 = 3</strong> &middot; 2+1 = 3 &middot; 3+0 = 3</td><td class="cell lt">3</td><td class="cell">1</td></tr>
+          <tr><td class="lab">4</td><td class="cell">1+3 = 4 &middot; 2+2 = 4 &middot; 3+1 = 4 &middot; <strong>10+0 = 10</strong></td><td class="cell lt">10</td><td class="cell">4</td></tr>
+        </table>
+        <p>
+          Traceback, one step: \(\mathrm{cut}[4] = 4\) takes the whole rod and
+          leaves \(0\). Pieces \(\{4\}\), value \(10\), zero cuts. Lengths
+          \(1\)&ndash;\(3\) meanwhile record \(\mathrm{cut} = 1\) on a three-way
+          tie, which costs nothing: those cells are never reached by this
+          traceback, and their values are correct in any case.
+        </p>
+      </div>
+      <div class="aside">
+        <span class="tag">Ties are fine</span>
+        At length \(3\), the candidates \(1 + 5\) and \(5 + 1\) tie at \(6\) before
+        \(8\) wins outright; in other instances the <em>max itself</em> ties, and
+        then several different cut lists achieve the same optimal value. The DP is
+        unbothered: it returns one optimal solution, whichever choice it
+        recorded first. When an exercise asks for &ldquo;the&rdquo; cuts, any
+        optimal set is correct unless a tie-breaking rule is stated; when
+        <em>writing</em> such an exercise, state one.
+      </div>
+
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=rodcut">Rod-cutting demo</a>. Three rows (the given
+        <code>price</code>, the <code>best</code> table being filled, and the <code>cut</code>
+        record) and one frame per <em>candidate</em>, so the \(\Theta(n^2)\) is counted
+        rather than asserted: the candidate counter ends at \(n(n+1)/2\), which is \(10\) for
+        the running instance. Watch each candidate highlight the smaller <code>best[]</code>
+        cell it reads; that reuse is the overlap. The traceback at the end walks the
+        <code>cut</code> row alone (\(\mathrm{cut}[4] = 2\), then \(\mathrm{cut}[2] = 2\)),
+        which is the whole reason the row exists. The presets carry exercise 1's prices
+        \(2, 5, 7, 8\) and exercise 2's \(1, 5, 8, 9, 10\) at \(n = 5\), so both can be
+        checked against your own table.
+        The proposition above claims \(\Theta(2^n)\) without a cache;
+        <a href="../../lib/demo.html?ds=rodcut-race">the rod-cutting race</a> counts it, running the
+        same rod through both versions in lockstep: exactly \(2^n\) calls against
+        \(n(n+1)/2\) candidates, \(4096\) against \(78\) at \(n = 12\), same optimum.
+      </div>
+
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=rodcut-tree">The subproblem tree</a> is the picture this
+        recurrence describes: a node is the length still to cut, an edge is the piece taken, so a
+        root-to-leaf path is one complete cutting and the leaves enumerate <em>all</em> of
+        them: the \(2^{n-1}\) compositions of \(n\), which is \(8\) for the running
+        instance. Scoring them leaves \(2+2 = 10\) as the only green path, with the whole rod
+        and the greedy best-ratio choice sitting beside it at \(9\). Its other two views are
+        the argument of this section in one image: <em>memoized</em> greys out every subtree a
+        cache hit removes, leaving exactly \(1 + n(n+1)/2\) nodes lit (\(11\) of \(16\)),
+        the root plus this table's candidate count, and <em>tabulated</em> drops the recursion
+        altogether for \(n+1\) cells and \(n(n+1)/2\) links. The pruned tree and the table are
+        the same \(\Theta(n^2)\) work, drawn twice.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">2. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Rod cutting with prices \(2, 5, 7, 8\) for lengths \(1\)&ndash;\(4\):
+          fill \(\mathrm{best}[1..4]\), showing every candidate, and give an
+          optimal set of cuts.
+          <details>
+            <summary>solution</summary>
+            \(\mathrm{best}[1] = 2 + 0 = 2\).
+            \(\mathrm{best}[2] = \max(2 + 2,\; 5 + 0) = 5\) (whole piece).
+            \(\mathrm{best}[3] = \max(2 + 5,\; 5 + 2,\; 7 + 0) = 7\), a
+            three-way tie, so a \(1{+}2\) split and the whole piece are all
+            optimal. \(\mathrm{best}[4] = \max(2 + 7,\; 5 + 5,\; 7 + 2,\; 8 + 0)
+            = \max(9, 10, 9, 8) = 10\), achieved only by \(5 + 5\): two
+            length-\(2\) pieces, value \(10\). (Note the whole-rod price \(8\) is
+            again not optimal, the same shape as the running instance.)
+          </details>
+        </li>
+        <li>
+          Extend the running instance with \(\mathrm{price}[5] = 10\) (so prices
+          \(1, 5, 8, 9, 10\)) and a rod of length \(5\). Compute
+          \(\mathrm{best}[5]\), the recorded \(\mathrm{cut}[5]\), and run the
+          traceback.
+          <details>
+            <summary>solution</summary>
+            The smaller cells are unchanged: \(\mathrm{best}[0..4] =
+            0, 1, 5, 8, 10\). Candidates for length \(5\):
+            \(1 + \mathrm{best}[4] = 11\); \(5 + \mathrm{best}[3] = 13\);
+            \(8 + \mathrm{best}[2] = 13\); \(9 + \mathrm{best}[1] = 10\);
+            \(10 + \mathrm{best}[0] = 10\). So \(\mathrm{best}[5] = 13\). Both
+            \(i = 2\) and \(i = 3\) achieve it; the code as written keeps the
+            first winner, \(\mathrm{cut}[5] = 2\). Traceback: take \(2\)
+            (remainder \(3\)), then \(\mathrm{cut}[3] = 3\), take \(3\)
+            (remainder \(0\)): pieces \(\{2, 3\}\), value \(5 + 8 = 13\). The
+            tie is harmless: \(i = 3\) first leads to the same
+            \(\{3, 2\}\) multiset.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Rod Cutting v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

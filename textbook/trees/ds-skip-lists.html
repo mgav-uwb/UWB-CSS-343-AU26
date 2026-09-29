@@ -1,0 +1,1097 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Skip Lists.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skip Lists - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      pre .hit { color: var(--accent); font-weight: 700; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom: 2px solid var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Skip Lists</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        A skip list is a sorted linked list with express lanes: each node gets a
+        random tower height by coin flips, and each level links the tall-enough
+        nodes in order. Search moves right along a level while the next key is
+        too small and drops a level otherwise; insert splices one new tower into
+        the levels its height reaches; delete unlinks one tower. Expected search,
+        insert, and delete cost is \(O(\log n)\), with the randomness in the
+        structure rather than the input, so no key sequence is bad. With a fixed
+        worked example carried through every operation, complete code, the
+        expected-cost argument, a comparison with the balanced search trees, and
+        exercises.
+      </div>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#lanes">Express lanes over a sorted list</a></li>
+          <li><a href="#structure">The structure, and the fixed example</a></li>
+          <li><a href="#search">Search, traced</a></li>
+          <li><a href="#insert">Insert: build a tower, splice it in</a></li>
+          <li><a href="#delete">Delete: unlink a tower</a></li>
+          <li><a href="#code">The code</a></li>
+          <li><a href="#cost">Why expected \(O(\log n)\)</a></li>
+          <li><a href="#adversary">No bad inputs, only bad flips</a></li>
+          <li><a href="#compare">Skip lists among the ordered symbol tables</a></li>
+          <li><a href="#ex-skip">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <p class="lead">
+        A sorted array gives binary search but \(O(n)\) insertion; a sorted
+        linked list gives \(O(1)\) splicing but \(O(n)\) search, because a list
+        has no random access to jump to the middle. The
+        <a href="ds-trees-bst.html">binary search tree</a> is one resolution of
+        that tension. The <strong>skip list</strong> (Pugh, 1990) is another,
+        and it never leaves the linked list: it adds express lanes above the
+        list and a coin to decide who is in them.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="lanes">1. Express lanes over a sorted list</h2>
+      <p>
+        Start with a sorted singly linked list. Now build a second list above
+        it containing every <em>other</em> node, a third containing every
+        fourth node, and so on, each node keeping a pointer down to its copy
+        below. To search, run along the top (sparsest) list until the next key
+        is too big, drop down one level, and repeat. Each level roughly halves
+        the candidates, just as binary search does, so with \(\log_2 n\)
+        levels a search costs \(O(\log n)\) steps.
+      </p>
+      <p>
+        That perfect every-other-node layout is a fine <em>static</em>
+        structure, but one insertion at the front shifts the parity of every
+        node after it: keeping the layout exact costs \(O(n)\) per update, the
+        same trap as keeping an array sorted. The skip list keeps the layered
+        <em>shape</em> and gives up the exact spacing: each node&rsquo;s height
+        is chosen <strong>randomly</strong>, by coin flips, when the node is
+        created, and never changes afterward. On average the levels still thin
+        out by half each step up, which is all the search argument needs, and
+        an update now touches only the one tower it inserts or removes.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="structure">2. The structure, and the fixed example</h2>
+      <div class="def">
+        <span class="tag">Definition (skip list)</span>
+        A collection of sorted singly linked lists, <em>level</em> \(0\) up to
+        level \(L\). Level \(0\) contains every key. A node&rsquo;s
+        <strong>tower height</strong> \(h \ge 1\) is fixed at insertion time:
+        flip a fair coin, and the tower grows one level per heads, stopping at
+        the first tails, so \(\Pr[h \ge k] = (1/2)^{k-1}\). A node of height
+        \(h\) appears in levels \(0\) through \(h-1\); one node object simply
+        carries an array <code>next[0..h-1]</code> of forward pointers, one per
+        level. A <strong>head sentinel</strong> (no key) is as tall as the
+        tallest tower and starts every level.
+      </div>
+      <p>
+        The whole structure is one node type: <em>key plus an array of forward
+        pointers</em>. There are no parent pointers, no rotations, no colors,
+        no balance factors. The level-\(0\) list alone is a plain sorted linked
+        list; everything above it is an index into that list.
+      </p>
+      <figure>
+        <svg viewBox="0 0 700 186" role="img" aria-label="The fixed example skip list with four levels. Level 0, the bottom, links head to 4, 9, 13, 22, 27, 34, 38, 42, 50, 55, then nil. Level 1 links head to 9, 22, 34, 42, 50. Level 2 links head to 9, 34, 50. Level 3, the top, links head to 34 only. Each key occupies one column, and its boxes stack into a tower whose height is the number of levels it appears in.">
+          <g font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">
+            <!-- level lines -->
+            <g stroke="#b9c0d0" stroke-width="1.4">
+              <line x1="67" y1="31"  x2="672" y2="31"/>
+              <line x1="67" y1="71"  x2="672" y2="71"/>
+              <line x1="67" y1="111" x2="672" y2="111"/>
+              <line x1="67" y1="151" x2="672" y2="151"/>
+            </g>
+            <g fill="#7a8296" font-size="12">
+              <text x="684" y="35">&#8709;</text><text x="684" y="75">&#8709;</text>
+              <text x="684" y="115">&#8709;</text><text x="684" y="155">&#8709;</text>
+            </g>
+            <!-- head tower -->
+            <g>
+              <rect x="23" y="16"  width="44" height="30" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+              <rect x="23" y="56"  width="44" height="30" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+              <rect x="23" y="96"  width="44" height="30" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+              <rect x="23" y="136" width="44" height="30" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+              <g fill="#0a7d4d" font-size="11.5" font-weight="600">
+                <text x="45" y="35">L3</text><text x="45" y="75">L2</text>
+                <text x="45" y="115">L1</text><text x="45" y="155">L0</text>
+              </g>
+            </g>
+            <!-- key towers: heights 4:1 9:3 13:1 22:2 27:1 34:4 38:1 42:2 50:3 55:1 -->
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.5">
+              <rect x="83"  y="136" width="44" height="30" rx="5"/>
+              <rect x="143" y="56"  width="44" height="30" rx="5"/>
+              <rect x="143" y="96"  width="44" height="30" rx="5"/>
+              <rect x="143" y="136" width="44" height="30" rx="5"/>
+              <rect x="203" y="136" width="44" height="30" rx="5"/>
+              <rect x="263" y="96"  width="44" height="30" rx="5"/>
+              <rect x="263" y="136" width="44" height="30" rx="5"/>
+              <rect x="323" y="136" width="44" height="30" rx="5"/>
+              <rect x="383" y="16"  width="44" height="30" rx="5"/>
+              <rect x="383" y="56"  width="44" height="30" rx="5"/>
+              <rect x="383" y="96"  width="44" height="30" rx="5"/>
+              <rect x="383" y="136" width="44" height="30" rx="5"/>
+              <rect x="443" y="136" width="44" height="30" rx="5"/>
+              <rect x="503" y="96"  width="44" height="30" rx="5"/>
+              <rect x="503" y="136" width="44" height="30" rx="5"/>
+              <rect x="563" y="56"  width="44" height="30" rx="5"/>
+              <rect x="563" y="96"  width="44" height="30" rx="5"/>
+              <rect x="563" y="136" width="44" height="30" rx="5"/>
+              <rect x="623" y="136" width="44" height="30" rx="5"/>
+            </g>
+            <g font-weight="600" fill="#1a1c22">
+              <text x="105" y="156">4</text>
+              <text x="165" y="76">9</text><text x="165" y="116">9</text><text x="165" y="156">9</text>
+              <text x="225" y="156">13</text>
+              <text x="285" y="116">22</text><text x="285" y="156">22</text>
+              <text x="345" y="156">27</text>
+              <text x="405" y="36">34</text><text x="405" y="76">34</text><text x="405" y="116">34</text><text x="405" y="156">34</text>
+              <text x="465" y="156">38</text>
+              <text x="525" y="116">42</text><text x="525" y="156">42</text>
+              <text x="585" y="76">50</text><text x="585" y="116">50</text><text x="585" y="156">50</text>
+              <text x="625" y="156" text-anchor="start">55</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The fixed example list used throughout this handout: keys
+          \(4, 9, 13, 22, 27, 34, 38, 42, 50, 55\) with tower heights
+          \(1, 3, 1, 2, 1, 4, 1, 2, 3, 1\). Every level is sorted; each level
+          links exactly the nodes tall enough to reach it; \(\emptyset\) marks
+          the end of each level.
+        </figcaption>
+      </figure>
+      <p>In text form, with dashes standing for the forward links:</p>
+      <pre>L3  head ------------------------------- 34 -------------------------&gt; nil
+L2  head ------- 9 --------------------- 34 -------------- 50 -------&gt; nil
+L1  head ------- 9 --------- 22 -------- 34 -------- 42 -- 50 -------&gt; nil
+L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- 34 -- 38 -- 42 -- 50 -- 55 -&gt; nil</pre>
+      <div class="aside">
+        <span class="tag">A note on the example</span>
+        In real use the heights come out of the random number generator; here
+        they are fixed by fiat so that every trace below is deterministic and
+        checkable. Nothing in the algorithms depends on <em>which</em> heights
+        occurred, only the cost analysis does, and it is deferred to the
+        <a href="#cost">expected-cost section</a>. The list level (index of the
+        top level) is \(3\); it always equals the tallest tower&rsquo;s height
+        minus one.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="search">3. Search, traced</h2>
+      <p>
+        Search keeps one finger <code>x</code>, starting at the head on the top
+        level, and repeats one two-way decision until it reaches the bottom:
+      </p>
+      <ul>
+        <li><strong>Move right</strong> if the next key on this level is
+          \(&lt;\) the target: <code>x = x.next[i]</code>.</li>
+        <li><strong>Drop down</strong> one level otherwise (next key
+          \(\ge\) target, or no next node).</li>
+      </ul>
+      <p>
+        After the bottom level is processed, <code>x</code> is the last node
+        with key \(&lt;\) target, so <code>x.next[0]</code> either is the
+        target or proves it absent. The invariant that makes this correct:
+        <em><code>x.key</code> \(&lt;\) target at all times</em>, so the answer
+        can never be to the left of the finger, and dropping never skips it.
+      </p>
+      <div class="ex">
+        <span class="tag">Trace (successful): search 38</span>
+        <table class="trace">
+          <tr><th>step</th><th>level</th><th>at</th><th>next key</th><th>next \(&lt;\) 38?</th><th>action</th></tr>
+          <tr><td>1</td><td>L3</td><td>head</td><td>34</td><td>yes</td><td class="set">move right to 34</td></tr>
+          <tr><td>2</td><td>L3</td><td>34</td><td>nil</td><td>&ndash;</td><td class="upd">drop to L2</td></tr>
+          <tr><td>3</td><td>L2</td><td>34</td><td>50</td><td>no</td><td class="upd">drop to L1</td></tr>
+          <tr><td>4</td><td>L1</td><td>34</td><td>42</td><td>no</td><td class="upd">drop to L0</td></tr>
+          <tr><td>5</td><td>L0</td><td>34</td><td>38</td><td>no</td><td>stop</td></tr>
+        </table>
+        Finger ends at \(34\); <code>x.next[0]</code> is \(38 = \) target:
+        <strong>found</strong>, in \(5\) key comparisons. The top level
+        teleported the finger past \(4, 9, 13, 22, 27\) in one step; the three
+        drops through \(34\)&rsquo;s tower show the drop-down case in each
+        flavor (nil next, and next too big).
+      </div>
+      <div class="ex">
+        <span class="tag">Trace (unsuccessful): search 30</span>
+        <table class="trace">
+          <tr><th>step</th><th>level</th><th>at</th><th>next key</th><th>next \(&lt;\) 30?</th><th>action</th></tr>
+          <tr><td>1</td><td>L3</td><td>head</td><td>34</td><td>no</td><td class="upd">drop to L2</td></tr>
+          <tr><td>2</td><td>L2</td><td>head</td><td>9</td><td>yes</td><td class="set">move right to 9</td></tr>
+          <tr><td>3</td><td>L2</td><td>9</td><td>34</td><td>no</td><td class="upd">drop to L1</td></tr>
+          <tr><td>4</td><td>L1</td><td>9</td><td>22</td><td>yes</td><td class="set">move right to 22</td></tr>
+          <tr><td>5</td><td>L1</td><td>22</td><td>34</td><td>no</td><td class="upd">drop to L0</td></tr>
+          <tr><td>6</td><td>L0</td><td>22</td><td>27</td><td>yes</td><td class="set">move right to 27</td></tr>
+          <tr><td>7</td><td>L0</td><td>27</td><td>34</td><td>no</td><td>stop</td></tr>
+        </table>
+        Finger ends at \(27\); <code>x.next[0]</code> is \(34 \ne 30\):
+        <strong>absent</strong>. The path stair-steps: right, drop, right,
+        drop, right, stop. Note the by-product: the node where the finger
+        paused on each level, \((27, 22, 9, \text{head})\) for levels
+        \(0\ldots 3\), is exactly the <em>predecessor of 30 on that
+        level</em>. Insert is about to use this.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="insert">4. Insert: build a tower, splice it in</h2>
+      <p>Insert has three phases, two of them already familiar:</p>
+      <ol>
+        <li><strong>Search</strong> for the key, recording in an array
+          <code>pred[i]</code> the last node visited on each level \(i\) (the
+          level-\(i\) predecessor of the key). If the key is already present,
+          stop.</li>
+        <li><strong>Flip</strong> the coin for the new tower&rsquo;s height
+          \(h\): start at \(1\), add one per heads, stop at the first tails.
+          If \(h\) exceeds the current number of levels, add new empty levels
+          to the head (the <strong>level increase</strong> case) with
+          <code>pred[i] = head</code> for each new level.</li>
+        <li><strong>Splice</strong>: create one node with \(h\) forward
+          pointers and link it after <code>pred[i]</code> on each level
+          \(i &lt; h\), exactly the two-assignment splice of a singly linked
+          list, done \(h\) times.</li>
+      </ol>
+      <div class="ex">
+        <span class="tag">Trace: insert 30, flips H,T (height 2)</span>
+        The search for \(30\) is the unsuccessful trace above, so
+        <code>pred = [27, 22, 9, head]</code> for levels \(0\ldots 3\). The
+        flips give heads then tails: height \(2\), levels \(0\) and \(1\), no
+        level increase. Two splices:
+        <pre>L1:  22 -&gt; <span class="hit">30</span> -&gt; 34      <span class="cm">(30.next[1] = 22.next[1]; 22.next[1] = 30)</span>
+L0:  27 -&gt; <span class="hit">30</span> -&gt; 34      <span class="cm">(30.next[0] = 27.next[0]; 27.next[0] = 30)</span></pre>
+        Levels \(2\) and \(3\) are untouched; <code>pred[2] = 9</code> and
+        <code>pred[3] = \)head\(</code> were recorded but unused because the
+        tower is too short to reach them. The list is now:
+        <pre>L3  head ------------------------------------- 34 -------------------------&gt; nil
+L2  head ------- 9 --------------------------- 34 -------------- 50 -------&gt; nil
+L1  head ------- 9 --------- 22 -------- <span class="hit">30</span> -- 34 -------- 42 -- 50 -------&gt; nil
+L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- <span class="hit">30</span> -- 34 -- 38 -- 42 -- 50 -- 55 -&gt; nil</pre>
+      </div>
+      <div class="ex">
+        <span class="tag">Trace: insert 47, flips H,H,H,H,T (height 5, level increase)</span>
+        The search for \(47\) on the current list: L3 moves right to \(34\)
+        (\(34 &lt; 47\)) then drops (next nil); L2 at \(34\) drops (next
+        \(50\)); L1 moves right to \(42\) then drops (next \(50\)); L0 at
+        \(42\) stops (next \(50\)). So
+        <code>pred = [42, 42, 34, 34]</code> for levels \(0\ldots 3\), and
+        \(47\) is absent. Four heads before the first tails give height
+        \(5\), one more than the list&rsquo;s four levels: a new empty level
+        L4 is added to the head, with <code>pred[4] = head</code>. Five
+        splices, bottom to top:
+        <pre>L0:  42 -&gt; <span class="hit">47</span> -&gt; 50
+L1:  42 -&gt; <span class="hit">47</span> -&gt; 50
+L2:  34 -&gt; <span class="hit">47</span> -&gt; 50
+L3:  34 -&gt; <span class="hit">47</span> -&gt; nil
+L4:  head -&gt; <span class="hit">47</span> -&gt; nil    <span class="cm">(the new top level: just head and 47)</span></pre>
+        <pre>L4  head ------------------------------------------------------- <span class="hit">47</span> -------------&gt; nil
+L3  head ------------------------------------- 34 -------------- <span class="hit">47</span> -------------&gt; nil
+L2  head ------- 9 --------------------------- 34 -------------- <span class="hit">47</span> -- 50 -------&gt; nil
+L1  head ------- 9 --------- 22 -------- 30 -- 34 -------- 42 -- <span class="hit">47</span> -- 50 -------&gt; nil
+L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- 30 -- 34 -- 38 -- 42 -- <span class="hit">47</span> -- 50 -- 55 -&gt; nil</pre>
+        No other node moves, ever: an insertion writes the new tower&rsquo;s
+        \(h\) pointers and rewrites \(h\) predecessor pointers, and nothing
+        else in the structure changes. Compare the
+        <a href="ds-avl-trees.html">AVL rebalance</a>, which may rotate on the
+        whole path back to the root.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="delete">5. Delete: unlink a tower</h2>
+      <p>
+        Delete is insert&rsquo;s mirror: search, recording the same
+        <code>pred</code> array; if <code>pred[0].next[0]</code> is not the
+        key, it is absent and nothing happens (the <strong>no-op</strong>
+        case). Otherwise unlink the target from every level its tower
+        reaches: <code>pred[i].next[i] = target.next[i]</code> for each
+        \(i\) below the tower height. If the top level ends up empty, drop it
+        (and repeat; the shrink can cascade).
+      </p>
+      <div class="ex">
+        <span class="tag">Trace: delete 34 (from the list with 30 and 47)</span>
+        Search for \(34\): L4 drops at head (next \(47\)); L3 drops at head
+        (next \(34\), not \(&lt; 34\)); L2 moves right to \(9\), drops (next
+        \(34\)); L1 moves right to \(22\), then to \(30\), drops (next
+        \(34\)); L0 at \(30\) stops (next \(34\)). So
+        <code>pred = [30, 30, 9, head, head]</code> for levels \(0\ldots4\),
+        and <code>pred[0].next[0]</code> is \(34\): present, height \(4\).
+        Unlink at levels \(0\ldots3\):
+        <table class="trace">
+          <tr><th>level</th><th>before</th><th>after</th></tr>
+          <tr><td>L3</td><td>head &rarr; 34 &rarr; 47</td><td class="upd">head &rarr; 47</td></tr>
+          <tr><td>L2</td><td>9 &rarr; 34 &rarr; 47</td><td class="upd">9 &rarr; 47</td></tr>
+          <tr><td>L1</td><td>30 &rarr; 34 &rarr; 42</td><td class="upd">30 &rarr; 42</td></tr>
+          <tr><td>L0</td><td>30 &rarr; 34 &rarr; 38</td><td class="upd">30 &rarr; 38</td></tr>
+        </table>
+        L4 is untouched (\(34\)&rsquo;s tower never reached it) and still
+        holds \(47\), so the level count stays put:
+        <pre>L4  head ------------------------------------------------- 47 -------------&gt; nil
+L3  head ------------------------------------------------- 47 -------------&gt; nil
+L2  head ------- 9 --------------------------------------- 47 -- 50 -------&gt; nil
+L1  head ------- 9 --------- 22 -------- 30 -------- 42 -- 47 -- 50 -------&gt; nil
+L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- 30 -- 38 -- 42 -- 47 -- 50 -- 55 -&gt; nil</pre>
+        For contrast, deleting \(47\) next would unlink at all five levels
+        and leave <em>both</em> L4 and L3 empty (\(34\), the only other
+        occupant of L3, is already gone), so the list level would drop by two,
+        back to L2 on top: the cascading-shrink case.
+      </div>
+      <p>
+        No borrow, no fuse, no rebalance: compare deletion in a
+        <a href="ds-red-black-trees.html">red-black tree</a> or a
+        <a href="ds-b-trees.html">B-tree</a>, where the delete cases outnumber
+        the insert cases. A skip-list delete is exactly \(h\) pointer
+        rewrites.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="code">6. The code</h2>
+      <p>
+        All three operations share the predecessor-collecting descent; the
+        entire structure is under sixty lines. <code>next[i]</code> is the
+        successor on level \(i\); the head sentinel&rsquo;s array length is
+        the list height.
+      </p>
+      <div class="code-tabs" data-snippet="trees/skip-list">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Skip list over int keys, p = 1/2. A node's height is fixed at birth by
+// coin flips; search moves right while next-&gt;key &lt; key, else drops a level.
+struct Node {
+    int key;
+    std::vector&lt;Node*&gt; next;                 // next[i] = successor on level i
+    Node(int k, int h) : key(k), next(h, nullptr) {}
+};
+
+struct SkipList {
+    Node head{0, 1};                          // sentinel; its height = list height
+    std::mt19937 rng{343};
+
+    int height() const { return (int)head.next.size(); }
+    int flipHeight() {                        // 1 + number of leading heads
+        int h = 1;
+        while (rng() &amp; 1) ++h;                // heads: grow the tower
+        return h;
+    }
+    // fills pred[i] = last node with key &lt; k on level i; returns the finger
+    Node* descend(int k, std::vector&lt;Node*&gt;&amp; pred) {
+        Node* x = &amp;head;
+        for (int i = height() - 1; i &gt;= 0; --i) {
+            while (x-&gt;next[i] &amp;&amp; x-&gt;next[i]-&gt;key &lt; k)
+                x = x-&gt;next[i];               // move right; else drop down
+            pred[i] = x;
+        }
+        return x;
+    }
+    bool contains(int k) {
+        std::vector&lt;Node*&gt; pred(height());
+        Node* y = descend(k, pred)-&gt;next[0];
+        return y &amp;&amp; y-&gt;key == k;
+    }
+    void insert(int k) {
+        std::vector&lt;Node*&gt; pred(height());
+        Node* x = descend(k, pred);
+        if (x-&gt;next[0] &amp;&amp; x-&gt;next[0]-&gt;key == k) return;   // already present
+        int h = flipHeight();
+        while (height() &lt; h) {                // level increase: new empty levels
+            head.next.push_back(nullptr);
+            pred.push_back(&amp;head);
+        }
+        Node* n = new Node(k, h);
+        for (int i = 0; i &lt; h; ++i) {         // splice on each level the tower reaches
+            n-&gt;next[i] = pred[i]-&gt;next[i];
+            pred[i]-&gt;next[i] = n;
+        }
+    }
+    void erase(int k) {
+        std::vector&lt;Node*&gt; pred(height());
+        Node* t = descend(k, pred)-&gt;next[0];
+        if (!t || t-&gt;key != k) return;        // absent: no-op
+        for (int i = 0; i &lt; (int)t-&gt;next.size(); ++i)
+            pred[i]-&gt;next[i] = t-&gt;next[i];    // unlink every level of the tower
+        delete t;
+        while (height() &gt; 1 &amp;&amp; !head.next.back())
+            head.next.pop_back();             // top level empty: shrink (may cascade)
+    }
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Skip list over int keys, p = 1/2. A node's height is fixed at birth by
+// coin flips; search moves right while next.key &lt; key, else drops a level.
+class SkipList {
+    static class Node {
+        int key; Node[] next;                 // next[i] = successor on level i
+        Node(int k, int h) { key = k; next = new Node[h]; }
+    }
+    Node head = new Node(0, 1);               // sentinel; its height = list height
+    java.util.Random rng = new java.util.Random(343);
+
+    int height() { return head.next.length; }
+    int flipHeight() {                        // 1 + number of leading heads
+        int h = 1;
+        while (rng.nextBoolean()) h++;        // heads: grow the tower
+        return h;
+    }
+    // fills pred[i] = last node with key &lt; k on level i; returns the finger
+    Node descend(int k, Node[] pred) {
+        Node x = head;
+        for (int i = height() - 1; i &gt;= 0; i--) {
+            while (x.next[i] != null &amp;&amp; x.next[i].key &lt; k)
+                x = x.next[i];                // move right; else drop down
+            pred[i] = x;
+        }
+        return x;
+    }
+    boolean contains(int k) {
+        Node y = descend(k, new Node[height()]).next[0];
+        return y != null &amp;&amp; y.key == k;
+    }
+    void insert(int k) {
+        Node[] pred = new Node[height()];
+        Node x = descend(k, pred);
+        if (x.next[0] != null &amp;&amp; x.next[0].key == k) return;  // present
+        int h = flipHeight(), old = height();
+        if (h &gt; old) {                        // level increase: new empty levels
+            head.next = java.util.Arrays.copyOf(head.next, h);
+            pred = java.util.Arrays.copyOf(pred, h);
+            for (int i = old; i &lt; h; i++) pred[i] = head;
+        }
+        Node n = new Node(k, h);
+        for (int i = 0; i &lt; h; i++) {         // splice on each level the tower reaches
+            n.next[i] = pred[i].next[i];
+            pred[i].next[i] = n;
+        }
+    }
+    void erase(int k) {
+        Node[] pred = new Node[height()];
+        Node t = descend(k, pred).next[0];
+        if (t == null || t.key != k) return;  // absent: no-op
+        for (int i = 0; i &lt; t.next.length; i++)
+            pred[i].next[i] = t.next[i];      // unlink every level of the tower
+        int h = height();
+        while (h &gt; 1 &amp;&amp; head.next[h - 1] == null) h--;  // shrink (may cascade)
+        if (h &lt; height()) head.next = java.util.Arrays.copyOf(head.next, h);
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Skip list, p = 1/2. A node's height is fixed at birth by coin flips;
+# search moves right while next.key &lt; key, else drops a level.
+import random
+
+class Node:
+    def __init__(self, key, height):
+        self.key = key
+        self.next = [None] * height   # next[i] = successor on level i
+
+class SkipList:
+    def __init__(self):
+        self.head = Node(None, 1)     # sentinel; its height = list height
+
+    def height(self):
+        return len(self.head.next)
+
+    def _flip_height(self):           # 1 + number of leading heads
+        h = 1
+        while random.random() &lt; 0.5:  # heads: grow the tower
+            h += 1
+        return h
+
+    def _descend(self, key):
+        &quot;&quot;&quot;pred[i] = last node with key &lt; key on level i.&quot;&quot;&quot;
+        pred = [None] * self.height()
+        x = self.head
+        for i in reversed(range(self.height())):
+            while x.next[i] and x.next[i].key &lt; key:
+                x = x.next[i]         # move right; else drop down
+            pred[i] = x
+        return pred
+
+    def contains(self, key):
+        y = self._descend(key)[0].next[0]
+        return y is not None and y.key == key
+
+    def insert(self, key):
+        pred = self._descend(key)
+        y = pred[0].next[0]
+        if y and y.key == key:        # already present
+            return
+        h = self._flip_height()
+        while self.height() &lt; h:      # level increase: new empty levels
+            self.head.next.append(None)
+            pred.append(self.head)
+        node = Node(key, h)
+        for i in range(h):            # splice on each level the tower reaches
+            node.next[i] = pred[i].next[i]
+            pred[i].next[i] = node
+
+    def delete(self, key):
+        pred = self._descend(key)
+        t = pred[0].next[0]
+        if not t or t.key != key:     # absent: no-op
+            return
+        for i in range(len(t.next)):
+            pred[i].next[i] = t.next[i]   # unlink every level of the tower
+        while self.height() &gt; 1 and self.head.next[-1] is None:
+            self.head.next.pop()      # top level empty: shrink (may cascade)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Skip list, p = 1/2, in an index arena: usize indices stand in for pointers,
+// which sidesteps shared-ownership issues (many levels point at one node).
+// nodes[0] is the head sentinel; NIL marks the end of a level.
+const NIL: usize = usize::MAX;
+
+struct Node { key: i32, next: Vec&lt;usize&gt; }    // next[i] = successor on level i
+
+struct SkipList { nodes: Vec&lt;Node&gt;, rng: u64 }
+
+impl SkipList {
+    fn new() -&gt; Self {
+        SkipList { nodes: vec![Node { key: i32::MIN, next: vec![NIL] }], rng: 343 }
+    }
+    fn height(&amp;self) -&gt; usize { self.nodes[0].next.len() }
+
+    fn flip(&amp;mut self) -&gt; bool {              // xorshift64 coin
+        self.rng ^= self.rng &lt;&lt; 13; self.rng ^= self.rng &gt;&gt; 7;
+        self.rng ^= self.rng &lt;&lt; 17; self.rng &amp; 1 == 1
+    }
+    fn flip_height(&amp;mut self) -&gt; usize {      // 1 + number of leading heads
+        let mut h = 1;
+        while self.flip() { h += 1 }          // heads: grow the tower
+        h
+    }
+    // pred[i] = index of the last node with key &lt; k on level i
+    fn descend(&amp;self, k: i32) -&gt; Vec&lt;usize&gt; {
+        let mut pred = vec![0; self.height()];
+        let mut x = 0;
+        for i in (0..self.height()).rev() {
+            while self.nodes[x].next[i] != NIL
+                &amp;&amp; self.nodes[self.nodes[x].next[i]].key &lt; k {
+                x = self.nodes[x].next[i];    // move right; else drop down
+            }
+            pred[i] = x;
+        }
+        pred
+    }
+    fn contains(&amp;self, k: i32) -&gt; bool {
+        let y = self.nodes[self.descend(k)[0]].next[0];
+        y != NIL &amp;&amp; self.nodes[y].key == k
+    }
+    fn insert(&amp;mut self, k: i32) {
+        let mut pred = self.descend(k);
+        let y = self.nodes[pred[0]].next[0];
+        if y != NIL &amp;&amp; self.nodes[y].key == k { return; }   // present
+        let h = self.flip_height();
+        while self.height() &lt; h {             // level increase: new empty levels
+            self.nodes[0].next.push(NIL);
+            pred.push(0);
+        }
+        let id = self.nodes.len();
+        let next = (0..h).map(|i| self.nodes[pred[i]].next[i]).collect();
+        self.nodes.push(Node { key: k, next });
+        for i in 0..h { self.nodes[pred[i]].next[i] = id; }  // splice each level
+    }
+    fn remove(&amp;mut self, k: i32) {
+        let pred = self.descend(k);
+        let t = self.nodes[pred[0]].next[0];
+        if t == NIL || self.nodes[t].key != k { return; }    // absent: no-op
+        for i in 0..self.nodes[t].next.len() {
+            let after = self.nodes[t].next[i];
+            self.nodes[pred[i]].next[i] = after;  // unlink every level
+        }
+        while self.height() &gt; 1 &amp;&amp; *self.nodes[0].next.last().unwrap() == NIL {
+            self.nodes[0].next.pop();         // top level empty: shrink
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/skip-list.cpp &middot; code/trees/skip-list.java &middot; code/trees/skip-list.py &middot; code/trees/skip-list.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Two details worth pausing on. The splice loop runs bottom to top, so
+        even mid-insert the list is never broken below the current level. And
+        the equality test happens once, at the bottom: on the way down the
+        comparison is always strict (\(&lt;\)), which is what makes the
+        recorded <code>pred</code> array the strict-predecessor array that
+        insert and delete both need.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">7. Why expected \(O(\log n)\)</h2>
+      <p>
+        Every cost here is an <em>expectation</em> over the coin flips (see
+        the <a href="../foundations/foundation-asymptotic-notation.html">asymptotic
+        notation</a> handout for the notation itself). Three facts do all the
+        work: towers are short on average, the list is low on average, and the
+        search path spends little time on each level on average.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (space)</span>
+        The expected height of a tower is \(2\), so a skip list on \(n\) keys
+        holds \(2n\) forward pointers in expectation: expected space
+        \(O(n)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> For a height \(H \ge 1\),
+        \(\mathbb{E}[H] = \sum_{k \ge 1} \Pr[H \ge k]\), and a tower reaches
+        height \(k\) exactly when the first \(k-1\) flips are heads:
+        \(\Pr[H \ge k] = 2^{-(k-1)}\). So
+        \(\mathbb{E}[H] = 1 + \tfrac12 + \tfrac14 + \cdots = 2\). Summing over
+        the \(n\) towers gives \(2n\) expected pointers.
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (height of the list)</span>
+        The expected number of levels is at most \(\log_2 n + 2\), and the
+        probability of exceeding \(2\log_2 n\) levels is at most \(2/n\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Let \(M = \max\) tower height over \(n\)
+        independent towers. By the union bound,
+        \(\Pr[M \ge k] \le n \cdot 2^{-(k-1)}\). For the tail: at
+        \(k = 2\log_2 n + 1\) this is \(n \cdot 2 \cdot n^{-2} = 2/n\). For
+        the expectation, split the sum
+        \(\mathbb{E}[M] = \sum_{k\ge 1} \Pr[M \ge k]\) at \(\log_2 n\): the
+        first \(\log_2 n\) terms are each at most \(1\), and the rest form a
+        geometric series,
+        \(\sum_{j \ge 1} n\, 2^{-(\log_2 n + j - 1)} = \sum_{j\ge 1} 2^{1-j}
+        = 2\). So \(\mathbb{E}[M] \le \log_2 n + 2\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Intuitively: each level up keeps a node with probability \(1/2\), so
+        level \(k\) holds \(n/2^k\) nodes in expectation, and around level
+        \(\log_2 n\) the population dwindles to about one. That matches the
+        fixed example: \(10\) keys, \(5, 3, 1\) nodes on levels \(1, 2, 3\),
+        each within a whisker of \(10/2^k = 5, 2.5, 1.25\).
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (search cost)</span>
+        The expected number of steps on any one level of a search path is at
+        most \(2\), so the expected total search cost is
+        \(O(\log n)\) comparisons.
+      </div>
+      <div class="proof">
+        <strong>Proof (sketch, the idea made precise).</strong> Walk the
+        search path <em>backwards</em>, from where it stopped back up to the
+        head. Read in reverse, every step is either <em>up</em> (the forward
+        path dropped down through this node&rsquo;s tower) or <em>left</em>
+        (the forward path moved right into this node). Stand at any node on
+        the path at level \(i\). The path is at this node because the
+        node&rsquo;s tower reaches level \(i\); whether the tower <em>also</em>
+        continues to level \(i+1\) was decided by one more independent coin
+        flip. If heads (probability \(1/2\)), the backward walk goes up here;
+        if tails, the forward path could not have come from above at this
+        node, so the backward walk goes left. The number of left-steps taken
+        on one level before an up-step is therefore dominated by a geometric
+        random variable with mean \(1\): at most \(2\) expected steps per
+        level, counting the up-step. By the previous proposition there are
+        \(O(\log n)\) levels in expectation, and (with a little care in
+        combining the two expectations, which we omit) the expected total is
+        \(\le 2\log_2 n + O(1) = O(\log n)\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        Insert and delete each run one search and then do \(O(1)\) expected
+        extra work (the new or removed tower has expected height \(2\)), so
+        all three operations are expected \(O(\log n)\). The \(2\log_2 n\)
+        constant is real, not an artifact of the proof: a search in a skip
+        list makes about twice the comparisons of a perfectly balanced BST,
+        the price of levels that only <em>tend</em> to halve. Measured on the
+        model that verified this handout&rsquo;s traces: random skip lists at
+        \(n = 1000\) averaged \(20.1\) steps per search against
+        \(2\log_2 1000 = 19.9\).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="adversary">8. No bad inputs, only bad flips</h2>
+      <p>
+        A plain <a href="ds-trees-bst.html">BST</a> has a bad <em>input</em>:
+        insert \(1, 2, \ldots, n\) in order and the tree is a path,
+        deterministically, every time. Its \(O(\log n)\) claim needs luck in
+        the data. The balanced trees (<a href="ds-avl-trees.html">AVL</a>,
+        <a href="ds-red-black-trees.html">red-black</a>,
+        <a href="ds-two-three-trees.html">2-3</a>) remove the luck by
+        enforcing an invariant with rebalancing work. The skip list removes
+        it differently: it moves the randomness out of the input and into the
+        structure.
+      </p>
+      <p>
+        A skip list&rsquo;s shape is determined by the set of (key, height)
+        pairs alone, not by the order of insertion; the towers are decided by
+        the generator, and the keys have no say in them. So there is
+        <em>no</em> sequence of keys an adversary can choose that makes the
+        expected cost bad: the expected \(O(\log n)\) bound of the previous
+        section holds for <strong>every</strong> input, with the expectation
+        over the flips only. The only way to get a bad skip list is bad
+        flips, for instance every tower coming up height \(1\), which
+        flattens the list back to a plain linked list; that event has
+        probability \(2^{-n}\), and the milder degradations are likewise
+        exponentially unlikely (the \(2/n\) tail bound above). An adversary
+        who knows the algorithm but not the random bits is helpless.
+      </p>
+      <div class="aside">
+        <span class="tag">The same trick elsewhere</span>
+        This is the same move randomized quicksort makes (see
+        <a href="../sorting/algo-quicksort.html"><em>Quicksort</em></a>):
+        sorted input ruins first-element pivots, but a <em>random</em> pivot
+        has no bad input, only bad coin flips. And it is the same reason
+        <a href="../hashing/ds-hashing.html">hashing</a> quotes expected
+        \(O(1)\): the hash function plays the role of the coin. Randomization
+        buys immunity from the input at the price of a guarantee that is
+        expected rather than worst-case.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="compare">9. Skip lists among the ordered symbol tables</h2>
+      <p>
+        This handout sits in the trees folder of the catalog with no tree in
+        it, and that placement is the point: the skip list is a drop-in
+        <strong>alternative to the balanced search trees</strong> as an
+        ordered symbol table. It supports the same operations at the same
+        expected cost: search, insert, delete in \(O(\log n)\), plus the
+        ordered ones (min, max, floor, ceiling, range search) that
+        <a href="../hashing/ds-hashing.html">hashing</a> gives up. An ordered
+        scan is just a walk along level \(0\), the same one-descent-plus-walk
+        pattern as the leaf chain of a
+        <a href="ds-b-trees.html">B+ tree</a>.
+      </p>
+      <table>
+        <tr><th></th><th>AVL / red-black</th><th>skip list</th></tr>
+        <tr><td>\(O(\log n)\) guarantee</td><td><strong>worst-case</strong>, deterministic</td><td>expected (w.h.p.), randomized</td></tr>
+        <tr><td>balance kept by</td><td>invariant + rotations</td><td><strong>coin flips</strong>; no rebalancing</td></tr>
+        <tr><td>an update touches</td><td>path to root (rotations, recolors)</td><td><strong>one tower</strong>: \(h\) pointers</td></tr>
+        <tr><td>bad case caused by</td><td>nothing (invariant forbids it)</td><td>bad flips, probability \(\le 2/n\)</td></tr>
+        <tr><td>ordered iteration</td><td>in-order traversal</td><td>walk level 0</td></tr>
+        <tr><td>space</td><td>2 child pointers / node</td><td>expected 2 pointers / node</td></tr>
+        <tr><td>code</td><td>many rebalance cases</td><td>one descent + splice</td></tr>
+      </table>
+      <p>
+        Where the skip list wins, and why it is not merely a curiosity:
+      </p>
+      <ul>
+        <li><strong>Simplicity.</strong> Delete, the operation with the
+          heaviest case analysis in every balanced tree, is \(h\) pointer
+          rewrites. There are no rotation cases to get wrong; the code in
+          this handout is complete.</li>
+        <li><strong>Concurrency.</strong> This is the industrial reason. An
+          insertion changes \(h\) pointers near one spot; a tree rotation
+          restructures an entire subtree and, under locking, must hold every
+          node it moves. Skip lists admit fine-grained and even lock-free
+          concurrent versions built on compare-and-swap of single pointers,
+          which is why <code>java.util.concurrent</code> provides
+          <code>ConcurrentSkipListMap</code> (there is no concurrent
+          red-black map beside it), why Redis implements sorted sets with a
+          skip list, and why LevelDB and RocksDB use one for the in-memory
+          write buffer.</li>
+      </ul>
+      <p>
+        Where the trees win: the guarantee. An AVL or red-black tree bounds
+        the <em>worst case</em>, with no probability in the statement, which
+        matters under real-time constraints and against the (unlikely but
+        possible) bad flips. On disk the contest goes to the
+        <a href="ds-b-trees.html">B-tree</a> either way, since neither a
+        binary tree nor a skip list matches its node size to the block.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex-skip">10. Exercises (with solutions)</h2>
+      <p class="note">
+        All exercises use the fixed example list of
+        <a href="#structure">the structure section</a> (keys
+        \(4, 9, 13, 22, 27, 34, 38, 42, 50, 55\), heights
+        \(1, 3, 1, 2, 1, 4, 1, 2, 3, 1\)), in its original state, without the
+        modifications traced in the text.
+      </p>
+      <ol>
+        <li>
+          Trace the search for \(55\): list every move-right and drop-down
+          with the comparison that caused it, and count key comparisons.
+          <details>
+            <summary>solution</summary>
+            <table class="trace">
+              <tr><th>step</th><th>level</th><th>at</th><th>next key</th><th>next \(&lt;\) 55?</th><th>action</th></tr>
+              <tr><td>1</td><td>L3</td><td>head</td><td>34</td><td>yes</td><td>right to 34</td></tr>
+              <tr><td>2</td><td>L3</td><td>34</td><td>nil</td><td>&ndash;</td><td>drop to L2</td></tr>
+              <tr><td>3</td><td>L2</td><td>34</td><td>50</td><td>yes</td><td>right to 50</td></tr>
+              <tr><td>4</td><td>L2</td><td>50</td><td>nil</td><td>&ndash;</td><td>drop to L1</td></tr>
+              <tr><td>5</td><td>L1</td><td>50</td><td>nil</td><td>&ndash;</td><td>drop to L0</td></tr>
+              <tr><td>6</td><td>L0</td><td>50</td><td>55</td><td>no</td><td>stop</td></tr>
+            </table>
+            <code>x.next[0]</code> is \(55\): found. Key comparisons: steps 1,
+            3, 6 plus the final equality test, \(4\) in total (the nil checks
+            compare no keys). The path rides the two tall towers \(34\) and
+            \(50\) across almost the whole list.
+          </details>
+        </li>
+        <li>
+          Trace the search for \(21\) (absent) and give the predecessor array
+          <code>pred[0..3]</code> it records.
+          <details>
+            <summary>solution</summary>
+            L3: at head, next \(34 \not&lt; 21\), drop. L2: head
+            \(\to 9\) (\(9 &lt; 21\)); at \(9\), next \(34\), drop. L1: at
+            \(9\), next \(22 \not&lt; 21\), drop. L0: \(9 \to 13\)
+            (\(13 &lt; 21\)); at \(13\), next \(22\), stop.
+            <code>x.next[0]</code> is \(22 \ne 21\): absent.
+            <code>pred = [13, 9, 9, head]</code> for levels \(0\ldots3\).
+            Note \(9\) appears twice: one node can be the predecessor on
+            several levels.
+          </details>
+        </li>
+        <li>
+          Insert \(21\) with flips H,H,H,T. Give the splice performed on each
+          level and draw the resulting list. Does the list level change?
+          <details>
+            <summary>solution</summary>
+            Height \(= 4\) (three heads, then tails). The current list has
+            four levels, so height \(4\) exactly fills them: <em>no</em>
+            level increase. Using <code>pred = [13, 9, 9, head]</code> from
+            the previous exercise:
+            <pre>L0:  13 -&gt; 21 -&gt; 22
+L1:   9 -&gt; 21 -&gt; 22
+L2:   9 -&gt; 21 -&gt; 34
+L3: head -&gt; 21 -&gt; 34</pre>
+            (The successor differs by level because \(22\)&rsquo;s tower
+            stops at L1 and \(9\)&rsquo;s at L2.) Result:
+            <pre>L3  head ------------- 21 -------------- 34 -------------------------&gt; nil
+L2  head ------- 9 --- 21 -------------- 34 -------------- 50 -------&gt; nil
+L1  head ------- 9 --- 21 -- 22 -------- 34 -------- 42 -- 50 -------&gt; nil
+L0  head - 4 --- 9 --- 13 -- 21 -- 22 -- 27 -- 34 -- 38 -- 42 -- 50 -- 55 -&gt; nil</pre>
+            One more head would have made height \(5\) and forced a new L4.
+          </details>
+        </li>
+        <li>
+          Delete \(9\). Give the predecessor array, the pointer rewrites per
+          level, and the resulting list. Why does the list level not change,
+          even though \(9\) was one of the taller towers?
+          <details>
+            <summary>solution</summary>
+            Search for \(9\): L3 drops at head (next \(34\)); L2 drops at
+            head (next \(9\), and \(9 \not&lt; 9\)); L1 drops at head (next
+            \(9\)); L0 moves head \(\to 4\) (\(4 &lt; 9\)), stops at \(4\)
+            (next \(9\)). <code>pred = [4, head, head, head]</code>;
+            <code>pred[0].next[0]</code> is \(9\): present, height \(3\).
+            Unlink levels \(0\ldots2\):
+            <pre>L2: head -&gt; 34   <span class="cm">(was head -&gt; 9 -&gt; 34)</span>
+L1: head -&gt; 22   <span class="cm">(was head -&gt; 9 -&gt; 22)</span>
+L0:    4 -&gt; 13   <span class="cm">(was 4 -&gt; 9 -&gt; 13)</span></pre>
+            <pre>L3  head ------------------------- 34 -------------------------&gt; nil
+L2  head ------------------------- 34 -------------- 50 -------&gt; nil
+L1  head ------------- 22 -------- 34 -------- 42 -- 50 -------&gt; nil
+L0  head - 4 -- 13 -- 22 -- 27 -- 34 -- 38 -- 42 -- 50 -- 55 --&gt; nil</pre>
+            The list level is set by the <em>tallest</em> tower.
+            \(9\)&rsquo;s height was \(3\), but \(34\)&rsquo;s tower (height
+            \(4\)) still occupies L3, so the top level is not empty and
+            nothing shrinks. Only deleting \(34\) could lower the level here.
+          </details>
+        </li>
+        <li>
+          Coin-flip probabilities, with the tower rule of this handout
+          (height \(1\) plus one per leading heads):
+          (a) what is the probability that a given tower has height exactly
+          \(3\)? (b) In a \(10\)-key skip list, what is the expected number of
+          nodes on level \(2\) or higher? (c) What is the probability that
+          all \(10\) towers have height \(1\), collapsing the structure to a
+          plain sorted linked list?
+          <details>
+            <summary>solution</summary>
+            (a) Height exactly \(3\) means heads, heads, tails:
+            \((1/2)^3 = 1/8\). (b) A node reaches level \(2\) iff its height
+            is \(\ge 3\), probability \((1/2)^2 = 1/4\); by linearity of
+            expectation, \(10 \cdot 1/4 = 2.5\) nodes. (The fixed example has
+            \(3\): the keys \(9\), \(34\), \(50\).) (c) Each tower stops at
+            height \(1\) with probability \(1/2\), independently:
+            \((1/2)^{10} = 1/1024\). For \(n\) keys, \(2^{-n}\): the
+            all-flat catastrophe is exponentially unlikely, and note that
+            <em>no choice of keys</em> changes this number.
+          </details>
+        </li>
+        <li>
+          Pugh&rsquo;s original design promotes with probability \(p = 1/4\)
+          instead of \(1/2\) (grow the tower while a four-sided die shows
+          \(1\)). What happens to (a) the expected number of pointers per
+          node, and (b) the expected number of levels? (c) Why might one
+          accept the slower level thinning?
+          <details>
+            <summary>solution</summary>
+            (a) \(\Pr[H \ge k] = p^{\,k-1}\), so
+            \(\mathbb{E}[H] = \sum_{k\ge1} p^{\,k-1} = 1/(1-p) = 4/3\)
+            pointers per node, versus \(2\) at \(p = 1/2\): a third of the
+            index overhead. (b) Level \(k\) keeps \(n p^k\) nodes in
+            expectation, which reaches \(1\) at \(k = \log_{1/p} n =
+            \log_4 n = \tfrac12 \log_2 n\): half as many levels. (c) The
+            per-level cost grows to about \(1/p = 4\) expected steps
+            (the geometric mean-\(1/p\) run of the backward-walk argument),
+            so the total expected comparisons come to
+            \(4 \cdot \tfrac12\log_2 n = 2\log_2 n\): the same leading term
+            as \(p = 1/2\), but with \(2/3\) fewer index pointers. Slightly
+            more comparisons per level, traded for less space and fewer
+            levels; \(p = 1/4\) is a standard production choice.
+          </details>
+        </li>
+        <li>
+          True or false: &ldquo;There is a sequence of insertions and
+          searches that forces a skip list to \(\Theta(n)\) <em>expected</em>
+          time per search.&rdquo; Contrast with the corresponding statement
+          for a plain BST.
+          <details>
+            <summary>solution</summary>
+            False. The expected-cost analysis conditions on nothing about the
+            input: for <em>every</em> fixed set of keys and every operation
+            sequence, the expectation over the coin flips of the search cost
+            is \(O(\log n)\), because the tower heights are independent of
+            the keys (the shape is determined by the (key, height) pairs, and
+            the heights come from the generator alone). \(\Theta(n)\)
+            behavior requires improbable flips, probability vanishing
+            exponentially, not a clever input. For a plain BST the
+            corresponding statement is <em>true</em> and easy: insert
+            \(1, 2, \ldots, n\) in order and every subsequent search for a
+            large key walks a path of length \(\Theta(n)\), with probability
+            \(1\). That difference, guaranteed-in-expectation against every
+            input versus hoping the input is kind, is the entire case for
+            randomizing the structure.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Skip Lists v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

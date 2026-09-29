@@ -1,0 +1,1584 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: P, NP & Reductions.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>P, NP &amp; Reductions - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.ok { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.no { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>P, NP &amp; Reductions</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        The vocabulary for saying that a problem is hard rather than that an
+        algorithm is slow. Decision problems and input encodings; the class P;
+        the class NP defined by verifiers, with a Hamiltonian-cycle certificate
+        checked step by step on a concrete graph; the containments
+        \(\mathrm{P} \subseteq \mathrm{NP} \subseteq \mathrm{EXP}\) proved;
+        polynomial-time reductions, their closure and transitivity properties,
+        and the direction rule that decides which way a reduction must run; the
+        Independent Set / Vertex Cover reduction worked in both directions on a
+        seven-vertex graph; NP-hardness, NP-completeness and the Cook&ndash;Levin
+        theorem; what an NP-completeness proof licenses in practice, worked
+        through the 2-approximation for Vertex Cover, its
+        \(O(2^k)\) branching search, and the pseudo-polynomial knapsack table.
+        With exercises.
+      </div>
+
+      <p class="lead">
+        Most of this catalog answers the question &ldquo;how fast is this
+        algorithm?&rdquo; For some problems the honest answer is that nobody
+        knows a fast algorithm, and has not for over fifty years. That is a
+        statement about the state of knowledge, not a proof; but there is a way
+        to make it precise and transferable. If you can show that a fast
+        algorithm for <em>your</em> problem would immediately give a fast
+        algorithm for thousands of others that many people have failed to solve,
+        you have said something definite about your problem. The machinery for
+        saying it is the classes P and NP and the polynomial-time reduction.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#dec">Decision problems and input size</a></li>
+          <li><a href="#p">The class P</a></li>
+          <li><a href="#np">The class NP: verifiers and certificates</a></li>
+          <li><a href="#red">Polynomial-time reductions</a></li>
+          <li><a href="#worked">A reduction worked in full: Independent Set and Vertex Cover</a></li>
+          <li><a href="#npc">NP-hardness, NP-completeness, Cook&ndash;Levin</a></li>
+          <li><a href="#practice">What an NP-completeness proof licenses</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="dec">1. Decision problems and input size</h2>
+      <p>
+        The theory is built on yes/no questions. That is a restriction, and the
+        first job is to show it costs nothing.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (decision problem)</span>
+        A <strong>decision problem</strong> is a question about an input that has
+        the answer <em>yes</em> or <em>no</em>. Fixing an alphabet \(\Sigma\) and
+        an encoding of inputs as strings over \(\Sigma\), a decision problem is
+        the set \(L \subseteq \Sigma^{*}\) of strings whose answer is yes. Such a
+        set is called a <strong>language</strong>, and &ldquo;solving the
+        problem&rdquo; means deciding membership in \(L\).
+      </div>
+      <div class="def">
+        <span class="tag">Definition (input size)</span>
+        The <strong>size</strong> \(|x|\) of an input is the number of symbols in
+        its encoding. Running times are measured against \(|x|\). Numbers are
+        written in binary, so an integer \(W\) contributes
+        \(\lfloor \log_2 W\rfloor + 1\) symbols, not \(W\) symbols. A graph with
+        \(n\) vertices and \(m\) edges contributes \(\Theta(n^2)\) symbols as an
+        adjacency matrix or \(\Theta((n+m)\log n)\) as adjacency lists (see
+        <a href="../graphs/ds-graph-representations.html">Graph
+        Representations</a>); the two are within a polynomial of each other, which
+        is all that will matter.
+      </div>
+      <p>
+        The binary encoding of numbers is not a technicality. It is the single
+        point on which the knapsack discussion in
+        <a href="#practice">section 7</a> turns.
+      </p>
+      <h3>Optimization, evaluation, decision</h3>
+      <p>
+        Every optimization problem comes in three forms. Take Vertex Cover, using
+        the definitions of <a href="#worked">section 5</a>:
+      </p>
+      <ul>
+        <li><strong>Optimization:</strong> given \(G\), output a smallest set of vertices touching every edge.</li>
+        <li><strong>Evaluation:</strong> given \(G\), output the size \(\tau(G)\) of a smallest such set.</li>
+        <li><strong>Decision:</strong> given \(G\) and an integer \(k\), is \(\tau(G) \le k\)?</li>
+      </ul>
+      <p>
+        The decision form looks weakest. It is not, because the three are
+        interchangeable at polynomial cost.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (self-reducibility of Vertex Cover)</span>
+        Given a subroutine \(D(G,k)\) that answers the decision form, one can
+        produce a minimum vertex cover of an \(n\)-vertex graph using at most
+        \(2n+1\) calls to \(D\) plus polynomial extra work.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> First find \(\tau(G)\): ask \(D(G,0), D(G,1),
+        \ldots\) until the answer is yes. The answer is yes at \(k=n\) at the
+        latest, so this costs at most \(n+1\) calls and returns
+        \(k^{*} = \tau(G)\). Now build the set. For a vertex \(v\), let
+        \(G-v\) be \(G\) with \(v\) and all its incident edges deleted. Claim:
+        <em>\(v\) belongs to some vertex cover of \(G\) of size \(k\) if and only
+        if \(D(G-v, k-1)\) is yes.</em> If \(C\) is a cover of \(G\) of size
+        \(k\) containing \(v\), then \(C \setminus \{v\}\) has size \(k-1\) and
+        covers every edge of \(G-v\), since those edges are exactly the edges of
+        \(G\) not touching \(v\). Conversely if \(C'\) covers \(G-v\) and
+        \(|C'| = k-1\), then \(C' \cup \{v\}\) has size at most \(k\) and covers
+        every edge of \(G\): an edge either touches \(v\) or survives in
+        \(G-v\). So: walk the vertices once, and whenever \(D(G-v, k-1)\) is
+        yes, put \(v\) into the answer and replace \(G \leftarrow G-v\),
+        \(k \leftarrow k-1\). That is \(n\) further calls. The invariant
+        &ldquo;the remaining graph has a cover of size \(k\)&rdquo; holds
+        throughout, and \(k\) reaches \(0\) exactly when the remaining graph has
+        no edges. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The same trick works for the other problems here. So nothing is lost by
+        studying only decision problems, and a great deal of formal convenience
+        is gained: a decision problem is just a set of strings, and sets can be
+        compared, mapped into one another and collected into classes.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="p">2. The class P</h2>
+      <div class="def">
+        <span class="tag">Definition (P)</span>
+        <strong>P</strong> is the class of decision problems \(L\) for which some
+        algorithm decides membership in \(L\) in time \(O(|x|^{c})\) for a
+        constant \(c\) fixed in advance, on every input \(x\). Equivalently:
+        problems solvable in polynomial time. The name abbreviates
+        <em>polynomial time</em>.
+      </div>
+      <p>
+        Two properties make the polynomial the natural boundary to draw, rather
+        than, say, \(O(n^3)\).
+      </p>
+      <p>
+        <strong>Closure under composition.</strong> If an algorithm runs in
+        \(O(n^{a})\) steps and each step may call a subroutine costing
+        \(O(n^{b})\), the total is \(O(n^{a+b})\), still a polynomial. Feeding
+        the output of one polynomial-time algorithm into another is therefore
+        safe, and a polynomial-time algorithm may call a polynomial-time
+        subroutine polynomially many times on polynomially larger inputs and
+        remain polynomial-time. No smaller class of growth rates is as
+        well behaved: \(O(n^3)\) algorithms composed \(n\) times are \(O(n^4)\).
+      </p>
+      <p>
+        <strong>Robustness across machine models.</strong> A problem in P on a
+        random-access machine is in P on a single-tape Turing machine and on
+        every other reasonable sequential model; the models simulate each other
+        with polynomial overhead, so membership in P does not depend on which
+        one is chosen. The models themselves and the simulations between them
+        are treated in <a href="foundation-computability.html">Turing Machines
+        and Computability</a>.
+      </p>
+      <div class="aside">
+        <span class="tag">P is an idealization</span>
+        An algorithm running in \(n^{100}\) steps is in P and is useless; an
+        algorithm running in \(2^{n/1000}\) steps is not in P and is fine for
+        \(n\) up to a few thousand. P is defined the way it is because it is
+        closed under composition and stable across machine models, not because
+        every polynomial is practical. In practice the polynomial-time algorithms
+        people actually find have small exponents.
+      </div>
+      <p>
+        Almost every algorithm in this catalog witnesses membership in P: sorting
+        (<a href="../sorting/algo-mergesort.html">mergesort</a>,
+        \(\Theta(n\log n)\)), single-source shortest paths
+        (<a href="../graphs/algo-dijkstra.html">Dijkstra</a>,
+        <a href="../graphs/algo-bellman-ford.html">Bellman&ndash;Ford</a>),
+        minimum spanning trees
+        (<a href="../graphs/algo-kruskal.html">Kruskal</a>,
+        <a href="../graphs/algo-prim.html">Prim</a>), substring search
+        (<a href="../strings/algo-kmp.html">Knuth&ndash;Morris&ndash;Pratt</a>),
+        connectivity and bipartiteness
+        (<a href="../graphs/algo-bfs.html">breadth-first search</a>). Deciding
+        whether an integer written in binary is prime is also in P, though that
+        took until 2002 and the algorithm is nothing like trial division.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="np">3. The class NP: verifiers and certificates</h2>
+      <p>
+        Some problems have a feature that is weaker than a fast algorithm but
+        still sharp: a yes answer can be <em>justified</em> briefly. If someone
+        hands you the justification, you can check it quickly, even though
+        finding it seems to require search.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (verifier, certificate, NP)</span>
+        A <strong>verifier</strong> for a decision problem \(L\) is an algorithm
+        \(V(x, c)\) taking an input \(x\) and a second string \(c\), the
+        <strong>certificate</strong> (or <em>witness</em>). \(L\) is in
+        <strong>NP</strong> if there is a verifier \(V\) and a polynomial \(p\)
+        such that:
+        <ul>
+          <li><em>Completeness.</em> If \(x \in L\), then some \(c\) with \(|c| \le p(|x|)\) makes \(V(x,c)\) accept.</li>
+          <li><em>Soundness.</em> If \(x \notin L\), then no \(c\) whatsoever makes \(V(x,c)\) accept.</li>
+          <li><em>Efficiency.</em> \(V\) runs in time polynomial in \(|x|\).</li>
+        </ul>
+        The name abbreviates <em>nondeterministic polynomial time</em>.
+      </div>
+      <p>
+        Three features of the definition are load-bearing and are the usual places
+        a proposed proof of membership goes wrong. The certificate must be
+        <em>short</em> (polynomial in \(|x|\), so the verifier can afford to read
+        it). The verifier must be <em>fast</em>. And the guarantee is
+        <em>one-sided</em>: yes-instances have certificates, no-instances have
+        none, and nothing is claimed about certifying a no.
+      </p>
+
+      <h3>A certificate checked step by step</h3>
+      <div class="def">
+        <span class="tag">Definition (Hamiltonian Cycle)</span>
+        A <strong>Hamiltonian cycle</strong> in an undirected graph
+        \(G = (V,E)\) is a cycle that visits every vertex exactly once and
+        returns to its start. <strong>HAM-CYCLE</strong> is the decision problem:
+        given \(G\), does it contain a Hamiltonian cycle? (After William Rowan
+        Hamilton, who in 1857 sold a puzzle based on finding such a cycle on the
+        dodecahedron.)
+      </div>
+      <p>
+        No polynomial-time algorithm for HAM-CYCLE is known. But a claimed cycle
+        is easy to check. Take this graph \(H\) on six vertices with eight edges:
+      </p>
+      <figure>
+        <svg viewBox="0 0 460 250" role="img" aria-label="Graph H drawn with vertices 1, 3, 5 on the top row and 2, 4, 6 on the bottom row. Edges run 1-2, 1-4, 1-6, 2-3, 3-4, 2-5, 4-5, 5-6. The pair 3-6 is the only top-bottom pair with no edge.">
+          <g stroke="#b9c0d0" stroke-width="1.6" fill="none">
+            <line x1="90" y1="70" x2="90" y2="185"/>
+            <line x1="90" y1="70" x2="230" y2="185"/>
+            <line x1="90" y1="70" x2="370" y2="185"/>
+            <line x1="90" y1="185" x2="230" y2="70"/>
+            <line x1="230" y1="70" x2="230" y2="185"/>
+            <line x1="90" y1="185" x2="370" y2="70"/>
+            <line x1="230" y1="185" x2="370" y2="70"/>
+            <line x1="370" y1="70" x2="370" y2="185"/>
+          </g>
+          <g stroke="#0a7d4d" stroke-width="1.6" fill="#eaf6ef">
+            <circle cx="90" cy="70" r="17"/>
+            <circle cx="230" cy="70" r="17"/>
+            <circle cx="370" cy="70" r="17"/>
+            <circle cx="90" cy="185" r="17"/>
+            <circle cx="230" cy="185" r="17"/>
+            <circle cx="370" cy="185" r="17"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#0a7d4d" text-anchor="middle">
+            <text x="90" y="75">1</text>
+            <text x="230" y="75">3</text>
+            <text x="370" y="75">5</text>
+            <text x="90" y="190">2</text>
+            <text x="230" y="190">4</text>
+            <text x="370" y="190">6</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12.5" fill="#5c6270" text-anchor="middle">
+            <text x="230" y="232">E = {12, 14, 16, 23, 34, 25, 45, 56}</text>
+          </g>
+        </svg>
+        <figcaption>
+          The graph \(H\). Drawn this way it is bipartite with parts
+          \(\{1,3,5\}\) and \(\{2,4,6\}\), and it is the complete bipartite
+          graph on those parts minus the single edge \(3\!-\!6\). Nothing in
+          the picture makes a Hamiltonian cycle apparent, which is the point:
+          the certificate carries the information, not the drawing.
+        </figcaption>
+      </figure>
+      <p>
+        The certificate for a yes answer is the cycle itself, written as a
+        sequence of vertices: \(c = \langle 1, 2, 3, 4, 5, 6 \rangle\). Its
+        length is \(n\) vertex labels, comfortably polynomial in \(|x|\). The
+        verifier does two things: confirm the sequence is a permutation of
+        \(V\), and confirm each consecutive pair (including the wrap from last
+        to first) is an edge. Here is every step of that check on \(H\):
+      </p>
+      <table class="trace">
+        <tr>
+          <th>step</th><th>arc tested</th><th>in \(E\)?</th>
+          <th>vertex arrived at</th><th>seen before?</th><th>verdict</th>
+        </tr>
+        <tr><td>1</td><td class="cell">1 &rarr; 2</td><td class="ok">yes</td><td class="cell">2</td><td>no</td><td>continue</td></tr>
+        <tr><td>2</td><td class="cell">2 &rarr; 3</td><td class="ok">yes</td><td class="cell">3</td><td>no</td><td>continue</td></tr>
+        <tr><td>3</td><td class="cell">3 &rarr; 4</td><td class="ok">yes</td><td class="cell">4</td><td>no</td><td>continue</td></tr>
+        <tr><td>4</td><td class="cell">4 &rarr; 5</td><td class="ok">yes</td><td class="cell">5</td><td>no</td><td>continue</td></tr>
+        <tr><td>5</td><td class="cell">5 &rarr; 6</td><td class="ok">yes</td><td class="cell">6</td><td>no</td><td>continue</td></tr>
+        <tr><td>6</td><td class="cell">6 &rarr; 1</td><td class="ok">yes</td><td class="cell">1 (wrap)</td><td>start vertex</td><td class="ok">accept</td></tr>
+      </table>
+      <p>
+        Six vertices listed, all distinct, six arcs all present: accept. The
+        verifier never searched for anything. Compare it with a certificate that
+        looks equally plausible, \(c' = \langle 1, 2, 5, 4, 3, 6 \rangle\):
+      </p>
+      <table class="trace">
+        <tr>
+          <th>step</th><th>arc tested</th><th>in \(E\)?</th>
+          <th>vertex arrived at</th><th>seen before?</th><th>verdict</th>
+        </tr>
+        <tr><td>1</td><td class="cell">1 &rarr; 2</td><td class="ok">yes</td><td class="cell">2</td><td>no</td><td>continue</td></tr>
+        <tr><td>2</td><td class="cell">2 &rarr; 5</td><td class="ok">yes</td><td class="cell">5</td><td>no</td><td>continue</td></tr>
+        <tr><td>3</td><td class="cell">5 &rarr; 4</td><td class="ok">yes</td><td class="cell">4</td><td>no</td><td>continue</td></tr>
+        <tr><td>4</td><td class="cell">4 &rarr; 3</td><td class="ok">yes</td><td class="cell">3</td><td>no</td><td>continue</td></tr>
+        <tr><td>5</td><td class="cell">3 &rarr; 6</td><td class="no">no</td><td class="cell">not reached</td><td>not reached</td><td class="no">reject</td></tr>
+      </table>
+      <p>
+        All six vertices are distinct here too, so the permutation test passes;
+        the failure is the missing edge \(3\!-\!6\), the one pair \(H\) does not
+        have. Rejecting a bad certificate is exactly as cheap as accepting a good
+        one, and this is what soundness demands: the verifier accepts
+        \(\langle H, c'\rangle\) for no certificate that fails a test.
+      </p>
+      <p>
+        The graph \(H\) has exactly two Hamiltonian cycles up to rotation and
+        reflection, \(\langle 1,2,3,4,5,6\rangle\) and
+        \(\langle 1,4,3,2,5,6\rangle\), out of \(5!/2 = 60\) cyclic orders to
+        consider. A verifier is handed one of the two. A solver has to find one.
+      </p>
+
+      <h3>The verifier in code, and its cost</h3>
+      <div class="code-tabs" data-snippet="complexity/hamilton-verify">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Verifier for HAM-CYCLE. adj is an n x n adjacency matrix; cert is a
+// claimed Hamiltonian cycle as a vertex sequence. Returns accept/reject.
+bool verify(const vector&lt;vector&lt;bool&gt;&gt;&amp; adj, const vector&lt;int&gt;&amp; cert) {
+    int n = adj.size();
+    if ((int)cert.size() != n) return false;      // wrong length
+    vector&lt;bool&gt; seen(n, false);
+    for (int v : cert) {                          // permutation test
+        if (v &lt; 0 || v &gt;= n || seen[v]) return false;
+        seen[v] = true;
+    }
+    for (int i = 0; i &lt; n; i++) {                 // adjacency test, incl. wrap
+        int u = cert[i], w = cert[(i + 1) % n];
+        if (!adj[u][w]) return false;
+    }
+    return true;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Verifier for HAM-CYCLE. adj is an n x n adjacency matrix; cert is a
+// claimed Hamiltonian cycle as a vertex sequence. Returns accept/reject.
+static boolean verify(boolean[][] adj, int[] cert) {
+    int n = adj.length;
+    if (cert.length != n) return false;           // wrong length
+    boolean[] seen = new boolean[n];
+    for (int v : cert) {                          // permutation test
+        if (v &lt; 0 || v &gt;= n || seen[v]) return false;
+        seen[v] = true;
+    }
+    for (int i = 0; i &lt; n; i++) {                 // adjacency test, incl. wrap
+        int u = cert[i], w = cert[(i + 1) % n];
+        if (!adj[u][w]) return false;
+    }
+    return true;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Verifier for HAM-CYCLE. adj is an n x n adjacency matrix; cert is a
+# claimed Hamiltonian cycle as a vertex sequence. Returns accept/reject.
+def verify(adj, cert):
+    n = len(adj)
+    if len(cert) != n:                            # wrong length
+        return False
+    seen = [False] * n
+    for v in cert:                                # permutation test
+        if not (0 &lt;= v &lt; n) or seen[v]:
+            return False
+        seen[v] = True
+    for i in range(n):                            # adjacency test, incl. wrap
+        u, w = cert[i], cert[(i + 1) % n]
+        if not adj[u][w]:
+            return False
+    return True</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Verifier for HAM-CYCLE. adj is an n x n adjacency matrix; cert is a
+// claimed Hamiltonian cycle as a vertex sequence. Returns accept/reject.
+fn verify(adj: &amp;Vec&lt;Vec&lt;bool&gt;&gt;, cert: &amp;[usize]) -&gt; bool {
+    let n = adj.len();
+    if cert.len() != n { return false; }           // wrong length
+    let mut seen = vec![false; n];
+    for &amp;v in cert {                               // permutation test
+        if v &gt;= n || seen[v] { return false; }
+        seen[v] = true;
+    }
+    for i in 0..n {                                // adjacency test, incl. wrap
+        let (u, w) = (cert[i], cert[(i + 1) % n]);
+        if !adj[u][w] { return false; }
+    }
+    true
+}</pre>
+<p class="ct-src">source: <code>code/complexity/hamilton-verify.cpp &middot; code/complexity/hamilton-verify.java &middot; code/complexity/hamilton-verify.py &middot; code/complexity/hamilton-verify.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Cost, argued rather than asserted. The permutation loop performs \(n\)
+        iterations, each doing a constant number of array operations:
+        \(\Theta(n)\). The adjacency loop performs \(n\) iterations, each one
+        matrix lookup: \(\Theta(n)\). So the body of the verifier is
+        \(\Theta(n)\) once the matrix is in memory, and reading the input itself
+        dominates at \(\Theta(n^2)\). The certificate holds \(n\) labels of
+        \(O(\log n)\) bits each, so \(|c| = O(n\log n)\), polynomial in
+        \(|x| = \Theta(n^2)\). All three clauses of the definition hold, so
+        HAM-CYCLE \(\in\) NP.
+      </p>
+
+      <h3>Guess and check</h3>
+      <p>
+        The equivalent phrasing that gives the class its name: imagine a machine
+        allowed to <em>guess</em>. On input \(x\) it writes down a string \(c\)
+        of length at most \(p(|x|)\) with no cost and no justification, then runs
+        the verifier. The machine accepts \(x\) if <em>some</em> sequence of
+        guesses leads to acceptance. Such a machine is called
+        <strong>nondeterministic</strong>, and NP is the class of problems it
+        decides in polynomial time. The two definitions describe the same class:
+        the guessed string is the certificate, and the deterministic part of the
+        machine is the verifier. Guessing is not a physical operation; it is a
+        way of naming the search that a real algorithm has to perform.
+      </p>
+      <div class="aside">
+        <span class="tag">NP does not mean &ldquo;not polynomial&rdquo;</span>
+        The N stands for <em>nondeterministic</em>. It is not a negation, and NP
+        is not the complement of P. Every problem in P is in NP; sorting,
+        shortest paths and minimum spanning trees are all NP problems. Saying
+        &ldquo;this problem is NP&rdquo; therefore says almost nothing, and
+        saying &ldquo;NP means no polynomial algorithm exists&rdquo; is false in
+        two separate ways. The claim people usually intend is
+        <em>NP-complete</em>, defined in <a href="#npc">section 6</a>, and even
+        that does not prove no polynomial algorithm exists: it proves that if one
+        does, then one exists for every problem in NP.
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem</span>
+        \(\mathrm{P} \subseteq \mathrm{NP} \subseteq \mathrm{EXP}\), where EXP is
+        the class of problems decidable in time \(2^{q(n)}\) for some polynomial
+        \(q\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> For the first containment, let \(L \in
+        \mathrm{P}\) with decider \(A\) running in polynomial time. Define
+        \(V(x,c)\) to ignore \(c\) entirely and return \(A(x)\), and take the
+        certificate bound \(p(n) = 0\). If \(x \in L\) the empty certificate is
+        accepted; if \(x \notin L\) no certificate is accepted, since \(V\) does
+        not consult \(c\); and \(V\) runs in polynomial time because \(A\) does.
+        So \(L \in \mathrm{NP}\).
+        <br />
+        For the second, let \(L \in \mathrm{NP}\) with verifier \(V\) running in
+        time \(q(n)\) and certificate bound \(p(n)\). Decide \(L\) by brute
+        force: enumerate every string \(c\) over \(\Sigma\) of length at most
+        \(p(n)\) and run \(V(x,c)\); accept if any run accepts, reject after all
+        of them fail. Completeness and soundness make this correct. The number of
+        strings enumerated is \(\sum_{i=0}^{p(n)} |\Sigma|^{i} <
+        |\Sigma|^{p(n)+1}\), and each costs \(q(n)\), so the total is
+        \(O(|\Sigma|^{p(n)+1} q(n)) = 2^{O(p(n))}\), which is \(2^{q'(n)}\) for
+        a polynomial \(q'\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        A separate result, the time hierarchy theorem, shows
+        \(\mathrm{P} \ne \mathrm{EXP}\). So at least one of the two containments
+        above is strict. Which one is unknown. Whether
+        \(\mathrm{P} = \mathrm{NP}\) is the open question of the field, posed by
+        Stephen Cook in 1971 and carrying one of the seven Clay Mathematics
+        Institute Millennium Prizes.
+      </p>
+      <div class="aside">
+        <span class="tag">The missing half: co-NP</span>
+        HAM-CYCLE has short certificates for yes. What certifies a no, that a
+        graph has <em>no</em> Hamiltonian cycle? Listing all \((n-1)!/2\) failed
+        cyclic orders is not a short certificate, and no short one is known. The
+        class of problems whose <em>no</em>-instances have short certificates is
+        called co-NP. Whether \(\mathrm{NP} = \mathrm{co\text{-}NP}\) is also
+        open. The asymmetry is built into the definition of NP, and it is why the
+        definition insists on the one-sided guarantee.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="red">4. Polynomial-time reductions</h2>
+      <p>
+        A reduction is a translation of one problem into another that preserves
+        the answer. It is the tool for transferring hardness.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (polynomial-time reduction)</span>
+        Problem \(A\) <strong>reduces</strong> to problem \(B\), written
+        \(A \le_{p} B\), if there is a function \(f\) computable in polynomial
+        time such that for every input \(x\),
+        \[ x \in A \quad\Longleftrightarrow\quad f(x) \in B. \]
+        \(f\) maps instances of \(A\) to instances of \(B\); yes-instances must
+        map to yes-instances and no-instances to no-instances. (This is a
+        <em>many-one</em> or <em>Karp</em> reduction, the kind used throughout
+        here.)
+      </div>
+      <p>
+        One consequence is worth stating because it is often assumed silently: an
+        algorithm running in time \(t(n)\) cannot write more than \(t(n)\)
+        symbols of output, so if \(f\) is computable in time \(O(n^{a})\) then
+        \(|f(x)| = O(|x|^{a})\). The translated instance is automatically only
+        polynomially larger.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (closure)</span>
+        If \(A \le_{p} B\) and \(B \in \mathrm{P}\), then \(A \in \mathrm{P}\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Let \(f\) be the reduction, computable in time
+        \(O(n^{a})\), and let \(B\) have a decider running in time
+        \(O(n^{b})\). To decide \(A\) on input \(x\) with \(|x| = n\): compute
+        \(y = f(x)\), then run the \(B\)-decider on \(y\) and return its answer.
+        Correctness is the definition of \(f\). Cost: computing \(y\) takes
+        \(O(n^{a})\), and \(|y| = O(n^{a})\) by the remark above, so deciding
+        \(B\) on \(y\) takes \(O((n^{a})^{b}) = O(n^{ab})\). The total is
+        \(O(n^{a} + n^{ab}) = O(n^{ab})\) for \(a, b \ge 1\), a polynomial.
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Corollary (the contrapositive, which is the useful form)</span>
+        If \(A \le_{p} B\) and \(A \notin \mathrm{P}\), then
+        \(B \notin \mathrm{P}\). Informally: \(B\) is at least as hard as \(A\).
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (transitivity)</span>
+        If \(A \le_{p} B\) and \(B \le_{p} C\) then \(A \le_{p} C\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Let \(f\) reduce \(A\) to \(B\) in time
+        \(O(n^{a})\) and \(g\) reduce \(B\) to \(C\) in time \(O(n^{b})\). Take
+        \(h = g \circ f\). Correctness chains the two equivalences:
+        \(x \in A \Leftrightarrow f(x) \in B \Leftrightarrow g(f(x)) \in C\).
+        Cost: \(f(x)\) costs \(O(n^{a})\) and has length \(O(n^{a})\), so
+        applying \(g\) to it costs \(O((n^{a})^{b}) = O(n^{ab})\). The
+        composition of two polynomials is a polynomial, so \(h\) is
+        polynomial-time computable. <span class="qed">&#8718;</span>
+      </div>
+      <div class="aside">
+        <span class="tag">The direction, which is where reductions go wrong</span>
+        Read \(A \le_{p} B\) as &ldquo;\(A\) is no harder than \(B\)&rdquo;, in
+        the same spirit as \(\le\) on numbers. The mechanical reading: a
+        reduction converts any solver for \(B\) into a solver for \(A\), so
+        \(B\) must be at least as hard.
+        <br /><br />
+        <strong>To prove that \(B\) is hard, reduce a known-hard \(A\)
+        <em>into</em> \(B\): show \(A \le_{p} B\).</strong> Building an instance
+        of \(B\) is the work; the known-hard problem is the source.
+        <br /><br />
+        The failure mode is doing it backwards. &ldquo;I encoded Vertex Cover as
+        a satisfiability instance, and satisfiability is NP-complete, therefore
+        Vertex Cover is NP-hard&rdquo; is not an argument. It establishes
+        \(\text{VC} \le_{p} \text{SAT}\), which says Vertex Cover is <em>no
+        harder</em> than satisfiability. That is true of every problem in NP and
+        proves nothing about Vertex Cover. Whenever a reduction argument feels
+        like it worked too easily, check which problem is the source and which is
+        the target.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="worked">5. A reduction worked in full: Independent Set and Vertex Cover</h2>
+      <div class="def">
+        <span class="tag">Definitions</span>
+        Let \(G = (V,E)\) be an undirected graph, \(n = |V|\).
+        <ul>
+          <li>
+            \(S \subseteq V\) is an <strong>independent set</strong> if no edge
+            of \(G\) has both endpoints in \(S\). <strong>INDEPENDENT SET</strong>:
+            given \(\langle G, k\rangle\), does \(G\) have an independent set of
+            size at least \(k\)? Write \(\alpha(G)\) for the largest size.
+          </li>
+          <li>
+            \(C \subseteq V\) is a <strong>vertex cover</strong> if every edge of
+            \(G\) has at least one endpoint in \(C\).
+            <strong>VERTEX COVER</strong>: given \(\langle G, k\rangle\), does
+            \(G\) have a vertex cover of size at most \(k\)? Write \(\tau(G)\)
+            for the smallest size.
+          </li>
+        </ul>
+      </div>
+      <p>
+        The two problems are the same problem seen from opposite sides, and the
+        following theorem is the whole content of the reduction.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (complementation)</span>
+        For every graph \(G=(V,E)\) and every \(S \subseteq V\): \(S\) is an
+        independent set of \(G\) if and only if \(V \setminus S\) is a vertex
+        cover of \(G\). Consequently \(\alpha(G) + \tau(G) = n\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> (\(\Rightarrow\)) Suppose \(S\) is independent
+        and take any edge \(\{u,v\} \in E\). If both \(u\) and \(v\) were in
+        \(S\), that edge would have both endpoints in \(S\), contradicting
+        independence. So at least one of \(u, v\) lies outside \(S\), that is, in
+        \(V \setminus S\). Since the edge was arbitrary, \(V \setminus S\) is a
+        vertex cover.
+        <br />
+        (\(\Leftarrow\)) Suppose \(V \setminus S\) is a vertex cover and take any
+        edge \(\{u,v\} \in E\). It has an endpoint in \(V \setminus S\), so not
+        both \(u\) and \(v\) lie in \(S\). Since the edge was arbitrary, no edge
+        has both endpoints in \(S\), so \(S\) is independent.
+        <br />
+        For the size identity, apply the equivalence twice. If \(S\) is a largest
+        independent set then \(V \setminus S\) is a vertex cover of size
+        \(n - \alpha(G)\), so \(\tau(G) \le n - \alpha(G)\), that is
+        \(\alpha(G) + \tau(G) \le n\). If \(C\) is a smallest vertex cover then
+        \(V \setminus C\) is independent of size \(n - \tau(G)\), so
+        \(\alpha(G) \ge n - \tau(G)\), that is \(\alpha(G) + \tau(G) \ge n\).
+        Hence \(\alpha(G) + \tau(G) = n\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="def">
+        <span class="tag">The reduction</span>
+        \(f(\langle G, k\rangle) = \langle G, \,n - k\rangle\), where \(n\) is
+        the number of vertices of \(G\). Reading it as INDEPENDENT SET
+        \(\le_{p}\) VERTEX COVER: the source instance asks for an independent set
+        of size at least \(k\); the target instance asks for a vertex cover of
+        size at most \(n-k\) in the <em>same</em> graph.
+      </div>
+      <p>
+        <strong>The reduction is polynomial-time.</strong> It copies the graph
+        and performs one subtraction: \(\Theta(|x|)\) work, well inside
+        polynomial. The graph is not modified at all, which makes this reduction
+        unusually transparent; most are gadget constructions that build a
+        structurally different instance.
+      </p>
+      <p>
+        <strong>The reduction is correct.</strong> \(G\) has an independent set
+        of size \(\ge k\) iff \(\alpha(G) \ge k\) iff \(n - \tau(G) \ge k\) (by
+        the theorem) iff \(\tau(G) \le n-k\) iff \(G\) has a vertex cover of size
+        \(\le n-k\). Each step is an equivalence, so \(\langle G,k\rangle\) is a
+        yes-instance of INDEPENDENT SET exactly when
+        \(f(\langle G,k\rangle)\) is a yes-instance of VERTEX COVER.
+      </p>
+
+      <h3>Worked on a concrete graph</h3>
+      <p>
+        Take \(G\) with \(V = \{a,b,c,d,e,f,g\}\), \(n = 7\), and the seven edges
+        \(E = \{ab,\, bc,\, ca,\, ad,\, be,\, cf,\, dg\}\): a triangle
+        \(a\,b\,c\), a pendant edge at \(b\) and at \(c\), and a path
+        \(a\!-\!d\!-\!g\) hanging off \(a\).
+      </p>
+      <figure>
+        <svg viewBox="0 0 420 330" role="img" aria-label="Graph G: a triangle on a, b, c; a path from a to d to g going right; a pendant vertex e attached to b and a pendant vertex f attached to c.">
+          <g stroke="#b9c0d0" stroke-width="1.6" fill="none">
+            <line x1="150" y1="70" x2="90" y2="180"/>
+            <line x1="90" y1="180" x2="215" y2="180"/>
+            <line x1="215" y1="180" x2="150" y2="70"/>
+            <line x1="150" y1="70" x2="258" y2="70"/>
+            <line x1="258" y1="70" x2="350" y2="70"/>
+            <line x1="90" y1="180" x2="55" y2="285"/>
+            <line x1="215" y1="180" x2="250" y2="285"/>
+          </g>
+          <g stroke="#0a7d4d" stroke-width="1.6" fill="#eaf6ef">
+            <circle cx="150" cy="70" r="17"/>
+            <circle cx="90" cy="180" r="17"/>
+            <circle cx="215" cy="180" r="17"/>
+            <circle cx="258" cy="70" r="17"/>
+            <circle cx="350" cy="70" r="17"/>
+            <circle cx="55" cy="285" r="17"/>
+            <circle cx="250" cy="285" r="17"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#0a7d4d" text-anchor="middle">
+            <text x="150" y="75">a</text>
+            <text x="90" y="185">b</text>
+            <text x="215" y="185">c</text>
+            <text x="258" y="75">d</text>
+            <text x="350" y="75">g</text>
+            <text x="55" y="290">e</text>
+            <text x="250" y="290">f</text>
+          </g>
+        </svg>
+        <figcaption>
+          The graph \(G\): \(7\) vertices, \(7\) edges. The triangle
+          \(a\,b\,c\) and the edge \(d\!-\!g\) share no vertex, a fact used
+          below to pin \(\tau(G)\) exactly.
+        </figcaption>
+      </figure>
+
+      <h4>Direction one: an INDEPENDENT SET yes-instance</h4>
+      <p>
+        Source instance: \(\langle G, 4\rangle\). Is there an independent set of
+        size at least \(4\)? Apply \(f\): the target instance is
+        \(\langle G, 7-4\rangle = \langle G, 3\rangle\), asking for a vertex cover
+        of size at most \(3\).
+      </p>
+      <p>
+        The target is a yes: \(C = \{b, c, d\}\) covers every edge. Checking all
+        seven edges, one row per edge:
+      </p>
+      <table class="trace">
+        <tr><th>edge</th><th>\(u \in C\)?</th><th>\(v \in C\)?</th><th>covered</th>
+            <th>both endpoints in \(V\setminus C\)?</th></tr>
+        <tr><td class="cell">a-b</td><td>a: no</td><td class="ok">b: yes</td><td class="ok">yes</td><td>no</td></tr>
+        <tr><td class="cell">b-c</td><td class="ok">b: yes</td><td class="ok">c: yes</td><td class="ok">yes</td><td>no</td></tr>
+        <tr><td class="cell">c-a</td><td class="ok">c: yes</td><td>a: no</td><td class="ok">yes</td><td>no</td></tr>
+        <tr><td class="cell">a-d</td><td>a: no</td><td class="ok">d: yes</td><td class="ok">yes</td><td>no</td></tr>
+        <tr><td class="cell">b-e</td><td class="ok">b: yes</td><td>e: no</td><td class="ok">yes</td><td>no</td></tr>
+        <tr><td class="cell">c-f</td><td class="ok">c: yes</td><td>f: no</td><td class="ok">yes</td><td>no</td></tr>
+        <tr><td class="cell">d-g</td><td class="ok">d: yes</td><td>g: no</td><td class="ok">yes</td><td>no</td></tr>
+      </table>
+      <p>
+        The last column is the theorem in action: because every edge has an
+        endpoint in \(C\), no edge has both endpoints in the complement
+        \(V \setminus C = \{a, e, f, g\}\), so that complement is independent. It
+        has size \(7 - 3 = 4\), which answers the source instance yes. Checking
+        it directly means testing all \(\binom{4}{2} = 6\) pairs against \(E\):
+      </p>
+      <table class="trace">
+        <tr><th>pair</th><td class="cell">a,e</td><td class="cell">a,f</td><td class="cell">a,g</td>
+            <td class="cell">e,f</td><td class="cell">e,g</td><td class="cell">f,g</td></tr>
+        <tr><th>in \(E\)?</th><td class="ok">no</td><td class="ok">no</td><td class="ok">no</td>
+            <td class="ok">no</td><td class="ok">no</td><td class="ok">no</td></tr>
+      </table>
+      <p>
+        Six non-edges, so \(\{a,e,f,g\}\) is independent. Note that \(a\)&ndash;\(b\)
+        and \(a\)&ndash;\(d\) <em>are</em> edges, but \(b\) and \(d\) are not in the
+        set, so they do not matter; only pairs inside the set are tested.
+      </p>
+
+      <h4>Direction two: reading the answer back</h4>
+      <p>
+        The reduction as defined only has to preserve yes and no. In this case it
+        also transports solutions, which is what makes it usable for the
+        optimization form. Suppose a VERTEX COVER solver is given
+        \(\langle G, 3\rangle\) and returns the cover \(\{b,c,d\}\). To answer
+        the original INDEPENDENT SET question, take the complement:
+        \(V \setminus \{b,c,d\} = \{a,e,f,g\}\), of size \(7-3 = 4 \ge 4\). The
+        table above is the proof that this works, and the theorem is the proof
+        that it always works.
+      </p>
+      <p>
+        Note that \(\{b,c,d\}\) is <em>not</em> independent: \(b\!-\!c\) is an
+        edge. A vertex cover and an independent set are different objects; they
+        are related by complementation, not by being the same set.
+      </p>
+
+      <h4>Direction three: a no-instance</h4>
+      <p>
+        Source instance \(\langle G, 5\rangle\): is there an independent set of
+        size at least \(5\)? Apply \(f\): the target is
+        \(\langle G, 7-5\rangle = \langle G, 2\rangle\), a vertex cover of size at
+        most \(2\). Both are no, and the reason is easiest to see on the cover
+        side.
+      </p>
+      <div class="proof">
+        <strong>Claim: \(\tau(G) = 3\).</strong> Upper bound: \(\{b,c,d\}\) is a
+        cover, verified row by row above, so \(\tau(G) \le 3\). Lower bound: any
+        cover \(C\) must contain at least two of \(\{a,b,c\}\), because if it
+        omitted two of them, the edge between those two (all three pairs
+        \(ab, bc, ca\) are edges) would be uncovered. \(C\) must also contain at
+        least one of \(\{d,g\}\), to cover the edge \(d\!-\!g\). The vertex sets
+        \(\{a,b,c\}\) and \(\{d,g\}\) are disjoint, so these two requirements
+        count different vertices and \(|C| \ge 2 + 1 = 3\). Hence
+        \(\tau(G) = 3\), and by the complementation theorem
+        \(\alpha(G) = 7 - 3 = 4\). <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        So there is no cover of size \(2\) and no independent set of size \(5\):
+        both instances are no, as the reduction requires. Exhaustive search
+        confirms the counts: the only vertex cover of size \(3\) is
+        \(\{b,c,d\}\), and the only independent set of size \(4\) is
+        \(\{a,e,f,g\}\).
+      </p>
+      <div class="aside">
+        <span class="tag">A caution about this particular pair</span>
+        The map \(k \mapsto n-k\) is its own inverse, so the same construction
+        also proves VERTEX COVER \(\le_{p}\) INDEPENDENT SET. That symmetry is
+        unusual and makes this a poor example for internalizing the direction
+        rule: here both directions happen to be available. A one-way construction
+        is given next.
+      </div>
+
+      <h3>A construction that runs one way: 3-SAT into INDEPENDENT SET</h3>
+      <p>
+        In a Boolean formula in <strong>conjunctive normal form</strong> (a
+        conjunction of clauses, each clause a disjunction of literals, a literal
+        being a variable or its negation), <strong>3-SAT</strong> asks whether a
+        formula with exactly three literals per clause has a satisfying
+        assignment. The reduction 3-SAT \(\le_{p}\) INDEPENDENT SET builds a
+        graph from a formula: one vertex per literal-occurrence, the three
+        vertices of each clause joined into a triangle, and an edge between any
+        two vertices carrying complementary literals (\(x\) and \(\bar x\)). Ask
+        for an independent set of size \(k = \) the number of clauses.
+      </p>
+      <div class="ex">
+        <span class="tag">Example</span>
+        \(\varphi = (x \vee y \vee \bar z) \wedge (\bar x \vee y \vee z)\), two
+        clauses, so \(k = 2\). The graph has six vertices
+        \(x_1, y_1, \bar z_1\) (first clause) and
+        \(\bar x_2, y_2, z_2\) (second). Edges: the two triangles
+        \(\{x_1y_1, x_1\bar z_1, y_1\bar z_1\}\) and
+        \(\{\bar x_2 y_2, \bar x_2 z_2, y_2 z_2\}\), plus the conflict edges
+        \(x_1\!-\!\bar x_2\) and \(\bar z_1\!-\!z_2\). Eight edges in all;
+        \(y_1\) and \(y_2\) carry the same literal \(y\), not complementary
+        ones, so they are not joined.
+        <br /><br />
+        A triangle contains no independent pair, so any independent set has at
+        most one vertex per clause, hence size at most \(2\); the size-\(2\) sets
+        are exactly the ways of choosing one literal per clause without choosing
+        a variable and its negation. \(\{y_1, y_2\}\) is one, giving the
+        assignment \(y = \text{true}\), and indeed \(\varphi\) is satisfied.
+        \(\{x_1, z_2\}\) is another, giving \(x = \text{true}, z = \text{true}\),
+        which also satisfies \(\varphi\). Exhaustive check: \(\alpha = 2\), and
+        the independent pairs are \(x_1y_2,\; x_1z_2,\; y_1\bar x_2,\; y_1y_2,\;
+        y_1z_2,\; \bar z_1\bar x_2,\; \bar z_1y_2\), seven of them, each a
+        satisfying assignment of \(\varphi\).
+        <br /><br />
+        In general: a size-\(k\) independent set picks one literal per clause,
+        never a variable together with its negation, so setting those literals
+        true is consistent and satisfies every clause; conversely a satisfying
+        assignment makes at least one literal true per clause, and picking one
+        such vertex per clause gives an independent set of size \(k\). Nothing
+        about this construction reverses. Formulas go in, graphs come out.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="npc">6. NP-hardness, NP-completeness, Cook&ndash;Levin</h2>
+      <div class="def">
+        <span class="tag">Definition (NP-hard, NP-complete)</span>
+        A problem \(B\) is <strong>NP-hard</strong> if \(A \le_{p} B\) for
+        <em>every</em> \(A \in \mathrm{NP}\). \(B\) is
+        <strong>NP-complete</strong> if it is NP-hard and also \(B \in
+        \mathrm{NP}\).
+        <br /><br />
+        NP-hard says &ldquo;at least as hard as everything in NP&rdquo;, and does
+        not require \(B\) to be in NP or even to be a decision problem.
+        NP-complete says &ldquo;exactly as hard as the hardest problems in
+        NP&rdquo;: these are the problems on which the whole class stands or
+        falls.
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem</span>
+        If any NP-complete problem is in P, then \(\mathrm{P} = \mathrm{NP}\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Let \(B\) be NP-complete with \(B \in
+        \mathrm{P}\), and let \(A\) be any problem in NP. Since \(B\) is NP-hard,
+        \(A \le_{p} B\). By the closure theorem of
+        <a href="#red">section 4</a>, \(A \in \mathrm{P}\). So
+        \(\mathrm{NP} \subseteq \mathrm{P}\), and \(\mathrm{P} \subseteq
+        \mathrm{NP}\) always holds. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The definition of NP-hard quantifies over <em>every</em> problem in NP,
+        infinitely many of them, which looks impossible to establish directly.
+        One theorem does it once, and afterwards a single reduction suffices.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (Cook 1971, Levin 1973), stated without proof</span>
+        SAT, the problem of deciding whether a Boolean formula in conjunctive
+        normal form has a satisfying assignment, is NP-complete.
+      </div>
+      <p>
+        The proof is not given here, but its idea is short to state and is not
+        magic. Let \(L \in \mathrm{NP}\) with verifier \(V\) running in time
+        \(p(n)\). On input \(x\), the entire computation of \(V\) on
+        \((x, c)\) can be laid out as a table with \(p(n)\) rows, one per step,
+        each row recording the machine's memory and state at that step. Cook and
+        Levin build, in time polynomial in \(p(n)\), a formula \(\varphi_x\)
+        whose variables are the certificate bits and the table entries, with
+        clauses asserting that row \(0\) is the correct starting configuration,
+        that each row follows from the previous one by the machine's transition
+        rules, and that the last row is accepting. A satisfying assignment of
+        \(\varphi_x\) is exactly an accepting run of \(V\) on \((x,c)\) for some
+        \(c\), so \(\varphi_x\) is satisfiable iff \(x \in L\). Boolean logic is
+        expressive enough to describe a step of computation, and that is the
+        entire content of the theorem.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (the working method)</span>
+        If \(B\) is NP-complete, \(C \in \mathrm{NP}\), and \(B \le_{p} C\), then
+        \(C\) is NP-complete.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Take any \(A \in \mathrm{NP}\). Since \(B\) is
+        NP-hard, \(A \le_{p} B\); combined with \(B \le_{p} C\), transitivity
+        gives \(A \le_{p} C\). As \(A\) was arbitrary, \(C\) is NP-hard, and
+        \(C \in \mathrm{NP}\) by assumption, so \(C\) is NP-complete.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This turns an NP-completeness proof into two obligations, both concrete:
+        exhibit a short certificate and a fast verifier for \(C\), and exhibit
+        one reduction from one already-known NP-complete problem into \(C\).
+        Richard Karp used it in 1972 to establish 21 problems at once, each
+        reduced from one already on the list. A fragment of that structure:
+      </p>
+      <figure>
+        <svg viewBox="0 0 540 200" role="img" aria-label="A reduction chain. SAT reduces to 3-SAT. 3-SAT reduces to Independent Set, to Hamiltonian Cycle, and to Subset-Sum. Independent Set reduces to Vertex Cover, Hamiltonian Cycle reduces to Travelling Salesman, and Subset-Sum reduces to 0/1 Knapsack.">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#8a91a3"/>
+            </marker>
+          </defs>
+          <g stroke="#8a91a3" stroke-width="1.5" fill="none" marker-end="url(#ah)">
+            <line x1="80" y1="105" x2="102" y2="105"/>
+            <line x1="188" y1="105" x2="212" y2="35"/>
+            <line x1="188" y1="105" x2="212" y2="105"/>
+            <line x1="188" y1="105" x2="212" y2="175"/>
+            <line x1="358" y1="35" x2="382" y2="35"/>
+            <line x1="358" y1="105" x2="382" y2="105"/>
+            <line x1="358" y1="175" x2="382" y2="175"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12.5" text-anchor="middle">
+            <g fill="#fff5e6" stroke="#9a5b00" stroke-width="1.4">
+              <rect x="8" y="90" width="72" height="30" rx="7"/>
+            </g>
+            <g fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4">
+              <rect x="105" y="90" width="82" height="30" rx="7"/>
+              <rect x="215" y="20" width="142" height="30" rx="7"/>
+              <rect x="215" y="90" width="142" height="30" rx="7"/>
+              <rect x="215" y="160" width="142" height="30" rx="7"/>
+            </g>
+            <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4">
+              <rect x="385" y="20" width="147" height="30" rx="7"/>
+              <rect x="385" y="90" width="147" height="30" rx="7"/>
+              <rect x="385" y="160" width="147" height="30" rx="7"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="44" y="110">SAT</text>
+              <text x="146" y="110">3-SAT</text>
+              <text x="286" y="40">Independent Set</text>
+              <text x="286" y="110">Hamiltonian Cycle</text>
+              <text x="286" y="180">Subset-Sum</text>
+              <text x="458" y="40">Vertex Cover</text>
+              <text x="458" y="110">Travelling Salesman</text>
+              <text x="458" y="180">0/1 Knapsack</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          An arrow \(X \rightarrow Y\) means \(X \le_{p} Y\), so hardness flows
+          left to right while a hypothetical fast algorithm would flow right to
+          left. SAT is anchored by Cook&ndash;Levin; every other node is
+          NP-complete by one reduction plus a certificate. The
+          Independent Set to Vertex Cover arrow is the one worked out in
+          <a href="#worked">section 5</a>. Clique also sits one arrow from
+          Independent Set, via the complement graph.
+        </figcaption>
+      </figure>
+
+      <!-- ============================================================ -->
+      <h2 id="practice">7. What an NP-completeness proof licenses</h2>
+      <p>
+        Establishing that a problem is NP-complete does not end the engineering
+        work; it changes what the engineering work should be. Three moves are
+        standard, and a fourth observation about numeric inputs is where the
+        knapsack fits.
+      </p>
+
+      <h3>Approximate: give up optimality, keep a guarantee</h3>
+      <p>
+        Minimum Vertex Cover is NP-hard, but a cover within a factor of two of
+        optimal can be built in linear time.
+      </p>
+      <div class="thm">
+        <span class="tag">Theorem (2-approximation for Vertex Cover)</span>
+        Let \(M \subseteq E\) be a <em>maximal matching</em> of \(G\): a set of
+        pairwise vertex-disjoint edges to which no further edge can be added.
+        Then the set \(C_M\) of all endpoints of edges in \(M\) is a vertex
+        cover, and \(|C_M| = 2|M| \le 2\,\tau(G)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> \(C_M\) is a cover: if some edge
+        \(\{u,v\}\) had neither endpoint in \(C_M\), then \(\{u,v\}\) is disjoint
+        from every edge of \(M\), so \(M \cup \{\{u,v\}\}\) is still a matching,
+        contradicting maximality. The size bound: the edges of \(M\) are pairwise
+        disjoint, so a vertex cover must contain at least one endpoint of each,
+        and no vertex serves two of them; hence \(\tau(G) \ge |M|\). And
+        \(|C_M| = 2|M|\) because the edges are disjoint. Combining,
+        \(|C_M| = 2|M| \le 2\tau(G)\). <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Worked on \(G\)</span>
+        Sweep the edges in the order \(ab, bc, ca, ad, be, cf, dg\), taking each
+        edge whose endpoints are both still free. Take \(ab\) (free), skip
+        \(bc, ca, ad\) and \(be\) (each touches \(a\) or \(b\)), take \(cf\)
+        (both free), take \(dg\) (both free). \(M = \{ab, cf, dg\}\), which is
+        maximal: the four skipped edges each touch a matched vertex. So
+        \(C_M = \{a,b,c,d,f,g\}\), size \(6\). It is a cover: the only vertex
+        outside it is \(e\), whose single edge \(b\!-\!e\) is covered by \(b\).
+        And \(\tau(G) = 3\), so the guarantee \(6 \le 2 \cdot 3\) holds with
+        equality: this instance realizes the worst case of the bound. The
+        algorithm never learns that \(\{b,c,d\}\) is available; it buys a factor
+        of two, in linear time, without search.
+      </div>
+
+      <h3>Parameterize: confine the exponential to a small quantity</h3>
+      <p>
+        A cover of size at most \(k\) can be found in \(O(2^{k}\cdot(n+m))\)
+        time. The exponential is in \(k\) alone, so for a small target the
+        algorithm is fast no matter how large the graph is. The idea: pick any
+        uncovered edge \(\{u,v\}\); every cover contains \(u\) or \(v\), so
+        branch on those two choices and recurse with the budget reduced by one.
+      </p>
+      <div class="code-tabs" data-snippet="complexity/vc-branch">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Bounded-search-tree vertex cover: is there a cover of size &lt;= k?
+// Branches on the two endpoints of one uncovered edge.  O(2^k * (n+m)).
+bool cover(vector&lt;pair&lt;int,int&gt;&gt; edges, int k, vector&lt;int&gt;&amp; out) {
+    if (edges.empty()) return true;              // nothing left to cover
+    if (k == 0) return false;                    // budget spent, edges remain
+    auto [u, v] = edges[0];                      // any uncovered edge
+    for (int w : {u, v}) {                       // it must contribute an endpoint
+        vector&lt;pair&lt;int,int&gt;&gt; rest;
+        for (auto&amp; e : edges)
+            if (e.first != w &amp;&amp; e.second != w) rest.push_back(e);
+        out.push_back(w);
+        if (cover(rest, k - 1, out)) return true;
+        out.pop_back();                          // undo, try the other endpoint
+    }
+    return false;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Bounded-search-tree vertex cover: is there a cover of size &lt;= k?
+// Branches on the two endpoints of one uncovered edge.  O(2^k * (n+m)).
+static boolean cover(List&lt;int[]&gt; edges, int k, Deque&lt;Integer&gt; out) {
+    if (edges.isEmpty()) return true;            // nothing left to cover
+    if (k == 0) return false;                    // budget spent, edges remain
+    int u = edges.get(0)[0], v = edges.get(0)[1];  // any uncovered edge
+    for (int w : new int[]{u, v}) {              // it must contribute an endpoint
+        List&lt;int[]&gt; rest = new ArrayList&lt;&gt;();
+        for (int[] e : edges)
+            if (e[0] != w &amp;&amp; e[1] != w) rest.add(e);
+        out.addLast(w);
+        if (cover(rest, k - 1, out)) return true;
+        out.removeLast();                        // undo, try the other endpoint
+    }
+    return false;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Bounded-search-tree vertex cover: is there a cover of size &lt;= k?
+# Branches on the two endpoints of one uncovered edge.  O(2^k * (n+m)).
+def cover(edges, k, out):
+    if not edges:                                # nothing left to cover
+        return True
+    if k == 0:                                   # budget spent, edges remain
+        return False
+    u, v = edges[0]                              # any uncovered edge
+    for w in (u, v):                             # it must contribute an endpoint
+        rest = [e for e in edges if w not in e]
+        out.append(w)
+        if cover(rest, k - 1, out):
+            return True
+        out.pop()                                # undo, try the other endpoint
+    return False</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Bounded-search-tree vertex cover: is there a cover of size &lt;= k?
+// Branches on the two endpoints of one uncovered edge.  O(2^k * (n+m)).
+fn cover(edges: &amp;[(usize, usize)], k: usize, out: &amp;mut Vec&lt;usize&gt;) -&gt; bool {
+    if edges.is_empty() { return true; }          // nothing left to cover
+    if k == 0 { return false; }                   // budget spent, edges remain
+    let (u, v) = edges[0];                        // any uncovered edge
+    for w in [u, v] {                             // it must contribute an endpoint
+        let rest: Vec&lt;_&gt; =
+            edges.iter().copied().filter(|e| e.0 != w &amp;&amp; e.1 != w).collect();
+        out.push(w);
+        if cover(&amp;rest, k - 1, out) { return true; }
+        out.pop();                                // undo, try the other endpoint
+    }
+    false
+}</pre>
+<p class="ct-src">source: <code>code/complexity/vc-branch.cpp &middot; code/complexity/vc-branch.java &middot; code/complexity/vc-branch.py &middot; code/complexity/vc-branch.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Cost, argued. Let \(T(k)\) be the number of recursive calls with budget
+        \(k\). Each call makes at most two children with budget \(k-1\), so
+        \(T(k) \le 2T(k-1) + 1\) with \(T(0) = 1\), giving
+        \(T(k) \le 2^{k+1}-1\). Each call does \(O(n+m)\) work filtering the edge
+        list, so the total is \(O(2^{k}(n+m))\). Correctness: the branch is
+        exhaustive, since any cover of the remaining edges must contain \(u\) or
+        \(v\); and the recursion is sound, since after committing \(w\) the edges
+        still needing coverage are exactly those not touching \(w\).
+      </p>
+      <div class="ex">
+        <span class="tag">The search tree on \(G\) with \(k = 3\)</span>
+        Edges are scanned in the order \(ab, bc, ca, ad, be, cf, dg\); each line
+        shows the branch vertex and what remains.
+        <pre>edge (a,b), k=3
+  put a: edge (b,c), k=2
+    put b: edge (c,f), k=1
+      put c: k=0, edge (d,g) remains        FAIL
+      put f: k=0, edge (d,g) remains        FAIL
+    put c: edge (b,e), k=1
+      put b: k=0, edge (d,g) remains        FAIL
+      put e: k=0, edge (d,g) remains        FAIL
+  put b: edge (c,a), k=2
+    put c: edge (a,d), k=1
+      put a: k=0, edge (d,g) remains        FAIL
+      put d: no edges left                  COVER {b, c, d}</pre>
+        Twelve recursive calls in all, against the bound
+        \(T(3) \le 2^{4}-1 = 15\); six of them are leaves, five failing and one
+        succeeding, and the cover found is the unique minimum one. All five
+        failures die the same way: the budget reaches \(0\) while the edge
+        \(d\!-\!g\) is still uncovered. That is the lower-bound argument for
+        \(\tau(G) \ge 3\) reappearing as a dead branch: each failing leaf spent
+        all three vertices without buying either \(d\) or \(g\), and at least two
+        of the three had to go to the triangle.
+      </div>
+      <p>
+        For comparison, testing all \(\binom{7}{3} = 35\) vertex triples would
+        also work here, but that approach is \(\Theta(n^{k})\), which grows with
+        the graph; the branching bound does not.
+      </p>
+
+      <h3>Heuristics: give up the guarantee, keep the speed</h3>
+      <p>
+        Branch-and-bound solvers, local search, and general-purpose satisfiability
+        and integer-programming solvers routinely settle NP-complete instances
+        with thousands of variables. They have exponential worst cases and no
+        guarantee on any particular input. NP-completeness is a statement about
+        worst-case behaviour over all instances; the instances arising in an
+        application are not adversarial, and this is why the practical situation
+        is better than the classification suggests.
+      </p>
+
+      <h3>The numeric loophole: pseudo-polynomial algorithms</h3>
+      <p>
+        <a href="../dp/algo-knapsack.html">0/1 Knapsack</a> asks, given \(n\)
+        items with weights \(w_i\) and values \(v_i\) and a capacity \(W\), for
+        the maximum total value of a subset of weight at most \(W\). It is
+        NP-hard: Subset-Sum reduces to it by taking \(v_i = w_i\) and asking
+        whether value \(W\) is attainable. Yet the dynamic-programming solution
+        fills a table of \(n \times (W{+}1)\) cells in \(\Theta(nW)\) time, and
+        \(nW\) is a product of two input quantities, not an exponential.
+        There is no contradiction, and the resolution is the encoding rule of
+        <a href="#dec">section 1</a>.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (pseudo-polynomial)</span>
+        An algorithm is <strong>pseudo-polynomial</strong> if its running time is
+        polynomial in the <em>numeric values</em> appearing in the input, but not
+        in the <em>length</em> of the input. Since a number \(W\) occupies about
+        \(\log_2 W\) bits, a running time of \(\Theta(W)\) is
+        \(\Theta(2^{\log_2 W})\): exponential in the number of bits used to write
+        \(W\).
+      </div>
+      <div class="ex">
+        <span class="tag">The numbers</span>
+        Take \(n = 100\) items with weights, values and capacity all below
+        \(2^{60}\), and \(W = 2^{60} = 1{,}152{,}921{,}504{,}606{,}846{,}976\).
+        The instance is written in
+        \(100 \times (60 + 60) + 60 = 12{,}060\) bits, about \(1.5\) kilobytes.
+        The knapsack table has
+        \(nW \approx 1.15 \times 10^{20}\) cells. A \(1.5\)-kilobyte input
+        demands \(10^{20}\) table cells: the table is exponential in the input
+        length, which is exactly what &ldquo;not polynomial-time&rdquo; means.
+        The \(\Theta(nW)\) algorithm is genuinely useful whenever \(W\) is small
+        (capacities in the thousands, say), and that is the case the
+        <a href="../dp/algo-knapsack.html">knapsack handout</a> works through; it
+        is not an algorithm for the general problem.
+      </div>
+      <p>
+        Two consequences worth carrying. First, when a running time contains an
+        input <em>value</em> rather than an input <em>count</em>, check whether
+        that value is bounded by a polynomial in the input length before calling
+        the algorithm efficient. Counting sort is
+        \(\Theta(n+k)\) for keys below \(k\) and is subject to the same reading
+        (see <a href="../sorting/algo-counting-radix-sort.html">Counting and
+        Radix Sort</a>), though there the assumption \(k = O(n)\) is usually
+        stated outright. Second, some problems admit no pseudo-polynomial
+        algorithm at all unless \(\mathrm{P} = \mathrm{NP}\): the Travelling
+        Salesman problem is hard even when all numbers in the input are tiny, a
+        property called <em>strong</em> NP-hardness, and the numeric loophole is
+        closed for it.
+      </p>
+      <p>
+        Knapsack has a further escape that Travelling Salesman does not: scaling
+        the item values down to \(O(n/\varepsilon)\) distinct levels and running
+        the same table on the scaled values yields a solution within a factor
+        \((1+\varepsilon)\) of optimal in time polynomial in \(n\) and
+        \(1/\varepsilon\). A family of algorithms of that shape is called a
+        <em>fully polynomial-time approximation scheme</em>, and it is the
+        strongest kind of approximation an NP-hard problem can have.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">8. Where this sits</h2>
+      <p>
+        The cost vocabulary used throughout, and the counting arguments the
+        proofs above rely on, are set up in
+        <a href="foundation-asymptotic-notation.html">Asymptotic Notation</a> and
+        <a href="foundation-time-analysis.html">Time Analysis</a>; the encoding
+        and input-length discussion of <a href="#dec">section 1</a> is the same
+        accounting used in
+        <a href="foundation-space-complexity.html">Space Complexity</a>. The
+        branching recurrence \(T(k) \le 2T(k-1)+1\) solved in
+        <a href="#practice">section 7</a> is one of the standard forms handled in
+        <a href="foundation-recursion.html">Recursion &amp; Induction</a>.
+      </p>
+      <p>
+        <a href="../sorting/foundation-sorting-lower-bound.html">The Sorting
+        Lower Bound</a> is the other lower-bound argument in this catalog, and
+        the contrast is worth holding in view. That bound is unconditional but
+        restricted: within the comparison model, \(\Omega(n\log n)\) is proved
+        outright, and the escape is to leave the model. NP-completeness is
+        unrestricted but conditional: it proves nothing outright, only that a
+        fast algorithm for one problem is a fast algorithm for all of them.
+      </p>
+      <p>
+        The problems named here are the hard neighbours of algorithms elsewhere
+        in the catalog. Minimum spanning tree
+        (<a href="../graphs/algo-kruskal.html">Kruskal</a>) is in P, while
+        Travelling Salesman on the same weighted graph is NP-hard;
+        <a href="../graphs/algo-dijkstra.html">Dijkstra</a> finds a shortest path
+        in polynomial time, while finding a longest simple path is NP-hard;
+        <a href="../graphs/algo-bfs.html">breadth-first search</a> decides
+        2-colourability in linear time, while 3-colourability is NP-complete. The
+        <a href="../greedy/paradigm-greedy-method.html">greedy method</a> and
+        <a href="../dp/paradigm-dp-method.html">dynamic programming</a> are the
+        two paradigms that turn out to solve many of the polynomial-time
+        neighbours, and the <a href="../dp/algo-knapsack.html">0/1 knapsack</a>
+        table is the pseudo-polynomial case dissected in
+        <a href="#practice">section 7</a>. Verifying the Hamiltonian-cycle
+        certificate uses the adjacency matrix of
+        <a href="../graphs/ds-graph-representations.html">Graph
+        Representations</a>.
+      </p>
+      <p>
+        Everything above takes for granted that &ldquo;an algorithm&rdquo; can be
+        made precise, that machine models simulate each other with polynomial
+        overhead, and that some problems have no algorithm at all. Those are the
+        subject of <a href="foundation-computability.html">Turing Machines and
+        Computability</a>, which supplies the
+        machine model relied on here; the finite automata of
+        <a href="../strings/algo-regex-automata.html">Regular Expressions and
+        Automata</a> are the weakest machine in that hierarchy, at the opposite
+        end from the Turing machines implicit in the Cook&ndash;Levin
+        construction.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          <strong>COMPOSITE</strong> asks, given an integer \(N\) written in
+          binary, whether \(N\) has a divisor strictly between \(1\) and \(N\).
+          Show COMPOSITE \(\in\) NP by naming a certificate, a verifier, and the
+          two size bounds. Why is trial division not a proof that COMPOSITE
+          \(\in\) P?
+          <details>
+            <summary>solution</summary>
+            Certificate: a divisor \(d\) with \(1 &lt; d &lt; N\), written in
+            binary. Verifier: check \(1 &lt; d &lt; N\) and that \(N \bmod d = 0\).
+            Sizes: the input has \(|x| = \Theta(\log N)\) bits; the certificate
+            has at most \(\log_2 N\) bits, so \(|c| \le |x|\), polynomial. Long
+            division of two \(\log N\)-bit numbers is \(O(\log^{2} N)\) bit
+            operations, polynomial in \(|x|\). Completeness: a composite \(N\)
+            has such a divisor. Soundness: if \(N\) is prime no \(d\) passes.
+            <br />
+            Trial division tries up to \(\sqrt{N}\) candidates, which is
+            \(2^{|x|/2}\): exponential in the input length, the same
+            pseudo-polynomial reading as the knapsack table. (COMPOSITE is in
+            fact in P, but by a much more intricate algorithm.)
+          </details>
+        </li>
+        <li>
+          A classmate writes: &ldquo;I built a polynomial-time map turning any
+          instance of 3-COLOURING into an instance of SAT, preserving the answer.
+          SAT is NP-complete, therefore 3-COLOURING is NP-hard.&rdquo; Identify
+          the error precisely, say what the construction does establish, and
+          state what would have to be built instead.
+          <details>
+            <summary>solution</summary>
+            The construction establishes 3-COLOURING \(\le_{p}\) SAT, which says
+            3-COLOURING is <em>no harder</em> than SAT. That is true of every
+            problem in NP and carries no information about 3-COLOURING: it
+            follows already from 3-COLOURING \(\in\) NP together with SAT being
+            NP-complete. Hardness flows from source to target, so a reduction
+            <em>out of</em> a problem never makes that problem hard.
+            <br />
+            What is needed is a reduction in the other direction, from a
+            known-hard problem <em>into</em> 3-COLOURING: for instance 3-SAT
+            \(\le_{p}\) 3-COLOURING, a map taking a formula and producing a graph
+            that is 3-colourable exactly when the formula is satisfiable.
+            Together with 3-COLOURING \(\in\) NP (certificate: the colouring;
+            verifier: check every edge has differently coloured endpoints), that
+            proves NP-completeness.
+          </details>
+        </li>
+        <li>
+          Using the graph \(G\) of <a href="#worked">section 5</a>, work the
+          reduction on the source instance \(\langle G, 3\rangle\) of INDEPENDENT
+          SET. What target instance does \(f\) produce, what is the answer, and
+          exhibit the two witnesses.
+          <details>
+            <summary>solution</summary>
+            \(f(\langle G,3\rangle) = \langle G, 7-3\rangle = \langle G,4\rangle\):
+            does \(G\) have a vertex cover of size at most \(4\)? Yes.
+            \(\{b,c,d\}\) is one of size \(3 \le 4\), and adding any fourth
+            vertex, say \(\{b,c,d,e\}\), also works, since supersets of covers
+            are covers. The source instance is also yes: \(\{a,e,f,g\}\) is
+            independent and has size \(4 \ge 3\), and any \(3\)-subset of it,
+            such as \(\{a,e,f\}\), is independent too, since subsets of
+            independent sets are independent.
+            <br />
+            Note the asymmetry of the two thresholds: INDEPENDENT SET asks for
+            <em>at least</em> \(k\) and VERTEX COVER for <em>at most</em> \(k\),
+            which is what makes \(k \mapsto n-k\) flip the inequality correctly.
+          </details>
+        </li>
+        <li>
+          A student proposes this certificate for HAM-CYCLE: &ldquo;the
+          certificate is the list of all \((n-1)!/2\) cyclic orders together with
+          a mark on one that is a cycle.&rdquo; The verifier reads the mark and
+          checks that one order. Is this a valid proof that HAM-CYCLE \(\in\) NP?
+          <details>
+            <summary>solution</summary>
+            No. The verifier is fine and the completeness and soundness clauses
+            hold, but the certificate violates the length bound: it has
+            \(\Theta((n-1)!)\) entries, and \((n-1)!\) is not bounded by any
+            polynomial in \(|x| = \Theta(n^{2})\). A verifier cannot even read it
+            in polynomial time. The certificate must be short; the correct one is
+            the single cycle, of length \(O(n \log n)\) bits. This is the most
+            common way a proposed NP-membership argument fails: the verification
+            step is cheap, but what is being verified is enormous.
+          </details>
+        </li>
+        <li>
+          Suppose someone exhibits a polynomial-time algorithm for VERTEX COVER.
+          What follows for INDEPENDENT SET, for HAM-CYCLE, and for the general
+          0/1 knapsack problem? Justify each, naming the results used.
+          <details>
+            <summary>solution</summary>
+            VERTEX COVER is NP-complete, so by the theorem of
+            <a href="#npc">section 6</a>, \(\mathrm{P} = \mathrm{NP}\), and every
+            problem in NP acquires a polynomial-time algorithm.
+            <br />
+            INDEPENDENT SET: directly, without invoking \(\mathrm{P} =
+            \mathrm{NP}\). Apply the reduction of <a href="#worked">section 5</a>:
+            answer \(\langle G,k\rangle\) by running the VERTEX COVER algorithm
+            on \(\langle G, n-k\rangle\), one call plus \(\Theta(|x|)\) work, by
+            the closure theorem.
+            <br />
+            HAM-CYCLE: it is in NP (verifier given in
+            <a href="#np">section 3</a>), so it inherits a polynomial-time
+            algorithm from \(\mathrm{P} = \mathrm{NP}\). Concretely, one composes
+            the chain HAM-CYCLE \(\le_{p}\) SAT (from Cook&ndash;Levin applied to
+            its verifier) \(\le_{p}\) 3-SAT \(\le_{p}\) INDEPENDENT SET
+            \(\le_{p}\) VERTEX COVER; transitivity makes the composition a single
+            polynomial-time reduction.
+            <br />
+            0/1 knapsack: the decision form is in NP (certificate: the chosen
+            subset; verifier: sum the weights and values), so it too gets a
+            polynomial-time algorithm, and by self-reducibility the optimization
+            form does as well. In particular a genuinely polynomial algorithm
+            would replace the \(\Theta(nW)\) table, whose cost is exponential in
+            the bit length of \(W\).
+          </details>
+        </li>
+        <li>
+          Run the maximal-matching 2-approximation on the graph \(H\) of
+          <a href="#np">section 3</a>, scanning edges in the order
+          \(12, 14, 16, 23, 34, 25, 45, 56\). What cover does it return? Compare
+          with \(\tau(H)\), which you should determine, and check the guarantee.
+          <details>
+            <summary>solution</summary>
+            Take \(12\) (both free). Skip \(14, 16\) (touch \(1\)), skip \(23\)
+            (touches \(2\)). Take \(34\) (both free). Skip \(25, 45\). Take
+            \(56\) (both free). \(M = \{12, 34, 56\}\), maximal, so the cover is
+            \(C_M = \{1,2,3,4,5,6\}\), all six vertices.
+            <br />
+            \(\tau(H)\): \(H\) is bipartite with parts \(\{1,3,5\}\) and
+            \(\{2,4,6\}\), so each part is a vertex cover, giving
+            \(\tau(H) \le 3\). And \(M\) is a matching of size \(3\) with
+            pairwise disjoint edges, so \(\tau(H) \ge 3\) by the argument in the
+            2-approximation proof. Hence \(\tau(H) = 3\), for example
+            \(C = \{1,3,5\}\). The guarantee: \(|C_M| = 6 = 2 \cdot 3 =
+            2\tau(H)\), tight again. Any graph that is a disjoint union of edges,
+            or that the sweep happens to match perfectly, realizes the factor of
+            two.
+          </details>
+        </li>
+        <li>
+          Let \(A \le_{p} B\) with reduction \(f\) computable in \(O(n^{2})\),
+          and suppose \(B\) has an algorithm running in \(O(n^{3})\). Bound the
+          resulting running time for \(A\), being explicit about where the
+          instance size enters. Then explain why the same argument fails if
+          \(B\)'s algorithm runs in \(O(2^{n})\).
+          <details>
+            <summary>solution</summary>
+            On an input \(x\) of size \(n\), computing \(y = f(x)\) costs
+            \(O(n^{2})\), and because an \(O(n^{2})\)-time algorithm writes at
+            most \(O(n^{2})\) output symbols, \(|y| = O(n^{2})\). Running the
+            \(B\)-algorithm on \(y\) costs \(O(|y|^{3}) = O((n^{2})^{3}) =
+            O(n^{6})\). Total: \(O(n^{2} + n^{6}) = O(n^{6})\). The instance size
+            enters twice: once as the cost of building \(y\), once as the size of
+            \(y\) fed into the exponent of the second algorithm.
+            <br />
+            With an \(O(2^{n})\) algorithm for \(B\) the composition gives
+            \(O(2^{|y|}) = O(2^{cn^{2}})\), worse than \(2^{n}\). Polynomial
+            blow-up in instance size is harmless inside a polynomial, because
+            polynomials compose to polynomials, and harmful inside an
+            exponential. This is precisely why the reduction framework is built
+            on P: the closure theorem depends on the composition property, and
+            \(\mathrm{EXP}\) does not have it in the same way.
+          </details>
+        </li>
+        <li>
+          Someone claims: &ldquo;My problem is NP, so it has no efficient
+          solution.&rdquo; List every distinct error in that sentence.
+          <details>
+            <summary>solution</summary>
+            Three errors.
+            <br />
+            (i) NP abbreviates <em>nondeterministic polynomial time</em>, not
+            &ldquo;not polynomial&rdquo;. It is a class of problems whose yes
+            answers have short certificates.
+            <br />
+            (ii) Membership in NP is not evidence of hardness. \(\mathrm{P}
+            \subseteq \mathrm{NP}\), so sorting, shortest paths and minimum
+            spanning trees are all in NP. The intended claim is presumably
+            NP-<em>complete</em> or NP-<em>hard</em>, which requires proving a
+            reduction from a known-hard problem.
+            <br />
+            (iii) Even NP-completeness does not establish that no efficient
+            algorithm exists. It establishes that a polynomial-time algorithm for
+            this problem would give one for every problem in NP. Whether
+            \(\mathrm{P} = \mathrm{NP}\) is open, so no such non-existence has
+            been proved for any problem in NP.
+            <br />
+            A fourth point, not an error but a common omission: even a correct
+            NP-completeness proof is a worst-case statement, and it leaves the
+            approximation, parameterization and heuristic routes of
+            <a href="#practice">section 7</a> entirely open.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; P, NP &amp; Reductions v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

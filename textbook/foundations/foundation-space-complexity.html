@@ -1,0 +1,986 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Space Complexity.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Space Complexity - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Space Complexity</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        The second half of the analysis toolkit: a program&rsquo;s memory cost.
+        We count actual bytes (primitive sizes, struct layout, alignment and
+        padding, the price of a pointer), then separate where memory lives
+        (stack vs heap), watch space grow as a function of \(N\), pay the hidden
+        rent of recursion (call-stack depth), distinguish in-place from auxiliary
+        space, and trade time against space. Order-of-growth notation
+        (\(O,\Omega,\Theta\)) is used only in passing here; its formal definitions
+        and proofs live in the companion
+        <a href="foundation-asymptotic-notation.html">Asymptotic Notation reading</a>.
+      </div>
+
+      <p class="lead">
+        The <a href="foundation-time-analysis.html"><em>Analysis of Algorithms:
+        Time</em></a> handout measured and modelled a program&rsquo;s
+        <em>running time</em>.
+        Every program also occupies <strong>memory</strong>, and that cost is just
+        as real: a structure that does not fit in RAM cannot run at any speed. This
+        handout analyses <strong>space</strong> exactly the way the time handout
+        analysed time (count first, then keep the order of growth), but it
+        starts one level lower, at the actual bytes. How big is a node? Why is a
+        linked list of \(N\) integers four times heavier than an array of the same
+        \(N\) integers? What does a recursive call cost even when it returns a
+        single number? And when can you spend memory to buy time, or the reverse?
+        These are the questions every data-structure choice in the rest of the
+        course quietly answers.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#bytes">Counting bytes: primitives and <code>sizeof</code></a></li>
+          <li><a href="#layout">Object layout: alignment and padding</a></li>
+          <li><a href="#heap">Stack vs heap, and the price of a pointer</a></li>
+          <li><a href="#growth">Space as a function of N</a></li>
+          <li><a href="#recursion">The space cost of recursion</a></li>
+          <li><a href="#aux">Auxiliary space and time&ndash;space tradeoffs</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="bytes">1. Counting bytes: primitives and <code>sizeof</code></h2>
+      <p>
+        A data structure occupies memory; the first question of space analysis is
+        simply <em>how much?</em> To answer it we start from the sizes of the
+        primitive types, because everything larger is built from them. In C++ the
+        operator <code>sizeof(x)</code> returns the number of bytes a value or type
+        occupies: a compile-time fact the compiler knows exactly. On a
+        typical 64-bit machine (the LP64 model, which we assume throughout):
+      </p>
+      <table>
+        <tr><th>type</th><th>bytes</th><th>type</th><th>bytes</th></tr>
+        <tr><td><code>char</code></td><td>1</td><td><code>long</code></td><td>8</td></tr>
+        <tr><td><code>bool</code></td><td>1</td><td><code>double</code></td><td>8</td></tr>
+        <tr><td><code>int</code></td><td>4</td><td>any <strong>pointer</strong></td><td><strong>8</strong></td></tr>
+      </table>
+      <p>
+        The one that surprises people is the pointer. A pointer is a memory
+        <em>address</em>, and on a 64-bit machine an address is 8 bytes regardless
+        of what it points at: a <code>char*</code>, an <code>int*</code>, and a
+        <code>Node*</code> are all 8 bytes. That single fact drives the cost of
+        every linked structure in the course: each link is an 8-byte tax.
+      </p>
+      <div class="aside">
+        <span class="tag">Sizes are a contract with the machine</span>
+        The C++ standard fixes only minimums and orderings
+        (<code>sizeof(char) == 1</code> by definition;
+        <code>char &le; short &le; int &le; long</code>). The concrete numbers
+        above are what mainstream 64-bit compilers (LP64: Linux, macOS) actually
+        produce, and are what the course&rsquo;s assignments assume. On a 32-bit
+        target a pointer is 4 bytes; on Windows LLP64 a <code>long</code> is 4.
+        When it matters, do not guess; ask <code>sizeof</code>.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="layout">2. Object layout: alignment and padding</h2>
+      <p>
+        A struct is a bundle of fields, so a first guess at its size is the sum of
+        its fields&rsquo; sizes. That guess is usually wrong. Consider the
+        linked-list node we will use all term:
+      </p>
+      <pre>  struct Node {
+      int   data;    <span class="cm">// 4 bytes</span>
+      Node* next;    <span class="cm">// 8 bytes</span>
+  };</pre>
+      <p>
+        The naive sum is \(4 + 8 = 12\). The real answer is
+        <code>sizeof(Node) == 16</code>. The extra four bytes are
+        <strong>padding</strong>, inserted to satisfy <strong>alignment</strong>.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (alignment, padding)</span>
+        A type of size \(s\) usually has an <strong>alignment</strong> requirement:
+        its address must be a multiple of its alignment (typically \(s\) itself for
+        primitives). To honour every field&rsquo;s alignment, the compiler inserts
+        unused <strong>padding</strong> bytes between fields, and pads the whole
+        struct up to a multiple of its largest field&rsquo;s alignment so that
+        arrays of it stay aligned.
+      </div>
+      <p>
+        In <code>Node</code>, the pointer <code>next</code> requires an 8-byte
+        alignment, so it cannot start at offset 4 (right after <code>data</code>);
+        the compiler pushes it to offset 8 and fills the gap with four padding
+        bytes:
+      </p>
+      <figure>
+        <svg viewBox="0 0 460 130" role="img" aria-label="Byte layout of struct Node across 16 bytes: bytes 0 to 3 hold the int data, bytes 4 to 7 are padding, bytes 8 to 15 hold the 8-byte pointer next.">
+          <g font-family="system-ui, sans-serif" text-anchor="middle">
+            <rect x="30"  y="45" width="96"  height="40" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.4"/>
+            <rect x="126" y="45" width="96"  height="40" fill="#fff5e6" stroke="#2a2d36" stroke-width="1.4"/>
+            <rect x="222" y="45" width="192" height="40" fill="#eef4fc" stroke="#2a2d36" stroke-width="1.4"/>
+            <g stroke="#c3c9d6" stroke-width="1">
+              <line x1="54"  y1="45" x2="54"  y2="85"/><line x1="78"  y1="45" x2="78"  y2="85"/>
+              <line x1="102" y1="45" x2="102" y2="85"/>
+              <line x1="150" y1="45" x2="150" y2="85"/><line x1="174" y1="45" x2="174" y2="85"/>
+              <line x1="198" y1="45" x2="198" y2="85"/>
+              <line x1="246" y1="45" x2="246" y2="85"/><line x1="270" y1="45" x2="270" y2="85"/>
+              <line x1="294" y1="45" x2="294" y2="85"/><line x1="318" y1="45" x2="318" y2="85"/>
+              <line x1="342" y1="45" x2="342" y2="85"/><line x1="366" y1="45" x2="366" y2="85"/>
+              <line x1="390" y1="45" x2="390" y2="85"/>
+            </g>
+            <text x="78"  y="35" font-size="13" font-weight="700" fill="#0a7d4d">data (int, 4)</text>
+            <text x="174" y="35" font-size="13" font-weight="700" fill="#9a5b00">padding (4)</text>
+            <text x="318" y="35" font-size="13" font-weight="700" fill="#1f5fb0">next (pointer, 8)</text>
+            <g font-size="10" fill="#5c6270">
+              <text x="42"  y="99">0</text><text x="66"  y="99">1</text><text x="90"  y="99">2</text><text x="114" y="99">3</text>
+              <text x="138" y="99">4</text><text x="162" y="99">5</text><text x="186" y="99">6</text><text x="210" y="99">7</text>
+              <text x="234" y="99">8</text><text x="258" y="99">9</text><text x="282" y="99">10</text><text x="306" y="99">11</text>
+              <text x="330" y="99">12</text><text x="354" y="99">13</text><text x="378" y="99">14</text><text x="402" y="99">15</text>
+            </g>
+            <text x="222" y="118" font-size="13" fill="#1a1c22">sizeof(Node) = 16 bytes: only 4 are useful data</text>
+          </g>
+        </svg>
+        <figcaption>
+          The 16 bytes of a <code>Node</code>. The pointer must sit on an 8-byte
+          boundary, so four bytes after <code>data</code> are wasted padding. You
+          cannot reorder your way out of this one: a single <code>int</code> and a
+          single 8-byte pointer will not pack below the pointer&rsquo;s slot.
+        </figcaption>
+      </figure>
+
+      <h3>Field order changes the size</h3>
+      <p>
+        When a struct has several small fields, the padding often <em>can</em> be
+        reduced, for free, just by reordering the declarations. The
+        same three fields in two orders give two different sizes:
+      </p>
+      <pre>  struct A { char a; int b; char c; };   <span class="cm">// sizeof(A) == 12</span>
+  struct B { int b; char a; char c; };   <span class="cm">// sizeof(B) == 8</span></pre>
+      <figure>
+        <svg viewBox="0 0 340 170" role="img" aria-label="Byte layouts of struct A (12 bytes) and struct B (8 bytes). A: char a, three padding bytes, int b, char c, three padding bytes. B: int b, char a, char c, two padding bytes.">
+          <g font-family="system-ui, sans-serif" text-anchor="middle">
+            <text x="40" y="30" font-size="13" font-weight="700" text-anchor="start" fill="#1a1c22">struct A: 12 bytes</text>
+            <rect x="40"  y="40" width="22" height="30" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.3"/>
+            <rect x="62"  y="40" width="66" height="30" fill="#fff5e6" stroke="#2a2d36" stroke-width="1.3"/>
+            <rect x="128" y="40" width="88" height="30" fill="#eef4fc" stroke="#2a2d36" stroke-width="1.3"/>
+            <rect x="216" y="40" width="22" height="30" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.3"/>
+            <rect x="238" y="40" width="66" height="30" fill="#fff5e6" stroke="#2a2d36" stroke-width="1.3"/>
+            <g font-size="11" fill="#2a2d36">
+              <text x="51"  y="59">a</text><text x="95"  y="59" fill="#9a5b00">pad</text>
+              <text x="172" y="59">b</text><text x="227" y="59">c</text>
+              <text x="271" y="59" fill="#9a5b00">pad</text>
+            </g>
+            <text x="40" y="110" font-size="13" font-weight="700" text-anchor="start" fill="#1a1c22">struct B: 8 bytes</text>
+            <rect x="40"  y="120" width="88" height="30" fill="#eef4fc" stroke="#2a2d36" stroke-width="1.3"/>
+            <rect x="128" y="120" width="22" height="30" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.3"/>
+            <rect x="150" y="120" width="22" height="30" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.3"/>
+            <rect x="172" y="120" width="44" height="30" fill="#fff5e6" stroke="#2a2d36" stroke-width="1.3"/>
+            <g font-size="11" fill="#2a2d36">
+              <text x="84"  y="139">b</text><text x="139" y="139">a</text>
+              <text x="161" y="139">c</text><text x="194" y="139" fill="#9a5b00">pad</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          In <code>A</code> the <code>int</code> needs a 4-aligned slot, so three
+          bytes pad after <code>a</code>, and three more pad the tail (to a multiple
+          of 4): 12 bytes, half of them wasted. In <code>B</code> the two
+          <code>char</code>s share the tail behind the <code>int</code>: only two
+          padding bytes, total 8. Same data, same rules, 33% smaller.
+        </figcaption>
+      </figure>
+      <p>
+        The habit is worth keeping: <strong>declare fields large-to-small</strong>
+        to group same-sized fields and minimise interior padding. It costs nothing
+        and, on a structure you allocate by the million, saves real memory. (It
+        does not rescue <code>Node</code>, whose single <code>int</code> and single
+        pointer cannot pack below the 8-byte slot.) The program below prints all of
+        these numbers, and a Rust and Python view of the same idea:
+      </p>
+      <div class="code-tabs" data-snippet="complexity/struct-layout">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Count the bytes: primitive sizes, and how field ORDER changes a struct&#x27;s size.
+// On a typical 64-bit machine. Compile: g++ -std=c++17 struct-layout.cpp
+#include &lt;cstddef&gt;   // offsetof
+#include &lt;iostream&gt;
+
+struct Node { int data; Node* next; };      // 4 + 4 pad + 8  = 16
+struct A    { char a; int b; char c; };      // 1 +3pad +4 +1 +3pad = 12
+struct B    { int b; char a; char c; };      // 4 +1 +1 +2pad = 8  (large-&gt;small)
+
+int main() {
+    std::cout &lt;&lt; &quot;int=&quot;    &lt;&lt; sizeof(int)    &lt;&lt; &quot; ptr=&quot; &lt;&lt; sizeof(void*)
+              &lt;&lt; &quot; double=&quot;&lt;&lt; sizeof(double) &lt;&lt; &quot;\n&quot;;           // 4 8 8
+    std::cout &lt;&lt; &quot;Node=&quot;   &lt;&lt; sizeof(Node)                       // 16
+              &lt;&lt; &quot; (next at offset &quot; &lt;&lt; offsetof(Node, next) &lt;&lt; &quot;)\n&quot;;  // 8
+    std::cout &lt;&lt; &quot;A=&quot; &lt;&lt; sizeof(A) &lt;&lt; &quot;  B=&quot; &lt;&lt; sizeof(B) &lt;&lt; &quot;\n&quot;;      // 12  8
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Java hides layout: there is no sizeof. Every object carries a HEADER
+// (~12-16 bytes) before its fields, and a reference is 4 bytes (compressed
+// oops) or 8. So a Node&#x27;s real footprint is larger than &quot;4 + 8&quot;.
+class Node {
+    int data;        // 4 bytes of field
+    Node next;       // a REFERENCE (4 or 8), not an inlined struct
+}
+// Approximate footprint of one Node on a 64-bit JVM with compressed oops:
+//   12 (header) + 4 (int data) + 4 (ref next) = 20, padded up to 24.
+// The point: managed runtimes add per-object overhead that C++/Rust do not,
+// so an object-per-element list is even costlier than the raw 16 bytes.
+// (Measure precisely with the JOL tool: ClassLayout.parseClass(Node.class).)</pre>
+<pre class="ct-pane" data-lang="py" hidden># Python has no structs and no fixed sizes: everything is a heap object with a
+# header. sys.getsizeof reports one object&#x27;s bytes (not what it references).
+import sys
+
+print(sys.getsizeof(0))          # a small int: ~28 bytes, not 4
+print(sys.getsizeof(3.14))       # a float:     ~24 bytes, not 8
+
+# A &quot;node&quot; is a class instance; each attribute is a REFERENCE to another object.
+class Node:
+    __slots__ = (&quot;data&quot;, &quot;next&quot;)   # without __slots__, add a per-instance __dict__
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+# One Node object plus the int it points at costs far more than 16 bytes.
+# Lesson: in a managed language you cannot &quot;count bytes&quot; the way sizeof does in
+# C++/Rust; the runtime charges a header per object and boxes every primitive.</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Rust exposes layout like C++: size_of and align_of are compile-time facts.
+// #[repr(C)] forces C&#x27;s field order/padding; the default repr may reorder
+// fields to shrink padding automatically (a nicety C++ does NOT have).
+use std::mem::{size_of, align_of};
+
+#[repr(C)]
+struct Node { data: i32, next: *const Node }   // 4 + 4 pad + 8 = 16
+
+#[repr(C)] struct A { a: u8, b: i32, c: u8 }    // 12  (like C++ struct A)
+#[repr(C)] struct B { b: i32, a: u8, c: u8 }    // 8   (large -&gt; small)
+
+fn main() {
+    println!(&quot;i32={} ptr={}&quot;, size_of::&lt;i32&gt;(), size_of::&lt;*const Node&gt;()); // 4 8
+    println!(&quot;Node={} align={}&quot;, size_of::&lt;Node&gt;(), align_of::&lt;Node&gt;());   // 16 8
+    println!(&quot;A={}  B={}&quot;, size_of::&lt;A&gt;(), size_of::&lt;B&gt;());                 // 12 8
+}</pre>
+<p class="ct-src">source: <code>code/complexity/struct-layout.cpp &middot; code/complexity/struct-layout.java &middot; code/complexity/struct-layout.py &middot; code/complexity/struct-layout.rs</code></p>
+<!--/ct--></div>
+      <div class="aside">
+        <span class="tag">Managed languages hide (and inflate) the count</span>
+        Only C, C++, and Rust let you count bytes this directly. In Java and Python
+        there is no <code>sizeof</code>, and <em>every object</em> carries a runtime
+        <strong>header</strong>: a Java object header is 12&ndash;16 bytes before any
+        field, and a Python <code>int</code> is roughly 28 bytes, not 4. So the
+        per-node overhead we compute here is a <em>floor</em>: on a managed
+        runtime an object-per-element list is heavier still. This is why bulk numeric
+        work in those languages leans on packed arrays (Java primitive arrays,
+        NumPy) rather than object graphs. See Sedgewick &amp; Wayne &sect;1.4 for the
+        JVM accounting.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="heap">3. Stack vs heap, and the price of a pointer</h2>
+      <p>
+        Knowing a struct&rsquo;s size is half the story; the other half is
+        <em>where</em> those bytes live. A program has two very different pools of
+        memory, and dynamic structures depend on the difference.
+      </p>
+      <pre>  Node  a;              <span class="cm">// on the STACK: automatic, freed at scope exit</span>
+  Node* p = new Node;   <span class="cm">// the node is on the HEAP: freed by delete p</span></pre>
+      <div class="def">
+        <span class="tag">Definition (stack, heap)</span>
+        The <strong>stack</strong> holds a function&rsquo;s local variables; it grows
+        and shrinks automatically as calls enter and leave, and its storage is freed
+        the instant a variable goes out of scope. The <strong>heap</strong> is the
+        pool that <code>new</code> / <code>delete</code> (C++), <code>malloc</code> /
+        <code>free</code> (C), or a garbage collector manage; a heap object lives
+        until it is explicitly (or automatically) freed. Dynamic structures
+        (linked lists, trees, hash tables) grow on the heap.
+      </div>
+      <p>
+        A linked list makes the split concrete. The list variable itself is one
+        8-byte <em>head pointer</em> on the stack; every node is a separate
+        heap allocation, one <code>new</code> apiece. Forgetting to
+        <code>delete</code> the nodes leaks the heap memory (a leak the course&rsquo;s
+        Valgrind checks catch), while the head pointer on the stack cleans itself up.
+      </p>
+      <h3>Each pointer is overhead</h3>
+      <p>
+        Return to the 16-byte <code>Node</code> holding one <code>int</code> of
+        payload. Of its 16 bytes, only 4 carry data; the other 12 (four
+        padding plus the 8-byte <code>next</code> pointer) are pure structural
+        overhead:
+      </p>
+      <table>
+        <tr><th>part of a <code>Node</code></th><th>bytes</th><th>role</th></tr>
+        <tr><td><code>data</code></td><td>4</td><td>useful payload</td></tr>
+        <tr><td>padding</td><td>4</td><td>alignment waste</td></tr>
+        <tr><td><code>next</code></td><td>8</td><td>the link (overhead)</td></tr>
+        <tr><td><strong>total</strong></td><td><strong>16</strong></td><td><strong>75% overhead</strong></td></tr>
+      </table>
+      <p>
+        Three quarters of a linked-list-of-<code>int</code> is machinery, not data.
+        The lesson is not &ldquo;never use linked lists&rdquo; (a larger
+        payload amortises the pointer, and lists buy \(O(1)\) splicing) but
+        that <em>the structure you choose has a memory price, not only a time
+        price</em>. We now watch that price grow with the number of elements.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="growth">4. Space as a function of N</h2>
+      <p>
+        Space, like time, is a function of the input size \(N\), and we summarise it
+        the same way: count the bytes, then keep the <strong>order of growth</strong>,
+        dropping constants and lower-order terms. Take two ways to hold \(N\)
+        integers, a contiguous array and a linked list of \(N\) nodes:
+      </p>
+      <table>
+        <tr><th>structure</th><th>bytes for \(N\) ints</th><th>order</th></tr>
+        <tr><td>array <code>int a[N]</code></td><td>\(4N\)</td><td>\(\Theta(N)\)</td></tr>
+        <tr><td>linked list of \(N\) <code>Node</code>s</td><td>\(16N\)</td><td>\(\Theta(N)\)</td></tr>
+      </table>
+      <p>
+        Both grow <em>linearly</em>, so both are \(\Theta(N)\): the order of growth
+        cannot tell them apart. Yet the array uses one quarter of the memory, because
+        its constant is 4 bytes per element against the list&rsquo;s 16:
+        exactly the padding-plus-pointer overhead from &sect;3, now multiplied by
+        \(N\). This is the recurring theme of this handout: <strong>same order,
+        different constant</strong>. (The array also wins a second, unmodelled prize:
+        its elements are contiguous, so it is far friendlier to the cache;
+        &sect;6 returns to this.)
+      </p>
+      <div class="aside">
+        <span class="tag">Notation, in passing</span>
+        We write memory bounds with the same \(O\) (upper), \(\Omega\) (lower), and
+        \(\Theta\) (tight) that the time handout used; a \(\Theta(N)\) space claim
+        means the byte count is squeezed between two constant multiples of \(N\) for
+        large \(N\). The formal set-definitions, the proofs, and the worked
+        exercises are in the companion
+        <a href="foundation-asymptotic-notation.html">Asymptotic Notation reading</a>;
+        this handout uses the notation but does not re-derive it.
+      </div>
+      <p>
+        The vocabulary scales past linear. A single scalar is \(\Theta(1)\); an array
+        or list of \(N\) elements is \(\Theta(N)\); an \(N \times N\) matrix
+        (an <em>adjacency matrix</em> for a graph, say) is \(\Theta(N^2)\). That
+        quadratic will matter in the graph unit: a matrix stores a cell for every
+        possible edge and so wastes space on a sparse graph, where an adjacency list
+        keeps only the edges that exist, at \(\Theta(V+E)\) (see
+        <a href="../graphs/ds-graph-representations.html"><em>Graph
+        Representations</em></a>).
+      </p>
+      <table>
+        <tr><th>memory used</th><th>example</th><th>order</th></tr>
+        <tr><td>one variable</td><td>a loop counter, an accumulator</td><td>\(\Theta(1)\)</td></tr>
+        <tr><td>proportional to \(N\)</td><td>array or list of \(N\) items</td><td>\(\Theta(N)\)</td></tr>
+        <tr><td>proportional to \(N^2\)</td><td>\(N \times N\) adjacency matrix</td><td>\(\Theta(N^2)\)</td></tr>
+      </table>
+
+      <h3>Input space vs auxiliary space</h3>
+      <p>
+        When we analyse an <em>algorithm</em> (rather than a structure), we usually
+        do not charge it for the input it was handed: that memory belongs to
+        the caller. What we count is the extra memory the algorithm allocates on top:
+      </p>
+      <div class="def">
+        <span class="tag">Definition (auxiliary space, in-place)</span>
+        The <strong>auxiliary space</strong> of an algorithm is the memory it uses
+        <em>beyond its input</em>: temporaries, recursion stack, and any allocated
+        scratch. An algorithm is <strong>in-place</strong> if its auxiliary space is
+        \(\Theta(1)\): a constant number of extra cells, independent of \(N\)
+        (recursion-stack space, in the strict definition, may be
+        \(\Theta(\log N)\)).
+      </div>
+      <p>
+        The distinction is why an algorithm can be slow in time yet cheap in space.
+        A summation reads all \(N\) inputs but allocates only one accumulator, so it
+        is \(\Theta(1)\) auxiliary space:
+      </p>
+      <pre>  long sum(const vector&lt;int&gt;&amp; a) {
+      long s = 0;               <span class="cm">// one accumulator: no allocation</span>
+      for (int x : a) s += x;
+      return s;                 <span class="cm">// Theta(1) auxiliary space</span>
+  }</pre>
+      <p>
+        The time handout&rsquo;s brute-force 3-sum is the striking case:
+        \(\Theta(N^3)\) <em>time</em> but only \(\Theta(1)\) extra
+        <em>space</em> (three loop counters and nothing allocated). Time and space are independent budgets, a
+        point &sect;6 makes with a table. First, though, the one source of auxiliary
+        space that is easy to forget because you never wrote a <code>new</code>: the
+        recursion itself.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="recursion">5. The space cost of recursion</h2>
+      <p>
+        A recursive function allocates no heap memory, yet it is not free in space.
+        Each call in progress needs its own <strong>stack frame</strong>
+        (room for its parameters, local variables, and return address), and
+        those frames coexist until the calls return. The number of frames stacked at
+        the deepest moment is the <strong>recursion depth</strong>, and it is the
+        algorithm&rsquo;s auxiliary space.
+      </p>
+      <pre>  long fact(int n) {
+      if (n &lt;= 1) return 1;      <span class="cm">// base case</span>
+      return n * fact(n - 1);    <span class="cm">// one frame stays live per level</span>
+  }</pre>
+      <p>
+        Calling <code>fact(n)</code> stacks \(n\) frames before the base case
+        returns, even though the result is a single number. Its auxiliary space is
+        \(\Theta(n)\), all of it on the stack.
+      </p>
+      <figure>
+        <svg viewBox="0 0 360 210" role="img" aria-label="A call stack for fact of 4, with four frames stacked from fact(4) at the top down to fact(1) at the base, showing recursion depth equals n.">
+          <g font-family="system-ui, sans-serif">
+            <g text-anchor="middle" font-size="13">
+              <rect x="70" y="20"  width="170" height="34" fill="#eef4fc" stroke="#2a2d36" stroke-width="1.3"/>
+              <rect x="70" y="58"  width="170" height="34" fill="#eef4fc" stroke="#2a2d36" stroke-width="1.3"/>
+              <rect x="70" y="96"  width="170" height="34" fill="#eef4fc" stroke="#2a2d36" stroke-width="1.3"/>
+              <rect x="70" y="134" width="170" height="34" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.3"/>
+              <text x="155" y="42">fact(4)&nbsp;&nbsp;n = 4</text>
+              <text x="155" y="80">fact(3)&nbsp;&nbsp;n = 3</text>
+              <text x="155" y="118">fact(2)&nbsp;&nbsp;n = 2</text>
+              <text x="155" y="156">fact(1)&nbsp;&nbsp;base &rarr; 1</text>
+            </g>
+            <g stroke="#9a5b00" stroke-width="1.6" fill="none">
+              <line x1="288" y1="26" x2="288" y2="162" marker-end="url(#adown)"/>
+            </g>
+            <defs>
+              <marker id="adown" markerWidth="9" markerHeight="9" refX="4" refY="7" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,0 L4,8 Z" fill="#9a5b00"/>
+              </marker>
+            </defs>
+            <text x="300" y="98" font-size="12" fill="#9a5b00" transform="rotate(90 300 98)" text-anchor="middle">depth = n frames &rarr; &Theta;(n) stack</text>
+            <text x="70" y="190" font-size="12" fill="#5c6270">deeper recursion &rarr; more live frames &rarr; more stack memory</text>
+          </g>
+        </svg>
+        <figcaption>
+          <code>fact(4)</code> holds four frames live at once. Recursion depth, not
+          the size of the returned value, sets the auxiliary space: an iterative loop
+          computing the same product keeps one frame, \(\Theta(1)\).
+        </figcaption>
+      </figure>
+      <p>
+        The general rule is <strong>recursion depth \(=\) auxiliary stack
+        space</strong>, and the depth depends on the structure being recursed over.
+        A linear recursion over \(N\) items is \(\Theta(N)\) deep. A traversal of a
+        tree recurses to the tree&rsquo;s <em>height</em>, so its stack is
+        \(\Theta(h)\): \(\Theta(\log N)\) for a balanced tree of \(N\) nodes, but
+        \(\Theta(N)\) for a degenerate one that has collapsed to a chain, a
+        motivation for the balanced trees of the
+        <a href="../trees/ds-avl-trees.html"><em>AVL Trees</em></a> handout. A divide-and-conquer
+        recursion that halves its input each level is only \(\Theta(\log N)\) deep;
+        mergesort&rsquo;s recursion (&sect;6) is exactly this.
+      </p>
+      <div class="aside">
+        <span class="tag">Deep recursion can overflow the stack</span>
+        The call stack is a bounded region (often a few megabytes), so unbounded
+        depth is not merely slow: it crashes with a stack overflow. Recursing
+        \(\Theta(N)\) deep on a million-element chain can exhaust it, whereas an
+        iterative version, or a balanced structure that caps depth at
+        \(\Theta(\log N)\), is safe. Some compilers convert a <em>tail</em> call
+        (where the recursive call is the last action) into a loop, reclaiming the
+        frame and restoring \(\Theta(1)\) space; C++ does not guarantee it, so do not
+        rely on it. Erickson&rsquo;s <em>Algorithms</em> is a good reference for
+        reasoning about recursion depth as a resource.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="aux">6. Auxiliary space and time&ndash;space tradeoffs</h2>
+      <p>
+        With input, auxiliary, and stack space defined, we can read off the memory
+        cost of two representative algorithms and then set space against time.
+      </p>
+      <h3>\(\Theta(N)\) auxiliary space: mergesort</h3>
+      <p>
+        <a href="../sorting/algo-mergesort.html">Mergesort</a> sorts by splitting the array in two, sorting each half
+        recursively, and <strong>merging</strong> the two sorted halves. Splitting is
+        free, but merging cannot be done in place with a simple linear scan: it needs
+        a scratch buffer to hold the merged output before copying it back.
+      </p>
+      <div class="code-tabs" data-snippet="sorting/mergesort">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Merge two adjacent sorted runs a[lo..mid] and a[mid+1..hi] into sorted order,
+// using aux[] as scratch. Every element is copied once: Theta(n).
+void merge(int a[], int lo, int mid, int hi, int aux[]) {
+    for (int k = lo; k &lt;= hi; k++) aux[k] = a[k];    // copy into scratch
+    int i = lo, j = mid + 1;
+    for (int k = lo; k &lt;= hi; k++) {
+        if (i &gt; mid)              a[k] = aux[j++];    // left run exhausted
+        else if (j &gt; hi)          a[k] = aux[i++];    // right run exhausted
+        else if (aux[j] &lt; aux[i]) a[k] = aux[j++];    // take the smaller front
+        else                      a[k] = aux[i++];    // ties take left: STABLE
+    }
+}
+
+// Top-down mergesort: sort each half, then merge. T(n) = 2T(n/2) + Theta(n).
+void mergesort(int a[], int lo, int hi, int aux[]) {
+    if (hi &lt;= lo) return;                 // base case: 0 or 1 element
+    int mid = lo + (hi - lo) / 2;
+    mergesort(a, lo, mid, aux);           // sort the left half
+    mergesort(a, mid + 1, hi, aux);       // sort the right half
+    merge(a, lo, mid, hi, aux);           // combine
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Merge two adjacent sorted runs a[lo..mid] and a[mid+1..hi] using aux[] as
+// scratch. Every element is copied once: Theta(n).
+static void merge(int[] a, int lo, int mid, int hi, int[] aux) {
+    for (int k = lo; k &lt;= hi; k++) aux[k] = a[k];    // copy into scratch
+    int i = lo, j = mid + 1;
+    for (int k = lo; k &lt;= hi; k++) {
+        if (i &gt; mid)              a[k] = aux[j++];    // left run exhausted
+        else if (j &gt; hi)          a[k] = aux[i++];    // right run exhausted
+        else if (aux[j] &lt; aux[i]) a[k] = aux[j++];    // take the smaller front
+        else                      a[k] = aux[i++];    // ties take left: STABLE
+    }
+}
+
+// Top-down mergesort. T(n) = 2T(n/2) + Theta(n).
+static void mergesort(int[] a, int lo, int hi, int[] aux) {
+    if (hi &lt;= lo) return;                 // base case: 0 or 1 element
+    int mid = lo + (hi - lo) / 2;
+    mergesort(a, lo, mid, aux);           // sort the left half
+    mergesort(a, mid + 1, hi, aux);       // sort the right half
+    merge(a, lo, mid, hi, aux);           // combine
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Merge two adjacent sorted runs of a[lo..hi] (split at mid) using aux as
+# scratch. Every element is copied once: Theta(n).
+def merge(a, lo, mid, hi, aux):
+    aux[lo:hi + 1] = a[lo:hi + 1]         # copy into scratch
+    i, j = lo, mid + 1
+    for k in range(lo, hi + 1):
+        if i &gt; mid:                       # left run exhausted
+            a[k] = aux[j]
+            j += 1
+        elif j &gt; hi:                      # right run exhausted
+            a[k] = aux[i]
+            i += 1
+        elif aux[j] &lt; aux[i]:             # take the smaller front (ties: left)
+            a[k] = aux[j]
+            j += 1
+        else:                             # ties take left: STABLE
+            a[k] = aux[i]
+            i += 1
+
+# Top-down mergesort. T(n) = 2T(n/2) + Theta(n).
+def mergesort(a, lo, hi, aux):
+    if hi &lt;= lo:                          # base case: 0 or 1 element
+        return
+    mid = (lo + hi) // 2
+    mergesort(a, lo, mid, aux)            # sort the left half
+    mergesort(a, mid + 1, hi, aux)        # sort the right half
+    merge(a, lo, mid, hi, aux)            # combine</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Merge sorted runs a[lo..=mid] and a[mid+1..=hi] using aux as scratch. O(n).
+fn merge(a: &amp;mut [i32], lo: usize, mid: usize, hi: usize, aux: &amp;mut [i32]) {
+    aux[lo..=hi].copy_from_slice(&amp;a[lo..=hi]);       // copy into scratch
+    let (mut i, mut j) = (lo, mid + 1);
+    for k in lo..=hi {
+        if i &gt; mid {                                 // left run exhausted
+            a[k] = aux[j]; j += 1;
+        } else if j &gt; hi {                           // right run exhausted
+            a[k] = aux[i]; i += 1;
+        } else if aux[j] &lt; aux[i] {                  // take the smaller front
+            a[k] = aux[j]; j += 1;
+        } else {                                     // ties take left: STABLE
+            a[k] = aux[i]; i += 1;
+        }
+    }
+}
+
+// Top-down mergesort. T(n) = 2T(n/2) + O(n).
+fn mergesort(a: &amp;mut [i32], lo: usize, hi: usize, aux: &amp;mut [i32]) {
+    if hi &lt;= lo { return; }               // base case: 0 or 1 element
+    let mid = lo + (hi - lo) / 2;
+    mergesort(a, lo, mid, aux);           // sort the left half
+    mergesort(a, mid + 1, hi, aux);       // sort the right half
+    merge(a, lo, mid, hi, aux);           // combine
+}</pre>
+<p class="ct-src">source: <code>code/sorting/mergesort.cpp &middot; code/sorting/mergesort.java &middot; code/sorting/mergesort.py &middot; code/sorting/mergesort.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The <code>aux</code> buffer holds one copy of the range being merged; sized
+        once to the full array, it is \(4N\) bytes for \(N\) ints, so mergesort&rsquo;s
+        auxiliary space is \(\Theta(N)\). The recursion adds a stack of depth
+        \(\lceil \log_2 N \rceil\), i.e. \(\Theta(\log N)\), which the \(\Theta(N)\)
+        buffer dominates. Two contrasts are worth drawing out. First, the
+        <em>time</em> is \(\Theta(N \log N)\) (many merges) while the
+        peak <em>memory</em> is only \(\Theta(N)\): the merges happen one at a time
+        as the recursion unwinds, so the buffers do not coexist. Second, quicksort
+        (<a href="../sorting/algo-quicksort.html"><em>Quicksort</em></a>)
+        partitions <em>in place</em>, so its only auxiliary space is its
+        recursion stack: \(\Theta(\log N)\) in expectation, because a random
+        pivot lands near the middle on average, so the ranges shrink
+        geometrically and the depth rule of &sect;5 applies. That is a genuine
+        space advantage, and one reason quicksort is often preferred despite
+        mergesort&rsquo;s cleaner worst-case time.
+      </p>
+      <p>
+        The course&rsquo;s mergesort visualiser makes the two costs visible side by
+        side: the recursion brackets nest to depth \(\log_2 N\) (the \(\Theta(\log
+        N)\) stack), while an auxiliary-bytes gauge rises and falls with the live
+        buffer, peaking at \(4N\) at the top-level merge: time \(N\log N\),
+        but peak space only \(N\).
+      </p>
+
+      <h3>\(\Theta(n^2)\) space: grid exploration</h3>
+      <p>
+        Breadth-first search over an \(n \times n\) grid (flood-fill, maze
+        shortest-paths; see <a href="../graphs/algo-bfs.html"><em>Breadth-First
+        Search</em></a>) expands outward in waves from a start cell,
+        keeping a queue of the current frontier and a <code>visited</code> grid so it
+        never processes a cell twice. The queue holds only the frontier (on a
+        grid, an \(O(n)\) wavefront), but the <code>visited</code> grid is a
+        full \(n \times n\) array, allocated up front regardless of the maze, and it
+        dominates:
+      </p>
+      <pre>  vector&lt;vector&lt;char&gt;&gt; visited(n, vector&lt;char&gt;(n, 0));  <span class="cm">// n*n bytes: Theta(n^2)</span>
+  queue&lt;pair&lt;int,int&gt;&gt; frontier;                       <span class="cm">// O(n) wavefront</span></pre>
+      <p>
+        A deliberate choice here is <code>char</code> per cell rather than
+        <code>vector&lt;bool&gt;</code>, which would bit-pack to \(n^2/8\) bytes and
+        hide the cost. What you store per cell decides the constant, but not
+        the order, which stays \(\Theta(n^2)\):
+      </p>
+      <table>
+        <tr><th>stored per cell</th><th>bytes</th><th>total</th><th>buys you</th></tr>
+        <tr><td>visited flag (<code>char</code>)</td><td>1</td><td>\(n^2\)</td><td>reachable?</td></tr>
+        <tr><td>distance (<code>int</code>)</td><td>4</td><td>\(4n^2\)</td><td>hops to each cell</td></tr>
+        <tr><td>predecessor id (<code>int</code>)</td><td>4</td><td>\(4n^2\)</td><td>the actual path</td></tr>
+        <tr><td>came-from direction (<code>char</code>)</td><td>1</td><td>\(n^2\)</td><td>the path, 4&times; cheaper</td></tr>
+      </table>
+      <p>
+        This is the array-versus-list lesson again (same \(\Theta\), different
+        constant), now <em>inside a single algorithm</em>. And it warns of a
+        real trap: a <code>char</code> distance overflows at 127, but a snaking
+        corridor can make a cell&rsquo;s distance approach \(n^2\), so distance needs
+        the wider <code>int</code>. Quadratic space is also where memory binds before
+        time does: a \(100{,}000 \times 100{,}000\) grid is \(10^{10}\) cells, which
+        at 4 bytes each (an <code>int</code> per cell) is \(4 \times 10^{10}\) bytes:
+        about 40&nbsp;GB, beyond most machines, no matter how fast the
+        processor. Dynamic-programming tables (see
+        <a href="../dp/paradigm-dp-method.html"><em>The Dynamic Programming Method</em></a>)
+        hit the same wall.
+      </p>
+
+      <h3>Time and space are independent budgets</h3>
+      <p>
+        A cost is not &ldquo;efficient&rdquo; until you say <em>which</em> resource.
+        The two columns below vary independently: fast can be memory-hungry, and slow
+        can be memory-thrifty.
+      </p>
+      <table>
+        <tr><th>algorithm</th><th>time</th><th>auxiliary space</th></tr>
+        <tr><td>array sum</td><td>\(\Theta(N)\)</td><td>\(\Theta(1)\)</td></tr>
+        <tr><td>brute-force 3-sum</td><td>\(\Theta(N^3)\)</td><td>\(\Theta(1)\)</td></tr>
+        <tr><td>mergesort</td><td>\(\Theta(N \log N)\)</td><td>\(\Theta(N)\)</td></tr>
+        <tr><td>quicksort</td><td>\(\Theta(N \log N)\) avg</td><td>\(\Theta(\log N)\) expected</td></tr>
+        <tr><td>BFS on an \(n \times n\) grid</td><td>\(\Theta(n^2)\)</td><td>\(\Theta(n^2)\)</td></tr>
+        <tr><td>DP over all \(2^N\) subsets</td><td>\(\Theta(2^N \! \cdot N)\)</td><td>\(\Theta(2^N)\)</td></tr>
+      </table>
+      <p>
+        The 3-sum row is the extreme for time (cubic) with trivial space; the last
+        row is the extreme for space: a table with one entry per subset of
+        \(N\) items has \(2^N\) entries, so its <em>memory</em> is exponential, which
+        is what makes such exact methods intractable past \(N \approx 20\) regardless
+        of speed.
+      </p>
+
+      <h3>Trading one budget for the other</h3>
+      <p>
+        Because the budgets are separate, you can often spend one to save the other.
+        The choice is a recurring design lever in the rest of the course:
+      </p>
+      <table>
+        <tr><th>tradeoff</th><th>spend</th><th>to save</th><th>where</th></tr>
+        <tr><td>hash table</td><td>extra space</td><td>lookup time (to \(O(1)\))</td><td><a href="../hashing/ds-hashing.html">Hashing</a></td></tr>
+        <tr><td>dynamic programming</td><td>a table of subresults</td><td>recomputation time</td><td><a href="../dp/paradigm-dp-method.html">The Dynamic Programming Method</a></td></tr>
+        <tr><td>compressed encoding</td><td>decode time</td><td>storage space</td><td><a href="../greedy/algo-huffman-coding.html">Huffman Coding</a></td></tr>
+        <tr><td>in-place algorithm</td><td>(sometimes) time or clarity</td><td>auxiliary space</td><td><a href="../sorting/algo-quicksort.html">Quicksort</a></td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Constants matter for memory in practice</span>
+        Order of growth decides feasibility at scale, but for memory the constant
+        often decides real speed, through the cache. A contiguous array is read in
+        cache-friendly runs; a pointer-chasing list can miss the cache on every hop.
+        Two structures with identical \(\Theta(N)\) space can differ several-fold in
+        wall-clock time for this reason alone: the reason
+        <code>std::vector</code> usually beats <code>std::list</code>. Sedgewick &amp;
+        Wayne and Cormen et al. (CLRS) both stress that the memory <em>access
+        pattern</em>, not just the byte count, drives performance.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">7. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Give <code>sizeof</code> for each on a 64-bit LP64 machine, with the
+          padding shown:
+          <code>struct P { char a; double b; };</code> and
+          <code>struct Q { double b; char a; };</code>.
+          <details>
+            <summary>solution</summary>
+            Both are <strong>16</strong>. In <code>P</code>: <code>a</code> at
+            offset 0, then 7 padding bytes so the <code>double</code> lands on an
+            8-aligned offset 8, giving \(1 + 7 + 8 = 16\). In <code>Q</code>: the
+            <code>double</code> fills 0&ndash;7, <code>a</code> takes byte 8, then 7
+            tail-padding bytes bring the size to a multiple of 8 (the struct&rsquo;s
+            alignment): \(8 + 1 + 7 = 16\). Reordering does not help here because the
+            8-byte alignment forces a full 8-byte tail either way, the same
+            reason <code>Node</code> cannot shrink.
+          </details>
+        </li>
+        <li>
+          A program stores \(N = 10^6\) integers. Give the total bytes for (a) an
+          <code>int</code> array and (b) a singly linked list of <code>Node</code>s,
+          and the ratio.
+          <details>
+            <summary>solution</summary>
+            (a) \(4N = 4{,}000{,}000\) bytes \(\approx 3.8\) MB. (b) \(16N =
+            16{,}000{,}000\) bytes \(\approx 15.3\) MB. The ratio is \(16N / 4N = 4\):
+            the list costs four times as much for the same data, entirely from the
+            per-node padding (4) plus pointer (8). Both are \(\Theta(N)\); the factor
+            of 4 is the constant the order of growth discards.
+          </details>
+        </li>
+        <li>
+          State the auxiliary space of each, with a one-line reason: (a) iterative
+          <code>fact(n)</code> using a loop; (b) recursive <code>fact(n)</code>;
+          (c) an in-order traversal of a balanced binary search tree of \(N\) nodes;
+          (d) the same traversal of a tree degenerated to a chain.
+          <details>
+            <summary>solution</summary>
+            (a) \(\Theta(1)\): one accumulator, one frame. (b) \(\Theta(n)\):
+            \(n\) live stack frames at the deepest point. (c) \(\Theta(\log
+            N)\): the recursion goes as deep as the height, which is
+            \(\Theta(\log N)\) when balanced. (d) \(\Theta(N)\): the height is
+            \(N-1\), so the stack is as deep as the chain is long (and may overflow).
+            Same code as (c); the input&rsquo;s shape sets the space.
+          </details>
+        </li>
+        <li>
+          True or false, with justification: &ldquo;Any algorithm that runs in
+          \(\Theta(N^2)\) time must use \(\Theta(N^2)\) space.&rdquo;
+          <details>
+            <summary>solution</summary>
+            <strong>False.</strong> Time and space are independent budgets. Selection
+            sort runs in \(\Theta(N^2)\) time but is in-place, \(\Theta(1)\)
+            auxiliary space; brute-force 3-sum is even \(\Theta(N^3)\) time with
+            \(\Theta(1)\) space. Time bounds the number of operations, not the memory
+            allocated. (A partial converse does hold: an algorithm that <em>allocates
+            and touches</em> \(\Theta(N^2)\) space must spend at least
+            \(\Theta(N^2)\) time doing so: you cannot use more memory than you
+            have time to address.)
+          </details>
+        </li>
+        <li>
+          You have a struct with fields, in this order:
+          <code>char flag; double value; int id; char kind;</code>. Give its size as
+          written, then reorder the fields to minimise it, and give the new size.
+          <details>
+            <summary>solution</summary>
+            As written: <code>flag</code> at 0; 7 pad; <code>value</code> at 8&ndash;15;
+            <code>id</code> at 16&ndash;19; <code>kind</code> at 20; then 3 tail pad to
+            a multiple of 8, total \(1+7+8+4+1+3 = \mathbf{24}\). Reordered
+            large-to-small (<code>double value; int id; char flag; char
+            kind;</code>) gives <code>value</code> 0&ndash;7, <code>id</code>
+            8&ndash;11, <code>flag</code> 12, <code>kind</code> 13, then 2 tail pad,
+            total \(8+4+1+1+2 = \mathbf{16}\). A 33% reduction with no change to the
+            data, exactly the <code>A</code>-vs-<code>B</code> effect of &sect;2.
+          </details>
+        </li>
+        <li>
+          Mergesort is \(\Theta(N \log N)\) time and \(\Theta(N)\) auxiliary space,
+          yet the recursion goes \(\Theta(\log N)\) levels deep and every level does
+          \(\Theta(N)\) work on \(\Theta(N)\) total buffer. Why is the peak memory
+          \(\Theta(N)\) and not \(\Theta(N \log N)\)?
+          <details>
+            <summary>solution</summary>
+            Peak memory counts what is <em>live simultaneously</em>, not the total
+            ever allocated. The merges execute one at a time as the recursion unwinds;
+            a merge&rsquo;s scratch buffer is freed (or reused) before the next merge
+            at that level begins, so at any instant only one buffer of total size
+            \(\le N\) is live, plus the \(\Theta(\log N)\) stack of frames. Time sums
+            over all levels (\(\Theta(N)\) per level \(\times \log N\) levels), but
+            space is a high-water mark, so the two need not match.
+          </details>
+        </li>
+        <li>
+          BFS on an \(n \times n\) grid, as written, uses \(\Theta(n^2)\) space for
+          its fixed <code>visited</code> array. A colleague claims you can make it use
+          only \(\Theta(n)\). Under what condition is that possible, and what do you
+          give up?
+          <details>
+            <summary>solution</summary>
+            You can drop the fixed \(n^2\) array if you only need to know
+            <em>reachability</em> or <em>distance</em>, not the path: BFS only ever
+            steps between adjacent layers, so keeping just the previous and current
+            frontiers (Korf&rsquo;s frontier search) avoids revisiting, and on a grid a
+            frontier is \(O(n)\) wide. What you give up is the <em>path</em>:
+            reconstructing it needs a predecessor per reached cell, which is
+            \(\Theta(n^2)\) again in the worst case. So space complexity here is a
+            property of the <em>implementation and the question asked</em>, not of
+            &ldquo;BFS&rdquo; in the abstract: the same order-of-growth /
+            constant / requirement layering as the rest of this handout.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Space Complexity v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

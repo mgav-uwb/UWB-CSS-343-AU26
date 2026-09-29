@@ -1,0 +1,420 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Quickselect.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quickselect - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Quickselect</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (divide-and-conquer).
+      </div>
+      <div class="src">
+        Quickselect finds the \(k\)-th smallest element (the median, a
+        percentile) in linear average time: partition, then recurse into only
+        the side that contains rank \(k\). The geometric-series analysis
+        behind the \(\Theta(n)\) expected cost, the \(\Theta(n^2)\) worst
+        case and its randomized fix, the median-of-medians guarantee, and when
+        selection beats sorting. With a worked median example, a run unrolled
+        through all three branches and the base case, a link to the demo, and
+        exercises.
+      </div>
+
+      <p class="lead">
+        Often you need one order statistic, not the whole sorted order.
+        Quickselect finds the \(k\)-th smallest in linear average time by
+        reusing <a href="algo-quicksort.html">quicksort</a>&rsquo;s partition and
+        recursing into only one side. Its recurrence,
+        \(T(n) = T(n/2) + \Theta(n)\) on balanced pivots, solves to
+        \(\Theta(n)\) by master-theorem case 3 (the
+        <a href="paradigm-divide-and-conquer.html">Divide-and-Conquer</a> handout):
+        one recursive call instead of two is exactly what drops
+        \(n\log n\) to \(n\).
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#select">Selection: order statistics in linear time</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="select">1. Selection: order statistics in linear time</h2>
+      <p>
+        Often you do not need the whole sorted order, only one <strong>order
+        statistic</strong>: the \(k\)-th smallest element. \(k = 0\) is the
+        minimum, \(k = n-1\) the maximum, \(k = n/2\) the median, \(k = 0.95n\) the
+        95th percentile. Sorting to extract one of them, at \(\Theta(n\log n)\), is
+        wasteful. <strong>Quickselect</strong> does it in linear average time by
+        reusing <a href="algo-quicksort.html">quicksort</a>&rsquo;s partition but recursing into only <em>one</em> side.
+      </p>
+      <div class="code-tabs" data-snippet="sorting/quickselect">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Quickselect: the k-th smallest element (0-indexed). Partition, then recurse
+// into ONLY the side that contains rank k. Average Theta(n). Reuses partition().
+int quickselect(int a[], int lo, int hi, int k) {
+    if (lo == hi) return a[lo];           // one element left
+    int p = partition(a, lo, hi);         // pivot lands at rank p
+    if (k == p)      return a[p];          // found it
+    else if (k &lt; p)  return quickselect(a, lo, p - 1, k);   // left side only
+    else             return quickselect(a, p + 1, hi, k);   // right side only
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Quickselect: the k-th smallest element (0-indexed). Partition, then recurse
+// into ONLY the side that contains rank k. Average Theta(n). Reuses partition().
+static int quickselect(int[] a, int lo, int hi, int k) {
+    if (lo == hi) return a[lo];           // one element left
+    int p = partition(a, lo, hi);         // pivot lands at rank p
+    if (k == p)      return a[p];          // found it
+    else if (k &lt; p)  return quickselect(a, lo, p - 1, k);   // left side only
+    else             return quickselect(a, p + 1, hi, k);   // right side only
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Quickselect: the k-th smallest element (0-indexed). Partition, then recurse
+# into ONLY the side that contains rank k. Average Theta(n). Reuses partition().
+def quickselect(a, lo, hi, k):
+    if lo == hi:                          # one element left
+        return a[lo]
+    p = partition(a, lo, hi)              # pivot lands at rank p
+    if k == p:
+        return a[p]                       # found it
+    elif k &lt; p:
+        return quickselect(a, lo, p - 1, k)    # recurse into the left side only
+    else:
+        return quickselect(a, p + 1, hi, k)    # recurse into the right side only</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Quickselect: the k-th smallest element (0-indexed). Partition, then recurse
+// into ONLY the side that contains rank k. Average O(n). Reuses partition().
+fn quickselect(a: &amp;mut [i32], lo: usize, hi: usize, k: usize) -&gt; i32 {
+    if lo == hi { return a[lo]; }         // one element left
+    let p = partition(a, lo, hi);         // pivot lands at rank p
+    if k == p { a[p] }                    // found it
+    else if k &lt; p { quickselect(a, lo, p - 1, k) }   // left side only
+    else { quickselect(a, p + 1, hi, k) }            // right side only
+}</pre>
+<p class="ct-src">source: <code>code/sorting/quickselect.cpp &middot; code/sorting/quickselect.java &middot; code/sorting/quickselect.py &middot; code/sorting/quickselect.rs</code></p>
+<!--/ct--></div>
+      <p>
+        After partitioning (the Lomuto <code>partition</code> of the
+        <a href="algo-quicksort.html">Quicksort</a> handout), the pivot sits at some final rank \(p\). If \(p = k\), the
+        pivot is the answer; if \(k &lt; p\), the \(k\)-th smallest is in the left
+        part; otherwise it is in the right part. Only that one side is searched.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (quickselect cost)</span>
+        Quickselect runs in \(\Theta(n)\) average time (\(\Theta(n^2)\) worst case
+        with unlucky pivots, removed by randomization).
+      </div>
+      <div class="proof">
+        <strong>Sketch.</strong> Each call partitions in \(\Theta(n)\) and recurses on
+        one side. A random pivot leaves, on average, at most a constant fraction of
+        the elements (at most \(3/4\) of them), so the surviving size
+        shrinks geometrically, and the total work is bounded by a geometric series
+        \(c\,(n + \tfrac34 n + (\tfrac34)^2 n + \cdots) = \Theta(n)\). The worst case,
+        where every pivot peels one element, is \(\Theta(n^2)\), but a random pivot
+        makes that astronomically unlikely; median-of-medians (below) removes it
+        entirely. <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (find the median)</span>
+        In \([7, 2, 9, 4, 1, 6, 3]\) (\(7\) elements) the median has rank \(3\)
+        (three below, three above). <code>quickselect(3)</code> partitions, follows
+        only the side containing rank \(3\), and returns \(4\) (the sorted order is
+        \(1\ 2\ 3\ 4\ 6\ 7\ 9\)) in about \(n\) comparisons on average, not
+        \(n\log n\). In C++, <code>std::nth_element(v.begin(), v.begin()+3, v.end())</code>
+        does exactly this.
+      </div>
+      <p>
+        The comparison of \(k\) against \(p\) has exactly three outcomes, and each
+        is a different fate for the recursion. One query on one array exercises all
+        three.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (all three branches, unrolled)</span>
+        Take the same \([7, 2, 9, 4, 1, 6, 3]\) and ask for rank \(k = 4\) (the
+        fifth smallest; the sorted order is \(1\ 2\ 3\ 4\ 6\ 7\ 9\), so the answer
+        should be \(6\)). Each call runs the Lomuto partition on its own range and
+        then compares \(k\) with the pivot&rsquo;s landing index \(p\).
+        <pre>  CALL 1   quickselect(lo=0, hi=6, k=4)   range = 7 2 9 4 1 6 3   pivot = a[6] = 3
+    j=0   7 &lt; 3 ? no
+    j=1   2 &lt; 3  &rarr; i=0, swap        &rarr; 2 7 9 4 1 6 3
+    j=2   9 &lt; 3 ? no
+    j=3   4 &lt; 3 ? no
+    j=4   1 &lt; 3  &rarr; i=1, swap        &rarr; 2 1 9 4 7 6 3
+    j=5   6 &lt; 3 ? no
+    place swap(a[2], a[6])            &rarr; 2 1 [3] 4 7 6 9      p = 2
+    k=4 &gt; p=2  &rarr;  RECURSE RIGHT on (3, 6).  6 comparisons.
+                    Indices 0..2 are discarded forever: 3 of 7 elements gone.
+
+  CALL 2   quickselect(lo=3, hi=6, k=4)   range = 4 7 6 9   pivot = a[6] = 9
+    j=3   4 &lt; 9  &rarr; i=3, swap(a[3],a[3])   a no-op
+    j=4   7 &lt; 9  &rarr; i=4, swap(a[4],a[4])   a no-op
+    j=5   6 &lt; 9  &rarr; i=5, swap(a[5],a[5])   a no-op
+    place swap(a[6], a[6])                 &rarr; 2 1 3 4 7 6 [9]     p = 6
+    k=4 &lt; p=6  &rarr;  RECURSE LEFT on (3, 5).  3 comparisons.
+                    The pivot was the LARGEST of its range, so only one element
+                    is discarded: the unlucky split, live.
+
+  CALL 3   quickselect(lo=3, hi=5, k=4)   range = 4 7 6   pivot = a[5] = 6
+    j=3   4 &lt; 6  &rarr; i=3, swap(a[3],a[3])   a no-op
+    j=4   7 &lt; 6 ? no
+    place swap(a[4], a[5])                 &rarr; 2 1 3 4 [6] 7 9     p = 4
+    k=4 = p=4  &rarr;  HIT: return a[4] = 6.  2 comparisons.</pre>
+        Eleven comparisons in all. Three things are worth reading off this run.
+        The array is left <em>partially</em> sorted, not sorted:
+        \([2, 1, 3, 4, 6, 7, 9]\) still has \(2\) before \(1\), and that is fine,
+        because everything left of index \(4\) is \(\le 6\) and everything right is
+        \(\ge 6\), which is all the question asked. Call 2 shows the branch that
+        costs: a pivot at the extreme of its range discards one element instead of
+        half, the same degenerate partition that makes
+        <a href="algo-quicksort.html">quicksort</a> quadratic, and a run of them
+        would make quickselect quadratic too. And the recursion is a
+        <em>chain</em>, never a tree: each call spawns at most one child, which is
+        why the cost is \(n + n/2 + n/4 + \cdots\) rather than \(\log n\) levels of
+        \(n\).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the fourth exit: the base case)</span>
+        The three branches above are not the only way a run ends. Ask the same
+        array for \(k = 3\), the median, instead. Calls 1 and 2 go exactly as
+        before (\(p = 2\), recurse right; \(p = 6\), recurse left), but call 3 now
+        finds \(k = 3 &lt; p = 4\) and recurses left on \((3, 3)\): a range of one
+        element. That call takes the <code>lo == hi</code> guard and returns
+        \(a[3] = 4\) without partitioning at all, which is the right answer, since
+        a range of one element can hold only one rank. So a range narrowing to a
+        single element is a fourth exit, and it is why the base case is tested
+        <em>before</em> the partition: partitioning a one-element range would
+        return \(p = lo\) and, if \(k\) somehow disagreed, recurse on an empty
+        range forever.
+      </div>
+      <div class="aside">
+        <span class="tag">Guaranteeing \(O(n)\): median-of-medians</span>
+        To kill the quadratic worst case deterministically, choose a provably good
+        pivot: split the array into groups of \(5\), take each group&rsquo;s median,
+        then recursively take the median <em>of those medians</em> as the pivot. It
+        guarantees at least a \(30\)/\(70\) split, hence worst-case \(O(n)\) selection
+        (the BFPRT algorithm). The constant is large, so randomized quickselect wins
+        in practice; median-of-medians matters when you need a hard guarantee.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=quickselect">Quickselect demo</a>. Choose a rank
+        \(k\) and watch half the array get discarded at each partition; that
+        one-sided recursion is what makes it \(\Theta(n)\) rather than
+        \(\Theta(n\log n)\). Compare the counters against a full
+        <a href="../../lib/demo.html?ds=quicksort">quicksort</a>: selection does a
+        fraction of the work.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">2. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          You must report the \(90\)th-percentile latency from \(10^7\) recorded
+          request times. Contrast sorting with selection, and give the running time of
+          the better approach.
+          <details>
+            <summary>solution</summary>
+            Sorting all \(10^7\) values to index the percentile costs
+            \(\Theta(n\log n)\) and produces far more order than needed. Selection
+            answers the single query directly: <code>quickselect</code> for rank
+            \(\lfloor 0.9\,n \rfloor\) runs in \(\Theta(n)\) average time (C++
+            <code>std::nth_element</code>). For one percentile, selection is the right
+            primitive; only if you need <em>many</em> percentiles at once does a single
+            sort start to pay off.
+          </details>
+        </li>
+        <li>
+          Run <code>quickselect</code> on \([5, 1, 8, 3, 9, 2, 7]\) for \(k = 5\)
+          with the last-element pivot. Name the branch taken at each call, count
+          the comparisons, and give the answer.
+          <details>
+            <summary>solution</summary>
+            Call 1, range \(0..6\), pivot \(a[6] = 7\): \(5, 1\) go left
+            (\(i = 1\)), \(8\) is skipped, \(3\) goes left (\(i = 2\)), \(9\) is
+            skipped, \(2\) goes left (\(i = 3\)), then the placement swap gives
+            \([5, 1, 3, 2, 7, 8, 9]\) with \(p = 4\). Six comparisons, and
+            \(k = 5 &gt; 4\), so <strong>recurse right</strong> on \((5, 6)\).
+            Call 2, range \([8, 9]\), pivot \(9\): one comparison, \(p = 6\), and
+            \(k = 5 &lt; 6\), so <strong>recurse left</strong> on \((5, 5)\).
+            Call 3 hits \(lo = hi\) and returns \(a[5] = 8\) with no work.
+            Seven comparisons in total; the sorted order is
+            \(1\ 2\ 3\ 5\ 7\ 8\ 9\), whose rank-\(5\) element is indeed \(8\).
+          </details>
+        </li>
+        <li>
+          You call <code>quickselect(a, 0, n-1, 0)</code> (the minimum) with a
+          last-element pivot on the already-sorted array \([1, 2, \dots, n]\). How
+          many comparisons does it make, which branch does it take every time, and
+          what should you have done instead?
+          <details>
+            <summary>solution</summary>
+            The last element is the maximum of every range, so the pivot lands at
+            \(p = hi\) and \(k = 0 &lt; p\) always: the <em>recurse-left</em>
+            branch, every time, discarding exactly one element per call. That is
+            \((n-1) + (n-2) + \cdots + 1 = \binom{n}{2}\) comparisons, so
+            \(\Theta(n^2)\); for \(n = 6\) it is \(15\) comparisons to find the
+            number \(1\). A single linear scan finds the minimum in \(n - 1\)
+            comparisons, and randomizing the pivot restores the \(\Theta(n)\)
+            expectation for general \(k\). The lesson is the same as
+            <a href="algo-quicksort.html">quicksort</a>&rsquo;s: with a fixed-position
+            pivot, sorted input is the adversarial input.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Quickselect v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

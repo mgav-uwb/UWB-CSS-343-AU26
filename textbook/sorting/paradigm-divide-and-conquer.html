@@ -1,0 +1,441 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Divide-and-Conquer.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Divide-and-Conquer - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Divide-and-Conquer</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Design paradigm.
+      </div>
+      <div class="src">
+        Divide-and-conquer as a design paradigm: split a problem into
+        subproblems, solve them recursively, and combine the answers. The cost
+        obeys a recurrence \(T(n) = a\,T(n/b) + f(n)\), and the master theorem
+        reads the recurrence&rsquo;s solution at a glance. With every case worked
+        in full, a numeric level-by-level table for each, the recursion-tree
+        argument behind the theorem&rsquo;s three cases, a recurrence the theorem
+        cannot classify and the substitution proof that settles it, a link to the
+        level-sum demo, and exercises.
+      </div>
+
+      <p class="lead">
+        You sorted in CSS 342; the frame here is
+        <strong>divide-and-conquer</strong>: split a problem into smaller
+        subproblems, solve them recursively, and combine the answers. The
+        <strong>master theorem</strong> reads the cost of such an algorithm
+        straight off its recurrence, no unrolling required.
+        <a href="algo-mergesort.html">Mergesort</a> and
+        <a href="algo-quicksort.html">quicksort</a> are the two famous sorts you get
+        by putting the work in the combine step versus the divide step; their
+        handouts lean on this one for their recurrence solutions.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#dc">The paradigm and the master theorem</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="dc">1. The paradigm and the master theorem</h2>
+      <div class="def">
+        <span class="tag">Definition (divide-and-conquer)</span>
+        A <strong>divide-and-conquer</strong> algorithm solves a problem in three
+        steps, applied recursively: <strong>divide</strong> it into smaller
+        subproblems, <strong>conquer</strong> each by recursing, and
+        <strong>combine</strong> the sub-answers into the full answer. A
+        <strong>base case</strong> (a subproblem small enough to solve directly)
+        stops the recursion.
+      </div>
+      <p>
+        You have already met the paradigm: binary search halves a sorted array
+        (\(T(n) = T(n/2) + O(1)\)), and mergesort splits and merges. The base case is
+        easy to overlook and fatal to omit (a size-\(0\)-or-\(1\) array is
+        already sorted, an empty search range means the key is absent), and
+        forgetting it means infinite recursion. The cost of a divide-and-conquer
+        algorithm obeys a <strong>recurrence</strong>
+        \[
+          T(n) = a\,T(n/b) + f(n),
+        \]
+        where \(a\) is the number of subproblems, \(b\) the factor by which each
+        shrinks, and \(f(n)\) the cost of dividing and combining. <a href="algo-mergesort.html">Mergesort</a>&rsquo;s is
+        \(T(n) = 2\,T(n/2) + \Theta(n)\).
+      </p>
+      <h3>The master theorem</h3>
+      <div class="thm">
+        <span class="tag">Theorem (master theorem)</span>
+        For \(T(n) = a\,T(n/b) + f(n)\) with \(a \ge 1\), \(b &gt; 1\), compare
+        \(f(n)\) with \(n^{\log_b a}\):
+        <ol>
+          <li>if \(f(n) = O(n^{\log_b a - \varepsilon})\) for some
+            \(\varepsilon &gt; 0\) (leaf work dominates), then
+            \(T(n) = \Theta(n^{\log_b a})\);</li>
+          <li>if \(f(n) = \Theta(n^{\log_b a})\) (the two tie), then
+            \(T(n) = \Theta(n^{\log_b a}\log n)\);</li>
+          <li>if \(f(n) = \Omega(n^{\log_b a + \varepsilon})\) and a regularity
+            condition holds (combine work dominates), then \(T(n) = \Theta(f(n))\).</li>
+        </ol>
+      </div>
+      <div class="proof">
+        <strong>Why the three cases (a recursion-tree sketch).</strong> Sum the tree
+        level by level. The root costs \(f(n)\); level \(i\) has \(a^i\) subproblems
+        of size \(n/b^i\), costing \(a^i f(n/b^i)\); the bottom level has
+        \(a^{\log_b n} = n^{\log_b a}\) leaves, each \(\Theta(1)\). The total is the
+        geometric-like series \(\sum_i a^i f(n/b^i)\), and, like any geometric series,
+        it is dominated by its largest term: the <em>root</em> if the terms shrink
+        (case 3, cost \(\Theta(f(n))\)), the <em>leaves</em> if they grow (case 1,
+        cost \(\Theta(n^{\log_b a})\)), and if every term is equal, one level&rsquo;s
+        cost times the \(\Theta(\log n)\) depth (case 2). The three cases are the three
+        behaviors of that series. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The critical exponent is \(\log_b a\) (the leaf count), and the
+        whole method is: compute it, compare to \(f(n)\), pick the case.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (reading recurrences)</span>
+        <pre>  mergesort:      2T(n/2) + &Theta;(n)   n^(log&#8322;2) = n = f  &rarr; case 2  &rArr; &Theta;(n log n)
+  binary search:   T(n/2) + &Theta;(1)   n^(log&#8322;1) = 1 = f  &rarr; case 2  &rArr; &Theta;(log n)
+  case 1 example: 4T(n/2) + &Theta;(n)   n^(log&#8322;4) = n&sup2; &gt; n  &rarr; case 1  &rArr; &Theta;(n&sup2;)
+  Karatsuba mult: 3T(n/2) + &Theta;(n)   n^(log&#8322;3) &asymp; n^1.58 &gt; n  &rarr; &Theta;(n^1.58)
+  case 3 example: 2T(n/2) + &Theta;(n&sup2;)  n^(log&#8322;2) = n &lt; n&sup2;  &rarr; case 3  &rArr; &Theta;(n&sup2;)</pre>
+        Karatsuba multiplication does three half-size multiplies instead of four, and
+        its \(n^{1.58}\) beats grade-school \(n^2\): a divide-and-conquer win
+        read straight off the recurrence.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (each case worked in full)</span>
+        The table above reads the case off at a glance; here is each comparison
+        spelled out once, hypotheses and all.
+        <ul>
+          <li><strong>Case 1</strong>, \(T(n) = 4T(n/2) + \Theta(n)\):
+            \(a = 4\), \(b = 2\), so \(n^{\log_b a} = n^{\log_2 4} = n^2\).
+            Is \(f(n) = n\) polynomially <em>smaller</em>? Yes:
+            \(n = O(n^{2-\varepsilon})\) with \(\varepsilon = 1\). Leaf work
+            dominates: \(T(n) = \Theta(n^2)\). (The recursion tree agrees: level
+            \(i\) costs \(4^i \cdot n/2^i = 2^i n\), a series that doubles every
+            level, so the bottom level&rsquo;s \(n^2\) dominates.)</li>
+          <li><strong>Case 2</strong>, \(T(n) = 2T(n/2) + \Theta(n)\)
+            (mergesort): \(n^{\log_2 2} = n = f(n)\) exactly, so every one of the
+            \(\log_2 n\) levels costs \(\Theta(n)\) and
+            \(T(n) = \Theta(n\log n)\).</li>
+          <li><strong>Case 3</strong>, \(T(n) = 2T(n/2) + \Theta(n^2)\):
+            \(n^{\log_2 2} = n\), and \(f(n) = n^2 = \Omega(n^{1+\varepsilon})\)
+            with \(\varepsilon = 1\), polynomially larger. Case 3 also demands
+            the <em>regularity condition</em> \(a f(n/b) \le c f(n)\) for some
+            \(c &lt; 1\): here \(2 (n/2)^2 = n^2/2 = \tfrac12 f(n)\), so
+            \(c = \tfrac12\) works, and \(T(n) = \Theta(f(n)) = \Theta(n^2)\).
+            (The condition guarantees the level costs really do shrink
+            geometrically below the root; ordinary polynomial \(f\) always
+            satisfies it.)</li>
+          <li><strong>No case applies</strong>, \(T(n) = 2T(n/2) + n\log n\):
+            \(n^{\log_2 2} = n\), and \(n \log n\) is bigger than \(n\), but not
+            <em>polynomially</em> bigger: \(n\log n \ne \Omega(n^{1+\varepsilon})\)
+            for any \(\varepsilon &gt; 0\), since \(\log n\) grows slower than
+            every \(n^{\varepsilon}\). Case 3&rsquo;s hypothesis fails (and cases
+            1 and 2 plainly do not fit), so the theorem is silent. The recursion
+            tree still answers: level \(i\) costs \(n(\log n - i)\), and summing
+            \(i = 0 \ldots \log n\) gives \(\Theta(n\log^2 n)\).</li>
+        </ul>
+      </div>
+      <p>
+        The three cases are three shapes of one series, and the shapes are visible
+        in numbers. Take \(n = 64\) and tabulate the level costs of those same four
+        recurrences, using \(f\) with constant \(1\) (level \(i\) has \(a^i\)
+        subproblems of size \(64/2^i\), so its cost is \(a^i f(64/2^i)\)):
+      </p>
+      <table class="trace">
+        <tr><th class="lab">level \(i\)</th><th class="lab">size</th>
+          <th>\(4T(n/2){+}n\)</th><th>\(2T(n/2){+}n\)</th><th>\(2T(n/2){+}n^2\)</th><th>\(2T(n/2){+}n\log n\)</th></tr>
+        <tr><td class="lab">0</td><td class="lab">64</td><td>64</td><td>64</td><td class="lt">4096</td><td class="lt">384</td></tr>
+        <tr><td class="lab">1</td><td class="lab">32</td><td>128</td><td>64</td><td>2048</td><td>320</td></tr>
+        <tr><td class="lab">2</td><td class="lab">16</td><td>256</td><td>64</td><td>1024</td><td>256</td></tr>
+        <tr><td class="lab">3</td><td class="lab">8</td><td>512</td><td>64</td><td>512</td><td>192</td></tr>
+        <tr><td class="lab">4</td><td class="lab">4</td><td>1024</td><td>64</td><td>256</td><td>128</td></tr>
+        <tr><td class="lab">5</td><td class="lab">2</td><td>2048</td><td>64</td><td>128</td><td>64</td></tr>
+        <tr><td class="lab">6</td><td class="lab">1</td><td class="lt">4096</td><td>64</td><td>64</td><td>0</td></tr>
+        <tr><td class="lab"><strong>total</strong></td><td class="lab"></td><td><strong>8128</strong></td><td><strong>448</strong></td><td><strong>8128</strong></td><td><strong>1344</strong></td></tr>
+      </table>
+      <p>
+        Read the columns. The first <em>doubles</em> every level, so its total
+        \(8128\) is under twice the \(4096 = n^2\) of the highlighted bottom level:
+        case 1, \(\Theta(n^{\log_b a})\). The second is <em>flat</em> at \(64 = n\),
+        so its total is \(n\) times the number of levels, \(64 \cdot 7 = 448\):
+        case 2, \(\Theta(n\log n)\). The third <em>halves</em> every level, so its
+        total is under twice the highlighted root \(4096 = f(n)\): case 3,
+        \(\Theta(f(n))\). The fourth shrinks too, but only by a subtracted
+        constant rather than a constant factor (\(384, 320, 256, \ldots\), an
+        arithmetic series, not a geometric one), and that is exactly why case 3
+        does not apply to it: its total \(1344\) is \(\Theta(\log n)\) times the
+        root, not \(\Theta(1)\) times it. In closed form that column is
+        \(\sum_{i=0}^{\log_2 n} n(\log_2 n - i) =
+        \tfrac{n\log_2 n(\log_2 n + 1)}{2}\), which at \(n = 64\) is
+        \(64 \cdot 6 \cdot 7 / 2 = 1344\).
+      </p>
+      <div class="aside">
+        <span class="tag">Balance is everything</span>
+        The savings depend on <em>balanced</em> splits. Even splits give \(\log n\)
+        levels and \(\Theta(n\log n)\); a skewed split into sizes \(1\) and \(n-1\)
+        gives \(n\) levels and \(\Theta(n^2)\). And the combine must be cheap:
+        halving a quadratic pass and recursing on that alone still sums to
+        \(\Theta(n^2)\), because a top-heavy geometric series is dominated by its root.
+        The \(n\log n\) sweet spot needs both balanced splits <em>and</em> a linear
+        combine: exactly \(2T(n/2) + \Theta(n)\). This is the difference between
+        <a href="algo-mergesort.html">mergesort</a> (always splits at the midpoint) and <a href="algo-quicksort.html">quicksort</a> (splits at a pivot).
+      </div>
+      <p>
+        Divide-and-conquer reaches far beyond sorting: binary search
+        (\(O(\log n)\)), Karatsuba and Strassen&rsquo;s matrix multiplication
+        (\(7T(n/2)+\Theta(n^2) = \Theta(n^{2.81})\)), the closest-pair-of-points
+        algorithm (\(\Theta(n\log n)\)), and the FFT are all recurrences the master
+        theorem reads at a glance. The two great sorts, mergesort and quicksort, are its most famous
+        instances; each has its own handout.
+      </p>
+      <div class="aside">
+        <span class="tag">When the master theorem does not apply</span>
+        The master theorem covers \(a\,T(n/b) + f(n)\), but real recurrences wander
+        outside that form, and Cormen&nbsp;et&nbsp;al. give three tools for the rest.
+        The <strong>substitution method</strong>: guess the answer and prove it by
+        induction (the honest way to <em>verify</em> a bound the tree method suggested).
+        The <strong>recursion-tree method</strong>: draw the tree, sum each level, and
+        add up the geometric series; that is exactly the sketch behind the three cases,
+        and the way to handle a gap case like \(T(n) = 2T(n/2) + n\log n\) (which is
+        \(\Theta(n\log^2 n)\), a factor the basic theorem cannot name). And the
+        <strong>Akra&ndash;Bazzi method</strong>, a heavier generalization that handles
+        <em>unequal</em> subproblem sizes: \(T(n) = T(n/5) + T(7n/10) + \Theta(n)\),
+        the median-of-medians recurrence of <a href="algo-quickselect.html">quickselect</a>, whose solution
+        \(\Theta(n)\) no elementary case delivers. The recurrence is still the analysis;
+        the master theorem is just the common special case.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (substitution, worked on the gap case)</span>
+        The tree <em>suggested</em> \(\Theta(n\log^2 n)\) for
+        \(T(n) = 2T(n/2) + n\log_2 n\); substitution <em>proves</em> it. Guess
+        \(T(n) \le c\,n\log_2^2 n\), assume it for \(n/2\), and substitute:
+        \[
+          \begin{aligned}
+            T(n) &amp;\le 2c\tfrac{n}{2}\log_2^2\tfrac{n}{2} + n\log_2 n
+                  = c\,n(\log_2 n - 1)^2 + n\log_2 n \\
+                 &amp;= c\,n\log_2^2 n - 2c\,n\log_2 n + c\,n + n\log_2 n \\
+                 &amp;= c\,n\log_2^2 n - \bigl[(2c-1)\,n\log_2 n - c\,n\bigr].
+          \end{aligned}
+        \]
+        The bracket is the slack, and the guess survives exactly when it is
+        non-negative, that is when \((2c-1)\log_2 n \ge c\). Take \(c = 1\): the
+        requirement becomes \(\log_2 n \ge 1\), i.e. \(n \ge 2\). The base case
+        checks out too, since \(T(1) = 0\) and \(T(2) = 2T(1) + 2 = 2 = 1 \cdot 2
+        \cdot \log_2^2 2\). So \(T(n) \le n\log_2^2 n\) for every power of two, and
+        the tree&rsquo;s exact sum
+        \(\tfrac{n\log_2 n(\log_2 n + 1)}{2}\) sits just under it: at \(n = 64\),
+        \(1344\) against \(64 \cdot 36 = 2304\). Tree first for the guess,
+        induction second for the proof.
+        <p>
+          The method is unforgiving about <em>which</em> guess you make, which is
+          its other lesson. Try to prove \(T(n) = 2T(n/2) + n\) is \(O(n)\) by
+          guessing \(T(n) \le c\,n\): substituting gives
+          \(T(n) \le 2c\tfrac{n}{2} + n = c\,n + n\), which is <em>not</em>
+          \(\le c\,n\) for any \(c\). The induction fails, and it fails for the
+          right reason: the bound is false. A failed substitution is evidence,
+          not a dead end.
+        </p>
+      </div>
+
+      <!-- ============================================================ -->
+      <div class="ex">
+        <span class="tag">Demo</span>
+        The <a href="../../lib/demo.html?ds=recurrence">master-theorem level sum</a> draws one bar per
+        level of the recursion tree. Type a recurrence and read the case off the shape of the
+        series: flat bars are case 2, growing bars are case 1, shrinking bars are case 3. The last
+        preset, \(2T(n/2) + n\log n\), is the gap the three cases do not cover; the level
+        sum still answers \(\Theta(n\log^2 n)\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">2. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Use the master theorem on \(T(n) = 9T(n/3) + \Theta(n^2)\) and on
+          \(T(n) = T(n/2) + \Theta(n)\).
+          <details>
+            <summary>solution</summary>
+            First: \(\log_3 9 = 2\), so \(n^{\log_b a} = n^2 = f(n)\), case 2,
+            giving \(\Theta(n^2\log n)\). Second: \(\log_2 1 = 0\), so
+            \(n^{\log_b a} = 1\) while \(f(n) = n\) dominates, case 3, giving
+            \(\Theta(n)\). (The second is the recurrence for the one-sided scan in
+            <a href="algo-quickselect.html">quickselect</a>: one subproblem of half size plus a linear partition, hence
+            linear overall.)
+          </details>
+        </li>
+        <li>
+          True or false, with justification: &ldquo;Divide-and-conquer always beats a
+          direct \(\Theta(n^2)\) algorithm.&rdquo;
+          <details>
+            <summary>solution</summary>
+            False. Splitting helps only when the subproblems are <em>balanced</em> and
+            the combine is <em>cheap</em>. The recurrence \(T(n) = 2T(n/2) +
+            \Theta(n^2)\) (a quadratic combine) is master-theorem case 3 and stays
+            \(\Theta(n^2)\); an unbalanced split \(T(n) = T(n-1) + \Theta(n)\) is also
+            \(\Theta(n^2)\). Only balanced splits with a cheap (e.g. linear) combine
+            reach the \(\Theta(n\log n)\) sweet spot, as mergesort does;
+            splitting alone is not magic.
+          </details>
+        </li>
+        <li>
+          Classify each of \(T(n) = 3T(n/4) + n\log n\),
+          \(T(n) = 7T(n/2) + \Theta(n^2)\) (Strassen&rsquo;s matrix multiplication)
+          and \(T(n) = 2T(n/2) + n/\log n\). For any case 3 you claim, check the
+          regularity condition explicitly.
+          <details>
+            <summary>solution</summary>
+            First: \(\log_4 3 \approx 0.79\), so \(n^{\log_b a} \approx n^{0.79}\),
+            and \(f(n) = n\log n\) is polynomially larger (take
+            \(\varepsilon = 0.2\), since \(n\log n = \Omega(n^{0.99})\)).
+            Regularity: \(a f(n/b) = 3\tfrac{n}{4}\log\tfrac{n}{4} \le
+            \tfrac34 n\log n = \tfrac34 f(n)\), so \(c = \tfrac34\) works.
+            Case 3, \(T(n) = \Theta(n\log n)\).
+            Second: \(\log_2 7 \approx 2.807\), so \(n^{\log_b a} \approx
+            n^{2.807}\), against \(f(n) = n^2\), which is polynomially smaller
+            (\(\varepsilon \approx 0.8\)). Case 1,
+            \(T(n) = \Theta(n^{2.807})\), which is what makes Strassen beat the
+            \(\Theta(n^3)\) of the schoolbook \(8T(n/2) + \Theta(n^2)\).
+            Third: \(n^{\log_2 2} = n\) and \(f(n) = n/\log n\) is smaller, but not
+            <em>polynomially</em> smaller: \(n/\log n\) is not
+            \(O(n^{1-\varepsilon})\) for any \(\varepsilon &gt; 0\), because
+            \(n^{\varepsilon}/\log n \to \infty\). No case applies. The recursion
+            tree answers anyway: level \(i\) costs \(2^i \cdot
+            \tfrac{n/2^i}{\log(n/2^i)} = \tfrac{n}{\log n - i}\), and summing
+            \(i = 0 \ldots \log n - 1\) gives \(n\,H_{\log n} =
+            \Theta(n\log\log n)\).
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Divide-and-Conquer v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+  </body>
+</html>

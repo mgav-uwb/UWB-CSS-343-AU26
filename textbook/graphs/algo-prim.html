@@ -1,0 +1,653 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Prim's Algorithm.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prim's Algorithm - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { padding: 5px 9px; font-variant-numeric: tabular-nums; }
+      table.trace td.num { text-align: center; }
+      table.trace td.add { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.skip { background: #f0f2f6; color: var(--dim); font-weight: 700; }
+      table.trace td.forest { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .mrg { color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Prim&rsquo;s Algorithm</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (greedy).
+      </div>
+      <div class="src">
+        Prim&rsquo;s minimum-spanning-tree algorithm: grow one tree from a start
+        vertex, always by the lightest edge leaving it, kept in a min-heap with lazy
+        deletion of stale entries. A full trace on the running graph, the
+        \(O(E\log V)\) analysis and the array variant for dense graphs, and the
+        comparison with Dijkstra&rsquo;s shortest-path tree, which the smallest
+        triangle separates. With the demo and exercises.
+      </div>
+
+      <p class="lead">
+        <strong>Prim&rsquo;s algorithm</strong> grows a minimum spanning tree
+        outward from a start vertex, always adding the lightest edge that leaves the
+        tree, found with the binary heap of
+        <a href="../heaps/ds-heaps-pq.html">Heaps, Priority Queues &amp; Heapsort</a>.
+        Its correctness is immediate from the cut property of the
+        <a href="foundation-minimum-spanning-trees.html">Minimum Spanning Trees</a> handout:
+        the growing tree versus everything else is a cut, and Prim takes that
+        cut&rsquo;s minimum crossing edge by construction.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#algo">Growing one tree</a></li>
+          <li><a href="#trace">The run on the running graph</a></li>
+          <li><a href="#analysis">Cost, and a queue-free variant</a></li>
+          <li><a href="#dijkstra">Prim and Dijkstra</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="algo">1. Growing one tree</h2>
+      <p>
+        <strong>Prim&rsquo;s algorithm</strong> grows a single tree from a start
+        vertex, repeatedly adding the lightest edge that leaves the tree to a vertex
+        not yet in it. Unlike <a href="algo-kruskal.html">Kruskal</a>, its correctness
+        needs no separate argument:
+        the growing tree versus everything else <em>is</em> a cut, and Prim takes that
+        cut&rsquo;s minimum crossing edge by construction: safe by the
+        <a href="foundation-minimum-spanning-trees.html#cut">cut property</a> at every step.
+      </p>
+      <p>
+        To find the lightest crossing edge quickly, keep the candidate crossing edges
+        in a <strong>min-heap</strong> (the
+        <a href="../heaps/ds-heaps-pq.html">binary heap</a> again). When a vertex joins the
+        tree, push its edges to outside vertices; to grow, pop the cheapest edge and
+        use it if it still leads outside, discarding stale entries whose far endpoint
+        has since joined, the same lazy-deletion trick as
+        <a href="algo-dijkstra.html">Dijkstra</a>.
+      </p>
+      <div class="code-tabs" data-snippet="graphs/prim">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Lazy Prim: grow one tree from s. A min-heap holds candidate crossing edges
+// keyed by weight; pop the lightest, skip it if it now leads back into the tree,
+// otherwise take it. adj[u] = u&#x27;s weighted edges. Returns the MST total weight.
+struct Edge { int to; long w; };
+
+long prim(int V, vector&lt;vector&lt;Edge&gt;&gt;&amp; adj, int s) {
+    vector&lt;bool&gt; inTree(V, false);
+    priority_queue&lt;pair&lt;long,int&gt;, vector&lt;pair&lt;long,int&gt;&gt;,
+                   greater&lt;&gt;&gt; pq;                 // min-heap keyed by edge weight
+    long total = 0; int picked = 0;
+    inTree[s] = true;
+    for (Edge e : adj[s]) pq.push({e.w, e.to});   // edges leaving the start
+    while (picked &lt; V - 1 &amp;&amp; !pq.empty()) {
+        auto [w, u] = pq.top(); pq.pop();
+        if (inTree[u]) continue;                  // stale: both ends already in
+        inTree[u] = true; total += w; picked++;   // take the crossing edge
+        for (Edge e : adj[u])
+            if (!inTree[e.to]) pq.push({e.w, e.to});
+    }
+    return total;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Lazy Prim: grow one tree from s. Min-heap of {weight, vertex}; skip stale pops.
+// adj.get(u) = u&#x27;s weighted edges. Returns the MST total weight.
+long prim(int V, List&lt;List&lt;Edge&gt;&gt; adj, int s) {
+    boolean[] inTree = new boolean[V];
+    PriorityQueue&lt;long[]&gt; pq =
+        new PriorityQueue&lt;&gt;((a, b) -&gt; Long.compare(a[0], b[0]));  // by weight
+    long total = 0; int picked = 0;
+    inTree[s] = true;
+    for (Edge e : adj.get(s)) pq.add(new long[]{e.w, e.to});
+    while (picked &lt; V - 1 &amp;&amp; !pq.isEmpty()) {
+        long[] top = pq.poll();
+        long w = top[0]; int u = (int) top[1];
+        if (inTree[u]) continue;                  // stale: both ends already in
+        inTree[u] = true; total += w; picked++;   // take the crossing edge
+        for (Edge e : adj.get(u))
+            if (!inTree[e.to]) pq.add(new long[]{e.w, e.to});
+    }
+    return total;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>import heapq
+
+# Lazy Prim: grow one tree from s. Min-heap of (weight, vertex); skip stale pops.
+# adj[u] is a list of (v, w) pairs, as in the weighted graph type. Returns the
+# MST total weight.
+def prim(V, adj, s):
+    in_tree = [False] * V
+    total, picked = 0, 0
+    in_tree[s] = True
+    pq = [(w, v) for v, w in adj[s]]          # edges leaving the start
+    heapq.heapify(pq)
+    while picked &lt; V - 1 and pq:
+        w, u = heapq.heappop(pq)
+        if in_tree[u]:                        # stale: both ends already in
+            continue
+        in_tree[u] = True                     # take the crossing edge
+        total += w
+        picked += 1
+        for v, wt in adj[u]:
+            if not in_tree[v]:
+                heapq.heappush(pq, (wt, v))
+    return total</pre>
+<pre class="ct-pane" data-lang="rs" hidden>use std::collections::BinaryHeap;
+use std::cmp::Reverse;
+
+// Lazy Prim from s. adj[u] holds (v, weight) pairs. Reverse turns the max-heap
+// into a min-heap on weight; skip stale pops. Returns the MST total weight.
+fn prim(n: usize, adj: &amp;Vec&lt;Vec&lt;(usize, i64)&gt;&gt;, s: usize) -&gt; i64 {
+    let mut in_tree = vec![false; n];
+    let mut pq = BinaryHeap::new();
+    let (mut total, mut picked) = (0i64, 0usize);
+    in_tree[s] = true;
+    for &amp;(v, w) in &amp;adj[s] { pq.push(Reverse((w, v))); }
+    while picked &lt; n - 1 {
+        let Some(Reverse((w, u))) = pq.pop() else { break };
+        if in_tree[u] { continue; }           // stale: both ends already in
+        in_tree[u] = true;                    // take the crossing edge
+        total += w;
+        picked += 1;
+        for &amp;(v, wt) in &amp;adj[u] {
+            if !in_tree[v] { pq.push(Reverse((wt, v))); }
+        }
+    }
+    total
+}</pre>
+<p class="ct-src">source: <code>code/graphs/prim.cpp &middot; code/graphs/prim.java &middot; code/graphs/prim.py &middot; code/graphs/prim.rs</code></p>
+<!--/ct--></div>
+      <h3>The cases the loop can take</h3>
+      <p>
+        The loop body is a pop and a test, so the algorithm has few branches. All of
+        them appear in the traces of <a href="#trace">&sect;2</a> and
+        <a href="#analysis">&sect;3</a>:
+      </p>
+      <ol>
+        <li><strong>Fresh pop: take the edge.</strong> The popped entry&rsquo;s far
+          endpoint \(u\) is still outside the tree, so the entry is the lightest
+          crossing edge; \(u\) joins the tree, the weight is added to the total, and
+          \(u\)&rsquo;s edges to outside vertices are pushed.</li>
+        <li><strong>Stale pop: skip.</strong> \(u\) joined the tree after this entry
+          was pushed, so the entry now points inside the tree and no longer crosses
+          the cut. It is discarded and the loop pops again, with no other
+          effect. This is <em>lazy deletion</em>: rather than hunt down and remove
+          the obsolete entry when \(u\) joins, the algorithm lets it sit in the heap
+          and recognizes it on the way out.</li>
+        <li><strong>A vertex&rsquo;s key improves.</strong> An outside vertex can
+          sit in the heap several times at several weights, one entry per tree
+          vertex that can reach it. The smallest of them is popped first, so the
+          vertex enters the tree by its cheapest crossing edge and the rest of its
+          entries become stale. The array variant of
+          <a href="#analysis">&sect;3</a> makes this explicit as an overwrite of
+          <code>key[v]</code>, which has its own two cases: the new crossing edge is
+          cheaper than the recorded one (update) or it is not (leave it alone).</li>
+        <li><strong>Termination.</strong> The loop stops when \(V-1\) edges have
+          been taken, typically leaving entries unpopped in the heap. If instead the
+          heap empties first, the graph is disconnected: no spanning tree exists,
+          and what has been built is the MST of the start vertex&rsquo;s
+          component.</li>
+      </ol>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">2. The run on the running graph</h2>
+      <p>
+        The trace below uses the running graph of the
+        <a href="foundation-minimum-spanning-trees.html#graph">Minimum Spanning Trees</a>
+        handout: eight vertices, eleven edges with all-distinct weights, and a
+        unique MST of total weight \(31\).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (Prim from 0)</span>
+        <pre>  tree {0}          cheapest leaving edge  0-1 (4)  &rarr; add 1   total  4
+  tree {0,1}        1-2 (1)                        &rarr; add 2   total  5
+  tree {0,1,2}      1-3 (5)                        &rarr; add 3   total 10
+  tree {0,1,2,3}    3-4 (2)                        &rarr; add 4   total 12
+  tree +4           4-5 (3)                        &rarr; add 5   total 15
+  tree +5           4-7 (7)                        &rarr; add 7   total 22
+  tree +7           5-6 (9)                        &rarr; add 6   total 31</pre>
+        Prim adds vertices in the order \(1,2,3,4,5,7,6\) (different from
+        Kruskal&rsquo;s edge order, which took the two lightest edges \(1\text{-}2\)
+        and \(3\text{-}4\) first), yet the final edge set and the total,
+        \(31\), are identical. Watch the expensive edges \(0\text{-}3\,(6)\) and
+        \(0\text{-}5\,(20)\) keep losing to cheaper options until the tree is complete
+        and they are never used.
+      </div>
+      <p>
+        That summary hides the structure the algorithm actually runs on. Here is the
+        same run at the level of the heap, one row per <code>pop</code>. An entry is
+        written \((w, u)\): weight \(w\), far endpoint \(u\). The
+        &ldquo;from&rdquo; column names the tree vertex that pushed the entry, which
+        an implementation that must return the edges (rather than only the total)
+        stores alongside.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr>
+            <th>pop</th><th>from</th><th>action</th><th>total</th>
+            <th>heap after the pop and its pushes</th>
+          </tr>
+          <tr>
+            <td class="num">&ndash;</td><td class="num">&ndash;</td>
+            <td>start: tree {0}, push 0&rsquo;s edges</td><td class="num">0</td>
+            <td class="forest">(4,1) (6,3) (20,5)</td>
+          </tr>
+          <tr>
+            <td class="num">(4,1)</td><td class="num">0</td>
+            <td class="add">TAKE 0-1, push (1,2) (5,3)</td><td class="num">4</td>
+            <td class="forest">(1,2) (5,3) (6,3) (20,5)</td>
+          </tr>
+          <tr>
+            <td class="num">(1,2)</td><td class="num">1</td>
+            <td class="add">TAKE 1-2, push (8,3)</td><td class="num">5</td>
+            <td class="forest">(5,3) (6,3) (8,3) (20,5)</td>
+          </tr>
+          <tr>
+            <td class="num">(5,3)</td><td class="num">1</td>
+            <td class="add">TAKE 1-3, push (2,4) (11,7)</td><td class="num">10</td>
+            <td class="forest">(2,4) <span class="mrg">(6,3) (8,3)</span> (11,7) (20,5)</td>
+          </tr>
+          <tr>
+            <td class="num">(2,4)</td><td class="num">3</td>
+            <td class="add">TAKE 3-4, push (3,5) (7,7)</td><td class="num">12</td>
+            <td class="forest">(3,5) <span class="mrg">(6,3)</span> (7,7) <span class="mrg">(8,3)</span> (11,7) (20,5)</td>
+          </tr>
+          <tr>
+            <td class="num">(3,5)</td><td class="num">4</td>
+            <td class="add">TAKE 4-5, push (9,6)</td><td class="num">15</td>
+            <td class="forest"><span class="mrg">(6,3)</span> (7,7) <span class="mrg">(8,3)</span> (9,6) (11,7) (20,5)</td>
+          </tr>
+          <tr>
+            <td class="num">(6,3)</td><td class="num">0</td>
+            <td class="skip">STALE: 3 joined at step 3, skip</td><td class="num">15</td>
+            <td class="forest">(7,7) <span class="mrg">(8,3)</span> (9,6) (11,7) (20,5)</td>
+          </tr>
+          <tr>
+            <td class="num">(7,7)</td><td class="num">4</td>
+            <td class="add">TAKE 4-7, nothing to push</td><td class="num">22</td>
+            <td class="forest"><span class="mrg">(8,3)</span> (9,6) (11,7) (20,5)</td>
+          </tr>
+          <tr>
+            <td class="num">(8,3)</td><td class="num">2</td>
+            <td class="skip">STALE: 3 is in the tree, skip</td><td class="num">22</td>
+            <td class="forest">(9,6) (11,7) (20,5)</td>
+          </tr>
+          <tr>
+            <td class="num">(9,6)</td><td class="num">5</td>
+            <td class="add">TAKE 5-6: 7 edges = V-1, stop</td><td class="num">31</td>
+            <td class="forest">(11,7) (20,5) &nbsp;&nbsp;left unpopped</td>
+          </tr>
+        </table>
+        <figcaption>
+          Lazy Prim from \(0\), one row per pop. Heap contents are listed in sorted
+          order for readability; a binary heap only guarantees the minimum at its
+          root. Highlighted entries are the ones that have gone stale: vertex \(3\)
+          entered the tree by \((5,3)\) at step \(3\), which made \((6,3)\), pushed
+          earlier from \(0\), and \((8,3)\), pushed from \(2\), obsolete. Both are
+          discarded when they surface, at no cost beyond one comparison. Nine pops
+          produce seven tree edges and two skips; two entries are never popped at
+          all, which is how the heavy edges \(3\text{-}7\,(11)\) and
+          \(0\text{-}5\,(20)\) stay out of the tree.
+        </figcaption>
+      </figure>
+      <p>
+        Three entries for vertex \(3\) coexisted in the heap at once,
+        \((5,3)\), \((6,3)\), \((8,3)\), one per tree vertex able to reach it. The
+        heap pops the cheapest first, so \(3\) joins by \(1\text{-}3\,(5)\), and the
+        other two are then stale by definition. That is how the lazy version does a
+        key decrease: it never edits an entry, it just lets the ordering of the heap
+        pick the smallest and throws the rest away on the way out. The price is a
+        heap holding up to \(E\) entries instead of \(V\), which costs a constant
+        factor in space and \(\log E \le 2\log V\) per operation in time.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=prim">Prim demo</a>. Run Prim from \(0\)
+        (one blob growing by its lightest exit edge), then run the
+        <a href="../../lib/demo.html?ds=kruskal">Kruskal demo</a> on the same graph and
+        confirm a different order but the same tree of weight \(31\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="analysis">3. Cost, and a queue-free variant</h2>
+      <p>
+        The lazy version pushes each edge onto the heap at most twice (once from
+        each endpoint), and each heap operation is \(O(\log E)\), so Prim runs in
+        \(O(E\log E) = O(E\log V)\) with a binary heap, the same bound as
+        <a href="algo-kruskal.html">Kruskal</a>.
+      </p>
+      <div class="aside">
+        <span class="tag">A queue-free Prim, \(O(V^2)\)</span>
+        As with Dijkstra, dropping the heap gives an array version: keep
+        <code>key[v]</code>, the weight of \(v\)&rsquo;s cheapest connection to the
+        tree, and each of \(V\) rounds scans for the minimum-key outside vertex in
+        \(O(V)\), then updates its neighbors. That is \(O(V^2)\), no heap, and on a
+        dense graph (\(E = \Theta(V^2)\)) it matches or beats the heap version:
+        the same dense-versus-sparse trade seen in the
+        <a href="ds-graph-representations.html">graph representations</a> and
+        <a href="algo-dijkstra.html">Dijkstra</a> handouts.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the array variant, key by key)</span>
+        The array version keeps one number per outside vertex,
+        <code>key[v]</code> = the weight of the cheapest edge now joining \(v\) to
+        the tree, and \(\infty\) if no such edge exists yet. Each round takes the
+        outside vertex of smallest key, then updates its outside neighbors. The same
+        run from \(0\), with the keys of the vertices still outside the tree:
+        <table class="trace">
+          <tr>
+            <th>round</th><th>join</th><th>by edge</th>
+            <th>keys of the vertices still outside</th><th>what the update did</th>
+          </tr>
+          <tr>
+            <td class="num">1</td><td class="num">0</td><td class="num">&ndash;</td>
+            <td class="forest">1:4 &nbsp;3:6 &nbsp;5:20 &nbsp;2,4,6,7:&infin;</td>
+            <td>three keys set for the first time (\(\infty\) replaced)</td>
+          </tr>
+          <tr>
+            <td class="num">2</td><td class="num">1</td><td class="num">0-1 (4)</td>
+            <td class="forest">2:1 &nbsp;<span class="mrg">3:5</span> &nbsp;5:20 &nbsp;4,6,7:&infin;</td>
+            <td><strong>key improves</strong>: \(1\text{-}3\,(5) &lt; 6\), so
+              \(\texttt{key}[3]\) drops \(6 \to 5\)</td>
+          </tr>
+          <tr>
+            <td class="num">3</td><td class="num">2</td><td class="num">1-2 (1)</td>
+            <td class="forest">3:5 &nbsp;5:20 &nbsp;4,6,7:&infin;</td>
+            <td><strong>no improvement</strong>: \(2\text{-}3\,(8) \ge 5\), so
+              \(\texttt{key}[3]\) is left alone</td>
+          </tr>
+          <tr>
+            <td class="num">4</td><td class="num">3</td><td class="num">1-3 (5)</td>
+            <td class="forest">4:2 &nbsp;5:20 &nbsp;7:11 &nbsp;6:&infin;</td>
+            <td>keys of \(4\) and \(7\) set for the first time</td>
+          </tr>
+          <tr>
+            <td class="num">5</td><td class="num">4</td><td class="num">3-4 (2)</td>
+            <td class="forest"><span class="mrg">5:3</span> &nbsp;<span class="mrg">7:7</span> &nbsp;6:&infin;</td>
+            <td><strong>two keys improve</strong>: \(4\text{-}5\,(3) &lt; 20\) and
+              \(4\text{-}7\,(7) &lt; 11\)</td>
+          </tr>
+          <tr>
+            <td class="num">6</td><td class="num">5</td><td class="num">4-5 (3)</td>
+            <td class="forest">6:9 &nbsp;7:7</td>
+            <td>key of \(6\) set for the first time</td>
+          </tr>
+          <tr>
+            <td class="num">7</td><td class="num">7</td><td class="num">4-7 (7)</td>
+            <td class="forest">6:9</td>
+            <td>no update: both neighbors of \(7\) are already in the tree</td>
+          </tr>
+          <tr>
+            <td class="num">8</td><td class="num">6</td><td class="num">5-6 (9)</td>
+            <td class="forest">(none left)</td>
+            <td>no update: \(6\) has only the one edge</td>
+          </tr>
+        </table>
+        The edges used are \(0\text{-}1,\ 1\text{-}2,\ 1\text{-}3,\ 3\text{-}4,\
+        4\text{-}5,\ 4\text{-}7,\ 5\text{-}6\), summing to
+        \(4+1+5+2+3+7+9 = 31\): the same tree the heap version built. The two
+        improvements at round \(5\) are the whole point of the array variant: where
+        the lazy heap leaves \((20,5)\) and \((11,7)\) lying around to be discarded
+        later, the array overwrites them on the spot, so it never holds more than
+        \(V\) numbers. It pays for that with an \(O(V)\) scan per round instead of
+        an \(O(\log V)\) pop.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="dijkstra">4. Prim and Dijkstra</h2>
+      <p>
+        Prim grows a tree from a source with a priority queue, and so does Dijkstra
+        (<a href="algo-dijkstra.html">Dijkstra&rsquo;s Algorithm</a>); the two
+        are the same skeleton, differing only in the key they minimize.
+      </p>
+      <table>
+        <tr><th></th><th>Prim (MST)</th><th>Dijkstra (shortest paths)</th></tr>
+        <tr><td>priority-queue key</td><td>edge weight \(w\)</td><td>distance \(\texttt{dist}[u] + w\)</td></tr>
+        <tr><td>minimizes</td><td>the single connecting edge</td><td>the total distance from the source</td></tr>
+        <tr><td>result</td><td>cheapest spanning tree</td><td>cheapest paths from the source</td></tr>
+      </table>
+      <p>
+        Because the keys differ, the trees can differ, and the smallest example
+        proves it.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (MST \(\ne\) shortest-path tree)</span>
+        The triangle \(0\text{-}1\,(2)\), \(1\text{-}2\,(2)\), \(0\text{-}2\,(3)\):
+        <pre>  MST:  keep 0-1 and 1-2      total weight 4   (drop the 3-edge)
+  SPT from 0:  keep 0-1, 0-2  dist[1]=2, dist[2]=3
+
+  in the MST, the route 0&rarr;2 costs 2+2 = 4, not the shortest 3;
+  the SPT's total weight is 2+3 = 5, not the minimum 4.</pre>
+        The MST minimizes <em>total</em> edge weight (\(4 &lt; 5\)); the shortest-path
+        tree minimizes <em>each vertex&rsquo;s distance</em> from the source (the
+        direct \(0\text{-}2\) at \(3\) beats the MST&rsquo;s \(4\)-cost detour).
+        Neither tree does the other&rsquo;s job. (On the eight-vertex running graph
+        the two happen to coincide, which is exactly why this three-vertex triangle is
+        the example to remember: it separates the concepts even when larger graphs do
+        not.)
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">5. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Run Prim from vertex \(6\) on the running graph. Do you get the same tree as
+          Prim from \(0\)? Why should you expect that?
+          <details>
+            <summary>solution</summary>
+            Yes: the same seven edges, total \(31\). From \(6\), Prim first
+            takes \(5\text{-}6\,(9)\), then \(4\text{-}5\,(3)\), \(3\text{-}4\,(2)\),
+            then \(1\text{-}3\,(5)\), \(1\text{-}2\,(1)\), \(0\text{-}1\,(4)\), and
+            \(4\text{-}7\,(7)\), assembling the identical edge set in a different
+            order. Because all weights are distinct, the MST is unique
+            (<a href="foundation-minimum-spanning-trees.html#mst">Minimum Spanning
+            Trees</a>), so <em>every</em> correct MST algorithm and
+            every start vertex must produce that one tree.
+          </details>
+        </li>
+        <li>
+          Give a weighted graph on which Prim&rsquo;s MST and Dijkstra&rsquo;s
+          shortest-path tree from the same source are different, and state each tree.
+          <details>
+            <summary>solution</summary>
+            The triangle \(0\text{-}1\,(2)\), \(1\text{-}2\,(2)\),
+            \(0\text{-}2\,(3)\). The MST is \(\{0\text{-}1, 1\text{-}2\}\) (total
+            weight \(4\), dropping the weight-\(3\) edge). Dijkstra from \(0\) keeps
+            \(\{0\text{-}1, 0\text{-}2\}\), reaching \(2\) by the direct edge at
+            distance \(3\) rather than the \(4\)-cost path through \(1\). The two trees
+            share \(0\text{-}1\) but differ on the second edge, because Prim minimizes
+            the connecting edge&rsquo;s weight while Dijkstra minimizes total distance
+            from the source.
+          </details>
+        </li>
+        <li>
+          The heap trace of <a href="#trace">&sect;2</a> made nine pops on a graph
+          with \(11\) edges: seven takes, two stale skips, two entries never popped.
+          Bound the number of entries the heap can ever hold and the number of pops
+          a run can make, and say what each of the two stale pops cost.
+          <details>
+            <summary>solution</summary>
+            An entry for edge \(u\text{-}v\) is pushed only when one endpoint joins
+            the tree while the other is still outside. Once either endpoint is in
+            the tree, the guard <code>if (!inTree[e.to])</code> blocks a second push
+            when the other joins, so this code pushes each edge at most once: at
+            most \(E\) entries pushed, hence at most \(E\) pops. (Without that guard
+            the bound is two pushes per edge, still \(O(E)\).) Exactly \(V-1\) pops
+            are takes on a connected graph, so at most \(E - (V-1)\) are stale, here
+            at most \(11 - 7 = 4\) and in fact \(2\). A stale pop costs one
+            \(O(\log E)\) pop plus one array test, and nothing else: no push, no
+            change to the tree or the total. Since \(\log E \le 2 \log V\), the run
+            is \(O(E \log V)\) whether or not stale entries pile up.
+          </details>
+        </li>
+        <li>
+          Run lazy Prim from \(0\) on the graph \(V = 5\) with edges
+          \(0\text{-}1\,(1)\), \(1\text{-}2\,(2)\), \(0\text{-}2\,(4)\),
+          \(3\text{-}4\,(3)\). Which loop exit fires, and what does the algorithm
+          return?
+          <details>
+            <summary>solution</summary>
+            The heap starts as \((1,1), (4,2)\). Pop \((1,1)\): take
+            \(0\text{-}1\), total \(1\), push \((2,2)\). Pop \((2,2)\): take
+            \(1\text{-}2\), total \(3\), nothing to push. Pop \((4,2)\): stale,
+            \(2\) is already in the tree. The heap is now empty with only \(2\)
+            edges taken, short of \(V - 1 = 4\), so the loop exits on
+            <code>pq.empty()</code> rather than on the edge count. What comes back
+            is the MST of \(0\)&rsquo;s component \(\{0,1,2\}\), weight \(3\);
+            vertices \(3\) and \(4\) are never reached, because Prim can only grow
+            across edges and no edge leaves the component. This is the one place
+            Prim and <a href="algo-kruskal.html">Kruskal</a> genuinely differ in
+            output: Kruskal sees every edge and returns a spanning forest of the
+            whole graph, while Prim stays inside the component it started in.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Prim&rsquo;s Algorithm v1.0 &middot;
+        prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive demos in
+        the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

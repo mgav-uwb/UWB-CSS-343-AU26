@@ -1,0 +1,1493 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Trees & Binary Search Trees.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trees &amp; Binary Search Trees - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Trees &amp; Binary Search Trees</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Data structure.
+      </div>
+      <div class="src">
+        The first real data structure of the term. Tree vocabulary
+        (root, leaf, depth, height, subtree) and the recursive definition that
+        drives every algorithm here; binary trees, their shapes, and their
+        traversals, with expression trees as a first payoff; then the
+        <strong>binary search tree</strong> as an <em>ordered symbol table</em>:
+        search, insert, the order-based operations (min/max, floor/ceiling,
+        rank/select, range), and Hibbard deletion, ending in the one
+        analysis that governs them all: every operation costs
+        \(\Theta(\text{height})\), a random tree is shallow
+        (\(\sim 1.39\log_2 n\)) but a sorted insert is a \(\Theta(n)\) path. With
+        worked traces, proofs, links to the interactive demo, and exercises.
+      </div>
+
+      <p class="lead">
+        The <a href="../foundations/foundation-time-analysis.html"><em>Analysis of
+        Algorithms: Time</em></a> and
+        <a href="../foundations/foundation-space-complexity.html"><em>Space
+        Complexity</em></a>
+        handouts built an analysis toolkit: the accounting of time and space, in
+        the language of the \(O\), \(\Theta\), and \(\Omega\) of the
+        <a href="../foundations/foundation-asymptotic-notation.html"><em>Asymptotic
+        Notation</em></a> handout. This handout spends it on a real
+        structure. A <strong>tree</strong> stores data not in a line but in a
+        branching hierarchy, and a <strong>binary search tree</strong> keeps that
+        hierarchy <em>ordered</em> so that a lookup follows a single root-to-leaf
+        path instead of scanning. That is the whole promise: the work of any BST
+        operation is the length of one path, so the <em>height</em> of the tree is
+        the entire story. The catch, and the reason balanced search trees
+        (starting with the <a href="ds-avl-trees.html"><em>AVL Trees</em></a>
+        handout) exist, is that
+        the same keys can build a tree as short as \(\log_2 n\) or as tall as
+        \(n-1\), and the shape is decided by nothing more than the order the keys
+        arrive. We finish by measuring exactly how tall a tree you should expect.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#terms">Trees: vocabulary and the recursive definition</a></li>
+          <li><a href="#binary">Binary trees and their shapes</a></li>
+          <li><a href="#traversal">Traversals and expression trees</a></li>
+          <li><a href="#bst">The binary search tree: an ordered symbol table</a></li>
+          <li><a href="#ordered">Ordered operations</a></li>
+          <li><a href="#delete">Deletion (Hibbard)</a></li>
+          <li><a href="#analysis">How tall is a BST?</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="terms">1. Trees: vocabulary and the recursive definition</h2>
+      <p>
+        A <strong>tree</strong> is a set of <strong>nodes</strong> joined by
+        <strong>links</strong> (edges): each link either is <strong>null</strong> or
+        points to another node, and the structure has no cycles. One node, the
+        <strong>root</strong>, has no parent; every other node has exactly one
+        parent. The picture is a family tree drawn upside down: the root at
+        the top, links fanning downward.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (tree vocabulary)</span>
+        In a tree, a node&rsquo;s <strong>children</strong> are the nodes its links
+        point to, and it is their <strong>parent</strong>; nodes with the same
+        parent are <strong>siblings</strong>. A node with no children is a
+        <strong>leaf</strong> (or external node); a node with at least one child is
+        <strong>internal</strong>. The <strong>ancestors</strong> of a node are
+        itself, its parent, its parent&rsquo;s parent, and so on to the root; the
+        <strong>descendants</strong> are itself and everything below it. A
+        <strong>subtree</strong> is a node together with all of its descendants;
+        a link &ldquo;points to a subtree.&rdquo;
+      </div>
+      <p>
+        The definition that actually drives the code is recursive, mirroring the
+        structure itself.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (a tree, recursively)</span>
+        A tree is either <strong>empty</strong>, or a <strong>root node</strong>
+        together with zero or more disjoint <strong>subtrees</strong>, each of which
+        is itself a tree. The root&rsquo;s links point to the roots of those
+        subtrees.
+      </div>
+      <p>
+        Almost every algorithm in this handout has the same shape as that
+        definition: <em>do something to the node, then recurse on its
+        subtrees</em>. When a structure is defined recursively, recursion is the
+        natural way to walk it.
+      </p>
+
+      <h3>Depth, level, and height</h3>
+      <div class="def">
+        <span class="tag">Definition (depth and height)</span>
+        The <strong>depth</strong> (or <strong>level</strong>) of a node is the
+        number of links on the path from the root to it; the root has depth
+        \(0\). The <strong>height</strong> of a tree is the maximum depth of any
+        node: the number of links on the longest root-to-leaf path. An
+        empty tree has height \(-1\); a single node has height \(0\).
+      </div>
+      <p>
+        Conventions differ: some texts put the root at level \(1\), and some
+        measure height in nodes rather than links. We fix <em>root depth \(0\),
+        height in links</em> and hold to it. The choice matters only in that you
+        must state it and stay consistent; the reason to care is that
+        <strong>height is the quantity that determines every BST
+        operation&rsquo;s worst-case cost</strong> (&sect;7). Keep an eye on it from
+        here on.
+      </p>
+      <div class="aside">
+        <span class="tag">Trees are everywhere in this course</span>
+        The tree is the backbone of the whole middle of the course. The
+        <em>search</em> trees of this handout become <strong>balanced</strong> in
+        the <a href="ds-avl-trees.html"><em>AVL Trees</em></a>,
+        <a href="ds-two-three-trees.html"><em>2&ndash;3 Trees</em></a>,
+        <a href="ds-red-black-trees.html"><em>Red-Black Trees</em></a>, and
+        <a href="ds-b-trees.html"><em>B-Trees</em></a> handouts; the
+        <em>complete</em> trees of &sect;2 become <strong>heaps</strong> and
+        priority queues in <a href="../heaps/ds-heaps-pq.html"><em>Heaps &amp;
+        Priority Queues</em></a>; Huffman
+        coding builds an optimal tree in
+        <a href="../greedy/algo-huffman-coding.html"><em>Huffman Coding</em></a>; and
+        the recursion-tree method for analyzing divide-and-conquer
+        (<a href="../sorting/paradigm-divide-and-conquer.html"><em>Divide and
+        Conquer</em></a>) draws a tree to count work. Learn the vocabulary
+        once here and it pays off five more times.
+      </div>
+
+      <h3>General trees</h3>
+      <p>
+        Nothing so far limited the number of children a node may have. A
+        <strong>general tree</strong> lets a node hold any number of children,
+        stored in a list, and its algorithms recurse over that list, exactly
+        the recursive definition made concrete:
+      </p>
+      <pre>struct TreeNode {
+    Object            item;
+    vector&lt;TreeNode*&gt; children;   <span class="cm">// 0, 1, 2, ... many</span>
+};
+
+int countNodes(TreeNode* t) {
+    if (!t) return 0;
+    int n = 1;
+    for (TreeNode* c : t-&gt;children) n += countNodes(c);   <span class="cm">// recurse on each subtree</span>
+    return n;
+}</pre>
+      <p>
+        Variable-length child lists are flexible but awkward. A standard trick
+        re-encodes any general tree with just <em>two</em> links per node:
+        <strong>firstChild</strong> (go down to the leftmost child) and
+        <strong>nextSibling</strong> (go across to the next sibling). Reading
+        firstChild as &ldquo;left&rdquo; and nextSibling as &ldquo;right,&rdquo;
+        <em>any</em> general tree becomes a binary tree. That is one reason the rest
+        of the handout, and much of the course, studies the binary case: it loses no
+        generality and gains a fixed, two-pointer node.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="binary">2. Binary trees and their shapes</h2>
+      <p>
+        A <strong>binary tree</strong> restricts every node to <strong>at most two
+        children</strong>, distinguished as the <strong>left</strong> and
+        <strong>right</strong> child (the distinction matters even when a node has
+        only one child). Its node is the workhorse of the handout:
+      </p>
+      <pre>struct Node {
+    Object item;
+    Node*  left;
+    Node*  right;
+};</pre>
+      <p>
+        The same three-field node underlies expression trees (&sect;3), binary
+        search trees (&sect;4 on), heaps (<a href="../heaps/ds-heaps-pq.html"><em>Heaps
+        &amp; Priority Queues</em></a>), and Huffman trees
+        (<a href="../greedy/algo-huffman-coding.html"><em>Huffman Coding</em></a>).
+        A few shape names recur often enough to be worth fixing.
+      </p>
+      <table>
+        <tr><th>term</th><th>definition</th></tr>
+        <tr><td><strong>full</strong></td><td>every node has <strong>0 or 2</strong> children (never exactly one)</td></tr>
+        <tr><td><strong>perfect</strong></td><td>full <em>and</em> every leaf at the <strong>same</strong> depth</td></tr>
+        <tr><td><strong>complete</strong></td><td>every level filled except possibly the last, which is packed to the <strong>left</strong></td></tr>
+        <tr><td><strong>balanced</strong></td><td>at every node, the two subtree heights differ by <strong>at most 1</strong></td></tr>
+      </table>
+      <p>
+        These are nested but not identical. Every perfect tree is complete, and
+        every complete tree is balanced, but <em>not conversely</em>: a
+        balanced tree need not be complete, and a complete tree need not be perfect.
+        The subtle implication, <strong>complete \(\Rightarrow\) balanced</strong>,
+        is what lets a heap (a complete tree; see
+        <a href="../heaps/ds-heaps-pq.html"><em>Heaps &amp; Priority
+        Queues</em></a>) guarantee logarithmic height for free.
+      </p>
+
+      <h3>How tall can a binary tree be?</h3>
+      <p>
+        Fix the number of nodes \(n\). The <em>same</em> \(n\) nodes can be arranged
+        into wildly different heights, and the two extremes bracket everything this
+        handout cares about.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (height bounds)</span>
+        A binary tree on \(n \ge 1\) nodes has height \(h\) with
+        \[ \lfloor \log_2 n \rfloor \;\le\; h \;\le\; n-1. \]
+        The lower bound is achieved by a perfect/complete tree; the upper bound by a
+        degenerate <strong>path</strong> in which every node has one child.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> A tree of height \(h\) has at most \(2^d\) nodes at
+        depth \(d\), so \(n \le 2^0 + 2^1 + \cdots + 2^h = 2^{h+1}-1\). Rearranging,
+        \(2^{h+1} \ge n+1\), hence \(h \ge \log_2(n+1) - 1\), which for integer
+        \(h\) gives \(h \ge \lfloor \log_2 n \rfloor\); a perfect tree fills every
+        level and attains it. For the upper bound, each of the \(h+1\) depths
+        \(0,1,\ldots,h\) on the longest path holds at least one node, so
+        \(n \ge h+1\), i.e. \(h \le n-1\); a path where each node has exactly one
+        child puts one node at each depth and attains it.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        This is the whole handout in one line: <strong>a binary tree&rsquo;s height
+        ranges from \(\log n\) to \(n\)</strong>, and <em>which</em> you get
+        (set by the tree&rsquo;s shape, not by \(n\)) decides the cost of
+        every operation. Everything from &sect;4 onward is an effort to land near the
+        short end.
+      </p>
+      <div class="aside">
+        <span class="tag">Storing a tree in a flat array</span>
+        A binary tree can live in an array with <em>no pointers at all</em>,
+        addressed by position: the root at index \(0\), and node \(i\)&rsquo;s
+        children at \(2i+1\) and \(2i+2\), its parent at
+        \(\lfloor (i-1)/2 \rfloor\). Contiguous and cache-friendly, but the
+        array must reach the largest index used, so a <em>complete</em> tree fills
+        \(0 \ldots n-1\) exactly while a <em>path</em> scatters nodes to indices
+        \(0,1,3,7,\ldots\), needing \(\sim 2^n\) slots. The layout pays off only for
+        (near-)complete trees, which is precisely the heap of
+        <a href="../heaps/ds-heaps-pq.html"><em>Heaps &amp; Priority Queues</em></a>.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="traversal">3. Traversals and expression trees</h2>
+      <p>
+        To <strong>traverse</strong> a tree is to visit every node exactly once, in
+        some order. Three orders come straight from the recursive definition and
+        differ only in <em>when</em> a node is visited relative to its two subtrees:
+      </p>
+      <ul>
+        <li><strong>pre-order</strong>: node, then left, then right;</li>
+        <li><strong>in-order</strong>: left, then node, then right;</li>
+        <li><strong>post-order</strong>: left, then right, then node.</li>
+      </ul>
+      <p>
+        A fourth, <strong>level-order</strong>, visits the tree top-to-bottom and
+        left-to-right using a queue rather than recursion; it is exactly the
+        breadth-first search we return to with graphs in
+        <a href="../graphs/algo-bfs.html"><em>Breadth-First Search</em></a>. The three
+        recursive orders are one piece of code with the visit line slid to three
+        positions:
+      </p>
+      <div class="code-tabs" data-snippet="trees/bst-traversal">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// The three recursive traversals are ONE recursion; only the line where you
+// visit(t) moves. In-order of a BST visits the keys in SORTED order.
+void inorder(Node* t) {
+    if (!t) return;
+    // visit(t);            // PRE-order:  node BEFORE its subtrees
+    inorder(t-&gt;left);
+    visit(t);               // IN-order:   node BETWEEN the subtrees (sorted!)
+    inorder(t-&gt;right);
+    // visit(t);            // POST-order: node AFTER its subtrees
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// The three recursive traversals are ONE recursion; only the line where you
+// visit(t) moves. In-order of a BST visits the keys in SORTED order.
+void inorder(Node t) {
+    if (t == null) return;
+    // visit(t);            // PRE-order:  node BEFORE its subtrees
+    inorder(t.left);
+    visit(t);               // IN-order:   node BETWEEN the subtrees (sorted!)
+    inorder(t.right);
+    // visit(t);            // POST-order: node AFTER its subtrees
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># The three recursive traversals are ONE recursion; only the line where you
+# visit(t) moves. In-order of a BST visits the keys in SORTED order.
+def inorder(t):
+    if t is None:
+        return
+    # visit(t)            # PRE-order:  node BEFORE its subtrees
+    inorder(t.left)
+    visit(t)              # IN-order:   node BETWEEN the subtrees (sorted!)
+    inorder(t.right)
+    # visit(t)            # POST-order: node AFTER its subtrees</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// The three recursive traversals are ONE recursion; only the line where you
+// visit(n) moves. In-order of a BST visits the keys in SORTED order.
+fn inorder(t: &amp;Option&lt;Box&lt;Node&gt;&gt;) {
+    if let Some(n) = t {
+        // visit(n);        // PRE-order:  node BEFORE its subtrees
+        inorder(&amp;n.left);
+        visit(n);           // IN-order:   node BETWEEN the subtrees (sorted!)
+        inorder(&amp;n.right);
+        // visit(n);        // POST-order: node AFTER its subtrees
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/bst-traversal.cpp &middot; code/trees/bst-traversal.java &middot; code/trees/bst-traversal.py &middot; code/trees/bst-traversal.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The in-order case earns special billing. Run in-order on a
+        <em>search</em> tree (&sect;4) and the keys come out in <strong>sorted
+        order</strong>, a fact we lean on for range queries and for the whole
+        analysis of &sect;7.
+      </p>
+      <figure>
+        <svg viewBox="0 0 320 210" role="img" aria-label="A binary tree of seven nodes used to illustrate the four traversal orders. The root is H. H's left child is C and its right child is R. C's left child is A and its right child is E. R's left child is P and its right child is X. A, E, P, and X are leaves.">
+          <g stroke="#8a92a6" stroke-width="1.6">
+            <line x1="160" y1="34" x2="95" y2="94"/>
+            <line x1="160" y1="34" x2="225" y2="94"/>
+            <line x1="95" y1="94" x2="55" y2="154"/>
+            <line x1="95" y1="94" x2="135" y2="154"/>
+            <line x1="225" y1="94" x2="185" y2="154"/>
+            <line x1="225" y1="94" x2="265" y2="154"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="160" cy="34" r="17"/>
+              <circle cx="95" cy="94" r="17"/>  <circle cx="225" cy="94" r="17"/>
+              <circle cx="55" cy="154" r="17"/> <circle cx="135" cy="154" r="17"/>
+              <circle cx="185" cy="154" r="17"/><circle cx="265" cy="154" r="17"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="160" y="39">H</text>
+              <text x="95" y="99">C</text>  <text x="225" y="99">R</text>
+              <text x="55" y="159">A</text> <text x="135" y="159">E</text>
+              <text x="185" y="159">P</text><text x="265" y="159">X</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The four orders on this tree: <strong>pre</strong> H C A E R P X;
+          <strong>in</strong> A C E H P R X (sorted; it is a BST);
+          <strong>post</strong> A E C P X R H; <strong>level</strong> H C R A E P X.
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=bst">BST demo</a>. Build a tree and read its keys
+        off in-order to watch them emerge in sorted order; the same demo drives every
+        operation in this handout.
+      </div>
+
+      <h3>Expression trees</h3>
+      <p>
+        A first use of a binary tree is to represent an arithmetic expression:
+        <strong>operators are internal nodes, operands are leaves</strong>, and the
+        <em>shape encodes precedence</em>. Because the shape carries the meaning, the
+        two ways of grouping \(2+3\times 4\) are two <em>different</em> trees with
+        different values: parentheses and precedence rules exist only to pick
+        the tree, and once the tree is fixed there is nothing left to interpret.
+      </p>
+      <figure>
+        <svg viewBox="0 0 520 210" role="img" aria-label="Two expression trees for 2 plus 3 times 4, side by side. Left tree, meaning (2 plus 3) times 4, which is 20: the root is a times sign, its left child is a plus sign whose children are the leaves 2 and 3, and its right child is the leaf 4. Right tree, meaning 2 plus (3 times 4), which is 14: the root is a plus sign, its left child is the leaf 2, and its right child is a times sign whose children are the leaves 3 and 4.">
+          <g stroke="#8a92a6" stroke-width="1.6">
+            <line x1="95" y1="34" x2="55" y2="94"/>
+            <line x1="95" y1="34" x2="135" y2="94"/>
+            <line x1="55" y1="94" x2="25" y2="154"/>
+            <line x1="55" y1="94" x2="85" y2="154"/>
+            <line x1="380" y1="34" x2="340" y2="94"/>
+            <line x1="380" y1="34" x2="420" y2="94"/>
+            <line x1="420" y1="94" x2="390" y2="154"/>
+            <line x1="420" y1="94" x2="450" y2="154"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="95" cy="34" r="17"/>  <circle cx="55" cy="94" r="17"/>
+              <circle cx="135" cy="94" r="17"/> <circle cx="25" cy="154" r="17"/>
+              <circle cx="85" cy="154" r="17"/>
+              <circle cx="380" cy="34" r="17"/> <circle cx="340" cy="94" r="17"/>
+              <circle cx="420" cy="94" r="17"/> <circle cx="390" cy="154" r="17"/>
+              <circle cx="450" cy="154" r="17"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="95" y="40">&times;</text>  <text x="55" y="99">+</text>
+              <text x="135" y="99">4</text> <text x="25" y="159">2</text>
+              <text x="85" y="159">3</text>
+              <text x="380" y="40">+</text>  <text x="340" y="99">2</text>
+              <text x="420" y="99">&times;</text> <text x="390" y="159">3</text>
+              <text x="450" y="159">4</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          Left: \((2+3)\times 4 = 20\). Right: \(2+(3\times 4)=14\). The operator
+          applied <em>last</em> sits at the root; lower precedence means closer to
+          the root.
+        </figcaption>
+      </figure>
+      <p>
+        Evaluation is then a <strong>post-order</strong> computation: a leaf is its
+        own value, and an operator combines the already-evaluated values of its two
+        subtrees.
+      </p>
+      <pre>double eval(Node* t) {
+    if (isLeaf(t)) return t-&gt;value;     <span class="cm">// operand</span>
+    double a = eval(t-&gt;left);           <span class="cm">// evaluate the subtrees first</span>
+    double b = eval(t-&gt;right);
+    return apply(t-&gt;op, a, b);          <span class="cm">// then combine: a (op) b</span>
+}</pre>
+      <p>
+        No precedence rules appear in the code: the structure already
+        encoded them. On the right tree above, <code>eval</code> computes
+        \(3\times 4 = 12\) at the lower node, then \(2+12 = 14\) at the root: values
+        bubble up, children before parents, which is exactly post-order.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="bst">4. The binary search tree: an ordered symbol table</h2>
+      <p>
+        A <strong>symbol table</strong> is a collection of <strong>(key, value)</strong>
+        pairs supporting <em>insert</em> and <em>search-by-key</em>: a map. A
+        <strong>binary search tree</strong> is a symbol table kept in a binary tree
+        under one ordering rule, which additionally makes it <em>ordered</em>: it
+        can answer questions about the ranking of keys, not just membership.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (BST ordering invariant)</span>
+        A <strong>binary search tree</strong> is a binary tree whose nodes carry
+        comparable, distinct <strong>keys</strong> (each with an associated value),
+        such that at <em>every</em> node \(x\): every key in \(x\)&rsquo;s
+        <strong>left</strong> subtree is <strong>less than</strong> \(x\)&rsquo;s
+        key, and every key in its <strong>right</strong> subtree is
+        <strong>greater than</strong> \(x\)&rsquo;s key.
+      </div>
+      <p>
+        The word <em>every</em> is the whole point. The invariant is recursive: it
+        holds not just for the root but at each node in every subtree. That is
+        strictly stronger than &ldquo;each node&rsquo;s immediate children are on the
+        correct side,&rdquo; and it is what makes search a guided descent (at
+        each node one comparison eliminates an entire subtree) and what makes
+        in-order traversal emit the keys in sorted order.
+      </p>
+      <p>
+        Following Sedgewick, we give each node a <strong>size</strong> field: the
+        number of nodes in the subtree rooted there. It costs one integer per node,
+        is trivially maintained on the way up during insert and delete, and it is
+        what powers the rank and select operations of &sect;5.
+      </p>
+      <div class="code-tabs" data-snippet="trees/bst-node">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// A BST node (Sedgewick&#x27;s ordered symbol table): key, value, two links, and a
+// subtree-size count. get returns a pointer to the value or null; put inserts.
+struct Node {
+    Key   key;   Value val;
+    Node* left  = nullptr;
+    Node* right = nullptr;
+    int   size  = 1;                    // # nodes in this subtree
+};
+int size(Node* t) { return t ? t-&gt;size : 0; }      // null-safe
+
+Value* get(Node* t, const Key&amp; key) {
+    if (!t) return nullptr;             // miss: fell off a null link
+    if (key == t-&gt;key) return &amp;t-&gt;val;  // hit
+    return key &lt; t-&gt;key ? get(t-&gt;left, key) : get(t-&gt;right, key);
+}
+Node* put(Node* t, const Key&amp; key, const Value&amp; val) {
+    if (!t) return new Node{key, val};  // grow at the null link
+    if      (key &lt; t-&gt;key) t-&gt;left  = put(t-&gt;left,  key, val);
+    else if (key &gt; t-&gt;key) t-&gt;right = put(t-&gt;right, key, val);
+    else t-&gt;val = val;                  // equal key: update the value
+    t-&gt;size = 1 + size(t-&gt;left) + size(t-&gt;right);   // recount on the way up
+    return t;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// A BST node: key, value, two links, and a subtree-size count. get returns the
+// value or null; put inserts, or updates the value on an equal key.
+class Node {
+    Key key; Value val; Node left, right; int size = 1;
+    Node(Key k, Value v) { key = k; val = v; }
+}
+int size(Node t) { return t == null ? 0 : t.size; }   // null-safe
+
+Value get(Node t, Key key) {
+    if (t == null) return null;                 // miss: fell off a null link
+    int c = key.compareTo(t.key);
+    if (c == 0) return t.val;                    // hit
+    return c &lt; 0 ? get(t.left, key) : get(t.right, key);
+}
+Node put(Node t, Key key, Value val) {
+    if (t == null) return new Node(key, val);    // grow at the null link
+    int c = key.compareTo(t.key);
+    if      (c &lt; 0) t.left  = put(t.left,  key, val);
+    else if (c &gt; 0) t.right = put(t.right, key, val);
+    else t.val = val;                            // equal key: update
+    t.size = 1 + size(t.left) + size(t.right);   // recount on the way up
+    return t;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># A BST node: key, value, two links, and a subtree-size count. get returns the
+# value or None; put inserts, or updates the value on an equal key.
+class Node:
+    def __init__(self, key, val):
+        self.key, self.val = key, val
+        self.left = self.right = None
+        self.size = 1                       # nodes in this subtree
+
+def size(t):
+    return t.size if t else 0               # null-safe
+
+def get(t, key):
+    if t is None:    return None            # miss: fell off a null link
+    if key == t.key: return t.val           # hit
+    return get(t.left, key) if key &lt; t.key else get(t.right, key)
+
+def put(t, key, val):
+    if t is None:    return Node(key, val)  # grow at the null link
+    if   key &lt; t.key: t.left  = put(t.left,  key, val)
+    elif key &gt; t.key: t.right = put(t.right, key, val)
+    else:             t.val = val           # equal key: update
+    t.size = 1 + size(t.left) + size(t.right)   # recount on the way up
+    return t</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// A BST node with a subtree-size count. Links are Option&lt;Box&lt;Node&gt;&gt;, so the
+// tree owns its children and drops them automatically (no manual free).
+struct Node {
+    key: i64, val: String,
+    left: Option&lt;Box&lt;Node&gt;&gt;, right: Option&lt;Box&lt;Node&gt;&gt;,
+    size: usize,
+}
+fn size(t: &amp;Option&lt;Box&lt;Node&gt;&gt;) -&gt; usize { t.as_ref().map_or(0, |n| n.size) }
+
+fn get&lt;&#x27;a&gt;(t: &amp;&#x27;a Option&lt;Box&lt;Node&gt;&gt;, key: i64) -&gt; Option&lt;&amp;&#x27;a str&gt; {
+    match t {
+        None =&gt; None,                               // miss: null link
+        Some(n) if key == n.key =&gt; Some(&amp;n.val),    // hit
+        Some(n) if key &lt;  n.key =&gt; get(&amp;n.left, key),
+        Some(n) =&gt; get(&amp;n.right, key),
+    }
+}
+fn put(t: Option&lt;Box&lt;Node&gt;&gt;, key: i64, val: String) -&gt; Option&lt;Box&lt;Node&gt;&gt; {
+    let mut n = match t {
+        None =&gt; return Some(Box::new(               // grow at the null link
+            Node { key, val, left: None, right: None, size: 1 })),
+        Some(n) =&gt; n,
+    };
+    if      key &lt; n.key { n.left  = put(n.left.take(),  key, val); }
+    else if key &gt; n.key { n.right = put(n.right.take(), key, val); }
+    else { n.val = val; }                           // equal key: update
+    n.size = 1 + size(&amp;n.left) + size(&amp;n.right);
+    Some(n)
+}</pre>
+<p class="ct-src">source: <code>code/trees/bst-node.cpp &middot; code/trees/bst-node.java &middot; code/trees/bst-node.py &middot; code/trees/bst-node.rs</code></p>
+<!--/ct--></div>
+      <p>
+        <code>get</code> walks down comparing keys: equal is a <strong>hit</strong>,
+        and falling off a null link is a <strong>miss</strong>. <code>put</code>
+        searches the same way and, on a miss, hangs a new node at the null link
+        where the search ended; on the way back up it resets each parent&rsquo;s
+        child link and recomputes each <code>size</code>. An equal key updates the
+        value in place: keys stay unique. Each is \(\Theta(\text{depth})\):
+        the work is one root-to-leaf path.
+      </p>
+
+      <h3>Search is a guided descent</h3>
+      <p>
+        The figure traces <code>get(65)</code> on a ten-key tree. Each comparison
+        turns left or right, discarding the other subtree, until the key is found.
+      </p>
+      <figure>
+        <svg viewBox="0 0 460 268" role="img" aria-label="A ten-node binary search tree. The root is 50. 50's left child is 30 and its right child is 70. 30's left child is 20 and its right child is 40; 40 has a left child 35. 70's left child is 60 and its right child is 80; 60 has a right child 65, and 80 has a right child 90. The search path for key 65 is highlighted in green: from 50 go right to 70, then left to 60, then right to 65, where the search hits.">
+          <g stroke="#8a92a6" stroke-width="1.6">
+            <line x1="230" y1="32" x2="130" y2="96"/>
+            <line x1="130" y1="96" x2="80" y2="160"/>
+            <line x1="130" y1="96" x2="180" y2="160"/>
+            <line x1="180" y1="160" x2="150" y2="224"/>
+            <line x1="330" y1="96" x2="380" y2="160"/>
+            <line x1="380" y1="160" x2="410" y2="224"/>
+          </g>
+          <g stroke="#0a7d4d" stroke-width="2.8">
+            <line x1="230" y1="32" x2="330" y2="96"/>
+            <line x1="330" y1="96" x2="280" y2="160"/>
+            <line x1="280" y1="160" x2="310" y2="224"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14.5" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="230" cy="32" r="17"/>
+              <circle cx="130" cy="96" r="17"/>
+              <circle cx="80" cy="160" r="17"/>  <circle cx="180" cy="160" r="17"/>
+              <circle cx="380" cy="160" r="17"/>
+              <circle cx="150" cy="224" r="17"/> <circle cx="410" cy="224" r="17"/>
+            </g>
+            <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2">
+              <circle cx="330" cy="96" r="17"/>
+              <circle cx="280" cy="160" r="17"/>
+              <circle cx="310" cy="224" r="17"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="230" y="37">50</text>
+              <text x="130" y="101">30</text> <text x="330" y="101">70</text>
+              <text x="80" y="165">20</text>  <text x="180" y="165">40</text>
+              <text x="280" y="165">60</text> <text x="380" y="165">80</text>
+              <text x="150" y="229">35</text> <text x="310" y="229">65</text>
+              <text x="410" y="229">90</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          <code>get(65)</code>: \(65 &gt; 50\) go right to \(70\); \(65 &lt; 70\) go
+          left to \(60\); \(65 &gt; 60\) go right to \(65\): hit, after
+          \(4\) comparisons (the depth of \(65\) plus one). A miss, say
+          <code>get(66)</code>, would end at the null right link of \(65\).
+        </figcaption>
+      </figure>
+      <p>
+        A miss runs the same descent to its end. <code>get(66)</code> compares
+        \(66 &gt; 50\) (go right), \(66 &lt; 70\) (left), \(66 &gt; 60\) (right),
+        \(66 &gt; 65\) (right), and falls off the null right link of \(65\):
+        four comparisons, the same path as the hit, with nothing at the end.
+        Hit and miss alike cost one root-to-leaf walk, and the null link where a
+        miss ends is exactly where <code>put</code> would hang the key.
+      </p>
+
+      <h3>The shape depends on insertion order</h3>
+      <p>
+        The same keys can form many different BSTs, because <code>put</code> hangs
+        each new key wherever its search happens to fall, and that depends on
+        the order the keys arrive. Tracing a short insertion makes the mechanism
+        concrete.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr>
+            <th class="lab">insert</th>
+            <th>comparisons on the way down</th>
+            <th>attaches as</th>
+          </tr>
+          <tr><td class="set">30</td><td class="lab">tree is empty</td><td class="lab">the root</td></tr>
+          <tr><td class="set">20</td><td class="lab">\(20 &lt; 30\)</td><td class="lab">left child of 30</td></tr>
+          <tr><td class="set">40</td><td class="lab">\(40 &gt; 30\)</td><td class="lab">right child of 30</td></tr>
+          <tr><td class="set">10</td><td class="lab">\(10 &lt; 30\), \(10 &lt; 20\)</td><td class="lab">left child of 20</td></tr>
+          <tr><td class="set">25</td><td class="lab">\(25 &lt; 30\), \(25 &gt; 20\)</td><td class="lab">right child of 20</td></tr>
+        </table>
+        <figcaption>
+          Inserting \(30, 20, 40, 10, 25\) into an empty tree. Each key follows the
+          search path for a miss and attaches at the null link where it ends. The
+          result has root \(30\), children \(20\) and \(40\), and \(10, 25\) under
+          \(20\); its in-order reading is \(10, 20, 25, 30, 40\): sorted, as
+          it must be.
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=bst">BST demo</a>. Insert the classic sequence
+        <code>S E A R C H E X A M P L E</code> and watch \(13\) insertions build a
+        \(10\)-node tree: the repeated <code>E</code> and <code>A</code>
+        update their values rather than adding nodes, exactly the symbol-table
+        semantics. Then shuffle the sequence and rebuild to see a different shape
+        from the same keys.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ordered">5. Ordered operations</h2>
+      <p>
+        Keeping the keys ordered buys far more than membership. The operations below
+        are what make a BST an <em>ordered</em> symbol table, and what a hash
+        table (<a href="../hashing/ds-hashing.html"><em>Hashing</em></a>), for all
+        its \(O(1)\) lookups, cannot do. Each is a short
+        recursion running in \(\Theta(\text{height})\).
+      </p>
+      <ul>
+        <li><strong>min / max</strong>: follow <code>left</code> (resp.
+          <code>right</code>) links to the end.</li>
+        <li><strong>floor(k)</strong>: the largest key \(\le k\); and
+          <strong>ceiling(k)</strong>: the smallest key \(\ge k\).</li>
+        <li><strong>select(i)</strong>: the key of rank \(i\) (the
+          \(i\)-th smallest, \(0\)-based); and <strong>rank(k)</strong>: the
+          number of keys strictly less than \(k\). These use the <code>size</code>
+          field.</li>
+        <li><strong>range(lo, hi)</strong>: all keys in \([lo, hi]\), in
+          sorted order.</li>
+      </ul>
+      <p>
+        <strong>floor</strong> is the instructive one, because the answer is not
+        always on the search path. If \(k\) equals the node&rsquo;s key, that is the
+        floor. If \(k\) is smaller, the floor must lie in the left subtree. If \(k\)
+        is larger, the current node is a <em>candidate</em>, but a still-larger
+        key \(\le k\) might sit in the right subtree, so we look there and keep the
+        node only if the right subtree offers nothing.
+      </p>
+      <pre>Node* floor(Node* t, const Key&amp; k) {   <span class="cm">// largest key &lt;= k</span>
+    if (!t) return nullptr;
+    if (k == t-&gt;key) return t;
+    if (k &lt; t-&gt;key)  return floor(t-&gt;left, k);   <span class="cm">// answer is strictly left</span>
+    Node* r = floor(t-&gt;right, k);               <span class="cm">// a closer key on the right?</span>
+    return r ? r : t;                           <span class="cm">// else this node is the floor</span>
+}</pre>
+      <p>
+        <strong>select</strong> and <strong>rank</strong> are inverses, and both
+        steer by subtree sizes. Let \(s\) be the size of the node&rsquo;s left
+        subtree. For <code>select(i)</code>: if \(i &lt; s\) the answer is the \(i\)-th key on
+        the left; if \(i &gt; s\) it is the \((i-s-1)\)-th key on the right; if
+        \(i = s\) it is this node. For <code>rank(k)</code>: recurse left if
+        \(k\) is smaller, return \(s\) on a match, and return \(s + 1 +
+        \texttt{rank}(\text{right}, k)\) if \(k\) is larger. Without the
+        <code>size</code> field these would be linear; with it they are
+        \(\Theta(\text{height})\).
+      </p>
+      <p>
+        <strong>range(lo, hi)</strong> is an in-order traversal with pruning:
+        recurse left only if \(lo\) could lie there, emit the node if it is in
+        range, and recurse right only if \(hi\) could lie there. It runs in time
+        proportional to the height plus the number of keys reported: the one
+        operation whose cost is not height alone.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (ordered queries on the &sect;4 tree)</span>
+        On the ten-key tree (in-order \(20,30,35,40,50,60,65,70,80,90\)):
+        <code>min</code> follows left links only, \(50 \to 30 \to 20\), and stops at
+        \(20\) because its left link is null, so <code>min = 20</code> after two
+        links; <code>max</code> follows right links, \(50 \to 70 \to 80 \to 90\),
+        stopping at \(90\), so <code>max = 90</code>. Neither ever compares a key:
+        the direction is fixed in advance. <code>floor(45)</code>: from
+        \(50\) go left to \(30\); \(45 &gt; 30\) so \(30\) is a candidate, look
+        right into \(\{40, 35\}\); at \(40\), \(45 &gt; 40\) with an empty right, so
+        \(40\) wins: <code>floor(45) = 40</code>. Symmetrically
+        <code>ceiling(45) = 50</code>. Since the sorted order is
+        \(20,30,35,40,50,\ldots\), <code>select(3) = 40</code> and
+        <code>rank(60) = 5</code> (the five keys \(20,30,35,40,50\) precede it).
+        Finally <code>range(35, 65)</code> reports \(35, 40, 50, 60, 65\).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (rank, select, and ceiling, step by step)</span>
+        The same queries, with the descents written out. For
+        <code>rank(60)</code>: at \(50\), \(60 &gt; 50\) and \(50\)&rsquo;s left
+        subtree \(\{20,30,35,40\}\) has size \(4\), so the answer is \(4 + 1\)
+        plus the rank of \(60\) in the right subtree; at \(70\), \(60 &lt; 70\),
+        recurse left; at \(60\), a match with an empty left subtree contributes
+        \(0\). Total \(4 + 1 + 0 = 5\), agreeing with the count by listing. For
+        <code>select(3)</code>: at \(50\), \(s = 4 &gt; 3\), go left; at \(30\),
+        \(s = 1 &lt; 3\), go right with \(i = 3 - 1 - 1 = 1\); at \(40\),
+        \(s = \text{size}(35) = 1 = i\), so <code>select(3) = 40</code>. And the
+        <code>ceiling(45)</code> claimed by symmetry above: at \(50\),
+        \(45 &lt; 50\), hold \(50\) as the candidate and look left for something
+        closer; at \(30\), \(45 &gt; 30\), so any better key must sit to the
+        right; at \(40\), \(45 &gt; 40\) again and \(40\)&rsquo;s right link is
+        null, so the left subtree offers nothing \(\ge 45\) and the candidate
+        \(50\) stands. Each answer took one root-to-node path, consulting only
+        cached sizes and keys.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=bst">BST demo</a>. Enter a key for floor/ceiling
+        or a rank for select and watch the descent light up; floor&rsquo;s
+        &ldquo;hold a candidate, then try the right subtree&rdquo; step is the one
+        worth seeing animated.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="delete">6. Deletion (Hibbard)</h2>
+      <p>
+        Removing a key is the one operation with a genuine complication. A
+        <strong>leaf</strong> is simply detached. A node with <strong>one
+        child</strong> is spliced out: the parent&rsquo;s link jumps to the lone
+        child, which carries its subtree along. The trouble is a node with
+        <strong>two children</strong>: detaching it leaves two dangling
+        subtrees and only one link in the parent to reattach them.
+      </p>
+      <p>
+        Deleting the <em>minimum</em> is the easy building block: walk left until a
+        node has no left child (that is the minimum), free it, and splice in its
+        right child. The general two-child case reduces to it.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (Hibbard deletion)</span>
+        To delete a node \(x\) with two children (Hibbard, 1962), replace it with
+        its <strong>in-order successor</strong> \(s\): the smallest key in
+        \(x\)&rsquo;s right subtree, which by construction has <em>no left
+        child</em>. Concretely: copy \(s\)&rsquo;s key and value up into
+        \(x\)&rsquo;s node, then <code>deleteMin</code> the duplicate \(s\) out of
+        the right subtree.
+      </div>
+      <p>
+        Order is preserved because no key lies strictly between \(x\)&rsquo;s key
+        and its successor: \(s\) is larger than everything in the left subtree
+        (which was all below \(x\)) and smaller than everything remaining in the
+        right subtree, so it belongs exactly where \(x\) sat. The predecessor
+        (the largest key in the left subtree) would serve equally well
+        by symmetry.
+      </p>
+      <div class="code-tabs" data-snippet="trees/bst-delete">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Hibbard deletion. 0/1-child: splice in the lone child. 2-child: copy the
+// in-order successor (min of the right subtree) up, then deleteMin it out.
+Node* deleteMin(Node* t) {
+    if (!t-&gt;left) { Node* r = t-&gt;right; delete t; return r; }   // free the min
+    t-&gt;left = deleteMin(t-&gt;left);
+    t-&gt;size = 1 + size(t-&gt;left) + size(t-&gt;right);
+    return t;
+}
+Node* erase(Node* t, const Key&amp; key) {
+    if (!t) return nullptr;
+    if      (key &lt; t-&gt;key) t-&gt;left  = erase(t-&gt;left,  key);
+    else if (key &gt; t-&gt;key) t-&gt;right = erase(t-&gt;right, key);
+    else {                                   // found the node to remove
+        if (!t-&gt;left || !t-&gt;right) {         // 0 or 1 child
+            Node* c = t-&gt;left ? t-&gt;left : t-&gt;right;
+            delete t;                        // free the node (no leak)
+            return c;                        // splice in the lone child
+        }
+        Node* s = t-&gt;right;                  // in-order successor:
+        while (s-&gt;left) s = s-&gt;left;         //   min of the right subtree
+        t-&gt;key = s-&gt;key; t-&gt;val = s-&gt;val;    // copy it up
+        t-&gt;right = deleteMin(t-&gt;right);      // remove (and free) the duplicate
+    }
+    t-&gt;size = 1 + size(t-&gt;left) + size(t-&gt;right);
+    return t;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Hibbard deletion. 0/1-child: splice the lone child. 2-child: copy the
+// in-order successor (min of the right subtree) up, then deleteMin it out.
+Node deleteMin(Node t) {
+    if (t.left == null) return t.right;      // the min; GC frees it
+    t.left = deleteMin(t.left);
+    t.size = 1 + size(t.left) + size(t.right);
+    return t;
+}
+Node erase(Node t, Key key) {
+    if (t == null) return null;
+    int c = key.compareTo(t.key);
+    if      (c &lt; 0) t.left  = erase(t.left,  key);
+    else if (c &gt; 0) t.right = erase(t.right, key);
+    else {                                   // found the node to remove
+        if (t.left  == null) return t.right; // 0 or 1 child
+        if (t.right == null) return t.left;
+        Node s = t.right;                    // in-order successor:
+        while (s.left != null) s = s.left;   //   min of the right subtree
+        t.key = s.key; t.val = s.val;        // copy it up
+        t.right = deleteMin(t.right);        // remove the duplicate
+    }
+    t.size = 1 + size(t.left) + size(t.right);
+    return t;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Hibbard deletion. 0/1-child: splice the lone child. 2-child: copy the
+# in-order successor (min of the right subtree) up, then delete_min it out.
+def delete_min(t):
+    if t.left is None:
+        return t.right                       # the min; spliced out here
+    t.left = delete_min(t.left)
+    t.size = 1 + size(t.left) + size(t.right)
+    return t
+
+def erase(t, key):
+    if t is None:
+        return None
+    if   key &lt; t.key: t.left  = erase(t.left,  key)
+    elif key &gt; t.key: t.right = erase(t.right, key)
+    else:                                    # found the node to remove
+        if t.left  is None: return t.right   # 0 or 1 child
+        if t.right is None: return t.left
+        s = t.right                          # in-order successor:
+        while s.left: s = s.left             #   min of the right subtree
+        t.key, t.val = s.key, s.val          # copy it up
+        t.right = delete_min(t.right)        # remove the duplicate
+    t.size = 1 + size(t.left) + size(t.right)
+    return t</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Hibbard deletion. 0/1-child: splice the lone child. 2-child: copy the
+// in-order successor (min of the right subtree) up, then delete_min it out.
+fn delete_min(mut t: Box&lt;Node&gt;) -&gt; Option&lt;Box&lt;Node&gt;&gt; {
+    match t.left.take() {
+        None =&gt; t.right.take(),                        // the min; dropped here
+        Some(l) =&gt; {
+            t.left = delete_min(l);
+            t.size = 1 + size(&amp;t.left) + size(&amp;t.right);
+            Some(t)
+        }
+    }
+}
+fn min_kv(t: &amp;Box&lt;Node&gt;) -&gt; (i64, String) {            // successor key + value
+    let mut n = t;
+    while let Some(l) = &amp;n.left { n = l; }
+    (n.key, n.val.clone())
+}
+fn erase(t: Option&lt;Box&lt;Node&gt;&gt;, key: i64) -&gt; Option&lt;Box&lt;Node&gt;&gt; {
+    let mut n = t?;                                     // None stays None
+    if      key &lt; n.key { n.left  = erase(n.left.take(),  key); }
+    else if key &gt; n.key { n.right = erase(n.right.take(), key); }
+    else {                                             // found it
+        if n.left.is_none()  { return n.right.take(); }    // 0 or 1 child
+        if n.right.is_none() { return n.left.take(); }
+        let (sk, sv) = min_kv(n.right.as_ref().unwrap());
+        n.key = sk; n.val = sv;                        // copy successor up
+        n.right = delete_min(n.right.take().unwrap()); // remove the duplicate
+    }
+    n.size = 1 + size(&amp;n.left) + size(&amp;n.right);
+    Some(n)
+}</pre>
+<p class="ct-src">source: <code>code/trees/bst-delete.cpp &middot; code/trees/bst-delete.java &middot; code/trees/bst-delete.py &middot; code/trees/bst-delete.rs</code></p>
+<!--/ct--></div>
+      <p>
+        In C++ each removed node must be <code>delete</code>d exactly once, which the
+        code does at every case: the 0/1-child branch frees the node and returns its
+        lone child; the two-child branch defers to <code>deleteMin</code>, which
+        frees the duplicated successor. No leaks: the standard the first
+        programming assignment grades. (Java and Python lean on garbage collection;
+        the Rust version drops owned <code>Box</code>es automatically.)
+      </p>
+      <figure>
+        <svg viewBox="0 0 650 320" role="img" aria-label="Hibbard deletion of key E from a binary search tree, shown as two trees with an arrow from the before tree to the after tree. Before: the root is S with left child E and right child X; E has left child A and right child R; A has a right child C; R has a left child H; H has a right child M; M has children L and P. E is highlighted as the node to delete and H is highlighted as its in-order successor. After: E is replaced by H, so the root S now has left child H and right child X; H keeps E's children A and R; A still has right child C; and M has moved up into H's old place as R's left child, keeping its children L and P.">
+          <!-- BEFORE -->
+          <g stroke="#8a92a6" stroke-width="1.6">
+            <line x1="160" y1="28" x2="95" y2="78"/>
+            <line x1="160" y1="28" x2="225" y2="78"/>
+            <line x1="95" y1="78" x2="55" y2="128"/>
+            <line x1="95" y1="78" x2="140" y2="128"/>
+            <line x1="55" y1="128" x2="78" y2="178"/>
+            <line x1="140" y1="128" x2="120" y2="178"/>
+            <line x1="120" y1="178" x2="145" y2="228"/>
+            <line x1="145" y1="228" x2="120" y2="278"/>
+            <line x1="145" y1="228" x2="170" y2="278"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14.5" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="160" cy="28" r="16"/>
+              <circle cx="225" cy="78" r="16"/>
+              <circle cx="55" cy="128" r="16"/>  <circle cx="140" cy="128" r="16"/>
+              <circle cx="78" cy="178" r="16"/>
+              <circle cx="145" cy="228" r="16"/>
+              <circle cx="120" cy="278" r="16"/> <circle cx="170" cy="278" r="16"/>
+            </g>
+            <g fill="#fff5e6" stroke="#9a5b00" stroke-width="2.2">
+              <circle cx="95" cy="78" r="16"/>
+            </g>
+            <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2">
+              <circle cx="120" cy="178" r="16"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="160" y="33">S</text>  <text x="95" y="83">E</text>
+              <text x="225" y="83">X</text>  <text x="55" y="133">A</text>
+              <text x="140" y="133">R</text> <text x="78" y="183">C</text>
+              <text x="120" y="183">H</text> <text x="145" y="233">M</text>
+              <text x="120" y="283">L</text> <text x="170" y="283">P</text>
+            </g>
+          </g>
+          <text x="325" y="150" font-family="system-ui, sans-serif" font-size="30" fill="#5c6270" text-anchor="middle">&rArr;</text>
+          <!-- AFTER (offset +330 in x) -->
+          <g stroke="#8a92a6" stroke-width="1.6">
+            <line x1="490" y1="28" x2="425" y2="78"/>
+            <line x1="490" y1="28" x2="555" y2="78"/>
+            <line x1="425" y1="78" x2="385" y2="128"/>
+            <line x1="425" y1="78" x2="470" y2="128"/>
+            <line x1="385" y1="128" x2="408" y2="178"/>
+            <line x1="470" y1="128" x2="450" y2="178"/>
+            <line x1="450" y1="178" x2="425" y2="228"/>
+            <line x1="450" y1="178" x2="475" y2="228"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="14.5" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="490" cy="28" r="16"/>
+              <circle cx="555" cy="78" r="16"/>
+              <circle cx="385" cy="128" r="16"/> <circle cx="470" cy="128" r="16"/>
+              <circle cx="408" cy="178" r="16"/>
+              <circle cx="425" cy="228" r="16"/> <circle cx="475" cy="228" r="16"/>
+            </g>
+            <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2">
+              <circle cx="425" cy="78" r="16"/>
+              <circle cx="450" cy="178" r="16"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="490" y="33">S</text>  <text x="425" y="83">H</text>
+              <text x="555" y="83">X</text>  <text x="385" y="133">A</text>
+              <text x="470" y="133">R</text> <text x="408" y="183">C</text>
+              <text x="450" y="183">M</text> <text x="425" y="233">L</text>
+              <text x="475" y="233">P</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          Deleting <strong>E</strong> (two children) from the tree built by
+          inserting \(S,E,A,R,C,H,X,M,P,L\). The in-order successor of \(E\) is
+          <strong>H</strong> (the minimum of \(E\)&rsquo;s right subtree); its key
+          moves up into \(E\)&rsquo;s node, and <code>deleteMin</code> removes the old
+          \(H\), whose right child \(M\) slides into its place. In-order before,
+          \(A\,C\,E\,H\,L\,M\,P\,R\,S\,X\); after, \(A\,C\,H\,L\,M\,P\,R\,S\,X\):
+          still sorted, with only \(E\) gone.
+        </figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Example (the two easy cases, on the ten-key tree)</span>
+        On the tree of &sect;4 (in-order \(20,30,35,40,50,60,65,70,80,90\)),
+        the other two deletion cases are single splices.
+        <strong>Leaf:</strong> <code>erase(35)</code> descends
+        \(50 \to 30 \to 40 \to 35\); \(35\) has no children, so \(40\)&rsquo;s
+        left link becomes null and the node is freed. In-order after:
+        \(20,30,40,50,60,65,70,80,90\).
+        <strong>One child:</strong> <code>erase(80)</code> descends
+        \(50 \to 70 \to 80\); \(80\) has only the right child \(90\), so
+        \(70\)&rsquo;s right link jumps to \(90\), which carries its subtree
+        along. In-order after: \(20,30,35,40,50,60,65,70,90\). Each case is one
+        downward walk plus \(O(1)\) pointer surgery, with the
+        <code>size</code> fields on the path recounted on the way back up.
+      </div>
+      <div class="aside">
+        <span class="tag">Hibbard&rsquo;s asymmetry wart</span>
+        Always taking the successor biases the tree: after many interleaved random
+        inserts and deletes, always-successor Hibbard deletion drives the expected
+        path length to \(\sim\!\sqrt{n}\) rather than \(\log n\) (Sedgewick &amp;
+        Wayne report this long-standing result). Alternating successor and
+        predecessor, or always taking from the taller subtree, mitigates it; the
+        balanced trees of the <a href="ds-avl-trees.html"><em>AVL Trees</em></a>
+        handout and its siblings remove the
+        concern entirely, which is
+        one more reason to want them.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="analysis">7. How tall is a BST?</h2>
+      <p>
+        Every operation in this handout walks one root-to-leaf path (delete walks
+        two: down to the node, then down to its successor), doing constant work per
+        node. So each costs \(\Theta(\text{depth})\), and in the worst case
+        \(\Theta(\text{height})\). This is worth stating on its own.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (cost is height)</span>
+        In a BST of height \(h\), search, insert, delete, and every ordered
+        operation of &sect;5 run in \(O(h)\) time in the worst case (range queries in
+        \(O(h + m)\) for \(m\) keys reported). Every question about BST performance
+        therefore reduces to a single one: <em>how tall is the tree?</em>
+      </div>
+      <p>
+        By the height bounds of &sect;2, \(h\) lies between \(\lfloor \log_2 n
+        \rfloor\) and \(n-1\), and the shape is set by insertion order. Sorted (or
+        reverse-sorted) input is the disaster: each key is larger than all before
+        it, so every insertion goes right, and the tree degenerates into a path of
+        height \(n-1\): a linked list with extra pointers, on which search is
+        \(\Theta(n)\).
+      </p>
+      <figure>
+        <svg viewBox="0 0 560 250" role="img" aria-label="Two binary search trees on the same seven keys 1 through 7, side by side. Left: inserting the keys in sorted order 1, 2, 3, 4, 5, 6, 7 yields a degenerate chain of height 6, where 1 is the root and each key's only child is its right child holding the next key, ending at 7. Right: inserting the keys in the order 4, 2, 6, 1, 3, 5, 7 yields a perfectly balanced tree of height 2, with root 4, whose left child 2 has children 1 and 3, and whose right child 6 has children 5 and 7.">
+          <!-- LEFT: sorted -> path -->
+          <g stroke="#8a92a6" stroke-width="1.6">
+            <line x1="40" y1="26" x2="70" y2="60"/>
+            <line x1="70" y1="60" x2="100" y2="94"/>
+            <line x1="100" y1="94" x2="130" y2="128"/>
+            <line x1="130" y1="128" x2="160" y2="162"/>
+            <line x1="160" y1="162" x2="190" y2="196"/>
+            <line x1="190" y1="196" x2="220" y2="230"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="40" cy="26" r="14"/>  <circle cx="70" cy="60" r="14"/>
+              <circle cx="100" cy="94" r="14"/> <circle cx="130" cy="128" r="14"/>
+              <circle cx="160" cy="162" r="14"/><circle cx="190" cy="196" r="14"/>
+              <circle cx="220" cy="230" r="14"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="40" y="31">1</text>  <text x="70" y="65">2</text>
+              <text x="100" y="99">3</text> <text x="130" y="133">4</text>
+              <text x="160" y="167">5</text><text x="190" y="201">6</text>
+              <text x="220" y="235">7</text>
+            </g>
+          </g>
+          <!-- RIGHT: balanced -->
+          <g stroke="#8a92a6" stroke-width="1.6">
+            <line x1="440" y1="34" x2="390" y2="98"/>
+            <line x1="440" y1="34" x2="490" y2="98"/>
+            <line x1="390" y1="98" x2="355" y2="162"/>
+            <line x1="390" y1="98" x2="425" y2="162"/>
+            <line x1="490" y1="98" x2="455" y2="162"/>
+            <line x1="490" y1="98" x2="525" y2="162"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="440" cy="34" r="14"/>
+              <circle cx="390" cy="98" r="14"/> <circle cx="490" cy="98" r="14"/>
+              <circle cx="355" cy="162" r="14"/><circle cx="425" cy="162" r="14"/>
+              <circle cx="455" cy="162" r="14"/><circle cx="525" cy="162" r="14"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="440" y="39">4</text>
+              <text x="390" y="103">2</text> <text x="490" y="103">6</text>
+              <text x="355" y="167">1</text> <text x="425" y="167">3</text>
+              <text x="455" y="167">5</text> <text x="525" y="167">7</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The same keys \(1,\ldots,7\), two insertion orders. Left: sorted input
+          \(1,2,\ldots,7\) builds a path of height \(6 = n-1\), search
+          \(\Theta(n)\). Right: the order \(4,2,6,1,3,5,7\) builds a perfect tree of
+          height \(2 = \lfloor \log_2 7 \rfloor\), search \(\Theta(\log n)\). Nothing
+          changed but the order.
+        </figcaption>
+      </figure>
+
+      <h3>The average case: a random BST is shallow</h3>
+      <p>
+        The worst case is real but pessimistic. If the \(n\) keys are inserted in
+        <em>random</em> order (every permutation equally likely), the tree is almost
+        always close to balanced. The precise result is one of the prettiest in the
+        subject.
+      </p>
+      <div class="thm">
+        <span class="tag">Proposition (average search cost, Sedgewick Prop. C)</span>
+        In a BST built by inserting \(n\) distinct keys in random order, a search hit
+        costs on average \(\sim 2\ln n \approx 1.39\log_2 n\) comparisons; search
+        misses and insertions cost \(\sim 1.39\log_2 n\) as well (Prop. D).
+      </div>
+      <p>
+        The comparisons for a search hit equal one plus the node&rsquo;s depth, so
+        the average hit cost is one plus the average depth: the mean depth
+        over all nodes. Here is a self-contained proof of the bound, avoiding the
+        quicksort recurrence Sedgewick solves.
+      </p>
+      <div class="proof">
+        <strong>Proof (ancestor probabilities).</strong> Number the keys
+        \(1, 2, \ldots, n\) by rank. A node&rsquo;s depth is its number of proper
+        ancestors, so the total depth summed over all nodes equals the number of
+        pairs \((i, j)\) for which \(j\) is an ancestor of \(i\). Fix two ranks
+        \(i &lt; j\) (the case \(j &lt; i\) is symmetric) and consider the block of
+        keys ranked \(i, i+1, \ldots, j\); there are \(j - i + 1\) of them.
+        Whichever key of this block is inserted <em>first</em> becomes an ancestor
+        of every other key in the block, and no key of the block is an ancestor of
+        another unless it was inserted first: once two of them are split into
+        different subtrees they can never become ancestor and descendant. Hence
+        \(j\) is an ancestor of \(i\) exactly when \(j\) is the first of the block to
+        be inserted, which by randomness has probability \(\dfrac{1}{j - i + 1}\).
+        <br>
+        Summing over all \(j &gt; i\), the expected number of ancestors of \(i\)
+        that are larger than it is
+        \[
+          \sum_{j &gt; i} \frac{1}{j - i + 1}
+          = \frac12 + \frac13 + \cdots + \frac{1}{n - i + 1} \;\le\; \ln(n-i) + 1,
+        \]
+        a harmonic sum, and symmetrically the smaller ancestors contribute
+        \(\le \ln(i-1) + 1\). Adding the two sides, each key has expected depth at
+        most \(\ln(n-i) + \ln(i-1) + 2 \le 2\ln n + 2\), and averaging over \(i\)
+        keeps the leading term: the mean depth is \(\sim 2\ln n\). Since
+        \(2\ln n = (2\ln 2)\log_2 n \approx 1.39\log_2 n\), the average hit costs
+        \(\sim 1.39\log_2 n\) comparisons. <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The single fact doing the work (among a contiguous block of ranks,
+        the first inserted becomes everyone&rsquo;s ancestor) is the same
+        harmonic-number argument that governs quicksort
+        (<a href="../sorting/algo-quicksort.html"><em>Quicksort</em></a>) and the
+        length of hash-table probe sequences
+        (<a href="../hashing/ds-hashing.html"><em>Hashing</em></a>); it is worth
+        knowing once and
+        reusing. The BST is in fact <em>dual</em> to quicksort: the root plays the
+        role of the first pivot, splitting the keys into a smaller-left and
+        larger-right part, each built recursively, so a random BST and a
+        random-pivot quicksort have the same \(\sim 2\ln n\) analysis.
+      </p>
+      <div class="aside">
+        <span class="tag">Average depth is not average height</span>
+        Prop. C bounds the average <em>depth</em> (\(\sim 1.39\log_2 n\)), the mean
+        over all nodes. The <em>height</em> (the maximum depth) of a
+        random BST is larger, \(\sim 2.99\log_2 n\) (Robson; Devroye), still
+        logarithmic but taller. Both are averages over random insertion orders and
+        neither is a guarantee: a single sorted run destroys them, as the path above
+        shows. This gap between &ldquo;shallow on average&rdquo; and &ldquo;shallow
+        always&rdquo; is exactly the gap that balanced trees close.
+      </div>
+      <p>
+        The scorecard, then, is the following, comparing a BST against the two
+        elementary symbol tables.
+      </p>
+      <table>
+        <tr><th>implementation</th><th>search (worst)</th><th>insert (worst)</th><th>search (avg)</th><th>insert (avg)</th></tr>
+        <tr><td>unordered list</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td></tr>
+        <tr><td>sorted array</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(n)\)</td><td>\(\Theta(\log n)\)</td><td>\(\Theta(n)\)</td></tr>
+        <tr><td><strong>BST</strong></td><td>\(\Theta(n)\)</td><td>\(\Theta(n)\)</td><td>\(\boldsymbol{\Theta(\log n)}\)</td><td>\(\boldsymbol{\Theta(\log n)}\)</td></tr>
+      </table>
+      <p>
+        The BST is the only one of the three with <em>logarithmic insertion on
+        average</em>: a sorted array can binary-search in \(\Theta(\log n)\) but must
+        shift \(\Theta(n)\) elements to insert. The price is the bad worst case:
+        a random tree is a hope, not a guarantee. The balanced search trees of
+        the <a href="ds-avl-trees.html"><em>AVL Trees</em></a>,
+        <a href="ds-two-three-trees.html"><em>2&ndash;3 Trees</em></a>,
+        <a href="ds-red-black-trees.html"><em>Red-Black Trees</em></a>, and
+        <a href="ds-b-trees.html"><em>B-Trees</em></a> handouts
+        buy the guarantee back, forcing height \(\Theta(\log n)\) for
+        <em>any</em> insertion order, which is why <code>std::map</code> and
+        <code>std::set</code> are balanced BSTs. That is the cliffhanger this
+        handout hands to <a href="ds-avl-trees.html"><em>AVL
+        Trees</em></a>.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=bst">BST demo</a>. Insert keys in sorted order to
+        watch the tree collapse into a path, then shuffle and reinsert to see it
+        spring back to \(\sim\!1.39\log_2 n\) depth. Seeing the same keys build both
+        shapes is the whole argument of this section in one gesture.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Insert the keys \(50, 30, 70, 20, 40, 60, 80\) into an empty BST
+          <em>in that order</em>, then also into a second empty BST in the order
+          \(20, 30, 40, 50, 60, 70, 80\). Give the height of each and the in-order
+          traversal of each.
+          <details>
+            <summary>solution</summary>
+            First order: \(50\) is the root; \(30\) and \(70\) its children;
+            \(20, 40\) under \(30\) and \(60, 80\) under \(70\): a perfect
+            tree of height \(2\). Second order (sorted): every key exceeds the
+            previous, so each attaches as a right child, giving a path
+            \(20 \to 30 \to \cdots \to 80\) of height \(6\). Both have the <em>same</em>
+            in-order traversal, \(20, 30, 40, 50, 60, 70, 80\): in-order always
+            yields sorted order regardless of shape.
+          </details>
+        </li>
+        <li>
+          A binary tree has pre-order \(H, C, A, E, R, P, X\) and in-order
+          \(A, C, E, H, P, R, X\). Reconstruct the tree and give its post-order.
+          <details>
+            <summary>solution</summary>
+            Pre-order&rsquo;s first key \(H\) is the root; in in-order, \(A, C, E\)
+            precede \(H\) (the left subtree) and \(P, R, X\) follow it (the right).
+            Recursing on the left with pre-order \(C, A, E\): root \(C\), with \(A\)
+            left and \(E\) right. On the right with pre-order \(R, P, X\): root \(R\),
+            with \(P\) left and \(X\) right. The tree is the &sect;3 figure; its
+            post-order (left, right, node) is \(A, E, C, P, X, R, H\).
+          </details>
+        </li>
+        <li>
+          On the ten-key tree of &sect;4 (in-order \(20,30,35,40,50,60,65,70,80,90\)),
+          compute <code>floor(68)</code>, <code>ceiling(68)</code>,
+          <code>rank(65)</code>, and <code>select(6)</code>.
+          <details>
+            <summary>solution</summary>
+            The sorted keys are \(20,30,35,40,50,60,65,70,80,90\) at ranks
+            \(0,\ldots,9\). <code>floor(68)</code> is the largest key \(\le 68\),
+            namely \(65\); <code>ceiling(68)</code> is the smallest \(\ge 68\),
+            namely \(70\). <code>rank(65)</code> counts keys \(&lt; 65\):
+            \(20,30,35,40,50,60\), so \(6\). <code>select(6)</code> is the rank-\(6\)
+            key, which is \(65\), confirming rank and select are inverses.
+          </details>
+        </li>
+        <li>
+          Delete the root \(50\) from the ten-key tree of &sect;4 using Hibbard
+          (successor) deletion. Which key replaces it, and what are the new root and
+          its right subtree?
+          <details>
+            <summary>solution</summary>
+            The in-order successor of \(50\) is the minimum of its right subtree.
+            That subtree is rooted at \(70\) with left child \(60\); since \(60\)
+            has no left child (its only child, \(65\), is on the right), \(60\) is
+            the minimum. Copy \(60\) up to the root, then <code>deleteMin</code>
+            removes the old \(60\), splicing its right child \(65\) into
+            \(60\)&rsquo;s place. The new root is \(60\); its right subtree is \(70\)
+            with left child \(65\) and right child \(80\) (\(90\) still under
+            \(80\)). In-order is now \(20,30,35,40,60,65,70,80,90\): \(50\)
+            gone, still sorted.
+          </details>
+        </li>
+        <li>
+          Prove that the in-order traversal of a binary search tree visits the keys
+          in increasing order.
+          <details>
+            <summary>solution</summary>
+            Induct on the number of nodes. The empty tree emits nothing, vacuously
+            sorted. For a tree rooted at \(x\), in-order emits (in-order of the left
+            subtree), then \(x\), then (in-order of the right subtree). By the
+            induction hypothesis the left output is sorted and, by the BST invariant,
+            consists entirely of keys \(&lt; x\); likewise the right output is sorted
+            and all \(&gt; x\). Concatenating a sorted run of keys below \(x\), then
+            \(x\), then a sorted run above \(x\) yields one sorted sequence.
+            <span style="white-space:nowrap">&#8718;</span>
+          </details>
+        </li>
+        <li>
+          True or false, with justification: &ldquo;If every node of a binary tree
+          has its left child&rsquo;s key less than its own and its right child&rsquo;s
+          key greater than its own, the tree is a binary search tree.&rdquo;
+          <details>
+            <summary>solution</summary>
+            False. The BST invariant constrains <em>whole subtrees</em>, not just
+            immediate children. Consider root \(20\) with left child \(10\) and right
+            child \(30\), and give \(30\) a left child \(5\): locally \(5 &lt; 30\) is
+            fine, but \(5\) sits in \(20\)&rsquo;s right subtree while \(5 &lt; 20\),
+            violating the invariant. In-order would emit \(10, 20, 5, 30\) (not
+            sorted), and a search for \(5\) starting at \(20\) would wrongly go
+            right and miss it. The correct test bounds each node against an
+            \((lo, hi)\) interval inherited from its ancestors.
+          </details>
+        </li>
+        <li>
+          You must repeatedly find, in a growing set of timestamps, the most recent
+          event at or before a query time, and occasionally list all events in a
+          date range. Would you use a hash table or a BST, and which operations does
+          each query map to?
+          <details>
+            <summary>solution</summary>
+            A BST (in practice a balanced one). &ldquo;Most recent at or before a
+            query time&rdquo; is exactly <code>floor(t)</code>, and &ldquo;all events
+            in a range&rdquo; is a <code>range(lo, hi)</code> query, both
+            \(\Theta(\log n)\) (plus output size for the range) on a balanced BST. A
+            hash table gives \(O(1)\) exact lookups but has <em>no</em> notion of
+            order, so it cannot answer floor or range at all without scanning every
+            key. Ordered queries are precisely where a BST beats a hash table.
+          </details>
+        </li>
+        <li>
+          Explain why a random BST&rsquo;s average <em>depth</em> (\(\sim
+          1.39\log_2 n\)) can be smaller than its average <em>height</em>
+          (\(\sim 2.99\log_2 n\)) even though both are logarithmic, and why neither
+          protects you against a bad input.
+          <details>
+            <summary>solution</summary>
+            Depth is averaged over <em>all</em> nodes, so shallow nodes near the root
+            pull the mean down; height is the single deepest node, an extreme value
+            that a random tree pushes to about \(2.99\log_2 n\). A tree can have small
+            average depth while one lucky branch runs deep, so the two constants
+            differ. Both statements are averages over random insertion orders and say
+            nothing about a specific order: feed the keys sorted and the height is
+            \(n-1\) with certainty. Guaranteeing logarithmic height for every order is
+            the job of balanced search trees, starting with the
+            <a href="ds-avl-trees.html"><em>AVL Trees</em></a> handout.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Trees &amp; Binary Search Trees
+        v1.0 &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

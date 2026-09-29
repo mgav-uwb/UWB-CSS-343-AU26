@@ -1,0 +1,742 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: 0/1 Knapsack.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>0/1 Knapsack - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h2.part { font-size: 23px; margin: 48px 0 8px; padding-top: 22px; border-top: 2px solid var(--line); }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.lt { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.piv { background: var(--warnbg); color: var(--warn); font-weight: 700; }
+      table.trace td.scan { outline: 2px solid var(--demo); outline-offset: -2px; }
+      table.trace td.num { text-align: center; }
+      table.trace td.pq { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace .two { background: var(--warnbg); color: var(--warn); font-weight: 700; border-radius: 3px; padding: 0 3px; }
+      table.trace td.new { text-align: center; color: var(--accent); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+      <h1>0/1 Knapsack</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
+      </div>
+      <div class="src">
+        The 0/1 knapsack problem: why greedy-by-ratio fails once items are
+        indivisible, the take-or-skip recurrence \(K[i][w]\), the worked
+        \(\Theta(nW)\) table, the item traceback, complete code, the
+        knapsack family of variants, and the pseudo-polynomial fine print: why
+        \(\Theta(nW)\) is exponential in the input&rsquo;s bit-length and
+        how that squares with NP-hardness. The method itself is the
+        <a href="paradigm-dp-method.html">Dynamic Programming Method</a> handout. With a
+        demo and exercises.
+      </div>
+
+      <p class="lead">
+        The DP recipe (define the subproblem, write the recurrence off the last
+        decision, pin the base cases, fill in dependency order, read the answer
+        cell) is the <a href="paradigm-dp-method.html">Dynamic Programming Method</a>
+        handout. This handout runs it on a problem where greedy fails outright
+        (the <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout):
+        the <strong>0/1 knapsack</strong>, whose take-or-skip table also
+        exposes the subtle notion of <em>pseudo-polynomial</em> time.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#knap">The 0/1 knapsack problem</a></li>
+          <li><a href="#pseudo">Pseudo-polynomial time</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="knap">1. The 0/1 knapsack problem</h2>
+      <div class="def">
+        <span class="tag">Definition (0/1 knapsack)</span>
+        Given \(n\) items, each with a <strong>value</strong> \(v_i\) and a
+        <strong>weight</strong> \(w_i\), and a knapsack of capacity \(W\): choose a
+        subset of items of maximum total value whose total weight is at most \(W\).
+        Each item is taken <em>whole or not at all</em>; that all-or-nothing
+        choice is the &ldquo;0/1.&rdquo;
+      </div>
+      <p>
+        The running example, four items and capacity \(W = 5\):
+      </p>
+      <pre>  item    A   B   C   D
+  value   3   4   5   6
+  weight  2   3   4   5        W = 5</pre>
+      <p>
+        Which subset fits and is worth the most? Contrast this with the
+        <em>fractional</em> knapsack of the
+        <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout, where items could be cut
+        and greedy-by-ratio was provably optimal. Making the items indivisible breaks
+        the greedy argument completely:
+      </p>
+      <div class="ex">
+        <span class="tag">Example (greedy fails)</span>
+        Capacity \(W = 6\), three items: \(P\) (value \(5\), weight \(4\), ratio
+        \(1.25\)), \(Q\) (value \(3\), weight \(3\), ratio \(1.00\)), \(R\) (value
+        \(3\), weight \(3\), ratio \(1.00\)). Greedy takes the best-ratio item \(P\)
+        first, and then only \(2\) units of capacity remain, into which nothing
+        fits, for a total of \(5\). The optimum is \(Q + R\): weight \(6\), value
+        \(6\). One high-ratio item <em>blocks</em> two jointly better ones. The best
+        choice for any one item depends on the remaining capacity and on all the
+        other items, so no single choice can be committed to greedily: both
+        including and excluding each item must be considered. (On the A&ndash;D set
+        above, greedy happens to get lucky; one passing test is not a proof, which is
+        why this counterexample matters.)
+      </div>
+      <p>
+        Trying everything naively is hopeless: \(n\) items form \(2^n\) subsets, and
+        for \(n = 40\) that is \(2^{40} \approx 1.1 \times 10^{12}\), a
+        trillion subsets. DP replaces the enumeration with a table of
+        \(n \cdot W\) cells: for \(n = 40\) and \(W = 1000\), forty thousand cells.
+        From \(10^{12}\) to \(4 \times 10^4\) is the same exponential-to-polynomial
+        collapse as memoized Fibonacci, now on a real optimization problem (with one
+        caveat about that \(W\), the subject of <a href="#pseudo">&sect;2</a>).
+      </p>
+      <h3>The subproblem and the recurrence</h3>
+      <div class="def">
+        <span class="tag">Definition (knapsack table)</span>
+        Let \(K[i][w]\) be the maximum value achievable using only the first \(i\)
+        items within weight capacity \(w\). The last-decision question
+        (<em>take item \(i\) or not?</em>) gives the recurrence
+        \[
+          K[i][w] = \max\bigl(\; \underbrace{K[i-1][w]}_{\text{skip item } i},\;\;
+          \underbrace{v_i + K[i-1][w - w_i]}_{\text{take item } i \text{ (only if } w_i \le w\text{)}} \;\bigr),
+        \]
+        with base cases \(K[0][w] = 0\) (no items, no value) and \(K[i][0] = 0\)
+        (no capacity, nothing fits). The answer is \(K[n][W]\).
+      </div>
+      <p>
+        The state is two-dimensional (how many items have been considered, and
+        how much capacity remains), exactly the &ldquo;add a dimension when the
+        recurrence needs information the state lacks&rdquo; move of the
+        <a href="paradigm-dp-method.html#recipe">DP recipe</a>: the
+        value of taking an item cannot be judged without knowing the capacity left
+        for the rest. Skipping item \(i\) keeps the best of the first \(i-1\) items at
+        the same capacity (the cell directly above); taking it earns \(v_i\) plus the
+        best the earlier items can do in the <em>reduced</em> capacity \(w - w_i\)
+        (one row up, \(w_i\) columns left). The guard \(w_i \le w\) is the only
+        wrinkle this recurrence adds over LCS: an item that does not fit cannot
+        be taken.
+      </p>
+      <figure>
+        <svg viewBox="0 0 460 190" role="img" aria-label="Two small grids showing which neighbor cells a DP cell reads. Left, the knapsack table: cell K[i][w] in the bottom row has one arrow arriving from the cell directly above it, labeled skip, and a second arrow arriving from the cell one row up and several columns to the left (at column w minus the item's weight), labeled take plus v-sub-i. Right, the edit-distance table: cell D[i][j] has three arrows arriving from the cell above (delete), the cell to the left (insert), and the diagonal upper-left cell (replace, or free on a match).">
+          <defs>
+            <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L8,4 L0,8 z" fill="#6b40d8"/>
+            </marker>
+          </defs>
+          <g font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#2a2d36" text-anchor="middle">
+            <text x="105" y="20">knapsack: K[i][w]</text>
+            <text x="348" y="20">edit distance: D[i][j]</text>
+          </g>
+          <!-- knapsack grid: 5 cols x 3 rows -->
+          <g fill="#fff" stroke="#cdd3de" stroke-width="1.2">
+            <rect x="20"  y="46" width="34" height="26"/><rect x="54" y="46" width="34" height="26"/>
+            <rect x="88"  y="46" width="34" height="26"/><rect x="122" y="46" width="34" height="26"/>
+            <rect x="156" y="46" width="34" height="26"/>
+            <rect x="20"  y="72" width="34" height="26"/><rect x="54" y="72" width="34" height="26"/>
+            <rect x="88"  y="72" width="34" height="26"/><rect x="122" y="72" width="34" height="26"/>
+            <rect x="156" y="72" width="34" height="26"/>
+            <rect x="20"  y="98" width="34" height="26"/><rect x="54" y="98" width="34" height="26"/>
+            <rect x="88"  y="98" width="34" height="26"/><rect x="122" y="98" width="34" height="26"/>
+            <rect x="156" y="98" width="34" height="26"/>
+          </g>
+          <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.5">
+            <rect x="20"  y="72" width="34" height="26"/>
+            <rect x="122" y="72" width="34" height="26"/>
+          </g>
+          <rect x="122" y="98" width="34" height="26" fill="#f3efff" stroke="#6b40d8" stroke-width="1.7"/>
+          <g stroke="#6b40d8" stroke-width="1.8" fill="none" marker-end="url(#arr)">
+            <line x1="139" y1="92" x2="139" y2="108"/>
+            <line x1="46"  y1="94" x2="130" y2="109"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12" fill="#5c6270" text-anchor="middle">
+            <text x="37"  y="42">w&minus;w&#7522;</text>
+            <text x="139" y="42">w</text>
+            <text x="163" y="103" text-anchor="start">skip</text>
+            <text x="78"  y="118">take +v&#7522;</text>
+          </g>
+          <!-- edit-distance grid: 3 cols x 3 rows -->
+          <g fill="#fff" stroke="#cdd3de" stroke-width="1.2">
+            <rect x="280" y="46" width="34" height="26"/><rect x="314" y="46" width="34" height="26"/>
+            <rect x="348" y="46" width="34" height="26"/>
+            <rect x="280" y="72" width="34" height="26"/><rect x="314" y="72" width="34" height="26"/>
+            <rect x="348" y="72" width="34" height="26"/>
+            <rect x="280" y="98" width="34" height="26"/><rect x="314" y="98" width="34" height="26"/>
+            <rect x="348" y="98" width="34" height="26"/>
+          </g>
+          <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.5">
+            <rect x="314" y="72" width="34" height="26"/>
+            <rect x="348" y="72" width="34" height="26"/>
+            <rect x="314" y="98" width="34" height="26"/>
+          </g>
+          <rect x="348" y="98" width="34" height="26" fill="#f3efff" stroke="#6b40d8" stroke-width="1.7"/>
+          <g stroke="#6b40d8" stroke-width="1.8" fill="none" marker-end="url(#arr)">
+            <line x1="365" y1="92"  x2="365" y2="108"/>
+            <line x1="338" y1="115" x2="357" y2="115"/>
+            <line x1="336" y1="94"  x2="357" y2="109"/>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12" fill="#5c6270" text-anchor="middle">
+            <text x="389" y="103" text-anchor="start">delete</text>
+            <text x="331" y="140">insert</text>
+            <text x="305" y="88" text-anchor="end">replace</text>
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="12" fill="#5c6270" text-anchor="middle">
+            <text x="105" y="168">two candidate sources, take the max</text>
+            <text x="348" y="168">three candidate sources, take the min</text>
+          </g>
+        </svg>
+        <figcaption>
+          The two marquee 2-D transitions as neighbor reads (edit distance is
+          the <a href="algo-edit-distance.html">Edit Distance</a> handout). Knapsack:
+          \(K[i][w]\) takes the larger of the cell directly above (skip) and the cell
+          one row up, \(w_i\) columns left, plus \(v_i\) (take). Edit distance:
+          \(D[i][j]\) takes \(1\) plus the smallest of up (delete), left (insert),
+          and diagonal (replace); the diagonal is free when the characters
+          match. Both fill row by row, so every source is ready before it is read.
+        </figcaption>
+      </figure>
+      <div class="aside">
+        <span class="tag">The indexing pitfall</span>
+        In the recurrence, &ldquo;item \(i\)&rdquo; is 1-based: \(K[i][w]\)
+        covers items \(1\) through \(i\), and row \(0\) is the empty set. A 0-based
+        C++ vector of items therefore reads <code>value[i-1]</code> and
+        <code>weight[i-1]</code> inside the row-\(i\) loop (or carries a dummy slot
+        \(0\), as the code below does). This off-by-one, and its twin at the base-case
+        edges, is the single most common knapsack bug: write row \(0\) and column
+        \(0\) first, then the double loop never reads an uninitialized or misaligned
+        cell.
+      </div>
+      <div class="ex">
+        <span class="tag">Example (one cell, both branches)</span>
+        Compute \(K[2][5]\) (items A and B available, capacity \(5\); B has
+        value \(4\), weight \(3\)):
+        <pre>  skip B:  K[1][5] = 3                       (just A)
+  take B:  4 + K[1][5-3] = 4 + K[1][2] = 4 + 3 = 7
+  K[2][5] = max(3, 7) = 7                    &larr; take both A and B</pre>
+        Taking B adds its value to the best use of the two units of capacity that
+        remain <em>for the earlier items</em>: \(K[1][2] = 3\), item A alone
+        (weights \(2 + 3 = 5\) exactly fill the sack). Every cell of the table is
+        this one computation. One more, at a tighter capacity: \(K[3][4]\) (items
+        A&ndash;C, capacity \(4\); C has value \(5\), weight \(4\)). Skip C:
+        \(K[2][4] = 4\) (B alone; A\(+\)B weigh \(5\), too much for capacity
+        \(4\)). Take C: \(5 + K[2][0] = 5 + 0 = 5\), C using the whole capacity.
+        \(K[3][4] = \max(4, 5) = 5\): C alone beats B alone at capacity \(4\).
+      </div>
+      <div class="ex">
+        <span class="tag">Example (one whole row, every branch)</span>
+        Row \(+\)C (item C, value \(5\), weight \(4\)) filled left to right, given
+        the row above it, \(K[2][0..5] = 0, 0, 3, 4, 4, 7\). The recurrence has
+        three possible outcomes at a cell, and this single row shows all of them:
+        <table class="trace">
+          <tr><th class="lab">\(w\)</th><th>\(w_C = 4 \le w\)?</th><th>skip = \(K[2][w]\)</th><th>take = \(5 + K[2][w-4]\)</th><th>\(K[3][w]\)</th></tr>
+          <tr><td class="lab">0</td><td>no, does not fit</td><td class="cell">0</td><td class="cell">&ndash;</td><td class="cell">0</td></tr>
+          <tr><td class="lab">1</td><td>no, does not fit</td><td class="cell">0</td><td class="cell">&ndash;</td><td class="cell">0</td></tr>
+          <tr><td class="lab">2</td><td>no, does not fit</td><td class="cell">3</td><td class="cell">&ndash;</td><td class="cell">3</td></tr>
+          <tr><td class="lab">3</td><td>no, does not fit</td><td class="cell">4</td><td class="cell">&ndash;</td><td class="cell">4</td></tr>
+          <tr><td class="lab">4</td><td>yes</td><td class="cell">4</td><td class="cell lt">\(5 + K[2][0] = 5\)</td><td class="cell lt">5 (take)</td></tr>
+          <tr><td class="lab">5</td><td>yes</td><td class="cell lt">7</td><td class="cell">\(5 + K[2][1] = 5\)</td><td class="cell lt">7 (skip)</td></tr>
+        </table>
+        <ul>
+          <li><strong>Does not fit</strong> (\(w &lt; 4\)): the take branch is
+            never evaluated, the guard skips it, and the cell copies the row
+            above unchanged. Four cells of this row are pure copies.</li>
+          <li><strong>Fits and take wins</strong> (\(w = 4\)): C alone
+            (\(5\)) beats the best of A and B at capacity \(4\) (\(4\),
+            which is B alone, since A\(+\)B weighs \(5\)).</li>
+          <li><strong>Fits and skip wins</strong> (\(w = 5\)): taking C
+            consumes \(4\) of the \(5\) units and leaves \(1\), into which
+            nothing fits, for \(5\); skipping keeps A\(+\)B at \(7\).</li>
+        </ul>
+        The fourth outcome, a <strong>tie</strong>, needs a little more capacity.
+        Widen the same instance to \(W = 7\) and look at
+        \(K[4][7]\), with row \(+\)C now reading
+        \(K[3][0..7] = 0, 0, 3, 4, 5, 7, 8, 9\):
+        <pre>  skip D:  K[3][7] = 9                       (B + C, weight 7)
+  take D:  6 + K[3][7-5] = 6 + K[3][2] = 6 + 3 = 9   (A + D, weight 7)
+  K[4][7] = max(9, 9) = 9                    &larr; both choices optimal</pre>
+        Because <code>max</code> keeps the skip value on a tie, the cell equals
+        the one above it, and the traceback below reports D as skipped and
+        returns \(\{\text{B}, \text{C}\}\). The equally optimal
+        \(\{\text{A}, \text{D}\}\) is simply the branch the tie-break did not
+        take; either answer is correct, and only one is reported.
+      </div>
+      <h3>The full table</h3>
+      <figure>
+        <table class="trace">
+          <tr><th class="lab">row</th><th>w=0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+          <tr><td class="lab">{} (no items)</td>
+            <td class="cell lt">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td></tr>
+          <tr><td class="lab">+A (v3, w2)</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell lt">3</td><td class="cell">3</td><td class="cell">3</td><td class="cell">3</td></tr>
+          <tr><td class="lab">+B (v4, w3)</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell">3</td><td class="cell">4</td><td class="cell">4</td><td class="cell lt">7</td></tr>
+          <tr><td class="lab">+C (v5, w4)</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell lt">7</td></tr>
+          <tr><td class="lab">+D (v6, w5)</td>
+            <td class="cell">0</td><td class="cell">0</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell lt piv">7</td></tr>
+        </table>
+        <figcaption>
+          The knapsack table for items A&ndash;D at \(W = 5\), filled row by row;
+          each row adds one item. The answer is the bottom-right cell,
+          \(K[4][5] = 7\). The highlighted cells are the ones the
+          traceback below visits on its way back: \(7 \to 7 \to 7\)
+          down column \(5\) (D and C skipped; the value never changes), then
+          the jump to \(K[1][2] = 3\) when B is found taken, then \(K[0][0]\) after
+          A. Watch where the \(7\) first appears: in the +B row at \(w = 5\), the
+          moment A\(+\)B (weight \(5\), value \(7\)) becomes available.
+        </figcaption>
+      </figure>
+      <h3>The code</h3>
+      <div class="code-tabs" data-snippet="dp/knapsack">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Tabulated 0/1 knapsack. value[i], weight[i] describe item i (1-based, with a
+// dummy slot 0). K[i][w] = best value using items 1..i within capacity w.
+// Theta(nW) time and space.
+int knapsack(int n, int W, const vector&lt;int&gt;&amp; value, const vector&lt;int&gt;&amp; weight,
+             vector&lt;vector&lt;int&gt;&gt;&amp; K) {
+    K.assign(n + 1, vector&lt;int&gt;(W + 1, 0));           // row 0: no items -&gt; 0
+    for (int i = 1; i &lt;= n; i++)
+        for (int w = 0; w &lt;= W; w++) {
+            K[i][w] = K[i-1][w];                      // skip item i
+            if (weight[i] &lt;= w)                       // does it fit?
+                K[i][w] = max(K[i][w],
+                              value[i] + K[i-1][w - weight[i]]);   // take it
+        }
+    return K[n][W];                                   // the optimal value
+}
+
+// Traceback: recover WHICH items achieve K[n][W]. If a cell differs from the
+// cell directly above, item i was taken; drop its weight and continue. O(n).
+vector&lt;int&gt; knapsackItems(int n, int W, const vector&lt;int&gt;&amp; weight,
+                          const vector&lt;vector&lt;int&gt;&gt;&amp; K) {
+    vector&lt;int&gt; taken;
+    int w = W;
+    for (int i = n; i &gt;= 1; i--)
+        if (K[i][w] != K[i-1][w]) {                   // value changed: taken
+            taken.push_back(i);
+            w -= weight[i];
+        }
+    reverse(taken.begin(), taken.end());              // forward order
+    return taken;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Tabulated 0/1 knapsack. value[i], weight[i] describe item i (1-based arrays
+// with a dummy slot 0). K[i][w] = best value using items 1..i within
+// capacity w. Theta(nW) time and space.
+static int knapsack(int n, int W, int[] value, int[] weight, int[][] K) {
+    for (int w = 0; w &lt;= W; w++) K[0][w] = 0;     // row 0: no items -&gt; 0
+    for (int i = 1; i &lt;= n; i++)
+        for (int w = 0; w &lt;= W; w++) {
+            K[i][w] = K[i-1][w];                  // skip item i
+            if (weight[i] &lt;= w)                   // does it fit?
+                K[i][w] = Math.max(K[i][w],
+                    value[i] + K[i-1][w - weight[i]]);   // take it
+        }
+    return K[n][W];                               // the optimal value
+}
+
+// Traceback: recover WHICH items achieve K[n][W]. If a cell differs from
+// the cell directly above, item i was taken; drop its weight. O(n).
+static List&lt;Integer&gt; knapsackItems(int n, int W, int[] weight, int[][] K) {
+    List&lt;Integer&gt; taken = new ArrayList&lt;&gt;();
+    int w = W;
+    for (int i = n; i &gt;= 1; i--)
+        if (K[i][w] != K[i-1][w]) {               // value changed: taken
+            taken.add(i);
+            w -= weight[i];
+        }
+    Collections.reverse(taken);                   // forward order
+    return taken;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Tabulated 0/1 knapsack. value[i], weight[i] describe item i (1-based lists
+# with a dummy slot 0). K[i][w] = best value using items 1..i within
+# capacity w. Theta(nW) time and space. Returns the full table.
+def knapsack(n, W, value, weight):
+    K = [[0] * (W + 1) for _ in range(n + 1)]     # row 0: no items -&gt; 0
+    for i in range(1, n + 1):
+        for w in range(W + 1):
+            K[i][w] = K[i - 1][w]                 # skip item i
+            if weight[i] &lt;= w:                    # does it fit?
+                K[i][w] = max(K[i][w],
+                              value[i] + K[i - 1][w - weight[i]])   # take it
+    return K                                      # K[n][W] is the optimum
+
+# Traceback: recover WHICH items achieve K[n][W]. If a cell differs from the
+# cell directly above, item i was taken; drop its weight and continue. O(n).
+def knapsack_items(n, W, weight, K):
+    taken, w = [], W
+    for i in range(n, 0, -1):
+        if K[i][w] != K[i - 1][w]:                # value changed: taken
+            taken.append(i)
+            w -= weight[i]
+    return taken[::-1]                            # forward order</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Tabulated 0/1 knapsack. value[i], weight[i] describe item i (1-based slices
+// with a dummy slot 0). k[i][w] = best value using items 1..=i within
+// capacity w. Theta(nW) time and space. Returns the full table.
+fn knapsack(n: usize, cap: usize, value: &amp;[i64], weight: &amp;[usize]) -&gt; Vec&lt;Vec&lt;i64&gt;&gt; {
+    let mut k = vec![vec![0i64; cap + 1]; n + 1];     // row 0: no items -&gt; 0
+    for i in 1..=n {
+        for w in 0..=cap {
+            k[i][w] = k[i - 1][w];                    // skip item i
+            if weight[i] &lt;= w {                       // does it fit?
+                k[i][w] = k[i][w].max(value[i] + k[i - 1][w - weight[i]]);
+            }
+        }
+    }
+    k                                                 // k[n][cap] is the optimum
+}
+
+// Traceback: recover WHICH items achieve k[n][cap]. If a cell differs from
+// the cell directly above, item i was taken; drop its weight. O(n).
+fn knapsack_items(n: usize, cap: usize, weight: &amp;[usize], k: &amp;[Vec&lt;i64&gt;]) -&gt; Vec&lt;usize&gt; {
+    let mut taken = Vec::new();
+    let mut w = cap;
+    for i in (1..=n).rev() {
+        if k[i][w] != k[i - 1][w] {                   // value changed: taken
+            taken.push(i);
+            w -= weight[i];
+        }
+    }
+    taken.reverse();                                  // forward order
+    taken
+}</pre>
+<p class="ct-src">source: <code>code/dp/knapsack.cpp &middot; code/dp/knapsack.java &middot; code/dp/knapsack.py &middot; code/dp/knapsack.rs</code></p>
+<!--/ct--></div>
+      <p>
+        The traceback deserves a word here (its general pattern is the
+        <a href="algo-traceback-space-saving.html">Traceback &amp; Space-Saving</a>
+        handout). \(K[n][W]\) is only the optimal
+        <em>value</em>; to know <em>which</em> items achieve it, walk from the
+        bottom-right upward, one item per step. If a cell equals the cell directly
+        above, skipping item \(i\) was (one) optimal choice (taking it changed
+        nothing), so the item was not needed; if the values differ, the item
+        was taken: record it and reduce the remaining capacity by its weight. On the
+        table above:
+      </p>
+      <pre>  K[4][5]=7 == K[3][5]=7  &rarr;  D skipped     (w stays 5)
+  K[3][5]=7 == K[2][5]=7  &rarr;  C skipped     (w stays 5)
+  K[2][5]=7 != K[1][5]=3  &rarr;  B TAKEN       (w = 5 &minus; 3 = 2)
+  K[1][2]=3 != K[0][2]=0  &rarr;  A TAKEN       (w = 2 &minus; 2 = 0)
+  &rarr;  items {A, B}, value 7</pre>
+      <div class="thm">
+        <span class="tag">Proposition (knapsack cost)</span>
+        The table has \((n+1)(W+1)\) cells, each filled in \(O(1)\), so the DP runs
+        in \(\Theta(nW)\) time and space; the traceback adds \(O(n)\). (Space drops
+        to \(\Theta(W)\) with the rolling array of the
+        <a href="algo-traceback-space-saving.html">Traceback &amp; Space-Saving</a>
+        handout, if only the value is needed.)
+      </div>
+      <div class="aside">
+        <span class="tag">The knapsack family</span>
+        Small changes to the transition cover a whole family of problems. In the
+        <strong>0/1</strong> version, the take branch reads row \(i-1\): item
+        \(i\), once used, is gone. In the <strong>unbounded</strong> version
+        (unlimited copies of each item), the take branch reads row \(i\) itself,
+        \(K[i][w] = \max(K[i-1][w],\; v_i + K[i][w-w_i])\), so an item
+        can be taken again. A <strong>bounded</strong> version (at most \(k\) copies)
+        loops over the count. Coin change (the <a href="algo-dp-patterns.html#oned">DP Patterns</a>
+        handout) is unbounded knapsack in disguise, minimizing the number of coins instead of maximizing
+        value. One mental model, a one-line tweak per variant, and the
+        <a href="algo-traceback-space-saving.html">Traceback &amp; Space-Saving</a>
+        handout shows the same 0/1-versus-unbounded switch hiding inside a loop
+        direction.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=knapsack">Knapsack demo</a>. The box holds the
+        whole instance as <code>weight/value</code> pairs followed by the capacity,
+        so this section&rsquo;s set is <code>2/3, 3/4, 4/5, 5/6 -&gt; 5</code>. Edit
+        either side of the arrow and press <em>Run</em> to watch the
+        \((n{+}1)\times(W{+}1)\) table fill cell by cell, each cell the max of
+        <em>skip</em> (carried down from the row above) and <em>take</em> (value plus
+        the cell a row up and \(w_i\) columns left). The traceback then compares each
+        row to the one above and marks the items taken. Run \(W = 5\) first and match
+        the table above (A\(+\)B, value \(7\)); then rerun at \(W = 8\) (B\(+\)D,
+        value \(10\)) and \(W = 12\) (B\(+\)C\(+\)D, value \(15\); A drops
+        out). The chosen subset changing with capacity is the greedy counterexample&rsquo;s
+        lesson made visible: no per-item score can decide membership alone. To watch a
+        greedy rule actually lose, run <code>1/6, 2/10, 3/12 -&gt; 5</code>: densities
+        \(6, 5, 4\), so taking the densest item first yields \(16\), while the optimum
+        is \(22\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="pseudo">2. Pseudo-polynomial time</h2>
+      <p>
+        \(\Theta(nW)\) looks polynomial: two variables, multiplied. But look
+        at what the two variables <em>are</em>. The \(n\) counts items: an input with
+        more items is physically longer. The \(W\), though, is not a count of
+        anything in the input; it is the numeric <em>value</em> of a single
+        number that the input spells in binary.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (pseudo-polynomial)</span>
+        An algorithm runs in <strong>pseudo-polynomial time</strong> if its running
+        time is polynomial in the <em>numeric value</em> of the input&rsquo;s numbers
+        but not in the <em>size</em> (bit-length) of the input. Knapsack&rsquo;s
+        \(\Theta(nW)\) is the standard example.
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (the bit-length argument)</span>
+        \(\Theta(nW)\) is exponential in the size of the encoded input.
+      </div>
+      <div class="proof">
+        <strong>Why.</strong> The capacity \(W\) occupies \(b = \lceil \log_2(W{+}1)
+        \rceil\) bits of input (\(W = 1{,}000{,}000\) is written in just
+        \(20\) bits, since \(2^{20} = 1{,}048{,}576\)), yet the DP builds a
+        table with \(W + 1\) columns: a million columns conjured from twenty bits.
+        In general a \(b\)-bit capacity can be as large as \(2^b - 1\), so the running
+        time is
+        \[
+          \Theta(nW) = \Theta\!\bigl(n \cdot 2^{\,b}\bigr),
+        \]
+        exponential in the bit-length \(b\). The everyday symptom: appending one
+        \(0\) bit to \(W\), one more input character, doubles the
+        running time. A truly polynomial algorithm would have to run in time
+        polynomial in \(n\) <em>and</em> \(\log W\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example (the same instance, rescaled)</span>
+        The A&ndash;D instance measured its weights in whole units: weights
+        \(2, 3, 4, 5\) and \(W = 5\), a table of \(6\) columns and \(5\) rows
+        (row \(0\) included), \(30\) cells. Measure the identical sack in tenths
+        of a unit, then in thousandths, and nothing about the problem changes:
+        the optimum is still A\(+\)B at value \(7\), the same two items. Only the
+        table changes.
+        <table class="trace">
+          <tr><th class="lab">weights</th><th>\(W\)</th><th>bits \(b = \lceil\log_2(W{+}1)\rceil\)</th><th>columns \(W+1\)</th><th>cells \((n{+}1)(W{+}1)\)</th><th>optimum</th></tr>
+          <tr><td class="lab">2, 3, 4, 5</td><td class="cell">5</td><td class="cell">3</td><td class="cell">6</td><td class="cell">30</td><td class="cell lt">7 (A+B)</td></tr>
+          <tr><td class="lab">20, 30, 40, 50</td><td class="cell">50</td><td class="cell">6</td><td class="cell">51</td><td class="cell">255</td><td class="cell lt">7 (A+B)</td></tr>
+          <tr><td class="lab">2000, 3000, 4000, 5000</td><td class="cell">5000</td><td class="cell">13</td><td class="cell">5001</td><td class="cell">25005</td><td class="cell lt">7 (A+B)</td></tr>
+        </table>
+        Three extra digits written into the input bought a table about
+        \(1000 \approx 2^{10}\) times larger, matching the \(10\) extra bits
+        (\(3 \to 13\)). The work tracks the numeric <em>value</em> of \(W\), while
+        the input grew by a handful of characters, and the answer never moved.
+        Padding \(W\) with one more bit doubles the table again, and again.
+      </div>
+      <p>
+        The contrast with edit distance (the
+        <a href="algo-edit-distance.html">Edit Distance</a> handout) makes the
+        distinction sharp. Its \(\Theta(mn)\) bound is <em>truly</em> polynomial,
+        because \(m\) and \(n\) are the lengths of the two input strings: the
+        table grows with the physical size of the input, not with the value of a
+        number inside it. Knapsack&rsquo;s table has a dimension proportional to a
+        <em>value</em>, and values grow exponentially faster than their encodings.
+      </p>
+      <div class="aside">
+        <span class="tag">No contradiction with NP-hardness</span>
+        The 0/1 knapsack problem is NP-hard (NP: nondeterministic polynomial time):
+        among the problems for which no polynomial-time algorithm is known,
+        and none is expected. The \(\Theta(nW)\) DP does not contradict that: it is
+        efficient when the capacity is numerically modest, and exponential (in the
+        input size) when \(W\) is astronomically large, exactly the regime the
+        hardness lives in. In practice this makes the DP a genuinely useful
+        algorithm: capacities in real scheduling, budgeting, and cargo problems are
+        usually small enough that \(nW\) is tiny. Recognizing a pseudo-polynomial
+        bound (asking &ldquo;is this variable a <em>count</em> or a
+        <em>value</em>?&rdquo;) is a standard exam and interview point.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">3. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Items X (value \(4\), weight \(3\)), Y (value \(5\), weight \(4\)), Z
+          (value \(7\), weight \(5\)); capacity \(W = 7\). Fill the knapsack table
+          \(K[0..3][0..7]\), state the optimal value and (by traceback) the items
+          taken, and show that greedy-by-ratio fails on this instance.
+          <details>
+            <summary>solution</summary>
+            <pre>  w:      0  1  2  3  4  5  6  7
+  {}      0  0  0  0  0  0  0  0
+  +X      0  0  0  4  4  4  4  4
+  +Y      0  0  0  4  5  5  5  9
+  +Z      0  0  0  4  5  7  7  9</pre>
+            \(K[3][7] = 9\). Traceback: \(K[3][7] = 9 = K[2][7]\) &rarr; Z skipped;
+            \(K[2][7] = 9 \ne K[1][7] = 4\) &rarr; Y taken (\(w = 7-4 = 3\));
+            \(K[1][3] = 4 \ne K[0][3] = 0\) &rarr; X taken (\(w = 0\)). Items
+            \(\{X, Y\}\): weight \(7\), value \(9\). Greedy by ratio: Z has the best
+            ratio (\(7/5 = 1.40\) versus \(4/3 \approx 1.33\) and \(5/4 = 1.25\)),
+            so greedy takes Z first, leaving capacity \(2\) into which nothing fits:
+            total \(7 &lt; 9\). The same &ldquo;one blocker beats two
+            partners&rdquo; failure as &sect;1.
+          </details>
+        </li>
+        <li>
+          A friend argues: &ldquo;\(\Theta(nW)\) is a polynomial in two variables,
+          so the knapsack DP is a polynomial-time algorithm, so knapsack cannot be
+          NP-hard.&rdquo; Locate the error precisely, using the case
+          \(W = 2^{100}\).
+          <details>
+            <summary>solution</summary>
+            &ldquo;Polynomial time&rdquo; means polynomial in the <em>input
+            size</em>: the number of bits needed to write the input down.
+            The capacity \(W = 2^{100}\) is written in only \(101\) bits, yet
+            \(\Theta(nW) = \Theta(n \cdot 2^{100})\) table cells would be needed,
+            astronomically exponential in those \(101\) bits. In general a
+            \(b\)-bit capacity permits \(W\) up to \(2^b - 1\), making the DP
+            \(\Theta(n \cdot 2^b)\): each additional input bit doubles the work.
+            That is pseudo-polynomial (polynomial in the <em>value</em>
+            \(W\), exponential in the <em>size</em> \(\log_2 W\)), so there is
+            no contradiction with NP-hardness. (Contrast edit distance: its \(m\)
+            and \(n\) are string lengths, actual input size, so \(\Theta(mn)\) is
+            genuinely polynomial.)
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; 0/1 Knapsack v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        interactive demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

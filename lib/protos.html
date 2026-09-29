@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 343 — Algorithm Prototypes (pseudocode)</title>
+<style>
+  body { margin: 0; background: #f6f7fb; color: #1a1c22; font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  header { background: #0b0c10; color: #e7eaf0; padding: 18px clamp(14px,5vw,48px); }
+  header h1 { margin: 0; font-size: 21px; }
+  header h1 a { color: #8b93a7; text-decoration: none; font-weight: 400; }
+  header .sub { color: #8b93a7; font-size: 13px; margin-top: 3px; max-width: 74ch; }
+  main { max-width: 880px; margin: 0 auto; padding: 22px clamp(12px,4vw,28px) 80px; }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  nav.toc a { font-size: 12.5px; font-weight: 600; text-decoration: none; color: #4b3ccc; border: 1px solid #e2dcff; background: #f3f0ff; border-radius: 8px; padding: 4px 10px; }
+  section { margin-top: 34px; scroll-margin-top: 12px; }
+  h2 { font-size: 19px; margin: 0 0 4px; }
+  .why { color: #4a5064; font-size: 13.5px; margin: 0 0 10px; }
+  pre { background: #14161d; color: #dfe3ec; border-radius: 10px; padding: 14px 16px; font: 12.5px/1.55 ui-monospace, Menlo, Consolas, monospace; overflow-x: auto; }
+  pre .todo, code.todo { color: #ffb454; font-style: italic; }
+  .backtop { font-size: 12px; margin-top: 6px; }
+  .backtop a { color: #66708a; }
+</style>
+</head>
+<body>
+<header>
+  <h1><a href="../index.html">CSS 343</a> · Algorithm Prototypes</h1>
+  <div class="sub">Skeletons of the algorithms behind the demos — enough structure to study and trace,
+  <b>not</b> enough to submit: the load-bearing steps are deliberately left as unimplemented helpers
+  (marked <code style="color:#ffb454">TODO</code>). Writing those is the assignment. Pseudocode-flavored C++;
+  error handling, memory management, and edge cases are yours.</div>
+</header>
+<main>
+<nav class="toc" id="toc"></nav>
+
+<section id="bst">
+<h2>Binary search tree</h2>
+<p class="why">Order invariant: left &lt; node &lt; right. Every operation is one root-to-target walk — cost Θ(height).</p>
+<pre>
+Node* insert(Node* t, int key) {
+    if (t == nullptr) return new Node(key);
+    if      (key &lt; t-&gt;key) t-&gt;left  = insert(t-&gt;left,  key);
+    else if (key &gt; t-&gt;key) t-&gt;right = insert(t-&gt;right, key);
+    return t;                       // duplicate: no-op
+}
+
+bool search(Node* t, int key);      <span class="todo">// TODO: the same three-way walk, returning found/not</span>
+
+Node* remove(Node* t, int key) {
+    // three-way walk to the node, then:
+    //   no children  → delete, return nullptr
+    //   one child    → delete, return the child
+    //   two children → Hibbard: overwrite t-&gt;key with the in-order
+    //                  successor's key, then remove THAT key from t-&gt;right
+    <span class="todo">// TODO: findMin(t-&gt;right) and the three cases — draw them first</span>
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="avl">
+<h2>AVL tree</h2>
+<p class="why">Height-balance invariant: each node's child heights differ by ≤ 1. Insert walks down, then repairs on the way back up.</p>
+<pre>
+Node* insert(Node* t, int key) {
+    if (t == nullptr) return new Node(key);
+    if (key &lt; t-&gt;key) t-&gt;left  = insert(t-&gt;left,  key);
+    else              t-&gt;right = insert(t-&gt;right, key);
+    updateHeight(t);
+    return rebalance(t);            // the interesting part
+}
+
+Node* rebalance(Node* t) {
+    int bf = height(t-&gt;left) - height(t-&gt;right);
+    // bf = +2, left child leaning left   → single right rotation (LL)
+    // bf = +2, left child leaning right  → rotate left child left, then right (LR)
+    // …mirror cases for bf = −2 (RR, RL)
+    <span class="todo">// TODO: the four cases, built from rotateLeft / rotateRight</span>
+}
+
+Node* rotateLeft(Node* t);          <span class="todo">// TODO: three pointer moves + two height updates — from the picture</span>
+Node* rotateRight(Node* t);         <span class="todo">// TODO: mirror</span>
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="btree">
+<h2>2-3 tree / B-tree (order M)</h2>
+<p class="why">Perfect balance by construction: nodes get wider, not taller — a full node splits and promotes its middle key; the tree only grows at the root.</p>
+<pre>
+// a node holds up to M−1 keys and up to M children (2-3 tree = M of 3)
+void insert(int key) {
+    Node* leaf = descendToLeaf(root, key);   // pure key-compare walk
+    insertIntoNode(leaf, key);
+    while (leaf-&gt;keys.size() == M) {         // overflow
+        <span class="todo">// TODO: split — move the middle key up into the parent,</span>
+        <span class="todo">//       the right half of keys/children into a new sibling;</span>
+        <span class="todo">//       if there is no parent, a new ROOT (the only way it grows taller)</span>
+        leaf = leaf-&gt;parent;
+    }
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="redblack">
+<h2>Red-black BST (left-leaning)</h2>
+<p class="why">A 2-3 tree encoded in a BST: a red link glues two nodes into one 2-3 node. Insert like a BST, then repair the encoding.</p>
+<pre>
+Node* insert(Node* h, int key) {
+    if (h == nullptr) return new Node(key, RED);   // new links are red
+    if (key &lt; h-&gt;key) h-&gt;left  = insert(h-&gt;left,  key);
+    else              h-&gt;right = insert(h-&gt;right, key);
+
+    if (isRed(h-&gt;right) &amp;&amp; !isRed(h-&gt;left))       h = rotateLeft(h);
+    if (isRed(h-&gt;left)  &amp;&amp; isRed(h-&gt;left-&gt;left))  h = rotateRight(h);
+    if (isRed(h-&gt;left)  &amp;&amp; isRed(h-&gt;right))       flipColors(h);
+    return h;
+}
+<span class="todo">// TODO: rotateLeft / rotateRight (they also swap colors here) and flipColors —</span>
+<span class="todo">//       each is ≤ 5 lines once you draw the 2-3 event it encodes</span>
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="heap">
+<h2>Binary heap · heapsort</h2>
+<p class="why">A complete tree in an array (1-indexed: parent k/2, children 2k, 2k+1), heap-ordered. Everything is swim or sink.</p>
+<pre>
+void insert(int key) { a[++n] = key; swim(n); }
+
+void swim(int k) {
+    while (k &gt; 1 &amp;&amp; a[k/2] &lt; a[k]) { swap(a[k/2], a[k]); k /= 2; }
+}
+
+int delMax() {
+    // swap root ↔ last, shrink, sink the new root
+    <span class="todo">// TODO: 4 lines around sink(1)</span>
+}
+
+void sink(int k) {
+    <span class="todo">// TODO: while 2k ≤ n — pick the LARGER child, stop when parent ≥ it</span>
+}
+
+void heapify() {                     // Θ(n), not n log n
+    for (int k = n / 2; k &gt;= 1; k--) sink(k);
+}
+
+void heapsort() {
+    heapify();
+    <span class="todo">// TODO: repeatedly swap a[1] ↔ a[end], shrink end, sink(1)</span>
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="hashing">
+<h2>Hash table — linear probing &amp; separate chaining</h2>
+<p class="why">h(k) = k mod M picks a home slot; the two strategies differ only in what happens on a collision.</p>
+<pre>
+// linear probing
+void insert(int key) {
+    int i = hash(key);
+    while (slot[i] is occupied) i = (i + 1) % M;   // probe forward
+    slot[i] = key;
+    if (++n &gt;= M * 0.5) resize(2 * M);             // keep α below ½
+}
+
+bool search(int key);   <span class="todo">// TODO: probe from home until the key OR an empty slot</span>
+void remove(int key);   <span class="todo">// TODO: can't just blank the slot (breaks probe chains) —</span>
+                        <span class="todo">//       Sedgewick: delete, then RE-INSERT the rest of the cluster</span>
+
+// separate chaining: slot[i] is a linked list — insert prepends,
+// search scans one chain (Θ(α) expected), delete is a plain unlink.
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="graph">
+<h2>Graph search — BFS · DFS · topological sort</h2>
+<p class="why">Same skeleton, different frontier: a queue explores in layers, a stack (or recursion) dives.</p>
+<pre>
+void bfs(int s) {
+    queue q; mark(s); q.push(s);
+    while (!q.empty()) {
+        int u = q.pop();
+        for (int v : adj[u])
+            if (!marked(v)) { mark(v); q.push(v); }   // mark ON ENQUEUE
+    }
+}
+
+void dfs(int u) {
+    mark(u);
+    for (int v : adj[u]) if (!marked(v)) dfs(v);
+}
+
+vector&lt;int&gt; kahnTopoSort() {
+    <span class="todo">// TODO: compute in-degrees; repeatedly remove a 0-in-degree vertex</span>
+    <span class="todo">//       (ties: smallest first) and decrement its neighbors;</span>
+    <span class="todo">//       fewer than V removed ⇒ a cycle</span>
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="dijkstra">
+<h2>Dijkstra shortest paths</h2>
+<p class="why">Greedy: the nearest unsettled vertex is final (needs non-negative weights). All work happens in relax().</p>
+<pre>
+void dijkstra(int s) {
+    dist[all] = INF; dist[s] = 0;
+    pq.push({0, s});
+    while (!pq.empty()) {
+        auto [d, u] = pq.popMin();
+        if (d &gt; dist[u]) continue;          // stale entry
+        for (auto [v, w] : adj[u]) relax(u, v, w);
+    }
+}
+
+void relax(int u, int v, int w) {
+    <span class="todo">// TODO: if the path through u improves dist[v], record it and push —</span>
+    <span class="todo">//       one comparison, one assignment, one pq push</span>
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="union-find">
+<h2>Union-find (weighted + path compression)</h2>
+<p class="why">A forest in one array: parent[i]. Union by size keeps trees log-shallow; compression flattens them to ~constant.</p>
+<pre>
+int find(int x) {
+    int root = x;
+    while (parent[root] != root) root = parent[root];
+    <span class="todo">// TODO: path compression — repoint every node on the walked path to root</span>
+    return root;
+}
+
+void unite(int p, int q) {
+    int rp = find(p), rq = find(q);
+    if (rp == rq) return;
+    if (size[rp] &gt; size[rq]) swap(rp, rq);   // rp = smaller
+    parent[rp] = rq;
+    size[rq] += size[rp];
+}
+// why the size array? weighting alone caps height at log n, and
+// weighting + compression is what reaches the ~constant α(n) bound —
+// arbitrary linking with compression alone is stuck at O(log n) amortized
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="mst">
+<h2>Minimum spanning tree — Kruskal &amp; Prim</h2>
+<p class="why">Both are the cut property in motion; they differ in which safe edge they grab next.</p>
+<pre>
+// Kruskal: cheapest edge anywhere that doesn't close a cycle
+// (variant: a min-heap of edges + stop at V−1 accepted — often skips the heavy tail)
+sort edges by weight;
+for (auto [w, u, v] : edges) {
+    <span class="todo">// TODO: use union-find — if find(u) != find(v), take the edge and unite;</span>
+    <span class="todo">//       stop after V−1 edges</span>
+}
+
+// Prim: cheapest edge LEAVING the tree so far
+start with any vertex; pq of crossing edges;
+while (tree has &lt; V vertices) {
+    <span class="todo">// TODO: pop the min edge; skip it if both ends are already in the tree;</span>
+    <span class="todo">//       otherwise take it and push the new vertex's edges</span>
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="sorting">
+<h2>Mergesort · quicksort · quickselect</h2>
+<p class="why">Divide and conquer twice over: mergesort's work is in the combine (NOT in place — each merge copies into a Θ(n) aux buffer), quicksort's in the divide (in place).</p>
+<pre>
+void merge(a, lo, mid, hi) {
+    copy a[lo..hi] to aux;
+    <span class="todo">// TODO: two fingers i (left run) and j (right run) — write the smaller</span>
+    <span class="todo">//       front element back into a[]; `&lt;=` keeps the left one (stability)</span>
+}
+
+int partition(a, lo, hi) {           // Lomuto: pivot = a[hi]
+    <span class="todo">// TODO: scan lo..hi−1, swapping anything &lt; pivot up to a growing</span>
+    <span class="todo">//       boundary; drop the pivot at the boundary; return its index</span>
+}
+
+void quicksort(a, lo, hi) {
+    if (lo &gt;= hi) return;
+    int p = partition(a, lo, hi);
+    quicksort(a, lo, p - 1); quicksort(a, p + 1, hi);
+}
+
+int quickselect(a, k) {              // k-th smallest, expected Θ(n)
+    <span class="todo">// TODO: partition, then recurse into ONLY the side containing k</span>
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="huffman">
+<h2>Huffman coding</h2>
+<p class="why">Greedy, bottom-up: the two rarest symbols can afford the longest codes, so merge them first.</p>
+<pre>
+Node* buildTrie(freq[]) {
+    minPQ&lt;Node*&gt; pq;                 // keyed by frequency
+    for each symbol s: pq.push(new leaf(s, freq[s]));
+    while (pq.size() &gt; 1) {
+        <span class="todo">// TODO: pop the two smallest, merge under a new parent</span>
+        <span class="todo">//       (freq = sum), push the parent back</span>
+    }
+    return pq.pop();                 // the root; codes = root-to-leaf paths (left=0, right=1)
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="dp">
+<h2>Dynamic programming — fib · rod cutting · LCS · knapsack · edit distance</h2>
+<p class="why">Recursion + remembering. The recipe: subproblem, recurrence (the last decision), base cases, fill order, answer — then traceback.</p>
+<pre>
+long fib(int n, memo[]) {
+    if (n &lt; 2) return n;
+    if (memo[n]) return memo[n];
+    return memo[n] = fib(n-1, memo) + fib(n-2, memo);
+}
+
+// rod cutting: best[len] = the most a rod of that length can earn
+//   best[len] = max over first cuts i = 1..len of price[i] + best[len-i]
+//   best[0] = 0
+// TODO: the two nested loops; record cut[len] = the winning i, then the
+//       TRACEBACK takes cut[n], subtracts, and repeats until nothing is left
+
+// LCS: L[i][j] = LCS length of a[0..i) and b[0..j)
+//   a[i-1] == b[j-1] → L[i-1][j-1] + 1        (extend the match)
+//   else             → max(L[i-1][j], L[i][j-1])
+<span class="todo">// TODO: the two nested fill loops, then TRACEBACK from L[n][m]</span>
+<span class="todo">//       (diagonal on a match; toward the larger neighbor otherwise)</span>
+
+// 0/1 knapsack: K[i][w] = best value using items 1..i within weight w
+//   skip item i → K[i-1][w]
+//   take item i → value[i] + K[i-1][w - weight[i]]   (if it fits)
+<span class="todo">// TODO: fill, answer = K[n][W]; traceback: item i taken iff K[i][w] != K[i-1][w]</span>
+
+// edit distance: match is free on the diagonal; otherwise
+//   1 + min(delete, insert, replace)
+<span class="todo">// TODO: base row/col = index (delete/insert the whole prefix)</span>
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="trie">
+<h2>Trie (prefix tree)</h2>
+<p class="why">One node per prefix; an edge per character. Cost is the key's length — independent of how many keys are stored.</p>
+<pre>
+struct Node { Node* next[R]; bool isWord; };
+
+void insert(string s) {
+    Node* t = root;
+    for (char c : s) {
+        if (t-&gt;next[c] == nullptr) t-&gt;next[c] = new Node();
+        t = t-&gt;next[c];
+    }
+    t-&gt;isWord = true;               // the flag, not the node, marks a word
+}
+
+bool search(string s);              <span class="todo">// TODO: walk; missing edge → false; END: return isWord</span>
+vector&lt;string&gt; keysWithPrefix(string p);  <span class="todo">// TODO: walk to p's node, then collect its subtree</span>
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="kmp">
+<h2>Substring search — KMP</h2>
+<p class="why">Never back up in the text: on a mismatch, the failure function says how much of the pattern still matches itself.</p>
+<pre>
+int kmpSearch(text, pat) {
+    f = failure(pat);
+    int j = 0;                                     // chars of pat matched
+    for (int i = 0; i &lt; text.length(); i++) {
+        while (j &gt; 0 &amp;&amp; text[i] != pat[j]) j = f[j-1];   // slide the pattern
+        if (text[i] == pat[j]) j++;
+        if (j == pat.length()) return i - j + 1;   // match ends at i
+    }
+    return -1;
+}
+
+int[] failure(pat) {
+    // f[i] = length of the longest proper prefix of pat[0..i] that is also its suffix
+    <span class="todo">// TODO: the same slide trick, pattern against itself — build f in one pass</span>
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<section id="nfa">
+<h2>Regex → NFA → simulate</h2>
+<p class="why">One state per regex character; consuming input is only ever i → i+1; everything else is an ε-edge. (This is ICA 17 — the TODOs are the graded work.)</p>
+<pre>
+bool simulate(nfa, text) {
+    set&lt;int&gt; states = epsClosure(nfa, {0});
+    for (char c : text) {
+        set&lt;int&gt; next;
+        <span class="todo">// TODO: every active state whose match char equals c advances to s+1</span>
+        states = epsClosure(nfa, next);
+    }
+    return states.count(nfa.accept);
+}
+
+set&lt;int&gt; epsClosure(nfa, seed) {
+    <span class="todo">// TODO: graph reachability over the ε-edges — a DFS/BFS from the seed set</span>
+}
+</pre>
+<p class="backtop"><a href="#toc">↑ contents</a></p>
+</section>
+
+<script>
+  const toc = document.getElementById("toc");
+  document.querySelectorAll("section").forEach((s) => {
+    const a = document.createElement("a");
+    a.href = "#" + s.id;
+    a.textContent = s.querySelector("h2").textContent;
+    toc.appendChild(a);
+  });
+</script>
+</main>
+</body>
+</html>

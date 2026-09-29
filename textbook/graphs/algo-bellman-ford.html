@@ -1,0 +1,1075 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Bellman-Ford.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bellman-Ford - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Bellman-Ford</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
+      </div>
+      <div class="src">
+        Single-source shortest paths when edge weights may be negative, the case
+        where <a href="algo-dijkstra.html">Dijkstra&rsquo;s</a> greedy settling is
+        unsound. Bellman-Ford makes no greedy commitment: it relaxes every edge,
+        \(V-1\) rounds over, and round \(i\) is a dynamic-programming step that
+        finalizes every shortest path of at most \(i\) edges. With the algorithm,
+        a full round-by-round trace showing each relaxation succeed or fail, the
+        early-termination test, a worked negative-cycle detection pass, the
+        correctness induction on path length, the \(\Theta(VE)\) cost, the
+        comparison with Dijkstra, and exercises with solutions.
+      </div>
+
+      <p class="lead">
+        The <a href="algo-dijkstra.html">Dijkstra handout</a> solves single-source
+        shortest paths by a greedy rule (settle the nearest unsettled vertex) and
+        proves the rule safe under one precondition: every edge weight is
+        \(\ge 0\). It also exhibits the failure when the precondition is dropped: a
+        negative edge lets a cheaper route arrive <em>after</em> its destination
+        has been settled, and Dijkstra never reconsiders a settled vertex.
+        <strong>Bellman-Ford</strong> is the algorithm for that harder problem. It
+        gives up the greedy shortcut entirely: no vertex is ever declared final
+        early; instead <em>every</em> edge is relaxed, over and over, until no
+        label can move. Organized properly, &ldquo;over and over&rdquo; means
+        exactly \(V-1\) rounds, because round \(i\) is a dynamic-programming step
+        over the number of edges a path may use. The same rounds also answer a
+        question Dijkstra never faces: whether the graph contains a
+        <em>negative cycle</em>, which makes &ldquo;shortest path&rdquo;
+        meaningless. Negative edge weights are not exotic; they appear whenever a
+        step can pay instead of cost (a rebate, a gain, a currency conversion
+        modeled by log-exchange rates) and in constraint systems where an edge
+        encodes an inequality.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#problem">The problem: negative weights break greed</a></li>
+          <li><a href="#dp">Rounds of relaxation as a dynamic program</a></li>
+          <li><a href="#algo">The algorithm</a></li>
+          <li><a href="#trace">A full trace, round by round</a></li>
+          <li><a href="#early">Early termination, and edge order</a></li>
+          <li><a href="#negcycle">Detecting negative cycles</a></li>
+          <li><a href="#correct">Correctness and cost</a></li>
+          <li><a href="#compare">Bellman-Ford or Dijkstra?</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="problem">1. The problem: negative weights break greed</h2>
+      <p>
+        The setup is the single-source shortest-paths (SSSP) problem of the
+        <a href="algo-dijkstra.html">Dijkstra handout</a>, on the weighted digraph
+        representation of the
+        <a href="ds-graph-representations.html">graph-representations handout</a>:
+        given a weighted digraph and a source \(s\), compute the distance
+        \(\delta(v)\) (the minimum total edge weight of any \(s \to v\) path) for
+        every vertex \(v\), with parent pointers to reconstruct the paths. The one
+        change: edge weights may now be <em>negative</em>.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (edge relaxation, recap)</span>
+        Keep a tentative distance \(\texttt{dist}[v]\) for every vertex,
+        initialized to \(\texttt{dist}[s] = 0\) and \(\infty\) elsewhere. To
+        <strong>relax</strong> an edge \(u \to v\) of weight \(w\):
+        <pre>  if (dist[u] + w &lt; dist[v]) {
+      dist[v] = dist[u] + w;   <span class="cm">// found a cheaper route to v</span>
+      parent[v] = u;           <span class="cm">// remember the edge, for the path</span>
+  }</pre>
+        Relaxation never raises a label, and a finite label is always the cost of
+        some real route from \(s\) (append the relaxed edge to the route that set
+        \(\texttt{dist}[u]\)). When <em>no</em> edge in the graph can be relaxed,
+        every label equals the true distance; the proof is in the Dijkstra
+        handout and does not use any sign assumption on the weights.
+      </div>
+      <p>
+        Every shortest-path algorithm is a schedule for relaxations. Dijkstra
+        schedules them greedily and, the moment a vertex is settled, promises never
+        to touch its label again. One negative edge voids the promise:
+      </p>
+      <div class="ex">
+        <span class="tag">Example (the counterexample, recapped)</span>
+        On \(s \to a\,(1)\), \(s \to b\,(2)\), \(b \to a\,(-4)\), Dijkstra settles
+        \(s\) at \(0\), then \(a\) at \(1\) (the nearest), declaring
+        \(\texttt{dist}[a] = 1\) final. Only then does \(b\) settle at \(2\) and
+        relax \(b \to a\): \(2 + (-4) = -2 &lt; 1\), but \(a\) is frozen. The true
+        distance is \(\delta(a) = -2\); Dijkstra reports \(1\), silently. The
+        <a href="algo-dijkstra.html">Dijkstra handout</a> pins the failure to the
+        one proof step that needs \(w \ge 0\).
+      </div>
+      <p>
+        So with negative weights no label may be trusted early. But there is a
+        second, deeper problem: with negative weights the <em>answer itself</em>
+        can stop existing.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (negative cycle)</span>
+        A <strong>negative cycle</strong> is a directed cycle whose edge weights
+        sum to a negative number. If some \(s \to v\) route can reach a negative
+        cycle and continue on to \(v\), then no shortest \(s \to v\) path exists:
+        each extra lap around the cycle lowers the total, so the costs descend
+        toward \(-\infty\).
+      </div>
+      <p>
+        The honest problem statement is therefore two-sided, and Bellman-Ford
+        answers both sides: <em>if</em> no negative cycle is reachable from \(s\),
+        report every \(\delta(v)\); otherwise, report that a reachable negative
+        cycle exists (<a href="#negcycle">&sect;6</a>).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="dp">2. Rounds of relaxation as a dynamic program</h2>
+      <p>
+        If no single relaxation schedule can be trusted, schedule all of them:
+        relax <em>every edge in the graph</em>, one full pass; then do it again;
+        and again. Each pass is a <strong>round</strong>. The question is how many
+        rounds are enough, and the answer comes from parameterizing the problem
+        the way <a href="../dp/paradigm-dp-method.html">dynamic programming</a>
+        (DP) always does: by a size measure of the solution. Here the measure is
+        <em>how many edges a path may use</em>.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (the DP subproblem)</span>
+        For \(i \ge 0\), let
+        \[
+          D_i(v) \;=\; \text{the minimum cost of an } s \to v \text{ path using at most } i \text{ edges}
+        \]
+        (\(\infty\) if no such path exists). Base case: \(D_0(s) = 0\) and
+        \(D_0(v) = \infty\) for \(v \ne s\). Recurrence:
+        \[
+          D_i(v) \;=\; \min\Bigl(\, D_{i-1}(v),\; \min_{\,u \to v \text{ of weight } w} \bigl(D_{i-1}(u) + w\bigr) \Bigr).
+        \]
+        A best path of at most \(i\) edges either uses at most \(i-1\) edges (first
+        term) or arrives by some final edge \(u \to v\), preceded by a best path to
+        \(u\) of at most \(i-1\) edges (second term, one candidate per incoming
+        edge). The optimal-substructure argument that the prefix may be assumed
+        optimal is the exchange argument of the Dijkstra handout, and it does not
+        care about signs.
+      </div>
+      <p>
+        Computing row \(D_i\) from row \(D_{i-1}\) means, for every edge
+        \(u \to v\), testing \(D_{i-1}(u) + w\) against the entry for \(v\): that
+        is exactly one relaxation pass over all \(E\) edges. And the rows stop
+        changing quickly: a shortest path never needs \(V\) or more edges (it
+        would repeat a vertex, and the enclosed cycle could be cut out; with no
+        negative cycles, cutting never makes it worse, as proved in
+        <a href="#correct">&sect;7</a>). So \(D_{V-1}(v) = \delta(v)\) for every
+        \(v\): <strong>\(V-1\) rounds suffice</strong>.
+      </p>
+      <h3>The running graph</h3>
+      <p>
+        One digraph anchors every trace in this handout: \(V = 5\), \(E = 9\),
+        source \(0\), with one negative edge \(4 \to 3\) of weight \(-5\).
+      </p>
+      <figure>
+        <svg viewBox="0 0 460 300" role="img" aria-label="The running weighted digraph on five vertices. Vertex 0 is at the left, vertices 1 and 3 along the top, vertices 2 and 4 along the bottom. The nine directed edges and weights are: 0 to 1 weight 4, 0 to 2 weight 2, 1 to 2 weight 3, 2 to 1 weight 1, 1 to 3 weight 2, 1 to 4 weight 3, 2 to 3 weight 4, 2 to 4 weight 5, and 4 to 3 weight minus 5, the negative edge, drawn in red.">
+          <defs>
+            <marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#4a5163"/>
+            </marker>
+            <marker id="ahr" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#b3261e"/>
+            </marker>
+          </defs>
+          <g stroke="#4a5163" stroke-width="1.8" fill="none" marker-end="url(#ah)">
+            <line x1="73" y1="138" x2="167" y2="73"/>    <!-- 0->1 -->
+            <line x1="73" y1="163" x2="167" y2="227"/>   <!-- 0->2 -->
+            <line x1="177" y1="82" x2="177" y2="218"/>   <!-- 1->2 -->
+            <line x1="193" y1="218" x2="193" y2="82"/>   <!-- 2->1 -->
+            <line x1="207" y1="60" x2="378" y2="60"/>    <!-- 1->3 -->
+            <line x1="202" y1="74" x2="383" y2="226"/>   <!-- 1->4 -->
+            <line x1="202" y1="226" x2="383" y2="74"/>   <!-- 2->3 -->
+            <line x1="207" y1="240" x2="378" y2="240"/>  <!-- 2->4 -->
+          </g>
+          <g stroke="#b3261e" stroke-width="2.2" fill="none" marker-end="url(#ahr)">
+            <line x1="400" y1="218" x2="400" y2="82"/>   <!-- 4->3, negative -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
+             fill="#0a7d4d" stroke="#fff" stroke-width="3" paint-order="stroke"
+             text-anchor="middle">
+            <text x="112" y="99">4</text>     <!-- 0->1 -->
+            <text x="112" y="211">2</text>    <!-- 0->2 -->
+            <text x="164" y="154">3</text>    <!-- 1->2 -->
+            <text x="207" y="154">1</text>    <!-- 2->1 -->
+            <text x="292" y="52">2</text>     <!-- 1->3 -->
+            <text x="238" y="106">3</text>    <!-- 1->4 -->
+            <text x="238" y="204">4</text>    <!-- 2->3 -->
+            <text x="292" y="257">5</text>    <!-- 2->4 -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
+             fill="#b3261e" stroke="#fff" stroke-width="3" paint-order="stroke"
+             text-anchor="middle">
+            <text x="421" y="154">&minus;5</text> <!-- 4->3 -->
+          </g>
+          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
+            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
+              <circle cx="55" cy="150" r="19"/>   <circle cx="185" cy="60" r="19"/>
+              <circle cx="185" cy="240" r="19"/>  <circle cx="400" cy="60" r="19"/>
+              <circle cx="400" cy="240" r="19"/>
+            </g>
+            <g fill="#1a1c22" stroke="none">
+              <text x="55" y="155">0</text>   <text x="185" y="65">1</text>
+              <text x="185" y="245">2</text>  <text x="400" y="65">3</text>
+              <text x="400" y="245">4</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>
+          The running graph. Edge list, in the scan order used by every trace
+          below: \(0\to1\,(4)\), \(0\to2\,(2)\), \(1\to2\,(3)\), \(1\to3\,(2)\),
+          \(1\to4\,(3)\), \(2\to1\,(1)\), \(2\to3\,(4)\), \(2\to4\,(5)\),
+          \(4\to3\,(-5)\). The two middle diagonals (\(1\to4\) and \(2\to3\))
+          cross without meeting. The trap: the cheapest route to \(3\) is the
+          four-edge \(0\to2\to1\to4\to3\), cost \(2+1+3-5 = 1\), which uses the
+          red negative edge and every one of its \(V-1 = 4\) allowed edges.
+        </figcaption>
+      </figure>
+      <p>
+        Here is the DP table on that graph, computed strictly by the recurrence
+        (each row from the previous row only):
+      </p>
+      <figure>
+        <table class="trace">
+          <tr>
+            <th class="lab">row</th>
+            <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th>
+            <th style="text-align:left">meaning</th>
+          </tr>
+          <tr><td class="lab">\(D_0\)</td>
+            <td>0</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td>
+            <td class="lab">paths of 0 edges</td></tr>
+          <tr><td class="lab">\(D_1\)</td>
+            <td>0</td><td class="upd">4</td><td class="upd">2</td><td class="inf">&infin;</td><td class="inf">&infin;</td>
+            <td class="lab">at most 1 edge</td></tr>
+          <tr><td class="lab">\(D_2\)</td>
+            <td>0</td><td class="upd">3</td><td>2</td><td class="upd">6</td><td class="upd">7</td>
+            <td class="lab">at most 2 edges</td></tr>
+          <tr><td class="lab">\(D_3\)</td>
+            <td>0</td><td>3</td><td>2</td><td class="upd">2</td><td class="upd">6</td>
+            <td class="lab">at most 3 edges</td></tr>
+          <tr><td class="lab">\(D_4\)</td>
+            <td>0</td><td>3</td><td>2</td><td class="upd">1</td><td>6</td>
+            <td class="lab">at most 4 edges \(= \delta\)</td></tr>
+        </table>
+        <figcaption>
+          The exact DP table for the running graph (shaded cells changed from the
+          row above). Read column \(3\): the best 2-edge path to \(3\) costs \(6\)
+          (via \(0\to1\to3\)), the best 3-edge path costs \(2\)
+          (\(0\to1\to4\to3\)), and only at \(i = 4\) does the true
+          \(\delta(3) = 1\) appear, because its path needs all four edges. The
+          \(V-1\) bound is tight on this graph.
+        </figcaption>
+      </figure>
+      <p>
+        One practical wrinkle. The code below does not keep two rows; it relaxes
+        <em>in place</em>, into the single array \(\texttt{dist}\). In-place
+        rounds can only be <em>ahead</em> of the table: if an edge scanned early
+        in a round improves \(\texttt{dist}[u]\), an edge scanned later in the
+        same round already sees the improvement, chaining several hops into one
+        round. Since labels are monotone and always honest (real path costs),
+        running ahead never produces a wrong value; after round \(i\),
+        \(\texttt{dist}[v] \le D_i(v)\), and the \(V-1\)-round guarantee holds a
+        fortiori. The trace in <a href="#trace">&sect;4</a> shows the chaining
+        happen, and one exercise shows when the distinction matters.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="algo">3. The algorithm</h2>
+      <p>
+        \(V-1\) rounds; each round relaxes every edge once, scanning vertices in
+        index order and each vertex&rsquo;s out-edges in adjacency-list order. Two
+        refinements: a round that changes nothing ends the run early (nothing can
+        change later, <a href="#early">&sect;5</a>), and one extra detection pass
+        reports reachable negative cycles (<a href="#negcycle">&sect;6</a>). The
+        <code>WGraph</code> type is the weighted adjacency list of the
+        <a href="ds-graph-representations.html">graph-representations handout</a>.
+      </p>
+      <div class="code-tabs" data-snippet="graphs/bellman-ford">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Bellman-Ford: V-1 rounds of relax-every-edge, then one detection pass.
+// Handles negative weights; reports whether a negative cycle is reachable.
+struct BFResult { vector&lt;long&gt; dist; bool negCycle; };
+
+BFResult bellmanFord(WGraph&amp; g, int s) {
+    vector&lt;long&gt; dist(g.V, LONG_MAX);        // LONG_MAX plays infinity
+    dist[s] = 0;
+    for (int round = 1; round &lt;= g.V - 1; round++) {
+        bool changed = false;
+        for (int u = 0; u &lt; g.V; u++) {
+            if (dist[u] == LONG_MAX) continue;   // no route to u yet: skip
+            for (Edge e : g.adj[u])
+                if (dist[u] + e.w &lt; dist[e.to]) {
+                    dist[e.to] = dist[u] + e.w;  // relax: cheaper route
+                    changed = true;
+                }
+        }
+        if (!changed) return {dist, false};  // nothing moved: all final
+    }
+    for (int u = 0; u &lt; g.V; u++)            // detection pass (round V)
+        if (dist[u] != LONG_MAX)
+            for (Edge e : g.adj[u])
+                if (dist[u] + e.w &lt; dist[e.to])
+                    return {dist, true};     // still relaxes: negative cycle
+    return {dist, false};
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Bellman-Ford: V-1 rounds of relax-every-edge, then one detection pass.
+// Handles negative weights; reports whether a negative cycle is reachable.
+// Returns null if a negative cycle is reachable from s, else the distances.
+long[] bellmanFord(WGraph g, int s) {
+    long[] dist = new long[g.V];
+    Arrays.fill(dist, Long.MAX_VALUE);       // MAX_VALUE plays infinity
+    dist[s] = 0;
+    for (int round = 1; round &lt;= g.V - 1; round++) {
+        boolean changed = false;
+        for (int u = 0; u &lt; g.V; u++) {
+            if (dist[u] == Long.MAX_VALUE) continue;  // no route yet: skip
+            for (Edge e : g.adj.get(u))
+                if (dist[u] + e.w &lt; dist[e.to]) {
+                    dist[e.to] = dist[u] + e.w;   // relax: cheaper route
+                    changed = true;
+                }
+        }
+        if (!changed) return dist;           // nothing moved: all final
+    }
+    for (int u = 0; u &lt; g.V; u++)            // detection pass (round V)
+        if (dist[u] != Long.MAX_VALUE)
+            for (Edge e : g.adj.get(u))
+                if (dist[u] + e.w &lt; dist[e.to])
+                    return null;             // still relaxes: negative cycle
+    return dist;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Bellman-Ford: V-1 rounds of relax-every-edge, then one detection pass.
+# Handles negative weights; reports whether a negative cycle is reachable.
+def bellman_ford(g, s):
+    dist = [float(&quot;inf&quot;)] * g.V
+    dist[s] = 0
+    for _round in range(g.V - 1):
+        changed = False
+        for u in range(g.V):
+            for v, w in g.adj[u]:            # inf + w is inf: no guard needed
+                if dist[u] + w &lt; dist[v]:
+                    dist[v] = dist[u] + w    # relax: cheaper route
+                    changed = True
+        if not changed:
+            return dist, False               # nothing moved: all final
+    for u in range(g.V):                     # detection pass (round V)
+        for v, w in g.adj[u]:
+            if dist[u] + w &lt; dist[v]:
+                return dist, True            # still relaxes: negative cycle
+    return dist, False</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Bellman-Ford: V-1 rounds of relax-every-edge, then one detection pass.
+// Handles negative weights; Err(()) means a negative cycle is reachable.
+fn bellman_ford(g: &amp;WGraph, s: usize) -&gt; Result&lt;Vec&lt;i64&gt;, ()&gt; {
+    let n = g.adj.len();
+    let mut dist = vec![i64::MAX; n];        // i64::MAX plays infinity
+    dist[s] = 0;
+    for _round in 1..n {
+        let mut changed = false;
+        for u in 0..n {
+            if dist[u] == i64::MAX { continue; }  // no route to u yet: skip
+            for &amp;(v, w) in &amp;g.adj[u] {
+                if dist[u] + w &lt; dist[v] {
+                    dist[v] = dist[u] + w;   // relax: cheaper route
+                    changed = true;
+                }
+            }
+        }
+        if !changed { return Ok(dist); }     // nothing moved: all final
+    }
+    for u in 0..n {                          // detection pass (round V)
+        if dist[u] == i64::MAX { continue; }
+        for &amp;(v, w) in &amp;g.adj[u] {
+            if dist[u] + w &lt; dist[v] { return Err(()); }  // negative cycle
+        }
+    }
+    Ok(dist)
+}</pre>
+<p class="ct-src">source: <code>code/graphs/bellman-ford.cpp &middot; code/graphs/bellman-ford.java &middot; code/graphs/bellman-ford.py &middot; code/graphs/bellman-ford.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Three implementation notes. The <code>dist[u] == &infin;</code> skip is
+        not an optimization but a correctness guard in the fixed-width languages:
+        <code>LONG_MAX + w</code> overflows (and for negative \(w\) would compare
+        as a genuine improvement); Python&rsquo;s <code>float("inf")</code>
+        absorbs addition, so its pane needs no guard. Second, unlike Dijkstra
+        there is no priority queue and no <code>settled</code> array: the only
+        state is \(\texttt{dist}\) itself (plus <code>parent</code> pointers if
+        paths are wanted; set <code>parent[v] = u</code> inside the improving
+        branch exactly as in the relaxation definition). Third, the algorithm
+        never <em>decides</em> anything about the graph; it just relaxes on a
+        fixed schedule, which is why negative weights cost it nothing.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="trace">4. A full trace, round by round</h2>
+      <p>
+        Bellman-Ford on the running graph from source \(0\), edges scanned in the
+        listed order. Every edge test of every round is shown; an
+        <strong>improve</strong> row writes a new label, a
+        <strong>no change</strong> row fails the strict inequality
+        \(\texttt{dist}[u] + w &lt; \texttt{dist}[v]\) and writes nothing.
+      </p>
+      <h3>Round 1</h3>
+      <p>Start of round: \(\texttt{dist} = [\,0,\ \infty,\ \infty,\ \infty,\ \infty\,]\).</p>
+      <table class="trace">
+        <tr><th class="lab">edge</th><th style="text-align:left">test</th><th style="text-align:left">outcome</th></tr>
+        <tr><td class="lab">\(0\to1\,(4)\)</td><td class="lab"><code>0+4 = 4 &lt; &infin;</code></td><td class="upd">improve: dist[1] = 4</td></tr>
+        <tr><td class="lab">\(0\to2\,(2)\)</td><td class="lab"><code>0+2 = 2 &lt; &infin;</code></td><td class="upd">improve: dist[2] = 2</td></tr>
+        <tr><td class="lab">\(1\to2\,(3)\)</td><td class="lab"><code>4+3 = 7 &ge; 2</code></td><td>no change</td></tr>
+        <tr><td class="lab">\(1\to3\,(2)\)</td><td class="lab"><code>4+2 = 6 &lt; &infin;</code></td><td class="upd">improve: dist[3] = 6</td></tr>
+        <tr><td class="lab">\(1\to4\,(3)\)</td><td class="lab"><code>4+3 = 7 &lt; &infin;</code></td><td class="upd">improve: dist[4] = 7</td></tr>
+        <tr><td class="lab">\(2\to1\,(1)\)</td><td class="lab"><code>2+1 = 3 &lt; 4</code></td><td class="upd">improve: dist[1] = 3</td></tr>
+        <tr><td class="lab">\(2\to3\,(4)\)</td><td class="lab"><code>2+4 = 6 &ge; 6</code></td><td>no change (tie)</td></tr>
+        <tr><td class="lab">\(2\to4\,(5)\)</td><td class="lab"><code>2+5 = 7 &ge; 7</code></td><td>no change (tie)</td></tr>
+        <tr><td class="lab">\(4\to3\,(-5)\)</td><td class="lab"><code>7&minus;5 = 2 &lt; 6</code></td><td class="upd">improve: dist[3] = 2</td></tr>
+      </table>
+      <p>
+        End of round 1: \(\texttt{dist} = [\,0,\ 3,\ 2,\ 2,\ 7\,]\). Four of the
+        cases are already on display. A label improves <em>from</em> \(\infty\)
+        (discovery: \(0\to1\)) or improves a finite label (\(2\to1\) lowers \(4\)
+        to \(3\)); a test fails outright (\(1\to2\): \(7 \ge 2\)) or fails on a
+        tie (\(2\to3\): \(6 \ge 6\); relaxation demands strict improvement, so an
+        equal-cost route changes nothing, and the recorded parent keeps the first
+        route found). Note also the in-place chaining promised in
+        <a href="#dp">&sect;2</a>: \(0\to2\) and then \(2\to1\), scanned in the
+        same round, carry the source&rsquo;s influence two hops, so
+        \(\texttt{dist}[1] = 3\) already beats the exact one-edge row \(D_1(1)=4\)
+        of the DP table. The chain stops where the scan order breaks it: \(1\to4\)
+        was scanned <em>before</em> \(2\to1\) lowered \(\texttt{dist}[1]\), so
+        vertex \(4\) still holds the stale \(7\) and must wait for the next round.
+      </p>
+      <h3>Round 2</h3>
+      <table class="trace">
+        <tr><th class="lab">edge</th><th style="text-align:left">test</th><th style="text-align:left">outcome</th></tr>
+        <tr><td class="lab">\(0\to1\,(4)\)</td><td class="lab"><code>0+4 = 4 &ge; 3</code></td><td>no change</td></tr>
+        <tr><td class="lab">\(0\to2\,(2)\)</td><td class="lab"><code>0+2 = 2 &ge; 2</code></td><td>no change (tie)</td></tr>
+        <tr><td class="lab">\(1\to2\,(3)\)</td><td class="lab"><code>3+3 = 6 &ge; 2</code></td><td>no change</td></tr>
+        <tr><td class="lab">\(1\to3\,(2)\)</td><td class="lab"><code>3+2 = 5 &ge; 2</code></td><td>no change</td></tr>
+        <tr><td class="lab">\(1\to4\,(3)\)</td><td class="lab"><code>3+3 = 6 &lt; 7</code></td><td class="upd">improve: dist[4] = 6</td></tr>
+        <tr><td class="lab">\(2\to1\,(1)\)</td><td class="lab"><code>2+1 = 3 &ge; 3</code></td><td>no change (tie)</td></tr>
+        <tr><td class="lab">\(2\to3\,(4)\)</td><td class="lab"><code>2+4 = 6 &ge; 2</code></td><td>no change</td></tr>
+        <tr><td class="lab">\(2\to4\,(5)\)</td><td class="lab"><code>2+5 = 7 &ge; 6</code></td><td>no change</td></tr>
+        <tr><td class="lab">\(4\to3\,(-5)\)</td><td class="lab"><code>6&minus;5 = 1 &lt; 2</code></td><td class="upd">improve: dist[3] = 1</td></tr>
+      </table>
+      <p>
+        End of round 2: \(\texttt{dist} = [\,0,\ 3,\ 2,\ 1,\ 6\,]\). The round
+        repairs exactly what round 1&rsquo;s scan order left stale: \(1\to4\) now
+        sees the improved \(\texttt{dist}[1] = 3\) and lowers \(4\)&rsquo;s label
+        to \(6\), and the negative edge \(4\to3\) immediately propagates the
+        saving onward, lowering \(3\)&rsquo;s label a second time (\(6 \to 2\) in
+        round 1, \(2 \to 1\) now). This is the pattern Dijkstra cannot follow: a
+        label revised long after cheaper-looking vertices were dealt with.
+      </p>
+      <h3>Round 3, and the stop</h3>
+      <p>
+        Round 3 runs all nine tests and every one fails:
+        \(4 \ge 3\), \(2 \ge 2\), \(6 \ge 2\), \(5 \ge 1\), \(6 \ge 6\),
+        \(3 \ge 3\), \(6 \ge 1\), \(7 \ge 6\), \(1 \ge 1\) (the last is the
+        negative edge itself, now offering exactly what \(3\) already has).
+        <code>changed</code> stays false, and the run stops: round 4, though
+        permitted by the \(V-1 = 4\) bound, is never executed
+        (<a href="#early">&sect;5</a>). The detection pass, had we run the full
+        \(V-1\) rounds, would find nothing to relax: no negative cycle.
+      </p>
+      <figure>
+        <table class="trace">
+          <tr>
+            <th class="lab">state</th>
+            <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th>
+          </tr>
+          <tr><td class="lab">initialize</td>
+            <td class="upd">0</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td></tr>
+          <tr><td class="lab">after round 1</td>
+            <td>0</td><td class="upd">3</td><td class="upd">2</td><td class="upd">2</td><td class="upd">7</td></tr>
+          <tr><td class="lab">after round 2</td>
+            <td>0</td><td>3</td><td>2</td><td class="upd">1</td><td class="upd">6</td></tr>
+          <tr><td class="lab">after round 3</td>
+            <td class="set">0</td><td class="set">3</td><td class="set">2</td><td class="set">1</td><td class="set">6</td></tr>
+        </table>
+        <figcaption>
+          The whole run in one table (shaded = lowered that round; green = final,
+          confirmed by the no-change round). Final parents:
+          \(\texttt{parent} = [\,\text{-},\ 2,\ 0,\ 4,\ 1\,]\), so the
+          shortest-paths tree is the single chain \(0\to2\to1\to4\to3\):
+          \(\delta = 0, 3, 2, 1, 6\) with \(\delta(3) = 2+1+3-5 = 1\).
+        </figcaption>
+      </figure>
+      <p>
+        Compare the in-place rows with the exact DP table of
+        <a href="#dp">&sect;2</a>: after round 1 the code already holds
+        \([\,0,3,2,2,7\,]\) where \(D_1 = [\,0,4,2,\infty,\infty\,]\), and it
+        reaches the final answer after 2 rounds where the table needs 4. Ahead,
+        never wrong.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="early">5. Early termination, and edge order</h2>
+      <div class="thm">
+        <span class="tag">Proposition (early termination is sound)</span>
+        If some round relaxes no edge, then no later round would relax an edge,
+        and every label already equals its final value. Stopping is safe.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Whether an edge relaxes depends only on the
+        current \(\texttt{dist}\) array. A round that changes nothing ends with
+        the same array it began with, so the next round faces the identical
+        array and makes the identical (empty) set of changes, and so on by
+        induction. Moreover &ldquo;no edge relaxes&rdquo; is exactly the terminal
+        condition of the relaxation invariant
+        (<a href="#problem">&sect;1</a>): at that point
+        \(\texttt{dist}[v] = \delta(v)\) for every \(v\).
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The running trace used it: round 3 was the confirming, all-fail round, and
+        round 4 never ran. How many rounds a run actually needs depends on the
+        <em>edge scan order</em>, which affects speed but never the answer. The
+        extreme case is a path:
+      </p>
+      <div class="ex">
+        <span class="tag">Example (best and worst scan order)</span>
+        Take the path \(0 \to 1 \to 2 \to 3\), each edge of weight \(1\), source
+        \(0\). Scanned <em>against</em> the path direction, order
+        \(2\to3,\ 1\to2,\ 0\to1\):
+        <pre>  round 1:  2&rarr;3: dist[2]=&infin;, skip     1&rarr;2: dist[1]=&infin;, skip     0&rarr;1: 0+1=1&lt;&infin; &rArr; dist[1]=1
+  round 2:  2&rarr;3: dist[2]=&infin;, skip     1&rarr;2: 1+1=2&lt;&infin; &rArr; dist[2]=2   0&rarr;1: 1 &ge; 1, no change
+  round 3:  2&rarr;3: 2+1=3&lt;&infin; &rArr; dist[3]=3   1&rarr;2: 2 &ge; 2   0&rarr;1: 1 &ge; 1
+  final:    dist = [0, 1, 2, 3]  after the full V-1 = 3 rounds</pre>
+        Each round the news travels exactly one edge, so all \(V-1\) rounds are
+        needed; the skipped tests (source label still \(\infty\), so
+        \(\infty + 1\) offers nothing and the guard skips) are the remaining
+        branch of the loop. Scanned <em>with</em> the path direction, order
+        \(0\to1,\ 1\to2,\ 2\to3\), round 1 chains all three improvements
+        (\(\texttt{dist} = [\,0,1,2,3\,]\) immediately) and round 2 is the
+        all-fail confirming round: two rounds total, the best case.
+      </div>
+      <p>
+        Both runs end with the same distances; the guarantee of
+        <a href="#correct">&sect;7</a> is scan-order-free because it only ever
+        argues &ldquo;by the end of round \(i\), paths of \(\le i\) edges are
+        accounted for,&rdquo; which any complete pass delivers regardless of
+        order.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="negcycle">6. Detecting negative cycles</h2>
+      <p>
+        After \(V-1\) full rounds, every label must be final, <em>if</em> the
+        distances exist at all. So run the loop body one more time as a
+        <strong>detection pass</strong> (round \(V\)): if any edge still relaxes,
+        the labels have not converged after they provably should have, and
+        <a href="#correct">&sect;7</a> shows this happens exactly when a negative
+        cycle is reachable from \(s\).
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a detection pass that fires)</span>
+        Vertices \(0,1,2,3\), source \(0\), edges in scan order
+        \(0\to1\,(1)\), \(1\to2\,(1)\), \(2\to3\,(-1)\), \(3\to1\,(-1)\). The
+        cycle \(1\to2\to3\to1\) has weight \(1-1-1 = -1\): negative, and
+        reachable. The \(V-1 = 3\) rounds:
+        <table class="trace">
+          <tr>
+            <th class="lab">state</th>
+            <th>0</th><th>1</th><th>2</th><th>3</th>
+          </tr>
+          <tr><td class="lab">initialize</td>
+            <td class="upd">0</td><td class="inf">&infin;</td><td class="inf">&infin;</td><td class="inf">&infin;</td></tr>
+          <tr><td class="lab">after round 1</td>
+            <td>0</td><td class="upd">0</td><td class="upd">2</td><td class="upd">1</td></tr>
+          <tr><td class="lab">after round 2</td>
+            <td>0</td><td class="upd">&minus;1</td><td class="upd">1</td><td class="upd">0</td></tr>
+          <tr><td class="lab">after round 3</td>
+            <td>0</td><td class="upd">&minus;2</td><td class="upd">0</td><td class="upd">&minus;1</td></tr>
+        </table>
+        Round 1 already laps the cycle once within the round (the scan order
+        follows the cycle): \(0\to1\) sets \(\texttt{dist}[1] = 1\), the lap
+        returns via \(3\to1\) with \(1 - 1 - 1 = 0 &lt; 1\) and lowers it to
+        \(0\). Every following round subtracts another lap: the three labels on
+        the cycle slide down by \(1\) per round, forever, and no round is ever
+        the all-fail round (early termination never triggers). Detection pass,
+        round 4: the first test is \(0\to1\): \(0 + 1 = 1 \ge -2\), no change;
+        but \(1\to2\): \(-2 + 1 = -1 &lt; 0\) <strong>still relaxes</strong>, and
+        the pass reports a negative cycle. (Verify the claim honestly: had the
+        labels been true distances, nothing could relax after \(V-1\) rounds.)
+      </div>
+      <p>
+        Two boundary cases sharpen the statement. First, the detection pass fires
+        only for cycles <em>reachable from \(s\)</em>: an unreachable negative
+        cycle sits at \(\texttt{dist} = \infty\), its edges are skipped by the
+        \(\infty\) guard, and the reachable part of the graph still gets correct
+        distances (one exercise works this). Second, when the pass fires, every
+        vertex reachable <em>from</em> the cycle has \(\delta = -\infty\), while
+        vertices the cycle cannot reach still have honest finite labels; the
+        boolean answer &ldquo;a negative cycle exists&rdquo; is what the basic
+        algorithm returns.
+      </p>
+      <div class="aside">
+        <span class="tag">Recovering the cycle itself</span>
+        The pass tells you a negative cycle exists; to <em>exhibit</em> one, take
+        the edge \(u \to v\) that still relaxed and walk the
+        \(\texttt{parent}\) pointers back from \(u\) for \(V\) steps. After \(V\)
+        steps the walk must have repeated a vertex, and any repeated vertex lies
+        on a cycle of parent edges; that cycle is a negative one (its labels
+        strictly dropped on the last lap that rewired the parents). Currency
+        arbitrage detectors are exactly this: vertices are currencies, the weight
+        of \(u \to v\) is \(-\log(\text{rate}_{u\to v})\), and a negative cycle
+        is a sequence of conversions that ends with more money than it started
+        with.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="correct">7. Correctness and cost</h2>
+      <p>
+        Three facts do all the work. Throughout, &ldquo;path&rdquo; allows
+        repeated vertices (a walk) unless it says simple; \(\delta(v)\) is the
+        infimum over all \(s \to v\) walks.
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (round guarantee)</span>
+        After round \(i\), for every vertex \(v\),
+        \(\texttt{dist}[v] \le\) the cost of <em>every</em> \(s \to v\) path that
+        uses at most \(i\) edges.
+      </div>
+      <div class="proof">
+        <strong>Proof (induction on \(i\)).</strong> Base \(i = 0\): the only
+        0-edge path is the empty path at \(s\), and
+        \(\texttt{dist}[s] = 0\) from the start. Step: assume the claim after
+        round \(i-1\), and take any \(s \to v\) path \(P\) with at most \(i\)
+        edges. If \(P\) has at most \(i-1\) edges, the claim already held after
+        round \(i-1\), and labels never rise. Otherwise write
+        \(P = P' \cdot (u \to v)\), where the prefix \(P'\) has at most \(i-1\)
+        edges, so at the start of round \(i\),
+        \(\texttt{dist}[u] \le \operatorname{cost}(P')\). During round \(i\) the
+        edge \(u \to v\) is tested; at that moment \(\texttt{dist}[u]\) can only
+        be smaller still, so afterwards
+        \[
+          \texttt{dist}[v] \;\le\; \texttt{dist}[u] + w(u,v)
+          \;\le\; \operatorname{cost}(P') + w(u,v) \;=\; \operatorname{cost}(P),
+        \]
+        and later relaxations only lower it further.
+        <span class="qed">&#8718;</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Theorem (Bellman-Ford is correct)</span>
+        If no negative cycle is reachable from \(s\), then after \(V-1\) rounds
+        \(\texttt{dist}[v] = \delta(v)\) for every vertex \(v\), and the
+        detection pass relaxes nothing. If a negative cycle is reachable from
+        \(s\), the detection pass relaxes some edge.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> <em>No reachable negative cycle.</em> First,
+        some shortest walk to each reachable \(v\) is simple: if a walk repeats a
+        vertex it contains a cycle; splicing the cycle out leaves an
+        \(s \to v\) walk and changes the cost by \(-w(\text{cycle}) \le 0\)
+        under the hypothesis, so removal never increases cost, and repeating
+        removals must terminate in a simple walk at least as cheap. A simple path
+        has at most \(V-1\) edges, so by the round-guarantee lemma, after
+        \(V-1\) rounds \(\texttt{dist}[v] \le \delta(v)\). The relaxation
+        invariant (<a href="#problem">&sect;1</a>) gives the other direction,
+        \(\texttt{dist}[v] \ge \delta(v)\), since every finite label is a real
+        walk&rsquo;s cost. Hence equality; and with every label equal to
+        \(\delta\), no edge can relax
+        (\(\delta(v) \le \delta(u) + w(u,v)\) for every edge, else appending
+        \(u \to v\) to a shortest walk to \(u\) would beat \(\delta(v)\)), so
+        the detection pass is silent.
+        <br>
+        <em>A reachable negative cycle exists.</em> Let its vertices in order be
+        \(v_1 \to v_2 \to \cdots \to v_k \to v_1\) with edge weights
+        \(w_1, \dots, w_k\), \(\sum_j w_j &lt; 0\). All its labels are finite
+        after at most \(V-1\) rounds (the cycle is reachable, and the lemma
+        discovers every reachable vertex within \(V-1\) rounds). Suppose, for
+        contradiction, the detection pass relaxes nothing; then for every cycle
+        edge, \(\texttt{dist}[v_{j+1}] \le \texttt{dist}[v_j] + w_j\) (indices
+        mod \(k\)). Summing all \(k\) inequalities, each \(\texttt{dist}[v_j]\)
+        appears once on each side and cancels, leaving
+        \(0 \le \sum_j w_j\), contradicting \(\sum_j w_j &lt; 0\). So some edge
+        still relaxes, and the pass fires.
+        <span class="qed">&#8718;</span>
+      </div>
+      <p>
+        The summation step is worth savoring: it converts &ldquo;no edge
+        relaxes&rdquo; (a local, per-edge fact) into a statement about the whole
+        cycle&rsquo;s weight, with the labels themselves canceling out. Whatever
+        values the labels hold, a negative cycle always leaves at least one of
+        its edges relaxable.
+      </p>
+      <h3>Cost</h3>
+      <div class="thm">
+        <span class="tag">Proposition (Bellman-Ford cost)</span>
+        Bellman-Ford runs in \(\Theta(VE)\) time in the worst case and
+        \(\Theta(V + E)\) extra space; with the early-termination test, a run
+        that stabilizes after \(r\) improving rounds costs \(\Theta((r+1)\,E)\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> One round scans every adjacency list once, doing
+        an \(O(1)\) test-and-maybe-write per edge: \(\Theta(E)\) per round, or
+        \(\Theta(V+E)\) counting the vertex loop on graphs with isolated
+        vertices. There are at most \(V-1\) rounds plus one detection pass, so
+        \(O(VE)\) overall; and the bound is tight, since the
+        against-the-path example of <a href="#early">&sect;5</a> generalizes to a
+        \(V\)-vertex path whose reversed scan order improves exactly one label
+        per round, forcing all \(V-1\) rounds of \(\Theta(E)\) work. With early
+        termination, the run does \(r\) improving rounds plus the one all-fail
+        confirming round: \((r+1)\,\Theta(E)\); the best case \(r = 1\) is
+        \(\Theta(E)\). Space: the \(\texttt{dist}\) and \(\texttt{parent}\)
+        arrays, \(\Theta(V)\), beside the \(\Theta(V+E)\) graph itself. No heap,
+        no queue, no recursion. <span class="qed">&#8718;</span>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="compare">8. Bellman-Ford or Dijkstra?</h2>
+      <p>
+        The two algorithms relax the same edges toward the same fixed point and
+        differ only in schedule, which is exactly what the price tags measure:
+      </p>
+      <table>
+        <tr><th></th><th><a href="algo-dijkstra.html">Dijkstra</a></th><th>Bellman-Ford</th></tr>
+        <tr><td>edge weights</td><td>must be \(\ge 0\)</td><td>any sign</td></tr>
+        <tr><td>schedule</td><td>greedy: settle nearest, relax its out-edges once</td><td>blind: all \(E\) edges, up to \(V-1\) rounds</td></tr>
+        <tr><td>relaxations</td><td>each edge once</td><td>each edge up to \(V-1\) times</td></tr>
+        <tr><td>time</td><td>\(O(E \log V)\) (binary heap)</td><td>\(\Theta(VE)\) worst case</td></tr>
+        <tr><td>extra machinery</td><td>priority queue</td><td>none</td></tr>
+        <tr><td>negative cycles</td><td>not applicable</td><td>detected, one extra pass</td></tr>
+        <tr><td>paradigm</td><td>greedy (<a href="../greedy/paradigm-greedy-method.html">Greedy Method</a>)</td><td>DP (<a href="../dp/paradigm-dp-method.html">Dynamic Programming</a>)</td></tr>
+      </table>
+      <p>
+        The decision rule: if every weight is nonnegative, use Dijkstra; the
+        greedy license is paid for and \(O(E\log V)\) beats \(\Theta(VE)\) by
+        roughly a factor of \(V/\log V\). Reach for Bellman-Ford when weights can
+        be negative, when the question <em>is</em> the negative cycle (arbitrage
+        detection), or when the setting cannot support a global priority queue:
+        distance-vector routing protocols such as RIP (Routing Information
+        Protocol) run Bellman-Ford distributively, each router repeatedly
+        relaxing using only its neighbors&rsquo; latest tables, which is one
+        round from that router&rsquo;s point of view. On a directed acyclic
+        graph there is a third option that beats both: relax each
+        vertex&rsquo;s out-edges once, in topological order (the
+        <a href="algo-topological-sort.html">topological-sort handout</a>), for
+        \(\Theta(V+E)\) even with negative weights. And with unit weights,
+        plain <a href="algo-bfs.html">breadth-first search</a> already returns
+        shortest paths in \(\Theta(V+E)\).
+      </p>
+      <p>
+        Where this sits in the catalog: the relaxation primitive, its invariant,
+        and the greedy schedule are the
+        <a href="algo-dijkstra.html">Dijkstra handout</a>; the parameterize-and-
+        recur pattern used in <a href="#dp">&sect;2</a> is the
+        <a href="../dp/paradigm-dp-method.html">Dynamic Programming</a> handout,
+        of which Bellman-Ford is the classic graph instance; the weighted
+        adjacency list is the
+        <a href="ds-graph-representations.html">graph-representations
+        handout</a>; and the priority queue Bellman-Ford pointedly does without
+        is the <a href="../heaps/ds-heaps-pq.html">Heaps &amp; Priority
+        Queues</a> handout.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Run Bellman-Ford from \(0\) on \(0\to1\,(5)\), \(0\to2\,(4)\),
+          \(1\to3\,(3)\), \(2\to1\,(-2)\), \(2\to3\,(4)\), edges scanned in that
+          order. Give \(\texttt{dist}\) after each round and state when the run
+          stops.
+          <details>
+            <summary>solution</summary>
+            Round 1: \(0\to1\) sets \(\texttt{dist}[1]=5\); \(0\to2\) sets
+            \(\texttt{dist}[2]=4\); \(1\to3\) sets \(\texttt{dist}[3]=8\);
+            \(2\to1\): \(4-2=2 &lt; 5\) improves \(\texttt{dist}[1]=2\);
+            \(2\to3\): \(4+4=8 \ge 8\), a tie, no change. After round 1:
+            \([\,0,2,4,8\,]\). Round 2: only \(1\to3\) fires
+            (\(2+3=5 &lt; 8\)), giving \([\,0,2,4,5\,]\); note the negative edge
+            improved \(1\) <em>after</em> \(1\to3\) was scanned in round 1, so
+            \(3\) needed the second round. Round 3: all five tests fail
+            (\(5\ge2\), \(4\ge4\), \(5\ge5\), \(2\ge2\), \(8\ge5\)), so
+            <code>changed</code> is false and the run stops early, before the
+            nominal \(V-1 = 3\)rd improving round would even matter. Final:
+            \(\delta = 0, 2, 4, 5\).
+          </details>
+        </li>
+        <li>
+          For the path \(0\to1\to2\to\cdots\to n\) (each weight \(1\), source
+          \(0\)): which edge scan orders make Bellman-Ford do the most rounds,
+          which the fewest, and how many in each case (counting the final all-fail
+          round)?
+          <details>
+            <summary>solution</summary>
+            Worst: scan the edges in reverse path order
+            (\((n{-}1)\to n\) first, \(0\to1\) last). Each round, every edge
+            whose source is still \(\infty\) is skipped, and exactly one new
+            label is set (the next one along the path), so \(n = V-1\) improving
+            rounds are needed, plus the all-fail round: \(V\) rounds, the
+            \(\Theta(VE)\) worst case realized. Best: scan in path order;
+            round 1 chains all \(n\) improvements in one pass (each edge sees the
+            label its predecessor just wrote), and round 2 is the all-fail
+            confirmation: \(2\) rounds total, \(\Theta(E)\). Same answers either
+            way; only the round count moves.
+          </details>
+        </li>
+        <li>
+          Add the edge \(3\to1\,(1)\) to the running graph of
+          <a href="#trace">&sect;4</a> (scanned last). Identify the negative cycle
+          this creates, give \(\texttt{dist}\) after each of the \(V-1 = 4\)
+          rounds from source \(0\), and show the detection pass firing.
+          <details>
+            <summary>solution</summary>
+            The cycle is \(1\to4\to3\to1\) with weight \(3 - 5 + 1 = -1\).
+            Rounds (verified by running the algorithm): after round 1,
+            \([\,0,3,2,2,7\,]\) (the new edge tests \(2+1=3 \ge 3\), a tie);
+            after round 2, \([\,0,2,2,1,6\,]\) (now \(3\to1\): \(1+1=2&lt;3\));
+            after round 3, \([\,0,1,2,0,5\,]\); after round 4,
+            \([\,0,0,2,-1,4\,]\). Each round the cycle&rsquo;s three labels drop
+            by \(1\): one more lap. No round is change-free, so early termination
+            never triggers. Detection pass: \(1\to4\) tests
+            \(0+3 = 3 &lt; 4\) and still relaxes; the pass reports a reachable
+            negative cycle. (Vertex \(2\) is untouched by the cycle: no route
+            from the cycle back to \(2\) exists, and its label \(2\) is genuinely
+            final.)
+          </details>
+        </li>
+        <li>
+          Suppose a negative cycle exists but is <em>not</em> reachable from the
+          source: \(0\to1\,(1)\) plus the two-vertex cycle \(2\to3\,(-1)\),
+          \(3\to2\,(-1)\), source \(0\). What do the rounds compute, and what
+          does the detection pass report? Point to the line of the code that
+          decides it.
+          <details>
+            <summary>solution</summary>
+            \(\texttt{dist}[2]\) and \(\texttt{dist}[3]\) stay \(\infty\)
+            forever: every scan of \(2\to3\) and \(3\to2\) hits the
+            <code>dist[u] == &infin;</code> guard and is skipped, so the cycle
+            never enters the computation. Round 1 sets
+            \(\texttt{dist}[1] = 1\); round 2 changes nothing and the run stops
+            with \([\,0, 1, \infty, \infty\,]\), which is correct
+            (\(2\) and \(3\) are unreachable, so their distance <em>is</em>
+            \(\infty\)). The detection pass, guarded the same way, is silent:
+            correctly so, because the theorem of <a href="#correct">&sect;7</a>
+            concerns cycles reachable from \(s\); an unreachable cycle cannot
+            lower any \(s\)-distance. Without the \(\infty\) guard (in the
+            fixed-width languages) the arithmetic itself breaks:
+            <code>LONG_MAX + (-1)</code> compares as an improvement and the pass
+            would misfire.
+          </details>
+        </li>
+        <li>
+          Prove or refute: on an <em>undirected</em> graph, a single negative
+          edge already makes single-source shortest paths undefined for every
+          vertex that can reach that edge.
+          <details>
+            <summary>solution</summary>
+            True. An undirected edge \(\{u, v\}\) of weight \(w\) is the two
+            directed edges \(u \to v\) and \(v \to u\), both of weight \(w\)
+            (this is how the weighted adjacency list stores it). For
+            \(w &lt; 0\) those two arcs form the cycle
+            \(u \to v \to u\) of weight \(2w &lt; 0\): a negative cycle. Any
+            vertex that can reach \(u\) can lap it forever, driving costs to
+            \(-\infty\). So &ldquo;Bellman-Ford handles negative weights&rdquo;
+            must be read on <em>digraphs</em>; on undirected graphs a negative
+            edge is instantly a negative cycle (and Bellman-Ford, run on the
+            two-arc encoding, correctly reports it).
+          </details>
+        </li>
+        <li>
+          Your airline problem: cheapest route from \(s\) using <em>at most</em>
+          \(k\) flights, \(k &lt; V-1\). A classmate proposes: run Bellman-Ford
+          but stop after \(k\) rounds, and read off \(\texttt{dist}\). Using the
+          running trace of <a href="#trace">&sect;4</a>, show the proposal is
+          wrong, and fix it.
+          <details>
+            <summary>solution</summary>
+            The in-place code can run <em>ahead</em> of the DP: after round 1 on
+            the running graph, \(\texttt{dist} = [\,0,3,2,2,7\,]\), but
+            \(\texttt{dist}[1] = 3\) is the cost of the two-edge path
+            \(0\to2\to1\) and \(\texttt{dist}[3] = 2\) of the <em>three</em>-edge
+            path \(0\to1\to4\to3\); the true one-edge row is
+            \(D_1 = [\,0,4,2,\infty,\infty\,]\). With \(k = 1\) the proposal
+            reports routes that use too many flights. The fix is the snapshot
+            recurrence of <a href="#dp">&sect;2</a>: keep the previous
+            round&rsquo;s array \(D_{i-1}\) frozen, relax every edge reading from
+            \(D_{i-1}\) and writing into a fresh copy \(D_i\), and repeat
+            \(k\) times; then \(D_k(v)\) is exactly the cheapest cost using at
+            most \(k\) edges. Cost \(\Theta(kE)\) time and \(\Theta(V)\) extra
+            space for the second row. (For plain shortest paths the in-place
+            shortcut is harmless, which is why the standard code uses it.)
+          </details>
+        </li>
+        <li>
+          In the correctness theorem&rsquo;s cycle-summation step, the labels
+          \(\texttt{dist}[v_j]\) cancel. Explain why the argument needs every
+          label on the cycle to be <em>finite</em>, and where the proof
+          guarantees that.
+          <details>
+            <summary>solution</summary>
+            The summation adds the \(k\) inequalities
+            \(\texttt{dist}[v_{j+1}] \le \texttt{dist}[v_j] + w_j\) and cancels
+            each label across the two sides, which is only legitimate arithmetic
+            if every \(\texttt{dist}[v_j]\) is a real number: \(\infty\) on both
+            sides of an inequality cancels to the vacuous \(0 \le 0 + w\) only
+            if one pretends \(\infty - \infty = 0\), which is not a step at all
+            (and with an \(\infty\) label the edge test itself is skipped by the
+            guard, so the per-edge inequality is not even asserted). The proof
+            guarantees finiteness from reachability: the cycle is reachable from
+            \(s\), so each of its vertices has some \(s\)-path, a simple version
+            of which has at most \(V-1\) edges; by the round-guarantee lemma,
+            after \(V-1\) rounds every such label is finite. This is also
+            exactly why an <em>unreachable</em> negative cycle (previous
+            exercise) escapes detection: its labels stay \(\infty\) and the
+            summation never gets off the ground.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Bellman-Ford v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline; all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

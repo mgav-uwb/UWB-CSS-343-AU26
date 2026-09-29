@@ -1,0 +1,888 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Counting Sort & Radix Sort.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Counting Sort &amp; Radix Sort - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13px; }
+      table.trace td, table.trace th { padding: 5px 7px; text-align: center; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+      table.trace td.cell { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace td.new { background: var(--accentbg); color: var(--accent); font-weight: 700; font-family: "SF Mono", Menlo, Consolas, monospace; }
+      table.trace .dg { color: var(--demo); font-weight: 700; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics and links to interactive
+        demos. Read it in a browser; a plain-text or inline document preview will
+        not render the math or reach the demos.
+      </p>
+
+      <h1>Counting Sort &amp; Radix Sort</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Algorithm.
+      </div>
+      <div class="src">
+        Sorting without comparisons: key-indexed counting sorts \(n\) keys
+        drawn from \(\{0,\dots,R-1\}\) in \(\Theta(n+R)\), stably, by using
+        each key as an array index. Least-significant-digit (LSD) radix sort
+        chains \(d\) counting passes to sort \(d\)-digit keys in
+        \(\Theta(d(n+R))\); stability is what makes the chaining correct.
+        With the counting pass fully unrolled, a digit-by-digit radix trace,
+        a counterexample showing an unstable pass breaking the sort, the
+        most-significant-digit (MSD) variant sketched, the radix-\(R\)
+        tradeoff, a bucket-sort aside, and exercises.
+      </div>
+
+      <p class="lead">
+        The <a href="foundation-sorting-lower-bound.html">sorting lower
+        bound</a> says comparison sorts cannot beat \(\Omega(n\log n)\).
+        Counting sort and radix sort beat it anyway, running in linear time,
+        because they never compare two keys: they read the keys&rsquo; digits
+        and use them as array indices. This handout builds the one primitive
+        both rest on, <strong>key-indexed counting</strong>, unrolls it
+        completely, and then chains it into radix sort, where the
+        primitive&rsquo;s <em>stability</em> turns out to carry the whole
+        correctness argument.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#beat">Beating \(n \log n\) without contradicting it</a></li>
+          <li><a href="#counting">Key-indexed counting, fully unrolled</a></li>
+          <li><a href="#lsd">LSD radix sort</a></li>
+          <li><a href="#msd">MSD radix sort, sketched</a></li>
+          <li><a href="#cost">Cost, and the choice of radix</a></li>
+          <li><a href="#sits">Where this sits</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="beat">1. Beating \(n\log n\) without contradicting it</h2>
+      <p>
+        The <a href="foundation-sorting-lower-bound.html">lower bound</a> is a
+        statement about a <em>model</em>: any algorithm whose only way to
+        learn about the keys is asking &ldquo;is \(a_i &lt; a_j\)?&rdquo;
+        must, in the worst case, ask \(\Omega(n\log n)\) times, because
+        \(n!\) possible orderings need \(\log_2(n!) = \Theta(n\log n)\)
+        yes/no answers to tell apart. The bound says nothing about algorithms
+        that get information any other way.
+      </p>
+      <p>
+        Counting sort gets its information another way. If the keys are known
+        to be integers in \(\{0, 1, \dots, R-1\}\), a key is not an opaque
+        thing you can only compare: it is an <em>address</em>. One array read
+        <code>count[key]</code> extracts \(\log_2 R\) bits of information
+        about the key at once, where a comparison extracts one bit. The
+        decision-tree argument simply does not apply, and \(\Theta(n+R)\)
+        running time is possible.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (key-indexed model)</span>
+        A sort is <strong>comparison-free</strong> (key-indexed) if it never
+        evaluates \(a_i &lt; a_j\), and instead uses keys, or digits of keys,
+        as indices into arrays of size \(R\). Here \(R\) is called the
+        <strong>radix</strong> (for digits) or <strong>alphabet size</strong>
+        (for characters). The assumption bought: keys are, or decompose
+        into, small integers.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (stability)</span>
+        A sort is <strong>stable</strong> if records with equal keys appear
+        in the output in the same relative order as in the input. Stability
+        is what lets sorts be <em>chained</em>: sorting stably by key
+        \(B\) after sorting by key \(A\) yields order &ldquo;by \(B\), ties
+        broken by \(A\)&rdquo;.
+      </div>
+      <p>
+        The plan: build a stable \(\Theta(n+R)\) sort for one small-integer
+        key (key-indexed counting), then handle big keys by splitting them
+        into \(d\) small digits and running one stable pass per digit.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="counting">2. Key-indexed counting, fully unrolled</h2>
+      <p>
+        Key-indexed counting sorts \(n\) records whose keys lie in
+        \(\{0,\dots,R-1\}\) in four passes, none of which compares anything:
+      </p>
+      <ol>
+        <li><strong>Histogram.</strong> Count how many records have each key:
+          <code>count[a[i].key]++</code>.</li>
+        <li><strong>Prefix sums.</strong> Convert counts to <em>start
+          positions</em>: <code>start[r]</code> = number of records with key
+          \(&lt; r\) = where key \(r\)&rsquo;s block begins in the output.</li>
+        <li><strong>Stable placement.</strong> Scan the input left to right;
+          drop each record at <code>aux[start[key]]</code> and increment
+          <code>start[key]</code>.</li>
+        <li><strong>Copy back.</strong> <code>a[i] = aux[i]</code>.</li>
+      </ol>
+      <div class="code-tabs" data-snippet="sorting/counting-sort">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Key-indexed counting: stable sort of n keys in {0..R-1}. Theta(n + R).
+void countingSort(int a[], int n, int R) {
+    int* count = new int[R]();                  // 1) histogram of keys
+    for (int i = 0; i &lt; n; i++) count[a[i]]++;
+    int* start = new int[R];                    // 2) prefix sums:
+    for (int r = 0, s = 0; r &lt; R; r++) {        //    start[r] = #keys &lt; r
+        start[r] = s; s += count[r];
+    }
+    int* aux = new int[n];                      // 3) stable placement:
+    for (int i = 0; i &lt; n; i++)                 //    left-to-right scan
+        aux[start[a[i]]++] = a[i];              //    keeps ties in order
+    for (int i = 0; i &lt; n; i++) a[i] = aux[i];  // 4) copy back
+    delete[] count; delete[] start; delete[] aux;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Key-indexed counting: stable sort of n keys in {0..R-1}. Theta(n + R).
+static void countingSort(int[] a, int R) {
+    int n = a.length;
+    int[] count = new int[R];                   // 1) histogram of keys
+    for (int i = 0; i &lt; n; i++) count[a[i]]++;
+    int[] start = new int[R];                   // 2) prefix sums:
+    for (int r = 0, s = 0; r &lt; R; r++) {        //    start[r] = #keys &lt; r
+        start[r] = s; s += count[r];
+    }
+    int[] aux = new int[n];                     // 3) stable placement:
+    for (int i = 0; i &lt; n; i++)                 //    left-to-right scan
+        aux[start[a[i]]++] = a[i];              //    keeps ties in order
+    for (int i = 0; i &lt; n; i++) a[i] = aux[i];  // 4) copy back
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Key-indexed counting: stable sort of n keys in {0..R-1}. Theta(n + R).
+def counting_sort(a, R):
+    count = [0] * R
+    for x in a:                       # 1) histogram of keys
+        count[x] += 1
+    start, s = [0] * R, 0             # 2) prefix sums:
+    for r in range(R):                #    start[r] = #keys &lt; r
+        start[r] = s
+        s += count[r]
+    aux = [None] * len(a)             # 3) stable placement: left-to-right
+    for x in a:                       #    scan keeps ties in order
+        aux[start[x]] = x
+        start[x] += 1
+    a[:] = aux                        # 4) copy back</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Key-indexed counting: stable sort of n keys in {0..R-1}. O(n + R).
+fn counting_sort(a: &amp;mut [usize], r_radix: usize) {
+    let mut count = vec![0usize; r_radix];      // 1) histogram of keys
+    for &amp;x in a.iter() { count[x] += 1; }
+    let mut start = vec![0usize; r_radix];      // 2) prefix sums:
+    let mut s = 0;                              //    start[r] = #keys &lt; r
+    for r in 0..r_radix { start[r] = s; s += count[r]; }
+    let mut aux = vec![0usize; a.len()];        // 3) stable placement:
+    for &amp;x in a.iter() {                        //    left-to-right scan
+        aux[start[x]] = x;                      //    keeps ties in order
+        start[x] += 1;
+    }
+    a.copy_from_slice(&amp;aux);                    // 4) copy back
+}</pre>
+<p class="ct-src">source: <code>code/sorting/counting-sort.cpp &middot; code/sorting/counting-sort.java &middot; code/sorting/counting-sort.py &middot; code/sorting/counting-sort.rs</code></p>
+<!--/ct--></div>
+
+      <h3 id="ct-trace">A full run</h3>
+      <p>
+        Sort eight records by a key in \(\{0,1,2,3\}\) (so \(R=4\)). Each
+        record is a name tagged with its key, and there are duplicate keys on
+        purpose: three records share key 2, and keys 0 and 1 each appear
+        twice. Input order:
+      </p>
+      <pre>Ava:2  Ben:0  Cal:3  Dia:2  Eve:0  Fox:1  Gia:2  Hal:1</pre>
+      <p>
+        <strong>Pass 1, histogram.</strong> One increment per record;
+        <code>count</code> after each read:
+      </p>
+      <table class="trace">
+        <tr><th>read</th><th>count[0]</th><th>count[1]</th><th>count[2]</th><th>count[3]</th></tr>
+        <tr><td class="lab">Ava:2</td><td class="cell">0</td><td class="cell">0</td><td class="new">1</td><td class="cell">0</td></tr>
+        <tr><td class="lab">Ben:0</td><td class="new">1</td><td class="cell">0</td><td class="cell">1</td><td class="cell">0</td></tr>
+        <tr><td class="lab">Cal:3</td><td class="cell">1</td><td class="cell">0</td><td class="cell">1</td><td class="new">1</td></tr>
+        <tr><td class="lab">Dia:2</td><td class="cell">1</td><td class="cell">0</td><td class="new">2</td><td class="cell">1</td></tr>
+        <tr><td class="lab">Eve:0</td><td class="new">2</td><td class="cell">0</td><td class="cell">2</td><td class="cell">1</td></tr>
+        <tr><td class="lab">Fox:1</td><td class="cell">2</td><td class="new">1</td><td class="cell">2</td><td class="cell">1</td></tr>
+        <tr><td class="lab">Gia:2</td><td class="cell">2</td><td class="cell">1</td><td class="new">3</td><td class="cell">1</td></tr>
+        <tr><td class="lab">Hal:1</td><td class="cell">2</td><td class="new">2</td><td class="cell">3</td><td class="cell">1</td></tr>
+      </table>
+      <p>
+        <strong>Pass 2, prefix sums.</strong> Running sum of the counts,
+        offset by one slot: <code>start[r]</code> is the total count of keys
+        strictly below \(r\), which is exactly the index where key
+        \(r\)&rsquo;s block must begin in sorted order.
+      </p>
+      <table class="trace">
+        <tr><th>key \(r\)</th><th>count[r]</th><th>start[r] = # keys &lt; r</th><th>block in output</th></tr>
+        <tr><td class="cell">0</td><td class="cell">2</td><td class="new">0</td><td class="cell">aux[0..1]</td></tr>
+        <tr><td class="cell">1</td><td class="cell">2</td><td class="new">2</td><td class="cell">aux[2..3]</td></tr>
+        <tr><td class="cell">2</td><td class="cell">3</td><td class="new">4</td><td class="cell">aux[4..6]</td></tr>
+        <tr><td class="cell">3</td><td class="cell">1</td><td class="new">7</td><td class="cell">aux[7]</td></tr>
+      </table>
+      <p>
+        <strong>Pass 3, stable placement.</strong> Scan the <em>input</em>
+        left to right. Each record goes to slot <code>start[key]</code>, and
+        that slot counter then advances by one, so the next record with the
+        same key lands one slot to the right. Every state of
+        <code>aux</code> and of the moving <code>start</code> array:
+      </p>
+      <table class="trace">
+        <tr><th>place</th><th>&rarr; slot</th>
+          <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th>
+          <th>start after</th></tr>
+        <tr><td class="lab">Ava:2</td><td class="cell">aux[4]</td>
+          <td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="new">Ava</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td>
+          <td class="cell">[0 2 5 7]</td></tr>
+        <tr><td class="lab">Ben:0</td><td class="cell">aux[0]</td>
+          <td class="new">Ben</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td>
+          <td class="cell">[1 2 5 7]</td></tr>
+        <tr><td class="lab">Cal:3</td><td class="cell">aux[7]</td>
+          <td class="cell">Ben</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="new">Cal</td>
+          <td class="cell">[1 2 5 8]</td></tr>
+        <tr><td class="lab">Dia:2</td><td class="cell">aux[5]</td>
+          <td class="cell">Ben</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="new">Dia</td><td class="cell">&middot;</td><td class="cell">Cal</td>
+          <td class="cell">[1 2 6 8]</td></tr>
+        <tr><td class="lab">Eve:0</td><td class="cell">aux[1]</td>
+          <td class="cell">Ben</td><td class="new">Eve</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">Dia</td><td class="cell">&middot;</td><td class="cell">Cal</td>
+          <td class="cell">[2 2 6 8]</td></tr>
+        <tr><td class="lab">Fox:1</td><td class="cell">aux[2]</td>
+          <td class="cell">Ben</td><td class="cell">Eve</td><td class="new">Fox</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">Dia</td><td class="cell">&middot;</td><td class="cell">Cal</td>
+          <td class="cell">[2 3 6 8]</td></tr>
+        <tr><td class="lab">Gia:2</td><td class="cell">aux[6]</td>
+          <td class="cell">Ben</td><td class="cell">Eve</td><td class="cell">Fox</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">Dia</td><td class="new">Gia</td><td class="cell">Cal</td>
+          <td class="cell">[2 3 7 8]</td></tr>
+        <tr><td class="lab">Hal:1</td><td class="cell">aux[3]</td>
+          <td class="cell">Ben</td><td class="cell">Eve</td><td class="cell">Fox</td><td class="new">Hal</td><td class="cell">Ava</td><td class="cell">Dia</td><td class="cell">Gia</td><td class="cell">Cal</td>
+          <td class="cell">[2 4 7 8]</td></tr>
+      </table>
+      <p>
+        Output: <code>Ben:0 Eve:0 Fox:1 Hal:1 Ava:2 Dia:2 Gia:2 Cal:3</code>.
+        Sorted by key, and look inside each block of duplicates:
+        <code>Ben</code> before <code>Eve</code> (their input order),
+        <code>Fox</code> before <code>Hal</code>, and
+        <code>Ava, Dia, Gia</code> in exactly their input order. No record
+        was ever compared with another; every record moved exactly once.
+      </p>
+      <div class="thm">
+        <span class="tag">Claim (correct, stable, \(\Theta(n+R)\))</span>
+        Key-indexed counting sorts correctly and stably in \(\Theta(n+R)\)
+        time with \(\Theta(n+R)\) extra space.
+        <div class="proof">
+          <em>Correct:</em> <code>start[r]</code> begins as the number of
+          keys less than \(r\), so the blocks
+          \([\,\texttt{start}[r], \texttt{start}[r{+}1]\,)\) partition
+          \(\texttt{aux}\) with key \(r\)&rsquo;s block before key
+          \(r'\)&rsquo;s for \(r &lt; r'\), and each block has exactly
+          <code>count[r]</code> slots. Placement drops each record into its
+          own key&rsquo;s block, filling it left to right, so no slot is
+          written twice and the result is ordered by key.
+          <em>Stable:</em> within a block, slots are assigned in input-scan
+          order, so equal keys keep their input order.
+          <em>Cost:</em> the four passes touch \(n\), \(R\), \(n\), \(n\)
+          array entries respectively, each \(\Theta(1)\) per entry:
+          \(\Theta(n+R)\) total. Space: \(\texttt{aux}\) is \(n\) slots and
+          \(\texttt{count}/\texttt{start}\) are \(R\).
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <div class="aside">
+        <span class="tag">Two ways to lose stability</span>
+        Both of these produce a correct <em>ordering</em> of plain integers
+        but break stability of records, which matters in the next section:
+        scanning the input <em>right to left</em> while filling blocks left
+        to right reverses ties; and filling each block from its right end
+        (using end positions and <code>--end[key]</code>) while scanning
+        left to right also reverses ties. The rule: scan direction and fill
+        direction must agree. (Scanning right to left while filling from
+        block ends is again stable, and is the form some texts use.)
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="lsd">3. LSD radix sort</h2>
+      <p>
+        Counting sort needs \(R\) small. To sort keys from a big universe,
+        decompose each key into \(d\) base-\(R\) digits and run one counting
+        pass per digit, <strong>least-significant digit first</strong>: sort
+        the whole array by the last digit, then by the next-to-last, and so
+        on. Each pass must be stable; the invariant below is why.
+      </p>
+      <div class="code-tabs" data-snippet="sorting/radix-lsd">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// LSD radix sort: d stable counting passes over base-R digits,
+// least-significant digit first. Theta(d(n + R)).
+void lsdSort(int a[], int n, int d, int R) {
+    int* aux   = new int[n];
+    int* start = new int[R];
+    long pw = 1;                                   // R^p: digit p extractor
+    for (int p = 0; p &lt; d; p++, pw *= R) {         // digit p = (x / pw) % R
+        for (int r = 0; r &lt; R; r++) start[r] = 0;
+        for (int i = 0; i &lt; n; i++)                // histogram of digit p
+            start[(a[i] / pw) % R]++;
+        for (int r = 0, s = 0; r &lt; R; r++) {       // counts -&gt; start slots
+            int c = start[r]; start[r] = s; s += c;
+        }
+        for (int i = 0; i &lt; n; i++)                // stable placement
+            aux[start[(a[i] / pw) % R]++] = a[i];
+        for (int i = 0; i &lt; n; i++) a[i] = aux[i]; // copy back
+    }
+    delete[] aux; delete[] start;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// LSD radix sort: d stable counting passes over base-R digits,
+// least-significant digit first. Theta(d(n + R)).
+static void lsdSort(int[] a, int d, int R) {
+    int n = a.length;
+    int[] aux = new int[n];
+    long pw = 1;                                   // R^p: digit p extractor
+    for (int p = 0; p &lt; d; p++, pw *= R) {         // digit p = (x / pw) % R
+        int[] start = new int[R];
+        for (int i = 0; i &lt; n; i++)                // histogram of digit p
+            start[(int)(a[i] / pw) % R]++;
+        for (int r = 0, s = 0; r &lt; R; r++) {       // counts -&gt; start slots
+            int c = start[r]; start[r] = s; s += c;
+        }
+        for (int i = 0; i &lt; n; i++)                // stable placement
+            aux[start[(int)(a[i] / pw) % R]++] = a[i];
+        for (int i = 0; i &lt; n; i++) a[i] = aux[i]; // copy back
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># LSD radix sort: d stable counting passes over base-R digits,
+# least-significant digit first. Theta(d(n + R)).
+def lsd_sort(a, d, R):
+    pw = 1                            # R**p: digit p extractor
+    for _ in range(d):                # digit p of x is (x // pw) % R
+        count = [0] * R
+        for x in a:                   # histogram of digit p
+            count[(x // pw) % R] += 1
+        start, s = [0] * R, 0         # counts -&gt; start slots
+        for r in range(R):
+            start[r] = s
+            s += count[r]
+        aux = [None] * len(a)
+        for x in a:                   # stable placement
+            dgt = (x // pw) % R
+            aux[start[dgt]] = x
+            start[dgt] += 1
+        a[:] = aux                    # copy back
+        pw *= R</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// LSD radix sort: d stable counting passes over base-R digits,
+// least-significant digit first. O(d(n + R)).
+fn lsd_sort(a: &amp;mut [u64], d: u32, r_radix: u64) {
+    let n = a.len();
+    let mut aux = vec![0u64; n];
+    let mut pw: u64 = 1;                           // R^p: digit p extractor
+    for _ in 0..d {                                // digit p = (x / pw) % R
+        let mut start = vec![0usize; r_radix as usize];
+        for &amp;x in a.iter() {                       // histogram of digit p
+            start[((x / pw) % r_radix) as usize] += 1;
+        }
+        let mut s = 0;                             // counts -&gt; start slots
+        for r in 0..r_radix as usize {
+            let c = start[r]; start[r] = s; s += c;
+        }
+        for &amp;x in a.iter() {                       // stable placement
+            let dgt = ((x / pw) % r_radix) as usize;
+            aux[start[dgt]] = x;
+            start[dgt] += 1;
+        }
+        a.copy_from_slice(&amp;aux);                   // copy back
+        pw *= r_radix;
+    }
+}</pre>
+<p class="ct-src">source: <code>code/sorting/radix-lsd.cpp &middot; code/sorting/radix-lsd.java &middot; code/sorting/radix-lsd.py &middot; code/sorting/radix-lsd.rs</code></p>
+<!--/ct--></div>
+
+      <h3 id="lsd-trace">Digit-by-digit trace</h3>
+      <p>
+        Sort seven 3-digit numbers (\(d=3\), \(R=10\)). Each row is the whole
+        array after one stable counting pass on the highlighted digit:
+      </p>
+      <table class="trace">
+        <tr><th></th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+        <tr><td class="lab">input</td>
+          <td class="cell">329</td><td class="cell">457</td><td class="cell">657</td><td class="cell">839</td><td class="cell">436</td><td class="cell">720</td><td class="cell">355</td></tr>
+        <tr><td class="lab">after ones</td>
+          <td class="cell">72<span class="dg">0</span></td><td class="cell">35<span class="dg">5</span></td><td class="cell">43<span class="dg">6</span></td><td class="cell">45<span class="dg">7</span></td><td class="cell">65<span class="dg">7</span></td><td class="cell">32<span class="dg">9</span></td><td class="cell">83<span class="dg">9</span></td></tr>
+        <tr><td class="lab">after tens</td>
+          <td class="cell">7<span class="dg">2</span>0</td><td class="cell">3<span class="dg">2</span>9</td><td class="cell">4<span class="dg">3</span>6</td><td class="cell">8<span class="dg">3</span>9</td><td class="cell">3<span class="dg">5</span>5</td><td class="cell">4<span class="dg">5</span>7</td><td class="cell">6<span class="dg">5</span>7</td></tr>
+        <tr><td class="lab">after hundreds</td>
+          <td class="cell"><span class="dg">3</span>29</td><td class="cell"><span class="dg">3</span>55</td><td class="cell"><span class="dg">4</span>36</td><td class="cell"><span class="dg">4</span>57</td><td class="cell"><span class="dg">6</span>57</td><td class="cell"><span class="dg">7</span>20</td><td class="cell"><span class="dg">8</span>39</td></tr>
+      </table>
+      <p>
+        Watch the ties do the work. The ones pass has two tie pairs
+        (457, 657 on digit 7; 329, 839 on digit 9); each pair keeps its input
+        order. The tens pass has three tie groups: digit 2 holds
+        \(\{720, 329\}\), digit 3 holds \(\{436, 839\}\), and digit 5 holds
+        \(\{355, 457, 657\}\); within each group, stability preserves the
+        ones-pass order, so after the tens pass every group is internally
+        sorted by its last <em>two</em> digits (355 &lt; 457 &lt; 657). The
+        hundreds pass then ties \(\{329, 355\}\) and \(\{436, 457\}\), and
+        again stability keeps each tie group in its already-correct order.
+        The final array is fully sorted.
+      </p>
+      <div class="thm">
+        <span class="tag">Invariant (why LSD works)</span>
+        After the pass on digit \(p\) (digits numbered \(0\) = least
+        significant), the array is sorted by the number formed by digits
+        \(p, p-1, \dots, 0\), i.e. by the key&rsquo;s last \(p+1\) digits.
+        Hence after the pass on digit \(d-1\), the array is sorted.
+        <div class="proof">
+          Induction on \(p\). Base: the pass on digit 0 sorts by digit 0.
+          Step: assume the array is sorted by the last \(p\) digits, and run
+          the stable pass on digit \(p\). Take any two keys \(x, y\) with
+          \(x &lt; y\) on their last \(p+1\) digits. Either they differ on
+          digit \(p\), and the counting pass puts \(x\)&rsquo;s block before
+          \(y\)&rsquo;s; or they agree on digit \(p\), so \(x &lt; y\)
+          already on the last \(p\) digits, so \(x\) preceded \(y\) before
+          the pass (induction hypothesis), and <em>stability</em> preserves
+          that order through the pass. <span class="qed">&#8718;</span>
+        </div>
+      </div>
+
+      <h3 id="unstable">Stability is load-bearing: a broken run</h3>
+      <p>
+        The induction&rsquo;s second case is the entire role of stability: a
+        pass on digit \(p\) is blind to digits below \(p\), so the only thing
+        protecting the earlier passes&rsquo; work is that ties survive
+        unreordered. Replace the stable pass with an <em>unstable</em> one
+        (same bucket contents, ties reversed; for instance, filling each
+        bucket from its right end while scanning the input left to right)
+        and radix sort silently breaks:
+      </p>
+      <table class="trace">
+        <tr><th></th><th colspan="3">stable passes</th><th colspan="3">unstable passes (ties reversed)</th></tr>
+        <tr><td class="lab">input</td>
+          <td class="cell">21</td><td class="cell">25</td><td class="cell">23</td>
+          <td class="cell">21</td><td class="cell">25</td><td class="cell">23</td></tr>
+        <tr><td class="lab">after ones</td>
+          <td class="cell">2<span class="dg">1</span></td><td class="cell">2<span class="dg">3</span></td><td class="cell">2<span class="dg">5</span></td>
+          <td class="cell">2<span class="dg">1</span></td><td class="cell">2<span class="dg">3</span></td><td class="cell">2<span class="dg">5</span></td></tr>
+        <tr><td class="lab">after tens</td>
+          <td class="cell"><span class="dg">2</span>1</td><td class="cell"><span class="dg">2</span>3</td><td class="cell"><span class="dg">2</span>5</td>
+          <td class="cell"><span class="dg">2</span>5</td><td class="cell"><span class="dg">2</span>3</td><td class="cell"><span class="dg">2</span>1</td></tr>
+      </table>
+      <p>
+        The ones pass is identical in both columns (its digits 1, 3, 5 are
+        all distinct, so there are no ties to mishandle). The tens pass is
+        where it breaks: all three keys tie on digit 2, so the pass&rsquo;s
+        only job is to leave them alone; the unstable version reverses them
+        and outputs \(25, 23, 21\). Wrong, even though every individual pass
+        put every key in the correct bucket.
+      </p>
+      <div class="aside">
+        <span class="tag">LSD in practice</span>
+        LSD radix sort is the standard way to sort fixed-length keys that
+        decompose into digits: 32- and 64-bit integers (bytes as digits,
+        \(R = 256\)), fixed-length strings (characters as digits, \(R\) =
+        alphabet size), IP addresses, dates packed as integers. It is itself
+        stable (a chain of stable passes), and its cost is
+        <em>guaranteed</em>, with no bad inputs. Punched-card sorters ran
+        exactly this algorithm mechanically: deal the deck into \(R=10\)
+        bins by one column, restack the bins in order (that restack is the
+        stable pass), repeat for the next column.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="msd">4. MSD radix sort, sketched</h2>
+      <p>
+        The other order also works, with a different shape. MSD
+        (most-significant-digit) radix sort runs one counting pass on the
+        <em>leading</em> digit, which splits the array into \(R\) blocks,
+        then <strong>recurses independently within each block</strong> on
+        the next digit. On the seven numbers of the trace, the first pass
+        splits by hundreds digit:
+      </p>
+      <pre>bucket 3: [329, 355]   bucket 4: [457, 436]   bucket 6: [657]
+bucket 7: [720]        bucket 8: [839]
+<span class="cm">recurse on the tens digit inside bucket 3, inside bucket 4, ... ;
+buckets 6, 7, 8 have one element each: already done.</span></pre>
+      <p>
+        The recursion must stay <em>inside</em> each block: a later full-array
+        pass on a lower digit would destroy the leading-digit order (this is
+        exercise 3). MSD stops recursing the moment a block has one element,
+        so it examines only enough leading digits to distinguish the keys,
+        while LSD always runs all \(d\) passes. That makes MSD win when:
+      </p>
+      <ul>
+        <li><strong>Keys are long but distinguished early.</strong> Sorting
+          long strings or multi-word keys: if most keys differ in their
+          first few characters, MSD touches only those characters, giving
+          about \(\Theta(n \cdot \bar{\ell} + \text{blocks} \cdot R)\)
+          where \(\bar{\ell}\) is the average distinguishing-prefix length,
+          versus LSD&rsquo;s full \(d\) passes.</li>
+        <li><strong>Keys have variable length.</strong> LSD needs all keys
+          the same length (or padding); MSD handles variable-length strings
+          naturally with an &ldquo;end of string&rdquo; pseudo-digit that
+          sorts shorter prefixes first.</li>
+      </ul>
+      <p>
+        Its costs: recursion bookkeeping, and a fresh \(R\)-slot count array
+        at <em>every</em> recursive call, which for many small blocks makes
+        the \(R\) term dominate; practical MSD implementations cut over to
+        insertion sort on small blocks for exactly this reason. The recursion
+        tree of MSD radix sort is the same shape as the
+        <a href="../strings/ds-tries.html">R-way trie</a> of the keys: each
+        node fans out by one digit into \(R\) children, and MSD is in effect
+        building and reading off that trie&rsquo;s leaves in order.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cost">5. Cost, and the choice of radix</h2>
+      <div class="thm">
+        <span class="tag">Claim (LSD cost)</span>
+        LSD radix sort on \(n\) keys of \(d\) base-\(R\) digits runs in
+        \(\Theta(d(n+R))\) time and \(\Theta(n+R)\) extra space, on every
+        input.
+        <div class="proof">
+          Each pass is one key-indexed counting sort on digit values in
+          \(\{0,\dots,R-1\}\): \(\Theta(n+R)\) by the claim in the
+          key-indexed counting section (digit extraction is \(\Theta(1)\)
+          per element). There are exactly \(d\) passes, always: no pass can
+          be skipped and no input makes a pass cheaper, so the total is
+          \(\Theta(d(n+R))\). The \(\texttt{aux}\) and \(\texttt{start}\)
+          arrays are reused across passes: \(\Theta(n+R)\) space.
+          <span class="qed">&#8718;</span>
+        </div>
+      </div>
+      <p>
+        The radix \(R\) is a dial, because \(d\) and \(R\) trade against each
+        other. Keys from a universe of size \(U\) (so \(w = \log_2 U\) bits)
+        have \(d = \lceil \log_R U \rceil = \lceil w / \log_2 R \rceil\)
+        base-\(R\) digits: raising \(R\) means fewer, fatter passes, but each
+        pass pays \(\Theta(R)\) to build and scan its count array whether or
+        not the buckets are used. Concretely, for 32-bit keys:
+      </p>
+      <table>
+        <tr><th>radix \(R\)</th><th>passes \(d\)</th><th>cost \(d(n+R)\)</th><th>at \(n = 1000\)</th><th>at \(n = 10^6\)</th></tr>
+        <tr><td>\(2^8 = 256\)</td><td>4</td><td>\(4(n + 256)\)</td><td>5&thinsp;024</td><td>&asymp;&nbsp;4.0&times;10<sup>6</sup></td></tr>
+        <tr><td>\(2^{16} = 65\,536\)</td><td>2</td><td>\(2(n + 65\,536)\)</td><td>133&thinsp;072</td><td>&asymp;&nbsp;2.1&times;10<sup>6</sup></td></tr>
+      </table>
+      <p>
+        At \(n = 1000\) the big radix is a disaster: the \(R\) term swamps
+        the \(n\) term, and 26 times the work of \(R = 256\). At
+        \(n = 10^6\) the big radix wins, because \(n \gg R\) makes each pass
+        cost essentially \(n\) and halving the pass count halves the total.
+        The balance point: take \(R \approx n\) (i.e. \(\log_2 R \approx
+        \log_2 n\) bits per pass), which makes each pass \(\Theta(n)\) and
+        gives total \(\Theta(n \cdot w / \log n)\); whenever the key width
+        \(w\) is \(O(\log n)\), that is \(\Theta(n)\), linear. This is the
+        precise sense in which radix sort is a linear-time sort: linear for
+        keys polynomial in \(n\) (so \(w = O(\log n)\)), not for arbitrary
+        keys. For truly long keys (\(d\) large, distinguishing prefixes
+        short), MSD or a comparison sort can win; \(\Theta(d \cdot n)\) is
+        not automatically better than \(\Theta(n \log n)\) when
+        \(d \gg \log n\).
+      </p>
+      <div class="aside">
+        <span class="tag">Bucket sort</span>
+        A cousin with a different assumption. <strong>Bucket sort</strong>
+        handles keys that are <em>not</em> small integers (say, reals in
+        \([0,1)\)) by dropping each of the \(n\) keys into bucket
+        \(\lfloor n \cdot x \rfloor\) of \(n\) buckets, sorting each bucket
+        with insertion sort, and concatenating. If the keys are drawn
+        <em>uniformly at random</em>, each bucket holds \(O(1)\) keys in
+        expectation and the total expected cost is \(\Theta(n)\). The
+        assumption moved: counting sort assumes a small key
+        <em>universe</em>; bucket sort assumes a benign key
+        <em>distribution</em>. Feed bucket sort skewed data (all keys in one
+        bucket) and it degrades to its per-bucket sort, \(\Theta(n^2)\) for
+        insertion sort. It is the only sort in this handout whose linear
+        time is probabilistic rather than guaranteed.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="sits">6. Where this sits</h2>
+      <p>
+        The <a href="foundation-sorting-lower-bound.html">Sorting Lower
+        Bound</a> handout proves the \(\Omega(n\log n)\) floor these sorts
+        step around, and delimits exactly the model in which they live.
+        Among comparison sorts, <a href="algo-mergesort.html">Mergesort</a>
+        is the stable one, and its merge plays the same
+        tie-breaking-discipline role that the left-to-right placement scan
+        plays here; <a href="algo-quicksort.html">Quicksort</a> is the
+        standard unstable contrast. The
+        <a href="../strings/ds-tries.html">Tries</a> handout is the search
+        made from the same move as the sort: an R-way trie uses one digit or
+        character as an index into an \(R\)-slot child array at each node,
+        exactly as a counting pass uses it as an index into an
+        \(R\)-slot count array, and MSD radix sort&rsquo;s recursion tree is
+        that trie.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">7. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          Run key-indexed counting on the characters of
+          <code>b a c c a b</code> (alphabet \(\{a,b,c\}\) mapped to
+          \(\{0,1,2\}\), so \(R=3\)). Give the count array, the start array,
+          and, for each character in scan order, the <code>aux</code> slot
+          it lands in.
+          <details>
+            <summary>solution</summary>
+            Histogram: two of each, so \(\texttt{count} = [2,2,2]\). Prefix
+            sums: \(\texttt{start} = [0,2,4]\) (0 keys before <code>a</code>,
+            2 before <code>b</code>, 4 before <code>c</code>). Placement, in
+            scan order: <code>b</code>&rarr;aux[2], <code>a</code>&rarr;aux[0],
+            <code>c</code>&rarr;aux[4], <code>c</code>&rarr;aux[5],
+            <code>a</code>&rarr;aux[1], <code>b</code>&rarr;aux[3]. Result:
+            <code>a a b b c c</code>, with the first <code>a</code> of the
+            input first in the output (stable). Verify the slots against the
+            start array: <code>b</code>&rsquo;s block is aux[2..3],
+            <code>a</code>&rsquo;s aux[0..1], <code>c</code>&rsquo;s
+            aux[4..5], each filled left to right.
+          </details>
+        </li>
+        <li>
+          Trace 2-digit LSD radix sort on \([21, 25, 23]\) where each pass
+          uses the unstable placement of the broken-run section (correct
+          buckets, ties reversed). Which pass goes wrong, and why does the
+          other one not?
+          <details>
+            <summary>solution</summary>
+            Ones pass: digits 1, 5, 3 are all distinct, so each bucket holds
+            one key and there are no ties to reverse; the pass gives
+            \([21, 23, 25]\), same as the stable pass. Tens pass: all three
+            keys have tens digit 2, one bucket, all ties; the unstable pass
+            reverses them to \([25, 23, 21]\). Final answer \([25, 23, 21]\),
+            not sorted. Instability only shows when a pass has ties, and only
+            hurts when the tied keys&rsquo; earlier-pass order carried
+            information.
+          </details>
+        </li>
+        <li>
+          A student runs full-array counting passes most-significant digit
+          first (hundreds, then tens, then ones), without MSD&rsquo;s
+          recursion, on \([329, 457, 657, 839, 436, 720, 355]\). Each pass
+          is stable. Give the array after each pass and explain the final
+          answer&rsquo;s order.
+          <details>
+            <summary>solution</summary>
+            After hundreds: \([329, 355, 457, 436, 657, 720, 839]\). After
+            tens (full array, so hundreds order is discarded except as tie
+            order): \([329, 720, 436, 839, 355, 457, 657]\). After ones:
+            \([720, 355, 436, 457, 657, 329, 839]\). The last full-array
+            pass dominates: the result is sorted by <em>ones</em> digit
+            (0, 5, 6, 7, 7, 9, 9), with earlier passes surviving only as
+            tie-breaks among equal ones digits, exactly backwards. This is
+            why LSD runs least-significant first (each pass&rsquo;s order is
+            the least important so far, refined by later passes) and why MSD
+            must recurse within blocks rather than re-scan the whole array.
+          </details>
+        </li>
+        <li>
+          You sort \(n = 10^6\) records with 64-bit keys by LSD radix sort
+          with \(R = 2^8\) (one byte per digit). How many passes run, and
+          roughly how many array operations does the sort do, counting each
+          pass as \(n + R\) slot-touches? Compare against
+          \(n \log_2 n\) for a comparison sort.
+          <details>
+            <summary>solution</summary>
+            \(64/8 = 8\) passes. Work \(\approx 8 \cdot (10^6 + 256) =
+            8\,002\,048\) slot-touches, about \(8n\). A comparison sort does
+            about \(n\log_2 n = 10^6 \cdot \log_2 10^6 \approx 1.99 \times
+            10^7\) comparisons, each with its own memory traffic: radix does
+            roughly 2.5&times; less key-touching work here, and the gap
+            widens as \(n\) grows while \(d = 8\) stays fixed. (Constant
+            factors, cache behavior, and the \(\Theta(n)\) buffer decide
+            real-world winners; the asymptotic point is that \(d\) does not
+            grow with \(n\).)
+          </details>
+        </li>
+        <li>
+          For 32-bit keys, compare \(R = 2^8\) (4 passes) against
+          \(R = 2^{16}\) (2 passes) at \(n = 1000\), counting each pass as
+          \(n + R\). Which radix wins, by what factor, and what changes at
+          large \(n\)?
+          <details>
+            <summary>solution</summary>
+            \(R = 2^8\): \(4 \cdot (1000 + 256) = 5\,024\).
+            \(R = 2^{16}\): \(2 \cdot (1000 + 65\,536) = 133\,072\). The
+            small radix wins by a factor of about 26: with \(n \ll R\), each
+            big-radix pass wastes \(\Theta(R)\) work scanning a count array
+            that is almost entirely zeros. At large \(n\) (say \(n \geq
+            10^6 \gg 2^{16}\)) the \(R\) term is negligible in both, and the
+            2-pass version does about half the work of the 4-pass version.
+            Rule of thumb: choose \(R\) around \(n\), never far above it.
+          </details>
+        </li>
+        <li>
+          Keys lie in \(\{0, \dots, n^2 - 1\}\). Direct counting sort costs
+          \(\Theta(n + n^2) = \Theta(n^2)\), worse than mergesort. Fix it
+          with radix sort in \(\Theta(n)\).
+          <details>
+            <summary>solution</summary>
+            Write each key in base \(R = n\): since keys are below \(n^2\),
+            every key has \(d = 2\) base-\(n\) digits
+            (\(x = q \cdot n + r\) with \(q = \lfloor x/n \rfloor\),
+            \(r = x \bmod n\), both in \(\{0,\dots,n-1\}\)). LSD radix sort
+            with these digits runs 2 stable counting passes, each
+            \(\Theta(n + n) = \Theta(n)\): total \(\Theta(n)\). Check on
+            \(n = 10\) keys below 100:
+            \([41, 19, 50, 83, 6, 9, 68, 12, 46, 74]\); the ones pass then
+            the tens pass yields \([6, 9, 12, 19, 41, 46, 50, 68, 74, 83]\).
+            The same trick gives \(\Theta(kn)\) for keys below \(n^k\),
+            which is the &ldquo;linear for polynomial-size keys&rdquo;
+            statement of the cost section.
+          </details>
+        </li>
+        <li>
+          Sort the twelve 3-letter strings <code>dab cab fad bad dad ebb ace
+          add fed bed fee bee</code> by LSD radix sort (\(d = 3\) character
+          positions, \(R = 26\)). In what order are the character positions
+          processed, and what is the output? What structure would you get if
+          you instead ran MSD all the way down without stopping early?
+          <details>
+            <summary>solution</summary>
+            Positions are processed right to left: position 2 (last letter),
+            then 1, then 0. Output: <code>ace add bad bed bee cab dab dad
+            ebb fad fed fee</code> (verified by running the three stable
+            passes). Full MSD recursion builds, level by level, the R-way
+            trie of the strings: first-letter buckets are the root&rsquo;s
+            children, second-letter sub-buckets their children, and reading
+            the leaves left to right gives the same sorted order; see the
+            <a href="../strings/ds-tries.html">Tries</a> handout.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Counting Sort &amp; Radix Sort v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        demos in the course library.
+      </footer>
+    </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
+  </body>
+</html>

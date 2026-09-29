@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<!--
+  Big-O Cheat Sheet, CSS 343 (converted from big-o-cheat-sheet-poster.png,
+  data after bigocheatsheet.com).
+
+  HOW TO AUGMENT (add course algorithms):
+  Each table is driven by a DATA array below. Add a row as a plain array of
+  strings; the color is computed automatically from each complexity by rank().
+    Data structures row: [name, Aavg,Savg,Iavg,Davg, Awst,Swst,Iwst,Dwst, space]
+    Sorting / algorithms row: [name, best, average, worst, space]
+  Use Θ()/O()/Ω() and notations like  1, log n, n, n log n, n(log n)², n², n³,
+  2ⁿ, n!, n+k, nk, k, N/A, and graph forms in V (vertices) and E (edges):
+  V+E, E log V, (V+E) log V, V², V·E, V³, 2^V, V!.  rank() understands all of these
+  (V,E are treated as a "size n"; O(a+b) is colored as O(max(a,b))).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big-O Cheat Sheet · CSS 343</title>
+<style>
+  :root{
+    --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+    --t0:#00e58a; --t1:#5cd47a; --t2:#9bdc4e; --t3:#e6d24a;
+    --t4:#f0a23c; --t5:#ef6b4b; --t6:#e0473a; --na:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:28px clamp(12px,4vw,48px) 64px}
+  h1{font-size:30px;margin:0 0 2px;letter-spacing:.5px}
+  h1 .br{color:var(--dim);font-weight:400}
+  h2{font-size:19px;margin:34px 0 10px;border-left:4px solid var(--t0);padding-left:10px}
+  .sub{color:var(--dim);margin:0 0 18px;font-size:13.5px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;
+          background:var(--panel);border:1px solid var(--line);border-radius:10px;
+          padding:12px 14px;margin:14px 0 6px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px}
+  .dot{width:13px;height:13px;border-radius:3px;display:inline-block}
+  .order{color:var(--dim);font-size:13px;margin:10px 2px 0}
+  .order b{color:var(--ink)}
+  .wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin-top:8px}
+  table{border-collapse:collapse;width:100%;min-width:760px}
+  th,td{padding:8px 10px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--line)}
+  thead th{background:var(--panel);color:var(--dim);font-weight:600;font-size:12.5px;
+           text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0;border-bottom:1px solid var(--line)}
+  thead tr:first-child th{border-bottom:1px solid var(--line)}
+  tbody td:first-child,tbody th:first-child{text-align:left;font-weight:600;color:var(--ink)}
+  tbody tr:hover td{background:#ffffff08}
+  td.c{font-variant-numeric:tabular-nums;font-weight:600;border-radius:4px}
+  .grp{border-left:1px solid var(--line)}
+  footer{color:var(--dim);font-size:12.5px;margin-top:30px}
+  a{color:var(--t1)}
+  @media print{ body{background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+                .legend,.wrap{border-color:#bbb} thead th{background:#f0f0f0;color:#333} }
+</style>
+</head>
+<body>
+  <h1>Big-O Cheat Sheet <span class="br">&lt;/&gt;</span></h1>
+  <p class="sub">Time vs. space complexity for common data structures and sorting algorithms. Cells are colored by order of growth.</p>
+
+  <div class="legend" id="legend"></div>
+  <p class="order"><b>Order of growth (best → worst):</b>
+     O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(2ⁿ) &lt; O(n!)</p>
+
+  <h2>Data Structure Operations</h2>
+  <div class="wrap" id="ds"></div>
+
+  <h2>Array Sorting Algorithms</h2>
+  <div class="wrap" id="sort"></div>
+
+  <h2>CSS 343 algorithms</h2>
+  <div class="wrap" id="course"></div>
+
+  <h2>Graph algorithms <span style="color:var(--dim);font-weight:400;font-size:14px">V vertices, E edges</span></h2>
+  <div class="wrap" id="graph"></div>
+
+  <footer>
+    Source: <a href="https://www.bigocheatsheet.com">bigocheatsheet.com</a>, converted for CSS 343.
+    Colors are computed from each complexity by <code>rank()</code>; add rows to the
+    <code>DS</code> / <code>SORT</code> / <code>COURSE</code> arrays in this file to augment.
+  </footer>
+
+<script>
+// ───────────────────────── DATA (edit to augment) ─────────────────────────
+// Data structures: [name, Aavg,Savg,Iavg,Davg,  Awst,Swst,Iwst,Dwst,  space]
+const DS = [
+  ["Array",              "Θ(1)","Θ(n)","Θ(n)","Θ(n)",       "O(1)","O(n)","O(n)","O(n)",       "O(n)"],
+  ["Stack",              "Θ(n)","Θ(n)","Θ(1)","Θ(1)",       "O(n)","O(n)","O(1)","O(1)",       "O(n)"],
+  ["Queue",              "Θ(n)","Θ(n)","Θ(1)","Θ(1)",       "O(n)","O(n)","O(1)","O(1)",       "O(n)"],
+  ["Singly-Linked List", "Θ(n)","Θ(n)","Θ(1)","Θ(1)",       "O(n)","O(n)","O(1)","O(1)",       "O(n)"],
+  ["Doubly-Linked List", "Θ(n)","Θ(n)","Θ(1)","Θ(1)",       "O(n)","O(n)","O(1)","O(1)",       "O(n)"],
+  ["Skip List",          "Θ(log n)","Θ(log n)","Θ(log n)","Θ(log n)", "O(n)","O(n)","O(n)","O(n)", "O(n log n)"],
+  ["Hash Table",         "N/A","Θ(1)","Θ(1)","Θ(1)",        "N/A","O(n)","O(n)","O(n)",        "O(n)"],
+  ["Binary Search Tree", "Θ(log n)","Θ(log n)","Θ(log n)","Θ(log n)", "O(n)","O(n)","O(n)","O(n)", "O(n)"],
+  ["Cartesian Tree",     "N/A","Θ(log n)","Θ(log n)","Θ(log n)",      "N/A","O(n)","O(n)","O(n)", "O(n)"],
+  ["B-Tree",             "Θ(log n)","Θ(log n)","Θ(log n)","Θ(log n)", "O(log n)","O(log n)","O(log n)","O(log n)", "O(n)"],
+  ["Red-Black Tree",     "Θ(log n)","Θ(log n)","Θ(log n)","Θ(log n)", "O(log n)","O(log n)","O(log n)","O(log n)", "O(n)"],
+  ["Splay Tree",         "N/A","Θ(log n)","Θ(log n)","Θ(log n)",      "N/A","O(log n)","O(log n)","O(log n)", "O(n)"],
+  ["AVL Tree",           "Θ(log n)","Θ(log n)","Θ(log n)","Θ(log n)", "O(log n)","O(log n)","O(log n)","O(log n)", "O(n)"],
+  ["KD Tree",            "Θ(log n)","Θ(log n)","Θ(log n)","Θ(log n)", "O(n)","O(n)","O(n)","O(n)", "O(n)"],
+];
+
+// Sorting / algorithms: [name, best, average, worst, space]
+const SORT = [
+  ["Quicksort",      "Ω(n log n)","Θ(n log n)","O(n²)","O(log n)"],
+  ["Mergesort",      "Ω(n log n)","Θ(n log n)","O(n log n)","O(n)"],
+  ["Timsort",        "Ω(n)","Θ(n log n)","O(n log n)","O(n)"],
+  ["Heapsort",       "Ω(n log n)","Θ(n log n)","O(n log n)","O(1)"],
+  ["Bubble Sort",    "Ω(n)","Θ(n²)","O(n²)","O(1)"],
+  ["Insertion Sort", "Ω(n)","Θ(n²)","O(n²)","O(1)"],
+  ["Selection Sort", "Ω(n²)","Θ(n²)","O(n²)","O(1)"],
+  ["Tree Sort",      "Ω(n log n)","Θ(n log n)","O(n²)","O(n)"],
+  ["Shell Sort",     "Ω(n log n)","Θ(n(log n)²)","O(n(log n)²)","O(1)"],
+  ["Bucket Sort",    "Ω(n+k)","Θ(n+k)","O(n²)","O(n)"],
+  ["Radix Sort",     "Ω(nk)","Θ(nk)","O(nk)","O(n+k)"],
+  ["Counting Sort",  "Ω(n+k)","Θ(n+k)","O(n+k)","O(k)"],
+  ["Cubesort",       "Ω(n)","Θ(n log n)","O(n log n)","O(n)"],
+];
+
+// CSS 343 examples (n = input size; for Grid BFS, n = grid side): [name, best, average, worst, space]
+const COURSE = [
+  ["Linear search",       "Ω(1)","Θ(n)","O(n)","O(1)"],
+  ["Binary search",       "Ω(1)","Θ(log n)","O(log n)","O(1)"],
+  ["3-sum (brute force)", "Ω(n³)","Θ(n³)","O(n³)","O(1)"],
+  ["Grid BFS (n×n)",      "Ω(n²)","Θ(n²)","O(n²)","O(n²)"],
+];
+
+// Graph algorithms (V vertices, E edges): [name, best, average, worst, space]
+const GRAPH = [
+  ["BFS / DFS",              "Ω(V+E)","Θ(V+E)","O(V+E)","O(V)"],
+  ["Topological sort",       "Ω(V+E)","Θ(V+E)","O(V+E)","O(V)"],
+  ["Dijkstra (binary heap)", "Ω(V+E)","Θ((V+E) log V)","O((V+E) log V)","O(V)"],
+  ["Prim / Kruskal (MST)",   "Ω(E log V)","Θ(E log V)","O(E log V)","O(V)"],
+  ["Bellman-Ford",           "Ω(V+E)","Θ(VE)","O(VE)","O(V)"],
+  ["Floyd-Warshall",         "Ω(V³)","Θ(V³)","O(V³)","O(V²)"],
+];
+
+// ───────────────────────── coloring ─────────────────────────
+const TIERS = {
+  0:{c:"--t0",l:"O(1) constant"}, 1:{c:"--t1",l:"O(log n) logarithmic"},
+  2:{c:"--t2",l:"O(n) linear"},   3:{c:"--t3",l:"O(n log n) linearithmic"},
+  4:{c:"--t4",l:"O(n²) quadratic / poly"}, 5:{c:"--t5",l:"O(2ⁿ) exponential"},
+  6:{c:"--t6",l:"O(n!) factorial"}, na:{c:"--na",l:"N/A"},
+};
+// rank one multiplicative term (already normalized to use n)
+function termTier(t){
+  if(t.includes("!")) return 6;                          // n!
+  if(t.includes("^n")) return 5;                         // 2^n, c^n, n^n (exponential)
+  if(t.includes("n^2")||t.includes("n^3")||t.includes("nn")) return 4;  // n², n³, V·E
+  if(t==="nlogn") return 3;                              // n log n, E log V, V log V
+  if(["n","nk","k"].includes(t)) return 2;               // n / n+k(split) / nk / k / V / E
+  if(t==="logn") return 1;
+  if(t==="1") return 0;
+  return 2;                                              // unknown → neutral
+}
+function rank(v){
+  if(!v) return "na";
+  let s = v.trim().replace(/^(Θ|O|Ω|θ|ω|o)/,"")          // drop leading Θ/O/Ω
+            .replace(/[()]/g,"").replace(/[·*×\s]/g,"").toLowerCase()
+            .replace(/²/g,"^2").replace(/³/g,"^3").replace(/ⁿ/g,"^n")
+            .replace(/[ve]/g,"n");                       // graph-aware: V, E → a size n
+  if(s==="n/a"||s==="na"||s==="") return "na";
+  return Math.max(...s.split("+").map(termTier));        // O(a+b) = O(max(a,b))
+}
+const cell = v => {
+  const t = TIERS[rank(v)], col = `var(${t.c})`;
+  return `<td class="c" style="color:${col};background:color-mix(in srgb,${col} 15%,transparent)">${v}</td>`;
+};
+
+// ───────────────────────── render ─────────────────────────
+document.getElementById("legend").innerHTML =
+  Object.values(TIERS).map(t =>
+    `<span class="chip"><span class="dot" style="background:var(${t.c})"></span>${t.l}</span>`).join("");
+
+function rows(data){ return data.map(r =>
+  "<tr><th>"+r[0]+"</th>"+r.slice(1).map(cell).join("")+"</tr>").join(""); }
+
+document.getElementById("ds").innerHTML = `<table>
+  <thead>
+    <tr><th rowspan="2">Data Structure</th>
+        <th colspan="4">Time: Average</th>
+        <th colspan="4" class="grp">Time: Worst</th>
+        <th rowspan="2" class="grp">Space<br>Worst</th></tr>
+    <tr><th>Access</th><th>Search</th><th>Insert</th><th>Delete</th>
+        <th class="grp">Access</th><th>Search</th><th>Insert</th><th>Delete</th></tr>
+  </thead><tbody>${rows(DS)}</tbody></table>`;
+
+const sortTable = data => `<table>
+  <thead>
+    <tr><th rowspan="2">Algorithm</th><th colspan="3">Time Complexity</th>
+        <th rowspan="2" class="grp">Space<br>Worst</th></tr>
+    <tr><th>Best</th><th>Average</th><th>Worst</th></tr>
+  </thead><tbody>${rows(data)}</tbody></table>`;
+document.getElementById("sort").innerHTML   = sortTable(SORT);
+document.getElementById("course").innerHTML = sortTable(COURSE);
+document.getElementById("graph").innerHTML  = sortTable(GRAPH);
+</script>
+</body>
+</html>
