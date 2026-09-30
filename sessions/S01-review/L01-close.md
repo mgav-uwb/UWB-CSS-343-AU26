@@ -22,10 +22,10 @@
 
 Starter `hw01/hw01.cpp`, instructions in <a href="hw01/HW01.html">HW01.html</a>:
 
-1. `IntList`: the Rule of Three
-2. `length` and `contains`, recursively
-3. `bsearch`, counting probes
-4. `countK`, counting checks
+1. `IntList` with a tail: the Rule of Three
+2. `sum` and `occurrences`, recursively
+3. `lowerBound`, counting probes
+4. `findK`: every k-sum, not just how many
 
 **Due Sun Oct 4, 11:59 PM.**
 

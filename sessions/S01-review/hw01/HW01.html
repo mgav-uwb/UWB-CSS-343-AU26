@@ -60,22 +60,25 @@
   <table>
     <tr><th>TODO</th><th>Function</th><th>What it must do</th></tr>
     <tr><td>1</td><td><code>~IntList()</code></td><td>Free every node the list owns.</td></tr>
-    <tr><td>2</td><td><code>IntList(const IntList&amp;)</code></td><td>Build an independent copy: the same keys in the same order, in nodes of its own.</td></tr>
-    <tr><td>3</td><td><code>operator=</code></td><td>Release the old nodes, then copy. Assigning a list to itself leaves it unchanged.</td></tr>
-    <tr><td>4</td><td><code>length</code></td><td>The number of nodes in a chain. Recursive, no loops.</td></tr>
-    <tr><td>5</td><td><code>contains</code></td><td>Whether a chain holds a key. Recursive, no loops.</td></tr>
-    <tr><td>6</td><td><code>bsearch</code></td><td>Binary search on a sorted array, recursive, adding 1 to <code>probes</code> each time an element is compared with the key.</td></tr>
-    <tr><td>7</td><td><code>countK</code></td><td>The number of ways to choose <em>k</em> elements from <code>a[start..]</code> that sum to a target, adding 1 to <code>checks</code> each time a complete choice is tested.</td></tr>
+    <tr><td>2</td><td><code>IntList(const IntList&amp;)</code></td><td>Build an independent copy: the same keys in the same order, in nodes of its own, with <code>head</code>, <code>tail</code> and <code>count</code> consistent.</td></tr>
+    <tr><td>3</td><td><code>operator=</code></td><td>Release the old nodes, then copy, leaving all three members consistent. Assigning a list to itself leaves it unchanged.</td></tr>
+    <tr><td>4</td><td><code>sum</code></td><td>The sum of the keys in a chain. Recursive, no loops.</td></tr>
+    <tr><td>5</td><td><code>occurrences</code></td><td>How many nodes in a chain hold a given key. Recursive, no loops.</td></tr>
+    <tr><td>6</td><td><code>lowerBound</code></td><td>In a sorted array that may repeat keys, the <em>first</em> index whose element is at least the key (or one past the range if there is none). Recursive, halving the range each call, adding 1 to <code>probes</code> per comparison.</td></tr>
+    <tr><td>7</td><td><code>findK</code></td><td>Every way to choose <em>k</em> elements from <code>a[start..]</code> that sum to a target, collected as lists of the chosen elements, adding 1 to <code>checks</code> each time a complete choice is tested.</td></tr>
   </table>
-  <p>The full contract of each function is in the comment above it in the starter.</p>
+  <p>Each task is a relative of code from Lecture 1, not a copy of it: the list keeps a
+  <code>tail</code> and a <code>count</code> as well as a <code>head</code>, the search finds a
+  position rather than a key, and the recursion reports the choices themselves rather than how many
+  there are. The full contract of each function is in the comment above it in the starter.</p>
 
   <h2>The tests run themselves</h2>
   <pre>g++ -std=c++17 -g hw01.cpp -o hw01 &amp;&amp; ./hw01</pre>
   <ul>
-    <li><strong>T1 to T3</strong> the Rule of Three, checked by counting the nodes that are alive</li>
-    <li><strong>T4, T5</strong> <code>length</code> and <code>contains</code></li>
-    <li><strong>T6</strong> binary search: the right index, and the right number of probes (4 for the 15-key array of the lecture)</li>
-    <li><strong>T7</strong> <em>k</em>-sum: the same answers as the loop version, and the same number of checks (120, 1140 and 9880 at <em>n</em> = 10, 20 and 40)</li>
+    <li><strong>T1 to T3</strong> the Rule of Three, checked by counting the nodes that are alive and by checking that <code>head</code>, <code>tail</code> and <code>count</code> agree</li>
+    <li><strong>T4, T5</strong> <code>sum</code> and <code>occurrences</code></li>
+    <li><strong>T6</strong> <code>lowerBound</code>: the right position, including the first of several equal keys, and the right number of probes (4 for the 15-key array of the lecture)</li>
+    <li><strong>T7</strong> <code>findK</code>: the exact choices, as many as the loop version counts, and the same number of checks (120, 1140 and 9880 at <em>n</em> = 10, 20 and 40)</li>
   </ul>
   <p>Each check prints <code>[PASS]</code> or <code>[FAIL]</code>. The unmodified starter
   compiles and fails most of them. A crash at the end of T2 usually means two lists are
@@ -102,9 +105,9 @@
     <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
     <tr><td>Compiles (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>does not compile: 0</td></tr>
     <tr><td>Rule of Three (TODO 1 to 3)</td><td>3</td><td rowspan="4">checked by our own test harness, on inputs different from the battery's</td></tr>
-    <tr><td><code>length</code>, <code>contains</code> (TODO 4, 5)</td><td>1</td></tr>
-    <tr><td><code>bsearch</code> (TODO 6): results and probe counts</td><td>2</td></tr>
-    <tr><td><code>countK</code> (TODO 7): results and check counts</td><td>2</td></tr>
+    <tr><td><code>sum</code>, <code>occurrences</code> (TODO 4, 5)</td><td>1</td></tr>
+    <tr><td><code>lowerBound</code> (TODO 6): results and probe counts</td><td>2</td></tr>
+    <tr><td><code>findK</code> (TODO 7): the choices and check counts</td><td>2</td></tr>
     <tr><td>Your test battery passes (T1 to T7)</td><td>2</td><td>all: 2 · most: 1</td></tr>
   </table>
   <p>Homework is 8% of the course grade, with the lowest two homework scores dropped.</p>
