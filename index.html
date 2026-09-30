@@ -23,160 +23,132 @@
 <title>CSS 343 · Course Hub · Autumn 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#fff8ec; --ink:#2b2a33; --dim:#6b6a78; --line:#e9e2d4; --card:#ffffff;
-    --lemon:#fff1a8; --lemon-d:#c99a00; --mint:#c9f0d8; --mint-d:#1f8a4c;
-    --peach:#ffd8c2; --peach-d:#c2560e; --sky:#cfe6ff; --sky-d:#1d63b8;
-    --lilac:#e4d9ff; --lilac-d:#6b45c9; --rose:#ffd6e6; --rose-d:#c02a6a;
-    --aqua:#c8f3ee; --aqua-d:#0f8a80; --exam:#ececf1; --exam-d:#5a5a6e;
-    --accent:#ff6f91; --accent2:#2ec4b6;
+    --paper:#faf7f1; --ink:#26252e; --dim:#6a6975; --line:#e3ded4; --card:#ffffff;
+    --lemon:#f3ead0; --lemon-d:#8c6a12; --mint:#d9eadf; --mint-d:#2b6e4b;
+    --peach:#f4ddd0; --peach-d:#a2532a; --sky:#d9e5f1; --sky-d:#2f5f95;
+    --lilac:#e3ddef; --lilac-d:#5f4a9e; --rose:#f0dbe2; --rose-d:#9c3f62;
+    --aqua:#d6e9e7; --aqua-d:#2a6f6a; --exam:#e9e8ec; --exam-d:#5a5a6e;
+    --accent:#b8556f; --accent2:#2f7d74;
   }
   *{box-sizing:border-box}
   .page{position:relative;z-index:1}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--paper);color:var(--ink);
-       font:16px/1.55 "Nunito",ui-rounded,"Segoe UI",sans-serif;
+       font:16px/1.5 "Source Sans 3","Segoe UI",sans-serif;
        padding:28px clamp(14px,4vw,64px) 72px;position:relative;overflow-x:hidden}
   /* a dotted paper texture and three soft blobs, fixed behind everything */
   body::before{content:"";position:fixed;inset:0;z-index:-2;
-    background-image:radial-gradient(#d9d0bd 1px,transparent 1.2px);background-size:22px 22px;opacity:.55}
-  body::after{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;filter:blur(60px);opacity:.75;
-    background:
-      radial-gradient(38% 30% at 12% 8%,var(--rose),transparent 70%),
-      radial-gradient(34% 28% at 88% 14%,var(--sky),transparent 70%),
-      radial-gradient(40% 32% at 50% 96%,var(--mint),transparent 70%),
-      radial-gradient(28% 24% at 92% 78%,var(--lemon),transparent 70%)}
+    background-image:linear-gradient(#e7e2d8 1px,transparent 1px),linear-gradient(90deg,#e7e2d8 1px,transparent 1px);
+    background-size:28px 28px;opacity:.45}
 
   /* ── header ── */
   header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 32px;margin-bottom:22px}
-  h1{font:700 clamp(44px,6vw,72px)/1 "Fredoka",sans-serif;margin:0;letter-spacing:.5px;
-     background:linear-gradient(95deg,#ff6f91,#ff9f43 35%,#2ec4b6 70%,#6b45c9);
-     -webkit-background-clip:text;background-clip:text;color:transparent}
-  h1 span{font-size:.55em;vertical-align:.35em;-webkit-text-fill-color:var(--dim);color:var(--dim);
-           background:none;font-weight:600;letter-spacing:0}
-  .course-sub{font:600 20px "Fredoka",sans-serif;margin:8px 0 2px}
+  h1{font:700 clamp(40px,5.5vw,64px)/1 "Outfit",sans-serif;margin:0;letter-spacing:-.5px;color:var(--ink)}
+  h1 span{font-size:.5em;vertical-align:.4em;color:var(--accent2);font-weight:600;letter-spacing:0}
+  .course-sub{font:500 19px "Outfit",sans-serif;margin:8px 0 2px}
   .meta{color:var(--dim);font-size:14px}
   .quick{display:flex;flex-wrap:wrap;gap:10px;max-width:640px;justify-content:flex-end}
   a.q{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);background:var(--card);
-      border:2px solid var(--line);border-radius:999px;padding:8px 16px 8px 12px;font-weight:700;font-size:14px;
-      box-shadow:0 2px 0 var(--line);transition:transform .15s,box-shadow .15s,border-color .15s}
-  a.q:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--line);border-color:var(--accent2)}
+      border:1px solid var(--line);border-radius:8px;padding:8px 16px 8px 12px;font-weight:700;font-size:14px;
+      box-shadow:0 1px 2px rgba(38,37,46,.06);transition:transform .15s,box-shadow .15s,border-color .15s}
+  a.q:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(38,37,46,.10);border-color:var(--accent2)}
   a.q .ic{font-size:18px} a.q .qd{color:var(--dim);font-weight:400}
 
   /* ── the daily quote ── */
   .wisdom{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;
-          background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px 22px;margin:8px 0 30px;
-          box-shadow:0 3px 0 var(--line);position:relative;overflow:hidden}
-  .wisdom::before{content:"“";position:absolute;left:14px;top:-18px;font:700 120px/1 "Fredoka",sans-serif;color:var(--lilac);z-index:0}
-  .wisdom .mark{font-size:34px;position:relative;z-index:1}
-  .wisdom blockquote{margin:0;position:relative;z-index:1;font:italic 400 18px/1.45 "Nunito",sans-serif}
-  .wisdom blockquote b{display:block;font:600 13px "Fredoka",sans-serif;font-style:normal;color:var(--dim);margin-top:6px;letter-spacing:.3px}
-  .wisdom button{font:600 13px "Fredoka",sans-serif;border:2px solid var(--line);background:var(--lemon);color:var(--ink);
-                 border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 2px 0 var(--line);position:relative;z-index:1}
-  .wisdom button:hover{background:var(--peach)}
+          background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 22px;margin:8px 0 30px;
+          box-shadow:0 1px 3px rgba(38,37,46,.07);position:relative;overflow:hidden}
+  .wisdom .mark{font-size:24px;position:relative;z-index:1}
+  .wisdom blockquote{margin:0;position:relative;z-index:1;font:italic 400 18px/1.45 "Source Sans 3",sans-serif}
+  .wisdom blockquote b{display:block;font:600 13px "Outfit",sans-serif;font-style:normal;color:var(--dim);margin-top:6px;letter-spacing:.3px}
+  .wisdom button{font:600 13px "Outfit",sans-serif;border:1px solid var(--line);background:#fff;color:var(--ink);
+                 border-radius:8px;padding:7px 14px;cursor:pointer;box-shadow:0 1px 2px rgba(38,37,46,.06);position:relative;z-index:1}
+  .wisdom button:hover{border-color:var(--accent2);color:var(--accent2)}
 
   /* ── the session table: session | reading | demos ── */
   #sessions{display:grid;grid-template-columns:minmax(340px,1.2fr) minmax(190px,.6fr) minmax(220px,.8fr);
             gap:14px 18px;align-items:stretch}
-  .colhead{font:600 13px "Fredoka",sans-serif;text-transform:uppercase;letter-spacing:1.5px;color:#4f4e63;
+  .colhead{font:600 13px "Outfit",sans-serif;text-transform:uppercase;letter-spacing:1.5px;color:#4f4e63;
            padding:0 4px 4px;border-bottom:2px dashed #d5cdbd;align-self:end}
   .colhead a{color:var(--mint-d);text-decoration:none;text-transform:none;letter-spacing:0}
   .colhead a:hover{text-decoration:underline}
 
-  .card{display:block;text-decoration:none;color:inherit;background:var(--card);border:2px solid var(--line);
-         border-radius:20px;padding:14px 16px 14px 14px;position:relative;overflow:hidden;
-         box-shadow:0 3px 0 var(--line);transition:transform .15s,box-shadow .15s}
-  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;background:var(--hue)}
+  .card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);
+         border-radius:12px;padding:14px 16px 14px 14px;position:relative;overflow:hidden;
+         box-shadow:0 1px 3px rgba(38,37,46,.07);transition:transform .15s,box-shadow .15s}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--hue-d);opacity:.55}
   .card.week{padding-bottom:16px}
   .card.week{padding-bottom:16px}
-  a.card:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--line)}
+  a.card:hover{transform:translateY(-3px);box-shadow:0 6px 14px rgba(38,37,46,.10)}
   .lec{display:flex;gap:14px;align-items:flex-start;padding-left:6px}
-  .badge{flex:0 0 auto;width:58px;height:58px;border-radius:18px;background:var(--hue);display:grid;place-items:center;
-         font-size:28px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.08)}
-  .badge small{display:block;font:700 11px "Fredoka",sans-serif;color:var(--hue-d);margin-top:-4px;letter-spacing:.5px}
-  .when{font:600 12.5px "Fredoka",sans-serif;color:var(--hue-d);letter-spacing:.4px;margin-bottom:1px}
-  .ctitle{font:600 18px/1.25 "Fredoka",sans-serif;margin:0 0 4px}
+  .badge{flex:0 0 auto;width:52px;height:52px;border-radius:10px;background:var(--hue);display:grid;place-items:center;
+         font-size:22px}
+  .badge small{display:block;font:700 11px "Outfit",sans-serif;color:var(--hue-d);margin-top:-4px;letter-spacing:.5px}
+  .when{font:600 12.5px "Outfit",sans-serif;color:var(--hue-d);letter-spacing:.4px;margin-bottom:1px}
+  .ctitle{font:600 18px/1.25 "Outfit",sans-serif;margin:0 0 4px}
   .ctopics{color:var(--dim);font-size:13.5px;line-height:1.45}
-  .go{display:inline-block;margin-top:8px;font:600 13px "Fredoka",sans-serif;color:var(--hue-d);
-       background:var(--hue);border-radius:999px;padding:3px 12px}
-  .pa{display:inline-block;margin:8px 0 0 6px;font:600 12px "Fredoka",sans-serif;color:#7a4b00;
-       background:var(--lemon);border-radius:999px;padding:3px 10px}
+  .go{display:inline-block;margin-top:8px;font:600 13px "Outfit",sans-serif;color:var(--hue-d);
+       background:var(--hue);border-radius:8px;padding:3px 12px}
+  .pa{display:inline-block;margin:8px 0 0 6px;font:600 12px "Outfit",sans-serif;color:var(--lemon-d);
+       background:var(--lemon);border-radius:8px;padding:3px 10px}
   .card.soon{border-style:dashed;background:#fffdf7}
   .card.soon .ctitle{color:#4a4956}
-  .card.exam{background:repeating-linear-gradient(-45deg,#fff,#fff 10px,#f6f4fb 10px,#f6f4fb 20px)}
+  .card.exam{background:repeating-linear-gradient(-45deg,#fff,#fff 12px,#f4f3f7 12px,#f4f3f7 24px)}
 
   /* the two meetings of a week, side by side */
   .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0 6px}
-  .lecchip{display:block;text-decoration:none;color:inherit;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:8px 11px;min-width:0}
+  .lecchip{display:block;text-decoration:none;color:inherit;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 11px;min-width:0}
   a.lecchip:hover{border-color:var(--hue-d);background:#fff}
   .lecchip.off{border-style:dashed;color:var(--dim)}
-  .lecchip .day{font:600 12px "Fredoka",sans-serif;color:var(--hue-d);letter-spacing:.3px}
+  .lecchip .day{font:600 12px "Outfit",sans-serif;color:var(--hue-d);letter-spacing:.3px}
   .lecchip.off .day{color:var(--dim)}
-  .lecchip .lt{display:block;font:600 14px/1.25 "Fredoka",sans-serif;margin-top:1px}
+  .lecchip .lt{display:block;font:600 14px/1.25 "Outfit",sans-serif;margin-top:1px}
   .lecchip .lx{display:block;color:var(--dim);font-size:11.5px;line-height:1.4;margin-top:2px}
-  .lecchip .open{display:inline-block;margin-top:5px;font:600 12px "Fredoka",sans-serif;color:var(--hue-d)}
+  .lecchip .open{display:inline-block;margin-top:5px;font:600 12px "Outfit",sans-serif;color:var(--hue-d)}
   .marks{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 0 6px}
   .marks:empty{display:none}
-  .qm{font:600 12px "Fredoka",sans-serif;border:2px solid var(--line);border-radius:999px;padding:3px 10px;background:#fff}
+  .qm{font:600 12px "Outfit",sans-serif;border:1px solid var(--line);border-radius:8px;padding:3px 10px;background:#fff}
   .qm.exam{border-color:#e0a9bd;color:var(--rose-d);background:var(--rose)}
   .marks .pa{margin:0}
-  .marks .hwc{font:600 12px "Fredoka",sans-serif;border-radius:999px;padding:3px 10px;background:var(--lemon);color:#7a4b00;text-decoration:none;border:2px solid #f0dc8a}
-  .marks .hwc.off{background:#fff;color:var(--dim);border-style:dashed}
-  @media (max-width: 560px){ .pair{grid-template-columns:1fr} }
-
-  /* the two meetings of a week, side by side */
-  .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0 6px}
-  .lecchip{display:block;text-decoration:none;color:inherit;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:8px 11px;min-width:0}
-  a.lecchip:hover{border-color:var(--hue-d);background:#fff}
-  .lecchip.off{border-style:dashed;color:var(--dim)}
-  .lecchip .day{font:600 12px "Fredoka",sans-serif;color:var(--hue-d);letter-spacing:.3px}
-  .lecchip.off .day{color:var(--dim)}
-  .lecchip .lt{display:block;font:600 14px/1.25 "Fredoka",sans-serif;margin-top:1px}
-  .lecchip .lx{display:block;color:var(--dim);font-size:11.5px;line-height:1.4;margin-top:2px}
-  .lecchip .open{display:inline-block;margin-top:5px;font:600 12px "Fredoka",sans-serif;color:var(--hue-d)}
-  .marks{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 0 6px}
-  .marks:empty{display:none}
-  .qm{font:600 12px "Fredoka",sans-serif;border:2px solid var(--line);border-radius:999px;padding:3px 10px;background:#fff}
-  .qm.exam{border-color:#e0a9bd;color:var(--rose-d);background:var(--rose)}
-  .marks .pa{margin:0}
-  .marks .hwc{font:600 12px "Fredoka",sans-serif;border-radius:999px;padding:3px 10px;background:var(--lemon);color:#7a4b00;text-decoration:none;border:2px solid #f0dc8a}
+  .marks .hwc{font:600 12px "Outfit",sans-serif;border-radius:8px;padding:3px 10px;background:var(--lemon);color:var(--lemon-d);text-decoration:none;border:1px solid #e6d8a8}
   .marks .hwc.off{background:#fff;color:var(--dim);border-style:dashed}
   @media (max-width: 560px){ .pair{grid-template-columns:1fr} }
 
   /* a comic tucked into the session card */
   button.comic{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:6px 10px 6px 6px;cursor:pointer;
-               background:var(--paper);border:2px dashed var(--line);border-radius:14px;color:var(--ink);text-align:left;font:inherit}
+               background:var(--paper);border:1px dashed var(--line);border-radius:9px;color:var(--ink);text-align:left;font:inherit}
   button.comic:hover{border-color:var(--accent)}
   button.comic img{height:54px;width:82px;object-fit:cover;object-position:left top;border-radius:8px;background:#fff;border:1px solid var(--line)}
-  button.comic .t{font:600 13px "Fredoka",sans-serif} button.comic .d{display:block;color:var(--dim);font-size:11.5px}
+  button.comic .t{font:600 13px "Outfit",sans-serif} button.comic .d{display:block;color:var(--dim);font-size:11.5px}
 
   /* handout / demo chips */
   .cell{display:flex;flex-direction:column;gap:8px}
-  a.chip{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:2px solid var(--line);
-          border-radius:14px;padding:8px 11px;font-size:12.5px;line-height:1.35;transition:transform .15s,border-color .15s}
+  a.chip{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);
+          border-radius:9px;padding:8px 11px;font-size:12.5px;line-height:1.35;transition:transform .15s,border-color .15s}
   a.chip:hover{transform:translateX(3px);border-color:var(--accent2)}
   a.chip .t{font-weight:700} a.chip .d{color:var(--dim);font-size:11.5px;display:block;margin-top:1px}
   .chip.h .t::before{content:"📖 "}
-  .chip.demo{background:#f4fffc} .chip.demo .t::before{content:"▶ ";color:var(--accent2);font-size:11px;vertical-align:1px}
-  .chip.hw{background:#fffbe6;border-color:#f0dc8a} .chip.hw .t::before{content:"✏️ "}
+  .chip.demo{background:#f3f8f7} .chip.demo .t::before{content:"▶ ";color:var(--accent2);font-size:11px;vertical-align:1px}
+  .chip.hw{background:#fbf6e6;border-color:#e6d8a8} .chip.hw .t::before{content:"✏️ "}
 
   /* staggered arrival */
-  @keyframes arrive{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-  #sessions > *{animation:arrive .5s both}
+  @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  #sessions > *{animation:arrive .35s both}
   @media (prefers-reduced-motion:reduce){#sessions > *{animation:none}}
 
   /* the comic lightbox */
-  dialog{border:2px solid var(--line);border-radius:22px;padding:18px 20px 16px;max-width:min(94vw,980px);background:var(--card);
+  dialog{border:1px solid var(--line);border-radius:12px;padding:18px 20px 16px;max-width:min(94vw,980px);background:var(--card);
           box-shadow:0 20px 60px rgba(40,30,60,.25)}
   dialog::backdrop{background:rgba(43,42,51,.55);backdrop-filter:blur(3px)}
   dialog img{max-width:100%;max-height:70vh;display:block;margin:0 auto}
   dialog .cap{margin:12px 0 0;font-size:14px;color:var(--dim);max-width:70ch}
-  dialog .cap b{font:600 16px "Fredoka",sans-serif;color:var(--ink)}
+  dialog .cap b{font:600 16px "Outfit",sans-serif;color:var(--ink)}
   dialog .cap a{color:var(--sky-d)}
   dialog form{position:absolute;top:10px;right:12px;margin:0}
-  dialog form button{border:0;background:var(--lemon);border-radius:999px;font:700 14px "Fredoka",sans-serif;padding:4px 12px;cursor:pointer}
+  dialog form button{border:0;background:var(--lemon);border-radius:8px;font:700 14px "Outfit",sans-serif;padding:4px 12px;cursor:pointer}
 
   @media (max-width: 920px){
     #sessions{grid-template-columns:1fr}
