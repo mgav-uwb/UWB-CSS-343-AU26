@@ -43,14 +43,16 @@ Quizzes and exams are **multiple choice, on paper**.
 
 ## Grading
 
-| Component | Weight | Policy |
-| --- | ---: | --- |
-| Exams (midterm + final) | 50% | |
-| Weekly quizzes | 21% | lowest 2 dropped |
-| Programming assignments (3) | 21% | 7% each |
-| Homework | 8% | lowest 2 dropped |
+1000 points in all: **points ÷ 10 = percent**.
 
-**2 late tokens** for the term: each extends one homework or programming assignment deadline by 48 hours.
+| Component | Points each | Counted | Points |
+| --- | ---: | --- | ---: |
+| Midterm · final | 200 · 300 | both | 500 |
+| Weekly quizzes (8) | 35 | best 6 | 210 |
+| Programming assignments (3) | 70 | all | 210 |
+| Homework (10) | 10 | best 8 | 80 |
+
+**2 late tokens**: each extends one homework or programming assignment by 48 hours.
 
 --
 
