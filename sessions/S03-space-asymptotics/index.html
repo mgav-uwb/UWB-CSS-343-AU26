@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+  CSS 343 · Autumn 2026 · Lecture 3.
+  A lecture page carries the logistics; the teaching is in TOPIC decks
+  (../../topics/*.md), mounted below in order. To rearrange a lecture, reorder,
+  add or remove <section data-markdown> blocks. See ../../topics/README.md.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS 343 · L03: Memory and Asymptotic Notation</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+  <link rel="stylesheet" href="../../lib/core/lib.css">
+  <!-- the memory topic's two canvas demos (mergesort buffer, grid BFS) -->
+  <link rel="stylesheet" href="../../topics/viz/viz.css">
+
+  <style>
+    :root { --accent: #7c5cff; }
+    .reveal h2 { color: #2a2a3a; }
+    .reveal h3 { color: var(--accent); }
+    .reveal section small { color: #66708a; }
+    .reveal table { font-size: 0.78em; }
+    .reveal pre { width: 100%; box-shadow: none; font-size: 0.6em; }
+    .reveal pre code { border-radius: 8px; }
+    .reveal img { background: #fff; border: 1px solid #eef0f4; border-radius: 8px; }
+    .reveal blockquote { width: 92%; }
+    /* a slide that hosts a demo: the demo gets the full slide width */
+    .reveal .algo-viz { text-align: left; font-size: 16px; }
+    .reveal .algo-viz .viz-fallback { font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <!-- opening: title, reading (session logistics) -->
+      <section data-markdown="L03-open.md"
+        data-separator="^\r?\n---\r?\n$" data-separator-vertical="^\r?\n--\r?\n$" data-separator-notes="^Note:"></section>
+
+      <!-- topics, in teaching order -->
+      <section data-markdown="../../topics/memory.md"
+        data-separator="^\r?\n---\r?\n$" data-separator-vertical="^\r?\n--\r?\n$" data-separator-notes="^Note:"></section>
+
+      <section>
+        <h3>Break</h3>
+        <small>(8 min)</small>
+      </section>
+
+      <section data-markdown="../../topics/asymptotic-notation.md"
+        data-separator="^\r?\n---\r?\n$" data-separator-vertical="^\r?\n--\r?\n$" data-separator-notes="^Note:"></section>
+      <section data-markdown="../../topics/bounds-cases-problems.md"
+        data-separator="^\r?\n---\r?\n$" data-separator-vertical="^\r?\n--\r?\n$" data-separator-notes="^Note:"></section>
+
+      <!-- closing: recap, homework, quiz (session logistics) -->
+      <section data-markdown="L03-close.md"
+        data-separator="^\r?\n---\r?\n$" data-separator-vertical="^\r?\n--\r?\n$" data-separator-notes="^Note:"></section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/math/math.js"></script>
+  <script src="../../topics/viz/mergesort.js"></script>
+  <script src="../../topics/viz/bfs.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: "c/t",
+      transition: "slide",
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX],
+    }).then(() => {
+      if (window.initVizMergesort) initVizMergesort();
+      if (window.initVizBfs) initVizBfs();
+    });
+  </script>
+  <!-- Presenter companion: press N for a synced notes tab (see lib/presenter.js) -->
+  <script src="../../lib/presenter.js"></script>
+  <!-- Grid review: press G for a zoomable, linearized grid of all slides -->
+  <script src="../../lib/grid-review.js"></script>
+  <!-- Demos: a topic embeds a demo by its registry slug
+         <div class="algo-viz" data-algo="factorial" data-config='{…}'>
+       and carries its own sizing in data-config, so this page registers every
+       slug once and needs no per-lecture wiring. -->
+  <script type="module">
+    import { initDeckDemos } from "../../lib/deck.js";
+    import { DEMOS } from "../../lib/demos/registry.js";
+    initDeckDemos(Object.fromEntries(Object.keys(DEMOS).map((slug) => [slug, { use: slug }])));
+  </script>
+</body>
+</html>

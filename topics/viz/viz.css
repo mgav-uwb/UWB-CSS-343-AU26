@@ -1,0 +1,29 @@
+/* CSS 343 memory topic: algorithm visualizers (progress + memory, side by side) */
+.legacy-viz { width: 100%; margin: 0 auto; }
+.legacy-viz .viz-panels {
+  display: flex; gap: 18px; justify-content: center; align-items: flex-start;
+}
+.legacy-viz .panel { display: flex; flex-direction: column; align-items: center; }
+.legacy-viz .panel-label {
+  font-size: 15px; color: #66708a; margin-bottom: 4px; font-weight: 600;
+  letter-spacing: .02em;
+}
+.legacy-viz canvas {
+  background: #fff; border: 1px solid #e6e9f0; border-radius: 8px;
+}
+.legacy-viz .viz-controls {
+  display: flex; gap: 10px; align-items: center; justify-content: center;
+  margin-top: 12px;
+}
+.legacy-viz .viz-controls button {
+  font: inherit; font-size: 16px; padding: 6px 14px; border-radius: 7px;
+  border: 1px solid #cfd4e0; background: #f6f7fb; color: #2a2a3a; cursor: pointer;
+  white-space: nowrap; flex: 0 0 auto;
+}
+.legacy-viz .viz-controls button:hover { background: #ecedf5; }
+.legacy-viz .viz-controls button:disabled { opacity: .4; cursor: default; }
+.legacy-viz .viz-status {
+  font-size: 15px; color: #334155; min-width: 360px; text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+.legacy-viz .viz-status b { color: #7c5cff; }

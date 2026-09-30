@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!-- CANVAS NOTE: relative links only resolve on the course site; when pasting
+     into Canvas, swap hrefs for the Canvas URLs. -->
+<!-- CSS 343 · Homework 2 instructions. Student-facing: NO solutions. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 2: Analysis of Algorithms · CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:46px clamp(20px,6vw,60px) 60px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:25px;line-height:1.25;margin:0 0 4px}
+  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 18px;border-bottom:1px solid var(--line);padding-bottom:16px}
+  h2{font-size:19px;margin:30px 0 8px;border-bottom:1px solid #edf0f4;padding-bottom:4px}
+  p{margin:10px 0} a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  .def,.aside{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .aside .tag{color:var(--warn)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:system-ui,sans-serif;font-size:15px}
+  .meta b{color:var(--accent)}
+  ol,ul{margin:8px 0;padding-left:24px} li{margin:7px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-family:system-ui,sans-serif;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#f0f2f6}
+  table.pts td:nth-child(2){text-align:center;font-weight:700;white-space:nowrap}
+  footer{margin-top:38px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px;font-family:system-ui,sans-serif}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Homework 2: Analysis of Algorithms</h1>
+  <div class="subtitle">CSS 343 · Week 2 · Lecture 2 (Time) and Lecture 3 (Memory and Asymptotic Notation)</div>
+  <div class="def"><span class="tag">At a glance</span>
+    <div class="meta">
+      <span><b>Format:</b> individual</span>
+      <span><b>Language:</b> C++17</span>
+      <span><b>Starter:</b> <a href="hw02.cpp"><code>hw02.cpp</code></a></span>
+      <span><b>Submit:</b> a <code>.zip</code> with your <code>hw02.cpp</code></span>
+      <span><b>Due:</b> Sun Oct 11, 11:59 PM</span>
+    </div>
+  </div>
+  <p>This homework applies the analysis tools of week 2 to cases the slides do not work out:
+  the doubling experiment when the sizes do not double, a sort that removes a loop, witness
+  constants for asymptotic claims, and the byte layout of a struct. The starter has a
+  <strong>self-running test battery</strong>; you fill in five <code>TODO</code>s (the fourth has
+  three parts). Quiz 2 (Monday Oct 12) asks about the same material.</p>
+
+  <h2>Tasks</h2>
+  <table>
+    <tr><th>TODO</th><th>Function</th><th>What it must do</th><th>Lecture</th></tr>
+    <tr><td>1</td><td><code>estimateExponent</code></td><td>From measured counts at increasing sizes, the exponent <em>b</em> of a power law <em>a</em>·<em>n</em><sup><em>b</em></sup>, using the last two measurements. The sizes may grow by any factor, not only 2.</td><td>2</td></tr>
+    <tr><td>2</td><td><code>predictCount</code></td><td>The count that power law predicts at a larger size, extrapolated from the last measurement.</td><td>2</td></tr>
+    <tr><td>3</td><td><code>countPairsWithDifference</code></td><td>How many pairs of distinct values differ by exactly <em>d</em>, in time proportional to <em>N</em> lg <em>N</em> or better.</td><td>2</td></tr>
+    <tr><td>4a to 4c</td><td><code>witnessA</code>, <code>witnessB</code>, <code>witnessC</code></td><td>Constants that prove three claims: one in O, one in Ω, one in Θ.</td><td>3</td></tr>
+    <tr><td>5</td><td><code>RecordPacked</code></td><td>The five members of <code>Record</code>, reordered so that <code>sizeof</code> is 16 instead of 32.</td><td>3</td></tr>
+  </table>
+  <p>The full contract of each task is in the comment above it in the starter. Parts A and B use
+  Lecture 2 (Monday); parts C and D use Lecture 3 (Wednesday).</p>
+
+  <div class="aside"><span class="tag">Witnesses</span>
+    A witness is valid only if the inequality holds for <strong>every</strong> <em>n</em> &ge; <em>n</em><sub>0</sub>,
+    not only at the values you tried. Work it out on paper first, as on the slides, and write
+    your reasoning as a comment in the function. The tests check every <em>n</em> from your
+    <em>n</em><sub>0</sub> to 1,000,000.
+  </div>
+
+  <h2>The tests run themselves</h2>
+  <pre>g++ -std=c++17 -O2 hw02.cpp -o hw02 &amp;&amp; ./hw02</pre>
+  <ul>
+    <li><strong>T1, T2</strong> the exponent and the prediction, on Lecture 2's 3-sum counts and on sizes that triple</li>
+    <li><strong>T3</strong> pairs with a given difference, including 200,000 values, which runs in well under a second when the algorithm is <em>N</em> lg <em>N</em> and takes far longer when it checks every pair</li>
+    <li><strong>T4</strong> each witness, checked for every <em>n</em> from <em>n</em><sub>0</sub> to 1,000,000</li>
+    <li><strong>T5</strong> the size of both structs</li>
+  </ul>
+  <p>Each check prints <code>[PASS]</code> or <code>[FAIL]</code>. The unmodified starter
+  compiles and fails almost all of them.</p>
+
+  <div class="aside"><span class="tag">Build on the lab</span>
+    Code is graded on the CSS Linux lab with <code>g++ -std=c++17</code>. Build and run
+    there at least once before you submit; the
+    <a href="../../../guides/guide-computing-environment.html"><strong>Computing Environment</strong></a>
+    guide has the login and file-transfer commands. Code that does not compile on the
+    lab receives no points.
+  </div>
+
+  <h2>Grading (10 pts)</h2>
+  <table class="pts">
+    <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
+    <tr><td>Compiles (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>does not compile: 0</td></tr>
+    <tr><td><code>estimateExponent</code>, <code>predictCount</code> (TODO 1, 2)</td><td>3</td><td rowspan="4">checked by our own test harness, on inputs different from the battery's</td></tr>
+    <tr><td><code>countPairsWithDifference</code> (TODO 3): correct, and fast</td><td>2</td></tr>
+    <tr><td>Witnesses (TODO 4)</td><td>2</td></tr>
+    <tr><td><code>RecordPacked</code> (TODO 5)</td><td>1</td></tr>
+    <tr><td>Your test battery passes (T1 to T5)</td><td>2</td><td>all: 2 · most: 1</td></tr>
+  </table>
+  <p>Homework is 8% of the course grade, with the lowest two homework scores dropped.</p>
+
+  <h2>Reading</h2>
+  <ul>
+    <li><a href="../../../textbook/foundations/foundation-time-analysis.html">Analysis of Algorithms: Time</a>: the doubling experiment, the cost model, the faster 3-sum.</li>
+    <li><a href="../../../textbook/foundations/foundation-space-complexity.html">Space Complexity</a>: bytes, layout and padding, auxiliary space.</li>
+    <li><a href="../../../textbook/foundations/foundation-asymptotic-notation.html">Asymptotic Notation</a>: O, Ω and Θ as sets, with worked membership proofs and <a href="../../../textbook/foundations/foundation-asymptotic-notation.html#ex">exercises with solutions</a>.</li>
+    <li>The slides: <a href="../index.html">Lecture 2</a> and <a href="../../S03-space-asymptotics/index.html">Lecture 3</a>.</li>
+  </ul>
+
+  <h2>Submit</h2>
+  <p>One <code>.zip</code> file on Canvas, containing your finished <code>hw02.cpp</code> and anything
+  else you want to include. Keep the file name <code>hw02.cpp</code>. Resubmissions are allowed until
+  the deadline; the last one is graded. To make the zip on the lab: <code>zip hw02.zip hw02.cpp</code>.
+  <strong>Due Sun Oct 11, 11:59 PM.</strong> A late token extends this deadline by 48 hours.</p>
+  <footer>CSS 343 · Autumn 2026 · Homework 2 · prepared by Dr. Marcel Gavriliu.</footer>
+</div>
+</body>
+</html>

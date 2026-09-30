@@ -145,7 +145,7 @@
   a.qc .qe{font-size:18px} a.qc .qd{color:var(--dim);font-weight:400;font-size:13px}
   nav.quick a.qc:nth-child(1){background:var(--lemon)} nav.quick a.qc:nth-child(2){background:var(--mint)}
   nav.quick a.qc:nth-child(3){background:var(--sky)} nav.quick a.qc:nth-child(4){background:var(--peach)}
-  nav.quick a.qc:nth-child(5){background:var(--lilac)}
+  nav.quick a.qc:nth-child(5){background:var(--lilac)} nav.quick a.qc:nth-child(6){background:var(--rose)}
   /* ── the quote over the fact, beside the comic ── */
   .row2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:stretch;margin:4px 0 6px}
   .wisdom3{display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0}
@@ -179,7 +179,7 @@
   @media (max-width: 920px){ .wkbody{grid-template-columns:1fr} .wd{display:none} nav.quick{justify-content:flex-start;max-width:none} }
   @media (max-width: 640px){
     img.logo{height:80px} h1{font-size:32px} .course-sub{font-size:15px}
-    nav.quick{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;width:100%}
+    nav.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:100%}
     a.qc{flex-direction:column;gap:0;padding:6px 2px;text-align:center;font-size:11px} a.qc .qd{display:none}
     .row2{grid-template-columns:minmax(0,1fr) 96px;gap:8px} .comicview{width:96px;height:auto;min-height:96px}
     .wm .hwtag,.wm .qtag{display:none}
@@ -232,6 +232,7 @@ const QUICKLINKS = [
   { href:"schedule/index.html", emo:"🗓️", title:"Schedule", desc:"every meeting, quiz, deadline" },
   { href:"lib/demo.html", emo:"🎮", title:"Explorer", desc:"every algorithm, interactive" },
   { href:"guides/guide-computing-environment.html", emo:"🐧", title:"Linux lab", desc:"compile and test" },
+  { href:"glossary/index.html", emo:"🔤", title:"Glossary", desc:"every term, defined" },
 ];
 
 // ───────── reading: textbook chapters, guides, references (keyed; attach per week) ─────────
@@ -395,9 +396,9 @@ const WEEKS = [
     title:"Analysis of algorithms",
     icon:"⏱️",
     hue:"lemon",
-    mon:{ id:"L02", date:"Mon Oct 5", title:"Analysis of Algorithms: Time", topics:"counting a basic operation · order of growth · the doubling experiment · faster 3-sum" },
-    wed:{ id:"L03", date:"Wed Oct 7", title:"Space Complexity and Asymptotic Notation", topics:"counting bytes · stack and heap · space as a function of n · O, Θ and Ω made precise" },
-    hw:{"n": 2},
+    mon:{ id:"L02", date:"Mon Oct 5", title:"Analysis of Algorithms: Time", topics:"the doubling experiment · cost model and tilde · order-of-growth classes · faster 3-sum: sort, binary search, two pointers · lower bounds", dir:"sessions/S02-time-analysis" },
+    wed:{ id:"L03", date:"Wed Oct 7", title:"Memory and Asymptotic Notation", topics:"sizeof, padding, stack and heap · auxiliary space · O, Ω and Θ as sets of functions · witnesses and membership proofs · case versus bound · problems versus algorithms", dir:"sessions/S03-space-asymptotics" },
+    hw:{"n": 2, "href": "sessions/S02-time-analysis/hw02/HW02.html", "due": "due Sun Oct 11, 11:59 PM"},
     quiz:"Q1 Mon",
     handouts:["time-analysis", "bigO", "space-complexity", "asymptotic-notation"],
     demos:[] },
