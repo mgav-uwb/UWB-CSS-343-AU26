@@ -3,125 +3,193 @@
   CSS 343, Autumn 2026: course hub. Every page uses relative paths, so any
   static server rooted at this folder serves the whole course.
 
-  LAYOUT: one row per session. The session card on the left, its reading and
-  homework in the middle, its interactive demos on the right.
+  LAYOUT: one row per session. The session card on the left (icon, date,
+  title, topics, a comic when one fits), its reading and homework in the
+  middle, its interactive demos on the right.
   TO POST A SESSION: add  dir:"sessions/Sxx-topic"  to its entry in SESSIONS
   (the folder under sessions/ that holds its index.html). Without dir the row
   is rendered unlinked. Exams: { exam:true }.
   TO POST A HOMEWORK: add  hw:{ href, title, desc }  to the session's entry.
-  handouts/demos are keys into the HANDOUTS/DEMOS maps below.
+  handouts/demos are keys into the HANDOUTS/DEMOS maps below. icon is an emoji,
+  hue one of lemon · mint · peach · sky · lilac · rose · aqua · exam, and
+  comic { num, title, alt, src } an xkcd comic stored in media/xkcd/ (see its
+  README for the license). QUOTES rotate one per day; "another" cycles them.
 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CSS 343 · Course Hub · Autumn 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
-         --accent:#00e58a; --accent2:#5cd47a; }
+  :root{
+    --paper:#fff8ec; --ink:#2b2a33; --dim:#6b6a78; --line:#e9e2d4; --card:#ffffff;
+    --lemon:#fff1a8; --lemon-d:#c99a00; --mint:#c9f0d8; --mint-d:#1f8a4c;
+    --peach:#ffd8c2; --peach-d:#c2560e; --sky:#cfe6ff; --sky-d:#1d63b8;
+    --lilac:#e4d9ff; --lilac-d:#6b45c9; --rose:#ffd6e6; --rose-d:#c02a6a;
+    --aqua:#c8f3ee; --aqua-d:#0f8a80; --exam:#ececf1; --exam-d:#5a5a6e;
+    --accent:#ff6f91; --accent2:#2ec4b6;
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-       font:15px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-       padding:36px clamp(14px,4vw,64px) 72px}
-  header{margin-bottom:8px}
-  h1{font-size:34px;margin:0;letter-spacing:.5px}
-  .course-sub{font-size:18px;color:var(--ink);margin:4px 0 2px;font-weight:500}
-  .meta{color:var(--dim);font-size:13.5px}
+  .page{position:relative;z-index:1}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font:16px/1.55 "Nunito",ui-rounded,"Segoe UI",sans-serif;
+       padding:28px clamp(14px,4vw,64px) 72px;position:relative;overflow-x:hidden}
+  /* a dotted paper texture and three soft blobs, fixed behind everything */
+  body::before{content:"";position:fixed;inset:0;z-index:-2;
+    background-image:radial-gradient(#d9d0bd 1px,transparent 1.2px);background-size:22px 22px;opacity:.55}
+  body::after{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;filter:blur(60px);opacity:.75;
+    background:
+      radial-gradient(38% 30% at 12% 8%,var(--rose),transparent 70%),
+      radial-gradient(34% 28% at 88% 14%,var(--sky),transparent 70%),
+      radial-gradient(40% 32% at 50% 96%,var(--mint),transparent 70%),
+      radial-gradient(28% 24% at 92% 78%,var(--lemon),transparent 70%)}
 
-  /* quick links (course-wide materials) */
-  .quick{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 6px}
-  a.q{display:inline-block;text-decoration:none;color:var(--ink);background:var(--panel);
-      border:1px solid var(--line);border-radius:9px;padding:8px 14px;font-size:13.5px;
-      font-weight:600;transition:border-color .15s,background .15s}
-  a.q:hover{border-color:var(--accent);background:#181b24}
-  a.q .qd{color:var(--dim);font-weight:400}
+  /* ── header ── */
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 32px;margin-bottom:22px}
+  h1{font:700 clamp(44px,6vw,72px)/1 "Fredoka",sans-serif;margin:0;letter-spacing:.5px;
+     background:linear-gradient(95deg,#ff6f91,#ff9f43 35%,#2ec4b6 70%,#6b45c9);
+     -webkit-background-clip:text;background-clip:text;color:transparent}
+  h1 span{font-size:.55em;vertical-align:.35em;-webkit-text-fill-color:var(--dim);color:var(--dim);
+           background:none;font-weight:600;letter-spacing:0}
+  .course-sub{font:600 20px "Fredoka",sans-serif;margin:8px 0 2px}
+  .meta{color:var(--dim);font-size:14px}
+  .quick{display:flex;flex-wrap:wrap;gap:10px;max-width:640px;justify-content:flex-end}
+  a.q{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);background:var(--card);
+      border:2px solid var(--line);border-radius:999px;padding:8px 16px 8px 12px;font-weight:700;font-size:14px;
+      box-shadow:0 2px 0 var(--line);transition:transform .15s,box-shadow .15s,border-color .15s}
+  a.q:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--line);border-color:var(--accent2)}
+  a.q .ic{font-size:18px} a.q .qd{color:var(--dim);font-weight:400}
 
-  /* the session table: session | handouts | demos */
-  #sessions{display:grid;grid-template-columns:minmax(330px,1.15fr) minmax(180px,.55fr) minmax(210px,.75fr);
-            gap:12px 16px;margin-top:26px;align-items:stretch}
-  .colhead{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);
-           font-weight:600;padding:0 2px 2px;border-bottom:1px solid var(--line);align-self:end}
-  .colhead a{color:var(--accent2);text-decoration:none;font-weight:600;text-transform:none;letter-spacing:0}
+  /* ── the daily quote ── */
+  .wisdom{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;
+          background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px 22px;margin:8px 0 30px;
+          box-shadow:0 3px 0 var(--line);position:relative;overflow:hidden}
+  .wisdom::before{content:"“";position:absolute;left:14px;top:-18px;font:700 120px/1 "Fredoka",sans-serif;color:var(--lilac);z-index:0}
+  .wisdom .mark{font-size:34px;position:relative;z-index:1}
+  .wisdom blockquote{margin:0;position:relative;z-index:1;font:italic 400 18px/1.45 "Nunito",sans-serif}
+  .wisdom blockquote b{display:block;font:600 13px "Fredoka",sans-serif;font-style:normal;color:var(--dim);margin-top:6px;letter-spacing:.3px}
+  .wisdom button{font:600 13px "Fredoka",sans-serif;border:2px solid var(--line);background:var(--lemon);color:var(--ink);
+                 border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 2px 0 var(--line);position:relative;z-index:1}
+  .wisdom button:hover{background:var(--peach)}
+
+  /* ── the session table: session | reading | demos ── */
+  #sessions{display:grid;grid-template-columns:minmax(340px,1.2fr) minmax(190px,.6fr) minmax(220px,.8fr);
+            gap:14px 18px;align-items:stretch}
+  .colhead{font:600 13px "Fredoka",sans-serif;text-transform:uppercase;letter-spacing:1.5px;color:#4f4e63;
+           padding:0 4px 4px;border-bottom:2px dashed #d5cdbd;align-self:end}
+  .colhead a{color:var(--mint-d);text-decoration:none;text-transform:none;letter-spacing:0}
   .colhead a:hover{text-decoration:underline}
 
-  a.card{display:block;text-decoration:none;color:inherit;background:var(--panel);
-         border:1px solid var(--line);border-left:3px solid var(--line);border-radius:11px;
-         padding:15px 17px;transition:border-color .15s,transform .15s,background .15s}
-  a.card:hover{border-color:var(--accent);border-left-color:var(--accent);
-               transform:translateY(-2px);background:#181b24}
-  .lec{display:flex;gap:14px;align-items:flex-start}
-  .badge{flex:0 0 auto;font-weight:700;font-size:14px;color:var(--accent);
-         border:1px solid var(--accent);border-radius:8px;padding:6px 9px;letter-spacing:.5px;
-         background:#00e58a14}
-  .ctitle{font-size:16.5px;font-weight:600;margin:0 0 4px}
-  .ctopics{color:var(--dim);font-size:13px;line-height:1.45}
-  .go{color:var(--accent2);font-size:13px;margin-top:9px;font-weight:600}
+  .card{display:block;text-decoration:none;color:inherit;background:var(--card);border:2px solid var(--line);
+         border-radius:20px;padding:14px 16px 14px 14px;position:relative;overflow:hidden;
+         box-shadow:0 3px 0 var(--line);transition:transform .15s,box-shadow .15s}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;background:var(--hue)}
+  a.card:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--line)}
+  .lec{display:flex;gap:14px;align-items:flex-start;padding-left:6px}
+  .badge{flex:0 0 auto;width:58px;height:58px;border-radius:18px;background:var(--hue);display:grid;place-items:center;
+         font-size:28px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.08)}
+  .badge small{display:block;font:700 11px "Fredoka",sans-serif;color:var(--hue-d);margin-top:-4px;letter-spacing:.5px}
+  .when{font:600 12.5px "Fredoka",sans-serif;color:var(--hue-d);letter-spacing:.4px;margin-bottom:1px}
+  .ctitle{font:600 18px/1.25 "Fredoka",sans-serif;margin:0 0 4px}
+  .ctopics{color:var(--dim);font-size:13.5px;line-height:1.45}
+  .go{display:inline-block;margin-top:8px;font:600 13px "Fredoka",sans-serif;color:var(--hue-d);
+       background:var(--hue);border-radius:999px;padding:3px 12px}
+  .pa{display:inline-block;margin:8px 0 0 6px;font:600 12px "Fredoka",sans-serif;color:#7a4b00;
+       background:var(--lemon);border-radius:999px;padding:3px 10px}
+  .card.soon{border-style:dashed;background:#fffdf7}
+  .card.soon .ctitle{color:#4a4956}
+  .card.exam{background:repeating-linear-gradient(-45deg,#fff,#fff 10px,#f6f4fb 10px,#f6f4fb 20px)}
 
-  /* exam rows: unlinked */
-  .card.exam{background:transparent;border-style:dashed;cursor:default}
-  .card.exam .badge{color:var(--dim);border-color:var(--line);background:transparent}
+  /* a comic tucked into the session card */
+  button.comic{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:6px 10px 6px 6px;cursor:pointer;
+               background:var(--paper);border:2px dashed var(--line);border-radius:14px;color:var(--ink);text-align:left;font:inherit}
+  button.comic:hover{border-color:var(--accent)}
+  button.comic img{height:54px;width:82px;object-fit:cover;object-position:left top;border-radius:8px;background:#fff;border:1px solid var(--line)}
+  button.comic .t{font:600 13px "Fredoka",sans-serif} button.comic .d{display:block;color:var(--dim);font-size:11.5px}
 
   /* handout / demo chips */
-  .cell{display:flex;flex-direction:column;gap:8px;justify-content:flex-start}
-  a.chip{display:block;text-decoration:none;color:var(--ink);background:var(--panel);
-         border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:12.5px;
-         line-height:1.35;transition:border-color .15s,background .15s}
-  a.chip:hover{border-color:var(--accent);background:#181b24}
-  a.chip .t{font-weight:600}
-  a.chip .d{color:var(--dim);font-size:11.5px;display:block;margin-top:1px}
-  .chip.h .t::before{content:"📄 "}
-  .chip.demo .t::before{content:"▶ ";color:var(--accent2);font-size:10.5px;vertical-align:1px}
-  .none{color:#3a3f4d;font-size:12.5px;padding:8px 2px}
+  .cell{display:flex;flex-direction:column;gap:8px}
+  a.chip{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:2px solid var(--line);
+          border-radius:14px;padding:8px 11px;font-size:12.5px;line-height:1.35;transition:transform .15s,border-color .15s}
+  a.chip:hover{transform:translateX(3px);border-color:var(--accent2)}
+  a.chip .t{font-weight:700} a.chip .d{color:var(--dim);font-size:11.5px;display:block;margin-top:1px}
+  .chip.h .t::before{content:"📖 "}
+  .chip.demo{background:#f4fffc} .chip.demo .t::before{content:"▶ ";color:var(--accent2);font-size:11px;vertical-align:1px}
+  .chip.hw{background:#fffbe6;border-color:#f0dc8a} .chip.hw .t::before{content:"✏️ "}
 
-  /* narrow screens: stack each session's three cells vertically */
+  /* staggered arrival */
+  @keyframes arrive{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  #sessions > *{animation:arrive .5s both}
+  @media (prefers-reduced-motion:reduce){#sessions > *{animation:none}}
+
+  /* the comic lightbox */
+  dialog{border:2px solid var(--line);border-radius:22px;padding:18px 20px 16px;max-width:min(94vw,980px);background:var(--card);
+          box-shadow:0 20px 60px rgba(40,30,60,.25)}
+  dialog::backdrop{background:rgba(43,42,51,.55);backdrop-filter:blur(3px)}
+  dialog img{max-width:100%;max-height:70vh;display:block;margin:0 auto}
+  dialog .cap{margin:12px 0 0;font-size:14px;color:var(--dim);max-width:70ch}
+  dialog .cap b{font:600 16px "Fredoka",sans-serif;color:var(--ink)}
+  dialog .cap a{color:var(--sky-d)}
+  dialog form{position:absolute;top:10px;right:12px;margin:0}
+  dialog form button{border:0;background:var(--lemon);border-radius:999px;font:700 14px "Fredoka",sans-serif;padding:4px 12px;cursor:pointer}
+
   @media (max-width: 920px){
     #sessions{grid-template-columns:1fr}
     .colhead{display:none}
     .cell{flex-direction:row;flex-wrap:wrap}
-    .cell a.chip{flex:0 0 auto}
-    .none{display:none}
-    a.card{margin-top:6px}
+    .cell a.chip{flex:0 0 auto;max-width:100%}
+    .card{margin-top:8px}
+    .wisdom{grid-template-columns:1fr;text-align:left} .wisdom .mark{display:none}
+    .quick{justify-content:flex-start}
   }
-
-  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim);font-size:13px}
-  code{background:#000;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
-
-  /* sessions whose deck is not posted yet: unlinked, muted */
-  .card.soon{display:block;background:var(--panel);border:1px solid var(--line);
-             border-left:3px solid var(--line);border-radius:11px;padding:15px 17px;opacity:.78}
-  .card.soon .badge{color:var(--dim);border-color:var(--line);background:transparent}
-  .card.exam{display:block;border:1px dashed var(--line);border-radius:11px;padding:15px 17px}
-  .when{color:var(--dim);font-size:12.5px;font-weight:600;letter-spacing:.3px;margin-bottom:2px}
-  .pa{display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#ffcf66;
-      border:1px solid #5a4a1e;border-radius:6px;padding:2px 8px;background:#ffcf6612}
-  .chip.hw .t::before{content:"✎ ";color:#ffcf66}
-  a.chip.hw{border-color:#5a4a1e}
-  @media (max-width: 920px){ .cell a.chip{max-width:100%} }
+  footer{margin-top:44px;border-top:2px dashed var(--line);padding-top:16px;color:var(--dim);font-size:13px}
+  footer a{color:var(--sky-d)}
+  code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--lilac-d);font-size:12.5px}
 </style>
 </head>
 <body>
+<main class="page">
   <header>
-    <h1>CSS 343 <span style="color:var(--dim);font-weight:400">&lt;/&gt;</span></h1>
-    <div class="course-sub">Data Structures, Algorithms &amp; Discrete Mathematics II</div>
-    <div class="meta">Autumn 2026 · MW 1:15–3:15 PM · Dr. Marcel Gavriliu</div>
+    <div>
+      <h1>CSS 343 <span>&lt;/&gt;</span></h1>
+      <div class="course-sub">Data Structures, Algorithms &amp; Discrete Mathematics II</div>
+      <div class="meta">Autumn 2026 · MW 1:15–3:15 PM · Dr. Marcel Gavriliu</div>
+    </div>
+    <nav class="quick">
+      <a class="q" href="textbook/index.html"><span class="ic">📚</span>Textbook <span class="qd">· one chapter per topic</span></a>
+      <a class="q" href="lib/demo.html"><span class="ic">🎮</span>Explorer <span class="qd">· every algorithm, interactive</span></a>
+      <a class="q" href="guides/guide-computing-environment.html"><span class="ic">🐧</span>The Linux lab</a>
+      <a class="q" href="guides/guide-valgrind.html"><span class="ic">🔍</span>Valgrind</a>
+      <a class="q" href="media/big-o-cheatsheet.html"><span class="ic">📈</span>Big-O cheat sheet</a>
+    </nav>
   </header>
 
-  <div class="quick">
-    <a class="q" href="textbook/index.html">Textbook <span class="qd">· the course text, one chapter per topic</span></a>
-    <a class="q" href="lib/demo.html">Explorer <span class="qd">· every structure &amp; algorithm, interactive</span></a>
-    <a class="q" href="guides/guide-computing-environment.html">Computing Environment <span class="qd">· the CSS Linux lab</span></a>
-    <a class="q" href="guides/guide-valgrind.html">Valgrind <span class="qd">· finding memory leaks</span></a>
-    <a class="q" href="media/big-o-cheatsheet.html">Big-O Cheat Sheet</a>
-  </div>
+  <section class="wisdom" aria-label="a quote">
+    <span class="mark">💡</span>
+    <blockquote id="quote"></blockquote>
+    <button id="another" type="button">another one</button>
+  </section>
 
   <div id="sessions"></div>
+
+  <dialog id="comicbox">
+    <form method="dialog"><button>close ✕</button></form>
+    <img id="comicimg" alt="">
+    <p class="cap" id="comiccap"></p>
+  </dialog>
 
   <footer>
     Announcements, submissions and grades are on Canvas.
     Each deck: <code>f</code> fullscreen · <code>o</code> overview · <code>g</code> slide grid.
     <br><br>
+    Comics by Randall Munroe, <a href="https://xkcd.com">xkcd.com</a>, CC BY-NC 2.5, each linked to its page.
     Content licensed <a href="LICENSE">CC BY-NC-SA 4.0</a> · code licensed <a href="LICENSE-CODE">MIT</a>.
   </footer>
+</main>
 
 <script>
 // ───────── reading: textbook chapters, guides, references (keyed; attach per session) ─────────
@@ -272,107 +340,130 @@ const DEMOS = {
 
 // ───────── one row per session: card + its reading + its demos ─────────
 const SESSIONS = [
-  { id:"L01", date:"Wed Sep 30", dir:"sessions/S01-review",
+  { id:"L01", icon:"🔁", hue:"lemon", comic:{ num:1270, title:"Functional", alt:"Functional programming combines the flexibility and power of abstract mathematics with the intuitive clarity of abstract mathematics.", src:"media/xkcd/1270.png" }, icon:"🔁", hue:"lemon", comic:{ num:1270, title:"Functional", alt:"Functional programming combines the flexibility and power of abstract mathematics with the intuitive clarity of abstract mathematics.", src:"media/xkcd/1270.png" }, date:"Wed Sep 30", dir:"sessions/S01-review",
     title:"Review: C++, Recursion, Counting",
     topics:"passing arguments · owning memory and the Rule of Three · recursion on lists, trees and arrays · counting loops · recurrences and unrolling · k-sum",
     handouts:["recursion", "env", "valgrind"], demos:["factorial", "three-sum", "k-sum"], hw:{ href:"sessions/S01-review/hw01/HW01.html", title:"Homework 1", desc:"due Sun Oct 4, 11:59 PM" } },
-  { id:"L02", date:"Mon Oct 5",
+  { id:"L02", icon:"⏱️", hue:"lemon", comic:{ num:1691, title:"Optimization", alt:"Premature optimization is the root of all evil, so to start this project I'd better come up with a system that can determine whether a possible optimization is premature or not.", src:"media/xkcd/1691.png" }, icon:"⏱️", hue:"lemon", comic:{ num:1691, title:"Optimization", alt:"Premature optimization is the root of all evil, so to start this project I'd better come up with a system that can determine whether a possible optimization is premature or not.", src:"media/xkcd/1691.png" }, date:"Mon Oct 5",
     title:"Analysis of Algorithms: Time",
     topics:"counting a basic operation · order of growth · the doubling experiment · faster 3-sum",
     handouts:["time-analysis", "bigO"] },
-  { id:"L03", date:"Wed Oct 7",
+  { id:"L03", icon:"🧮", hue:"lemon", comic:{ num:1445, title:"Efficiency", alt:"I need an extension for my research project because I spent all month trying to figure out whether learning Dvorak would help me type it faster.", src:"media/xkcd/1445.png" }, icon:"🧮", hue:"lemon", comic:{ num:1445, title:"Efficiency", alt:"I need an extension for my research project because I spent all month trying to figure out whether learning Dvorak would help me type it faster.", src:"media/xkcd/1445.png" }, date:"Wed Oct 7",
     title:"Space Complexity and Asymptotic Notation",
     topics:"counting bytes · stack and heap · space as a function of n · O, Θ and Ω made precise",
     handouts:["space-complexity", "asymptotic-notation", "bigO"] },
-  { id:"L04", date:"Mon Oct 12",
+  { id:"L04", icon:"🌳", hue:"mint", icon:"🌳", hue:"mint", date:"Mon Oct 12",
     title:"Trees and Binary Search Trees",
     topics:"trees and traversals · the BST as an ordered symbol table · Hibbard deletion · cost is Θ(height)",
     handouts:["trees-bst"], demos:["bst"], pa:"PA1 out" },
-  { id:"L05", date:"Wed Oct 14",
+  { id:"L05", icon:"⚖️", hue:"mint", icon:"⚖️", hue:"mint", date:"Wed Oct 14",
     title:"Balanced Trees I: AVL",
     topics:"the balance invariant · single and double rotations · insertion with rebalancing · the height bound",
     handouts:["avl-trees"], demos:["avl", "bst-vs-avl"] },
-  { id:"L06", date:"Mon Oct 19",
+  { id:"L06", icon:"📚", hue:"mint", icon:"📚", hue:"mint", date:"Mon Oct 19",
     title:"Balanced Trees II: 2-3, Red-Black, B and B+ Trees",
     topics:"split and promote · red-black trees as 2-3 trees · B-trees and B+ trees on disk",
     handouts:["two-three-trees", "red-black-trees", "b-trees"], demos:["two-three", "btree", "redblack"] },
-  { id:"L07", date:"Wed Oct 21",
+  { id:"L07", icon:"⛰️", hue:"peach", comic:{ num:835, title:"Tree", alt:"Not only is that terrible in general, but you just KNOW Billy's going to open the root present first, and then everyone will have to wait while the heap is rebuilt.", src:"media/xkcd/835.png" }, icon:"⛰️", hue:"peach", comic:{ num:835, title:"Tree", alt:"Not only is that terrible in general, but you just KNOW Billy's going to open the root present first, and then everyone will have to wait while the heap is rebuilt.", src:"media/xkcd/835.png" }, date:"Wed Oct 21",
     title:"Heaps and Priority Queues; Heapsort",
     topics:"the priority-queue ADT · swim and sink · build-heap in Θ(n) · heapsort",
     handouts:["heaps-pq", "heapsort"], demos:["heap", "min-heap"] },
-  { id:"L08", date:"Mon Oct 26",
+  { id:"L08", icon:"#️⃣", hue:"peach", icon:"#️⃣", hue:"peach", date:"Mon Oct 26",
     title:"Hashing",
     topics:"hash functions · separate chaining · open addressing · load factor and resizing",
     handouts:["hashing"], demos:["hash-lp", "hash-quad", "hash-double", "hash-chain", "hash-chain-resize", "hash-delete-race", "probe-race", "probe-delete-pitfalls"] },
-  { id:"L09", date:"Wed Oct 28",
+  { id:"L09", icon:"🕸️", hue:"sky", comic:{ num:1195, title:"Flowchart", alt:"The way out is to use the marker you have to add a box that says 'get a marker' to the line between you and 'start', then add a 'no' line from the trap box to 'end'.", src:"media/xkcd/1195.png" }, icon:"🕸️", hue:"sky", comic:{ num:1195, title:"Flowchart", alt:"The way out is to use the marker you have to add a box that says 'get a marker' to the line between you and 'start', then add a 'no' line from the trap box to 'end'.", src:"media/xkcd/1195.png" }, date:"Wed Oct 28",
     title:"Graphs I: Representations, BFS and DFS",
     topics:"graph vocabulary · adjacency list and matrix · breadth-first search · depth-first search",
     handouts:["graph-representations", "bfs", "dfs"], demos:["graph", "search-race"], pa:"PA1 due · PA2 out" },
-  { id:"L10", date:"Mon Nov 2",
+  { id:"L10", icon:"🧭", hue:"sky", icon:"🧭", hue:"sky", date:"Mon Nov 2",
     title:"Graphs II: DFS Applications, Topological Sort",
     topics:"DFS numbering and edge types · cycle detection · topological sort",
     handouts:["dfs", "topological-sort"], demos:["graph"] },
-  { id:"L11", date:"Wed Nov 4",
+  { id:"L11", icon:"🛣️", hue:"sky", comic:{ num:399, title:"Travelling Salesman Problem", alt:"What's the complexity class of the best linear programming cutting-plane techniques?  I couldn't find it anywhere.  Man, the Garfield guy doesn't have these problems ...", src:"media/xkcd/399.png" }, icon:"🛣️", hue:"sky", comic:{ num:399, title:"Travelling Salesman Problem", alt:"What's the complexity class of the best linear programming cutting-plane techniques?  I couldn't find it anywhere.  Man, the Garfield guy doesn't have these problems ...", src:"media/xkcd/399.png" }, date:"Wed Nov 4",
     title:"Graphs III: Dijkstra Shortest Paths",
     topics:"weighted digraphs · edge relaxation · Dijkstra with a priority queue · the greedy method, first contact",
     handouts:["dijkstra", "greedy-method"], demos:["dijkstra"] },
-  { id:"MT", date:"Mon Nov 9", exam:true,
+  { id:"MT", icon:"🎓", hue:"exam", icon:"🎓", hue:"exam", date:"Mon Nov 9", exam:true,
     title:"Review and Midterm Exam",
     topics:"in class, on paper · covers sessions 1 to 11", },
-  { id:"L13", date:"Mon Nov 16",
+  { id:"L13", icon:"🌉", hue:"sky", icon:"🌉", hue:"sky", date:"Mon Nov 16",
     title:"Graphs IV: Union-Find and Minimum Spanning Trees",
     topics:"union-find · the cut property · Kruskal · Prim",
     handouts:["union-find", "minimum-spanning-trees", "kruskal", "prim"], demos:["union-find", "kruskal", "prim"], pa:"PA2 due" },
-  { id:"L14", date:"Wed Nov 18",
+  { id:"L14", icon:"🎁", hue:"lilac", icon:"🎁", hue:"lilac", date:"Wed Nov 18",
     title:"Greedy Algorithms; Huffman Coding",
     topics:"the exchange argument · when greedy is optimal · Huffman coding · prefix-free codes",
     handouts:["greedy-method", "huffman-coding"], demos:["huffman", "huffman-codec", "adaptive-huffman"], pa:"PA3 out" },
-  { id:"L15", date:"Mon Nov 23",
+  { id:"L15", icon:"🔀", hue:"lilac", comic:{ num:1185, title:"Ineffective Sorts", alt:"StackSort connects to StackOverflow, searches for 'sort a list', and downloads and runs code snippets until the list is sorted.", src:"media/xkcd/1185.png" }, icon:"🔀", hue:"lilac", comic:{ num:1185, title:"Ineffective Sorts", alt:"StackSort connects to StackOverflow, searches for 'sort a list', and downloads and runs code snippets until the list is sorted.", src:"media/xkcd/1185.png" }, date:"Mon Nov 23",
     title:"Sorting and Divide-and-Conquer",
     topics:"the master theorem · mergesort · quicksort · the Ω(n log n) lower bound · quickselect",
     handouts:["divide-and-conquer", "mergesort", "quicksort", "quickselect", "sorting-lower-bound"], demos:["recurrence", "mergesort", "quicksort", "quickselect", "sort-race", "lomuto-vs-hoare"] },
-  { id:"L16", date:"Wed Nov 25",
+  { id:"L16", icon:"🧩", hue:"rose", icon:"🧩", hue:"rose", date:"Wed Nov 25",
     title:"Dynamic Programming I",
     topics:"overlapping subproblems · memoization and tabulation · rod cutting · longest common subsequence",
     handouts:["dp-method", "rod-cutting", "longest-common-subsequence"], demos:["fib", "fib-race", "rodcut-tree", "rodcut", "rodcut-race", "lcs-tree", "lcs"] },
-  { id:"L17", date:"Mon Nov 30",
+  { id:"L17", icon:"🎒", hue:"rose", icon:"🎒", hue:"rose", date:"Mon Nov 30",
     title:"Dynamic Programming II",
     topics:"0/1 knapsack · pseudo-polynomial time · edit distance",
     handouts:["knapsack", "edit-distance"], demos:["knapsack", "edit-distance"], pa:"PA3 design due" },
-  { id:"L18", date:"Wed Dec 2",
+  { id:"L18", icon:"🗺️", hue:"rose", comic:{ num:974, title:"The General Problem", alt:"I find that when someone's taking time to do something right in the present, they're a perfectionist with no ability to prioritize, whereas when someone took time to do something right in the past, they're a master artisan of great foresight.", src:"media/xkcd/974.png" }, icon:"🗺️", hue:"rose", comic:{ num:974, title:"The General Problem", alt:"I find that when someone's taking time to do something right in the present, they're a perfectionist with no ability to prioritize, whereas when someone took time to do something right in the past, they're a master artisan of great foresight.", src:"media/xkcd/974.png" }, date:"Wed Dec 2",
     title:"Dynamic Programming III",
     topics:"grid and interval patterns · traceback · space-saving",
     handouts:["dp-patterns", "traceback-space-saving"], demos:["grid-dp"] },
-  { id:"L19", date:"Mon Dec 7",
+  { id:"L19", icon:"🧵", hue:"aqua", comic:{ num:1171, title:"Perl Problems", alt:"To generate #1 albums, 'jay --help' recommends the -z flag.", src:"media/xkcd/1171.png" }, icon:"🧵", hue:"aqua", comic:{ num:1171, title:"Perl Problems", alt:"To generate #1 albums, 'jay --help' recommends the -z flag.", src:"media/xkcd/1171.png" }, date:"Mon Dec 7",
     title:"Strings: Tries and Substring Search",
     topics:"R-way tries and ternary search tries · prefix operations · KMP · Boyer-Moore",
     handouts:["tries", "substring-search", "kmp", "boyer-moore"], demos:["trie", "tst", "kmp-fail", "string-search"] },
-  { id:"L20", date:"Wed Dec 9",
+  { id:"L20", icon:"🔤", hue:"aqua", comic:{ num:208, title:"Regular Expressions", alt:"Wait, forgot to escape a space.  Wheeeeee[taptaptap]eeeeee.", src:"media/xkcd/208.png" }, icon:"🔤", hue:"aqua", comic:{ num:208, title:"Regular Expressions", alt:"Wait, forgot to escape a space.  Wheeeeee[taptaptap]eeeeee.", src:"media/xkcd/208.png" }, date:"Wed Dec 9",
     title:"Regular Expressions and Finite Automata",
     topics:"regular expressions · NFAs · Thompson's construction · NFA simulation",
     handouts:["regex-automata"], demos:["dfa", "nfa-build", "nfa-sim", "nfa2dfa"], pa:"PA3 due" },
-  { id:"FE", date:"Mon Dec 14", exam:true,
+  { id:"FE", icon:"🎓", hue:"exam", icon:"🎓", hue:"exam", date:"Mon Dec 14", exam:true,
     title:"Final Exam",
     topics:"1:15 to 3:15 PM, on paper · comprehensive", },
 ];
 
-const paTag = s => s.pa ? `<div class="pa">${s.pa}</div>` : "";
+// ───────── a quote a day; "another one" cycles ─────────
+const QUOTES = [
+  { q: "Premature optimization is the root of all evil.", who: "Donald Knuth", src: "Structured Programming with go to Statements, 1974" },
+  { q: "Programs must be written for people to read, and only incidentally for machines to execute.", who: "Harold Abelson and Gerald Jay Sussman", src: "Structure and Interpretation of Computer Programs, preface" },
+  { q: "Controlling complexity is the essence of computer programming.", who: "Brian Kernighan", src: "Software Tools, 1976" },
+  { q: "Everyone knows that debugging is twice as hard as writing a program in the first place. So if you're as clever as you can be when you write it, how will you ever debug it?", who: "Brian Kernighan", src: "The Elements of Programming Style, 1974" },
+  { q: "The purpose of computing is insight, not numbers.", who: "Richard Hamming", src: "Numerical Methods for Scientists and Engineers, 1962" },
+  { q: "Simplicity is prerequisite for reliability.", who: "Edsger W. Dijkstra", src: "How do we tell truths that might hurt?, EWD498, 1975" },
+  { q: "An algorithm must be seen to be believed.", who: "Donald Knuth", src: "The Art of Computer Programming, vol. 1" },
+  { q: "Bad programmers worry about the code. Good programmers worry about data structures and their relationships.", who: "Linus Torvalds", src: "git mailing list, 2006" },
+  { q: "Beware of bugs in the above code; I have only proved it correct, not tried it.", who: "Donald Knuth", src: "memo to Peter van Emde Boas, 1977" },
+  { q: "Algorithms + Data Structures = Programs", who: "Niklaus Wirth", src: "the title of his 1976 book" },
+  { q: "Rules of Optimization: Rule 1: Don't do it. Rule 2 (for experts only): Don't do it yet.", who: "Michael A. Jackson", src: "Principles of Program Design, 1975" },
+];
+
+const HUES = { lemon:["--lemon","--lemon-d"], mint:["--mint","--mint-d"], peach:["--peach","--peach-d"], sky:["--sky","--sky-d"],
+               lilac:["--lilac","--lilac-d"], rose:["--rose","--rose-d"], aqua:["--aqua","--aqua-d"], exam:["--exam","--exam-d"] };
+const hueStyle = s => { const [a, b] = HUES[s.hue] || HUES.exam; return `style="--hue:var(${a});--hue-d:var(${b})"`; };
+const paTag = s => s.pa ? `<span class="pa">${s.pa}</span>` : "";
+const comicTag = s => s.comic ? `
+    <button class="comic" type="button" data-comic="${s.id}" aria-label="comic: ${s.comic.title}">
+      <img src="${s.comic.src}" alt="">
+      <span><span class="t">xkcd ${s.comic.num} · ${s.comic.title}</span><span class="d">click to read</span></span>
+    </button>` : "";
 
 const inner = (s, go) => `
     <div class="lec">
-      <span class="badge">${s.id}</span>
-      <div>
+      <span class="badge">${s.icon || ""}<small>${s.id}</small></span>
+      <div style="min-width:0">
         <div class="when">${s.date}</div>
         <div class="ctitle">${s.title}</div>
         <div class="ctopics">${s.topics}</div>
         ${go}${paTag(s)}
       </div>
-    </div>`;
+    </div>${comicTag(s)}`;
 
 const sessionCell = s =>
-  s.exam ? `<div class="card exam">${inner(s, "")}</div>` :
-  s.dir  ? `<a class="card" href="${s.dir}/index.html">${inner(s, `<div class="go">Open deck →</div>`)}</a>` :
-           `<div class="card soon">${inner(s, "")}</div>`;
+  s.exam ? `<div class="card exam" ${hueStyle(s)}>${inner(s, "")}</div>` :
+  s.dir  ? `<a class="card" ${hueStyle(s)} href="${s.dir}/index.html">${inner(s, `<span class="go">Open deck →</span>`)}</a>` :
+           `<div class="card soon" ${hueStyle(s)}>${inner(s, "")}</div>`;
 
 const handoutCell = s => {
   const hs = (s.handouts || []).map(k => HANDOUTS[k]).filter(Boolean);
@@ -390,11 +481,32 @@ const demoCell = s => {
     <a class="chip demo" href="lib/demo.html?ds=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("") + `</div>`;
 };
 
-document.getElementById("sessions").innerHTML =
+const grid = document.getElementById("sessions");
+grid.innerHTML =
   `<div class="colhead">Sessions</div>
    <div class="colhead">Reading &amp; homework</div>
    <div class="colhead">Demos · <a href="lib/demo.html">full explorer →</a></div>` +
   SESSIONS.map(s => sessionCell(s) + handoutCell(s) + demoCell(s)).join("");
+[...grid.children].forEach((el, i) => { el.style.animationDelay = `${Math.min(i * 35, 900)}ms`; });
+
+// a comic opens in the lightbox; the lightbox links to its xkcd page
+const box = document.getElementById("comicbox"), img = document.getElementById("comicimg"), cap = document.getElementById("comiccap");
+grid.addEventListener("click", e => {
+  const b = e.target.closest("button.comic"); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const s = SESSIONS.find(x => x.id === b.dataset.comic); if (!s || !s.comic) return;
+  img.src = s.comic.src; img.alt = s.comic.title + ". " + s.comic.alt;
+  cap.innerHTML = `<b>${s.comic.title}</b><br>${s.comic.alt}<br><a href="https://xkcd.com/${s.comic.num}/" target="_blank" rel="noopener">xkcd.com/${s.comic.num}</a> · Randall Munroe · CC BY-NC 2.5`;
+  box.showModal();
+});
+box.addEventListener("click", e => { if (e.target === box) box.close(); });
+
+// the quote: one per day, stable through the day; the button walks the list
+const dayIndex = Math.floor(Date.now() / 86400000);
+let qi = dayIndex % QUOTES.length;
+const showQuote = () => { const x = QUOTES[qi]; document.getElementById("quote").innerHTML = `${x.q}<b>${x.who} · ${x.src}</b>`; };
+document.getElementById("another").addEventListener("click", () => { qi = (qi + 1) % QUOTES.length; showQuote(); });
+showQuote();
 </script>
 </body>
 </html>
