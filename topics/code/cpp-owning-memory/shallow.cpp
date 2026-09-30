@@ -1,4 +1,4 @@
-// CSS 343 · Lecture 1 demo: what goes wrong WITHOUT the Rule of Three.
+// CSS 343 · topic program: what goes wrong WITHOUT the Rule of Three.
 // The class has a destructor but no copy constructor, so the compiler's
 // default copy duplicates the head POINTER: two lists share one chain.
 //

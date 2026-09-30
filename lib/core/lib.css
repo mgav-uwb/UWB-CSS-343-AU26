@@ -13,6 +13,10 @@
 .u-vp-ctl button { width: 26px; height: 26px; padding: 0; font: 700 15px/1 system-ui, sans-serif; color: #4a5064; background: #fff; border: 1px solid #d5d9e4; border-radius: 6px; cursor: pointer; }
 .u-vp-ctl button:hover { border-color: #7c5cff; color: #7c5cff; }
 .u-player .u-canvas-wrap + .u-canvas-wrap { margin-top: 6px; }
+/* Player opts.layout "row": canvases side by side, each at its own flex weight */
+.u-player .u-row { display: flex; gap: 6px; align-items: stretch; }
+.u-player .u-row > .u-canvas-wrap { min-width: 0; }
+.u-player .u-row > .u-canvas-wrap + .u-canvas-wrap { margin-top: 0; }
 
 /* EXPAND (core/viewport.js): a short panel takes the demo's full height and
    overlays the panels below it, instead of pushing them down */

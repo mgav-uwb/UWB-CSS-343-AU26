@@ -216,6 +216,9 @@ const HANDOUTS = {
 
 // ───────── interactive demos (keyed; ds = lib/demo.html?ds=…) ─────────
 const DEMOS = {
+  "factorial":              { title:"Recursion: factorial", desc:"the recursion tree and the call stack, side by side: frames pile up on the way down, results come back on the way up" },
+  "three-sum":              { title:"3-sum: loops and recursion", desc:"the same tree walked twice: the loops in one frame, the recursion with a frame per level" },
+  "k-sum":                  { title:"Recursion: k-sum", desc:"choose k elements one call at a time; a path from the root is a choice" },
   "bst":                    { title:"Binary Search Tree", desc:"search · insert · Hibbard delete · ordered ops" },
   "avl":                    { title:"AVL Tree", desc:"insert & delete with rotations, live balance factors" },
   "bst-vs-avl":             { title:"BST vs AVL", desc:"same keys side by side; heights diverge, ⏩ to sweep" },
@@ -272,7 +275,7 @@ const SESSIONS = [
   { id:"L01", date:"Wed Sep 30", dir:"sessions/S01-review",
     title:"Review: C++, Recursion, Counting",
     topics:"passing arguments · owning memory and the Rule of Three · recursion on lists, trees and arrays · counting loops · recurrences and unrolling · k-sum",
-    handouts:["recursion", "env", "valgrind"], hw:{ href:"sessions/S01-review/hw01/HW01.html", title:"Homework 1", desc:"due Sun Oct 4, 11:59 PM" } },
+    handouts:["recursion", "env", "valgrind"], demos:["factorial", "three-sum", "k-sum"], hw:{ href:"sessions/S01-review/hw01/HW01.html", title:"Homework 1", desc:"due Sun Oct 4, 11:59 PM" } },
   { id:"L02", date:"Mon Oct 5",
     title:"Analysis of Algorithms: Time",
     topics:"counting a basic operation · order of growth · the doubling experiment · faster 3-sum",

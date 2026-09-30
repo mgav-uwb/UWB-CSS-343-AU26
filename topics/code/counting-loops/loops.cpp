@@ -1,4 +1,4 @@
-// CSS 343 · Lecture 1 demo: counting how often a loop body runs.
+// CSS 343 · topic program: counting how often a loop body runs.
 // Each function returns the exact number of times its innermost statement
 // executes; main prints the count beside the closed form.
 //
