@@ -7,7 +7,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
-<title>CSS 343 · Gallery</title>
+<title>CSS 343 · Comics</title>
 <style>
   :root{ --ink:#26252e; --dim:#6a6975; --line:#e3ded4; --accent:#2a8c80; }
   *{box-sizing:border-box}
@@ -51,20 +51,17 @@
 </head>
 <body>
 <header>
-  <h1>Gallery</h1>
-  <div class="meta"><a href="../index.html">course hub</a> · <span id="count"></span> · click any picture for its story</div>
+  <h1>Comics</h1>
+  <div class="meta"><a href="../index.html">course hub</a> · <span id="count"></span> · click a comic to read it large, with its alt text</div>
 </header>
-<div class="filters" role="group" aria-label="filter">
+<div class="filters" role="group" aria-label="filter" hidden>
   <button type="button" data-f="all" aria-pressed="true">All</button>
-  <button type="button" data-f="pic" aria-pressed="false">Pictures</button>
-  <button type="button" data-f="comic" aria-pressed="false">Comics</button>
 </div>
 <div id="grid"></div>
 
 <dialog id="lb"><div class="lb" id="lbc"></div></dialog>
 
 <footer>
-  Pictures: made for this course (the fruit tree is drawn by <code>media/fruit_tree.py</code>; the lemur trees with an image generator).
   Comics: xkcd by Randall Munroe, <a href="https://creativecommons.org/licenses/by-nc/2.5/">CC BY-NC 2.5</a>, each linked to its page.
 </footer>
 
@@ -84,7 +81,7 @@ const srcHTML = (src) => {
 
 const pics = await loadPool();
 const items = [...pics, ...COMICS.map(comicItem)];
-document.getElementById('count').textContent = `${pics.length} pictures and ${COMICS.length} comics`;
+document.getElementById('count').textContent = `${COMICS.length} comics`;
 
 let filter = 'all', shown = [], cur = -1;
 const grid = document.getElementById('grid');

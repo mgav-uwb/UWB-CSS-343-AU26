@@ -3,8 +3,8 @@
   CSS 343, Autumn 2026: course hub. Every page uses relative paths, so any static
   server rooted at this folder serves the whole course.
 
-  TOP: a rotating picture beside the title, the link cards on the right; below,
-  the quote over a "did you know?" fact beside a rotating xkcd panel. All four come
+  TOP: the course logo (media/logo.png) beside the title, the link cards on the right;
+  below, the quote over a "did you know?" fact beside a rotating xkcd panel, all three
   from lib/site-extras.js reading lib/site-data.js (every fact and quote sourced).
   WEEKS: one collapsible row per week; the current week opens by itself. Inside,
   the week card holds its Monday and Wednesday meetings, the homework going out,
@@ -136,10 +136,10 @@
   /* ── header: the picture beside the title, the link cards on the right ── */
   header.hdr{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 28px;margin-bottom:12px}
   .brand{display:flex;align-items:center;gap:18px;min-width:0}
-  .picview{width:124px;height:124px}
-  nav.quick{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;max-width:620px}
+  img.logo{height:112px;width:auto;border-radius:12px;border:1px solid var(--line);background:#fbf7ee;display:block}
+  nav.quick{display:grid;grid-template-columns:repeat(3,auto);gap:8px;justify-content:end}
   a.qc{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);border:1px solid var(--line);
-        border-radius:10px;padding:8px 14px;font-weight:700;font-size:14px;box-shadow:0 1px 2px rgba(38,37,46,.06);
+        border-radius:10px;padding:7px 12px;font-weight:700;font-size:14px;box-shadow:0 1px 2px rgba(38,37,46,.06);
         transition:transform .15s,box-shadow .15s,border-color .15s}
   a.qc:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(38,37,46,.10);border-color:var(--accent2)}
   a.qc .qe{font-size:18px} a.qc .qd{color:var(--dim);font-weight:400;font-size:13px}
@@ -178,7 +178,7 @@
   #alldemos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
   @media (max-width: 920px){ .wkbody{grid-template-columns:1fr} .wd{display:none} nav.quick{justify-content:flex-start;max-width:none} }
   @media (max-width: 640px){
-    .picview{width:84px;height:84px} h1{font-size:32px} .course-sub{font-size:15px}
+    img.logo{height:80px} h1{font-size:32px} .course-sub{font-size:15px}
     nav.quick{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;width:100%}
     a.qc{flex-direction:column;gap:0;padding:6px 2px;text-align:center;font-size:11px} a.qc .qd{display:none}
     .row2{grid-template-columns:minmax(0,1fr) 96px;gap:8px} .comicview{width:96px;height:auto;min-height:96px}
@@ -190,7 +190,7 @@
 <main class="page">
   <header class="hdr">
     <div class="brand">
-      <div data-viewer="pics" data-gallery="gallery/index.html" data-rotate="12000" class="picview"></div>
+      <img class="logo" src="media/logo.png" alt="CSS 343 logo: a monkey with a banana beside a tree of nodes growing out of a row of buckets" width="704" height="384">
       <div>
         <h1>CSS 343 <span>&lt;/&gt;</span></h1>
         <div class="course-sub">Data Structures, Algorithms &amp; Discrete Mathematics II</div>
@@ -218,7 +218,7 @@
     Announcements, submissions and grades are on Canvas.
     Each deck: <code>f</code> fullscreen · <code>o</code> overview · <code>g</code> slide grid.
     <br><br>
-    Pictures made for this course; comics by Randall Munroe, <a href="https://xkcd.com">xkcd.com</a>, CC BY-NC 2.5
+    Comics by Randall Munroe, <a href="https://xkcd.com">xkcd.com</a>, CC BY-NC 2.5
     (<a href="gallery/index.html">gallery</a>).
     Content licensed <a href="LICENSE">CC BY-NC-SA 4.0</a> · code licensed <a href="LICENSE-CODE">MIT</a>.
   </footer>
