@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!-- CSS 343 AU26 syllabus. Source of the grading scheme: quarters/AU26/planning/assessment-plan.md; of the calendar: schedule.md. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 343 · Syllabus · Autumn 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{ --paper:#fbf7ee; --ink:#26252e; --dim:#6a6975; --line:#e3ded4;
+    --lemon:#fbe9a6; --lemon-d:#9a6f00; --mint:#cbebd9; --mint-d:#217a4e; --peach:#fbd9c4; --peach-d:#b8521c;
+    --sky:#cfe2f8; --sky-d:#2a62a8; --lilac:#e2d7fb; --lilac-d:#6446b9; --rose:#f9d3e2; --rose-d:#b33366;
+    --aqua:#cbeeea; --aqua-d:#1e7d76; --accent:#d9527a; --accent2:#2a8c80; }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--ink);font:16px/1.55 "Source Sans 3","Segoe UI",sans-serif;padding:28px clamp(14px,4vw,56px) 64px;
+       background:radial-gradient(900px 520px at 8% -6%, #f9d3e2 0%, transparent 60%),
+                  radial-gradient(760px 480px at 96% 4%, #cfe2f8 0%, transparent 62%),
+                  radial-gradient(900px 700px at 50% 108%, #cbebd9 0%, transparent 60%), var(--paper);background-attachment:fixed}
+  .page{max-width:980px;margin:0 auto}
+  .crumb{font-size:14px;margin-bottom:8px} .crumb a{color:var(--accent2);text-decoration:none} .crumb a:hover{text-decoration:underline}
+  h1{font:700 clamp(30px,4.5vw,44px)/1.1 "Outfit",sans-serif;margin:0;background:linear-gradient(95deg,var(--accent),var(--lilac-d) 55%,var(--accent2));
+     -webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+  .sub{color:var(--dim);font-size:15px;margin:6px 0 20px}
+  section{background:#ffffffe6;border:1px solid var(--line);border-left:6px solid var(--sec,var(--sky-d));border-radius:12px;padding:14px 20px;margin:14px 0;
+          box-shadow:0 1px 3px rgba(38,37,46,.06)}
+  section:nth-of-type(6n+1){--sec:#e0b94a} section:nth-of-type(6n+2){--sec:#62b58a} section:nth-of-type(6n+3){--sec:#6f9fd8}
+  section:nth-of-type(6n+4){--sec:#e39068} section:nth-of-type(6n+5){--sec:#9a83dc} section:nth-of-type(6n+6){--sec:#e07ea5}
+  h2{font:600 20px "Outfit",sans-serif;margin:2px 0 8px}
+  h3{font:600 16px "Outfit",sans-serif;margin:14px 0 4px}
+  p{margin:8px 0} ul{margin:6px 0;padding-left:22px} li{margin:4px 0}
+  a{color:var(--sky-d)}
+  table{border-collapse:collapse;width:100%;margin:8px 0;font-size:14.5px}
+  th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+  th{font:600 13px "Outfit",sans-serif;text-transform:uppercase;letter-spacing:.8px;color:#4f4e63;background:#faf6ee}
+  td.n{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;font:600 12px "Outfit",sans-serif;border-radius:8px;padding:1px 8px;margin:1px 2px 1px 0;border:1px solid var(--line);background:#fff;white-space:nowrap}
+  .pill.q{background:var(--sky);color:var(--sky-d)} .pill.x{background:var(--rose);color:var(--rose-d);border-color:#e0a9bd}
+  .pill.hw{background:var(--lemon);color:var(--lemon-d);border-color:#e6d8a8} .pill.pa{background:var(--peach);color:var(--peach-d)}
+  .pill.off{background:#f1efe9;color:var(--dim)}
+  .note{font-size:14px;color:var(--dim)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px}
+  dl.facts{display:grid;grid-template-columns:max-content 1fr;gap:6px 18px;margin:6px 0}
+  dl.facts dt{font-weight:700} dl.facts dd{margin:0}
+  tr.wk td{background:linear-gradient(90deg,color-mix(in srgb,var(--h) 70%,#fff),#fff 70%);font:600 14px "Outfit",sans-serif;color:#3a3946}
+  footer{margin-top:28px;color:var(--dim);font-size:13px}
+  @media (max-width:700px){ .grid2{grid-template-columns:1fr} dl.facts{grid-template-columns:1fr} dl.facts dt{margin-top:6px} th.hide,td.hide{display:none} }
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="crumb"><a href="../index.html">← course hub</a></div>
+  <h1>Syllabus</h1>
+  <div class="sub">Data Structures, Algorithms &amp; Discrete Mathematics II · Autumn 2026</div>
+
+  <section>
+    <h2>The course</h2>
+    <p>The internal workings of algorithms and data structures, from mathematical principles to
+    implementation in C++. It opens with a review of C++, recursion and counting, then analysis of
+    algorithms: how to measure a program's time and memory and reason about them formally. That lens is
+    applied to search trees and balanced trees, heaps and priority queues, hash tables, graphs and tries;
+    to the design paradigms greedy, divide and conquer, and dynamic programming; and to the discrete
+    mathematics underneath them (induction, counting, recurrences, graph theory). It closes with string
+    matching, regular expressions and finite automata.</p>
+    <p>A 5-credit course is about 15 hours of work a week in all: plan on about 11 outside class.</p>
+  </section>
+
+  <section>
+    <h2>Class information</h2>
+    <dl class="facts">
+      <dt>Meetings</dt><dd>Monday and Wednesday, 1:15–3:15 PM · Section A · SLN 13481 · 5 credits</dd>
+      <dt>Term</dt><dd>Wed Sep 30 to Wed Dec 9, 2026 (20 meetings; no class Wed Nov 11, Veterans Day)</dd>
+      <dt>Final exam</dt><dd>Mon Dec 14, 2026, 1:15–3:15 PM, in the regular room</dd>
+      <dt>Instructor</dt><dd>Dr. Marcel Gavriliu · <a href="mailto:mgav@uw.edu">mgav@uw.edu</a> (put [CSS 343] in the subject line)</dd>
+      <dt>Room and office hours</dt><dd>on Canvas</dd>
+      <dt>Canvas</dt><dd>announcements, submissions, grades</dd>
+      <dt>Prerequisite</dt><dd>CSS 342 with a grade of 2.0 or better</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Course text</h2>
+    <p>The course has its own online <a href="../textbook/index.html">textbook</a>, one chapter per
+    topic, with worked examples, exercises with solutions, and links to the interactive demos. Nothing
+    has to be bought. Free references for a second explanation:</p>
+    <ul>
+      <li>Sedgewick and Wayne, <i>Algorithms</i>, 4th ed.: the <a href="https://algs4.cs.princeton.edu/">free booksite</a> (code in Java).</li>
+      <li>Pat Morin, <a href="https://opendatastructures.org/"><i>Open Data Structures</i></a>, with a C++ edition.</li>
+      <li>Jeff Erickson, <a href="https://jeffe.cs.illinois.edu/teaching/algorithms/"><i>Algorithms</i></a>: recursion, dynamic programming, greedy correctness, lower bounds.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Grading</h2>
+    <div class="grid2">
+      <table>
+        <tr><th>Component</th><th class=n>Weight</th><th>Policy</th></tr>
+        <tr><td>Exams: midterm and final</td><td class=n>50%</td><td>on paper</td></tr>
+        <tr><td>Weekly quizzes (8)</td><td class=n>21%</td><td>lowest 2 dropped</td></tr>
+        <tr><td>Programming assignments (3)</td><td class=n>21%</td><td>7% each</td></tr>
+        <tr><td>Homework (10)</td><td class=n>8%</td><td>lowest 2 dropped</td></tr>
+      </table>
+      <div>
+        <p>Grades are not curved. Percentages map to grade points on the standard UW decimal scale
+        (the minimum score for each grade point, right); a final score below 60% is a 0.0.</p>
+      </div>
+    </div>
+    <details><summary>Grade scale</summary>
+      <table><tr><th class=n>score</th><th class=n>GP</th><th class=n>score</th><th class=n>GP</th></tr><tr><td class=n>≥ 97.0</td><td class=n>4.0</td><td class=n>≥ 77.9</td><td class=n>2.3</td></tr><tr><td class=n>≥ 95.9</td><td class=n>3.9</td><td class=n>≥ 76.8</td><td class=n>2.2</td></tr><tr><td class=n>≥ 94.8</td><td class=n>3.8</td><td class=n>≥ 75.7</td><td class=n>2.1</td></tr><tr><td class=n>≥ 93.6</td><td class=n>3.7</td><td class=n>≥ 74.6</td><td class=n>2.0</td></tr><tr><td class=n>≥ 92.5</td><td class=n>3.6</td><td class=n>≥ 73.5</td><td class=n>1.9</td></tr><tr><td class=n>≥ 91.4</td><td class=n>3.5</td><td class=n>≥ 72.3</td><td class=n>1.8</td></tr><tr><td class=n>≥ 90.3</td><td class=n>3.4</td><td class=n>≥ 71.2</td><td class=n>1.7</td></tr><tr><td class=n>≥ 89.2</td><td class=n>3.3</td><td class=n>≥ 70.1</td><td class=n>1.6</td></tr><tr><td class=n>≥ 88.0</td><td class=n>3.2</td><td class=n>≥ 69.0</td><td class=n>1.5</td></tr><tr><td class=n>≥ 86.9</td><td class=n>3.1</td><td class=n>≥ 67.8</td><td class=n>1.4</td></tr><tr><td class=n>≥ 85.8</td><td class=n>3.0</td><td class=n>≥ 66.7</td><td class=n>1.3</td></tr><tr><td class=n>≥ 84.7</td><td class=n>2.9</td><td class=n>≥ 65.6</td><td class=n>1.2</td></tr><tr><td class=n>≥ 83.5</td><td class=n>2.8</td><td class=n>≥ 64.5</td><td class=n>1.1</td></tr><tr><td class=n>≥ 82.4</td><td class=n>2.7</td><td class=n>≥ 63.4</td><td class=n>1.0</td></tr><tr><td class=n>≥ 81.3</td><td class=n>2.6</td><td class=n>≥ 62.2</td><td class=n>0.9</td></tr><tr><td class=n>≥ 80.2</td><td class=n>2.5</td><td class=n>≥ 61.1</td><td class=n>0.8</td></tr><tr><td class=n>≥ 79.1</td><td class=n>2.4</td><td class=n>≥ 60.0</td><td class=n>0.7</td></tr></table>
+    </details>
+  </section>
+
+  <section>
+    <h2>How the course runs</h2>
+    <h3>Lectures</h3>
+    <p>Two 2-hour lectures a week, interactive: predict, run, explain. The slides, the course text and
+    the demos are on the <a href="../index.html">course hub</a>. There are no recordings.</p>
+    <h3>Weekly quizzes</h3>
+    <p>20 minutes on paper, multiple choice, on Mondays, on the previous week's lectures and homework.
+    Eight quizzes; the lowest two are dropped. There are no make-up quizzes: the two dropped scores cover
+    absences.</p>
+    <h3>Homework</h3>
+    <p>One homework a week in C++: a starter file with the parts to write and a test program that runs
+    itself, practice for the quiz that follows. Due Sunday at 11:59 PM; graded by an autograder, 10 points
+    each; the lowest two of ten are dropped.</p>
+    <h3>Programming assignments</h3>
+    <p>Three larger builds, one per block of the course: search trees, graphs, and dynamic programming.
+    Individual work. Graded on the CSS Linux lab with <code>g++ -std=c++17</code>: code that does not
+    compile there receives no points, and from the first assignment on, memory leaks cost points (see the
+    <a href="../guides/guide-valgrind.html">Valgrind guide</a>). The paper quiz after each due date asks about
+    your assignment.</p>
+    <h3>Exams</h3>
+    <p>Multiple choice, on paper. Midterm Mon Nov 9, in class, on everything through shortest paths;
+    comprehensive final Mon Dec 14, 1:15–3:15 PM. No make-up exams, earlier or later.</p>
+  </section>
+
+  <section>
+    <h2>Policies</h2>
+    <h3>Late work and late tokens</h3>
+    <p>Everyone has <b>2 late tokens</b> for the term. A token extends one homework or programming
+    assignment deadline by 48 hours; it does not apply to quizzes or exams. Without a token, late work is not
+    accepted, and nothing is accepted after the last day of instruction, Fri Dec 11. Submit on Canvas, not
+    by email.</p>
+    <h3>Academic integrity</h3>
+    <p>Programming assignments and homework are individual work; copied code is misconduct. If
+    misconduct is suspected: (1) the instructor contacts you to discuss it; (2) refusing to engage is
+    reported to the school with documentation; (3) if you are responsible and say so before a referral, you
+    receive zero on the work and are not reported; (4) if you are responsible and do not, the case goes to
+    the school, which can mean failing the course with a recorded violation.</p>
+    <h3>Generative AI</h3>
+    <p>AI tools may be used for learning, and for limited help on assignments if you disclose it: cite
+    the tool, summarize your prompts, and note any AI-assisted code in a comment. Using AI for a whole
+    assignment is misconduct, and AI is not allowed during quizzes or exams. If you used none, say so:
+    <i>“I did not use any AI tools for this assignment.”</i></p>
+    <h3>Attendance</h3>
+    <p>There are no recordings and no make-up lectures. You are responsible for all material covered in
+    class.</p>
+    <h3>Disability accommodations</h3>
+    <p>Contact <a href="https://depts.washington.edu/uwdrs/">Disability Resources for Students</a> early,
+    within the first two weeks, and have your DRS counselor contact the instructor. Exam accommodations
+    must be requested through DRS at least 10 business days before each exam.</p>
+    <h3>Grade questions</h3>
+    <p>Bring any grading concern to the instructor within one week of the work being returned; after that,
+    grades are final.</p>
+  </section>
+
+  <section>
+    <h2>Remark</h2>
+    <p>This syllabus is a plan; changes may be needed during the term and will be announced on Canvas.
+    See the <a href="https://www.washington.edu/students/reg/calendar.html">UW academic calendar</a> for
+    registration and withdrawal deadlines.</p>
+  </section>
+
+  <footer>CSS 343 · Autumn 2026 · Dr. Marcel Gavriliu. Content licensed <a href="../LICENSE">CC BY-NC-SA 4.0</a>.</footer>
+</main>
+</body>
+</html>
