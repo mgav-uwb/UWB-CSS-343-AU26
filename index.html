@@ -3,13 +3,14 @@
   CSS 343, Autumn 2026: course hub. Every page uses relative paths, so any
   static server rooted at this folder serves the whole course.
 
-  LAYOUT: one row per session. The session card on the left (icon, date,
-  title, topics, a comic when one fits), its reading and homework in the
-  middle, its interactive demos on the right.
-  TO POST A SESSION: add  dir:"sessions/Sxx-topic"  to its entry in SESSIONS
-  (the folder under sessions/ that holds its index.html). Without dir the row
-  is rendered unlinked. Exams: { exam:true }.
-  TO POST A HOMEWORK: add  hw:{ href, title, desc }  to the session's entry.
+  LAYOUT: one row per WEEK. The week card on the left holds its two meetings
+  (Monday and Wednesday) as a pair of chips, the homework going out, the quiz,
+  the PA milestones and a comic when one fits; the week's reading in the
+  middle; its interactive demos on the right.
+  TO POST A LECTURE: add  dir:"sessions/Sxx-topic"  to that meeting's entry
+  in WEEKS (the folder under sessions/ that holds its index.html). Without dir
+  the chip is rendered unlinked. An exam meeting carries exam:true.
+  TO POST A HOMEWORK: add  href  (and due) to the week's hw entry.
   handouts/demos are keys into the HANDOUTS/DEMOS maps below. icon is an emoji,
   hue one of lemon · mint · peach · sky · lilac · rose · aqua · exam, and
   comic { num, title, alt, src } an xkcd comic stored in media/xkcd/ (see its
@@ -88,6 +89,8 @@
          border-radius:20px;padding:14px 16px 14px 14px;position:relative;overflow:hidden;
          box-shadow:0 3px 0 var(--line);transition:transform .15s,box-shadow .15s}
   .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;background:var(--hue)}
+  .card.week{padding-bottom:16px}
+  .card.week{padding-bottom:16px}
   a.card:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--line)}
   .lec{display:flex;gap:14px;align-items:flex-start;padding-left:6px}
   .badge{flex:0 0 auto;width:58px;height:58px;border-radius:18px;background:var(--hue);display:grid;place-items:center;
@@ -103,6 +106,44 @@
   .card.soon{border-style:dashed;background:#fffdf7}
   .card.soon .ctitle{color:#4a4956}
   .card.exam{background:repeating-linear-gradient(-45deg,#fff,#fff 10px,#f6f4fb 10px,#f6f4fb 20px)}
+
+  /* the two meetings of a week, side by side */
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0 6px}
+  .lecchip{display:block;text-decoration:none;color:inherit;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:8px 11px;min-width:0}
+  a.lecchip:hover{border-color:var(--hue-d);background:#fff}
+  .lecchip.off{border-style:dashed;color:var(--dim)}
+  .lecchip .day{font:600 12px "Fredoka",sans-serif;color:var(--hue-d);letter-spacing:.3px}
+  .lecchip.off .day{color:var(--dim)}
+  .lecchip .lt{display:block;font:600 14px/1.25 "Fredoka",sans-serif;margin-top:1px}
+  .lecchip .lx{display:block;color:var(--dim);font-size:11.5px;line-height:1.4;margin-top:2px}
+  .lecchip .open{display:inline-block;margin-top:5px;font:600 12px "Fredoka",sans-serif;color:var(--hue-d)}
+  .marks{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 0 6px}
+  .marks:empty{display:none}
+  .qm{font:600 12px "Fredoka",sans-serif;border:2px solid var(--line);border-radius:999px;padding:3px 10px;background:#fff}
+  .qm.exam{border-color:#e0a9bd;color:var(--rose-d);background:var(--rose)}
+  .marks .pa{margin:0}
+  .marks .hwc{font:600 12px "Fredoka",sans-serif;border-radius:999px;padding:3px 10px;background:var(--lemon);color:#7a4b00;text-decoration:none;border:2px solid #f0dc8a}
+  .marks .hwc.off{background:#fff;color:var(--dim);border-style:dashed}
+  @media (max-width: 560px){ .pair{grid-template-columns:1fr} }
+
+  /* the two meetings of a week, side by side */
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0 6px}
+  .lecchip{display:block;text-decoration:none;color:inherit;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:8px 11px;min-width:0}
+  a.lecchip:hover{border-color:var(--hue-d);background:#fff}
+  .lecchip.off{border-style:dashed;color:var(--dim)}
+  .lecchip .day{font:600 12px "Fredoka",sans-serif;color:var(--hue-d);letter-spacing:.3px}
+  .lecchip.off .day{color:var(--dim)}
+  .lecchip .lt{display:block;font:600 14px/1.25 "Fredoka",sans-serif;margin-top:1px}
+  .lecchip .lx{display:block;color:var(--dim);font-size:11.5px;line-height:1.4;margin-top:2px}
+  .lecchip .open{display:inline-block;margin-top:5px;font:600 12px "Fredoka",sans-serif;color:var(--hue-d)}
+  .marks{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 0 6px}
+  .marks:empty{display:none}
+  .qm{font:600 12px "Fredoka",sans-serif;border:2px solid var(--line);border-radius:999px;padding:3px 10px;background:#fff}
+  .qm.exam{border-color:#e0a9bd;color:var(--rose-d);background:var(--rose)}
+  .marks .pa{margin:0}
+  .marks .hwc{font:600 12px "Fredoka",sans-serif;border-radius:999px;padding:3px 10px;background:var(--lemon);color:#7a4b00;text-decoration:none;border:2px solid #f0dc8a}
+  .marks .hwc.off{background:#fff;color:var(--dim);border-style:dashed}
+  @media (max-width: 560px){ .pair{grid-template-columns:1fr} }
 
   /* a comic tucked into the session card */
   button.comic{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:6px 10px 6px 6px;cursor:pointer;
@@ -192,7 +233,7 @@
 </main>
 
 <script>
-// ───────── reading: textbook chapters, guides, references (keyed; attach per session) ─────────
+// ───────── reading: textbook chapters, guides, references (keyed; attach per week) ─────────
 const HANDOUTS = {
   "recursion":                { href:"textbook/foundations/foundation-recursion.html", title:"Recursion &amp; Induction",
                               desc:"course text · foundation" },
@@ -338,90 +379,137 @@ const DEMOS = {
   "nfa2dfa":                { title:"NFA → DFA", desc:"subset construction, then the race" },
 };
 
-// ───────── one row per session: card + its reading + its demos ─────────
-const SESSIONS = [
-  { id:"L01", icon:"🔁", hue:"lemon", comic:{ num:1270, title:"Functional", alt:"Functional programming combines the flexibility and power of abstract mathematics with the intuitive clarity of abstract mathematics.", src:"media/xkcd/1270.png" }, icon:"🔁", hue:"lemon", comic:{ num:1270, title:"Functional", alt:"Functional programming combines the flexibility and power of abstract mathematics with the intuitive clarity of abstract mathematics.", src:"media/xkcd/1270.png" }, date:"Wed Sep 30", dir:"sessions/S01-review",
-    title:"Review: C++, Recursion, Counting",
-    topics:"passing arguments · owning memory and the Rule of Three · recursion on lists, trees and arrays · counting loops · recurrences and unrolling · k-sum",
-    handouts:["recursion", "env", "valgrind"], demos:["factorial", "three-sum", "k-sum"], hw:{ href:"sessions/S01-review/hw01/HW01.html", title:"Homework 1", desc:"due Sun Oct 4, 11:59 PM" } },
-  { id:"L02", icon:"⏱️", hue:"lemon", comic:{ num:1691, title:"Optimization", alt:"Premature optimization is the root of all evil, so to start this project I'd better come up with a system that can determine whether a possible optimization is premature or not.", src:"media/xkcd/1691.png" }, icon:"⏱️", hue:"lemon", comic:{ num:1691, title:"Optimization", alt:"Premature optimization is the root of all evil, so to start this project I'd better come up with a system that can determine whether a possible optimization is premature or not.", src:"media/xkcd/1691.png" }, date:"Mon Oct 5",
-    title:"Analysis of Algorithms: Time",
-    topics:"counting a basic operation · order of growth · the doubling experiment · faster 3-sum",
-    handouts:["time-analysis", "bigO"] },
-  { id:"L03", icon:"🧮", hue:"lemon", comic:{ num:1445, title:"Efficiency", alt:"I need an extension for my research project because I spent all month trying to figure out whether learning Dvorak would help me type it faster.", src:"media/xkcd/1445.png" }, icon:"🧮", hue:"lemon", comic:{ num:1445, title:"Efficiency", alt:"I need an extension for my research project because I spent all month trying to figure out whether learning Dvorak would help me type it faster.", src:"media/xkcd/1445.png" }, date:"Wed Oct 7",
-    title:"Space Complexity and Asymptotic Notation",
-    topics:"counting bytes · stack and heap · space as a function of n · O, Θ and Ω made precise",
-    handouts:["space-complexity", "asymptotic-notation", "bigO"] },
-  { id:"L04", icon:"🌳", hue:"mint", icon:"🌳", hue:"mint", date:"Mon Oct 12",
-    title:"Trees and Binary Search Trees",
-    topics:"trees and traversals · the BST as an ordered symbol table · Hibbard deletion · cost is Θ(height)",
-    handouts:["trees-bst"], demos:["bst"], pa:"PA1 out" },
-  { id:"L05", icon:"⚖️", hue:"mint", icon:"⚖️", hue:"mint", date:"Wed Oct 14",
-    title:"Balanced Trees I: AVL",
-    topics:"the balance invariant · single and double rotations · insertion with rebalancing · the height bound",
-    handouts:["avl-trees"], demos:["avl", "bst-vs-avl"] },
-  { id:"L06", icon:"📚", hue:"mint", icon:"📚", hue:"mint", date:"Mon Oct 19",
-    title:"Balanced Trees II: 2-3, Red-Black, B and B+ Trees",
-    topics:"split and promote · red-black trees as 2-3 trees · B-trees and B+ trees on disk",
-    handouts:["two-three-trees", "red-black-trees", "b-trees"], demos:["two-three", "btree", "redblack"] },
-  { id:"L07", icon:"⛰️", hue:"peach", comic:{ num:835, title:"Tree", alt:"Not only is that terrible in general, but you just KNOW Billy's going to open the root present first, and then everyone will have to wait while the heap is rebuilt.", src:"media/xkcd/835.png" }, icon:"⛰️", hue:"peach", comic:{ num:835, title:"Tree", alt:"Not only is that terrible in general, but you just KNOW Billy's going to open the root present first, and then everyone will have to wait while the heap is rebuilt.", src:"media/xkcd/835.png" }, date:"Wed Oct 21",
-    title:"Heaps and Priority Queues; Heapsort",
-    topics:"the priority-queue ADT · swim and sink · build-heap in Θ(n) · heapsort",
-    handouts:["heaps-pq", "heapsort"], demos:["heap", "min-heap"] },
-  { id:"L08", icon:"#️⃣", hue:"peach", icon:"#️⃣", hue:"peach", date:"Mon Oct 26",
-    title:"Hashing",
-    topics:"hash functions · separate chaining · open addressing · load factor and resizing",
-    handouts:["hashing"], demos:["hash-lp", "hash-quad", "hash-double", "hash-chain", "hash-chain-resize", "hash-delete-race", "probe-race", "probe-delete-pitfalls"] },
-  { id:"L09", icon:"🕸️", hue:"sky", comic:{ num:1195, title:"Flowchart", alt:"The way out is to use the marker you have to add a box that says 'get a marker' to the line between you and 'start', then add a 'no' line from the trap box to 'end'.", src:"media/xkcd/1195.png" }, icon:"🕸️", hue:"sky", comic:{ num:1195, title:"Flowchart", alt:"The way out is to use the marker you have to add a box that says 'get a marker' to the line between you and 'start', then add a 'no' line from the trap box to 'end'.", src:"media/xkcd/1195.png" }, date:"Wed Oct 28",
-    title:"Graphs I: Representations, BFS and DFS",
-    topics:"graph vocabulary · adjacency list and matrix · breadth-first search · depth-first search",
-    handouts:["graph-representations", "bfs", "dfs"], demos:["graph", "search-race"], pa:"PA1 due · PA2 out" },
-  { id:"L10", icon:"🧭", hue:"sky", icon:"🧭", hue:"sky", date:"Mon Nov 2",
-    title:"Graphs II: DFS Applications, Topological Sort",
-    topics:"DFS numbering and edge types · cycle detection · topological sort",
-    handouts:["dfs", "topological-sort"], demos:["graph"] },
-  { id:"L11", icon:"🛣️", hue:"sky", comic:{ num:399, title:"Travelling Salesman Problem", alt:"What's the complexity class of the best linear programming cutting-plane techniques?  I couldn't find it anywhere.  Man, the Garfield guy doesn't have these problems ...", src:"media/xkcd/399.png" }, icon:"🛣️", hue:"sky", comic:{ num:399, title:"Travelling Salesman Problem", alt:"What's the complexity class of the best linear programming cutting-plane techniques?  I couldn't find it anywhere.  Man, the Garfield guy doesn't have these problems ...", src:"media/xkcd/399.png" }, date:"Wed Nov 4",
-    title:"Graphs III: Dijkstra Shortest Paths",
-    topics:"weighted digraphs · edge relaxation · Dijkstra with a priority queue · the greedy method, first contact",
-    handouts:["dijkstra", "greedy-method"], demos:["dijkstra"] },
-  { id:"MT", icon:"🎓", hue:"exam", icon:"🎓", hue:"exam", date:"Mon Nov 9", exam:true,
-    title:"Review and Midterm Exam",
-    topics:"in class, on paper · covers sessions 1 to 11", },
-  { id:"L13", icon:"🌉", hue:"sky", icon:"🌉", hue:"sky", date:"Mon Nov 16",
-    title:"Graphs IV: Union-Find and Minimum Spanning Trees",
-    topics:"union-find · the cut property · Kruskal · Prim",
-    handouts:["union-find", "minimum-spanning-trees", "kruskal", "prim"], demos:["union-find", "kruskal", "prim"], pa:"PA2 due" },
-  { id:"L14", icon:"🎁", hue:"lilac", icon:"🎁", hue:"lilac", date:"Wed Nov 18",
-    title:"Greedy Algorithms; Huffman Coding",
-    topics:"the exchange argument · when greedy is optimal · Huffman coding · prefix-free codes",
-    handouts:["greedy-method", "huffman-coding"], demos:["huffman", "huffman-codec", "adaptive-huffman"], pa:"PA3 out" },
-  { id:"L15", icon:"🔀", hue:"lilac", comic:{ num:1185, title:"Ineffective Sorts", alt:"StackSort connects to StackOverflow, searches for 'sort a list', and downloads and runs code snippets until the list is sorted.", src:"media/xkcd/1185.png" }, icon:"🔀", hue:"lilac", comic:{ num:1185, title:"Ineffective Sorts", alt:"StackSort connects to StackOverflow, searches for 'sort a list', and downloads and runs code snippets until the list is sorted.", src:"media/xkcd/1185.png" }, date:"Mon Nov 23",
-    title:"Sorting and Divide-and-Conquer",
-    topics:"the master theorem · mergesort · quicksort · the Ω(n log n) lower bound · quickselect",
-    handouts:["divide-and-conquer", "mergesort", "quicksort", "quickselect", "sorting-lower-bound"], demos:["recurrence", "mergesort", "quicksort", "quickselect", "sort-race", "lomuto-vs-hoare"] },
-  { id:"L16", icon:"🧩", hue:"rose", icon:"🧩", hue:"rose", date:"Wed Nov 25",
-    title:"Dynamic Programming I",
-    topics:"overlapping subproblems · memoization and tabulation · rod cutting · longest common subsequence",
-    handouts:["dp-method", "rod-cutting", "longest-common-subsequence"], demos:["fib", "fib-race", "rodcut-tree", "rodcut", "rodcut-race", "lcs-tree", "lcs"] },
-  { id:"L17", icon:"🎒", hue:"rose", icon:"🎒", hue:"rose", date:"Mon Nov 30",
-    title:"Dynamic Programming II",
-    topics:"0/1 knapsack · pseudo-polynomial time · edit distance",
-    handouts:["knapsack", "edit-distance"], demos:["knapsack", "edit-distance"], pa:"PA3 design due" },
-  { id:"L18", icon:"🗺️", hue:"rose", comic:{ num:974, title:"The General Problem", alt:"I find that when someone's taking time to do something right in the present, they're a perfectionist with no ability to prioritize, whereas when someone took time to do something right in the past, they're a master artisan of great foresight.", src:"media/xkcd/974.png" }, icon:"🗺️", hue:"rose", comic:{ num:974, title:"The General Problem", alt:"I find that when someone's taking time to do something right in the present, they're a perfectionist with no ability to prioritize, whereas when someone took time to do something right in the past, they're a master artisan of great foresight.", src:"media/xkcd/974.png" }, date:"Wed Dec 2",
-    title:"Dynamic Programming III",
-    topics:"grid and interval patterns · traceback · space-saving",
-    handouts:["dp-patterns", "traceback-space-saving"], demos:["grid-dp"] },
-  { id:"L19", icon:"🧵", hue:"aqua", comic:{ num:1171, title:"Perl Problems", alt:"To generate #1 albums, 'jay --help' recommends the -z flag.", src:"media/xkcd/1171.png" }, icon:"🧵", hue:"aqua", comic:{ num:1171, title:"Perl Problems", alt:"To generate #1 albums, 'jay --help' recommends the -z flag.", src:"media/xkcd/1171.png" }, date:"Mon Dec 7",
-    title:"Strings: Tries and Substring Search",
-    topics:"R-way tries and ternary search tries · prefix operations · KMP · Boyer-Moore",
-    handouts:["tries", "substring-search", "kmp", "boyer-moore"], demos:["trie", "tst", "kmp-fail", "string-search"] },
-  { id:"L20", icon:"🔤", hue:"aqua", comic:{ num:208, title:"Regular Expressions", alt:"Wait, forgot to escape a space.  Wheeeeee[taptaptap]eeeeee.", src:"media/xkcd/208.png" }, icon:"🔤", hue:"aqua", comic:{ num:208, title:"Regular Expressions", alt:"Wait, forgot to escape a space.  Wheeeeee[taptaptap]eeeeee.", src:"media/xkcd/208.png" }, date:"Wed Dec 9",
-    title:"Regular Expressions and Finite Automata",
-    topics:"regular expressions · NFAs · Thompson's construction · NFA simulation",
-    handouts:["regex-automata"], demos:["dfa", "nfa-build", "nfa-sim", "nfa2dfa"], pa:"PA3 due" },
-  { id:"FE", icon:"🎓", hue:"exam", icon:"🎓", hue:"exam", date:"Mon Dec 14", exam:true,
-    title:"Final Exam",
-    topics:"1:15 to 3:15 PM, on paper · comprehensive", },
+// ───────── one row per week: its two meetings, homework, quiz, milestones, reading, demos ─────────
+const WEEKS = [
+  { id:"W1",
+    title:"Review: C++, recursion, counting",
+    icon:"🔁",
+    hue:"lemon",
+    mon:null,
+    wed:{ id:"L01", date:"Wed Sep 30", title:"Review: C++, Recursion, Counting", topics:"passing arguments · owning memory and the Rule of Three · recursion on lists, trees and arrays · counting loops · recurrences and unrolling · k-sum", dir:"sessions/S01-review" },
+    hw:{"n": 1, "href": "sessions/S01-review/hw01/HW01.html", "due": "due Sun Oct 4, 11:59 PM"},
+    handouts:["recursion", "env", "valgrind"],
+    demos:["factorial", "three-sum", "k-sum"],
+    comic:{ num:1270, title:"Functional", alt:"Functional programming combines the flexibility and power of abstract mathematics with the intuitive clarity of abstract mathematics.", src:"media/xkcd/1270.png" } },
+  { id:"W2",
+    title:"Analysis of algorithms",
+    icon:"⏱️",
+    hue:"lemon",
+    mon:{ id:"L02", date:"Mon Oct 5", title:"Analysis of Algorithms: Time", topics:"counting a basic operation · order of growth · the doubling experiment · faster 3-sum" },
+    wed:{ id:"L03", date:"Wed Oct 7", title:"Space Complexity and Asymptotic Notation", topics:"counting bytes · stack and heap · space as a function of n · O, Θ and Ω made precise" },
+    hw:{"n": 2},
+    quiz:"Q1 Mon",
+    handouts:["time-analysis", "bigO", "space-complexity", "asymptotic-notation"],
+    demos:[],
+    comic:{ num:1691, title:"Optimization", alt:"Premature optimization is the root of all evil, so to start this project I'd better come up with a system that can determine whether a possible optimization is premature or not.", src:"media/xkcd/1691.png" } },
+  { id:"W3",
+    title:"Search trees",
+    icon:"🌳",
+    hue:"mint",
+    mon:{ id:"L04", date:"Mon Oct 12", title:"Trees and Binary Search Trees", topics:"trees and traversals · the BST as an ordered symbol table · Hibbard deletion · cost is Θ(height)" },
+    wed:{ id:"L05", date:"Wed Oct 14", title:"Balanced Trees I: AVL", topics:"the balance invariant · single and double rotations · insertion with rebalancing · the height bound" },
+    hw:{"n": 3},
+    quiz:"Q2 Mon",
+    pa:"PA1 out",
+    handouts:["trees-bst", "avl-trees"],
+    demos:["bst", "avl", "bst-vs-avl"] },
+  { id:"W4",
+    title:"Balanced trees; heaps",
+    icon:"⛰️",
+    hue:"mint",
+    mon:{ id:"L06", date:"Mon Oct 19", title:"Balanced Trees II: 2-3, Red-Black, B and B+ Trees", topics:"split and promote · red-black trees as 2-3 trees · B-trees and B+ trees on disk" },
+    wed:{ id:"L07", date:"Wed Oct 21", title:"Heaps and Priority Queues; Heapsort", topics:"the priority-queue ADT · swim and sink · build-heap in Θ(n) · heapsort" },
+    hw:{"n": 4},
+    quiz:"Q3 Mon",
+    handouts:["two-three-trees", "red-black-trees", "b-trees", "heaps-pq", "heapsort"],
+    demos:["two-three", "btree", "redblack", "heap", "min-heap"],
+    comic:{ num:835, title:"Tree", alt:"Not only is that terrible in general, but you just KNOW Billy's going to open the root present first, and then everyone will have to wait while the heap is rebuilt.", src:"media/xkcd/835.png" } },
+  { id:"W5",
+    title:"Hashing; graphs",
+    icon:"🕸️",
+    hue:"peach",
+    mon:{ id:"L08", date:"Mon Oct 26", title:"Hashing", topics:"hash functions · separate chaining · open addressing · load factor and resizing" },
+    wed:{ id:"L09", date:"Wed Oct 28", title:"Graphs I: Representations, BFS and DFS", topics:"graph vocabulary · adjacency list and matrix · breadth-first search · depth-first search" },
+    hw:{"n": 5},
+    quiz:"Q4 Mon",
+    pa:"PA1 due \u00b7 PA2 out",
+    handouts:["hashing", "graph-representations", "bfs", "dfs"],
+    demos:["hash-lp", "hash-quad", "hash-double", "hash-chain", "hash-chain-resize", "hash-delete-race", "probe-race", "probe-delete-pitfalls", "graph", "search-race"],
+    comic:{ num:1195, title:"Flowchart", alt:"The way out is to use the marker you have to add a box that says 'get a marker' to the line between you and 'start', then add a 'no' line from the trap box to 'end'.", src:"media/xkcd/1195.png" } },
+  { id:"W6",
+    title:"Graphs: DFS, topological sort, shortest paths",
+    icon:"🧭",
+    hue:"sky",
+    mon:{ id:"L10", date:"Mon Nov 2", title:"Graphs II: DFS Applications, Topological Sort", topics:"DFS numbering and edge types · cycle detection · topological sort" },
+    wed:{ id:"L11", date:"Wed Nov 4", title:"Graphs III: Dijkstra Shortest Paths", topics:"weighted digraphs · edge relaxation · Dijkstra with a priority queue · the greedy method, first contact" },
+    hw:{"n": 6},
+    quiz:"Q5 Mon",
+    handouts:["dfs", "topological-sort", "dijkstra", "greedy-method"],
+    demos:["graph", "dijkstra"],
+    comic:{ num:399, title:"Travelling Salesman Problem", alt:"What's the complexity class of the best linear programming cutting-plane techniques?  I couldn't find it anywhere.  Man, the Garfield guy doesn't have these problems ...", src:"media/xkcd/399.png" } },
+  { id:"W7",
+    title:"Midterm; Veterans Day",
+    icon:"📝",
+    hue:"exam",
+    mon:{ id:"MT", date:"Mon Nov 9", title:"Review and Midterm Exam", topics:"in class, on paper · covers sessions 1 to 11", exam:true },
+    wed:null,
+    quiz:"Midterm Mon",
+    handouts:[],
+    demos:[] },
+  { id:"W8",
+    title:"Spanning trees; greedy algorithms",
+    icon:"🌉",
+    hue:"sky",
+    mon:{ id:"L13", date:"Mon Nov 16", title:"Graphs IV: Union-Find and Minimum Spanning Trees", topics:"union-find · the cut property · Kruskal · Prim" },
+    wed:{ id:"L14", date:"Wed Nov 18", title:"Greedy Algorithms; Huffman Coding", topics:"the exchange argument · when greedy is optimal · Huffman coding · prefix-free codes" },
+    hw:{"n": 7},
+    pa:"PA2 due \u00b7 PA3 out",
+    handouts:["union-find", "minimum-spanning-trees", "kruskal", "prim", "greedy-method", "huffman-coding"],
+    demos:["union-find", "kruskal", "prim", "huffman", "huffman-codec", "adaptive-huffman"] },
+  { id:"W9",
+    title:"Sorting; dynamic programming",
+    icon:"🔀",
+    hue:"lilac",
+    mon:{ id:"L15", date:"Mon Nov 23", title:"Sorting and Divide-and-Conquer", topics:"the master theorem · mergesort · quicksort · the Ω(n log n) lower bound · quickselect" },
+    wed:{ id:"L16", date:"Wed Nov 25", title:"Dynamic Programming I", topics:"overlapping subproblems · memoization and tabulation · rod cutting · longest common subsequence" },
+    hw:{"n": 8},
+    quiz:"Q6 Mon",
+    handouts:["divide-and-conquer", "mergesort", "quicksort", "quickselect", "sorting-lower-bound", "dp-method", "rod-cutting", "longest-common-subsequence"],
+    demos:["recurrence", "mergesort", "quicksort", "quickselect", "sort-race", "lomuto-vs-hoare", "fib", "fib-race", "rodcut-tree", "rodcut", "rodcut-race", "lcs-tree", "lcs"],
+    comic:{ num:1185, title:"Ineffective Sorts", alt:"StackSort connects to StackOverflow, searches for 'sort a list', and downloads and runs code snippets until the list is sorted.", src:"media/xkcd/1185.png" } },
+  { id:"W10",
+    title:"Dynamic programming",
+    icon:"🧩",
+    hue:"rose",
+    mon:{ id:"L17", date:"Mon Nov 30", title:"Dynamic Programming II", topics:"0/1 knapsack · pseudo-polynomial time · edit distance" },
+    wed:{ id:"L18", date:"Wed Dec 2", title:"Dynamic Programming III", topics:"grid and interval patterns · traceback · space-saving" },
+    hw:{"n": 9},
+    quiz:"Q7 Mon",
+    pa:"PA3 design due",
+    handouts:["knapsack", "edit-distance", "dp-patterns", "traceback-space-saving"],
+    demos:["knapsack", "edit-distance", "grid-dp"],
+    comic:{ num:974, title:"The General Problem", alt:"I find that when someone's taking time to do something right in the present, they're a perfectionist with no ability to prioritize, whereas when someone took time to do something right in the past, they're a master artisan of great foresight.", src:"media/xkcd/974.png" } },
+  { id:"W11",
+    title:"Strings; regular expressions",
+    icon:"🔤",
+    hue:"aqua",
+    mon:{ id:"L19", date:"Mon Dec 7", title:"Strings: Tries and Substring Search", topics:"R-way tries and ternary search tries · prefix operations · KMP · Boyer-Moore" },
+    wed:{ id:"L20", date:"Wed Dec 9", title:"Regular Expressions and Finite Automata", topics:"regular expressions · NFAs · Thompson's construction · NFA simulation" },
+    hw:{"n": 10},
+    quiz:"Q8 Mon",
+    pa:"PA3 due",
+    handouts:["tries", "substring-search", "kmp", "boyer-moore", "regex-automata"],
+    demos:["trie", "tst", "kmp-fail", "string-search", "dfa", "nfa-build", "nfa-sim", "nfa2dfa"],
+    comic:{ num:208, title:"Regular Expressions", alt:"Wait, forgot to escape a space.  Wheeeeee[taptaptap]eeeeee.", src:"media/xkcd/208.png" } },
+  { id:"F",
+    title:"Final exam",
+    icon:"🎓",
+    hue:"exam",
+    mon:{ id:"FE", date:"Mon Dec 14", title:"Final Exam", topics:"1:15 to 3:15 PM, on paper · comprehensive", exam:true },
+    wed:null,
+    quiz:"Final Mon",
+    handouts:[],
+    demos:[] },
 ];
 
 // ───────── a quote a day; "another one" cycles ─────────
@@ -441,41 +529,50 @@ const QUOTES = [
 
 const HUES = { lemon:["--lemon","--lemon-d"], mint:["--mint","--mint-d"], peach:["--peach","--peach-d"], sky:["--sky","--sky-d"],
                lilac:["--lilac","--lilac-d"], rose:["--rose","--rose-d"], aqua:["--aqua","--aqua-d"], exam:["--exam","--exam-d"] };
-const hueStyle = s => { const [a, b] = HUES[s.hue] || HUES.exam; return `style="--hue:var(${a});--hue-d:var(${b})"`; };
-const paTag = s => s.pa ? `<span class="pa">${s.pa}</span>` : "";
-const comicTag = s => s.comic ? `
-    <button class="comic" type="button" data-comic="${s.id}" aria-label="comic: ${s.comic.title}">
-      <img src="${s.comic.src}" alt="">
-      <span><span class="t">xkcd ${s.comic.num} · ${s.comic.title}</span><span class="d">click to read</span></span>
-    </button>` : "";
+const hueStyle = w => { const [a, b] = HUES[w.hue] || HUES.exam; return `style="--hue:var(${a});--hue-d:var(${b})"`; };
 
-const inner = (s, go) => `
-    <div class="lec">
-      <span class="badge">${s.icon || ""}<small>${s.id}</small></span>
-      <div style="min-width:0">
-        <div class="when">${s.date}</div>
-        <div class="ctitle">${s.title}</div>
-        <div class="ctopics">${s.topics}</div>
-        ${go}${paTag(s)}
-      </div>
-    </div>${comicTag(s)}`;
-
-const sessionCell = s =>
-  s.exam ? `<div class="card exam" ${hueStyle(s)}>${inner(s, "")}</div>` :
-  s.dir  ? `<a class="card" ${hueStyle(s)} href="${s.dir}/index.html">${inner(s, `<span class="go">Open deck →</span>`)}</a>` :
-           `<div class="card soon" ${hueStyle(s)}>${inner(s, "")}</div>`;
-
-const handoutCell = s => {
-  const hs = (s.handouts || []).map(k => HANDOUTS[k]).filter(Boolean);
-  const hw = s.hw ? `
-    <a class="chip hw" href="${s.hw.href}"><span class="t">${s.hw.title}</span><span class="d">${s.hw.desc}</span></a>` : "";
-  if (!hs.length && !hw) return `<div class="cell"></div>`;
-  return `<div class="cell">` + hs.map(h => `
-    <a class="chip h" href="${h.href}"><span class="t">${h.title}</span><span class="d">${h.desc}</span></a>`).join("") + hw + `</div>`;
+const lecChip = (day, L) => {
+  if (!L) return `<span class="lecchip off"><span class="day">${day}</span><span class="lt">No meeting</span></span>`;
+  const head = `<span class="day">${L.date} · ${L.id}</span><span class="lt">${L.title}</span><span class="lx">${L.topics}</span>`;
+  if (L.dir) return `<a class="lecchip" href="${L.dir}/index.html">${head}<span class="open">Open deck →</span></a>`;
+  return `<span class="lecchip${L.exam ? "" : " off"}">${head}</span>`;
 };
+const marks = w => {
+  const out = [];
+  if (w.hw) out.push(w.hw.href ? `<a class="hwc" href="${w.hw.href}">✏️ Homework ${w.hw.n}${w.hw.due ? " · " + w.hw.due : ""}</a>`
+                              : `<span class="hwc off">✏️ Homework ${w.hw.n}</span>`);
+  if (w.quiz) out.push(`<span class="qm${/Midterm|Final/.test(w.quiz) ? " exam" : ""}">${/Midterm|Final/.test(w.quiz) ? "🎓 " : "📝 "}${w.quiz}</span>`);
+  if (w.pa) out.push(`<span class="pa">${w.pa}</span>`);
+  return out.length ? `<div class="marks">${out.join("")}</div>` : "";
+};
+const comicTag = w => w.comic ? `
+    <button class="comic" type="button" data-comic="${w.id}" aria-label="comic: ${w.comic.title}">
+      <img src="${w.comic.src}" alt="">
+      <span><span class="t">xkcd ${w.comic.num} · ${w.comic.title}</span><span class="d">click to read</span></span>
+    </button>` : "";
+const range = w => { const ds = [w.mon, w.wed].filter(Boolean).map(L => L.date); return ds.length === 2 ? ds[0] + " and " + ds[1].replace(/^\w+ /, "") : ds[0] || ""; };
 
-const demoCell = s => {
-  const ds = (s.demos || []).map(k => [k, DEMOS[k]]).filter(([,d]) => d);
+const weekCell = w => `
+  <div class="card week${w.hue === "exam" ? " exam" : ""}" ${hueStyle(w)}>
+    <div class="lec">
+      <span class="badge">${w.icon}<small>${w.id}</small></span>
+      <div style="min-width:0">
+        <div class="when">${range(w)}</div>
+        <div class="ctitle">${w.title}</div>
+      </div>
+    </div>
+    ${w.id === "F" ? "" : `<div class="pair">${lecChip("Mon", w.mon) + lecChip("Wed", w.wed)}</div>`}
+    ${marks(w)}${comicTag(w)}
+  </div>`;
+
+const handoutCell = w => {
+  const hs = (w.handouts || []).map(k => HANDOUTS[k]).filter(Boolean);
+  if (!hs.length) return `<div class="cell"></div>`;
+  return `<div class="cell">` + hs.map(h => `
+    <a class="chip h" href="${h.href}"><span class="t">${h.title}</span><span class="d">${h.desc}</span></a>`).join("") + `</div>`;
+};
+const demoCell = w => {
+  const ds = (w.demos || []).map(k => [k, DEMOS[k]]).filter(([,d]) => d);
   if (!ds.length) return `<div class="cell"></div>`;
   return `<div class="cell">` + ds.map(([k, d]) => `
     <a class="chip demo" href="lib/demo.html?ds=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("") + `</div>`;
@@ -483,20 +580,20 @@ const demoCell = s => {
 
 const grid = document.getElementById("sessions");
 grid.innerHTML =
-  `<div class="colhead">Sessions</div>
-   <div class="colhead">Reading &amp; homework</div>
+  `<div class="colhead">Weeks: lectures · homework · quiz</div>
+   <div class="colhead">Reading</div>
    <div class="colhead">Demos · <a href="lib/demo.html">full explorer →</a></div>` +
-  SESSIONS.map(s => sessionCell(s) + handoutCell(s) + demoCell(s)).join("");
-[...grid.children].forEach((el, i) => { el.style.animationDelay = `${Math.min(i * 35, 900)}ms`; });
+  WEEKS.map(w => weekCell(w) + handoutCell(w) + demoCell(w)).join("");
+[...grid.children].forEach((el, i) => { el.style.animationDelay = `${Math.min(i * 45, 900)}ms`; });
 
 // a comic opens in the lightbox; the lightbox links to its xkcd page
 const box = document.getElementById("comicbox"), img = document.getElementById("comicimg"), cap = document.getElementById("comiccap");
 grid.addEventListener("click", e => {
   const b = e.target.closest("button.comic"); if (!b) return;
   e.preventDefault(); e.stopPropagation();
-  const s = SESSIONS.find(x => x.id === b.dataset.comic); if (!s || !s.comic) return;
-  img.src = s.comic.src; img.alt = s.comic.title + ". " + s.comic.alt;
-  cap.innerHTML = `<b>${s.comic.title}</b><br>${s.comic.alt}<br><a href="https://xkcd.com/${s.comic.num}/" target="_blank" rel="noopener">xkcd.com/${s.comic.num}</a> · Randall Munroe · CC BY-NC 2.5`;
+  const w = WEEKS.find(x => x.id === b.dataset.comic); if (!w || !w.comic) return;
+  img.src = w.comic.src; img.alt = w.comic.title + ". " + w.comic.alt;
+  cap.innerHTML = `<b>${w.comic.title}</b><br>${w.comic.alt}<br><a href="https://xkcd.com/${w.comic.num}/" target="_blank" rel="noopener">xkcd.com/${w.comic.num}</a> · Randall Munroe · CC BY-NC 2.5`;
   box.showModal();
 });
 box.addEventListener("click", e => { if (e.target === box) box.close(); });
