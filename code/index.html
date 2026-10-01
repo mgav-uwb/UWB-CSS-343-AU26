@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!-- CSS 343 AU26 code library: reusable programs and utilities, separate from assignment starters. Files live in code/ (util/, measure/) and topics/code/ (the programs the lecture topics run). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 343 · Code Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{ --paper:#fbf7ee; --ink:#26252e; --dim:#6a6975; --line:#e3ded4;
+    --lemon:#fbe9a6; --lemon-d:#9a6f00; --mint:#cbebd9; --mint-d:#217a4e; --peach:#fbd9c4; --peach-d:#b8521c;
+    --sky:#cfe2f8; --sky-d:#2a62a8; --lilac:#e2d7fb; --lilac-d:#6446b9; --rose:#f9d3e2; --rose-d:#b33366;
+    --aqua:#cbeeea; --aqua-d:#1e7d76; --accent:#d9527a; --accent2:#2a8c80; }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--ink);font:16px/1.55 "Source Sans 3","Segoe UI",sans-serif;padding:28px clamp(14px,4vw,56px) 64px;
+       background:radial-gradient(900px 520px at 8% -6%, #f9d3e2 0%, transparent 60%),
+                  radial-gradient(760px 480px at 96% 4%, #cfe2f8 0%, transparent 62%),
+                  radial-gradient(900px 700px at 50% 108%, #cbebd9 0%, transparent 60%), var(--paper);background-attachment:fixed}
+  .page{max-width:980px;margin:0 auto}
+  .crumb{font-size:14px;margin-bottom:8px} .crumb a{color:var(--accent2);text-decoration:none} .crumb a:hover{text-decoration:underline}
+  h1{font:700 clamp(30px,4.5vw,44px)/1.1 "Outfit",sans-serif;margin:0;background:linear-gradient(95deg,var(--accent),var(--lilac-d) 55%,var(--accent2));
+     -webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+  .sub{color:var(--dim);font-size:15px;margin:6px 0 20px}
+  section{background:#ffffffe6;border:1px solid var(--line);border-left:6px solid var(--sec,var(--sky-d));border-radius:12px;padding:14px 20px;margin:14px 0;
+          box-shadow:0 1px 3px rgba(38,37,46,.06)}
+  section:nth-of-type(6n+1){--sec:#e0b94a} section:nth-of-type(6n+2){--sec:#62b58a} section:nth-of-type(6n+3){--sec:#6f9fd8}
+  section:nth-of-type(6n+4){--sec:#e39068} section:nth-of-type(6n+5){--sec:#9a83dc} section:nth-of-type(6n+6){--sec:#e07ea5}
+  h2{font:600 20px "Outfit",sans-serif;margin:2px 0 8px}
+  h3{font:600 16px "Outfit",sans-serif;margin:14px 0 4px}
+  p{margin:8px 0} ul{margin:6px 0;padding-left:22px} li{margin:4px 0}
+  a{color:var(--sky-d)}
+  table{border-collapse:collapse;width:100%;margin:8px 0;font-size:14.5px}
+  th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+  td:first-child{white-space:nowrap}
+  th{font:600 13px "Outfit",sans-serif;text-transform:uppercase;letter-spacing:.8px;color:#4f4e63;background:#faf6ee}
+  td.n{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;font:600 12px "Outfit",sans-serif;border-radius:8px;padding:1px 8px;margin:1px 2px 1px 0;border:1px solid var(--line);background:#fff;white-space:nowrap}
+  .pill.q{background:var(--sky);color:var(--sky-d)} .pill.x{background:var(--rose);color:var(--rose-d);border-color:#e0a9bd}
+  .pill.hw{background:var(--lemon);color:var(--lemon-d);border-color:#e6d8a8} .pill.pa{background:var(--peach);color:var(--peach-d)}
+  .pill.off{background:#f1efe9;color:var(--dim)}
+  .note{font-size:14px;color:var(--dim)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px}
+  dl.facts{display:grid;grid-template-columns:max-content 1fr;gap:6px 18px;margin:6px 0}
+  dl.facts dt{font-weight:700} dl.facts dd{margin:0}
+  tr.wk td{background:linear-gradient(90deg,color-mix(in srgb,var(--h) 70%,#fff),#fff 70%);font:600 14px "Outfit",sans-serif;color:#3a3946}
+  footer{margin-top:28px;color:var(--dim);font-size:13px}
+  @media (max-width:700px){ .grid2{grid-template-columns:1fr} dl.facts{grid-template-columns:1fr} dl.facts dt{margin-top:6px} th.hide,td.hide{display:none} }
+  pre{font:13px/1.5 "SF Mono",Menlo,Consolas,monospace;background:#f6f4ee;border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;margin:8px 0}
+  code{font:.9em "SF Mono",Menlo,Consolas,monospace;background:#f3f0e8;border-radius:4px;padding:0 4px}
+  td code{white-space:nowrap}
+  @media (max-width:700px){ td:first-child{white-space:normal} td code{white-space:normal;word-break:break-all} table{font-size:13.5px} th,td{padding:6px 5px} }
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="crumb"><a href="../index.html">← course hub</a></div>
+  <h1>Code Library</h1>
+  <div class="sub">Reusable C++ for experiments and homework: small utilities, measurement programs, and every program the lectures run.
+  Assignment starters live with their assignments, not here.</div>
+
+  <section>
+    <h2>Utilities</h2>
+    <p>Headers to copy into a program. Each one's comment says how to use it. Build anything here with
+    <code>g++ -std=c++17 -O2 file.cpp -o file</code>; each header works on its own.</p>
+    <table>
+      <tr><th>file</th><th>what it gives you</th></tr>
+      <tr><td><a href="util/rng.h"><code>rng.h</code></a></td><td>a random number generator that produces the same sequence with every compiler, plus <code>between(lo, hi)</code> and <code>shuffle(v)</code>. The standard library's distributions differ between g++ and clang, so the same seed can give different data</td></tr>
+      <tr><td><a href="util/timer.h"><code>timer.h</code></a></td><td><code>Stopwatch</code> on a clock that never jumps, and <code>fastestOf(reps, f)</code>, the fastest of several runs</td></tr>
+      <tr><td><a href="util/alloc_counter.h"><code>alloc_counter.h</code></a></td><td>counts every byte and block allocated with <code>new</code>, by replacing the global <code>operator new</code>; include it in exactly one <code>.cpp</code> file</td></tr>
+      <tr><td><a href="util/example.cpp"><code>example.cpp</code></a></td><td>all three in one short program</td></tr>
+    </table>
+<pre>#include "rng.h"
+#include "timer.h"
+#include "alloc_counter.h"          // in exactly one .cpp file
+
+Rng r(343);
+std::vector&lt;int&gt; v(1000000);
+for (int&amp; x : v) x = (int)r.between(-1000000, 1000000);
+double t = fastestOf(5, [&amp;] { w = v; std::sort(w.begin(), w.end()); });
+AllocStats before = allocStats();
+std::vector&lt;int&gt; a(1000);
+long long bytes = (allocStats() - before).bytes;   // 4000</pre>
+  </section>
+
+  <section>
+    <h2>Measurement</h2>
+    <p>Programs that measure the machine rather than an algorithm. They back the numbers in the
+    <a href="../textbook/foundations/foundation-computer-systems.html">Computer Systems Primer</a>, and the
+    first two also run in the browser as <a href="../lib/measure/memory.html">Memory Hierarchy, Measured</a>.</p>
+    <table>
+      <tr><th>file</th><th>what it measures</th></tr>
+      <tr><td><a href="measure/latency.cpp"><code>latency.cpp</code></a></td><td>the time for one dependent memory read, as the array grows past each cache: about 1.4 ns in L1 to 100 ns in main memory</td></tr>
+      <tr><td><a href="measure/locality.cpp"><code>locality.cpp</code></a></td><td>the same additions in two orders: a matrix by rows and by columns, a linked list in memory order and scattered</td></tr>
+      <tr><td><a href="measure/optimize.cpp"><code>optimize.cpp</code></a></td><td>3-sum at <code>-O0</code> and <code>-O2</code>, and a loop the optimizer deletes because its result is never used</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Lecture programs</h2>
+    <p>The programs the lecture topics run in class, each with its build command in its first lines.
+    They print the numbers the slides quote.</p>
+    <table>
+      <tr><th>file</th><th>what it shows</th><th>topic</th></tr>
+      <tr><td><a href="../topics/code/cpp-passing-arguments/passing.cpp"><code>cpp-passing-arguments/passing.cpp</code></a></td><td>by value, by reference, by pointer, and the copies const reference avoids</td><td>Passing arguments</td></tr>
+      <tr><td><a href="../topics/code/cpp-owning-memory/intlist.cpp"><code>cpp-owning-memory/intlist.cpp</code></a></td><td>a list class that owns its nodes: destructor, deep copy, copy assignment</td><td>Owning memory</td></tr>
+      <tr><td><a href="../topics/code/cpp-owning-memory/shallow.cpp"><code>cpp-owning-memory/shallow.cpp</code></a></td><td>the same class without a copy constructor: two lists share one chain</td><td>Owning memory</td></tr>
+      <tr><td><a href="../topics/code/recursion/recursion.cpp"><code>recursion/recursion.cpp</code></a></td><td>work before and after the recursive call; recursion on lists and trees; binary search</td><td>Recursion</td></tr>
+      <tr><td><a href="../topics/code/counting-loops/loops.cpp"><code>counting-loops/loops.cpp</code></a></td><td>exact counts of how often a loop body runs, for the common loop shapes</td><td>Counting loops</td></tr>
+      <tr><td><a href="../topics/code/k-sum/ksum.cpp"><code>k-sum/ksum.cpp</code></a></td><td>3-sum with loops and k-sum with recursion, with their check and call counts</td><td>k-sum</td></tr>
+      <tr><td><a href="../topics/code/analysis-doubling/threesum.cpp"><code>analysis-doubling/threesum.cpp</code></a></td><td>the doubling experiment on brute-force 3-sum: counts, times, ratios</td><td>The doubling experiment</td></tr>
+      <tr><td><a href="../topics/code/faster-3sum/faster.cpp"><code>faster-3sum/faster.cpp</code></a></td><td>2-sum and 3-sum, brute force against sort + binary search, by array accesses</td><td>Designing a faster 3-sum</td></tr>
+      <tr><td><a href="../topics/code/faster-3sum/twopointer.cpp"><code>faster-3sum/twopointer.cpp</code></a></td><td>the whole 3-sum ladder, N^3 to N^2 lg N to N^2, with doubling ratios</td><td>Designing a faster 3-sum</td></tr>
+      <tr><td><a href="../topics/code/memory/sizeof_demo.cpp"><code>memory/sizeof_demo.cpp</code></a></td><td>primitive sizes, struct padding, and measured bytes for an array and a list</td><td>Memory</td></tr>
+      <tr><td><a href="../topics/code/memory/mergesort.cpp"><code>memory/mergesort.cpp</code></a></td><td>mergesort, with its peak auxiliary buffer measured</td><td>Memory</td></tr>
+      <tr><td><a href="../topics/code/memory/bfs_grid.cpp"><code>memory/bfs_grid.cpp</code></a></td><td>shortest paths on a grid: the fixed n x n table against the cells reached</td><td>Memory</td></tr>
+    </table>
+  </section>
+
+  <footer>CSS 343 · Autumn 2026 · code library. Files are plain text; open one and save it, or copy the parts you need.</footer>
+</main>
+</body>
+</html>

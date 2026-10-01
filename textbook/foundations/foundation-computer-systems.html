@@ -167,9 +167,9 @@
         <span class="tag">The measurements</span>
         Every number labelled <em>measured</em> in this chapter comes from three
         short C++ programs
-        (<a href="../../topics/code/computer-systems/latency.cpp"><code>latency.cpp</code></a>,
-        <a href="../../topics/code/computer-systems/locality.cpp"><code>locality.cpp</code></a>,
-        <a href="../../topics/code/computer-systems/optimize.cpp"><code>optimize.cpp</code></a>) run on a 2019 laptop: an Intel Core i9-9980HK
+        (<a href="../../code/measure/latency.cpp"><code>latency.cpp</code></a>,
+        <a href="../../code/measure/locality.cpp"><code>locality.cpp</code></a>,
+        <a href="../../code/measure/optimize.cpp"><code>optimize.cpp</code></a>) run on a 2019 laptop: an Intel Core i9-9980HK
         at 2.4 GHz with a 32 KiB level-1 data cache and a 256 KiB level-2 cache
         per core, a 16 MiB level-3 cache shared by its 8 cores, and 32 GiB of
         main memory. Other machines give different numbers with the same shape.
@@ -244,6 +244,12 @@
           translation of addresses (section 6) also begins to miss.
         </figcaption>
       </figure>
+      <div class="demo">
+        <span class="tag">Demo</span>
+        <a href="../../lib/measure/memory.html">Memory Hierarchy, Measured</a> runs this
+        experiment, and the two of section 3, in your browser on your own machine, and draws your
+        curve over this one.
+      </div>
       <p>
         One way to make the ratios concrete is to scale time so that one
         nanosecond becomes one second:

@@ -145,7 +145,7 @@
   a.qc .qe{font-size:18px} a.qc .qd{color:var(--dim);font-weight:400;font-size:13px}
   nav.quick a.qc:nth-child(1){background:var(--lemon)} nav.quick a.qc:nth-child(2){background:var(--mint)}
   nav.quick a.qc:nth-child(3){background:var(--sky)} nav.quick a.qc:nth-child(4){background:var(--peach)}
-  nav.quick a.qc:nth-child(5){background:var(--lilac)} nav.quick a.qc:nth-child(6){background:var(--rose)}
+  nav.quick a.qc:nth-child(5){background:var(--lilac)} nav.quick a.qc:nth-child(6){background:var(--rose)} nav.quick a.qc:nth-child(7){background:var(--aqua)}
   /* ── the quote over the fact, beside the comic ── */
   .row2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:stretch;margin:4px 0 6px}
   .wisdom3{display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0}
@@ -233,6 +233,7 @@ const QUICKLINKS = [
   { href:"lib/demo.html", emo:"🎮", title:"Explorer", desc:"every algorithm, interactive" },
   { href:"guides/guide-computing-environment.html", emo:"🐧", title:"Linux lab", desc:"compile and test" },
   { href:"glossary/index.html", emo:"🔤", title:"Glossary", desc:"every term, defined" },
+  { href:"code/index.html", emo:"🧰", title:"Code", desc:"utilities and every lecture program" },
 ];
 
 // ───────── reading: textbook chapters, guides, references (keyed; attach per week) ─────────
@@ -334,6 +335,8 @@ const DEMOS = {
   "factorial":              { title:"Recursion: factorial", desc:"the recursion tree and the call stack, side by side: frames pile up on the way down, results come back on the way up" },
   "three-sum":              { title:"3-sum: loops and recursion", desc:"the same tree walked twice: the loops in one frame, the recursion with a frame per level" },
   "k-sum":                  { title:"Recursion: k-sum", desc:"choose k elements one call at a time; a path from the root is a choice" },
+  "hanoi":                  { title:"Towers of Hanoi", desc:"watch the recursion solve it beside its call stack, or play it yourself against the minimum, 2^n - 1 moves" },
+  "memory-hierarchy":       { title:"Memory hierarchy, measured", desc:"your own machine: memory latency by array size, and the same additions in a cache-friendly and a cache-hostile order", href:"lib/measure/memory.html" },
   "bst":                    { title:"Binary Search Tree", desc:"search · insert · Hibbard delete · ordered ops" },
   "avl":                    { title:"AVL Tree", desc:"insert & delete with rotations, live balance factors" },
   "bst-vs-avl":             { title:"BST vs AVL", desc:"same keys side by side; heights diverge, ⏩ to sweep" },
@@ -395,7 +398,7 @@ const WEEKS = [
     wed:{ id:"L01", date:"Wed Sep 30", title:"Review: C++, Recursion, Counting", topics:"passing arguments · owning memory and the Rule of Three · recursion on lists, trees and arrays · counting loops · recurrences and unrolling · k-sum", dir:"sessions/S01-review" },
     hw:{"n": 1, "href": "sessions/S01-review/hw01/HW01.html", "due": "due Sun Oct 4, 11:59 PM"},
     handouts:["cpp", "recursion", "systems", "env", "valgrind"],
-    demos:["factorial", "three-sum", "k-sum"] },
+    demos:["factorial", "three-sum", "k-sum", "hanoi"] },
   { id:"W2",
     title:"Analysis of algorithms",
     icon:"⏱️",
@@ -405,7 +408,7 @@ const WEEKS = [
     hw:{"n": 2, "href": "sessions/S02-time-analysis/hw02/HW02.html", "due": "due Sun Oct 11, 11:59 PM"},
     quiz:"Q1 Mon",
     handouts:["time-analysis", "bigO", "space-complexity", "asymptotic-notation"],
-    demos:[] },
+    demos:["memory-hierarchy"] },
   { id:"W3",
     title:"Search trees",
     icon:"🌳",
@@ -542,7 +545,7 @@ const handoutCell = w => {
     <a class="chip h" href="${h.href}"><span class="t">${h.title}</span><span class="d">${h.desc}</span></a>`).join("") + `</div>`;
 };
 const demoChip = ([k, d]) => `
-    <a class="chip demo" href="lib/demo.html?ds=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`;
+    <a class="chip demo" href="${d.href || `lib/demo.html?ds=${k}`}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`;
 const demoCell = w => {
   const ds = (w.demos || []).map(k => [k, DEMOS[k]]).filter(([,d]) => d);
   return ds.length ? `<div class="cell">` + ds.map(demoChip).join("") + `</div>` : `<div class="cell"></div>`;

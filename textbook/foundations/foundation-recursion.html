@@ -862,6 +862,12 @@ fn inorder(t: &amp;Link, out: &amp;mut Vec&lt;i32&gt;) {
         move counts for \(n = 1,\dots,10\) are
         1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, which are \(2^n - 1\) exactly.
       </p>
+      <div class="demo">
+        <span class="tag">Demo</span>
+        <a href="../../lib/demo.html?ds=hanoi">Towers of Hanoi</a>: watch the recursive
+        solution move the disks beside its call stack, which is never deeper than \(n\) frames
+        while the calls number \(2^n - 1\); or play the puzzle yourself against that minimum.
+      </div>
       <table>
         <tr><th>recurrence</th><th>solution</th><th>appears in</th></tr>
         <tr><td>\(T(n) = T(n-1) + c\)</td><td>\(\Theta(n)\)</td><td>factorial, list traversal, linear search</td></tr>

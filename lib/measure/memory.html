@@ -1,0 +1,218 @@
+<!doctype html>
+<!-- CSS 343 · Memory hierarchy, measured in the reader's own browser.
+     Three experiments from code/measure/ (latency.cpp,
+     locality.cpp), run in a Web Worker (memory-worker.js). Reference numbers
+     are the C++ programs' output on the textbook's laptop. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memory Hierarchy, Measured · CSS 343</title>
+<style>
+  :root { --ink:#1a1c22; --dim:#5c6270; --line:#dfe3ea; --bg:#f4f5f9; --card:#fff;
+          --accent:#7c5cff; --accentbg:#f1edff; --ref:#9aa1b2; --good:#1f9d6b; --bad:#d0553f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 22px 16px 60px; }
+  .nav { font-size: 13px; margin-bottom: 10px; } .nav a { color: var(--dim); text-decoration: none; margin-right: 14px; }
+  .nav a:hover { color: var(--accent); }
+  h1 { font-size: 26px; margin: 0 0 4px; } .sub { color: var(--dim); margin: 0 0 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
+  .card h2 { font-size: 18px; margin: 0 0 4px; } .card p { margin: 6px 0; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 10px 0; }
+  button { font: 600 14px system-ui, sans-serif; color: #fff; background: var(--accent); border: 0; border-radius: 8px; padding: 7px 14px; cursor: pointer; }
+  button:hover { filter: brightness(1.07); } button:disabled { background: #b9b2db; cursor: default; }
+  button.ghost { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+  select { font: 14px system-ui, sans-serif; padding: 5px 8px; border: 1px solid var(--line); border-radius: 7px; background: #fff; }
+  .status { color: var(--dim); font-size: 13.5px; min-height: 1.4em; }
+  .chart svg { width: 100%; height: auto; display: block; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+  th, td { border-bottom: 1px solid var(--line); padding: 4px 8px; text-align: right; } th { color: var(--dim); font-weight: 600; }
+  th:first-child, td:first-child { text-align: left; }
+  details summary { cursor: pointer; color: var(--accent); font-size: 13.5px; margin-top: 8px; }
+  .bars { margin-top: 10px; } .bar { display: grid; grid-template-columns: 150px 1fr 82px; align-items: center; gap: 10px; margin: 6px 0; font-size: 14px; }
+  .bar .track { background: #f0f1f5; border-radius: 6px; height: 22px; overflow: hidden; }
+  .bar .fill { height: 100%; border-radius: 6px; width: 0; transition: width .4s; min-width: 2px; }
+  .bar .t { text-align: right; font-variant-numeric: tabular-nums; }
+  .verdict { font-weight: 700; margin-top: 4px; } .ref { color: var(--dim); font-size: 13.5px; }
+  .note { font-size: 13px; color: var(--dim); }
+  .legend { display: flex; gap: 18px; font-size: 13px; color: var(--dim); margin-top: 4px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 22px; height: 0; border-top: 2.5px solid var(--accent); vertical-align: middle; margin-right: 6px; }
+  .legend i.r { border-top: 2px dashed var(--ref); }
+  code { font: 0.92em "SF Mono", Menlo, Consolas, monospace; background: #f1f3f7; border-radius: 4px; padding: 0 4px; }
+  @media (max-width: 560px) { .bar { grid-template-columns: 96px 1fr 70px; font-size: 13px; } h1 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav"><a href="../../index.html">&#8592; Course hub</a><a href="../../textbook/foundations/foundation-computer-systems.html">Computer Systems Primer</a></div>
+  <h1>Memory Hierarchy, Measured</h1>
+  <p class="sub">Three experiments that run in your browser, on your machine. Each one does a fixed
+  amount of work and times how long it takes, so the numbers describe your processor&rsquo;s
+  caches and memory. The dashed curve and the reference lines are the C++ versions of the same
+  programs on the textbook&rsquo;s 2019 laptop.</p>
+  <div class="row"><button id="all">Run all three</button>
+    <span class="note">About 15 seconds in all (longer with the largest sizes). Close other heavy tabs for steadier numbers. The page stays usable while it runs.</span></div>
+
+  <!-- ============ 1. latency ============ -->
+  <section class="card" id="latency">
+    <h2>1. How long does one memory read take?</h2>
+    <p>An array of indices forms one random cycle through every slot, and the program follows it,
+    <code>p = next[p]</code>, ten million times. Each read needs the previous result and the next
+    address is unpredictable, so the time per read is the time to fetch one value from wherever the
+    array fits. As the array grows past each cache, the time jumps.</p>
+    <div class="row">
+      <button id="runLat">Run</button>
+      <label>largest array <select id="maxLat"><option value="67108864">64 MiB</option><option value="268435456">256 MiB</option></select></label>
+      <span class="status" id="stLat"></span>
+    </div>
+    <div class="chart" id="chart"></div>
+    <div class="legend"><span><i></i>your machine (this browser)</span><span><i class="r"></i>textbook laptop (C++, <code>latency.cpp</code>)</span></div>
+    <details><summary>table of values</summary><table id="tabLat"><tr><th>array size</th><th>your machine, ns</th><th>textbook laptop, ns</th></tr></table></details>
+    <p class="note">How to read it: each flat stretch is one level of the hierarchy, and the array size
+    where the curve rises is about that level&rsquo;s capacity. On the textbook laptop the steps are at
+    32 KiB (L1), 256 KiB (L2) and a few MiB (L3), and main memory costs about 100 ns per read.</p>
+  </section>
+
+  <!-- ============ 2. matrix ============ -->
+  <section class="card" id="matrix">
+    <h2>2. Same additions, different order: a matrix</h2>
+    <p>Sum every element of an <i>n</i> &times; <i>n</i> matrix stored row by row, first along the rows,
+    then down the columns, three times each, keeping the fastest. Both loops perform exactly <i>n</i>&sup2; additions on the same values.
+    Along a row, neighbours share a 64-byte cache line; down a column, every read is in a different line.</p>
+    <div class="row">
+      <button id="runMat">Run</button>
+      <label><i>n</i> = <select id="nMat"><option value="4096">4096 (64 MiB)</option><option value="2048">2048 (16 MiB)</option><option value="8192">8192 (256 MiB)</option></select></label>
+      <span class="status" id="stMat"></span>
+    </div>
+    <div class="bars" id="barsMat"></div>
+    <div class="verdict" id="vMat"></div>
+    <div class="ref">Textbook laptop (C++, <i>n</i> = 8192): by rows 0.3 ns per element, by columns 12.6 ns: 41&times; slower.
+    The C++ row loop is faster than a browser&rsquo;s because the compiler uses vector instructions that add
+    several elements at once; down a column, both pay about 10 ns or more per read.</div>
+  </section>
+
+  <!-- ============ 3. list ============ -->
+  <section class="card" id="list">
+    <h2>3. Same additions, different order: a linked list</h2>
+    <p>Walk a linked list and add up its values, first with the nodes laid out in memory in list
+    order, then with the same nodes linked in a shuffled order, three times each, keeping the fastest.
+    Every walk visits every node once.
+    The scattered walk is pointer chasing: each node&rsquo;s address is known only after the
+    previous node arrives.</p>
+    <div class="row">
+      <button id="runList">Run</button>
+      <label>nodes <select id="nList"><option value="4194304">4,194,304 (32 MiB)</option><option value="8388608">8,388,608 (64 MiB)</option><option value="1048576">1,048,576 (8 MiB)</option></select></label>
+      <span class="status" id="stList"></span>
+    </div>
+    <div class="bars" id="barsList"></div>
+    <div class="verdict" id="vList"></div>
+    <div class="ref">Textbook laptop (C++, 16,777,216 nodes): in order 2.1 ns per node, scattered 111 ns: 52&times; slower.</div>
+  </section>
+
+  <p class="note">The experiments use JavaScript typed arrays (<a href="memory-worker.js">source</a>) and
+  match the C++ programs <a href="../../code/measure/latency.cpp"><code>latency.cpp</code></a> and
+  <a href="../../code/measure/locality.cpp"><code>locality.cpp</code></a>. Browsers round their
+  clocks to protect privacy; every measurement here times enough work for the rounding not to matter.
+  Results vary with the browser, battery state and other running programs; the shape is what to compare.</p>
+</div>
+
+<script>
+const REF = [[4096,1.39],[8192,1.40],[16384,1.38],[32768,1.37],[65536,2.45],[131072,2.96],[262144,5.16],[524288,9.18],
+  [1048576,12.04],[2097152,13.50],[4194304,17.96],[8388608,46.20],[16777216,80.03],[33554432,90.88],[67108864,98.50],
+  [134217728,101.92],[268435456,107.73]];
+const mine = [];
+const $ = (id) => document.getElementById(id);
+const label = (b) => b < (1 << 20) ? `${b >> 10} KiB` : `${b >> 20} MiB`;
+
+// ---------- the latency chart: log-log, drawn as SVG ----------
+function drawChart() {
+  const W = 760, H = 330, L = 56, R = 16, T = 14, B = 46;
+  const x0 = Math.log2(4096), x1 = Math.log2(268435456), y0 = 0, y1 = Math.log10(300);
+  const X = (b) => L + (Math.log2(b) - x0) / (x1 - x0) * (W - L - R);
+  const Y = (v) => T + (1 - (Math.log10(Math.max(v, 1)) - y0) / (y1 - y0)) * (H - T - B);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Time per memory read against array size, log-log" font-family="system-ui, sans-serif" font-size="11">`;
+  s += `<rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="#fbfbfe" stroke="#dfe3ea"/>`;
+  for (const v of [1, 2, 5, 10, 20, 50, 100, 200]) s += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#eceef3"/><text x="${L - 6}" y="${Y(v) + 4}" text-anchor="end" fill="#5c6270">${v}</text>`;
+  for (const [b, t] of [[4096, "4K"], [32768, "32K"], [262144, "256K"], [2097152, "2M"], [16777216, "16M"], [134217728, "128M"], [268435456, "256M"]])
+    s += `<line x1="${X(b)}" x2="${X(b)}" y1="${H - B}" y2="${H - B + 4}" stroke="#5c6270"/><text x="${X(b)}" y="${H - B + 16}" text-anchor="middle" fill="#5c6270">${t}</text>`;
+  s += `<text x="${(L + W - R) / 2}" y="${H - 10}" text-anchor="middle" fill="#1a1c22">array size (bytes, log scale)</text>`;
+  s += `<text x="14" y="${(T + H - B) / 2}" text-anchor="middle" fill="#1a1c22" transform="rotate(-90 14 ${(T + H - B) / 2})">ns per read (log scale)</text>`;
+  s += `<polyline points="${REF.map(([b, v]) => `${X(b)},${Y(v)}`).join(" ")}" fill="none" stroke="#9aa1b2" stroke-width="2" stroke-dasharray="5 4"/>`;
+  if (mine.length) {
+    s += `<polyline points="${mine.map(([b, v]) => `${X(b)},${Y(v)}`).join(" ")}" fill="none" stroke="#7c5cff" stroke-width="2.5"/>`;
+    for (const [b, v] of mine) s += `<circle cx="${X(b)}" cy="${Y(v)}" r="3.5" fill="#7c5cff"><title>${label(b)}: ${v.toFixed(2)} ns</title></circle>`;
+  }
+  $("chart").innerHTML = s + `</svg>`;
+}
+function drawTable() {
+  const ref = new Map(REF), m = new Map(mine);
+  const sizes = [...new Set([...mine.map(([b]) => b)])];
+  $("tabLat").innerHTML = `<tr><th>array size</th><th>your machine, ns</th><th>textbook laptop, ns</th></tr>` +
+    sizes.map((b) => `<tr><td>${label(b)}</td><td>${m.get(b).toFixed(2)}</td><td>${ref.has(b) ? ref.get(b).toFixed(2) : ""}</td></tr>`).join("");
+}
+
+// ---------- bars for the two locality experiments ----------
+function bars(el, rows) {
+  const max = Math.max(...rows.map((r) => r.ms));
+  el.innerHTML = rows.map((r) => `<div class="bar"><span>${r.name}</span><div class="track"><div class="fill" style="background:${r.color}"></div></div><span class="t">${(r.ms / 1000).toFixed(3)} s</span></div>`).join("");
+  requestAnimationFrame(() => el.querySelectorAll(".fill").forEach((f, i) => { f.style.width = `${Math.max(0.4, rows[i].ms / max * 100)}%`; }));
+}
+
+// ---------- one worker, one experiment at a time ----------
+const worker = new Worker("memory-worker.js");
+let current = null, queue = [];
+const buttons = ["all", "runLat", "runMat", "runList"];
+function setBusy(b) { buttons.forEach((id) => { $(id).disabled = b; }); }
+function start(job) {
+  current = job; setBusy(true);
+  $(job.st).textContent = "starting";
+  worker.postMessage(job.msg);
+}
+function enqueue(job) { if (current) queue.push(job); else start(job); }
+function done() {
+  current = null;
+  if (queue.length) start(queue.shift()); else setBusy(false);
+}
+
+const jobs = {
+  latency: () => {
+    const max = +$("maxLat").value, sizes = [];
+    for (let b = 4096; b <= max; b *= 2) sizes.push(b);
+    mine.length = 0; drawChart(); drawTable();
+    return { st: "stLat", msg: { cmd: "latency", sizes, steps: 10000000 } };
+  },
+  matrix: () => { $("barsMat").innerHTML = ""; $("vMat").textContent = ""; return { st: "stMat", msg: { cmd: "matrix", n: +$("nMat").value } }; },
+  list: () => { $("barsList").innerHTML = ""; $("vList").textContent = ""; return { st: "stList", msg: { cmd: "list", nodes: +$("nList").value } }; },
+};
+
+worker.onmessage = (e) => {
+  const m = e.data, st = current && $(current.st);
+  if (m.type === "status" && st) st.textContent = m.text + "...";
+  else if (m.type === "point") { mine.push([m.bytes, m.ns]); drawChart(); drawTable(); st.textContent = `${label(m.bytes)}: ${m.ns.toFixed(2)} ns per read`; }
+  else if (m.type === "error") { st.textContent = "stopped: " + m.text + " (try a smaller size)"; queue = []; done(); }
+  else if (m.type === "result") {
+    if (m.exp === "latency") st.textContent = `done: ${mine.length} sizes measured`;
+    if (m.exp === "matrix") {
+      bars($("barsMat"), [{ name: "by rows", ms: m.rowsMs, color: "var(--good)" }, { name: "by columns", ms: m.colsMs, color: "var(--bad)" }]);
+      $("vMat").textContent = `Your machine: by rows ${(m.rowsMs * 1e6 / m.adds).toFixed(1)} ns per element, by columns ${(m.colsMs * 1e6 / m.adds).toFixed(1)} ns: ${(m.colsMs / m.rowsMs).toFixed(1)}× slower.`;
+      st.textContent = m.sumRows === m.sumCols ? "done (both sums agree)" : "done";
+    }
+    if (m.exp === "list") {
+      bars($("barsList"), [{ name: "in memory order", ms: m.orderMs, color: "var(--good)" }, { name: "scattered", ms: m.scatterMs, color: "var(--bad)" }]);
+      $("vList").textContent = `Your machine: in order ${(m.orderMs * 1e6 / m.nodes).toFixed(1)} ns per node, scattered ${(m.scatterMs * 1e6 / m.nodes).toFixed(0)} ns: ${(m.scatterMs / m.orderMs).toFixed(1)}× slower.`;
+      st.textContent = m.sum1 === m.sum2 ? "done (both sums agree)" : "done";
+    }
+    done();
+  }
+};
+worker.onerror = (e) => { if (current) $(current.st).textContent = "stopped: " + (e.message || "the worker failed"); queue = []; done(); };
+
+$("runLat").onclick = () => enqueue(jobs.latency());
+$("runMat").onclick = () => enqueue(jobs.matrix());
+$("runList").onclick = () => enqueue(jobs.list());
+$("all").onclick = () => { enqueue(jobs.latency()); queue.push(jobs.matrix()); queue.push(jobs.list()); };
+drawChart();
+</script>
+</body>
+</html>
