@@ -1,0 +1,726 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Computer Systems Primer.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Computer Systems Primer - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+      @media (max-width: 520px) { table { font-size: 13px; } th, td { padding: 5px 6px; } td code { word-break: break-all; } }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics. Read it in a browser; a
+        plain-text or inline document preview will not render the math.
+      </p>
+
+      <h1>Computer Systems Primer</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        What happens between a C++ program and the hardware, at the level a
+        data-structures programmer needs: the processor and the memory hierarchy,
+        with latencies measured on a real machine; caches and locality, and what
+        they do to algorithms with the same operation count; a cost model that
+        counts memory transfers; the operating system&rsquo;s processes, virtual
+        memory, paging, swap and multitasking; and the compiler, its optimizer and
+        undefined behaviour. The C++ language itself is covered in
+        <a href="foundation-cpp-essentials.html">C++ for Data Structures</a>.
+      </div>
+
+      <p class="lead">
+        The analysis chapters of this book count operations and treat every
+        operation as costing the same. That model is the right first
+        approximation: it predicts orders of growth correctly and it is the
+        language every later chapter uses. It also leaves out the single largest
+        effect on the running time of real data structures: <em>where the data
+        is</em> when the processor needs it. Two loops that perform exactly the
+        same additions can differ in speed by a factor of fifty. This chapter
+        explains why, and introduces the operating system and compiler behaviour
+        that also shows up in every timing experiment.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#cpu">The processor</a></li>
+          <li><a href="#hierarchy">The memory hierarchy</a></li>
+          <li><a href="#locality">Caches and locality</a></li>
+          <li><a href="#model">Counting memory transfers: the external-memory model</a></li>
+          <li><a href="#os">The operating system</a></li>
+          <li><a href="#vm">Virtual memory, paging and swap</a></li>
+          <li><a href="#compiler">The compiler</a></li>
+          <li><a href="#timing">Consequences for measuring programs</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <div class="aside">
+        <span class="tag">The measurements</span>
+        Every number labelled <em>measured</em> in this chapter comes from three
+        short C++ programs
+        (<a href="../../topics/code/computer-systems/latency.cpp"><code>latency.cpp</code></a>,
+        <a href="../../topics/code/computer-systems/locality.cpp"><code>locality.cpp</code></a>,
+        <a href="../../topics/code/computer-systems/optimize.cpp"><code>optimize.cpp</code></a>) run on a 2019 laptop: an Intel Core i9-9980HK
+        at 2.4 GHz with a 32 KiB level-1 data cache and a 256 KiB level-2 cache
+        per core, a 16 MiB level-3 cache shared by its 8 cores, and 32 GiB of
+        main memory. Other machines give different numbers with the same shape.
+        (KiB, MiB and GiB are \(2^{10}\), \(2^{20}\) and \(2^{30}\) bytes.)
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="cpu">1. The processor</h2>
+      <p>
+        A compiled program is a sequence of <strong>machine instructions</strong>:
+        load a value from memory into a register, add two registers, compare,
+        jump to another instruction, store a register to memory. A
+        <strong>register</strong> is one of a few dozen storage slots inside the
+        processor itself; arithmetic happens only on registers. The processor
+        steps through instructions to the beat of a <strong>clock</strong>; at
+        2.4 GHz one clock cycle lasts \(1 / (2.4 \times 10^9)\) s, about 0.42 ns.
+      </p>
+      <p>
+        A modern processor completes several simple instructions per cycle. It
+        does so by working on many instructions at once: while one is being
+        decoded, another is executing and a third is writing its result
+        (<strong>pipelining</strong>), and independent instructions run side by
+        side. It also guesses which way each branch will go and runs ahead along
+        the guess (<strong>branch prediction</strong>), discarding the work if the
+        guess was wrong. All of this depends on the next instructions having their
+        inputs ready. An instruction that waits for a value from main memory
+        stalls everything that depends on it, and as the next section shows, that
+        wait can last hundreds of cycles.
+      </p>
+      <p>
+        A <strong>core</strong> is one complete processor; the laptop above has 8,
+        each able to run its own sequence of instructions. A single-threaded
+        program, which is every program in this book, uses one core at a time.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="hierarchy">2. The memory hierarchy</h2>
+      <p>
+        No single memory technology is large, fast and cheap at once. Computers
+        therefore use a <strong>hierarchy</strong>: a small, fast memory close to
+        the processor, backed by successively larger, slower ones. Data the program
+        is using right now is kept near the top; everything else lives lower down
+        and is brought up when needed.
+      </p>
+      <table>
+        <tr><th>level</th><th>typical size</th><th>time to read one value</th><th>source</th></tr>
+        <tr><td>registers</td><td>a few hundred bytes</td><td>under one cycle</td><td></td></tr>
+        <tr><td>L1 cache</td><td>32 KiB per core</td><td>1.4 ns</td><td>measured</td></tr>
+        <tr><td>L2 cache</td><td>256 KiB per core</td><td>2.5 to 5 ns</td><td>measured</td></tr>
+        <tr><td>L3 cache</td><td>16 MiB shared</td><td>12 to 18 ns</td><td>measured (1 to 4 MiB arrays)</td></tr>
+        <tr><td>main memory (DRAM)</td><td>32 GiB</td><td>about 100 ns</td><td>measured</td></tr>
+        <tr><td>solid-state drive (SSD)</td><td>1 TB</td><td>tens of microseconds</td><td>typical</td></tr>
+        <tr><td>hard disk</td><td>several TB</td><td>several milliseconds</td><td>typical</td></tr>
+      </table>
+      <p>
+        The measured rows come from <code>latency.cpp</code>, which builds an
+        array of indices forming one random cycle through every slot and then
+        follows it: <code>p = next[p]</code>, fifty million times. Each read needs
+        the result of the one before, so the processor cannot overlap them, and
+        because the cycle is random it cannot predict the next address. The time
+        per step is therefore the time to fetch one value from wherever the array
+        currently fits.
+      </p>
+      <figure>
+        <svg viewBox="0 0 640 330" width="640" role="img" aria-label="Time per memory read against array size, log-log: about 1.4 ns up to 32 KiB, rising through 3 to 18 ns up to 4 MiB, and about 100 ns beyond 16 MiB" font-family="system-ui, sans-serif" font-size="11"><rect x="62" y="20" width="558" height="258" fill="#fbfcfd" stroke="#d7dbe3"/><rect x="62.0" y="20" width="98.5" height="258" fill="#eaf6ef"/><text x="111.2" y="34" text-anchor="middle" fill="#5c6270">L1</text><rect x="160.5" y="20" width="98.5" height="258" fill="#eef4fc"/><text x="209.7" y="34" text-anchor="middle" fill="#5c6270">L2</text><rect x="258.9" y="20" width="196.9" height="258" fill="#fff5e6"/><text x="357.4" y="34" text-anchor="middle" fill="#5c6270">L3</text><rect x="455.9" y="20" width="164.1" height="258" fill="#f9eef1"/><text x="537.9" y="34" text-anchor="middle" fill="#5c6270">main memory</text><line x1="62" x2="620" y1="278.0" y2="278.0" stroke="#e6e9ef"/><text x="56" y="282.0" text-anchor="end" fill="#5c6270">1</text><line x1="62" x2="620" y1="244.2" y2="244.2" stroke="#e6e9ef"/><text x="56" y="248.2" text-anchor="end" fill="#5c6270">2</text><line x1="62" x2="620" y1="199.6" y2="199.6" stroke="#e6e9ef"/><text x="56" y="203.6" text-anchor="end" fill="#5c6270">5</text><line x1="62" x2="620" y1="165.9" y2="165.9" stroke="#e6e9ef"/><text x="56" y="169.9" text-anchor="end" fill="#5c6270">10</text><line x1="62" x2="620" y1="132.1" y2="132.1" stroke="#e6e9ef"/><text x="56" y="136.1" text-anchor="end" fill="#5c6270">20</text><line x1="62" x2="620" y1="87.5" y2="87.5" stroke="#e6e9ef"/><text x="56" y="91.5" text-anchor="end" fill="#5c6270">50</text><line x1="62" x2="620" y1="53.8" y2="53.8" stroke="#e6e9ef"/><text x="56" y="57.8" text-anchor="end" fill="#5c6270">100</text><line x1="62" x2="620" y1="20.0" y2="20.0" stroke="#e6e9ef"/><text x="56" y="24.0" text-anchor="end" fill="#5c6270">200</text><line x1="62.0" x2="62.0" y1="278" y2="282" stroke="#5c6270"/><text x="62.0" y="294" text-anchor="middle" fill="#5c6270">4K</text><line x1="160.5" x2="160.5" y1="278" y2="282" stroke="#5c6270"/><text x="160.5" y="294" text-anchor="middle" fill="#5c6270">32K</text><line x1="258.9" x2="258.9" y1="278" y2="282" stroke="#5c6270"/><text x="258.9" y="294" text-anchor="middle" fill="#5c6270">256K</text><line x1="324.6" x2="324.6" y1="278" y2="282" stroke="#5c6270"/><text x="324.6" y="294" text-anchor="middle" fill="#5c6270">1M</text><line x1="455.9" x2="455.9" y1="278" y2="282" stroke="#5c6270"/><text x="455.9" y="294" text-anchor="middle" fill="#5c6270">16M</text><line x1="554.4" x2="554.4" y1="278" y2="282" stroke="#5c6270"/><text x="554.4" y="294" text-anchor="middle" fill="#5c6270">128M</text><line x1="620.0" x2="620.0" y1="278" y2="282" stroke="#5c6270"/><text x="620.0" y="294" text-anchor="middle" fill="#5c6270">512M</text><text x="341.0" y="318" text-anchor="middle" fill="#1a1c22">array size (bytes, log scale)</text><text x="16" y="149.0" text-anchor="middle" fill="#1a1c22" transform="rotate(-90 16 149.0)">nanoseconds per read (log scale)</text><polyline points="62.0,262.0 94.8,261.6 127.6,262.3 160.5,262.7 193.3,234.4 226.1,225.2 258.9,198.1 291.8,170.0 324.6,156.8 357.4,151.3 390.2,137.4 423.1,91.4 455.9,64.6 488.7,58.4 521.5,54.5 554.4,52.8 587.2,50.1 620.0,47.3" fill="none" stroke="#0a7d4d" stroke-width="2"/><circle cx="62.0" cy="262.0" r="3" fill="#0a7d4d"/><circle cx="94.8" cy="261.6" r="3" fill="#0a7d4d"/><circle cx="127.6" cy="262.3" r="3" fill="#0a7d4d"/><circle cx="160.5" cy="262.7" r="3" fill="#0a7d4d"/><circle cx="193.3" cy="234.4" r="3" fill="#0a7d4d"/><circle cx="226.1" cy="225.2" r="3" fill="#0a7d4d"/><circle cx="258.9" cy="198.1" r="3" fill="#0a7d4d"/><circle cx="291.8" cy="170.0" r="3" fill="#0a7d4d"/><circle cx="324.6" cy="156.8" r="3" fill="#0a7d4d"/><circle cx="357.4" cy="151.3" r="3" fill="#0a7d4d"/><circle cx="390.2" cy="137.4" r="3" fill="#0a7d4d"/><circle cx="423.1" cy="91.4" r="3" fill="#0a7d4d"/><circle cx="455.9" cy="64.6" r="3" fill="#0a7d4d"/><circle cx="488.7" cy="58.4" r="3" fill="#0a7d4d"/><circle cx="521.5" cy="54.5" r="3" fill="#0a7d4d"/><circle cx="554.4" cy="52.8" r="3" fill="#0a7d4d"/><circle cx="587.2" cy="50.1" r="3" fill="#0a7d4d"/><circle cx="620.0" cy="47.3" r="3" fill="#0a7d4d"/></svg>
+        <figcaption>
+          Measured time per dependent read against the size of the array being
+          read, both on logarithmic scales. The plateaus match the cache sizes:
+          about 1.4 ns while the array fits in the 32 KiB L1 cache, 2.5 to 5 ns in
+          L2, 9 to 18 ns in L3, and about 100 ns once the array is several times
+          larger than L3. The rise starts before the 16 MiB L3 is full because the
+          translation of addresses (section 6) also begins to miss.
+        </figcaption>
+      </figure>
+      <p>
+        One way to make the ratios concrete is to scale time so that one
+        nanosecond becomes one second:
+      </p>
+      <table>
+        <tr><th>event</th><th>real time</th><th>scaled (1 ns = 1 s)</th></tr>
+        <tr><td>one clock cycle</td><td>0.42 ns</td><td>0.4 seconds</td></tr>
+        <tr><td>read from L1</td><td>1.4 ns</td><td>1.4 seconds</td></tr>
+        <tr><td>read from L3</td><td>about 15 ns</td><td>15 seconds</td></tr>
+        <tr><td>read from main memory</td><td>about 100 ns</td><td>1.7 minutes</td></tr>
+        <tr><td>read from an SSD</td><td>about 50 &micro;s</td><td>14 hours</td></tr>
+        <tr><td>read from a hard disk</td><td>about 5 ms</td><td>2 months</td></tr>
+      </table>
+      <h3>The processor-memory gap</h3>
+      <p>
+        These ratios have not always been so large. In the early 1980s a
+        main-memory access took roughly as long as an instruction, and counting
+        instructions was a good model of running time. Since then processors have
+        become faster by a factor of thousands, mostly through higher clock rates
+        and many instructions per cycle, while the time to fetch one value from
+        DRAM has improved by perhaps a factor of ten. On the laptop above, one
+        main-memory read costs about \(100 / 0.42 \approx 240\) clock cycles,
+        time in which the processor could have completed several hundred
+        instructions. Caches exist to hide this gap, and they succeed only when the
+        program&rsquo;s accesses cooperate.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="locality">3. Caches and locality</h2>
+      <div class="def">
+        <span class="tag">Definition (cache, cache line)</span>
+        A <strong>cache</strong> keeps copies of recently used parts of main memory.
+        Memory moves between DRAM and the caches in fixed blocks called
+        <strong>cache lines</strong>, 64 bytes on current processors. A read that
+        finds its line in a cache is a <strong>hit</strong>; one that does not is a
+        <strong>miss</strong>, and fetches the whole line from the level below.
+      </div>
+      <p>
+        Because a miss brings in 64 bytes, not just the 4 bytes of one
+        <code>int</code>, the next 15 <code>int</code>s of an array arrive for free.
+        Caches work well for programs that have locality:
+      </p>
+      <div class="def">
+        <span class="tag">Definition (locality)</span>
+        <strong>Spatial locality</strong>: after accessing an address, the program
+        soon accesses nearby addresses (scanning an array). <strong>Temporal
+        locality</strong>: after accessing an address, the program soon accesses
+        the same address again (a loop counter, the top levels of a tree).
+      </div>
+      <p>
+        The processor also watches the pattern of misses. When it sees addresses
+        increasing by a fixed step, it fetches the following lines before they are
+        requested (<strong>prefetching</strong>), so a sequential scan rarely waits
+        for memory at all. A sequence of addresses with no pattern defeats both the
+        cache line and the prefetcher.
+      </p>
+      <h3>Same additions, different order</h3>
+      <p>
+        <code>locality.cpp</code> runs two experiments. In each, both versions
+        perform exactly the same additions on exactly the same values; only the
+        order of the memory accesses differs.
+      </p>
+      <pre><span class="cm">// m is an 8192 x 8192 matrix of int (256 MiB), stored row by row</span>
+for (r = 0; r &lt; n; r++) for (c = 0; c &lt; n; c++) sum += m[r * n + c];   <span class="cm">// by rows</span>
+for (c = 0; c &lt; n; c++) for (r = 0; r &lt; n; r++) sum += m[r * n + c];   <span class="cm">// by columns</span></pre>
+      <p>
+        By rows, consecutive reads are adjacent in memory: one miss per 16
+        <code>int</code>s, and the prefetcher hides most of those. By columns,
+        consecutive reads are \(8192 \times 4 = 32{,}768\) bytes apart, so every
+        read touches a different line, and by the time the loop returns to a line
+        for the next column the line has long since been evicted. The second
+        experiment walks a linked list of 16,777,216 nodes twice: once with the
+        nodes laid out in memory in list order, and once with the same nodes linked
+        in a shuffled order.
+      </p>
+      <table>
+        <tr><th>experiment</th><th>additions</th><th>good order</th><th>bad order</th><th>ratio</th></tr>
+        <tr><td>matrix: rows, then columns</td><td>67,108,864</td><td>0.021 s</td><td>0.845 s</td><td>41&times;</td></tr>
+        <tr><td>list: in memory order, then scattered</td><td>16,777,216</td><td>0.036 s</td><td>1.855 s</td><td>52&times;</td></tr>
+      </table>
+      <p class="note">Measured, <code>g++ -std=c++17 -O2</code>.</p>
+      <p>
+        The scattered list costs about 110 ns per node, the main-memory latency of
+        section 2: each <code>p = p-&gt;next</code> is a dependent read of an
+        unpredictable address. A list built by inserting nodes in random order, or
+        a tree after many insertions and deletions, has exactly this layout.
+      </p>
+      <h3>What this means for data structures</h3>
+      <p>
+        None of this changes an order of growth. Both matrix loops are
+        \(\Theta(n^2)\) and both list walks are \(\Theta(N)\). It changes the
+        constant factor, by a factor of forty or fifty here, and that is enough to
+        reverse comparisons between algorithms of the same order:
+      </p>
+      <table>
+        <tr><th>choice</th><th>same order of growth</th><th>usually faster in practice, because</th></tr>
+        <tr><td>array or linked list</td><td>\(\Theta(N)\) scan</td><td>the array is contiguous: one miss per 16 <code>int</code>s, and prefetched</td></tr>
+        <tr><td>open addressing (linear probing) or separate chaining</td><td>expected \(\Theta(1)\) search</td><td>probing reads adjacent slots; chaining follows a pointer per entry</td></tr>
+        <tr><td>quicksort or heapsort</td><td>\(\Theta(N \lg N)\)</td><td>quicksort&rsquo;s partition scans sequentially; heapsort jumps between \(i\) and \(2i\)</td></tr>
+        <tr><td>B-tree or binary search tree</td><td>\(\Theta(\lg N)\) search</td><td>a B-tree node fills whole lines with keys, so a search touches far fewer lines</td></tr>
+      </table>
+      <p>
+        See <a href="../hashing/ds-hashing.html">Hashing</a>,
+        <a href="../sorting/algo-quicksort.html">Quicksort</a> and
+        <a href="../trees/ds-b-trees.html">B-Trees</a> for the structures
+        themselves.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="model">4. Counting memory transfers: the external-memory model</h2>
+      <p>
+        When transfers between levels dominate the running time, the right cost
+        model counts transfers rather than operations. The
+        <strong>external-memory model</strong> (Aggarwal and Vitter, 1988) was
+        stated for a disk below main memory, and it applies equally to main memory
+        below a cache.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (external-memory model)</span>
+        A fast memory of \(M\) items sits above an unbounded slow memory. Data moves
+        between them in blocks of \(B\) consecutive items. Computation on items
+        already in fast memory is free; the cost of an algorithm is the number of
+        block transfers.
+      </div>
+      <p>
+        Two results show the model at work. <strong>Scanning</strong> \(N\)
+        consecutive items costs \(\lceil N / B \rceil\) transfers, not \(N\).
+        <strong>Searching</strong> a sorted array by binary search costs about
+        \(\lg(N/B)\) transfers, because each probe lands in a new block until the
+        remaining range fits in one block. A search tree whose nodes each hold
+        about \(B\) keys has height about \(\log_B N\), and a search reads one
+        block per level:
+      </p>
+      \[
+        \log_B N = \frac{\lg N}{\lg B}.
+      \]
+      <p>
+        For \(N = 10^9\) keys and blocks of \(B = 1000\) keys, binary search
+        needs about \(\lg(10^6) \approx 20\) transfers while the B-tree needs
+        \(\log_{1000} 10^9 = 3\). When a transfer is a disk read of several
+        milliseconds, that is the difference between a tenth of a second and
+        about fifteen milliseconds, and it is why databases and file systems are built on
+        <a href="../trees/ds-b-trees.html">B-trees</a>. Algorithms designed to
+        perform well for every \(B\) and \(M\) at once, without knowing them, are
+        called <strong>cache-oblivious</strong>.
+      </p>
+      <p>
+        The external-memory model does not replace the operation-counting model of
+        <a href="foundation-time-analysis.html">Analysis of Algorithms: Time</a>;
+        it is a second cost model, chosen when memory transfers are the expensive
+        operation. Choosing what to count is part of every analysis.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="os">5. The operating system</h2>
+      <p>
+        The <strong>operating system</strong> (OS) is the program that manages the
+        hardware on behalf of every other program: it decides which program runs
+        on which core, gives each program its memory, and performs input and
+        output (I/O) for them.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (process)</span>
+        A <strong>process</strong> is a running program: its machine code, its
+        memory, its open files, and the current state of its registers. Each
+        process has its own <strong>address space</strong>, the range of memory
+        addresses it can use, and cannot read or write another process&rsquo;s
+        memory.
+      </div>
+      <p>
+        Within its address space, a C++ process&rsquo;s memory is laid out in
+        regions with different lifetimes:
+      </p>
+      <pre>high addresses   +--------------------+
+                 |  stack             |  frames of active function calls; grows down
+                 |        |           |
+                 |        v           |
+                 |                    |
+                 |        ^           |
+                 |        |           |
+                 |  heap              |  objects from new; grows up
+                 +--------------------+
+                 |  static data       |  global and static variables
+                 +--------------------+
+low addresses    |  code (text)       |  the machine instructions
+                 +--------------------+</pre>
+      <p>
+        The stack has a fixed maximum size, commonly 8 MiB for the main thread on
+        Linux and macOS (the shell command <code>ulimit -s</code> shows it in KiB).
+        A recursion that goes too deep exhausts it, and the process is stopped
+        with a <strong>stack overflow</strong>, usually reported as a
+        segmentation fault. A recursive function with a 100-byte frame can recurse
+        about 80,000 levels deep; a recursion on a linked list of a million nodes
+        cannot. The <a href="foundation-recursion.html">Recursion</a> chapter shows
+        how to convert such recursions into loops.
+      </p>
+      <h3>Multitasking</h3>
+      <p>
+        A laptop runs hundreds of processes on 8 cores. The OS
+        <strong>scheduler</strong> gives each runnable process a <strong>time
+        slice</strong>, typically a few milliseconds, then stops it and runs
+        another. Switching between processes, a <strong>context switch</strong>,
+        saves one process&rsquo;s registers and restores another&rsquo;s. It costs
+        microseconds directly, and more indirectly, because the incoming process
+        finds the caches full of the outgoing one&rsquo;s data. Switching happens
+        often enough that every program appears to run continuously.
+      </p>
+      <h3>System calls and I/O</h3>
+      <p>
+        A process cannot touch a disk, a network or the screen itself. It asks the
+        OS through a <strong>system call</strong>, which transfers control into the
+        OS and back, at a cost of hundreds of nanoseconds or more before any data
+        moves. This is why output is <strong>buffered</strong>: <code>cout</code>
+        collects characters in memory and passes them to the OS in large pieces.
+        <code>endl</code> writes a newline <em>and</em> forces the buffer out, so
+        when output goes to a file or another program, a loop that prints a
+        million lines with <code>endl</code> makes about a million system calls
+        where <code>"\n"</code> makes a few hundred. (Output to a terminal is
+        flushed at every newline either way.)
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="vm">6. Virtual memory, paging and swap</h2>
+      <p>
+        The addresses a program uses are not the physical addresses of memory
+        chips. They are <strong>virtual addresses</strong>, translated by the
+        hardware on every access.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (virtual memory, page)</span>
+        <strong>Virtual memory</strong> divides each address space into fixed-size
+        <strong>pages</strong>, 4 KiB on most systems, and keeps a <strong>page
+        table</strong> per process mapping each virtual page to a physical page
+        frame or marking it as not present. A small cache of recent translations,
+        the <strong>TLB</strong> (translation lookaside buffer), makes most
+        translations free.
+      </div>
+      <p>
+        Translation is what gives each process its own address space: the same
+        virtual address in two processes maps to different physical memory. It
+        also lets the OS hand out memory lazily. When a program allocates a large
+        array, the OS only records that those pages may be used; it supplies a
+        physical page the first time each page is touched. That first touch is a
+        <strong>page fault</strong>: the hardware finds no translation, the OS
+        allocates and zeroes a page, updates the table, and resumes the program. A
+        program that allocates 256 MiB and then fills it pays 65,536 such faults,
+        one per page, on the first pass and none afterwards. This is one reason a
+        timing experiment should not time the first pass over freshly allocated
+        memory.
+      </p>
+      <p>
+        An array much larger than the TLB covers (the TLB holds on the order of a
+        thousand translations, a few MiB of 4 KiB pages) also pays a translation
+        miss on random accesses. That is the early rise in the latency figure of
+        section 2, before the L3 cache is full.
+      </p>
+      <h3>Swap and thrashing</h3>
+      <p>
+        When the processes running together ask for more memory than the machine
+        has, the OS moves pages that have not been used recently out to a reserved
+        area of the disk, the <strong>swap</strong> space, and marks them not
+        present. Touching a swapped-out page causes a page fault that reads it back
+        from disk, at SSD or disk latency: tens of microseconds to milliseconds,
+        thousands to tens of thousands of times a main-memory access. A program
+        whose working set (the memory it uses repeatedly) fits in physical memory
+        hardly notices swap. One whose working set does not fit spends nearly all
+        its time waiting for pages, a condition called <strong>thrashing</strong>,
+        in which it can run hundreds of times slower than its operation count
+        suggests. For data structures this is the space analysis of
+        <a href="foundation-space-complexity.html">Space Complexity</a> with a
+        cliff in it: a structure 10% too large for memory is not 10% slower.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="compiler">7. The compiler</h2>
+      <p>
+        <code>g++ prog.cpp -o prog</code> runs four programs in turn:
+      </p>
+      <ol>
+        <li><strong>the preprocessor</strong> pastes in every <code>#include</code>d
+          file and expands macros, producing one large source file;</li>
+        <li><strong>the compiler proper</strong> parses that file, checks types,
+          optimizes, and generates assembly code for the target processor;</li>
+        <li><strong>the assembler</strong> turns assembly into an <strong>object
+          file</strong> of machine code with unresolved references to functions
+          defined elsewhere;</li>
+        <li><strong>the linker</strong> combines object files and libraries into
+          one executable, resolving each reference to the function&rsquo;s
+          address.</li>
+      </ol>
+      <p>
+        The division explains two kinds of error message. A compile error names a
+        line of your source. A linker error, such as <code>undefined reference to
+        'IntList::~IntList()'</code>, means every file compiled but some function
+        was declared (usually in a header) and never defined, or its file was not
+        given to the linker.
+      </p>
+      <h3>Optimization</h3>
+      <p>
+        By default (<code>-O0</code>) the compiler translates each statement
+        directly, keeping every variable in memory, so that a debugger can show
+        them. With <code>-O2</code> it keeps values in registers, moves
+        computations out of loops, replaces calls to small functions by their
+        bodies (<strong>inlining</strong>), and removes work whose result is never
+        used. The program&rsquo;s output is the same; its running time is not.
+      </p>
+      <table>
+        <tr><th>measured (<code>optimize.cpp</code>)</th><th><code>-O0</code></th><th><code>-O2</code></th></tr>
+        <tr><td>brute-force 3-sum, \(n = 1500\): 561,375,500 triples tested</td><td>3.82 s</td><td>0.190 s</td></tr>
+        <tr><td>a billion-iteration loop whose sum is printed</td><td>8.35 s</td><td>0.646 s</td></tr>
+        <tr><td>the same loop, with the sum never used</td><td>8.46 s</td><td>0.000 s</td></tr>
+      </table>
+      <p>
+        The first two rows differ by a factor of 13 to 20 with identical operation
+        counts. The last row is not a fast loop: at <code>-O2</code> the compiler
+        proved that the loop has no effect on the program&rsquo;s output and deleted
+        it. Any timing experiment must use what it computes (print it, return it,
+        add it to something printed), or it may be timing nothing.
+      </p>
+      <h3>Undefined behaviour</h3>
+      <p>
+        The C++ standard leaves some operations <strong>undefined</strong>: reading
+        outside an array, using an object after its lifetime, reading an
+        uninitialized variable, overflowing a signed integer. The optimizer is
+        allowed to assume they never happen. A loop that relies on signed overflow
+        to terminate, or a check placed after a null dereference, may be removed
+        entirely at <code>-O2</code>, so a program with undefined behaviour can
+        work at <code>-O0</code> and fail at <code>-O2</code>, or work on one
+        compiler and fail on another. The tools of
+        <a href="foundation-cpp-essentials.html#tools">C++ for Data Structures,
+        section 8</a> (warnings, sanitizers, Valgrind) find most of these errors.
+      </p>
+      <h3>Different machines, different compilers</h3>
+      <p>
+        &ldquo;It works on my laptop&rdquo; often means it works with that compiler
+        and that library. macOS installs Apple&rsquo;s <code>clang</code> under the
+        name <code>g++</code>, with a different standard library from Linux&rsquo;s
+        GNU <code>g++</code>. The two give some library types different sizes
+        (<code>sizeof(std::string)</code> is 24 bytes with Apple&rsquo;s library
+        and 32 with GNU&rsquo;s) and implement the random number distributions
+        differently, so the same seed can give different sequences. Code meant to run elsewhere should be compiled and tested there.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="timing">8. Consequences for measuring programs</h2>
+      <p>
+        The doubling experiments of
+        <a href="foundation-time-analysis.html#doubling">Analysis of Algorithms:
+        Time</a> measure running time; everything above affects the measurement.
+      </p>
+      <ul>
+        <li><strong>Count operations when you can.</strong> An operation count is
+          exact and the same on every machine; a time is neither.</li>
+        <li><strong>Compile with optimization</strong> (<code>-O2</code>), since
+          that is how programs are run, and <strong>use every result</strong>, so
+          that the optimizer cannot delete the work.</li>
+        <li><strong>Time enough work.</strong> A run of a few milliseconds is
+          dominated by timer resolution, page faults on first touch and cache
+          warm-up. Repeat short runs and report the median.</li>
+        <li><strong>Expect noise.</strong> Other processes share the cores and the
+          caches, and the processor changes its clock rate with temperature and
+          load. Ratios between runs on the same machine are more reliable than
+          absolute times.</li>
+        <li><strong>Watch for a change of level.</strong> A doubling ratio that
+          jumps when the data outgrows a cache, or memory, is the hierarchy, not
+          the algorithm.</li>
+      </ul>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          A cache line is 64 bytes. A loop reads every element of an array of
+          \(10^6\) <code>double</code>s in order. About how many cache misses occur,
+          ignoring prefetching? How many if it reads every 8th element?
+          <details>
+            <summary>solution</summary>
+            A line holds \(64 / 8 = 8\) doubles, so the full scan touches
+            \(10^6 / 8 = 125{,}000\) lines: about 125,000 misses. Reading every 8th
+            element touches the same 125,000 lines, one element from each, so it
+            takes about as many misses while doing one eighth of the additions. Its
+            running time is close to that of the full scan.
+          </details>
+        </li>
+        <li>
+          Explain why summing a row-major matrix by columns is slow, and give a
+          loop order for computing the sum of each column that is fast.
+          <details>
+            <summary>solution</summary>
+            Down a column, consecutive elements are a full row apart in memory, so
+            each read is in a different cache line, and the line is evicted before
+            the next column returns to it. To compute column sums quickly, keep an
+            array <code>colSum[c]</code> and loop by rows:
+            <code>for r: for c: colSum[c] += m[r*n + c];</code>. The matrix is now
+            read sequentially, and the \(n\) partial sums stay in cache.
+          </details>
+        </li>
+        <li>
+          In the external-memory model with \(B = 512\) items per block, how many
+          transfers does a scan of \(N = 2^{30}\) items cost? A binary search? A
+          search in a tree with 512 keys per node?
+          <details>
+            <summary>solution</summary>
+            Scan: \(2^{30} / 2^9 = 2^{21} = 2{,}097{,}152\) transfers. Binary
+            search: about \(\lg(N/B) = 30 - 9 = 21\) transfers. Tree with fan-out
+            512: height about \(\log_{512} 2^{30} = 30/9 \approx 3.3\), so 4
+            transfers.
+          </details>
+        </li>
+        <li>
+          A recursive function on a linked list uses a 64-byte stack frame per
+          call. With an 8 MiB stack, what is the longest list it can process?
+          <details>
+            <summary>solution</summary>
+            \(8 \times 2^{20} / 64 = 131{,}072\) nodes, slightly fewer in practice
+            because <code>main</code> and the runtime use part of the stack. A list
+            of a million nodes overflows the stack; an iterative version uses
+            constant stack space.
+          </details>
+        </li>
+        <li>
+          A student times <code>for (i = 0; i &lt; n; i++) x += i;</code> at
+          <code>-O2</code>, never uses <code>x</code>, and finds the time does not
+          grow with <code>n</code>. What happened?
+          <details>
+            <summary>solution</summary>
+            The loop has no effect on the program&rsquo;s output, so the optimizer
+            removed it. The measured time is the cost of reading the clock twice.
+            Printing <code>x</code> after the timing restores the loop.
+          </details>
+        </li>
+        <li>
+          A program allocates a 2 GiB table, fills it once, then performs random
+          lookups. On a machine with 4 GiB of memory and other programs running it
+          is extremely slow; on a machine with 32 GiB it is fast. Explain.
+          <details>
+            <summary>solution</summary>
+            On the small machine the table and the other programs do not all fit
+            in physical memory, so the OS swaps pages of the table to disk, and
+            random lookups keep faulting them back in at disk latency, thousands
+            of times slower than a memory access: thrashing. On the large machine
+            the whole table stays resident and each lookup costs one main-memory
+            access.
+          </details>
+        </li>
+        <li>
+          Why can printing a million lines with <code>endl</code> be much slower
+          than with <code>"\n"</code>?
+          <details>
+            <summary>solution</summary>
+            <code>endl</code> flushes the output buffer after every line, and each
+            flush is a system call. <code>"\n"</code> leaves the characters in the
+            buffer, which is passed to the OS only when it fills, so a million lines
+            become a few hundred system calls. (This holds when output goes to a
+            file or a pipe; a terminal is flushed at every newline.)
+          </details>
+        </li>
+        <li>
+          Linear probing and separate chaining both search a hash table in expected
+          constant time. Using sections 3 and 4, explain why linear probing is
+          usually faster on modern hardware at moderate load.
+          <details>
+            <summary>solution</summary>
+            A linear-probing search reads a run of adjacent slots in one array,
+            usually within one or two cache lines. A chaining search reads the
+            bucket array and then follows a pointer to each node of the chain, and
+            nodes allocated separately are scattered in memory, so each step can be
+            a cache miss. In the external-memory view, probing costs about one
+            block transfer per search and chaining about one per chain node.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Computer Systems Primer v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax.
+      </footer>
+    </div>
+  </body>
+</html>

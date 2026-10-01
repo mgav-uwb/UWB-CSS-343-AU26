@@ -1,0 +1,708 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: C++ for Data Structures.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>C++ for Data Structures - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+      @media (max-width: 520px) { table { font-size: 13px; } th, td { padding: 5px 6px; } td code { word-break: break-all; } }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+
+      <h1>C++ for Data Structures</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        The parts of C++ that every data structure in this book relies on: how
+        values, references and pointers name objects; what each way of passing an
+        argument lets a function do; how heap memory is allocated, owned and
+        freed; why a class that owns memory needs a destructor, a copy constructor
+        and a copy assignment operator (the Rule of Three); the standard
+        containers and templates; and the tools that find memory errors. It
+        assumes a first course in programming in C++ or a similar language. The
+        machine-level view of memory (caches, pages, the compiler) is in the
+        companion <a href="foundation-computer-systems.html">Computer Systems
+        Primer</a>.
+      </div>
+
+      <p class="lead">
+        A linked list, a binary search tree, a hash table and a graph are all
+        built from the same few C++ mechanisms: an object that refers to other
+        objects through pointers, nodes allocated one at a time on the heap, and a
+        class that is responsible for freeing them. When these mechanisms are
+        misunderstood, the resulting bugs are not wrong answers but crashes,
+        corrupted data and memory that is never returned, and they often appear
+        far from the line that caused them. This chapter states each mechanism
+        precisely, shows what goes wrong without it, and ends with the tools that
+        detect the errors.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#objects">Objects, names and lifetimes</a></li>
+          <li><a href="#refptr">References and pointers</a></li>
+          <li><a href="#passing">Passing arguments and returning results</a></li>
+          <li><a href="#heap">The heap: <code>new</code> and <code>delete</code></a></li>
+          <li><a href="#owning">Classes that own memory: the destructor</a></li>
+          <li><a href="#three">Copying: the Rule of Three</a></li>
+          <li><a href="#stl">Templates and the standard library</a></li>
+          <li><a href="#tools">Finding memory errors</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="objects">1. Objects, names and lifetimes</h2>
+      <p>
+        An <strong>object</strong> in C++ is a region of memory that holds a value
+        of some type: an <code>int</code>, a <code>double</code>, a
+        <code>struct</code>. A <strong>variable</strong> is a name for an object.
+        Every object has a <strong>lifetime</strong>, the interval during which it
+        exists, and using an object outside its lifetime is an error that the
+        language does not catch for you.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (storage duration)</span>
+        An <strong>automatic</strong> object is a local variable or parameter. It
+        is created when execution reaches its declaration and destroyed when the
+        enclosing block (the code between a pair of braces) ends. A
+        <strong>dynamic</strong> object is created by <code>new</code> and lives
+        until a matching <code>delete</code>, regardless of blocks. A
+        <strong>static</strong> object (a global variable, or a local declared
+        <code>static</code>) lives for the whole run of the program.
+      </div>
+      <p>
+        Automatic objects live in the function&rsquo;s <strong>stack
+        frame</strong>: when a function is called, a block of memory is reserved
+        for its parameters and locals, and when it returns that block is released
+        all at once. Dynamic objects live on the <strong>heap</strong>, a separate
+        pool managed by the program at run time. The
+        <a href="foundation-space-complexity.html#heap">Space Complexity</a>
+        chapter counts the bytes in each; this chapter is about using them
+        correctly.
+      </p>
+      <pre>void f() {
+    int a = 1;              <span class="cm">// automatic: created here</span>
+    {
+        int b = 2;          <span class="cm">// automatic: created here</span>
+    }                       <span class="cm">// b destroyed here</span>
+    int* p = new int(3);    <span class="cm">// p is automatic; *p is dynamic</span>
+    delete p;               <span class="cm">// *p destroyed here</span>
+}                           <span class="cm">// a and p destroyed here</span></pre>
+      <p>
+        The pointer <code>p</code> and the integer it points to have different
+        lifetimes. Destroying <code>p</code> at the closing brace does not destroy
+        <code>*p</code>; without the <code>delete</code>, the integer would remain
+        allocated with nothing left that knows its address. That situation, a
+        <strong>memory leak</strong>, is the first of the errors this chapter
+        teaches you to avoid.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="refptr">2. References and pointers</h2>
+      <p>
+        C++ has two ways for one name to refer to an object that another name
+        also refers to.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (reference)</span>
+        A <strong>reference</strong> <code>int&amp; r = x;</code> is another name
+        for the existing object <code>x</code>. It must be initialized when it is
+        declared, it always refers to the same object afterwards, and there is no
+        null reference. Using <code>r</code> is using <code>x</code>.
+      </div>
+      <div class="def">
+        <span class="tag">Definition (pointer)</span>
+        A <strong>pointer</strong> <code>int* p = &amp;x;</code> is an object whose
+        value is the address of another object. <code>&amp;x</code> takes the
+        address of <code>x</code>; <code>*p</code> (dereferencing) is the object at
+        that address. A pointer can be changed to point elsewhere, and it can hold
+        the special value <code>nullptr</code>, which points to no object.
+      </div>
+      <pre>int x = 10, y = 20;
+int&amp; r = x;      <span class="cm">// r is x</span>
+int* p = &amp;x;     <span class="cm">// p holds x's address</span>
+r = 11;          <span class="cm">// x is now 11</span>
+*p = 12;         <span class="cm">// x is now 12</span>
+p = &amp;y;          <span class="cm">// p now points to y; x is unchanged</span>
+*p = 21;         <span class="cm">// y is now 21</span>
+r = y;           <span class="cm">// NOT a rebinding: copies y's value into x, so x is 21</span></pre>
+      <p>
+        The last line is a frequent source of confusion. A reference cannot be
+        made to refer to a different object; assigning to it assigns to the object
+        it already names. This is why data structures use pointers, not
+        references, for links: a list node&rsquo;s <code>next</code> must be able
+        to change, and the last node needs a <code>next</code> that refers to
+        nothing.
+      </p>
+      <table>
+        <tr><th></th><th>reference <code>T&amp;</code></th><th>pointer <code>T*</code></th></tr>
+        <tr><td>must be initialized</td><td>yes</td><td>no (but an uninitialized pointer holds garbage)</td></tr>
+        <tr><td>can refer to nothing</td><td>no</td><td>yes, <code>nullptr</code></td></tr>
+        <tr><td>can be redirected</td><td>no</td><td>yes</td></tr>
+        <tr><td>access the object</td><td><code>r</code></td><td><code>*p</code>, or <code>p-&gt;field</code> for a struct</td></tr>
+        <tr><td>typical use</td><td>parameters, aliases</td><td>links between nodes, optional objects, heap objects</td></tr>
+      </table>
+      <p>
+        For a pointer to a struct, <code>p-&gt;key</code> is shorthand for
+        <code>(*p).key</code>. Dereferencing <code>nullptr</code>, or a pointer
+        whose object no longer exists, is <strong>undefined behaviour</strong>: the
+        language makes no promise about what happens. The program may crash, may
+        print a plausible wrong value, or may appear to work until the input
+        changes. Every traversal of a linked structure therefore tests for
+        <code>nullptr</code> before following a link.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="passing">3. Passing arguments and returning results</h2>
+      <p>
+        How a parameter is declared decides what the function receives, whether it
+        can change the caller&rsquo;s variable, and whether a copy is made.
+      </p>
+      <pre>void byValue(int x)  { x = 99; }
+void byRef(int&amp; x)   { x = 99; }
+void byPtr(int* x)   { *x = 99; }
+
+int main() {
+    int a = 1, b = 1, c = 1;
+    byValue(a);
+    byRef(b);
+    byPtr(&amp;c);
+    cout &lt;&lt; a &lt;&lt; " " &lt;&lt; b &lt;&lt; " " &lt;&lt; c &lt;&lt; "\n";   <span class="cm">// prints 1 99 99</span>
+}</pre>
+      <table>
+        <tr><th>parameter</th><th>the function receives</th><th>can change the caller&rsquo;s variable?</th><th>copies the argument?</th></tr>
+        <tr><td><code>T x</code></td><td>a copy</td><td>no</td><td>yes</td></tr>
+        <tr><td><code>T&amp; x</code></td><td>the variable itself</td><td>yes</td><td>no</td></tr>
+        <tr><td><code>const T&amp; x</code></td><td>the variable itself, read-only</td><td>no</td><td>no</td></tr>
+        <tr><td><code>T* x</code></td><td>the variable&rsquo;s address</td><td>yes, through <code>*x</code></td><td>copies only the address</td></tr>
+      </table>
+      <h3>The cost of a copy</h3>
+      <p>
+        Passing by value copies the whole argument. For an <code>int</code> that
+        is free; for a <code>vector</code> of \(N\) elements it is \(N\) element
+        copies and a heap allocation on <em>every call</em>. A function that sums a
+        vector of 1000 elements whose element type counts its own copies shows the
+        difference directly:
+      </p>
+      <pre>long sumByValue(vector&lt;Tracked&gt; a)          { ... }   <span class="cm">// 1000 element copies per call</span>
+long sumByConstRef(const vector&lt;Tracked&gt;&amp; a) { ... }   <span class="cm">// 0 copies</span></pre>
+      <p>
+        A function called once per element of a loop that copies an \(N\)-element
+        argument turns a linear algorithm into a quadratic one without any change
+        to its visible logic. The rule that follows is the default in this book:
+      </p>
+      <div class="thm">
+        <span class="tag">Rule (choosing a parameter)</span>
+        Pass small values (<code>int</code>, <code>double</code>, a pointer) by
+        value. Pass objects the function only reads (containers, strings,
+        structs) by <code>const</code> reference. Pass by non-<code>const</code>
+        reference when the function must change the caller&rsquo;s object. Use a
+        pointer when &ldquo;no object&rdquo; is a legal argument, as for the
+        <code>Node*</code> of an empty subtree.
+      </div>
+      <h3>Returning results</h3>
+      <p>
+        A function may return a reference or a pointer only to an object that
+        outlives the call. Returning the address of a local variable is the
+        standard lifetime error:
+      </p>
+      <pre>int* makeA() { int x = 7; return &amp;x; }    <span class="cm">// BUG: x dies at return</span>
+int* makeB() { return new int(7); }        <span class="cm">// correct; the caller must delete</span></pre>
+      <p>
+        <code>makeA</code> returns a <strong>dangling pointer</strong>: the address
+        of a stack slot that the next function call will reuse. Returning a large
+        object <em>by value</em>, on the other hand, is not expensive in modern
+        C++: the compiler constructs the result directly in the caller&rsquo;s
+        variable or moves it, so <code>vector&lt;int&gt; build(int n)</code> is
+        the normal way to return a container.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="heap">4. The heap: <code>new</code> and <code>delete</code></h2>
+      <p>
+        A data structure that grows while the program runs cannot keep its nodes
+        in stack frames, because the frame disappears when the function that
+        created the node returns. Nodes are therefore allocated on the heap.
+      </p>
+      <pre>struct Node {
+    int   key;
+    Node* next;
+    Node(int k, Node* n) : key(k), next(n) {}
+};
+
+Node* head = nullptr;
+head = new Node(8, head);     <span class="cm">// list: 8</span>
+head = new Node(5, head);     <span class="cm">// list: 5 8</span>
+head = new Node(3, head);     <span class="cm">// list: 3 5 8</span></pre>
+      <pre>head
+ |
+ v
+[3 | *]--&gt;[5 | *]--&gt;[8 | null]</pre>
+      <p>
+        <code>new Node(3, head)</code> allocates space for one <code>Node</code> on
+        the heap, runs its constructor, and returns the address. The node lives
+        until <code>delete</code> is applied to that address. An array allocated
+        with <code>new T[n]</code> must be freed with <code>delete[]</code>, not
+        <code>delete</code>.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (three heap errors)</span>
+        A <strong>memory leak</strong>: a heap object that is never deleted, usually
+        because the last pointer to it was overwritten or went out of scope. A
+        <strong>dangling pointer</strong>: a pointer to an object that has already
+        been deleted (or to a dead local); using it is undefined behaviour. A
+        <strong>double delete</strong>: deleting the same object twice, which
+        corrupts the heap&rsquo;s own bookkeeping and typically crashes later, at
+        an unrelated allocation.
+      </div>
+      <p>
+        All three come from the same question left unanswered: <em>which part of
+        the program is responsible for deleting this object?</em> The answer C++
+        programs give is ownership by a class.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="owning">5. Classes that own memory: the destructor</h2>
+      <div class="def">
+        <span class="tag">Definition (ownership, destructor)</span>
+        A class <strong>owns</strong> a heap object when it is the one place in the
+        program responsible for deleting it. Its <strong>destructor</strong>,
+        written <code>~ClassName()</code>, runs automatically when an object of the
+        class is destroyed (at the end of its block for an automatic object, at
+        <code>delete</code> for a dynamic one) and is where the owned objects are
+        freed.
+      </div>
+      <pre>class IntList {
+public:
+    ~IntList() {
+        while (head != nullptr) {
+            Node* doomed = head;
+            head = head-&gt;next;      <span class="cm">// read next BEFORE deleting the node holding it</span>
+            delete doomed;
+        }
+    }
+    void pushFront(int key) { head = new Node(key, head); }
+private:
+    Node* head = nullptr;
+};</pre>
+      <p>
+        The order of the two middle lines matters. After <code>delete
+        doomed</code>, the node no longer exists, so reading
+        <code>doomed-&gt;next</code> would be a use of a dangling pointer. The loop
+        saves the link first.
+      </p>
+      <p>
+        Tying the release of a resource to the destructor of the object that owns
+        it is called <strong>RAII</strong> (Resource Acquisition Is
+        Initialization). Its benefit is that cleanup cannot be forgotten: when an
+        <code>IntList</code> goes out of scope, every node it owns is freed,
+        whether the block ended normally, by an early <code>return</code>, or by an
+        exception. The standard containers (<code>vector</code>,
+        <code>string</code>, <code>map</code>) all work this way.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="three">6. Copying: the Rule of Three</h2>
+      <p>
+        If a class declares no copy operations, the compiler writes them: the
+        generated <strong>copy constructor</strong> and <strong>copy
+        assignment</strong> copy each member in turn. For an <code>IntList</code>
+        whose only member is <code>head</code>, that copies one pointer.
+      </p>
+      <pre>{
+    IntList a;                 <span class="cm">// a owns 3 nodes</span>
+    a.pushFront(8); a.pushFront(5); a.pushFront(3);
+    IntList b = a;             <span class="cm">// generated copy: b.head == a.head</span>
+    b.setFirst(99);            <span class="cm">// changes a's first node too</span>
+}                              <span class="cm">// b's destructor frees the 3 nodes, then</span>
+                               <span class="cm">// a's destructor walks and frees them again</span></pre>
+      <div class="def">
+        <span class="tag">Definition (shallow and deep copy)</span>
+        A <strong>shallow copy</strong> copies the pointers an object holds, so the
+        original and the copy share the objects pointed to. A <strong>deep
+        copy</strong> allocates new objects with the same values, so the copy owns
+        objects of its own.
+      </div>
+      <p>
+        The shallow copy above has two symptoms. Changing <code>b</code> changes
+        <code>a</code>, and at the end of the block both destructors delete the
+        same three nodes: a double delete. A class that owns memory must therefore
+        replace the generated copy operations.
+      </p>
+      <div class="thm">
+        <span class="tag">Rule of Three</span>
+        If a class needs a user-written destructor, copy constructor, or copy
+        assignment operator, it almost certainly needs all three. A destructor that
+        frees owned memory means the generated (shallow) copies are wrong.
+      </div>
+      <h3>The copy constructor</h3>
+      <p>
+        The copy constructor builds a new object from an existing one. For a list
+        it walks the source and appends a new node for each, keeping the order:
+      </p>
+      <pre>IntList(const IntList&amp; other) {
+    Node* tail = nullptr;
+    for (const Node* p = other.head; p != nullptr; p = p-&gt;next) {
+        Node* n = new Node(p-&gt;key, nullptr);
+        if (tail == nullptr) head = n;      <span class="cm">// first node</span>
+        else                 tail-&gt;next = n; <span class="cm">// append after the last</span>
+        tail = n;
+    }
+}</pre>
+      <p>
+        Building the copy with <code>pushFront</code> would be shorter and wrong:
+        it reverses the list.
+      </p>
+      <h3>Copy assignment</h3>
+      <p>
+        Assignment <code>c = a;</code> differs from construction in one way:
+        <code>c</code> already exists and already owns nodes. Assignment must free
+        those first, then copy, and must survive being asked to assign an object
+        to itself.
+      </p>
+      <pre>IntList&amp; operator=(const IntList&amp; other) {
+    if (this != &amp;other) {        <span class="cm">// self-assignment guard</span>
+        clear();                 <span class="cm">// free the nodes this list owns</span>
+        copyFrom(other);         <span class="cm">// then deep-copy, as the copy constructor does</span>
+    }
+    return *this;                <span class="cm">// allows c = b = a</span>
+}</pre>
+      <p>
+        Without the guard, <code>c = c;</code> would free <code>c</code>&rsquo;s
+        nodes and then try to copy from them. The return value
+        <code>*this</code> lets assignments chain, as they do for built-in types.
+        A program that builds a list, copies it, assigns over another and
+        assigns a list to itself, counting nodes as they are created and
+        destroyed, ends with exactly as many deletions as allocations:
+      </p>
+      <pre>a: 3 -&gt; 5 -&gt; 8
+after b = a; b.setFirst(99)
+a: 3 -&gt; 5 -&gt; 8
+b: 99 -&gt; 5 -&gt; 8
+c: 3 -&gt; 5 -&gt; 8
+live nodes inside the block: 9
+live nodes after the block:  0</pre>
+      <div class="aside">
+        <span class="tag">Beyond three</span>
+        C++11 added two more operations, the move constructor and move assignment,
+        which transfer ownership from an object that is about to be destroyed
+        instead of copying it (the <strong>Rule of Five</strong>). The opposite
+        approach, the <strong>Rule of Zero</strong>, avoids writing any of the five
+        by holding resources only through members that already manage themselves,
+        such as <code>vector</code> or <code>std::unique_ptr</code>. Production
+        code prefers the Rule of Zero; this book writes the Rule of Three out by
+        hand because the data structures it studies are the kind of class that
+        sits underneath those members.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="stl">7. Templates and the standard library</h2>
+      <p>
+        A <strong>template</strong> is code written once for any type. A function
+        template states its type as a parameter, and the compiler generates a
+        separate version for each type it is used with:
+      </p>
+      <pre>template &lt;class T&gt;
+T largest(const vector&lt;T&gt;&amp; a) {      <span class="cm">// a must be non-empty</span>
+    T best = a[0];
+    for (const T&amp; x : a) if (best &lt; x) best = x;
+    return best;
+}
+largest(vector&lt;int&gt;{3, 9, 4});         <span class="cm">// 9</span>
+largest(vector&lt;string&gt;{"b", "c", "a"}); <span class="cm">// "c"</span></pre>
+      <p>
+        The only requirement <code>largest</code> places on <code>T</code> is that
+        it can be copied and compared with <code>&lt;</code>. A class template such
+        as <code>template &lt;class Key, class Value&gt; class BST</code> works the
+        same way, and is how the symbol tables of this book are written.
+      </p>
+      <p>
+        The <strong>Standard Template Library</strong> (STL) provides the
+        containers and algorithms used throughout:
+      </p>
+      <table>
+        <tr><th>name</th><th>what it is</th><th>chapter that builds the same idea</th></tr>
+        <tr><td><code>vector&lt;T&gt;</code></td><td>a dynamic array: contiguous, grows by doubling</td><td><a href="foundation-amortized-analysis.html">Amortized Analysis</a></td></tr>
+        <tr><td><code>list&lt;T&gt;</code></td><td>a doubly linked list</td><td>this chapter, section 4</td></tr>
+        <tr><td><code>map&lt;K,V&gt;</code>, <code>set&lt;K&gt;</code></td><td>ordered symbol tables (balanced search trees)</td><td><a href="../trees/ds-red-black-trees.html">Red-Black Trees</a></td></tr>
+        <tr><td><code>unordered_map&lt;K,V&gt;</code></td><td>a hash table</td><td><a href="../hashing/ds-hashing.html">Hashing</a></td></tr>
+        <tr><td><code>priority_queue&lt;T&gt;</code></td><td>a binary heap</td><td><a href="../heaps/ds-heaps-pq.html">Heaps &amp; Priority Queues</a></td></tr>
+        <tr><td><code>sort</code>, <code>lower_bound</code></td><td>sorting; binary search for the first position not less than a key</td><td><a href="../sorting/algo-quicksort.html">Quicksort</a>, <a href="foundation-recursion.html">Recursion</a></td></tr>
+      </table>
+      <p>
+        A <code>vector</code> keeps its <em>size</em> (elements in use) separate
+        from its <em>capacity</em> (elements allocated). <code>push_back</code> is
+        constant time on average because the capacity doubles when it runs out,
+        and the occasional full copy is paid for by the many cheap appends before
+        it. A pointer or reference to an element can dangle after a
+        <code>push_back</code> that reallocates, because the elements move to a new
+        array.
+      </p>
+      <pre>vector&lt;int&gt; v = {1, 2, 3};
+int&amp; first = v[0];
+v.push_back(4);      <span class="cm">// may reallocate: 'first' may now dangle</span></pre>
+
+      <!-- ============================================================ -->
+      <h2 id="tools">8. Finding memory errors</h2>
+      <p>
+        Memory errors rarely fail where they happen. A double delete corrupts the
+        allocator, and the crash comes at some later, unrelated
+        <code>new</code>; a leak produces no symptom at all until memory runs out.
+        Three tools find these errors at the line that causes them.
+      </p>
+      <table>
+        <tr><th>tool</th><th>how to use it</th><th>what it reports</th></tr>
+        <tr><td>compiler warnings</td><td><code>g++ -std=c++17 -Wall -Wextra</code></td><td>uninitialized variables, unused results, suspicious conversions, at compile time</td></tr>
+        <tr><td>sanitizers</td><td><code>g++ -std=c++17 -g -fsanitize=address,undefined</code>, then run</td><td>use after free, double delete, out-of-bounds access, signed overflow, leaks (on Linux), each with the line that caused it</td></tr>
+        <tr><td>Valgrind</td><td><code>g++ -std=c++17 -g</code>, then <code>valgrind --leak-check=full ./prog</code> (Linux)</td><td>invalid reads and writes, uses of uninitialized values, and every leaked block with the line that allocated it</td></tr>
+      </table>
+      <p>
+        The <code>-g</code> flag stores the source line of every instruction in
+        the program, which is what lets these tools name lines instead of
+        addresses. A clean Valgrind run ends with
+      </p>
+      <pre>All heap blocks were freed -- no leaks are possible
+ERROR SUMMARY: 0 errors from 0 contexts</pre>
+      <p>
+        The shallow-copy program of section 6, run under the address sanitizer,
+        stops inside the second destructor with a report that begins
+        <code>ERROR: AddressSanitizer: heap-use-after-free</code>: before that
+        destructor can delete a node a second time, it reads the node&rsquo;s
+        <code>next</code> field, and the node was already freed by the first
+        destructor. The report gives three stack traces: the bad read, where the
+        memory was freed, and where it was allocated. A program that runs correctly on one input is not
+        thereby free of memory errors; running the tests under a sanitizer or
+        Valgrind is part of testing.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          What does this print?
+          <pre>void f(int a, int&amp; b, int* c) { a++; b++; (*c)++; c = nullptr; }
+int main() { int x = 1, y = 1, z = 1; f(x, y, &amp;z); cout &lt;&lt; x &lt;&lt; y &lt;&lt; z; }</pre>
+          <details>
+            <summary>solution</summary>
+            <code>122</code>. <code>a</code> is a copy, so <code>x</code> stays 1.
+            <code>b</code> is <code>y</code>, so <code>y</code> becomes 2.
+            <code>c</code> holds the address of <code>z</code>, so
+            <code>(*c)++</code> makes <code>z</code> 2. Setting <code>c</code> to
+            <code>nullptr</code> changes only the function&rsquo;s own copy of the
+            address.
+          </details>
+        </li>
+        <li>
+          After <code>int x = 5, y = 7; int&amp; r = x; r = y; r = 9;</code>, what
+          are <code>x</code> and <code>y</code>?
+          <details>
+            <summary>solution</summary>
+            <code>x</code> is 9 and <code>y</code> is 7. <code>r = y</code> copies
+            the value 7 into <code>x</code>; it does not make <code>r</code> refer
+            to <code>y</code>. Then <code>r = 9</code> sets <code>x</code> to 9.
+          </details>
+        </li>
+        <li>
+          A function <code>bool contains(vector&lt;int&gt; a, int key)</code> scans
+          for a key, and is called once for each of \(N\) keys against a vector of
+          \(N\) elements. What is the total cost, and what one-character change
+          fixes it?
+          <details>
+            <summary>solution</summary>
+            Each call copies the \(N\)-element vector (\(N\) element copies) and
+            then scans it (up to \(N\) comparisons), so \(N\) calls cost on the
+            order of \(N^2\) copies in addition to the scans. Declaring the
+            parameter <code>const vector&lt;int&gt;&amp; a</code> removes the
+            copies. The scans remain quadratic in total, but the copying, which
+            also allocates on every call, is gone.
+          </details>
+        </li>
+        <li>
+          This destructor is wrong. Explain the error and fix it.
+          <pre>~IntList() { for (Node* p = head; p != nullptr; p = p-&gt;next) delete p; }</pre>
+          <details>
+            <summary>solution</summary>
+            After <code>delete p</code>, the update <code>p = p-&gt;next</code>
+            reads a field of a node that no longer exists: a use of a dangling
+            pointer. Save the link first:
+            <code>while (head) { Node* d = head; head = head-&gt;next; delete d; }</code>.
+          </details>
+        </li>
+        <li>
+          A class <code>Stack</code> holds <code>int* data</code> allocated with
+          <code>new int[cap]</code> and frees it in its destructor. It declares no
+          copy constructor. What happens in <code>{ Stack s; Stack t = s; }</code>?
+          <details>
+            <summary>solution</summary>
+            The generated copy constructor copies the pointer, so <code>s</code> and
+            <code>t</code> share one array. At the closing brace <code>t</code>
+            is destroyed first and frees the array, then <code>s</code> frees it
+            again: a double delete. Any change through one of them in between would
+            also be visible through the other.
+          </details>
+        </li>
+        <li>
+          Write the copy assignment operator for the <code>Stack</code> of the
+          previous exercise, which also has members <code>int size</code> and
+          <code>int cap</code>.
+          <details>
+            <summary>solution</summary>
+            <pre>Stack&amp; operator=(const Stack&amp; other) {
+    if (this != &amp;other) {
+        delete[] data;
+        cap = other.cap;
+        size = other.size;
+        data = new int[cap];
+        for (int i = 0; i &lt; size; i++) data[i] = other.data[i];
+    }
+    return *this;
+}</pre>
+            Note <code>delete[]</code>, matching <code>new int[cap]</code>.
+          </details>
+        </li>
+        <li>
+          Why does this assignment operator fail on <code>a = a;</code>?
+          <pre>IntList&amp; operator=(const IntList&amp; other) { clear(); copyFrom(other); return *this; }</pre>
+          <details>
+            <summary>solution</summary>
+            When <code>other</code> is the same object as <code>*this</code>,
+            <code>clear()</code> deletes every node, leaving <code>head</code>
+            null, and <code>copyFrom(other)</code> then copies an empty list. The
+            list silently becomes empty. (If <code>clear</code> did not reset
+            <code>head</code>, <code>copyFrom</code> would read deleted nodes
+            instead.) The guard <code>if (this != &amp;other)</code> prevents both.
+          </details>
+        </li>
+        <li>
+          <code>vector&lt;int&gt; v(4); int* p = &amp;v[0]; v.push_back(1); *p = 7;</code>
+          Is this correct?
+          <details>
+            <summary>solution</summary>
+            Not necessarily. If the <code>push_back</code> finds the capacity full
+            (here the capacity is 4, so it is), the vector allocates a larger array,
+            moves the elements, and frees the old one. <code>p</code> then points
+            into freed memory, and <code>*p = 7</code> is undefined behaviour. Take
+            the pointer after the last operation that can grow the vector, or keep
+            an index instead.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; C++ for Data Structures v1.0
+        &middot; prepared by Dr. Marcel Gavriliu.
+      </footer>
+    </div>
+  </body>
+</html>

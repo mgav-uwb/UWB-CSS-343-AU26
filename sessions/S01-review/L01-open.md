@@ -60,7 +60,8 @@ Quizzes and exams are **multiple choice, on paper**.
 
 - **Canvas:** announcements, submissions, grades
 - **Course text:** an online textbook, one chapter per topic
-- **Today's chapter:** <a href="../../textbook/foundations/foundation-recursion.html">Recursion & Induction</a>
+- **Today's chapters:** <a href="../../textbook/foundations/foundation-cpp-essentials.html">C++ for Data Structures</a>, <a href="../../textbook/foundations/foundation-recursion.html">Recursion & Induction</a>
+- **Background:** <a href="../../textbook/foundations/foundation-computer-systems.html">Computer Systems Primer</a> (memory, the OS, the compiler)
 - **Guides:** <a href="../../guides/guide-computing-environment.html">Computing Environment</a>, <a href="../../guides/guide-valgrind.html">Valgrind</a>
 - **Compiler:** `g++ -std=c++17` on the CSS Linux lab
 
