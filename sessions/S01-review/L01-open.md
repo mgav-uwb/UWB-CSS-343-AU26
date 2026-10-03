@@ -59,11 +59,11 @@ Quizzes and exams are **multiple choice, on paper**.
 ## Where things are
 
 - **Canvas:** announcements, submissions, grades
-- **Course text:** an online textbook, one chapter per topic
-- **Today's chapters:** <a href="../../textbook/foundations/foundation-cpp-essentials.html">C++ for Data Structures</a>, <a href="../../textbook/foundations/foundation-recursion.html">Recursion & Induction</a>
-- **Background:** <a href="../../textbook/foundations/foundation-computer-systems.html">Computer Systems Primer</a> (memory, the OS, the compiler)
+- **Course text:** online, one chapter per topic
+- **Today's chapters:** <a href="../../textbook/foundations/foundation-cpp-essentials.html">C++ for Data Structures</a>, <a href="../../textbook/foundations/foundation-recursion.html">Recursion & Induction</a>, <a href="../../textbook/foundations/foundation-counting-loops.html">Counting Loop Iterations</a>
+- **Background:** <a href="../../textbook/foundations/foundation-computer-systems.html">Computer Systems Primer</a>
 - **Guides:** <a href="../../guides/guide-computing-environment.html">Computing Environment</a>, <a href="../../guides/guide-valgrind.html">Valgrind</a>
-- **Compiler:** `g++ -std=c++17` on the CSS Linux lab
+- **Compiler:** `g++ -std=c++17`, CSS Linux lab
 
 Code is graded on the lab machines. Build and test there before submitting.
 

@@ -1,0 +1,543 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Counting Loop Iterations.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Counting Loop Iterations - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+      @media (max-width: 520px) { table { font-size: 13px; } th, td { padding: 5px 6px; } td code { word-break: break-all; } }
+      mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics. Read it in a browser; a
+        plain-text or inline document preview will not render the math.
+      </p>
+
+      <h1>Counting Loop Iterations</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        How to find, exactly, how many times a statement inside loops runs, as a
+        function of the input size: the trip count of a single loop and its
+        off-by-one traps, loops in sequence and loops nested, inner loops whose
+        bounds depend on the outer index, loops that halve or double, and loops
+        whose count depends on the data. It ends with a five-step method and
+        exercises with solutions. What to do with a count once you have it (which
+        terms matter, and how counts compare) is the subject of
+        <a href="foundation-time-analysis.html">Analysis of Algorithms: Time</a>;
+        counting the calls of a recursive function is in
+        <a href="foundation-recursion.html#recur">Recursion &amp; Induction,
+        section 6</a>.
+      </div>
+
+      <p class="lead">
+        Every cost in this book starts as a count: how many comparisons a search
+        makes, how many times a sort swaps, how many pairs an algorithm examines.
+        Most of those counts come from loops, and a loop&rsquo;s count is a
+        precise question with a precise answer. The answer is an expression in
+        \(n\) that is exactly right for every \(n\), and it can be checked by
+        putting a counter in the loop and running it. This chapter teaches the few
+        patterns that cover nearly every loop in the course.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#what">What we count</a></li>
+          <li><a href="#single">One loop: the trip count</a></li>
+          <li><a href="#seqnest">Loops in sequence and loops nested</a></li>
+          <li><a href="#dependent">Dependent inner loops: counts become sums</a></li>
+          <li><a href="#sums">The sums you need</a></li>
+          <li><a href="#log">Loops that halve or double</a></li>
+          <li><a href="#data">Loops whose count depends on the data</a></li>
+          <li><a href="#method">The method, in five steps</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="what">1. What we count</h2>
+      <p>
+        Pick one statement, usually the innermost one, and ask how many times it
+        executes. Call that statement the <strong>basic operation</strong>; in the
+        examples below it is <code>ops++</code>, a counter that does nothing else,
+        so that the code you read is the code being counted.
+      </p>
+      <pre>long ops = 0;
+for (int i = 0; i &lt; n; i++)
+    ops++;                     <span class="cm">// runs n times</span></pre>
+      <div class="def">
+        <span class="tag">Definition (count, trip count)</span>
+        The <strong>count</strong> of a statement is the number of times it
+        executes, as a function of the input size \(n\). The <strong>trip
+        count</strong> of a loop is the number of times its body runs, which is
+        the number of values its loop variable takes for which the condition is
+        true.
+      </div>
+      <p>
+        The second sentence is the key to every example that follows: to count a
+        loop, <em>list the values the loop variable takes</em>, then count the
+        list. A count is exact (499,500, not &ldquo;about half a million&rdquo;),
+        and it is a property of the code, not of the machine: the same loop has
+        the same count on every computer.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="single">2. One loop: the trip count</h2>
+      <p>
+        A loop that starts at \(a\), runs while \(i \lt b\), and adds a step
+        \(s \ge 1\) visits \(a, a+s, a+2s, \ldots\) up to the last value below
+        \(b\), so <code>for (i = a; i &lt; b; i += s)</code> runs
+      </p>
+      \[
+        \max\!\left(0, \left\lceil \frac{b - a}{s} \right\rceil\right) \text{ times.}
+      \]
+      <div style="overflow-x:auto"><table>
+        <tr><th>loop header</th><th>values of <code>i</code></th><th>trip count</th><th>at \(n = 10\)</th></tr>
+        <tr><td><code>for (i = 0; i &lt; n; i++)</code></td><td>0, 1, &hellip;, n &minus; 1</td><td>\(n\)</td><td>10</td></tr>
+        <tr><td><code>for (i = 1; i &lt;= n; i++)</code></td><td>1, 2, &hellip;, n</td><td>\(n\)</td><td>10</td></tr>
+        <tr><td><code>for (i = 0; i &lt;= n; i++)</code></td><td>0, 1, &hellip;, n</td><td>\(n + 1\)</td><td>11</td></tr>
+        <tr><td><code>for (i = 1; i &lt; n; i++)</code></td><td>1, 2, &hellip;, n &minus; 1</td><td>\(n - 1\)</td><td>9</td></tr>
+        <tr><td><code>for (i = 0; i &lt; n; i += 2)</code></td><td>0, 2, 4, &hellip;</td><td>\(\lceil n/2 \rceil\)</td><td>5</td></tr>
+        <tr><td><code>for (i = 0; i &lt; n; i += 3)</code></td><td>0, 3, 6, &hellip;</td><td>\(\lceil n/3 \rceil\)</td><td>4</td></tr>
+        <tr><td><code>for (i = n; i &gt; 0; i--)</code></td><td>n, n &minus; 1, &hellip;, 1</td><td>\(n\)</td><td>10</td></tr>
+      </table></div>
+      <div class="aside">
+        <span class="tag">Off by one</span>
+        The difference between <code>&lt;</code> and <code>&lt;=</code>, or between
+        starting at 0 and starting at 1, changes the count by one. That is
+        irrelevant to how the count grows, but it is the difference between a right
+        and a wrong answer to &ldquo;how many times exactly&rdquo;, and between a
+        correct loop and one that reads past the end of an array. When in doubt,
+        write out the values for \(n = 3\).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="seqnest">3. Loops in sequence and loops nested</h2>
+      <p>
+        Two loops <em>one after the other</em> run their bodies one set after the
+        other, so their counts <strong>add</strong>. A loop <em>inside</em> another
+        runs completely once for every iteration of the outer loop, so when the
+        inner count does not depend on the outer variable, the counts
+        <strong>multiply</strong>.
+      </p>
+      <pre>for (int i = 0; i &lt; n; i++) ops++;          <span class="cm">// n</span>
+for (int i = 0; i &lt; n; i++)
+    for (int j = 0; j &lt; m; j++) ops++;      <span class="cm">// n * m</span>
+                                            <span class="cm">// total: n + n*m</span></pre>
+      <div class="thm">
+        <span class="tag">Rule (sequence and nesting)</span>
+        Code in sequence: add the counts. A loop of trip count \(t\) around a body
+        of count \(c\) that does not depend on the loop variable: \(t \cdot c\).
+        Three nested loops of \(n\) iterations each give \(n^3\); a loop over all
+        \(n^2\) cells of a matrix around a body of count \(c\) gives
+        \(n^2 c\).
+      </div>
+      <p>
+        The rule applies to whatever the inner body is, including another loop of
+        a different shape. A loop of \(n^2\) iterations around a halving loop
+        (section 6) counts \(n^2(\lfloor \log_2 n \rfloor + 1)\): at \(n = 16\),
+        \(256 \times 5 = 1280\).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="dependent">4. Dependent inner loops: counts become sums</h2>
+      <p>
+        When the inner loop&rsquo;s bounds involve the outer variable, the inner
+        count is different on each outer iteration, and the total is a
+        <strong>sum</strong> of those counts.
+      </p>
+      <pre>for (int i = 0; i &lt; n; i++)
+    for (int j = 0; j &lt;= i; j++)
+        ops++;</pre>
+      <p>
+        Follow the method of section 1 one level at a time. For a fixed \(i\), the
+        inner variable takes the values \(0, 1, \ldots, i\): that is \(i + 1\)
+        values. The outer variable takes \(i = 0, 1, \ldots, n - 1\). So
+      </p>
+      \[
+        \text{count} \;=\; \sum_{i=0}^{n-1} (i + 1) \;=\; 1 + 2 + \cdots + n \;=\; \frac{n(n+1)}{2}.
+      \]
+      <p>
+        At \(n = 10\) that is 55, which is easy to confirm: the inner loop runs 1,
+        2, 3, &hellip;, 10 times. Changing <code>j &lt;= i</code> to
+        <code>j &lt; i</code> makes the inner count \(i\) instead of \(i + 1\), and
+        the total \(0 + 1 + \cdots + (n-1) = n(n-1)/2\), which is 45 at \(n = 10\).
+      </p>
+      <h3>Pairs and triples</h3>
+      <p>
+        The loop <code>for (i = 0; i &lt; n; i++) for (j = i + 1; j &lt; n; j++)</code>
+        visits every pair of indices \(i \lt j\) exactly once. Its count can be
+        found as a sum (the inner loop runs \(n - 1, n - 2, \ldots, 0\) times) or
+        by counting what it visits: the number of ways to choose 2 of \(n\)
+        indices,
+      </p>
+      \[
+        \binom{n}{2} = \frac{n(n-1)}{2}, \qquad
+        \binom{n}{3} = \frac{n(n-1)(n-2)}{6}.
+      \]
+      <p>
+        The second is the count of three nested loops with
+        <code>j = i + 1</code> and <code>k = j + 1</code>, which visit every triple
+        \(i \lt j \lt k\) once: 120 at \(n = 10\). Recognizing <em>what</em> a set
+        of nested loops enumerates is often the fastest way to count it.
+      </p>
+      <h3>Steps that skip</h3>
+      <p>
+        A dependent inner loop with a step uses section 2 inside the sum. In
+      </p>
+      <pre>for (int i = 0; i &lt; n; i++)
+    for (int j = i; j &lt; n; j += 2)
+        ops++;</pre>
+      <p>
+        the inner loop runs \(\lceil (n - i)/2 \rceil\) times, so the count is
+        \(\sum_{i=0}^{n-1} \lceil (n-i)/2 \rceil\): 30 at \(n = 10\)
+        (\(5 + 5 + 4 + 4 + 3 + 3 + 2 + 2 + 1 + 1\)), and about \(n^2/4\) in
+        general.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="sums">5. The sums you need</h2>
+      <p>
+        Four sums cover nearly every dependent loop in the course. The first is
+        found by writing the sum forwards and backwards and adding the columns:
+      </p>
+      <pre>   S = 1       + 2       + ... + n
+   S = n       + (n - 1) + ... + 1
+  -----------------------------------------
+  2S = (n + 1) + (n + 1) + ... + (n + 1)    (n columns)
+   S = n(n + 1) / 2</pre>
+      <div style="overflow-x:auto"><table>
+        <tr><th>sum</th><th>closed form</th><th>at \(n = 10\)</th><th>where it appears</th></tr>
+        <tr><td>\(\sum_{i=1}^{n} 1\)</td><td>\(n\)</td><td>10</td><td>a single loop</td></tr>
+        <tr><td>\(\sum_{i=1}^{n} i\)</td><td>\(\dfrac{n(n+1)}{2}\)</td><td>55</td><td>an inner loop up to the outer index</td></tr>
+        <tr><td>\(\sum_{i=1}^{n} i^2\)</td><td>\(\dfrac{n(n+1)(2n+1)}{6}\)</td><td>385</td><td>an inner loop up to the square of the outer index</td></tr>
+        <tr><td>\(\sum_{i=0}^{k} 2^i\)</td><td>\(2^{k+1} - 1\)</td><td>2047 (for \(k = 10\))</td><td>an inner loop up to a doubling outer index</td></tr>
+      </table></div>
+      <p>
+        The geometric sum is worth remembering in words: <em>a sum of doublings is
+        less than twice its last term</em>. \(1 + 2 + 4 + \cdots + 512 = 1023\),
+        just under \(2 \times 512\).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="log">6. Loops that halve or double</h2>
+      <p>
+        A loop whose variable is multiplied or divided by 2 each time takes
+        logarithmically many steps, because the base-2 logarithm counts exactly
+        how many times a number can be halved.
+      </p>
+      <div style="overflow-x:auto"><table>
+        <tr><th>loop header</th><th>values of <code>i</code> (n = 16)</th><th>trip count</th><th>\(n = 16\)</th><th>\(n = 17\)</th><th>\(n = 1000\)</th></tr>
+        <tr><td><code>for (i = n; i &gt;= 1; i /= 2)</code></td><td>16, 8, 4, 2, 1</td><td>\(\lfloor \log_2 n \rfloor + 1\)</td><td>5</td><td>5</td><td>10</td></tr>
+        <tr><td><code>for (i = 1; i &lt;= n; i *= 2)</code></td><td>1, 2, 4, 8, 16</td><td>\(\lfloor \log_2 n \rfloor + 1\)</td><td>5</td><td>5</td><td>10</td></tr>
+        <tr><td><code>for (i = 1; i &lt; n; i *= 2)</code></td><td>1, 2, 4, 8</td><td>\(\lceil \log_2 n \rceil\)</td><td>4</td><td>5</td><td>10</td></tr>
+      </table></div>
+      <p>
+        Integer division matters in the first row: with \(n = 17\) the values are
+        17, 8, 4, 2, 1, because 17 / 2 is 8 in C++. The count is again the number
+        of halvings, rounded down, plus one for the first iteration.
+      </p>
+      <h3>Nested around a halving loop</h3>
+      <p>
+        By the nesting rule, \(n\) iterations around a halving loop count
+        \(n(\lfloor \log_2 n \rfloor + 1)\): 10,000 at \(n = 1000\). This is the
+        shape of the costs written \(n \log n\) later in the course.
+      </p>
+      <h3>A dependent inner loop that adds up to linear</h3>
+      <p>
+        The nesting rule fails when the inner bound depends on the outer variable,
+        and the result can be surprising:
+      </p>
+      <pre>for (int i = n; i &gt; 0; i /= 2)
+    for (int j = 0; j &lt; i; j++)
+        ops++;</pre>
+      <p>
+        The outer loop runs about \(\log_2 n\) times, and the inner loop up to
+        \(n\) times, but the count is not \(n \log_2 n\). The inner loop runs
+        \(n\), then \(n/2\), then \(n/4\) times, and so on: a sum of halvings,
+        which by section 5 is less than \(2n\). At \(n = 16\) the count is
+        \(16 + 8 + 4 + 2 + 1 = 31\); at \(n = 1000\) it is 1994. Multiplying the
+        largest inner count by the outer trip count gives an upper bound, not the
+        count; the sum gives the count.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="data">7. Loops whose count depends on the data</h2>
+      <p>
+        A <code>while</code> loop, or a <code>for</code> loop with a
+        <code>break</code>, may stop at a point that depends on the values in the
+        input, not only on \(n\). Its count is then not one function of \(n\) but a
+        range, and we report the cases.
+      </p>
+      <pre>int find(const vector&lt;int&gt;&amp; a, int key) {
+    for (int i = 0; i &lt; (int)a.size(); i++)
+        if (a[i] == key) return i;        <span class="cm">// one comparison per iteration</span>
+    return -1;
+}</pre>
+      <ul>
+        <li><strong>Best case:</strong> the key is first: 1 comparison.</li>
+        <li><strong>Worst case:</strong> the key is last or absent: \(n\) comparisons.</li>
+        <li><strong>Average case</strong>, for a key equally likely to be at each of the \(n\) positions: \((n+1)/2\) comparisons.</li>
+      </ul>
+      <p>
+        When a loop has no simple formula, bound it by finding something that
+        <strong>shrinks every iteration and cannot go below zero</strong>. A
+        binary search loop halves the size of the range it still has to search,
+        so it runs at most \(\lfloor \log_2 n \rfloor + 1\) times. Two indices that
+        move toward each other, one of them by one step each iteration, start
+        \(n - 1\) apart and stop when they meet, so the loop runs at most
+        \(n - 1\) times, whatever the data.
+      </p>
+      <pre>int lo = 0, hi = n - 1;
+while (lo &lt; hi) {
+    if (/* some test on a[lo], a[hi] */) lo++;
+    else hi--;                            <span class="cm">// hi - lo shrinks by 1 every iteration</span>
+}</pre>
+
+      <!-- ============================================================ -->
+      <h2 id="method">8. The method, in five steps</h2>
+      <ol>
+        <li><strong>Choose the statement</strong> to count, usually the innermost one.</li>
+        <li><strong>Work from the inside out.</strong> For the innermost loop, list
+          the values of its variable for fixed outer variables, and count them
+          (section 2). The result may involve the outer variables.</li>
+        <li><strong>Combine</strong>: add for code in sequence; multiply when the inner
+          count does not depend on the outer variable; otherwise write a sum over the
+          outer variable.</li>
+        <li><strong>Close the sum</strong> with the table of section 5, or by
+          recognizing what the loops enumerate (pairs, triples).</li>
+        <li><strong>Check</strong> the formula at a small \(n\), such as 3 or 4, by listing
+          every iteration by hand, or by putting a counter in the code and printing
+          it for several \(n\).</li>
+      </ol>
+      <p>
+        The last step catches almost every error. A formula that gives 6 where the
+        hand count gives 5 has an off-by-one in it, and \(n = 3\) is small enough to
+        find where.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">9. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          How many times does the body run? <code>for (i = 2; i &lt; n; i += 2)</code>,
+          for \(n = 10\) and in general (\(n \ge 2\)).
+          <details>
+            <summary>solution</summary>
+            The values are 2, 4, 6, 8: 4 times at \(n = 10\). In general
+            \(\lceil (n - 2)/2 \rceil\), which is \(n/2 - 1\) for even \(n\).
+          </details>
+        </li>
+        <li>
+          Count <code>ops++</code>:
+          <pre>for (i = 0; i &lt; n; i++) ops++;
+for (j = 0; j &lt; 2 * n; j++) ops++;
+for (k = 0; k &lt; n; k++) for (m = 0; m &lt; 3; m++) ops++;</pre>
+          <details>
+            <summary>solution</summary>
+            \(n + 2n + 3n = 6n\). The loops are in sequence, so their counts add;
+            the last is \(n\) iterations around a body of 3.
+          </details>
+        </li>
+        <li>
+          Count <code>ops++</code> in
+          <code>for (i = 1; i &lt;= n; i++) for (j = 1; j &lt;= i; j++) ops++;</code>
+          for \(n = 6\), then in general.
+          <details>
+            <summary>solution</summary>
+            The inner loop runs \(i\) times: \(1 + 2 + \cdots + 6 = 21\). In general
+            \(n(n+1)/2\).
+          </details>
+        </li>
+        <li>
+          Count <code>ops++</code> in
+          <code>for (i = 0; i &lt; n; i++) for (j = 0; j &lt; n; j++) for (k = 0; k &lt; j; k++) ops++;</code>
+          <details>
+            <summary>solution</summary>
+            The innermost loop runs \(j\) times, so the two inner loops count
+            \(0 + 1 + \cdots + (n-1) = n(n-1)/2\), and the outer loop repeats that
+            \(n\) times: \(n \cdot n(n-1)/2\). At \(n = 10\): 450.
+          </details>
+        </li>
+        <li>
+          Count <code>ops++</code> in
+          <code>for (i = 0; i &lt; n; i++) for (j = 0; j &lt; i * i; j++) ops++;</code>
+          <details>
+            <summary>solution</summary>
+            The inner loop runs \(i^2\) times, for \(i = 0, \ldots, n-1\):
+            \(\sum_{i=0}^{n-1} i^2 = \frac{(n-1)n(2n-1)}{6}\). At \(n = 10\): 285.
+          </details>
+        </li>
+        <li>
+          How many times does <code>for (i = 1; i &lt; n; i *= 3)</code> run, for
+          \(n = 100\)?
+          <details>
+            <summary>solution</summary>
+            The values are 1, 3, 9, 27, 81: 5 times. In general
+            \(\lceil \log_3 n \rceil\) for \(n \ge 2\).
+          </details>
+        </li>
+        <li>
+          Count <code>ops++</code> in
+          <code>for (i = 1; i &lt; n; i *= 2) for (j = 0; j &lt; i; j++) ops++;</code>
+          for \(n = 100\).
+          <details>
+            <summary>solution</summary>
+            The outer values are 1, 2, 4, 8, 16, 32, 64, and the inner loop runs
+            that many times: \(1 + 2 + \cdots + 64 = 127\). A sum of doublings, less
+            than twice the last term, so less than \(2n\) in general.
+          </details>
+        </li>
+        <li>
+          A loop runs <code>while (n &gt; 1) { n = n / 2; ops++; }</code>. Starting
+          from \(n = 100\), what is <code>ops</code> at the end?
+          <details>
+            <summary>solution</summary>
+            \(n\) goes 100, 50, 25, 12, 6, 3, 1, so the body runs 6 times:
+            \(\lfloor \log_2 100 \rfloor = 6\). (Compare the halving loop of section
+            6, which also runs once for \(i = 1\).)
+          </details>
+        </li>
+        <li>
+          A function scans an array for the first negative number and stops there.
+          Give its best-case and worst-case number of comparisons for an array of
+          \(n\) elements.
+          <details>
+            <summary>solution</summary>
+            Best case 1 (the first element is negative); worst case \(n\) (the only
+            negative is last, or there is none).
+          </details>
+        </li>
+        <li>
+          Someone claims that
+          <code>for (i = n; i &gt; 0; i /= 2) for (j = 0; j &lt; i; j++) ops++;</code>
+          counts \(n \log_2 n\). Find the actual count for \(n = 64\) and explain
+          the error.
+          <details>
+            <summary>solution</summary>
+            \(64 + 32 + 16 + 8 + 4 + 2 + 1 = 127\), less than \(2n = 128\), while
+            \(64 \log_2 64 = 384\). Multiplying the outer trip count by the
+            <em>largest</em> inner count gives an upper bound, but the inner count
+            shrinks each time, so the count is a sum of halvings, not a product.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Counting Loop Iterations v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax.
+      </footer>
+    </div>
+  </body>
+</html>
