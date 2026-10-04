@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!-- CANVAS NOTE: relative links only resolve on the course site; when pasting
+     into Canvas, swap hrefs for the Canvas URLs. -->
+<!-- CSS 343 · Programming Assignment 1. Student-facing: NO solutions. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PA1: One Interface, Three Trees · CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:46px clamp(20px,6vw,60px) 60px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:25px;line-height:1.25;margin:0 0 4px}
+  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 18px;border-bottom:1px solid var(--line);padding-bottom:16px}
+  h2{font-size:19px;margin:30px 0 8px;border-bottom:1px solid #edf0f4;padding-bottom:4px}
+  p{margin:10px 0} a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  .def,.aside{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .aside .tag{color:var(--warn)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:system-ui,sans-serif;font-size:15px}
+  .meta b{color:var(--accent)}
+  ol,ul{margin:8px 0;padding-left:24px} li{margin:7px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-family:system-ui,sans-serif;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#f0f2f6}
+  table.pts td:nth-child(2){text-align:center;font-weight:700;white-space:nowrap}
+  blockquote{margin:14px 0;padding:10px 16px;border-left:4px solid var(--line);background:var(--box);border-radius:6px}
+  footer{margin-top:38px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px;font-family:system-ui,sans-serif}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Programming Assignment 1: One Interface, Three Trees</h1>
+  <div class="subtitle">CSS 343 · Search trees · Lectures 4 to 6</div>
+  <div class="def"><span class="tag">At a glance</span>
+    <div class="meta">
+      <span><b>Format:</b> individual</span>
+      <span><b>Language:</b> C++17</span>
+      <span><b>Points:</b> 70 (+10 extra credit)</span>
+      <span><b>Starter:</b> <a href="starter/bintree.h"><code>bintree.h</code></a>, <a href="starter/bintree.cpp"><code>bintree.cpp</code></a>, <a href="starter/driver.cpp"><code>driver.cpp</code></a>, <a href="starter/expected-output.txt"><code>expected-output.txt</code></a></span>
+      <span><b>Out:</b> Mon Oct 12</span>
+      <span><b>Due:</b> Wed Oct 28, 11:59 PM</span>
+    </div>
+  </div>
+
+  <p>You build one binary search tree class, <code>BinTree</code>, whose balancing policy is chosen
+  when the tree is constructed:</p>
+  <ul>
+    <li><code>Mode::VANILLA</code>: a plain BST, no rebalancing (Lecture 4);</li>
+    <li><code>Mode::AVL</code>: height-balanced with rotations (Lecture 5);</li>
+    <li><code>Mode::REDBLACK</code>: the left-leaning red-black insert (Lecture 6), <strong>extra credit</strong>.</li>
+  </ul>
+  <p>Then you run the same adversarial input through the modes and measure what each policy buys. The class
+  carries its own counters (<code>rotations()</code>, <code>colorFlips()</code>), so the theory becomes numbers
+  your code produces: sorted keys 1 to 1023 give height 1023 in a plain BST and 10 in an AVL tree, at a price of
+  1013 rotations.</p>
+  <p>The second half is an operation the lectures do not give you: <code>mergeWith</code>, which combines two
+  trees into one. You get a contract (the correct union, a height bound, the other tree untouched) and design the
+  algorithm yourself.</p>
+
+  <h2>What to implement</h2>
+  <p>Everything is in <code>bintree.h</code> and <code>bintree.cpp</code>. The public interface is fixed; add your
+  own private recursive helpers. <code>displayTree</code> is given, as a debugging aid.</p>
+  <ol>
+    <li><strong>Rule of Three and equality.</strong> Deep copy constructor, destructor, and a self-assignment-safe
+      <code>operator=</code> (the mode and the counters copy too). <code>operator==</code> and <code>!=</code> mean
+      <em>same keys and same structure</em>; the mode is not compared, so the same keys inserted in
+      <code>VANILLA</code> and <code>AVL</code> trees are usually <code>!=</code>.</li>
+    <li><strong>Queries:</strong> <code>isEmpty</code>, <code>size</code>, <code>contains</code>,
+      <code>treeHeight()</code> (the number of nodes on the longest path; an empty tree has height 0).</li>
+    <li><strong><code>insert</code>, per mode.</strong> A duplicate returns <code>false</code> in every mode. Then the
+      mode's fix-up: nothing for <code>VANILLA</code>; for <code>AVL</code>, update heights on the way up and apply
+      the four rotation cases. (Extra credit: <code>REDBLACK</code>, the three-if left-leaning insert with the root
+      kept black. If you skip it, let <code>REDBLACK</code> behave like <code>VANILLA</code>.)</li>
+    <li><strong><code>remove</code>,</strong> in <code>VANILLA</code> mode only: Hibbard deletion with the in-order
+      successor, freeing every removed node. In the balanced modes it returns <code>false</code> and changes nothing.</li>
+    <li><strong>Counters:</strong> <code>rotations()</code> counts every single rotation (a double rotation counts 2);
+      <code>colorFlips()</code> counts red-black flips. Increment them inside your helpers.</li>
+    <li><strong><code>toSortedArray</code> and <code>mergeWith</code>, your own algorithm.</strong> The contract:
+      <ul>
+        <li>afterwards the tree holds the <strong>union</strong> of the two key sets (shared keys once);
+          <code>other</code> is unchanged; merging a tree with itself is safe;</li>
+        <li>the result is a valid BST with height at most <strong>2&middot;&lceil;log<sub>2</sub>(n+1)&rceil;</strong>,
+          and stays consistent for its mode, so that later inserts keep the mode's guarantee;</li>
+        <li>you set <code>mergeAuxBytes()</code> to the peak number of heap bytes your merge allocated (vectors,
+          stacks, every new node). The instructor's benchmark checks it with a counting allocator; within a factor of
+          2 is accepted.</li>
+      </ul>
+      How you meet the contract is the design exercise. Directions to consider: insert the other tree's keys one by
+      one; flatten both trees to sorted arrays, merge, and rebuild; the same without materializing the arrays, using
+      two iterator stacks; or split/join merging. <strong>Predict your algorithm's time and space before you
+      measure.</strong></li>
+  </ol>
+
+  <blockquote><strong>Why "consistent for its mode" matters.</strong> Suppose you merge by flattening and rebuilding a
+  perfectly balanced tree: an excellent way to meet the height bound. In <code>AVL</code> mode, every node's stored
+  <code>height</code> must then equal its true subtree height. Leave it at 0 and the tree looks balanced, but the next
+  <code>insert</code> reads the wrong heights and rotates the wrong way. So after a rebuild, recompute the heights in one
+  bottom-up pass (or merge by a method that maintains them), and test a few inserts after a merge in your own driver.</blockquote>
+
+  <h2>Verify as you go</h2>
+  <pre>g++ -std=c++17 -g bintree.cpp driver.cpp -o pa1
+./pa1 &gt; myoutput.txt &amp;&amp; diff myoutput.txt expected-output.txt   # no output = exact match
+valgrind --leak-check=full ./pa1                                 # on the CSS Linux lab</pre>
+  <p>If you skip the red-black extra credit, the <code>REDBLACK</code> lines of the output will differ from the expected
+  output; every other line should match. The given driver is the floor, not the ceiling: write your own
+  <code>mydriver.cpp</code> covering the awkward cases, such as empty trees, self-assignment, all the remove cases,
+  merging with and into an empty tree, and merging a tree with itself.</p>
+  <p>The four benchmark workloads the instructor uses are published in
+  <code>starter/workloads/</code> (<a href="starter/workloads/w1a.txt"><code>w1a</code></a>, <a href="starter/workloads/w1b.txt"><code>w1b</code></a>, <a href="starter/workloads/w2a.txt"><code>w2a</code></a>, <a href="starter/workloads/w2b.txt"><code>w2b</code></a>, <a href="starter/workloads/w3a.txt"><code>w3a</code></a>, <a href="starter/workloads/w3b.txt"><code>w3b</code></a>, <a href="starter/workloads/w4a.txt"><code>w4a</code></a>, <a href="starter/workloads/w4b.txt"><code>w4b</code></a>; with their generator,
+  <a href="starter/gen_workloads.cpp"><code>gen_workloads.cpp</code></a>): build each tree in <code>AVL</code> mode by
+  inserting in file order, then merge <em>b</em> into <em>a</em>. W1 is two equal trees, W2 a tiny tree into a big one,
+  W3 two trees with 50% shared keys, W4 two disjoint ranges.</p>
+
+  <h2>Report (one page)</h2>
+  <ol>
+    <li><strong>The head-to-head:</strong> the table the driver prints (heights and rotations for sorted 1 to 1023 in each
+      mode you implemented), and two or three sentences on what each policy bought and what it cost.</li>
+    <li><strong>Your merge:</strong> the algorithm in a few sentences, its predicted time and auxiliary space as functions
+      of <em>n</em> and <em>m</em>, and your measured times and <code>mergeAuxBytes()</code> on at least two of the
+      workloads. If prediction and measurement disagree, explain why.</li>
+    <li><strong>One sentence</strong> on the interface decision: AVL deletion is doable, yet <code>remove</code> is refused in
+      the balanced modes. Defend it or attack it.</li>
+  </ol>
+
+  <h2>Grading (70 points)</h2>
+  <table class="pts">
+    <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
+    <tr><td>Compiles against our driver (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>we compile only your <code>bintree.h</code> and <code>bintree.cpp</code> against our own <code>main()</code>; keep the interface exactly as given</td></tr>
+    <tr><td>Correctness: <code>VANILLA</code> and <code>remove</code></td><td>10</td><td rowspan="4">our test harness, on inputs different from the driver's</td></tr>
+    <tr><td>Correctness: Rule of Three and structural <code>==</code></td><td>8</td></tr>
+    <tr><td>Correctness: <code>AVL</code> height bound, <code>remove</code> refused</td><td>9</td></tr>
+    <tr><td>Correctness: the <code>mergeWith</code> contract</td><td>8</td></tr>
+    <tr><td>Memory: Valgrind reports 0 leaks and 0 errors</td><td>10</td><td>all or nothing; see the <a href="../../guides/guide-valgrind.html">Valgrind guide</a></td></tr>
+    <tr><td>Your testing (<code>mydriver.cpp</code>: every method, every mode you built, the awkward cases)</td><td>7</td><td></td></tr>
+    <tr><td>Report</td><td>14</td><td>head-to-head 4 · merge prediction and measurement 8 · the interface sentence 2</td></tr>
+    <tr><td>Coding standards (private helpers, comments, naming)</td><td>4</td><td></td></tr>
+    <tr><td><em>Extra credit:</em> <code>REDBLACK</code> mode (height bound, merge, post-merge inserts)</td><td>+5</td><td>all or nothing, by our harness</td></tr>
+    <tr><td><em>Extra credit:</em> a derivation of your merge's time and space, validated by a doubling experiment</td><td>+3</td><td>a recurrence you solve or a counting argument, not a stated O( )</td></tr>
+    <tr><td><em>Extra credit:</em> your merge beats two of the instructor's five baseline merges on time or memory</td><td>+2</td><td>measured on the CSS lab</td></tr>
+  </table>
+  <p>The rotation and flip counts are checked against the standard algorithms. If your correct variant counts
+  differently, say so in the report.</p>
+
+  <h2>Reading</h2>
+  <ul>
+    <li><a href="../../textbook/trees/ds-trees-bst.html">Trees &amp; Binary Search Trees</a>: insert, Hibbard deletion, height.</li>
+    <li><a href="../../textbook/trees/ds-avl-trees.html">AVL Trees</a>: the four rotation cases and the height bound.</li>
+    <li><a href="../../textbook/trees/ds-red-black-trees.html">Red-Black Trees</a>: the left-leaning insert, for the extra credit.</li>
+    <li><a href="../../textbook/foundations/foundation-cpp-essentials.html#three">C++ for Data Structures, section 6</a>: the Rule of Three.</li>
+  </ul>
+
+  <h2>Submit</h2>
+  <p>One <code>.zip</code> on Canvas holding <code>bintree.h</code>, <code>bintree.cpp</code>, <code>mydriver.cpp</code>
+  and your report (PDF or Markdown). Resubmissions are allowed until the deadline; the last one is graded.
+  <strong>Due Wed Oct 28, 11:59 PM.</strong> A late token extends this deadline by 48 hours.</p>
+  <footer>CSS 343 · Autumn 2026 · Programming Assignment 1 · prepared by Dr. Marcel Gavriliu.</footer>
+</div>
+</body>
+</html>

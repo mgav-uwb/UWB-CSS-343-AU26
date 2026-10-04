@@ -1,0 +1,36 @@
+=== sorted stream 1..1023, three modes ===
+VANILLA: size=1023 height=1023 rotations=0 colorFlips=0
+AVL: size=1023 height=10 rotations=1013 colorFlips=0
+REDBLACK: size=1023 height=10 rotations=1013 colorFlips=1013
+
+=== insert 10,20,30 (the RR case) ===
+-- VANILLA (height 3)
+Root: 10
+    R--- 20
+        R--- 30
+-- AVL (height 2)
+Root: 20
+    L--- 10
+    R--- 30
+-- REDBLACK (height 2)
+Root: 20
+    L--- 10
+    R--- 30
+
+=== semantics ===
+insert 50: ok
+insert 30: ok
+insert 70: ok
+insert 30: dup
+insert 50: dup
+inorder: 30 50 70 
+contains 30 / 99: 1 / 0
+remove 30 (vanilla): 1 → 50 70 
+remove in AVL mode is refused: 0, tree intact: 1 2 
+
+=== mergeWith: evens (AVL) absorb odds (VANILLA), some overlap ===
+merged: size=21 heightOK=yes
+merged inorder: 0 1 2 4 6 7 8 10 12 13 14 16 18 19 20 22 24 25 26 28 30 
+odds unchanged: 1 4 7 10 13 16 19 22 25 28 
+aux bytes reported: yes
+post-merge inserts keep the AVL bound: yes

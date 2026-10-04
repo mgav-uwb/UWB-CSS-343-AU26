@@ -1,0 +1,106 @@
+/* CSS 343 · L03 interactive-demo styles (shared by the viz/ visualizers). */
+.reveal .algo-viz { width: 96%; margin: 6px auto 0; }
+.reveal .algo-viz canvas {
+  display: block; margin: 0 auto; background: #fff;
+  border: 1px solid #e6e9f0; border-radius: 10px;
+}
+.reveal .algo-viz .viz-controls {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  justify-content: center; margin-top: 8px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.reveal .algo-viz input {
+  width: 58px; padding: 4px 6px; border: 1px solid #cbd2e0;
+  border-radius: 6px; font-size: 16px; font-family: inherit;
+}
+.reveal .algo-viz button {
+  padding: 5px 11px; border: 1px solid #7c5cff; background: #f3f0ff;
+  color: #4a3aa8; border-radius: 7px; cursor: pointer;
+  font-size: 15px; font-family: inherit; font-weight: 600;
+}
+.reveal .algo-viz button:hover { background: #e7e0ff; }
+.reveal .algo-viz button.alt { border-color: #c3c9d6; background: #f1f3f7; color: #44485a; }
+.reveal .algo-viz .viz-status {
+  width: 100%; text-align: center; margin-top: 6px;
+  color: #555; font-size: 16px; font-family: system-ui, sans-serif; min-height: 1.2em;
+}
+
+/* ---- transport buttons (VizPlayer) ---- */
+.reveal .algo-viz .viz-controls button.tp { padding: 4px 9px; font-size: 14px; line-height: 1.2; }
+
+/* ---- input/output side panels (data-panels="1") ---- */
+.reveal .algo-viz .viz-row { display: flex; gap: 10px; align-items: stretch; justify-content: center; }
+.reveal .algo-viz .viz-canvas-wrap { position: relative; flex: 1 1 auto; min-width: 0; }
+.reveal .algo-viz .viz-panel {
+  flex: 0 0 148px; width: 148px; background: #f8f9fc; border: 1px solid #e6e9f0;
+  border-radius: 10px; padding: 8px 10px; text-align: left;
+  font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; min-height: 0;
+}
+.reveal .algo-viz .viz-panel h5 {
+  margin: 0 0 6px; font-size: 10.5px; font-weight: 700; letter-spacing: .6px;
+  text-transform: uppercase; color: #8a93a6;
+}
+.reveal .algo-viz .viz-chips { display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; }
+.reveal .algo-viz .viz-chip {
+  font: 600 13px ui-monospace, Menlo, Consolas, monospace; color: #4a5262;
+  background: #fff; border: 1px solid #d7dbe3; border-radius: 5px; padding: 1px 6px;
+}
+.reveal .algo-viz .viz-chip.cur { color: #fff; background: #7c5cff; border-color: #7c5cff; }
+.reveal .algo-viz .viz-chip.done { color: #b7bdcb; }
+.reveal .algo-viz .viz-rebuild { margin-top: auto; padding-top: 8px; display: flex; gap: 4px; }
+.reveal .algo-viz .viz-rebuild input { width: 100%; min-width: 0; font-size: 12px; padding: 3px 5px; }
+.reveal .algo-viz .viz-rebuild button { font-size: 12px; padding: 3px 7px; }
+.reveal .algo-viz .viz-stats { font-size: 12.5px; color: #4a5262; line-height: 1.5; margin-bottom: 6px; }
+.reveal .algo-viz .viz-stats span { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; }
+.reveal .algo-viz .viz-log {
+  flex: 1 1 0; min-height: 0; overflow-y: auto; font-size: 12px; line-height: 1.5;
+  color: #6a7284; border-top: 1px solid #e6e9f0; padding-top: 5px;
+}
+
+/* ---- key-picker dropdown (insert/edit) ---- */
+.reveal .algo-viz .viz-dd {
+  position: absolute; z-index: 40; background: #fff; border: 1px solid #cbd2e0;
+  border-radius: 9px; box-shadow: 0 8px 22px #00000026; padding: 6px 8px;
+  display: flex; gap: 4px; align-items: center; flex-wrap: wrap; max-width: 300px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.reveal .algo-viz .viz-dd .dd-title { font-size: 12px; font-weight: 700; color: #8a93a6; margin-right: 2px; white-space: nowrap; }
+.reveal .algo-viz .viz-dd button { padding: 2px 8px; font-size: 13.5px; }
+.reveal .algo-viz .viz-dd button.dd-pg { border-color: #c3c9d6; background: #f1f3f7; color: #44485a; font-weight: 800; }
+
+/* ---- ⚙ sequence menu (on the input strip) ---- */
+.reveal .algo-viz .viz-dd.viz-gear { flex-direction: column; align-items: stretch; gap: 5px; max-width: 300px; }
+.reveal .algo-viz .viz-gear .gm-row { display: flex; gap: 4px; }
+.reveal .algo-viz .viz-gear .gm-row input { flex: 1 1 auto; min-width: 0; width: 190px; font-size: 13px; padding: 3px 6px; }
+.reveal .algo-viz .viz-gear > button { text-align: left; font-size: 13.5px; border-color: #c3c9d6; background: #f8f9fc; color: #44485a; }
+.reveal .algo-viz .viz-gear > button:hover { background: #efeaff; border-color: #7c5cff; }
+.reveal .algo-viz .viz-gear > button span { color: #9aa3b5; font-weight: 400; font-size: 12px; }
+
+/* ---- S04-style demo layout: actions bar · canvas · bottom input|output halves ---- */
+.reveal .algo-viz .viz-actions { display: flex; flex-wrap: wrap; gap: 5px 9px; align-items: center; justify-content: center; margin: 0 0 7px; font-family: system-ui, sans-serif; }
+.reveal .algo-viz .viz-actions .grp { display: inline-flex; gap: 4px; align-items: center; padding-right: 9px; border-right: 1px solid #e6e9f0; }
+.reveal .algo-viz .viz-actions .grp:last-child { border-right: none; padding-right: 0; }
+.reveal .algo-viz .viz-actions input[type="text"] { width: 128px; }
+.reveal .algo-viz .viz-actions label.chk { font-size: 13px; color: #55607a; display: inline-flex; gap: 4px; align-items: center; cursor: pointer; white-space: nowrap; }
+.reveal .algo-viz .viz-actions label.chk input { width: auto; }
+.reveal .algo-viz .viz-actions select { font: 600 13px system-ui, sans-serif; color: #555; padding: 3px 4px; border: 1px solid #cbd2e0; border-radius: 6px; }
+.reveal .algo-viz .viz-actions button.tp { padding: 4px 8px; font-size: 14px; line-height: 1.2; }
+.reveal .algo-viz .viz-actions button:disabled { opacity: .4; cursor: default; }
+
+.reveal .algo-viz .viz-bottom { display: flex; gap: 10px; align-items: stretch; margin-top: 8px; }
+.reveal .algo-viz .viz-half { flex: 1 1 50%; min-width: 0; background: #f8f9fc; border: 1px solid #e6e9f0; border-radius: 9px; padding: 5px 9px; text-align: left; font-family: system-ui, sans-serif; }
+.reveal .algo-viz .viz-half .h { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; display: flex; justify-content: space-between; align-items: center; }
+.reveal .algo-viz .viz-half .gear { cursor: pointer; border: none; background: none; font-size: 14px; color: #8a93a6; padding: 0 2px; line-height: 1; }
+.reveal .algo-viz .viz-half .gear:hover { color: #7c5cff; }
+.reveal .algo-viz .viz-initbar .toks { margin-top: 3px; font: 700 15px ui-monospace, Menlo, Consolas, monospace; color: #4a5262; line-height: 1.5; overflow-x: auto; white-space: nowrap; }
+.reveal .algo-viz .viz-initbar .toks .cur { color: #7c5cff; background: #efeaff; border-radius: 4px; padding: 0 3px; }
+.reveal .algo-viz .viz-initbar .toks .done { color: #c3c9d6; }
+.reveal .algo-viz .viz-output .out { margin-top: 3px; font: 600 13px ui-monospace, Menlo, Consolas, monospace; color: #0a7d4d; line-height: 1.45; max-height: 46px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+
+/* ---- ASCII fallback (inside .algo-viz): removed by the demo builders at init.
+   Visible only where the interactive demo cannot run (raw md, Canvas, print). ---- */
+.reveal .algo-viz .viz-fallback, .algo-viz .viz-fallback {
+  font: 12px/1.35 ui-monospace, Menlo, Consolas, monospace; color: #55607a;
+  background: #f8f9fc; border: 1px dashed #c3c9d6; border-radius: 8px;
+  padding: 10px 14px; overflow-x: auto; text-align: left; white-space: pre;
+}

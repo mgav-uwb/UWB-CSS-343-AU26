@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!-- CANVAS NOTE: relative links only resolve on the course site; when pasting
+     into Canvas, swap hrefs for the Canvas URLs. -->
+<!-- CSS 343 · Homework 4 instructions. Student-facing: NO solutions. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 4: Heaps and Balanced-Tree Invariants · CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:46px clamp(20px,6vw,60px) 60px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:25px;line-height:1.25;margin:0 0 4px}
+  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 18px;border-bottom:1px solid var(--line);padding-bottom:16px}
+  h2{font-size:19px;margin:30px 0 8px;border-bottom:1px solid #edf0f4;padding-bottom:4px}
+  p{margin:10px 0} a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  .def,.aside{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .aside .tag{color:var(--warn)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:system-ui,sans-serif;font-size:15px}
+  .meta b{color:var(--accent)}
+  ol,ul{margin:8px 0;padding-left:24px} li{margin:7px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-family:system-ui,sans-serif;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#f0f2f6}
+  table.pts td:nth-child(2){text-align:center;font-weight:700;white-space:nowrap}
+  footer{margin-top:38px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px;font-family:system-ui,sans-serif}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Homework 4: Heaps and Balanced-Tree Invariants</h1>
+  <div class="subtitle">CSS 343 · Week 4 · Lecture 6 (Balanced Trees II) and Lecture 7 (Heaps)</div>
+  <div class="def"><span class="tag">At a glance</span>
+    <div class="meta">
+      <span><b>Format:</b> individual</span>
+      <span><b>Language:</b> C++17</span>
+      <span><b>Starter:</b> <a href="hw04.cpp"><code>hw04.cpp</code></a></span>
+      <span><b>Submit:</b> a <code>.zip</code> with your <code>hw04.cpp</code></span>
+      <span><b>Due:</b> Sun Oct 25, 11:59 PM</span>
+    </div>
+  </div>
+  <p>Six functions: two on heaps with <em>d</em> children per node instead of two, two that use a priority
+  queue to solve a problem, one that checks the left-leaning red-black invariants, and one that counts the
+  keys in the sparsest possible B-tree. The starter has a <strong>self-running test battery</strong>; you fill
+  in six <code>TODO</code>s. Quiz 4 (Monday Oct 26) asks about the same material.</p>
+
+  <h2>Tasks</h2>
+  <table>
+    <tr><th>TODO</th><th>Function</th><th>What it must do</th></tr>
+    <tr><td>1</td><td><code>sinkDary</code></td><td>Sink one element in a 0-based <em>d</em>-ary max-heap, swapping with the largest child (the leftmost on ties).</td></tr>
+    <tr><td>2</td><td><code>buildDary</code></td><td>Turn an array into a <em>d</em>-ary max-heap in linear time, sinking the internal nodes from the last to the root.</td></tr>
+    <tr><td>3</td><td><code>kthLargest</code></td><td>The <em>k</em>-th largest value, with a min-heap of at most <em>k</em> values and no sorting.</td></tr>
+    <tr><td>4</td><td><code>mergeSorted</code></td><td>Merge <em>k</em> sorted lists into one, with a min-heap holding one entry per list.</td></tr>
+    <tr><td>5</td><td><code>llrbBlackHeight</code></td><td>Check the three left-leaning red-black invariants and return the black height, or &minus;1.</td></tr>
+    <tr><td>6</td><td><code>minKeysBTree</code></td><td>The fewest keys a B-tree of order <em>M</em> and height <em>h</em> can hold.</td></tr>
+  </table>
+  <p>The full contract of each function, with examples, is in the comment above it in the starter. For TODOs 3
+  and 4 you may use <code>std::priority_queue</code>; the starter shows how to declare a min-heap.</p>
+
+  <h2>The tests run themselves</h2>
+  <pre>g++ -std=c++17 -O2 hw04.cpp -o hw04 &amp;&amp; ./hw04</pre>
+  <p>Each check prints <code>[PASS]</code> or <code>[FAIL]</code>. The unmodified starter compiles and fails
+  most of them.</p>
+
+  <div class="aside"><span class="tag">Build on the lab</span>
+    Code is graded on the CSS Linux lab with <code>g++ -std=c++17</code>. Build and run there at least once
+    before you submit; the
+    <a href="../../../guides/guide-computing-environment.html"><strong>Computing Environment</strong></a>
+    guide has the login and file-transfer commands. Code that does not compile on the lab receives no points.
+  </div>
+
+  <h2>Grading (10 pts)</h2>
+  <table class="pts">
+    <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
+    <tr><td>Compiles (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>does not compile: 0</td></tr>
+    <tr><td><code>sinkDary</code> (TODO 1)</td><td>1</td><td rowspan="6">checked by our own test harness, on random inputs different from the battery's; TODOs 3 and 4 also on large inputs with a time limit</td></tr>
+    <tr><td><code>buildDary</code> (TODO 2)</td><td>1</td></tr>
+    <tr><td><code>kthLargest</code> (TODO 3)</td><td>1</td></tr>
+    <tr><td><code>mergeSorted</code> (TODO 4)</td><td>2</td></tr>
+    <tr><td><code>llrbBlackHeight</code> (TODO 5)</td><td>2</td></tr>
+    <tr><td><code>minKeysBTree</code> (TODO 6)</td><td>1</td></tr>
+    <tr><td>Your test battery passes (T1 to T6)</td><td>2</td><td>all: 2 · most: 1</td></tr>
+  </table>
+  <p>Homework is 8% of the course grade, with the lowest two homework scores dropped.</p>
+
+  <h2>Reading</h2>
+  <ul>
+    <li><a href="../../../textbook/heaps/ds-heaps-pq.html">Heaps &amp; Priority Queues</a>: swim, sink, building in linear time.</li>
+    <li><a href="../../../textbook/trees/ds-red-black-trees.html">Red-Black Trees</a> and <a href="../../../textbook/trees/ds-b-trees.html">B-Trees &amp; B+ Trees</a>.</li>
+    <li>The slides: <a href="../../S06-balanced-trees/index.html">Lecture 6</a> and <a href="../index.html">Lecture 7</a>.</li>
+  </ul>
+
+  <h2>Submit</h2>
+  <p>One <code>.zip</code> file on Canvas, containing your finished <code>hw04.cpp</code> and anything else you
+  want to include. Keep the file name <code>hw04.cpp</code>. Resubmissions are allowed until the deadline; the
+  last one is graded. To make the zip on the lab: <code>zip hw04.zip hw04.cpp</code>.
+  <strong>Due Sun Oct 25, 11:59 PM.</strong> A late token extends this deadline by 48 hours.</p>
+  <footer>CSS 343 · Autumn 2026 · Homework 4 · prepared by Dr. Marcel Gavriliu.</footer>
+</div>
+</body>
+</html>
