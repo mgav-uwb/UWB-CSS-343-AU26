@@ -11,9 +11,13 @@
   header h1 { margin: 0; font-size: 21px; }
   header h1 a { color: #8b93a7; text-decoration: none; font-weight: 400; }
   header .sub { color: #8b93a7; font-size: 13px; margin-top: 3px; }
-  .picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  /* one compact row: a grouped menu plus previous/next, so the demo starts above the fold */
+  .picker { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .picker select { font: 600 14px system-ui, sans-serif; color: #e7eaf0; background: #161922; border: 1px solid #2c313d;
+    border-radius: 8px; padding: 6px 10px; max-width: 100%; }
   .picker a { font-size: 13px; font-weight: 600; text-decoration: none; color: #cfd4e0; border: 1px solid #262a35; border-radius: 8px; padding: 5px 11px; }
-  .picker a.on { color: #0b0c10; background: #00e58a; border-color: #00e58a; }
+  .picker a:hover { border-color: #00e58a; color: #00e58a; }
+  .picker .count { color: #8b93a7; font-size: 12.5px; }
   main { max-width: 940px; margin: 0 auto; padding: 16px clamp(12px,4vw,28px) 60px; }
   .note { color: #66708a; font-size: 12.5px; margin: 14px 2px 0; }
 
@@ -98,8 +102,35 @@
     catch (err) { console.error("bad ?config= JSON", err); }
   }
 
-  document.getElementById("picker").innerHTML = DEMO_LIST // deduped: alias slugs list once
-    .map((d) => `<a href="?ds=${d.id}" class="${d.id === spec.id ? "on" : ""}">${d.title}</a>`).join("");
+  // the picker: one menu grouped by topic (course order), plus previous / next
+  const GROUPS = [
+    ["Recursion and analysis", ["factorial", "three-sum", "k-sum", "hanoi", "recurrence"]],
+    ["Search trees", ["bst", "avl", "bst-vs-avl", "two-three", "redblack", "btree"]],
+    ["Heaps", ["heap", "min-heap"]],
+    ["Hashing", ["hash-lp", "hash-quad", "hash-double", "probe-race", "probe-delete-pitfalls", "hash-chain", "hash-chain-resize", "hash-delete-race", "hash-race"]],
+    ["Graphs", ["graph", "search-race", "dfs-edges", "scc", "dijkstra", "bellman-ford", "union-find", "kruskal", "prim"]],
+    ["Greedy and compression", ["huffman", "huffman-codec", "adaptive-huffman"]],
+    ["Sorting and selection", ["mergesort", "quicksort", "lomuto-vs-hoare", "sort-race", "quickselect"]],
+    ["Dynamic programming", ["fib", "fib-race", "rodcut-tree", "rodcut", "rodcut-race", "lcs-tree", "lcs", "knapsack", "edit-distance", "grid-dp"]],
+    ["Strings", ["trie", "tst", "kmp-fail", "string-search"]],
+    ["Automata", ["dfa", "nfa-build", "nfa-sim", "nfa2dfa"]],
+  ];
+  const byId = Object.fromEntries(DEMO_LIST.map((d) => [d.id, d]));
+  const listed = new Set(GROUPS.flatMap(([, ids]) => ids));
+  const rest = DEMO_LIST.filter((d) => !listed.has(d.id)).map((d) => d.id);
+  if (rest.length) GROUPS.push(["Other", rest]);
+  const order = GROUPS.flatMap(([, ids]) => ids.filter((id) => byId[id]));
+  const at = order.indexOf(spec.id);
+  const prev = order[(at - 1 + order.length) % order.length], next = order[(at + 1) % order.length];
+  document.getElementById("picker").innerHTML =
+    `<a href="?ds=${prev}" title="${byId[prev].title}">← prev</a>` +
+    `<select id="pick" aria-label="choose a demo">` +
+    GROUPS.map(([g, ids]) => `<optgroup label="${g}">` + ids.filter((id) => byId[id])
+      .map((id) => `<option value="${id}"${id === spec.id ? " selected" : ""}>${byId[id].title}</option>`).join("") + `</optgroup>`).join("") +
+    `</select>` +
+    `<a href="?ds=${next}" title="${byId[next].title}">next →</a>` +
+    `<span class="count">${at + 1} of ${order.length}</span>`;
+  document.getElementById("pick").onchange = (e) => { location.search = "?ds=" + e.target.value; };
   document.getElementById("demo-title").textContent = spec.title;
   document.title = `CSS 343: ${spec.title} demo`;
 
