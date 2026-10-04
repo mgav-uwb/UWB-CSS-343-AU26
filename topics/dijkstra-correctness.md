@@ -2,7 +2,7 @@
   TOPIC · Dijkstra: correctness and limits.
   Teaches: the correctness proof; where negative weights break it; Bellman-Ford for negative weights; negative cycles; Dijkstra against BFS; choosing a shortest-path algorithm; A* in one slide.
   Needs:   Dijkstra's algorithm.
-  Demos:   dijkstra-neg (slide spec)
+  Demos:   dijkstra-neg (slide spec); bellman-ford (registry demo, slide spec in demos.js)
   Program: none
   Budget:  ~20 min, 10 slides.
   Ported from Summer 2026 L09-graphs-dijkstra.md, parts 5.
@@ -83,6 +83,18 @@ Relax **every edge, V−1 times**:
 ```
 
 Handles negative weights; detects **negative cycles**. Slower: **O(V·E)**. Round i finalizes every shortest path of **≤ i edges**.
+
+--
+
+## Demo: Bellman-Ford on the negative edge
+
+<div class="algo-viz" data-algo="bellman-ford">
+<pre class="viz-fallback">
+s = 0, a = 1, b = 2:  s→a 1, s→b 2, b→a −4
+round 1: dist[a] = 1, dist[b] = 2, then b→a: 2 + (−4) = −2 < 1 → dist[a] = −2
+round 2: nothing changes → stop early; dist = 0, −2, 2
+</pre>
+</div>
 
 --
 

@@ -120,7 +120,8 @@
 .u-infobar.u-below .win { color: #0a7d4d; font-weight: 700; }
 .u-infobar.u-below .lose { color: #b3261e; font-weight: 700; }
 .u-canvas-label { font: 600 12px system-ui; color: #66708a; text-align: center; padding: 0 0 2px; }
-.u-status { min-height: 1.5em; margin: 6px 2px 4px; color: #3a3f4d; font-size: 13.5px; }
+/* two lines reserved: a step message that wraps must not push the transport row (or re-center a slide) mid-run */
+.u-status { min-height: 2.8em; line-height: 1.4; margin: 6px 2px 4px; color: #3a3f4d; font-size: 13.5px; }
 .u-transport { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .u-transport button { font: 600 13px system-ui; border: 1px solid #d7dbe6; background: #f7f8fb; color: #2a2f3a; border-radius: 8px; padding: 6px 11px; cursor: pointer; }
 .u-transport button:hover { border-color: #7c5cff; color: #4b3ccc; }
@@ -231,3 +232,9 @@
 .u-dual-col canvas { width: 100%; height: auto; display: block; }
 .u-dual-title { font-size: 12.5px; color: #66708a; text-align: center; padding: 4px 0 2px; }
 .u-dual-title b { color: #2a2f3a; }
+
+/* an op that takes no argument: hide its Run box but keep its width, so switching ops never shifts the row */
+.u-val.u-disabled { visibility: hidden; }
+
+/* the state band stays one line (full text on hover): a wrap mid-run would push the transport row */
+.u-infobar:not(.u-below) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

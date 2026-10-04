@@ -2,9 +2,9 @@
   TOPIC · Strongly connected components.
   Teaches: mutual reachability; strongly connected components as the classes of an equivalence relation; the component graph is a DAG; Kosaraju's two-pass algorithm (DFS on G for reverse post-order, then DFS on the transpose in that order); why the order matters; Θ(V + E) cost; uses.
   Needs:   DFS numbering and edge types, topological sort.
-  Demos:   none
+  Demos:   scc (registry demo, slide spec in demos.js)
   Program: none
-  Budget:  ~20 min, 9 slides.
+  Budget:  ~20 min, 10 slides.
   New for Autumn 2026; follows textbook/graphs/algo-strongly-connected-components.html (same pass order).
   Every number on these slides was computed by a script (neighbors in increasing order).
 -->
@@ -85,6 +85,19 @@ Pass 2, DFS on Gᵀ in that order:
    start 2:  2, 4           → SCC { 2, 4 }
    (7, 5, 4, 1, 6 are already marked when their turn comes)
 ```
+
+--
+
+## Demo: Kosaraju, both passes
+
+<div class="algo-viz" data-algo="scc">
+<pre class="viz-fallback">
+pass 1 (DFS on G):  finish order 6 1 4 2 0 5 7 3
+transpose, then pass 2 in reverse post-order 3 7 5 0 2 4 1 6:
+  start 3 → A = {3, 5, 7} · start 0 → B = {0, 1, 6} · start 2 → C = {2, 4}
+component DAG: A → B → C
+</pre>
+</div>
 
 --
 

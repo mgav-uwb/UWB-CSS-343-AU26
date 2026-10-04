@@ -48,7 +48,7 @@ const SLIDE_SPECS = {
     initial: "",
     sequence: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
     speedControl: true, finishButton: true,
-    width: 400, height: 250,
+    width: 400, height: 215,
   },
   "tt-insert": {
     make: () => new TwoThree(),
@@ -288,6 +288,10 @@ const GRAPH_SPECS = {
   },
   "dijkstra": wgraphBase(),
   "dijkstra-neg": wgraphBase(),
+  // Lecture 10 and 11 graph algorithms (lib/demos/graph-algos.js), sized for 1280x620
+  "dfs-edges": { use: "dfs-edges", width: 960, height: [215, 34] },
+  "scc": { use: "scc", width: 960, height: [215, 34] },
+  "bellman-ford": { use: "bellman-ford", width: 960, height: [200, 34] },
 };
 
 // static figures drawn from the engines (they cannot drift from the demos)

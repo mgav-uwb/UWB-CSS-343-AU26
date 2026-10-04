@@ -2,7 +2,7 @@
   TOPIC · DFS numbering and edge types.
   Teaches: discovery and finish times (pre-order and post-order numbers); the parenthesis property; the four edge types in a digraph (tree, back, forward, cross) decided by the color of the far end; a digraph has a cycle iff DFS finds a back edge; cycle detection with three colors; the undirected case.
   Needs:   DFS.
-  Demos:   graph-dfs (slide spec, with a cyclic example)
+  Demos:   dfs-edges (registry demo, slide spec in demos.js)
   Program: none
   Budget:  ~25 min, 11 slides.
   The tree/back slide is ported from Summer 2026 L08-graphs-bfs-dfs.md, part 2; the rest is new for Autumn 2026.
@@ -118,14 +118,13 @@ Two colors are **not** enough: with a single visited flag, the forward edge `0�
 
 ## Demo: watch DFS find the back edges
 
-<div class="algo-viz" data-algo="graph-dfs" data-example="0 1, 0 2, 1 2, 2 0, 3 1, 3 4, 4 5, 5 3">
+<div class="algo-viz" data-algo="dfs-edges">
 <pre class="viz-fallback">
-DFS from 0 on 0→1, 0→2, 1→2, 2→0, 3→1, 3→4, 4→5, 5→3:
-  2→0 finds 0 on the stack: back edge, a cycle (0 1 2)
-DFS from 3 later:  5→3 finds 3 on the stack: back edge, a cycle (3 4 5)
+DFS on 0→1, 0→2, 1→2, 2→0, 3→1, 3→4, 4→5, 5→3 (restart at 3):
+  pre/post  0 1/6 · 1 2/5 · 2 3/4 · 3 7/12 · 4 8/11 · 5 9/10
+  tree 0→1, 1→2, 3→4, 4→5 · back 2→0, 5→3 · forward 0→2 · cross 3→1
 </pre>
 </div>
-
 
 --
 
