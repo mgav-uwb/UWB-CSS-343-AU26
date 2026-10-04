@@ -1,0 +1,89 @@
+=== GraphM · graph 1 (5 nodes) ===
+Description          From  To  Distance  Path
+Aurora and 85th
+      1    2        40  1 3 2
+      1    3        20  1 3
+      1    4        50  1 3 2 4
+      1    5        30  1 5
+Green Lake Starbucks
+      2    1       ---
+      2    3       ---
+      2    4        10  2 4
+      2    5       ---
+Woodland Park Zoo
+      3    1       ---
+      3    2        20  3 2
+      3    4        30  3 2 4
+      3    5       ---
+Troll under Aurora bridge
+      4    1       ---
+      4    2       ---
+      4    3       ---
+      4    5       ---
+PCC
+      5    1       ---
+      5    2        20  5 2
+      5    3       ---
+      5    4        25  5 4
+
+displayPath(1, 4):
+      1    4        50  1 3 2 4
+Aurora and 85th
+Woodland Park Zoo
+Green Lake Starbucks
+Troll under Aurora bridge
+
+removeEdge(1, 3), recompute:
+      1    4        55  1 5 4
+Aurora and 85th
+PCC
+Troll under Aurora bridge
+
+insertEdge(1, 3, 20) restores it:
+      1    4        50  1 3 2 4
+Aurora and 85th
+Woodland Park Zoo
+Green Lake Starbucks
+Troll under Aurora bridge
+
+=== GraphM · graph 2 (3 nodes) ===
+Description          From  To  Distance  Path
+Coffee cart
+      1    2         5  1 2
+      1    3        12  1 2 3
+Library steps
+      2    1       ---
+      2    3         7  2 3
+Fountain lawn
+      3    1       ---
+      3    2       ---
+
+=== GraphL · graph 1 (5 nodes) ===
+Graph:
+Node 1      Aurora and 85th
+  edge 1 5
+  edge 1 3
+  edge 1 2
+Node 2      Green Lake Starbucks
+  edge 2 4
+Node 3      Woodland Park Zoo
+  edge 3 2
+Node 4      Troll under Aurora bridge
+Node 5      PCC
+  edge 5 4
+  edge 5 2
+edgeList(1): 5 3 2
+DFS from 1:  1 2 4 3 5
+BFS from 1:  1 5 3 2 4
+
+=== GraphL · graph 2 (3 nodes) ===
+Graph:
+Node 1      Coffee cart
+  edge 1 2
+Node 2      Library steps
+  edge 2 3
+Node 3      Fountain lawn
+edgeList(1): 2
+DFS from 1:  1 2 3
+BFS from 1:  1 2 3
+

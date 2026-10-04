@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!-- CANVAS NOTE: relative links only resolve on the course site; when pasting
+     into Canvas, swap hrefs for the Canvas URLs. -->
+<!-- CSS 343 · Programming Assignment 2. Student-facing: NO solutions. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PA2: Two Graphs · CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:46px clamp(20px,6vw,60px) 60px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:25px;line-height:1.25;margin:0 0 4px}
+  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 18px;border-bottom:1px solid var(--line);padding-bottom:16px}
+  h2{font-size:19px;margin:30px 0 8px;border-bottom:1px solid #edf0f4;padding-bottom:4px}
+  p{margin:10px 0} a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  .def,.aside{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .aside .tag{color:var(--warn)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:system-ui,sans-serif;font-size:15px}
+  .meta b{color:var(--accent)}
+  ol,ul{margin:8px 0;padding-left:24px} li{margin:7px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-family:system-ui,sans-serif;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#f0f2f6}
+  table.pts td:nth-child(2){text-align:center;font-weight:700;white-space:nowrap}
+  blockquote{margin:14px 0;padding:10px 16px;border-left:4px solid var(--line);background:var(--box);border-radius:6px}
+  footer{margin-top:38px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px;font-family:system-ui,sans-serif}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Programming Assignment 2: Two Graphs</h1>
+  <div class="subtitle">CSS 343 · Graph representations, traversals and shortest paths · Lectures 9 to 11</div>
+  <div class="def"><span class="tag">At a glance</span>
+    <div class="meta">
+      <span><b>Format:</b> individual</span>
+      <span><b>Language:</b> C++17</span>
+      <span><b>Points:</b> 70 (+5 extra credit)</span>
+      <span><b>Starter:</b> <a href="starter/graphm.h"><code>graphm.h</code></a>, <a href="starter/graphm.cpp"><code>graphm.cpp</code></a>, <a href="starter/graphl.h"><code>graphl.h</code></a>, <a href="starter/graphl.cpp"><code>graphl.cpp</code></a>, <a href="starter/sample_driver.cpp"><code>sample_driver.cpp</code></a>, <a href="starter/expected-output.txt"><code>expected-output.txt</code></a></span>
+      <span><b>Out:</b> Wed Oct 28</span>
+      <span><b>Due:</b> Mon Nov 16, 11:59 PM</span>
+    </div>
+  </div>
+
+  <p>You build the same graph twice, in the two representations from Lecture 9, and give each one the algorithms
+  that suit it:</p>
+  <ul>
+    <li><code>GraphM</code>: an adjacency <strong>matrix</strong> that computes shortest paths <strong>from every
+      vertex</strong> with Dijkstra's algorithm in its linear-scan form (no priority queue), and reconstructs each path;</li>
+    <li><code>GraphL</code>: an adjacency <strong>list</strong> of raw, heap-allocated <code>EdgeNode</code>s, with an
+      iterative depth-first search (explicit stack), a breadth-first search (queue), and a destructor that frees every node.</li>
+  </ul>
+  <p>Both read the same file format, with named vertices and several graphs per file. In Part 4 you race the matrix
+  version against your heap-based <code>dijkstra</code> from Homework 6 on dense and sparse graphs, predict the outcome
+  from the bounds, and explain what you measure.</p>
+
+  <h2>The file format</h2>
+  <p>The first line is the vertex count <em>n</em>, followed by <em>n</em> lines of vertex names (names contain
+  spaces, so read them with <code>getline</code>), then one <code>from to cost</code> triple per line, ended by a line
+  that starts with <code>0</code>. A file may hold <strong>several graphs back to back</strong>: <code>buildGraph</code>
+  consumes exactly one and leaves the stream ready for the next. Vertices are numbered 1 to <em>n</em> (slot 0 is
+  unused). See <a href="starter/simple_graph.txt"><code>simple_graph.txt</code></a> (two graphs) and <a href="starter/complex_graph.txt"><code>complex_graph.txt</code></a> (ten vertices).</p>
+  <pre>5
+Aurora and 85th
+Green Lake Starbucks
+Woodland Park Zoo
+Troll under Aurora bridge
+PCC
+1 2 50
+1 3 20
+...
+0 0 0</pre>
+
+  <h2>Part 1: <code>GraphM</code> (matrix, all-pairs Dijkstra)</h2>
+  <p>The data members are declared in <code>graphm.h</code>: the vertex names, <code>adjM</code> (a cell holds the edge
+  weight, <code>INF</code> means no edge; a repeated edge in the file <strong>overwrites</strong> the earlier one), and
+  <code>pathM</code>, one row of <code>TableType { visited, dist, prev_node }</code> per source.</p>
+  <ol>
+    <li><code>buildGraph</code>, <code>insertEdge</code> and <code>removeEdge</code>. The edge operations return
+      <code>-1</code> for an endpoint outside 1 to <em>n</em>, a self-loop, or a negative cost.</li>
+    <li><code>findShortestPath()</code>: Dijkstra from every source. Each round finds the nearest unsettled vertex by a
+      <strong>linear scan</strong> of the row, settles it, and relaxes its out-edges. No priority queue.</li>
+    <li><code>getDist</code> and <code>getPath</code>, so the class can be used as a component, and the two display
+      methods, whose formats are fixed by <code>expected-output.txt</code>.</li>
+  </ol>
+  <p>The table stores only each vertex's <em>predecessor</em> on its best path. <code>getPath</code> has to turn that
+  into the path from the source, in order.</p>
+
+  <h2>Part 2: <code>GraphL</code> (list, iterative traversals)</h2>
+  <p>Each <code>GraphNode</code> heads a singly linked list of heap-allocated <code>EdgeNode</code>s. <strong>Every new
+  edge is inserted at the head</strong> of its list, so each list holds its edges in reverse input order. That rule makes
+  every traversal order deterministic, and <code>expected-output.txt</code> is computed under it.</p>
+  <ol>
+    <li>Constructor and destructor: <strong>every <code>EdgeNode</code> is freed</strong>, and calling
+      <code>buildGraph</code> on an object that already holds a graph frees the old one first.</li>
+    <li><code>buildGraph</code> (the weights are read and ignored), <code>getSize</code>, <code>displayGraph</code>,
+      <code>edgeList(id)</code>.</li>
+    <li><code>DFSorder(start)</code>: <strong>iterative</strong>, with an explicit stack. Push the start; then
+      repeatedly pop a vertex, skip it if it is already visited, otherwise visit it and push its unvisited neighbors in
+      list order. Recursion is not accepted.</li>
+    <li><code>BFSorder(start)</code>: a queue, marking a vertex visited when it is <strong>enqueued</strong>.</li>
+  </ol>
+  <p><strong>Copying.</strong> The class declares <code>GraphL(const GraphL&amp;) = delete;</code>. With raw pointers,
+  the compiler-written copy would share the edge lists and free them twice. PA1 answered the Rule of Three by
+  implementing deep copies; deleting the operations is the other legitimate answer. Keep the <code>= delete</code> and
+  say why in a comment, or implement a real deep copy. Either way, document the decision.</p>
+
+  <h2>Part 3: your own testing (<code>driver.cpp</code>)</h2>
+  <p>The given <code>sample_driver.cpp</code> never feeds a malformed file, never inserts an invalid edge, never starts a
+  traversal anywhere but vertex 1, and never rebuilds an existing object. Your <code>driver.cpp</code> does all of that,
+  on both provided files.</p>
+
+  <h2>Part 4: the representation race</h2>
+  <p>Compile <a href="starter/gen_graphs.cpp"><code>gen_graphs.cpp</code></a> and run it: it writes fixed-seed families <code>dense_V.txt</code>
+  (<em>E</em> &asymp; <em>V</em><sup>2</sup>/2) and <code>sparse_V.txt</code> (<em>E</em> &asymp; 4<em>V</em>) for
+  <em>V</em> = 200, 400, 800, 1600. Then paste your Homework 6 <code>dijkstra</code> into <a href="starter/race.cpp"><code>race.cpp</code></a>, unchanged,
+  and run it on each file:</p>
+  <pre>g++ -std=c++17 -O2 race.cpp graphm.cpp -o race
+./race sparse_400.txt</pre>
+  <p>It times all-pairs shortest paths two ways (your <code>GraphM::findShortestPath()</code>, and your Homework 6
+  <code>dijkstra</code> looped over every source) and checks that the two agree. If you have not finished Homework 6,
+  write its heap-based <code>dijkstra</code> for this part anyway; Lecture 11 covers it.</p>
+
+  <h2>Verify as you go</h2>
+  <pre>g++ -std=c++17 -g graphm.cpp graphl.cpp sample_driver.cpp -o pa2
+./pa2 &gt; myoutput.txt &amp;&amp; diff myoutput.txt expected-output.txt   # no output = exact match
+valgrind --leak-check=full ./pa2                                 # on the CSS Linux lab</pre>
+
+  <h2>Report (one page)</h2>
+  <ol>
+    <li><strong>Prediction.</strong> Before you measure, state the running time of each all-pairs method as a function
+      of <em>V</em> and <em>E</em>, and what it becomes on each family. Predict the doubling ratio (the time at 2<em>V</em>
+      divided by the time at <em>V</em>) for each method on each family.</li>
+    <li><strong>Measurement.</strong> One table per family: <em>V</em>, both times, and both doubling ratios.</li>
+    <li><strong>Explanation.</strong> A few sentences: where the measurements agree with the prediction, and where they do
+      not, why. If a result departs from the bound, look at what the bound assumes. For example, count how many times
+      your <code>dijkstra</code> pushes onto the heap per source and compare that with <em>E</em>.</li>
+  </ol>
+  <p>No hand trace is required: the <code>diff</code> against <code>expected-output.txt</code> checks the same thing.</p>
+
+  <h2>Grading (70 points)</h2>
+  <table class="pts">
+    <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
+    <tr><td>Compiles against our driver (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>we compile only your four class files against our own <code>main()</code>; keep the public interface exactly as given</td></tr>
+    <tr><td>Correctness: <code>GraphM</code> build and edge validation</td><td>4</td><td rowspan="7">our test harness, on graphs different from the provided ones; paths are checked by walking them, so any correct tie-break passes</td></tr>
+    <tr><td>Correctness: <code>GraphM</code> all-pairs distances</td><td>7</td></tr>
+    <tr><td>Correctness: <code>GraphM</code> path reconstruction</td><td>5</td></tr>
+    <tr><td>Correctness: <code>GraphM</code> remove an edge, recompute</td><td>5</td></tr>
+    <tr><td>Correctness: <code>GraphL</code> build and list order</td><td>5</td></tr>
+    <tr><td>Correctness: <code>GraphL</code> DFS and BFS</td><td>7</td></tr>
+    <tr><td>Correctness: <code>GraphL</code> a second graph in the stream, rebuilding</td><td>2</td></tr>
+    <tr><td>Memory: Valgrind reports 0 leaks and 0 errors</td><td>10</td><td>all or nothing; see the <a href="../../guides/guide-valgrind.html">Valgrind guide</a></td></tr>
+    <tr><td>Your testing (<code>driver.cpp</code>: every method, bad files, invalid edges, every start, both files)</td><td>7</td><td></td></tr>
+    <tr><td>Report</td><td>14</td><td>prediction 4 · measurement table 4 · explanation 6</td></tr>
+    <tr><td>Coding standards (private helpers, comments, naming, the documented copy decision)</td><td>4</td><td></td></tr>
+    <tr><td><em>Extra credit:</em> <code>findMST()</code>, Prim's algorithm on the matrix</td><td>+5</td><td>all or nothing, by our harness. Prim's algorithm is your linear-scan Dijkstra with one line changed; name that line in the report</td></tr>
+  </table>
+
+  <h2>Reading</h2>
+  <ul>
+    <li><a href="../../textbook/graphs/ds-graph-representations.html">Graph Representations</a>: matrix against list.</li>
+    <li><a href="../../textbook/graphs/algo-dfs.html">Depth-First Search</a> and <a href="../../textbook/graphs/algo-bfs.html">Breadth-First Search</a>.</li>
+    <li><a href="../../textbook/graphs/algo-dijkstra.html">Dijkstra's Algorithm</a>: both the heap and the array-scan versions.</li>
+    <li><a href="../../textbook/graphs/algo-prim.html">Prim's Algorithm</a>, for the extra credit.</li>
+    <li><a href="../../guides/guide-valgrind.html">Valgrind guide</a> and <a href="../../guides/guide-computing-environment.html">Computing environment guide</a>.</li>
+  </ul>
+
+  <h2>Submit</h2>
+  <p>One <code>.zip</code> on Canvas holding <code>graphm.h</code>, <code>graphm.cpp</code>, <code>graphl.h</code>,
+  <code>graphl.cpp</code>, your <code>driver.cpp</code> (with any test files it reads) and your report (PDF or Markdown).
+  Resubmissions are allowed until the deadline; the last one is graded. <strong>Due Mon Nov 16, 11:59 PM.</strong>
+  A late token extends this deadline by 48 hours.</p>
+  <footer>CSS 343 · Autumn 2026 · Programming Assignment 2 · prepared by Dr. Marcel Gavriliu.</footer>
+</div>
+</body>
+</html>

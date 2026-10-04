@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!-- CANVAS NOTE: relative links only resolve on the course site; when pasting
+     into Canvas, swap hrefs for the Canvas URLs. -->
+<!-- CSS 343 · Homework 6 instructions. Student-facing: NO solutions. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 6: Directed Graphs and Shortest Paths · CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:46px clamp(20px,6vw,60px) 60px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:25px;line-height:1.25;margin:0 0 4px}
+  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 18px;border-bottom:1px solid var(--line);padding-bottom:16px}
+  h2{font-size:19px;margin:30px 0 8px;border-bottom:1px solid #edf0f4;padding-bottom:4px}
+  p{margin:10px 0} a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  .def,.aside{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .aside .tag{color:var(--warn)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:system-ui,sans-serif;font-size:15px}
+  .meta b{color:var(--accent)}
+  ol,ul{margin:8px 0;padding-left:24px} li{margin:7px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-family:system-ui,sans-serif;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#f0f2f6}
+  table.pts td:nth-child(2){text-align:center;font-weight:700;white-space:nowrap}
+  footer{margin-top:38px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px;font-family:system-ui,sans-serif}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Homework 6: Directed Graphs and Shortest Paths</h1>
+  <div class="subtitle">CSS 343 · Week 6 · Lecture 10 (DFS and Topological Sort) and Lecture 11 (Dijkstra)</div>
+  <div class="def"><span class="tag">At a glance</span>
+    <div class="meta">
+      <span><b>Format:</b> individual</span>
+      <span><b>Language:</b> C++17</span>
+      <span><b>Starter:</b> <a href="hw06.cpp"><code>hw06.cpp</code></a></span>
+      <span><b>Submit:</b> a <code>.zip</code> with your <code>hw06.cpp</code></span>
+      <span><b>Due:</b> Sun Nov 8, 11:59 PM</span>
+    </div>
+  </div>
+  <p>Five functions: cycle detection with three colors, a topological order that always takes the smallest ready vertex, the strongly connected components by Kosaraju's two passes, Dijkstra's algorithm with a priority queue, and shortest paths in a DAG whose edges may have negative weights. The starter has a <strong>self-running test battery</strong>; you fill in five <code>TODO</code>s. The midterm (Monday Nov 9) covers this material too.</p>
+
+  <h2>Tasks</h2>
+  <table>
+    <tr><th>TODO</th><th>Function</th><th>What it must do</th></tr>
+    <tr><td>1</td><td><code>hasCycle</code></td><td>Decide whether a digraph has a directed cycle, by looking for a back edge in a depth-first search.</td></tr>
+    <tr><td>2</td><td><code>topoOrderMin</code></td><td>A topological order by Kahn's algorithm, always outputting the smallest ready vertex; empty if there is a cycle.</td></tr>
+    <tr><td>3</td><td><code>sccLabels</code></td><td>Label the strongly connected components with Kosaraju's two depth-first passes.</td></tr>
+    <tr><td>4</td><td><code>dijkstra</code></td><td>Shortest-path distances from <em>s</em> with nonnegative weights, using a priority queue with lazy deletion.</td></tr>
+    <tr><td>5</td><td><code>dagShortest</code></td><td>Shortest-path distances in a DAG with possibly negative weights, relaxing edges in topological order.</td></tr>
+  </table>
+  <p>The full contract of each function, with examples, is in the comment above it in the starter. Every function is also tested on graphs with 100,000 vertices and 1,000,000 edges, with a time limit: write each one with the running time its contract states. Keep the signature of <code>dijkstra</code> exactly as given; Programming Assignment 2 reuses it.</p>
+
+  <h2>The tests run themselves</h2>
+  <pre>g++ -std=c++17 -O2 hw06.cpp -o hw06 &amp;&amp; ./hw06</pre>
+  <p>Each check prints <code>[PASS]</code> or <code>[FAIL]</code>. The unmodified starter compiles and fails
+  most of them.</p>
+
+  <div class="aside"><span class="tag">Build on the lab</span>
+    Code is graded on the CSS Linux lab with <code>g++ -std=c++17</code>. Build and run there at least once
+    before you submit; the
+    <a href="../../../guides/guide-computing-environment.html"><strong>Computing Environment</strong></a>
+    guide has the login and file-transfer commands. Code that does not compile on the lab receives no points.
+  </div>
+
+  <h2>Grading (10 pts)</h2>
+  <table class="pts">
+    <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
+    <tr><td>Compiles (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>does not compile: 0</td></tr>
+    <tr><td><code>hasCycle</code> (TODO 1)</td><td>1</td><td rowspan="5">checked by our own test harness, on random inputs different from the battery's, and on large inputs with a time limit</td></tr>
+    <tr><td><code>topoOrderMin</code> (TODO 2)</td><td>2</td></tr>
+    <tr><td><code>sccLabels</code> (TODO 3)</td><td>2</td></tr>
+    <tr><td><code>dijkstra</code> (TODO 4)</td><td>2</td></tr>
+    <tr><td><code>dagShortest</code> (TODO 5)</td><td>1</td></tr>
+    <tr><td>Your test battery passes</td><td>2</td><td>all: 2 · most: 1</td></tr>
+  </table>
+  <p>Homework is 8% of the course grade, with the lowest two homework scores dropped.</p>
+
+  <h2>Reading</h2>
+  <ul>
+    <li><a href="../../../textbook/graphs/algo-dfs.html">Depth-First Search</a>, <a href="../../../textbook/graphs/algo-topological-sort.html">Topological Sort</a> and <a href="../../../textbook/graphs/algo-strongly-connected-components.html">Strongly Connected Components</a>.</li>
+    <li><a href="../../../textbook/graphs/algo-dijkstra.html">Dijkstra's Algorithm</a>.</li>
+    <li>The slides: <a href="../../S10-dfs-topological-sort/index.html">Lecture 10</a> and <a href="../index.html">Lecture 11</a>.</li>
+  </ul>
+
+  <h2>Submit</h2>
+  <p>One <code>.zip</code> file on Canvas, containing your finished <code>hw06.cpp</code> and anything else you
+  want to include. Keep the file name <code>hw06.cpp</code>. Resubmissions are allowed until the deadline; the
+  last one is graded. To make the zip on the lab: <code>zip hw06.zip hw06.cpp</code>.
+  <strong>Due Sun Nov 8, 11:59 PM.</strong> A late token extends this deadline by 48 hours.</p>
+  <footer>CSS 343 · Autumn 2026 · Homework 6 · prepared by Dr. Marcel Gavriliu.</footer>
+</div>
+</body>
+</html>
