@@ -6,7 +6,7 @@
   Needs:   the doubling-experiment topic; the counting-loops topic.
   Demos:   none.
   Program: none (numbers from topics/code/analysis-doubling/threesum.cpp).
-  Budget:  ~22 min, 16 slides.
+  Budget:  ~25 min, 18 slides.
 -->
 
 ### Model: count it from the code
@@ -185,6 +185,40 @@ Counting **array accesses** instead of triples:
 A cost model lets us state a fact about the **algorithm**, not about one run on one machine.
 
 <small>Code: <a href="../../topics/code/faster-3sum/faster.cpp">faster.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
+
+--
+
+## Cost models: what to count
+
+<div style="font-size:0.8em">
+
+| cost model | counts | example |
+| --- | --- | --- |
+| RAM model | every primitive operation, 1 each | behind O, Ω, Θ |
+| inner-loop executions | each pass through the inner body | 3-sum: N(N − 1)(N − 2)/6 |
+| array accesses | each array read or write | 3-sum: ~ N³/2 |
+| compares | each key comparison | searching and sorting |
+| compares and exchanges | both, separately | selection sort: ~ N²/2 and N − 1 |
+
+</div>
+
+--
+
+## More cost models
+
+<div style="font-size:0.8em">
+
+| cost model | counts | example |
+| --- | --- | --- |
+| probes | each slot or element inspected | binary search: ⌊log₂ N⌋ + 1 |
+| vertices and edges | each visit, each adjacency entry | graph search: V + E |
+| bit operations | each operation on one bit | n-bit multiplication: Θ(n²) |
+| block transfers | each block moved between memories | external-memory model |
+
+</div>
+
+**Our counters:** `threesum.cpp` counts inner-loop executions, `faster.cpp` array accesses.
 
 --
 
