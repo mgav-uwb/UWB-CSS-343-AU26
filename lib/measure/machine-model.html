@@ -1,0 +1,208 @@
+<!doctype html>
+<!-- CSS 343 · Machine models, simulated. A doubling experiment on a machine the
+     reader chooses, computed (not timed) from the cost model in machine-model.js,
+     the same code that computes the numbers in the textbook chapter
+     "Algorithms on Real Machines". ?embed=1 gives a compact layout for a slide
+     iframe (about 940 x 440); ?machine=<key>&algo=<key> preselect. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machine Models, Simulated · CSS 343</title>
+<style>
+  :root { --ink:#1a1c22; --dim:#5c6270; --line:#dfe3ea; --bg:#f4f5f9; --card:#fff;
+          --accent:#7c5cff; --accentbg:#f1edff; --ref:#9aa1b2; --good:#1f9d6b; --bad:#d0553f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 22px 16px 60px; }
+  .nav { font-size: 13px; margin-bottom: 10px; } .nav a { color: var(--dim); text-decoration: none; margin-right: 14px; }
+  .nav a:hover { color: var(--accent); }
+  h1 { font-size: 26px; margin: 0 0 4px; } .sub { color: var(--dim); margin: 0 0 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 12px 0; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+  label { font-size: 13.5px; color: var(--dim); }
+  select, input { font: 14px system-ui, sans-serif; padding: 5px 8px; border: 1px solid var(--line); border-radius: 7px; background: #fff; color: var(--ink); }
+  input { width: 92px; }
+  label { max-width: 100%; display: inline-flex; align-items: center; gap: 6px; } label select { max-width: calc(100vw - 110px); }
+  .levels { overflow-x: auto; }
+  .out { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+  .chart { max-width: 760px; margin: 0 auto; width: 100%; }
+  .chart svg { width: 100%; height: auto; display: block; }
+  .tablewrap { max-height: 360px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  th, td { border-bottom: 1px solid var(--line); padding: 3px 7px; text-align: right; white-space: nowrap; }
+  th { color: var(--dim); font-weight: 600; position: sticky; top: 0; background: #fafbfd; }
+  td.l { text-align: left; color: var(--dim); }
+  td.hot { color: var(--bad); font-weight: 700; } td.ok { color: var(--good); }
+  table.lv input { width: 84px; padding: 3px 6px; font-size: 13px; }
+  table.lv td, table.lv th { text-align: left; }
+  .note { font-size: 13px; color: var(--dim); }
+  .summary { font-size: 13.5px; margin: 6px 0 0; }
+  details summary { cursor: pointer; color: var(--accent); font-size: 13.5px; }
+  code { font: 0.92em "SF Mono", Menlo, Consolas, monospace; background: #f1f3f7; border-radius: 4px; padding: 0 4px; }
+  .about p { margin: 6px 0; font-size: 14px; }
+  /* embedded in a slide: no page chrome, one control row, chart and table side by side */
+  body.embed .wrap { max-width: none; padding: 6px 8px; }
+  body.embed .nav, body.embed h1, body.embed .sub, body.embed .about, body.embed .levels { display: none; }
+  body.embed .card { margin: 6px 0; padding: 8px 10px; }
+  body.embed .tablewrap { max-height: 300px; }
+  body.embed table { font-size: 11.5px; }
+  body.embed .summary { font-size: 12.5px; }
+  body.embed .wide { display: none; }
+  body.embed .out { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+  @media (max-width: 720px) { .out { grid-template-columns: 1fr; } body:not(.embed) h1 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav"><a href="../../index.html">&#8592; Course hub</a><a href="../../textbook/foundations/foundation-machine-models.html">Algorithms on Real Machines</a><a href="memory.html">Memory Hierarchy, Measured</a></div>
+  <h1>Machine Models, Simulated</h1>
+  <p class="sub">A doubling experiment on a machine you choose. Nothing here is timed: the cost of every
+  step comes from a model of the machine&rsquo;s memory levels, so the numbers are exact for the model
+  and the same on every computer. Change the machine or the access pattern and watch where the doubling
+  ratio stops being 2<sup>b</sup>.</p>
+
+  <section class="card">
+    <div class="row">
+      <label>machine <select id="machine"></select></label>
+      <label>algorithm <select id="algo"></select></label>
+    </div>
+    <details class="levels" id="levels"><summary>edit the machine&rsquo;s memory levels</summary>
+      <table class="lv" id="lv"></table>
+      <p class="note">Capacity in bytes (accepts 32K, 16M, 4G, inf), time per access in the machine&rsquo;s unit,
+      block = bytes handed to the level above on a miss. Levels are listed fastest first; the last one is unbounded.</p>
+    </details>
+  </section>
+
+  <section class="card">
+    <div class="out">
+      <div class="chart" id="chart"></div>
+      <div class="tablewrap"><table id="tab"></table></div>
+    </div>
+    <p class="summary" id="summary"></p>
+  </section>
+
+  <section class="card about">
+    <h2 style="font-size:17px;margin:0 0 4px">How to read it</h2>
+    <p>Each row doubles <i>N</i>. The <b>ratio</b> is the cost at this <i>N</i> divided by the cost at half
+    this <i>N</i>, and <b>b</b> = lg(ratio) is the local exponent. For an algorithm whose cost in the RAM
+    model is &Theta;(<i>N</i><sup>b</sup>), the ratio is 2<sup>b</sup> while the working set stays in one
+    memory level. In the doubling where the working set outgrows a level, the cost of one access rises, and
+    the local exponent becomes b + lg(new cost per access / old cost per access): highlighted in red. After
+    the crossing it returns to b, because the slower level also costs a constant per access. The dashed
+    line in the chart has the RAM-model slope through the first point.</p>
+    <p><b>The model.</b> A machine is a list of levels, fastest first, each with a capacity, a time per
+    access and a block size. A sequential scan of a working set of <i>W</i> bytes held at level <i>k</i>
+    fetches each block once from level <i>k</i>: one access costs the top level&rsquo;s time plus level
+    <i>k</i>&rsquo;s time times (item size / block size). Random accesses over <i>W</i> bytes find their
+    data at level <i>k</i> with probability min(1, <i>C</i><sub>k</sub>/<i>W</i>) minus the same for the
+    level above, the steady state of random replacement and close to least-recently-used (LRU) replacement.
+    This analytical model is used instead of simulating every access because the effects worth seeing happen at
+    <i>N</i> beyond 10<sup>9</sup>, where <i>N</i><sup>2</sup> accesses cannot be simulated one by one.</p>
+    <p><b>The machines.</b> The laptop uses the latencies measured in the Computer Systems Primer (1.4 ns,
+    about 4, 15 and 100 ns) and a typical 50 &micro;s for its solid-state drive (SSD). The small machine
+    has 64 MiB of memory and swaps to a hard disk with a 5 ms access time.
+    The million-cycle machine charges 10<sup>6</sup> cycles for every memory access: its ratios never change.
+    The source is <a href="machine-model.js"><code>machine-model.js</code></a>.</p>
+  </section>
+</div>
+
+<script type="module">
+import { MACHINES, ALGOS, table, human, bytes, levelOf, GiB } from "./machine-model.js";
+const $ = (id) => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+if (params.get("embed")) document.body.classList.add("embed");
+
+// a working copy of the chosen preset, editable in the levels table
+let machine = null;
+const clone = (m) => ({ ...m, levels: m.levels.map((l) => ({ ...l })) });
+$("machine").innerHTML = Object.entries(MACHINES).map(([k, m]) => `<option value="${k}">${m.name}</option>`).join("");
+$("algo").innerHTML = Object.entries(ALGOS).map(([k, a]) => `<option value="${k}">${a.name}</option>`).join("");
+if (params.get("machine") && MACHINES[params.get("machine")]) $("machine").value = params.get("machine");
+else $("machine").value = "swap";
+if (params.get("algo") && ALGOS[params.get("algo")]) $("algo").value = params.get("algo");
+else $("algo").value = "lookups";
+
+const parseCap = (s) => {
+  s = String(s).trim().toLowerCase();
+  if (s === "inf" || s === "infinity" || s === "∞") return Infinity;
+  const m = s.match(/^([\d.]+)\s*([kmgt]?)i?b?$/); if (!m) return NaN;
+  return +m[1] * { "": 1, k: 1024, m: 1024 ** 2, g: 1024 ** 3, t: 1024 ** 4 }[m[2]];
+};
+const capText = (c) => c === Infinity ? "inf" : bytes(c).replace(/ (\w)iB$/, "$1").replace(" B", "");
+
+function drawLevels() {
+  $("lv").innerHTML = `<tr><th>level</th><th>capacity</th><th>time per access (${machine.unit})</th><th>block (bytes)</th></tr>` +
+    machine.levels.map((l, i) => `<tr><td>${l.name}</td>
+      <td><input data-i="${i}" data-f="cap" value="${capText(l.cap)}" ${i === machine.levels.length - 1 ? "disabled" : ""}></td>
+      <td><input data-i="${i}" data-f="lat" value="${l.lat}"></td>
+      <td><input data-i="${i}" data-f="block" value="${l.block}"></td></tr>`).join("");
+  $("lv").querySelectorAll("input").forEach((inp) => inp.onchange = () => {
+    const l = machine.levels[+inp.dataset.i], f = inp.dataset.f;
+    const v = f === "cap" ? parseCap(inp.value) : +inp.value;
+    if (!(v > 0)) { inp.value = f === "cap" ? capText(l[f]) : l[f]; return; }
+    l[f] = v; run();
+  });
+}
+
+const fmtT = (t) => machine.unit === "ns" ? human(t) : `${t.toPrecision(3)} ${machine.unit}`;
+const fmtPer = (t) => machine.unit === "ns" ? (t < 1000 ? `${t.toPrecision(3)} ns` : human(t)) : t.toPrecision(3);
+
+function run() {
+  const a = ALGOS[$("algo").value];
+  const rows = table(machine, $("algo").value, 16, 128 * GiB);
+  const hot = (r) => r.b != null && Math.abs(r.b - a.exp) > 0.35 && r.b > a.exp;
+  // ---- table ----
+  $("tab").innerHTML = `<tr><th>N</th><th class="wide">working set</th><th>held in</th><th>cost</th><th class="wide">per access</th><th>ratio</th><th>b</th></tr>` +
+    rows.map((r) => `<tr><td>${r.N.toLocaleString("en-US")}</td><td class="wide">${bytes(r.W)}</td><td class="l">${r.level}</td>
+      <td>${fmtT(r.T)}</td><td class="wide">${fmtPer(r.T / a.accesses(r.N))}</td>
+      <td>${r.ratio == null ? "" : r.ratio < 1000 ? r.ratio.toFixed(2) : Math.round(r.ratio).toLocaleString("en-US")}</td>
+      <td class="${hot(r) ? "hot" : r.b == null ? "" : "ok"}">${r.b == null ? "" : r.b.toFixed(2)}</td></tr>`).join("");
+  // ---- chart: log2 N against log10 cost ----
+  const W = 640, H = 360, L = 78, R = 14, T = 14, B = 44;
+  const x0 = Math.log2(rows[0].N), x1 = Math.log2(rows[rows.length - 1].N);
+  const ys = rows.map((r) => Math.log10(r.T)), y0 = Math.floor(Math.min(...ys)), y1 = Math.ceil(Math.max(...ys));
+  const X = (N) => L + (Math.log2(N) - x0) / (x1 - x0) * (W - L - R);
+  const Y = (t) => T + (1 - (Math.log10(t) - y0) / Math.max(1, y1 - y0)) * (H - T - B);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cost against N on logarithmic scales" font-family="system-ui, sans-serif" font-size="11">`;
+  s += `<rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="#fbfbfe" stroke="#dfe3ea"/>`;
+  // y ticks: readable time units for ns machines, powers of ten otherwise
+  const YR = 365.25 * 86400e9;
+  let ticks = machine.unit === "ns"
+    ? [[1, "1 ns"], [1e3, "1 µs"], [1e6, "1 ms"], [1e9, "1 s"], [60e9, "1 min"], [3600e9, "1 h"], [86400e9, "1 day"], [YR, "1 year"], [1e3 * YR, "1,000 years"], [1e6 * YR, "10⁶ years"], [1e9 * YR, "10⁹ years"], [1e12 * YR, "10¹² years"]]
+    : Array.from({ length: y1 - y0 + 1 }, (_, i) => [10 ** (y0 + i), `10<tspan dy="-5" font-size="9">${y0 + i}</tspan>`]);
+  ticks = ticks.filter(([v]) => Math.log10(v) >= y0 - 1e-9 && Math.log10(v) <= y1 + 1e-9);
+  if (machine.unit !== "ns" && ticks.length > 8) ticks = ticks.filter((_, i) => i % Math.ceil(ticks.length / 8) === 0);
+  for (const [v, lab] of ticks) s += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#eceef3"/><text x="${L - 6}" y="${Y(v) + 4}" text-anchor="end" fill="#5c6270">${lab}</text>`;
+  const xs = Math.max(1, Math.ceil((x1 - x0) / 8));
+  for (let e = x0; e <= x1; e += xs) s += `<line x1="${X(2 ** e)}" x2="${X(2 ** e)}" y1="${H - B}" y2="${H - B + 4}" stroke="#5c6270"/><text x="${X(2 ** e)}" y="${H - B + 16}" text-anchor="middle" fill="#5c6270">2<tspan dy="-5" font-size="9">${e}</tspan></text>`;
+  s += `<text x="${(L + W - R) / 2}" y="${H - 8}" text-anchor="middle" fill="#1a1c22">N (log scale)</text>`;
+  s += `<text x="12" y="${(T + H - B) / 2}" text-anchor="middle" fill="#1a1c22" transform="rotate(-90 12 ${(T + H - B) / 2})">cost (log scale)</text>`;
+  // RAM-model slope through the first point
+  const r0 = rows[0], last = rows[rows.length - 1];
+  const ref = (N) => r0.T * (a.accesses(N) / a.accesses(r0.N));
+  s += `<polyline points="${[r0.N, last.N].map((N) => `${X(N).toFixed(1)},${Y(ref(N)).toFixed(1)}`).join(" ")}" fill="none" stroke="#9aa1b2" stroke-dasharray="5 4"/>`;
+  for (let i = 1; i < rows.length; i++) {
+    const p = rows[i - 1], q = rows[i];
+    s += `<line x1="${X(p.N).toFixed(1)}" y1="${Y(p.T).toFixed(1)}" x2="${X(q.N).toFixed(1)}" y2="${Y(q.T).toFixed(1)}" stroke="${hot(q) ? "#d0553f" : "#7c5cff"}" stroke-width="${hot(q) ? 3 : 2.2}"/>`;
+  }
+  for (const r of rows) s += `<circle cx="${X(r.N).toFixed(1)}" cy="${Y(r.T).toFixed(1)}" r="3" fill="${hot(r) ? "#d0553f" : "#7c5cff"}"><title>N = ${r.N.toLocaleString("en-US")}: ${fmtT(r.T)}${r.b == null ? "" : ", b = " + r.b.toFixed(2)}</title></circle>`;
+  $("chart").innerHTML = s + `</svg>`;
+  // ---- summary ----
+  const worst = rows.filter((r) => r.b != null).reduce((m, r) => (r.b > m.b ? r : m), { b: -Infinity });
+  const tail = rows[rows.length - 1];
+  $("summary").innerHTML = `RAM-model exponent ${a.exp}${a.exp === 1 && $("algo").value === "merge" ? " (times lg N)" : ""}. ` +
+    (worst.b > a.exp + 0.35
+      ? `Largest local exponent: <b style="color:#d0553f">${worst.b.toFixed(1)}</b> at N = ${worst.N.toLocaleString("en-US")}, where the working set moves into ${worst.level}. ` +
+        (Math.abs(tail.b - a.exp) < 0.35 ? `In the last row b = ${tail.b.toFixed(2)}: the order of growth is unchanged.`
+          : `After it, b falls back toward ${a.exp} (${tail.b.toFixed(2)} in the last row, closer at larger N): the order of growth is unchanged.`)
+      : `Every doubling shows b close to ${a.exp}: on this machine the cost of an access does not change with N.`);
+}
+
+function choose() { machine = clone(MACHINES[$("machine").value]); drawLevels(); run(); }
+$("machine").onchange = choose;
+$("algo").onchange = run;
+choose();
+</script>
+</body>
+</html>

@@ -4,14 +4,14 @@
            experiment and the ratio 2^b; log-log plots and power laws;
            predicting from a measured exponent; why the constant cancels.
   Needs:   the k-sum topic (3-sum, count3, C(n,3)).
-  Demos:   none.
+  Demos:   lib/measure/doubling.html (embedded, brute force to N = 2000).
   Program: topics/code/analysis-doubling/threesum.cpp
-  Budget:  ~22 min, 10 slides.
+  Budget:  ~24 min, 15 slides.
 -->
 
 ### Observe: the doubling experiment
 
-<small>(~22 min)</small>
+<small>(~24 min)</small>
 
 --
 
@@ -64,6 +64,25 @@ Each line **doubles N** and prints the operation count, the time, and each one's
 ```
 
 The **operation ratio → 8** every time N doubles. The **time ratio agrees, noisily.**
+
+--
+
+## Demo: the experiment in your browser
+
+<iframe data-src="../../lib/measure/doubling.html?embed=1&alg=brute&max=2000" style="width:100%;height:470px;border:0" title="doubling experiment"></iframe>
+
+--
+
+## When the ratio wobbles
+
+Count ratios are exact; time ratios scatter:
+
+- **N too small**: below the timer's resolution
+- **warm-up**: compiling, loading, filling caches
+- **other processes** share the machine
+- **caches**: data outgrows a level, accesses slow down
+
+Remedy: **count** when you can; repeat timings, keep the best; trust the larger N.
 
 --
 
@@ -122,4 +141,47 @@ Slope **b = 3**, so T(N) = a·N³. Solve for a from one measured point, then **f
 The forecast stands or falls on the **next measurement**.
 
 Measuring gives the exponent and a forecast. It never says **why** the exponent is 3.
+
+--
+
+## Estimate a once b is known
+
+With b = 3, one row fixes the constant. From **T(2000) = 1.050 s**:
+
+$$a = \frac{1.050}{2000^3} = 1.31 \times 10^{-10} \text{ s}$$
+
+Then T(N) ≈ 1.31 × 10⁻¹⁰ · N³ predicts:
+
+| N | predicted T(N) |
+| --- | --- |
+| 4000 | 8.4 s |
+| 16000 | 538 s, about 9 minutes |
+
+--
+
+## Same b, different machine
+
+| run | T(2000) | doubling ratio | b |
+| --- | --- | --- | --- |
+| C++, -O2, the authoring laptop | 1.05 s | 8.0 | 3 |
+| JavaScript, Chrome, same laptop | 2.5 s | 8.7 | 3 |
+
+A different language or machine changes **a**, the constant; the exponent **b** is the algorithm's.
+
+--
+
+## Your turn: predict the next row
+
+A program you have not seen:
+
+| N | time (s) |
+| --- | --- |
+| 1000 | 0.21 |
+| 2000 | 0.83 |
+| 4000 | 3.32 |
+| 8000 | ? |
+
+Estimate b, then predict T(8000) and T(16000).
+
+<small>Ratios 3.95, 4.00 → 2ᵇ ≈ 4 → **b ≈ 2**. T(8000) ≈ 4 × 3.32 ≈ **13.3 s**; T(16000) ≈ 4 × 13.3 ≈ **53 s**.</small> <!-- .element: class="fragment" -->
 

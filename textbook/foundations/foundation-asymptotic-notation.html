@@ -329,6 +329,13 @@
         discarding them keeps the part of the cost that actually matters and
         makes the description independent of the machine and the implementation.
       </p>
+      <p>
+        That independence holds as long as every operation costs between two
+        fixed constants on the machine at hand. What a memory hierarchy, swapping
+        to disk, or a memory whose access time grows with its size does to an
+        order of growth is the subject of
+        <a href="foundation-machine-models.html">Algorithms on Real Machines</a>.
+      </p>
       <div class="aside">
         <span class="tag">Standing assumption</span> Every function placed
         inside this notation is assumed
@@ -956,6 +963,12 @@
           that input family, not a <em>proof</em> of the order for all \(n\) or
           all inputs. Use measurement to estimate and to catch errors, and use
           analysis to establish the bound.
+        </li>
+        <li>
+          Watch for a change of level: a single doubling ratio far above the rest
+          usually means the data outgrew a cache or main memory, not that the
+          order changed. <a href="foundation-machine-models.html#knee">Algorithms
+          on Real Machines, section 4</a> works through such a table.
         </li>
       </ul>
 

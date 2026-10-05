@@ -86,12 +86,17 @@ long long bytes = (allocStats() - before).bytes;   // 4000</pre>
     <h2>Measurement</h2>
     <p>Programs that measure the machine rather than an algorithm. They back the numbers in the
     <a href="../textbook/foundations/foundation-computer-systems.html">Computer Systems Primer</a>, and the
-    first two also run in the browser as <a href="../lib/measure/memory.html">Memory Hierarchy, Measured</a>.</p>
+    first two also run in the browser as <a href="../lib/measure/memory.html">Memory Hierarchy, Measured</a>.
+    <code>branch.cpp</code> and <code>matmul.cpp</code> back
+    <a href="../textbook/foundations/foundation-machine-models.html">Algorithms on Real Machines</a>, whose
+    cost model runs in the browser as <a href="../lib/measure/machine-model.html">Machine Models, Simulated</a>.</p>
     <table>
       <tr><th>file</th><th>what it measures</th></tr>
       <tr><td><a href="measure/latency.cpp"><code>latency.cpp</code></a></td><td>the time for one dependent memory read, as the array grows past each cache: about 1.4 ns in L1 to 100 ns in main memory</td></tr>
       <tr><td><a href="measure/locality.cpp"><code>locality.cpp</code></a></td><td>the same additions in two orders: a matrix by rows and by columns, a linked list in memory order and scattered</td></tr>
       <tr><td><a href="measure/optimize.cpp"><code>optimize.cpp</code></a></td><td>3-sum at <code>-O0</code> and <code>-O2</code>, and a loop the optimizer deletes because its result is never used</td></tr>
+      <tr><td><a href="measure/branch.cpp"><code>branch.cpp</code></a></td><td>the same loop over random and sorted values: a branch the optimizer removes (no difference) and one it keeps (3 to 4&times; slower when unpredictable)</td></tr>
+      <tr><td><a href="measure/matmul.cpp"><code>matmul.cpp</code></a></td><td>matrix multiplication in three loop orders with the same multiply-adds: i-j-k, i-k-j (9&times; faster), and blocked (16&times; faster)</td></tr>
     </table>
   </section>
 

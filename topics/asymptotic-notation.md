@@ -5,12 +5,14 @@
            contradiction; witnesses are not unique; Θ = O ∩ Ω; the
            polynomial theorem; f = O(g) as one-way shorthand; order of growth
            as Θ membership; sum and product rules as set facts; the strict
-           hierarchy and the limit test; common mistakes.
+           hierarchy; the limit test; log bases are interchangeable;
+           exponentials beat polynomials; ranking functions; common mistakes;
+           practice proofs.
   Needs:   the cost-model topic (tilde, order of growth); the faster-3sum
            topic (sum and product rules, informally).
   Demos:   none.
   Program: none.
-  Budget:  ~45 min, 21 slides.
+  Budget:  ~38 min, 27 slides.
   Math:    marked runs before KaTeX. No \, \; \{ in math (use \lbrace,
            \rbrace); on a line with two or more subscripts, write every one
            as \_ so marked does not pair them into <em>.
@@ -19,7 +21,7 @@
 
 ### Asymptotic notation: O, Ω, Θ as sets
 
-<small>(~45 min)</small>
+<small>(~38 min)</small>
 
 --
 
@@ -166,6 +168,17 @@ $$c\_1 \le \frac{1}{2} - \frac{3}{n} \le c\_2$$
 
 --
 
+## A Θ proof, line by line
+
+**Claim:** 3n² − 5n + 2 ∈ Θ(n²). Find c₁, c₂, n₀ with c₁n² ≤ 3n² − 5n + 2 ≤ c₂n² for all n ≥ n₀.
+
+1. **Upper.** For n ≥ 1, −5n + 2 ≤ −3 < 0, so 3n² − 5n + 2 ≤ 3n². Take **c₂ = 3**.
+2. **Lower.** Try c₁ = 2: need 3n² − 5n + 2 ≥ 2n², that is n² − 5n + 2 ≥ 0.
+3. The roots of n² − 5n + 2 are (5 ± √17)/2, about 0.44 and **4.56**, so it holds for every n ≥ 5.
+4. **Witnesses:** c₁ = 2, c₂ = 3, n₀ = 5. Check n = 5: 2·25 = 50 ≤ 52 ≤ 75 = 3·25. ∎
+
+--
+
 ## Theorem: Θ = O ∩ Ω
 
 $$\Theta(g) = O(g) \cap \Omega(g)$$
@@ -246,6 +259,56 @@ $$1 \quad \lg n \quad \sqrt{n} \quad n \quad n \lg n \quad n^2 \quad n^3 \quad 2
 
 --
 
+## The limit test
+
+If the limit of f(n)/g(n) as n → ∞ **exists**, it settles the comparison:
+
+| limit of f/g | conclusion |
+| --- | --- |
+| 0 | f ∈ O(g), f ∉ Ω(g): g grows strictly faster |
+| a constant L > 0 | f ∈ Θ(g) |
+| ∞ | f ∈ Ω(g), f ∉ O(g): f grows strictly faster |
+
+**Example:** (3n² − 5n + 2)/n² = 3 − 5/n + 2/n² → 3, so the function is in Θ(n²) with no witnesses to hunt for.
+
+--
+
+## Logarithm bases do not matter
+
+For bases a, b > 1: $$\log\_a n = \frac{1}{\log\_b a} \cdot \log\_b n$$
+
+A **positive constant** factor, so it serves as c₁ and c₂. Example: lg n is about **1.443 · ln n**.
+
+O(lg n), O(ln n), O(log₁₀ n) are **the same set**: write O(log n).
+
+--
+
+## Exponentials beat every polynomial
+
+**Claim:** for every fixed k, 2ⁿ ∉ O(nᵏ).
+
+**Proof.** If 2ⁿ ≤ c·nᵏ for all n ≥ n₀, take lg:
+
+$$n \le \lg c + k \lg n$$
+
+n − k lg n is unbounded: **contradiction**. ∎
+
+Crossovers: 2ⁿ ≥ n² from n = 4, ≥ n³ from 10, ≥ n¹⁰ from 59.
+
+--
+
+## Rank these functions
+
+Order by growth, slowest first; mark any two in the same Θ:
+
+$$n^2 \quad \sqrt{n} \quad n \lg n \quad 2^{\lg n} \quad \frac{n^2}{\lg n} \quad (\lg n)^2 \quad n^{1.5} \quad \lg(n!)$$
+
+$$(\lg n)^2 \prec \sqrt{n} \prec 2^{\lg n} \prec \lbrace n \lg n, \quad \lg(n!) \rbrace$$
+$$\prec n^{1.5} \prec n^2 / \lg n \prec n^2$$
+<!-- .element: class="fragment" -->
+
+--
+
 ## Common mistakes
 
 - **Constants that depend on n.** "n² ≤ c·n with c = n" proves nothing.
@@ -264,4 +327,13 @@ With a neighbor: **member or not?** Give witnesses or a contradiction.
 3. 2²ⁿ ∈ O(2ⁿ)?
 
 **Answers.** (1) Yes: n² ≤ (n + 1)² ≤ 4n² for n ≥ 1. (2) Yes: lg(n²) = 2 lg n, so c = 2. (3) No: 2²ⁿ/2ⁿ = 2ⁿ exceeds every constant c. <!-- .element: class="fragment" -->
+
+--
+
+## Your turn: two proofs
+
+1. Prove **5n³ + 2n ∈ Θ(n³)**: give c₁, c₂ and n₀.
+2. Prove **n² ∉ O(n lg n)**.
+
+**(1)** For n ≥ 1: 5n³ ≤ 5n³ + 2n ≤ 5n³ + 2n³ = 7n³, so c₁ = 5, c₂ = 7, n₀ = 1. **(2)** Suppose n² ≤ c·n lg n for all n ≥ n₀. Dividing by n lg n gives n / lg n ≤ c, but n / lg n grows without bound: contradiction. <!-- .element: class="fragment" -->
 

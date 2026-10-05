@@ -1,0 +1,868 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: Algorithms on Real Machines.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Algorithms on Real Machines - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+      blockquote { margin: 14px 0; padding: 10px 16px; border-left: 4px solid var(--line); background: var(--box); border-radius: 6px; font-style: italic; }
+      @media (max-width: 520px) { table { font-size: 13px; } th, td { padding: 5px 6px; } td code { word-break: break-all; } }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+      <p class="note">
+        This chapter uses MathJax for its mathematics. Read it in a browser; a
+        plain-text or inline document preview will not render the math.
+      </p>
+
+      <h1>Algorithms on Real Machines</h1>
+      <div class="subtitle">
+        Data Structures &amp; Algorithms. Foundation.
+      </div>
+      <div class="src">
+        What the machine does to an asymptotic bound: every bound is a statement
+        about a cost model; costs that stay within constant limits leave the order
+        of growth unchanged however large the constants are; a memory hierarchy
+        makes the cost of one access a step function of the working set, which a
+        doubling experiment sees as a knee; the exponent changes only when the cost
+        of a basic step grows with the input; pipelines, superscalar execution and
+        branch prediction change constant factors; and what it means for a
+        programmer to optimize a program. Builds on the
+        <a href="foundation-computer-systems.html">Computer Systems Primer</a> and
+        <a href="foundation-asymptotic-notation.html">Asymptotic Notation</a>.
+      </div>
+
+      <p class="lead">
+        An analysis that says an algorithm runs in \(\Theta(N^2)\) time counts
+        operations in an idealized machine where every operation costs the same.
+        Real machines are not like that: one memory read can take 1.4 ns or 5 ms,
+        a factor of more than three million, depending on where the data is. This
+        chapter answers three questions that follow. Does a slow memory, or a
+        program that runs out of memory and swaps to disk, change the order of
+        growth? When does the order of growth really change? And if the order of
+        growth is fixed by the algorithm, what is left for a programmer to
+        optimize?
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#costmodel">Every bound is relative to a cost model</a></li>
+          <li><a href="#bounded">Bounded costs preserve the order of growth</a></li>
+          <li><a href="#steps">The memory hierarchy: cost per access as a step function</a></li>
+          <li><a href="#knee">Crossing a boundary: swap, the knee, and the doubling ratio</a></li>
+          <li><a href="#exponent">When the exponent does change</a></li>
+          <li><a href="#cpi">Pipelines, parallel execution and branch prediction</a></li>
+          <li><a href="#optimize">What it means to optimize a program</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <div class="aside">
+        <span class="tag">The numbers</span>
+        Numbers labelled <em>measured</em> come from C++ programs in the course&rsquo;s
+        code library, run on the laptop of the
+        <a href="foundation-computer-systems.html">Computer Systems Primer</a>
+        (Intel Core i9-9980HK, 32 GiB of memory):
+        <a href="../../code/measure/branch.cpp"><code>branch.cpp</code></a> and
+        <a href="../../code/measure/matmul.cpp"><code>matmul.cpp</code></a> here, and
+        <a href="../../code/measure/locality.cpp"><code>locality.cpp</code></a> from that chapter.
+        Numbers labelled <em>model</em> come from the cost model of
+        <a href="#steps">section 3</a>, computed by the same code that runs the
+        simulator page linked below.
+      </div>
+      <div class="demo">
+        <span class="tag">Demo</span>
+        <a href="../../lib/measure/machine-model.html">Machine Models, Simulated</a>
+        runs a doubling experiment on a machine you choose (the idealized model, a
+        laptop, a fast processor with a memory read of a million cycles, or a
+        small memory backed by a disk) for six access patterns, and reports the
+        doubling ratio and the local exponent at every step.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="costmodel">1. Every bound is relative to a cost model</h2>
+      <p>
+        A statement such as &ldquo;brute-force 3-sum runs in \(\Theta(N^3)\)
+        time&rdquo; is a statement about a function \(T(N)\), and \(T(N)\) is
+        defined by a <strong>cost model</strong>: a choice of which operations count
+        and what each one costs.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (RAM model)</span>
+        The <strong>random-access machine</strong> (RAM) has an unbounded memory
+        of words, addressed by integers. Reading or writing any word, an arithmetic
+        operation or comparison on words, and a branch each cost one step. The cost
+        of an algorithm on an input is the number of steps it takes.
+      </div>
+      <p>
+        Every bound in the analysis chapters of this book is a bound in the RAM
+        model, or in a coarser model that counts one kind of operation (a
+        comparison, an array access) as a stand-in for all of them. The model
+        leaves out the property that dominates real running times: in a real
+        machine a memory read costs more or less depending on where the data
+        currently is (<a href="foundation-computer-systems.html#hierarchy">Computer
+        Systems Primer, section 2</a>). The question for this chapter is when that
+        omission changes the order of growth and when it only changes the constant.
+      </p>
+      <p>
+        Real running time is a sum over the operations the program executes:
+      </p>
+      \[
+        R(N) \;=\; \sum_{\text{operations } o} \operatorname{cost}(o),
+      \]
+      <p>
+        where \(\operatorname{cost}(o)\) is the time that operation actually took.
+        The RAM model replaces every \(\operatorname{cost}(o)\) by 1. The next
+        section shows that this replacement cannot change a \(\Theta\) bound as long
+        as every cost stays between two fixed constants.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="bounded">2. Bounded costs preserve the order of growth</h2>
+      <div class="thm">
+        <span class="tag">Theorem (bounded costs)</span>
+        Suppose every operation of a program costs at least \(a\) and at most
+        \(b\), for constants \(0 &lt; a \le b\) that do not depend on \(N\). If the
+        program executes \(T(N)\) operations, its running time \(R(N)\) satisfies
+        \[ a\,T(N) \;\le\; R(N) \;\le\; b\,T(N), \]
+        so \(R(N) \in \Theta(T(N))\).
+      </div>
+      <div class="proof">
+        Each of the \(T(N)\) terms of the sum \(R(N) = \sum_o \operatorname{cost}(o)\)
+        lies between \(a\) and \(b\), so the sum lies between \(a\,T(N)\) and
+        \(b\,T(N)\). These are exactly the witnesses of
+        <a href="foundation-asymptotic-notation.html">Asymptotic Notation</a>:
+        \(R \in O(T)\) with \(c = b\), and \(R \in \Omega(T)\) with \(c = a\), for
+        every \(N \ge 1\). <span class="qed">&#9633;</span>
+      </div>
+      <p>
+        The constants may be enormous. Consider a machine whose instructions take
+        one cycle but whose every memory read takes \(10^6\) cycles, and an
+        all-pairs loop that executes three instructions and one memory read for
+        each of its \(N^2\) pairs:
+      </p>
+      \[
+        R(N) = N^2\,(3 + 10^6) \text{ cycles}, \qquad
+        R(1000) = 1{,}000{,}003{,}000{,}000 \text{ cycles}, \qquad
+        \frac{R(2000)}{R(1000)} = 4.
+      \]
+      <p>
+        The doubling ratio is exactly 4, as on any other machine: the program is
+        \(\Theta(N^2)\), slower than on an ordinary computer by a factor of about
+        \(10^6\). <strong>A slow memory, however slow, does not change an order of
+        growth if every read costs the same.</strong>
+      </p>
+      <p>
+        What the constant does change is which of two algorithms is faster at a
+        given \(N\). On the same machine, compare that \(\Theta(N^2)\) loop, at
+        \(10^6\) cycles per pair, with a \(\Theta(N^3)\) algorithm whose data stays
+        in registers, at one cycle per step. The cubic algorithm is faster while
+        \(N^3 &lt; 10^6 N^2\), that is, for every \(N\) below \(10^6\). On an
+        ordinary machine, where a read costs about as much as an instruction, the
+        quadratic algorithm wins for every \(N\) above 4. Asymptotics say which algorithm
+        wins eventually; the cost model decides where &ldquo;eventually&rdquo;
+        begins.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="steps">3. The memory hierarchy: cost per access as a step function</h2>
+      <p>
+        On a real machine the cost of a memory read is not one constant but one of
+        several, depending on which level of the hierarchy holds the data. Which
+        level that is depends on how much memory the program is using.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (working set)</span>
+        The <strong>working set</strong> of a program over a stretch of its
+        execution is the set of memory locations it accesses repeatedly during that
+        stretch. Its size \(W\), in bytes, decides which level of the hierarchy the
+        accesses are served from.
+      </div>
+      <p>
+        A simple model gives the expected cost of one access as a function of
+        \(W\). It describes a machine by its levels, fastest first, each with a
+        capacity \(C_k\), a time \(L_k\) to serve one read, and the size of the
+        block it hands to the level above on a miss (64-byte cache lines; 4096-byte
+        pages from a disk).
+      </p>
+      <ul>
+        <li><strong>Sequential scan</strong> of \(W\) bytes held at level \(k\),
+          the first level with \(C_k \ge W\): each block is fetched once, then its
+          items are read from the top level. One access to an \(e\)-byte item
+          costs \(L_1 + L_k \cdot e / \text{block}_k\).</li>
+        <li><strong>Random order</strong> over \(W\) bytes: in the steady state a
+          level of capacity \(C\) holds a fraction \(\min(1, C/W)\) of the working
+          set, so an access is first found at level \(k\) with probability
+          \(F_k - F_{k-1}\), where \(F_k = \min(1, C_k/W)\). The expected cost is
+          \(\sum_k (F_k - F_{k-1})\,L_k\).</li>
+      </ul>
+      <p>
+        With the latencies measured in the Computer Systems Primer (1.4 ns for the
+        level-1 cache, L1; about 4 ns for L2; about 15 ns for L3; about 100 ns for
+        main memory) and a
+        typical 50 &micro;s for a solid-state drive (SSD), the model gives this
+        picture:
+      </p>
+      <figure>
+        <svg viewBox="0 0 640 330" width="640" role="img" aria-label="Cost of one memory access against working-set size on the laptop machine, log-log: random accesses step from 1.4 ns to about 100 ns and then to about 50 microseconds; sequential accesses stay far lower" font-family="system-ui, sans-serif" font-size="11"><rect x="62" y="20" width="558" height="258" fill="#fbfcfd" stroke="#d7dbe3"/><rect x="62" y="20" width="59.78571428571428" height="258" fill="#eaf6ef"/><text x="91.89285714285714" y="34" text-anchor="middle" fill="#5c6270">L1</text><rect x="121.78571428571428" y="20" width="59.78571428571428" height="258" fill="#eef4fc"/><text x="151.67857142857142" y="34" text-anchor="middle" fill="#5c6270">L2</text><rect x="181.57142857142856" y="20" width="119.57142857142856" height="258" fill="#fff5e6"/><text x="241.35714285714283" y="34" text-anchor="middle" fill="#5c6270">L3</text><rect x="301.1428571428571" y="20" width="199.28571428571433" height="258" fill="#f9eef1"/><text x="400.7857142857143" y="34" text-anchor="middle" fill="#5c6270">main memory</text><rect x="500.42857142857144" y="20" width="119.57142857142856" height="258" fill="#f1eefb"/><text x="560.2142857142858" y="34" text-anchor="middle" fill="#5c6270">SSD</text><line x1="62" x2="620" y1="278" y2="278" stroke="#e6e9ef"/><text x="56" y="282" text-anchor="end" fill="#5c6270">1 ns</text><line x1="62" x2="620" y1="226.4" y2="226.4" stroke="#e6e9ef"/><text x="56" y="230.4" text-anchor="end" fill="#5c6270">10 ns</text><line x1="62" x2="620" y1="174.79999999999998" y2="174.79999999999998" stroke="#e6e9ef"/><text x="56" y="178.79999999999998" text-anchor="end" fill="#5c6270">100 ns</text><line x1="62" x2="620" y1="123.2" y2="123.2" stroke="#e6e9ef"/><text x="56" y="127.2" text-anchor="end" fill="#5c6270">1 µs</text><line x1="62" x2="620" y1="71.6" y2="71.6" stroke="#e6e9ef"/><text x="56" y="75.6" text-anchor="end" fill="#5c6270">10 µs</text><line x1="62" x2="620" y1="20" y2="20" stroke="#e6e9ef"/><text x="56" y="24" text-anchor="end" fill="#5c6270">100 µs</text><line x1="62" x2="62" y1="278" y2="282" stroke="#5c6270"/><text x="62" y="294" text-anchor="middle" fill="#5c6270">4K</text><line x1="141.71428571428572" x2="141.71428571428572" y1="278" y2="282" stroke="#5c6270"/><text x="141.71428571428572" y="294" text-anchor="middle" fill="#5c6270">64K</text><line x1="221.42857142857142" x2="221.42857142857142" y1="278" y2="282" stroke="#5c6270"/><text x="221.42857142857142" y="294" text-anchor="middle" fill="#5c6270">1M</text><line x1="301.1428571428571" x2="301.1428571428571" y1="278" y2="282" stroke="#5c6270"/><text x="301.1428571428571" y="294" text-anchor="middle" fill="#5c6270">16M</text><line x1="380.85714285714283" x2="380.85714285714283" y1="278" y2="282" stroke="#5c6270"/><text x="380.85714285714283" y="294" text-anchor="middle" fill="#5c6270">256M</text><line x1="460.57142857142856" x2="460.57142857142856" y1="278" y2="282" stroke="#5c6270"/><text x="460.57142857142856" y="294" text-anchor="middle" fill="#5c6270">4G</text><line x1="540.2857142857142" x2="540.2857142857142" y1="278" y2="282" stroke="#5c6270"/><text x="540.2857142857142" y="294" text-anchor="middle" fill="#5c6270">64G</text><line x1="620" x2="620" y1="278" y2="282" stroke="#5c6270"/><text x="620" y="294" text-anchor="middle" fill="#5c6270">1T</text><text x="341" y="316" text-anchor="middle" fill="#1a1c22">working set (bytes, log scale)</text><text x="14" y="149" text-anchor="middle" fill="#1a1c22" transform="rotate(-90 14 149)">time per access (log scale)</text><polyline points="62.0,270.5 81.9,270.5 101.9,270.5 121.8,270.5 141.7,255.7 161.6,250.9 181.6,248.8 201.5,227.9 221.4,222.0 241.4,219.5 261.3,218.4 281.2,217.8 301.1,217.6 321.1,187.2 341.0,180.2 360.9,177.3 380.9,176.0 400.8,175.4 420.7,175.1 440.6,174.9 460.6,174.9 480.5,174.8 500.4,174.8 520.4,51.0 540.3,42.0 560.2,38.5 580.1,37.0 600.1,36.2 620.0,35.9" fill="none" stroke="#b3261e" stroke-width="2.2"/><polyline points="62.0,270.5 81.9,270.5 101.9,270.5 121.8,270.5 141.7,266.8 161.6,266.8 181.6,266.8 201.5,259.0 221.4,259.0 241.4,259.0 261.3,259.0 281.2,259.0 301.1,259.0 321.1,232.4 341.0,232.4 360.9,232.4 380.9,232.4 400.8,232.4 420.7,232.4 440.6,232.4 460.6,232.4 480.5,232.4 500.4,232.4 520.4,190.2 540.3,190.2 560.2,190.2 580.1,190.2 600.1,190.2 620.0,190.2" fill="none" stroke="#0a7d4d" stroke-width="2.2" stroke-dasharray="6 4"/><text x="400.7857142857143" y="167.4045765031011" fill="#b3261e" text-anchor="middle">random order</text><text x="400.7857142857143" y="248.40306994607334" fill="#0a7d4d" text-anchor="middle">sequential scan</text></svg>
+        <figcaption>
+          Model: expected time for one access against the working-set size, for a
+          laptop with 32 KiB of L1, 256 KiB of L2, 16 MiB of L3, 16 GiB of main
+          memory and an SSD below it. Random accesses step from 1.4 ns to about
+          100 ns, then jump to about 50 &micro;s once the working set no longer
+          fits in memory. Sequential scans pay one block transfer per 16 four-byte
+          items (per 1024 from the SSD) and stay far lower.
+        </figcaption>
+      </figure>
+      <table>
+        <tr><th>working set</th><th>random order, per access</th><th>sequential, per access</th></tr>
+        <tr><td>16 KiB</td><td>1.40 ns</td><td>1.40 ns</td></tr>
+        <tr><td>256 KiB</td><td>3.68 ns</td><td>1.65 ns</td></tr>
+        <tr><td>16 MiB</td><td>14.8 ns</td><td>2.34 ns</td></tr>
+        <tr><td>16 GiB</td><td>99.9 ns</td><td>7.65 ns</td></tr>
+        <tr><td>1 TiB</td><td>49.2 &micro;s</td><td>50.2 ns</td></tr>
+      </table>
+      <p class="note">Model, laptop machine.</p>
+      <p>
+        Two facts follow. First, the cost per access is <em>bounded</em>: it never
+        exceeds the latency of the slowest level, 50 &micro;s here. So on this
+        fixed machine the theorem of section 2 applies, with \(a = 1.4\) ns and
+        \(b = 50\) &micro;s: no program&rsquo;s order of growth is changed by the
+        hierarchy. Second, the ratio \(b/a\) is about 35,700. A bound that hides a
+        constant of that size is still a correct bound, and it is a poor predictor
+        of running time across that range. The next section shows what this looks
+        like in a doubling experiment.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="knee">4. Crossing a boundary: swap, the knee, and the doubling ratio</h2>
+      <p>
+        Take a machine with only 64 MiB of main memory, backed by swap space on a
+        hard disk with a 5 ms access time, and a \(\Theta(N)\) program: \(N\)
+        lookups at random positions in a table of \(N\) eight-byte entries, which
+        is what a hash table does. Double \(N\) and record the time, as in the
+        doubling experiment of
+        <a href="foundation-time-analysis.html">Analysis of Algorithms: Time</a>.
+      </p>
+      <table class="trace">
+        <tr><th>N</th><th>table</th><th>total time</th><th>per lookup</th><th>ratio</th><th>\(b = \lg(\text{ratio})\)</th></tr>
+        <tr><td>1,048,576</td><td>8 MiB</td><td>60.2 ms</td><td>57.4 ns</td><td>7.71</td><td>2.95</td></tr>
+        <tr><td>2,097,152</td><td>16 MiB</td><td>165 ms</td><td>78.7 ns</td><td>2.74</td><td>1.45</td></tr>
+        <tr><td>4,194,304</td><td>32 MiB</td><td>375 ms</td><td>89.4 ns</td><td>2.27</td><td>1.18</td></tr>
+        <tr><td>8,388,608</td><td>64 MiB</td><td>794 ms</td><td>94.7 ns</td><td>2.12</td><td>1.08</td></tr>
+        <tr><td>16,777,216</td><td>128 MiB</td><td class="upd">11.7 hours</td><td>2.50 ms</td><td class="upd">52,810</td><td class="upd">15.69</td></tr>
+        <tr><td>33,554,432</td><td>256 MiB</td><td>1.46 days</td><td>3.75 ms</td><td>3.00</td><td>1.58</td></tr>
+        <tr><td>67,108,864</td><td>512 MiB</td><td>3.40 days</td><td>4.38 ms</td><td>2.33</td><td>1.22</td></tr>
+        <tr><td>134,217,728</td><td>1 GiB</td><td>7.28 days</td><td>4.69 ms</td><td>2.14</td><td>1.10</td></tr>
+        <tr><td>2,147,483,648</td><td>16 GiB</td><td>124 days</td><td>4.98 ms</td><td>2.01</td><td>1.01</td></tr>
+      </table>
+      <p class="note">Model, small-memory machine (32 KiB L1, 4 MiB L3, 64 MiB main memory, hard disk). The ratio in each row is to the row with half the \(N\); rows 512 MiB to 16 GiB are thinned out.</p>
+      <figure>
+        <svg viewBox="0 0 640 340" width="640" role="img" aria-label="Total time for N random lookups in a table of N items on a machine with 64 MiB of memory and a hard disk, log-log: slope 1 throughout except one doubling where the table outgrows memory and the time jumps by a factor of about 53,000" font-family="system-ui, sans-serif" font-size="11"><rect x="70" y="20" width="550" height="268" fill="#fbfcfd" stroke="#d7dbe3"/><rect x="367.91666666666663" y="20" width="22.916666666666742" height="268" fill="#fdeaea"/><line x1="70" x2="620" y1="288" y2="288" stroke="#e6e9ef"/><text x="64" y="292" text-anchor="end" fill="#5c6270">1 µs</text><line x1="70" x2="620" y1="230.57142857142856" y2="230.57142857142856" stroke="#e6e9ef"/><text x="64" y="234.57142857142856" text-anchor="end" fill="#5c6270">1 ms</text><line x1="70" x2="620" y1="173.14285714285714" y2="173.14285714285714" stroke="#e6e9ef"/><text x="64" y="177.14285714285714" text-anchor="end" fill="#5c6270">1 s</text><line x1="70" x2="620" y1="115.71428571428571" y2="115.71428571428571" stroke="#e6e9ef"/><text x="64" y="119.71428571428571" text-anchor="end" fill="#5c6270">17 min</text><line x1="70" x2="620" y1="58.2857142857143" y2="58.2857142857143" stroke="#e6e9ef"/><text x="64" y="62.2857142857143" text-anchor="end" fill="#5c6270">12 days</text><line x1="70" x2="70" y1="288" y2="292" stroke="#5c6270"/><text x="70" y="304" text-anchor="middle" fill="#5c6270">2<tspan dy="-5" font-size="9">10</tspan></text><line x1="161.66666666666666" x2="161.66666666666666" y1="288" y2="292" stroke="#5c6270"/><text x="161.66666666666666" y="304" text-anchor="middle" fill="#5c6270">2<tspan dy="-5" font-size="9">14</tspan></text><line x1="253.33333333333331" x2="253.33333333333331" y1="288" y2="292" stroke="#5c6270"/><text x="253.33333333333331" y="304" text-anchor="middle" fill="#5c6270">2<tspan dy="-5" font-size="9">18</tspan></text><line x1="345" x2="345" y1="288" y2="292" stroke="#5c6270"/><text x="345" y="304" text-anchor="middle" fill="#5c6270">2<tspan dy="-5" font-size="9">22</tspan></text><line x1="436.66666666666663" x2="436.66666666666663" y1="288" y2="292" stroke="#5c6270"/><text x="436.66666666666663" y="304" text-anchor="middle" fill="#5c6270">2<tspan dy="-5" font-size="9">26</tspan></text><line x1="528.3333333333334" x2="528.3333333333334" y1="288" y2="292" stroke="#5c6270"/><text x="528.3333333333334" y="304" text-anchor="middle" fill="#5c6270">2<tspan dy="-5" font-size="9">30</tspan></text><line x1="620" x2="620" y1="288" y2="292" stroke="#5c6270"/><text x="620" y="304" text-anchor="middle" fill="#5c6270">2<tspan dy="-5" font-size="9">34</tspan></text><text x="345" y="326" text-anchor="middle" fill="#1a1c22">N, the number of lookups and of table entries (log scale)</text><text x="14" y="154" text-anchor="middle" fill="#1a1c22" transform="rotate(-90 14 154)">total time (log scale)</text><polyline points="70.0,285.0 620.0,146.7" fill="none" stroke="#9aa1b2" stroke-dasharray="5 4"/><polyline points="70.0,159.6 620.0,21.3" fill="none" stroke="#9aa1b2" stroke-dasharray="5 4"/><polyline points="70.0,285.0 92.9,279.2 115.8,273.5 138.8,253.0 161.7,244.4 184.6,237.5 207.5,231.2 230.4,225.2 253.3,219.3 276.3,213.5 299.2,196.5 322.1,188.1 345.0,181.3 367.9,175.1 390.8,84.7 413.8,75.5 436.7,68.5 459.6,62.1 482.5,56.1 505.4,50.2 528.3,44.4 551.3,38.6 574.2,32.8 597.1,27.0 620.0,21.3" fill="none" stroke="#1f5fb0" stroke-width="2"/><circle cx="70.0" cy="285.0" r="2.6" fill="#1f5fb0"/><circle cx="92.9" cy="279.2" r="2.6" fill="#1f5fb0"/><circle cx="115.8" cy="273.5" r="2.6" fill="#1f5fb0"/><circle cx="138.8" cy="253.0" r="2.6" fill="#1f5fb0"/><circle cx="161.7" cy="244.4" r="2.6" fill="#1f5fb0"/><circle cx="184.6" cy="237.5" r="2.6" fill="#1f5fb0"/><circle cx="207.5" cy="231.2" r="2.6" fill="#1f5fb0"/><circle cx="230.4" cy="225.2" r="2.6" fill="#1f5fb0"/><circle cx="253.3" cy="219.3" r="2.6" fill="#1f5fb0"/><circle cx="276.3" cy="213.5" r="2.6" fill="#1f5fb0"/><circle cx="299.2" cy="196.5" r="2.6" fill="#1f5fb0"/><circle cx="322.1" cy="188.1" r="2.6" fill="#1f5fb0"/><circle cx="345.0" cy="181.3" r="2.6" fill="#1f5fb0"/><circle cx="367.9" cy="175.1" r="2.6" fill="#1f5fb0"/><circle cx="390.8" cy="84.7" r="2.6" fill="#1f5fb0"/><circle cx="413.8" cy="75.5" r="2.6" fill="#1f5fb0"/><circle cx="436.7" cy="68.5" r="2.6" fill="#1f5fb0"/><circle cx="459.6" cy="62.1" r="2.6" fill="#1f5fb0"/><circle cx="482.5" cy="56.1" r="2.6" fill="#1f5fb0"/><circle cx="505.4" cy="50.2" r="2.6" fill="#1f5fb0"/><circle cx="528.3" cy="44.4" r="2.6" fill="#1f5fb0"/><circle cx="551.3" cy="38.6" r="2.6" fill="#1f5fb0"/><circle cx="574.2" cy="32.8" r="2.6" fill="#1f5fb0"/><circle cx="597.1" cy="27.0" r="2.6" fill="#1f5fb0"/><circle cx="620.0" cy="21.3" r="2.6" fill="#1f5fb0"/><text x="398.83333333333337" y="88.65178154196762" fill="#b3261e">one doubling: ratio 52,810, b = 15.7</text><text x="459.58333333333337" y="203.04175984383318" fill="#5c6270" text-anchor="middle">slope 1</text></svg>
+        <figcaption>
+          The same experiment on logarithmic scales. Away from the boundaries the
+          points run parallel to the dashed lines of slope 1: the program is
+          \(\Theta(N)\) before the knee and after it. The two dashed lines are the
+          same slope shifted by the constant factor of the disk. In the shaded
+          doubling the table outgrows memory and the time rises by a factor of
+          52,810.
+        </figcaption>
+      </figure>
+      <p>
+        If the time per operation changes from \(c(N)\) to \(c(2N)\) while the
+        operation count of a \(\Theta(N^b)\) algorithm grows by \(2^b\), the
+        doubling ratio is \(2^b \cdot c(2N)/c(N)\), so the measured exponent is
+      </p>
+      \[
+        b_{\text{local}} \;=\; b \;+\; \lg \frac{c(2N)}{c(N)} .
+      \]
+      <p>
+        Inside a level \(c(2N) = c(N)\) and the experiment reads off the true
+        \(b\). In the doubling where the working set crosses from memory to a disk
+        whose access time is 50,000 times that of memory, the term
+        \(\lg 50{,}000 \approx 15.6\) is added: the \(\Theta(N)\) lookups show
+        \(b \approx 15.7\). After the crossing the ratio returns to 2, and the
+        exponent to 1, because every lookup now costs about the same 5 ms.
+      </p>
+      <div class="thm">
+        <span class="tag">Swapping and the exponent</span>
+        On a fixed machine, swapping does not change an order of growth: once the
+        working set is on the disk, every access costs at most the disk&rsquo;s
+        access time, a constant, and section 2 applies. An \(N^2\) algorithm stays
+        \(\Theta(N^2)\). What swapping changes is the constant, by a factor of up to
+        \(50{,}000\) for random access to a hard disk (500 for an SSD), and that
+        change is concentrated in the one doubling where the working set crosses
+        the size of memory.
+      </div>
+      <p>
+        A doubling experiment that <em>spans</em> the crossing can still mislead.
+        Over \(k\) doublings that include it, the apparent exponent is
+        \(b + \lg(c_{\text{after}}/c_{\text{before}})/k\). Measuring the lookups
+        from 64 MiB to 16 GiB, eight doublings, gives an apparent exponent of 2.96:
+        a \(\Theta(N)\) program that looks cubic. A quadratic program measured over
+        the same range would look like \(N^4\). This is a statement about the
+        experiment, not about the algorithm, and it is the reason the
+        Computer Systems Primer says to watch for a change of level in any doubling
+        table.
+      </p>
+      <h3>The access pattern decides the size of the knee</h3>
+      <p>
+        A disk transfers a whole 4096-byte page per access. A sequential scan uses
+        every byte of it: 1024 four-byte items per disk read. The same model,
+        applied to an \(N^2\) all-pairs loop that scans an array of \(N\) integers
+        once per element, gives a per-access cost of 7.65 ns while the array fits in
+        the 64 MiB of memory and 4,884 ns once it does not: a factor of 638, a local
+        exponent of \(2 + 9.3 = 11.3\), and then \(b = 2\) again. Random access
+        over the same array pays a full disk access almost every time, a factor of
+        about 50,000.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (thrashing)</span>
+        A program is <strong>thrashing</strong> when its working set exceeds
+        physical memory and it spends most of its time waiting for pages to be read
+        back from swap. Thrashing multiplies running time by a large constant; it
+        does not change the order of growth.
+      </div>
+      <p>
+        One more limit lies outside every cost model in this chapter. When the data
+        no longer fits in memory and swap together, the program does not run
+        slowly; it fails. Asymptotic statements assume the input fits in the
+        machine.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="exponent">5. When the exponent does change</h2>
+      <p>
+        The theorem of section 2 has one hypothesis: a constant upper bound \(b\)
+        on the cost of an operation. The exponent can change only if that
+        hypothesis fails, that is, if the cost of a basic step grows with \(N\).
+      </p>
+      <h3>Costs that grow with the size of memory</h3>
+      <p>
+        A memory that holds \(S\) bits occupies an area proportional to \(S\). On a
+        chip, which is flat, the farthest bit is at a distance proportional to
+        \(\sqrt{S}\), and no signal travels faster than light, so the time to fetch
+        an arbitrary bit grows at least like \(\sqrt{S}\) (like \(\sqrt[3]{S}\) for
+        memory packed in three dimensions). A fixed computer hides this behind a
+        fixed hierarchy. A model in which the input grows without bound and the
+        machine grows with it must charge for it. In the simplest such model,
+        accessing address \(x\) costs \(\sqrt{x}\):
+      </p>
+      \[
+        \text{scan of } N \text{ items: } \sum_{x=1}^{N} \sqrt{x}
+        \;\approx\; \int_0^N \sqrt{x}\,dx \;=\; \tfrac{2}{3} N^{3/2} .
+      \]
+      <table>
+        <tr><th>N</th><th>\(\sum_{x \le N} \sqrt{x}\)</th><th>\(\tfrac{2}{3}N^{3/2}\)</th><th>local exponent</th></tr>
+        <tr><td>1,000</td><td>21,097</td><td>21,082</td><td></td></tr>
+        <tr><td>2,000</td><td>59,651</td><td>59,628</td><td>1.4995</td></tr>
+        <tr><td>4,000</td><td>168,686</td><td>168,655</td><td>1.4997</td></tr>
+        <tr><td>8,000</td><td>477,072</td><td>477,028</td><td>1.4999</td></tr>
+      </table>
+      <p>
+        A scan, \(\Theta(N)\) in the RAM model, is \(\Theta(N^{3/2})\) in this
+        one. An all-pairs algorithm that makes \(N^2\) accesses spread over \(N\)
+        items pays about \(\tfrac{2}{3}\sqrt{N}\) per access on average and becomes
+        \(\Theta(N^{5/2})\). Here the exponent really changes, because the cost of
+        one step is no longer bounded. Aggarwal, Alpern, Chandra and Snir (1987)
+        studied algorithms in this kind of model, the <strong>hierarchical memory
+        model</strong>, in which accessing location \(x\) costs \(f(x)\) for a
+        growing function \(f\) such as \(\log x\) or \(x^{\alpha}\). The measured
+        staircase of section 3 is a coarse version of the same curve: from 32 KiB
+        to 16 GiB, a factor of \(2^{19}\) in size, the cost of a random access
+        grows from 1.4 ns to about 100 ns, a factor of 71, between the cube root
+        (80) and the square root (724) of the size ratio.
+      </p>
+      <h3>Counting transfers: the external-memory model</h3>
+      <p>
+        A different way to make the hierarchy visible in a bound is to count only
+        what is expensive. The external-memory model
+        (<a href="foundation-computer-systems.html#model">Computer Systems Primer,
+        section 4</a>) charges one unit per block transfer between a fast memory
+        of \(M\) items and a slow memory, with \(B\) items per block, and nothing
+        for computation.
+      </p>
+      <figure>
+        <svg viewBox="0 0 640 210" width="640" role="img" aria-label="The external-memory model: a processor works on a fast memory of M items; data moves to and from an unbounded slow memory only in blocks of B consecutive items, and the cost is the number of block transfers" font-family="system-ui, sans-serif" font-size="11"><rect x="30" y="70" width="110" height="60" rx="8" fill="#eef4fc" stroke="#1f5fb0"/><text x="85" y="104" text-anchor="middle" font-size="13" fill="#1a1c22">processor</text><line x1="140" y1="100" x2="190" y2="100" stroke="#5c6270" stroke-width="2"/><text x="165" y="92" text-anchor="middle" fill="#5c6270">free</text><rect x="190" y="55" width="150" height="90" rx="8" fill="#eaf6ef" stroke="#0a7d4d"/><text x="265" y="94" text-anchor="middle" font-size="13" fill="#1a1c22">fast memory</text><text x="265" y="114" text-anchor="middle" fill="#5c6270">holds M items</text><line x1="340" y1="90" x2="400" y2="90" stroke="#b3261e" stroke-width="2.5" marker-end="url(#ah)"/><line x1="400" y1="112" x2="340" y2="112" stroke="#b3261e" stroke-width="2.5" marker-end="url(#ah)"/><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b3261e"/></marker></defs><text x="370" y="80" text-anchor="middle" fill="#b3261e">1 transfer</text><text x="370" y="132" text-anchor="middle" fill="#b3261e">= 1 block</text><rect x="400" y="30" width="215" height="140" rx="8" fill="#fbfcfd" stroke="#9aa1b2"/><text x="507" y="52" text-anchor="middle" font-size="13" fill="#1a1c22">slow memory (unbounded)</text><rect x="415" y="64" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="464" y="64" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="513" y="64" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="562" y="64" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="415" y="88" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="464" y="88" width="44" height="18" fill="#fdeaea" stroke="#c4c9d4"/><rect x="513" y="88" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="562" y="88" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="415" y="112" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="464" y="112" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="513" y="112" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="562" y="112" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="415" y="136" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="464" y="136" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="513" y="136" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><rect x="562" y="136" width="44" height="18" fill="#fff" stroke="#c4c9d4"/><text x="507" y="166" text-anchor="middle" fill="#5c6270">blocks of B consecutive items</text></svg>
+        <figcaption>
+          The external-memory model. Computation on data in the fast memory is free;
+          the cost of an algorithm is the number of blocks moved.
+        </figcaption>
+      </figure>
+      <p>
+        Multiplying two \(N \times N\) matrices stored row by row takes \(N^3\)
+        multiply-adds however the loops are arranged, and the transfers depend on
+        the arrangement:
+      </p>
+      <table>
+        <tr><th>loop order</th><th>inner loop reads</th><th>transfers</th><th>at \(N = 2048,\ B = 8,\ M = 32{,}768\)</th></tr>
+        <tr><td>i-j-k (the textbook loop)</td><td>a row of \(A\), a column of \(B\)</td><td>\(\approx N^3(1 + 1/B)\)</td><td>9,663,676,416</td></tr>
+        <tr><td>i-k-j (inner loops swapped)</td><td>rows of \(B\) and \(C\)</td><td>\(\approx 2N^3/B\)</td><td>2,147,483,648</td></tr>
+        <tr><td>blocked, \(T \times T\) tiles with \(3T^2 \le M\)</td><td>rows of tiles in fast memory</td><td>\(\approx 2N^3/(BT) \in \Theta\!\left(N^3/(B\sqrt{M})\right)\)</td><td>20,648,881 (\(T = 104\))</td></tr>
+      </table>
+      <p class="note">\(B = 8\) doubles per 64-byte line; \(M = 32{,}768\) doubles is a 256 KiB level-2 cache. Computed from the formulas.</p>
+      <p>
+        Down a column of \(B\), consecutive reads are a whole row apart, so the
+        i-j-k loop pays a transfer for nearly every multiply-add. Swapping the two
+        inner loops makes every inner read sequential and divides the transfers by
+        about \(B/2\). Blocking keeps three tiles in the fast memory and reuses each
+        transferred block \(T\) times. The exponent of \(N\) is 3 in every row. What
+        changes is how the bound depends on the machine&rsquo;s \(B\) and \(M\),
+        and so how much of the fast memory&rsquo;s speed the program can use.
+        Measured with <code>matmul.cpp</code> at \(N = 2048\):
+      </p>
+      <table>
+        <tr><th>version</th><th>time</th><th>per multiply-add</th><th>relative to i-j-k</th></tr>
+        <tr><td>i-j-k</td><td>41.26 s</td><td>4.80 ns</td><td>1&times;</td></tr>
+        <tr><td>i-k-j</td><td>4.53 s</td><td>0.53 ns</td><td>9.1&times; faster</td></tr>
+        <tr><td>blocked, \(T = 64\)</td><td>2.61 s</td><td>0.30 ns</td><td>15.8&times; faster</td></tr>
+      </table>
+      <p class="note">Measured, <code>g++ -std=c++17 -O2</code>; the three products agree.</p>
+      <p>
+        The external-memory model predicts the order of these three times, and it
+        does not predict their ratios: the processor prefetches the sequential
+        reads of i-k-j, so its cost per multiply-add is already close to the cost
+        of the arithmetic, and blocking gains a further 1.7&times; rather than the
+        100-fold reduction in transfers. A model is chosen to capture the dominant
+        cost; when that cost stops dominating, the model stops predicting.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="cpi">6. Pipelines, parallel execution and branch prediction</h2>
+      <p>
+        The time a program takes is
+      </p>
+      \[
+        R \;=\; (\text{instructions executed}) \times (\text{cycles per instruction}) \times (\text{seconds per cycle}).
+      \]
+      <p>
+        The RAM model counts the first factor. The processor features of the
+        <a href="foundation-computer-systems.html#cpu">Computer Systems Primer,
+        section 1</a> act on the second. <strong>Pipelining</strong> overlaps the
+        stages of consecutive instructions, and <strong>superscalar</strong>
+        execution starts several independent instructions in the same cycle, so a
+        stretch of independent arithmetic can average well under one cycle per
+        instruction. An instruction that waits for main memory stalls everything
+        that depends on it for hundreds of cycles. <strong>Branch
+        prediction</strong> lets the pipeline run ahead past a branch along the
+        direction it guesses; a wrong guess discards the work done since the
+        branch, typically 15 to 20 cycles on current processors.
+      </p>
+      <p>
+        <code>branch.cpp</code> runs the same loop over the same 16,777,216 random
+        values from 0 to 255, first in random order and then sorted. The work is
+        identical; only the predictability of the test differs.
+      </p>
+      <table>
+        <tr><th>loop body</th><th>random order</th><th>sorted</th><th>ratio</th></tr>
+        <tr><td><code>if (a[i] &gt;= 128) s += a[i];</code></td><td>0.31 ns</td><td>0.30 ns</td><td>1.0&times;</td></tr>
+        <tr><td><code>if (a[i] &gt;= 128) s += weight(a[i]);</code></td><td>4.22 ns</td><td>1.15 ns</td><td>3.7&times;</td></tr>
+      </table>
+      <p class="note">Measured per value, <code>g++ -std=c++17 -O2</code>; <code>weight</code> is a function the compiler does not inline. The second ratio varied from 3.2&times; to 4.7&times; across runs.</p>
+      <p>
+        In the first loop the optimizer replaced the branch by branch-free
+        instructions that compute both outcomes and keep one, so there is nothing
+        to predict and the order of the values does not matter. In the second, the
+        branch guards a function call and stays a branch. On random data the
+        processor guesses wrongly about half the time; on sorted data the outcome
+        changes once in sixteen million values and the guess is almost always
+        right.
+      </p>
+      <p>
+        These effects, the locality ratios of 41&times; and 52&times; measured in
+        the Computer Systems Primer, and the 9.1&times; of the loop order above,
+        all change the cycles per instruction. None changes an order of growth:
+        each is bounded by a constant on a given processor. They are nonetheless
+        larger than the difference between many algorithms that differ in order.
+        At \(N = 10^6\), \(\lg N \approx 20\), so a \(\Theta(N \lg N)\) algorithm
+        with a 50&times; better constant is faster than a \(\Theta(N)\) one up to
+        astronomically large \(N\) (until \(\lg N &gt; 50\), past \(10^{15}\)).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="optimize">7. What it means to optimize a program</h2>
+      <p>
+        The compiler&rsquo;s optimizer rewrites code without changing what it
+        computes (<a href="foundation-computer-systems.html#compiler">Computer Systems
+        Primer, section 7</a>). A programmer optimizing a program does something
+        the compiler cannot: changes the computation itself, choosing a different
+        algorithm, a different representation of the data, or a different order of
+        work, and decides where that effort is worth spending. The choices fall
+        into levels, ordered by what each can achieve.
+      </p>
+      <h3>1. The algorithm: the only lever on the exponent</h3>
+      <p>
+        The 3-sum ladder of the lecture is the example. At \(N = 8000\):
+      </p>
+      <table>
+        <tr><th>algorithm</th><th>order</th><th>inner operations at \(N = 8000\)</th></tr>
+        <tr><td>brute force, three loops</td><td>\(\Theta(N^3)\)</td><td>85,301,336,000</td></tr>
+        <tr><td>sort, then binary search for each pair</td><td>\(\Theta(N^2 \lg N)\)</td><td>about 415,948,000</td></tr>
+        <tr><td>sort, then two pointers for each \(i\)</td><td>\(\Theta(N^2)\)</td><td>about 32,000,000</td></tr>
+      </table>
+      <p class="note">Brute force: \(N(N-1)(N-2)/6\) triples; binary search: \(\binom{N}{2}\) pairs times \(\lceil \lg N \rceil = 13\) probes; two pointers: about \(N^2/2\) steps.</p>
+      <p>
+        The factors are 205 and 2,666, and they grow without bound as \(N\) grows.
+        No constant-factor technique in this chapter reaches them at large \(N\).
+      </p>
+      <h3>2. The data structure</h3>
+      <p>
+        Replacing a list searched linearly by a hash table turns each lookup from
+        \(\Theta(N)\) into expected \(\Theta(1)\), and a program that performs
+        \(N\) lookups from \(\Theta(N^2)\) into expected \(\Theta(N)\). Choosing
+        the structure is choosing which operations are cheap, and it can change the
+        exponent of the whole program.
+      </p>
+      <h3>3. Constants under the real cost model</h3>
+      <p>
+        Once the algorithm and the structure are right, the remaining work is on
+        the constant, and the cost model that matters is the real machine&rsquo;s:
+      </p>
+      <ul>
+        <li><strong>Locality.</strong> Traverse memory in the order it is laid out
+          (9.1&times; for the matrix loop order); block computations so that what is
+          reused stays in cache (a further 1.7&times; here, more when memory is the
+          bottleneck).</li>
+        <li><strong>Contiguous layout.</strong> An array instead of linked nodes
+          (52&times; for a scattered list walk); a structure of arrays when a loop
+          reads one field of many records.</li>
+        <li><strong>Smaller data.</strong> A 4-byte <code>int</code> instead of an
+          8-byte <code>long</code> where the range allows halves the bytes moved and
+          doubles what fits in each cache level.</li>
+        <li><strong>Fewer allocations.</strong> Each <code>new</code> costs time and
+          places the object wherever the allocator finds room; reserving a
+          <code>vector</code>&rsquo;s capacity or reusing nodes avoids both.</li>
+        <li><strong>Less work in the inner loop.</strong> Move computations that do
+          not change inside the loop out of it, and avoid recomputing values that
+          can be carried from one iteration to the next.</li>
+        <li><strong>Predictable branches.</strong> Process data in an order that
+          makes tests predictable, or write the test so that the compiler can make
+          it branch-free (3.7&times; above).</li>
+      </ul>
+      <h3>4. Choosing for the actual \(N\)</h3>
+      <p>
+        An asymptotic comparison is about large \(N\); a program runs at the
+        \(N\) it is given. Insertion sort makes about \(N^2/4\) comparisons on
+        random input and mergesort about \(N \lg N\):
+      </p>
+      <table>
+        <tr><th>N</th><th>\(N^2/4\)</th><th>\(N \lg N\)</th></tr>
+        <tr><td>8</td><td>16</td><td>24</td></tr>
+        <tr><td>16</td><td>64</td><td>64</td></tr>
+        <tr><td>32</td><td>256</td><td>160</td></tr>
+        <tr><td>64</td><td>1,024</td><td>384</td></tr>
+      </table>
+      <p>
+        Below \(N = 16\) insertion sort makes fewer comparisons, and its inner loop
+        is simpler and reads memory sequentially. That is why practical sorts are
+        <strong>hybrids</strong>: the GNU implementation of <code>std::sort</code>
+        quicksorts large ranges and finishes ranges of 16 or fewer elements with
+        insertion sort.
+      </p>
+      <h3>5. Measure first</h3>
+      <p>
+        Every technique above costs programming time and usually clarity. The
+        first step is to find where the time goes, with a
+        <strong>profiler</strong> (a tool that samples which function the program
+        is executing, such as <code>perf</code> on Linux or Instruments on macOS),
+        and the second is to estimate what an improvement can be worth.
+      </p>
+      <div class="thm">
+        <span class="tag">Amdahl&rsquo;s law</span>
+        If a fraction \(p\) of the running time is spent in a part that is made
+        \(s\) times faster, the whole program becomes
+        \[ \text{speedup} \;=\; \frac{1}{(1 - p) + p/s} \]
+        times faster, and never more than \(1/(1-p)\) times faster however large
+        \(s\) is.
+      </div>
+      <div class="proof">
+        Normalize the old running time to 1. The part that is not changed still
+        takes \(1 - p\); the optimized part took \(p\) and now takes \(p/s\). The
+        speedup is the old time divided by the new. As \(s \to \infty\) the new
+        time tends to \(1 - p\). <span class="qed">&#9633;</span>
+      </div>
+      <div class="ex">
+        <span class="tag">Example</span>
+        A function takes 60% of the running time and is made 10 times faster. The
+        program becomes \(1/(0.4 + 0.06) \approx 2.17\) times faster, and no
+        improvement to that function can make it more than \(1/0.4 = 2.5\) times
+        faster. Had the function taken 90% of the time, the same change would give
+        \(1/(0.1 + 0.09) \approx 5.26\). Making a part that takes 5% of the time 100
+        times faster gives \(1/(0.95 + 0.0005) \approx 1.05\).
+      </div>
+      <figure>
+        <svg viewBox="0 0 640 300" width="640" role="img" aria-label="Overall speedup against the speedup of the optimized part, for parts taking 50, 80, 90 and 95 percent of the time: each curve levels off at 1 / (1 - p)" font-family="system-ui, sans-serif" font-size="11"><rect x="56" y="20" width="464" height="232" fill="#fbfcfd" stroke="#d7dbe3"/><line x1="56" x2="520" y1="252" y2="252" stroke="#e6e9ef"/><text x="50" y="256" text-anchor="end" fill="#5c6270">0&#215;</text><line x1="56" x2="520" y1="194" y2="194" stroke="#e6e9ef"/><text x="50" y="198" text-anchor="end" fill="#5c6270">5&#215;</text><line x1="56" x2="520" y1="136" y2="136" stroke="#e6e9ef"/><text x="50" y="140" text-anchor="end" fill="#5c6270">10&#215;</text><line x1="56" x2="520" y1="78" y2="78" stroke="#e6e9ef"/><text x="50" y="82" text-anchor="end" fill="#5c6270">15&#215;</text><line x1="56" x2="520" y1="20" y2="20" stroke="#e6e9ef"/><text x="50" y="24" text-anchor="end" fill="#5c6270">20&#215;</text><line x1="56" x2="56" y1="252" y2="256" stroke="#5c6270"/><text x="56" y="268" text-anchor="middle" fill="#5c6270">1&#215;</text><line x1="125.83895899404364" x2="125.83895899404364" y1="252" y2="256" stroke="#5c6270"/><text x="125.83895899404364" y="268" text-anchor="middle" fill="#5c6270">2&#215;</text><line x1="218.16104100595638" x2="218.16104100595638" y1="252" y2="256" stroke="#5c6270"/><text x="218.16104100595638" y="268" text-anchor="middle" fill="#5c6270">5&#215;</text><line x1="288" x2="288" y1="252" y2="256" stroke="#5c6270"/><text x="288" y="268" text-anchor="middle" fill="#5c6270">10&#215;</text><line x1="357.83895899404365" x2="357.83895899404365" y1="252" y2="256" stroke="#5c6270"/><text x="357.83895899404365" y="268" text-anchor="middle" fill="#5c6270">20&#215;</text><line x1="450.16104100595635" x2="450.16104100595635" y1="252" y2="256" stroke="#5c6270"/><text x="450.16104100595635" y="268" text-anchor="middle" fill="#5c6270">50&#215;</text><line x1="520" x2="520" y1="252" y2="256" stroke="#5c6270"/><text x="520" y="268" text-anchor="middle" fill="#5c6270">100&#215;</text><text x="288" y="288" text-anchor="middle" fill="#1a1c22">speedup s of the optimized part (log scale)</text><text x="14" y="136" text-anchor="middle" fill="#1a1c22" transform="rotate(-90 14 136)">overall speedup</text><polyline points="56.0,240.4 61.8,240.1 67.6,239.7 73.4,239.4 79.2,239.1 85.0,238.7 90.8,238.4 96.6,238.1 102.4,237.8 108.2,237.5 114.0,237.2 119.8,236.8 125.6,236.5 131.4,236.3 137.2,236.0 143.0,235.7 148.8,235.4 154.6,235.1 160.4,234.9 166.2,234.6 172.0,234.4 177.8,234.1 183.6,233.9 189.4,233.7 195.2,233.5 201.0,233.2 206.8,233.0 212.6,232.8 218.4,232.7 224.2,232.5 230.0,232.3 235.8,232.1 241.6,232.0 247.4,231.8 253.2,231.7 259.0,231.5 264.8,231.4 270.6,231.3 276.4,231.1 282.2,231.0 288.0,230.9 293.8,230.8 299.6,230.7 305.4,230.6 311.2,230.5 317.0,230.4 322.8,230.3 328.6,230.3 334.4,230.2 340.2,230.1 346.0,230.0 351.8,230.0 357.6,229.9 363.4,229.8 369.2,229.8 375.0,229.7 380.8,229.7 386.6,229.6 392.4,229.6 398.2,229.6 404.0,229.5 409.8,229.5 415.6,229.4 421.4,229.4 427.2,229.4 433.0,229.3 438.8,229.3 444.6,229.3 450.4,229.3 456.2,229.2 462.0,229.2 467.8,229.2 473.6,229.2 479.4,229.1 485.2,229.1 491.0,229.1 496.8,229.1 502.6,229.1 508.4,229.1 514.2,229.0 520.0,229.0" fill="none" stroke="#9aa1b2" stroke-width="2"/><text x="526" y="233.02970297029702" fill="#9aa1b2">p = 0.5 (limit 2&#215;)</text><polyline points="56.0,240.4 61.8,239.9 67.6,239.3 73.4,238.7 79.2,238.1 85.0,237.5 90.8,236.9 96.6,236.2 102.4,235.5 108.2,234.9 114.0,234.2 119.8,233.4 125.6,232.7 131.4,231.9 137.2,231.2 143.0,230.4 148.8,229.6 154.6,228.8 160.4,228.0 166.2,227.2 172.0,226.4 177.8,225.6 183.6,224.7 189.4,223.9 195.2,223.1 201.0,222.2 206.8,221.4 212.6,220.6 218.4,219.7 224.2,218.9 230.0,218.1 235.8,217.3 241.6,216.5 247.4,215.7 253.2,214.9 259.0,214.2 264.8,213.4 270.6,212.7 276.4,212.0 282.2,211.3 288.0,210.6 293.8,209.9 299.6,209.2 305.4,208.6 311.2,208.0 317.0,207.4 322.8,206.8 328.6,206.2 334.4,205.7 340.2,205.2 346.0,204.7 351.8,204.2 357.6,203.7 363.4,203.2 369.2,202.8 375.0,202.4 380.8,202.0 386.6,201.6 392.4,201.2 398.2,200.9 404.0,200.5 409.8,200.2 415.6,199.9 421.4,199.6 427.2,199.3 433.0,199.0 438.8,198.8 444.6,198.5 450.4,198.3 456.2,198.1 462.0,197.9 467.8,197.6 473.6,197.5 479.4,197.3 485.2,197.1 491.0,196.9 496.8,196.8 502.6,196.6 508.4,196.5 514.2,196.4 520.0,196.2" fill="none" stroke="#1f5fb0" stroke-width="2"/><text x="526" y="200.23076923076923" fill="#1f5fb0">p = 0.8 (limit 5&#215;)</text><polyline points="56.0,240.4 61.8,239.8 67.6,239.1 73.4,238.5 79.2,237.8 85.0,237.0 90.8,236.3 96.6,235.5 102.4,234.6 108.2,233.8 114.0,232.9 119.8,231.9 125.6,230.9 131.4,229.9 137.2,228.9 143.0,227.8 148.8,226.7 154.6,225.5 160.4,224.3 166.2,223.1 172.0,221.8 177.8,220.5 183.6,219.2 189.4,217.8 195.2,216.4 201.0,215.0 206.8,213.5 212.6,212.0 218.4,210.5 224.2,209.0 230.0,207.4 235.8,205.8 241.6,204.2 247.4,202.6 253.2,200.9 259.0,199.3 264.8,197.6 270.6,196.0 276.4,194.3 282.2,192.6 288.0,190.9 293.8,189.3 299.6,187.6 305.4,186.0 311.2,184.4 317.0,182.7 322.8,181.1 328.6,179.6 334.4,178.0 340.2,176.5 346.0,175.0 351.8,173.5 357.6,172.1 363.4,170.6 369.2,169.3 375.0,167.9 380.8,166.6 386.6,165.3 392.4,164.1 398.2,162.9 404.0,161.7 409.8,160.6 415.6,159.5 421.4,158.4 427.2,157.4 433.0,156.4 438.8,155.5 444.6,154.5 450.4,153.7 456.2,152.8 462.0,152.0 467.8,151.2 473.6,150.5 479.4,149.8 485.2,149.1 491.0,148.4 496.8,147.8 502.6,147.2 508.4,146.6 514.2,146.1 520.0,145.6" fill="none" stroke="#0a7d4d" stroke-width="2"/><text x="526" y="149.57798165137612" fill="#0a7d4d">p = 0.9 (limit 10&#215;)</text><polyline points="56.0,240.4 61.8,239.7 67.6,239.1 73.4,238.3 79.2,237.6 85.0,236.8 90.8,235.9 96.6,235.1 102.4,234.1 108.2,233.2 114.0,232.1 119.8,231.1 125.6,230.0 131.4,228.8 137.2,227.5 143.0,226.3 148.8,224.9 154.6,223.5 160.4,222.0 166.2,220.5 172.0,218.9 177.8,217.2 183.6,215.5 189.4,213.7 195.2,211.8 201.0,209.9 206.8,207.8 212.6,205.7 218.4,203.6 224.2,201.3 230.0,199.0 235.8,196.6 241.6,194.2 247.4,191.6 253.2,189.0 259.0,186.3 264.8,183.6 270.6,180.8 276.4,177.9 282.2,175.0 288.0,172.0 293.8,169.0 299.6,165.9 305.4,162.7 311.2,159.5 317.0,156.3 322.8,153.1 328.6,149.8 334.4,146.5 340.2,143.2 346.0,139.8 351.8,136.5 357.6,133.2 363.4,129.8 369.2,126.5 375.0,123.2 380.8,119.9 386.6,116.7 392.4,113.4 398.2,110.2 404.0,107.1 409.8,104.0 415.6,100.9 421.4,97.9 427.2,95.0 433.0,92.1 438.8,89.2 444.6,86.5 450.4,83.8 456.2,81.1 462.0,78.6 467.8,76.1 473.6,73.7 479.4,71.4 485.2,69.1 491.0,66.9 496.8,64.8 502.6,62.7 508.4,60.8 514.2,58.9 520.0,57.0" fill="none" stroke="#b3261e" stroke-width="2"/><text x="526" y="61.04201680672284" fill="#b3261e">p = 0.95 (limit 20&#215;)</text></svg>
+        <figcaption>
+          Amdahl&rsquo;s law: overall speedup against the speedup of the optimized
+          part, for parts that take 50%, 80%, 90% and 95% of the running time.
+          Each curve levels off at \(1/(1-p)\).
+        </figcaption>
+      </figure>
+      <p>
+        Knuth&rsquo;s remark about optimization is often quoted only in its middle.
+        In full (Knuth, &ldquo;Structured Programming with go to Statements,&rdquo;
+        <em>Computing Surveys</em>, 1974):
+      </p>
+      <blockquote>
+        &ldquo;Programmers waste enormous amounts of time thinking about, or
+        worrying about, the speed of noncritical parts of their programs, and these
+        attempts at efficiency actually have a strong negative impact when
+        debugging and maintenance are considered. We should forget about small
+        efficiencies, say about 97% of the time: premature optimization is the root
+        of all evil. Yet we should not pass up our opportunities in that critical
+        3%.&rdquo;
+      </blockquote>
+      <p>
+        Amdahl&rsquo;s law is the arithmetic behind the passage: effort spent on
+        the 97% has a small \(p\) and returns little; the critical 3% of the code,
+        found by measuring, often holds most of the running time. The choice of
+        algorithm and data structure is not a small efficiency and is not
+        premature: it decides the exponent, and it is cheapest to make before the
+        program is written.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">8. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          On a machine where instructions take one cycle and every memory read takes
+          \(10^6\) cycles, algorithm \(X\) performs \(N^2\) steps of two memory reads
+          each, and algorithm \(Y\) performs \(N^3\) steps entirely in registers. For
+          which \(N\) is \(Y\) faster? What are the orders of growth on this
+          machine?
+          <details>
+            <summary>solution</summary>
+            \(X\) costs about \(2 \times 10^6 N^2\) cycles and \(Y\) costs \(N^3\).
+            \(Y\) is faster while \(N^3 &lt; 2 \times 10^6 N^2\), that is, for
+            \(N &lt; 2{,}000{,}000\). The orders are unchanged: \(X \in \Theta(N^2)\)
+            and \(Y \in \Theta(N^3)\), because each read costs a constant.
+          </details>
+        </li>
+        <li>
+          A doubling experiment on a quadratic program gives the ratios 4.0, 4.1,
+          3.9, 2,600, 4.0. Explain the fourth ratio and estimate by what factor the
+          cost of one access changed.
+          <details>
+            <summary>solution</summary>
+            The operation count still quadrupled, so the cost per access rose by
+            \(2600/4 = 650\) in that doubling: the working set crossed a level
+            boundary. A factor of about 650 matches a sequential scan moving from
+            main memory to a disk with 4096-byte pages (the model of section 4 gives
+            638). The last ratio, 4.0, shows the order is still \(N^2\).
+          </details>
+        </li>
+        <li>
+          A \(\Theta(N \lg N)\) program accesses its data in random order. In the
+          doubling where its working set outgrows main memory (about 100 ns per
+          access) and moves to an SSD (about 50 &micro;s), roughly what local
+          exponent does a doubling experiment report?
+          <details>
+            <summary>solution</summary>
+            \(b_{\text{local}} \approx 1 + \lg(50{,}000/100) = 1 + \lg 500 \approx 1 +
+            9.0 = 10\), plus a few hundredths from the \(\lg N\) factor. The next
+            doublings return to about 1.
+          </details>
+        </li>
+        <li>
+          A \(\Theta(N)\) program is measured over four doublings that include a
+          crossing at which the cost per access grows by a factor of 50,000. What
+          exponent does a fit over the four doublings suggest?
+          <details>
+            <summary>solution</summary>
+            \(1 + \lg(50{,}000)/4 \approx 1 + 15.6/4 \approx 4.9\). A program that is
+            linear looks like \(N^5\) over that range.
+          </details>
+        </li>
+        <li>
+          Explain why the theorem of section 2 does not apply to the model in which
+          accessing address \(x\) costs \(\sqrt{x}\), and show that an algorithm
+          making \(N^2\) accesses spread evenly over \(N\) items is
+          \(\Theta(N^{5/2})\) in that model.
+          <details>
+            <summary>solution</summary>
+            The theorem needs a constant upper bound on the cost of one operation;
+            here the cost \(\sqrt{x}\) grows without bound as \(N\) grows. Each item
+            is accessed \(N\) times, so the total is \(N \sum_{x=1}^{N} \sqrt{x}
+            \approx N \cdot \tfrac{2}{3}N^{3/2} = \tfrac{2}{3}N^{5/2}\).
+          </details>
+        </li>
+        <li>
+          In the external-memory model with \(B = 16\) four-byte integers per block,
+          how many transfers does a scan of \(2^{30}\) integers cost? How many do
+          \(2^{30}\) reads at random positions of an array much larger than the fast
+          memory cost?
+          <details>
+            <summary>solution</summary>
+            Scan: \(2^{30}/16 = 2^{26} = 67{,}108{,}864\) transfers. Random reads:
+            almost every read lands in a block that is not in fast memory, so about
+            \(2^{30} = 1{,}073{,}741{,}824\) transfers, 16 times as many.
+          </details>
+        </li>
+        <li>
+          For \(N = 2048\), \(B = 8\) and tiles of \(T = 64\), how many transfers
+          does blocked matrix multiplication make, compared with the i-k-j loop?
+          The measured speedup of blocking over i-k-j was only 1.7&times;. Why?
+          <details>
+            <summary>solution</summary>
+            Blocked: \(2N^3/(BT) = 2 \cdot 2^{33}/(8 \cdot 64) = 2^{25} =
+            33{,}554{,}432\). i-k-j: \(2N^3/B = 2^{31} = 2{,}147{,}483{,}648\), 64
+            times as many. The i-k-j loop reads memory sequentially, the processor
+            prefetches those reads, and the time per multiply-add (0.53 ns) is
+            already close to the cost of the arithmetic, so the transfers it saves
+            were not the dominant cost.
+          </details>
+        </li>
+        <li>
+          A profile shows 70% of a program&rsquo;s time in one function. How much
+          faster must that function become for the program to run twice as fast?
+          Can any change to that function make the program 3.5 times faster?
+          <details>
+            <summary>solution</summary>
+            \(1/(0.3 + 0.7/s) = 2\) gives \(0.7/s = 0.2\), so \(s = 3.5\). The
+            largest possible speedup is \(1/0.3 \approx 3.33\), so 3.5 is out of
+            reach however fast the function becomes.
+          </details>
+        </li>
+        <li>
+          A program looks up each of \(N\) names in a linked list of the same
+          \(N\) names. Of these changes, which change the order of growth:
+          compiling with <code>-O3</code>; unrolling the search loop four times;
+          storing the list in an array; replacing the list by a hash table?
+          <details>
+            <summary>solution</summary>
+            Only the hash table: it makes each lookup expected \(\Theta(1)\) and the
+            program expected \(\Theta(N)\) instead of \(\Theta(N^2)\). The other
+            three change the constant (the array substantially, through locality).
+          </details>
+        </li>
+        <li>
+          In <code>branch.cpp</code>, sorting the values made the second loop 3.7
+          times faster. Sorting costs \(\Theta(N \lg N)\) and the loop costs
+          \(\Theta(N)\). When is sorting first worth it?
+          <details>
+            <summary>solution</summary>
+            Only when the loop runs over the same data many times: one pass saves
+            about \(3.07\) ns per value, while sorting costs \(\Theta(\lg N)\)
+            comparisons per value, each of them a few nanoseconds. For a single pass
+            sorting costs more than it saves; over many passes the one-time sort is
+            repaid. It is the preprocessing trade of the faster 3-sum: pay once to
+            make every later operation cheaper.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; Algorithms on Real Machines v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax.
+      </footer>
+    </div>
+  </body>
+</html>

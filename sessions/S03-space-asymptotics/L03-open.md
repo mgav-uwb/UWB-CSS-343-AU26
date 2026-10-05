@@ -24,6 +24,7 @@
 - <a href="../../textbook/foundations/foundation-space-complexity.html">Space Complexity</a>: bytes, layout, auxiliary space
 - <a href="../../textbook/foundations/foundation-computer-systems.html">Computer Systems Primer</a>, sections 2 and 3: the memory hierarchy and caches
 - <a href="../../textbook/foundations/foundation-asymptotic-notation.html">Asymptotic Notation</a>: the definitions, proofs, and <a href="../../textbook/foundations/foundation-asymptotic-notation.html#ex">exercises with solutions</a>
+- <a href="../../textbook/foundations/foundation-machine-models.html">Machine Models</a>: cost models, swapping, and what optimizing means
 
 Terms are defined in the <a href="../../glossary/">course glossary</a>.
 

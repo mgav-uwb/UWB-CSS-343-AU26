@@ -3,18 +3,21 @@
   Teaches: sizeof for primitives and structs; alignment and padding; field
            order; stack vs heap; per-node overhead; array vs linked list;
            order of growth for space; auxiliary space; mergesort's buffer
-           and grid BFS's per-cell table; time and space as separate budgets.
+           and grid BFS's per-cell table; time and space as separate budgets;
+           what a std::vector costs (header, capacity doubling); recursion
+           depth as stack space. (Locality and layout: the machine-models topic.)
   Needs:   the cpp-owning-memory topic (new/delete); the growth-classes topic.
   Demos:   legacy canvas demos mergesort-memory and bfs-memory
            (topics/viz/; the lecture page loads viz.css, mergesort.js, bfs.js
            and calls initVizMergesort() and initVizBfs()).
-  Programs: topics/code/memory/sizeof_demo.cpp, mergesort.cpp, bfs_grid.cpp
-  Budget:  ~38 min, 20 slides.
+  Programs: topics/code/memory/sizeof_demo.cpp, vector_locality.cpp,
+           mergesort.cpp, bfs_grid.cpp
+  Budget:  ~31 min, 23 slides.
 -->
 
 ### Memory: how many bytes?
 
-<small>(~38 min)</small>
+<small>(~31 min)</small>
 
 --
 
@@ -135,6 +138,37 @@ Same **order of growth**, a **4× constant**.
 
 --
 
+## `std::vector`: a header and a heap block
+
+```cpp
+vector<int> v;     // the header: 24 bytes, wherever v lives
+v.push_back(7);    // the data: a separate block on the heap
+```
+
+`sizeof(vector<int>)` is **24**: three 8-byte fields.
+
+- a pointer to the heap block
+- the **size**: elements in use
+- the **capacity**: elements the block can hold
+
+`sizeof` never counts the heap block: it reports the header only.
+
+--
+
+## Capacity doubles
+
+`push_back` 1000 times and print the capacity each time it changes:
+
+```text
+1  2  4  8  16  32  64  128  256  512  1024
+```
+
+- when size reaches capacity, a **new block twice as large** is allocated and **every element is copied**
+- at N = 1000 the block holds **1024**: up to about half the block can sit unused
+- total copies for all the regrowths: 1 + 2 + … + 512 = **1023**, fewer than **2N**
+
+--
+
 ## Space has an order of growth
 
 | holds | memory | order of growth |
@@ -160,6 +194,22 @@ long sum(const vector<int>& a) {
 ```
 
 Order of growth **1** auxiliary space. Brute-force 3-sum: time **N³**, auxiliary space **1**, just loop counters.
+
+--
+
+## Recursion costs stack space
+
+Each call pushes a **frame** (arguments, locals, return address); space counts frames **alive at once**.
+
+```cpp
+long fact(long n) { return n <= 1 ? 1 : n * fact(n - 1); }
+```
+
+| function | deepest recursion | auxiliary space |
+| --- | :-: | :-: |
+| `fact(n)` | n frames | Θ(n) |
+| binary search, recursive | ⌊lg N⌋ + 1 frames | Θ(lg N) |
+| mergesort | about lg N frames | Θ(lg N), plus the Θ(N) buffer |
 
 --
 

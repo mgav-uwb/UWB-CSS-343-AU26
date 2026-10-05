@@ -5,14 +5,14 @@
            trade; 3-sum in N² lg N and in N² with two pointers; the idea of a
            lower bound.
   Needs:   the recursion topic (binary search); the growth-classes topic.
-  Demos:   none.
+  Demos:   threesum-fast (binary search; two pointers); lib/measure/doubling.html (race, embedded).
   Programs: topics/code/faster-3sum/faster.cpp, twopointer.cpp
-  Budget:  ~28 min, 14 slides.
+  Budget:  ~30 min, 19 slides.
 -->
 
 ### Designing a faster 3-sum
 
-<small>(~28 min)</small>
+<small>(~30 min)</small>
 
 --
 
@@ -131,6 +131,19 @@ Sum rule and product rule: N lg N + N² · lg N ⇒ **N² lg N**, down from N³.
 
 --
 
+## Demo: one probe per frame
+
+<div class="algo-viz" data-algo="threesum-fast" data-config='{"height":110,"chrome":{"costsInline":true,"showInput":false,"showClear":false},"defaultOp":"Binary search","openRun":true,"ops":[{"name":"Two pointers","enabled":false}]}'>
+<pre class="viz-fallback">
+sorted: -5 -3 -1  0  1  2  3  4
+pair (-5, -3): search for 8   probes a[3]=0, a[5]=2, a[6]=3, a[7]=4: absent
+pair (-5,  1): search for 4   probes a[3]=0, a[5]=2, a[6]=3, a[7]=4: found at 7 > j, counted
+28 pairs, 80 probes, 6 triples
+</pre>
+</div>
+
+--
+
 ## See the gap
 
 ```text
@@ -157,6 +170,18 @@ Each step **retires an index for good**, so at most N steps per i.
 
 --
 
+## Why two pointers miss nothing
+
+No move discards an index of an uncounted triple:
+
+- **s < 0**: a[lo] + a[h] ≤ a[lo] + a[hi] < −a[i] for all h ≤ hi; lo has no partner left
+- **s > 0**: a[h] + a[hi] ≥ a[lo] + a[hi] > −a[i] for all h ≥ lo; hi has no partner left
+- **s = 0**: distinct values: lo and hi are each other's only partner
+
+Each test retires an index: **at most N − i − 2 tests** per i.
+
+--
+
 ## 3-sum with two pointers
 
 ```cpp
@@ -180,6 +205,28 @@ N lg N + N · N ⇒ **N²**: the lg N is gone.
 
 --
 
+## Demo: two pointers
+
+<div class="algo-viz" data-algo="threesum-fast" data-config='{"height":110,"chrome":{"costsInline":true,"showInput":false,"showClear":false},"defaultOp":"Two pointers","openRun":true,"ops":[{"name":"Binary search","enabled":false}]}'>
+<pre class="viz-fallback">
+sorted: -5 -3 -1  0  1  2  3  4
+i = -5: lo, hi close in: (-3, 4) = -4 lo++ ... (1, 4) = 0 counted ... (2, 3) = 0 counted
+6 triples, 18 sum tests in all
+</pre>
+</div>
+
+--
+
+## Your turn: two pointers
+
+Sorted: **−7 −3 −2 0 1 2 4 5 9**. Fix a[i] = −7: lo at −3, hi at 9.
+
+Trace every test. Which triples are counted, and how many tests run?
+
+<small>(−3, 9): −1, lo++ · (−2, 9): <b>0</b>, count (−7, −2, 9) · (0, 5): −2, lo++ · (1, 5): −1, lo++ · (2, 5): <b>0</b>, count (−7, 2, 5) · lo and hi meet. <b>5 tests, 2 triples</b>, within the bound N − i − 2 = 7.</small> <!-- .element: class="fragment" -->
+
+--
+
 ## The whole ladder
 
 | algorithm | idea | order | doubling ratio |
@@ -191,6 +238,12 @@ N lg N + N · N ⇒ **N²**: the lg N is gone.
 ```text
 $ ./twopointer 16000
 ```
+
+--
+
+## Demo: race all three, doubling N
+
+<iframe data-src="../../lib/measure/doubling.html?embed=1&alg=race&max=4000" style="width:100%;height:470px;border:0" title="3-sum doubling race"></iframe>
 
 --
 

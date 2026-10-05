@@ -11,10 +11,10 @@
 
 ## Recap
 
-- **Memory:** `sizeof`, alignment and padding, stack and heap; space has an order of growth
-- **O(g), Ω(g), Θ(g)** are **sets of functions**; f ∈ O(g) is proved by witnesses c and n₀
-- **Θ = O ∩ Ω**; a polynomial is in Θ of its leading power
-- **Case and bound** are separate choices; algorithms give upper bounds on a problem, lower bounds must be proved
+- **Memory:** sizes, padding, stack and heap; space has an order of growth
+- **O, Ω, Θ** are **sets**; membership is proved by witnesses c and n₀; Θ = O ∩ Ω
+- **Case and bound** are separate choices; a lower bound belongs to the problem
+- **Machine models:** a bounded cost per access changes the constant; swapping is a knee, not a new exponent
 
 --
 

@@ -6,12 +6,12 @@
   Needs:   the doubling-experiment topic; the counting-loops topic.
   Demos:   none.
   Program: none (numbers from topics/code/analysis-doubling/threesum.cpp).
-  Budget:  ~20 min, 10 slides.
+  Budget:  ~22 min, 15 slides.
 -->
 
 ### Model: count it from the code
 
-<small>(~20 min)</small>
+<small>(~22 min)</small>
 
 --
 
@@ -23,6 +23,20 @@ $$\text{total time} = \sum_{\text{statements}} \text{cost} \times \text{frequenc
 - **frequency**, how often it runs: a property of the **algorithm** and the input
 
 The interesting part is always the **frequency**.
+
+--
+
+## Every statement has a frequency
+
+| statement | frequency | tilde |
+| --- | --- | --- |
+| test `i < N` | N + 1 | ~ N |
+| test `j < N` | C(N, 2) + N | ~ N²/2 |
+| test `k < N` | C(N, 3) + C(N, 2) | ~ N³/6 |
+| the `if` | C(N, 3) | ~ N³/6 |
+| `cnt++` | triples found | input-dependent |
+
+Only the **innermost** rows matter at scale.
 
 --
 
@@ -65,6 +79,66 @@ $$\frac{N^3/6 - N^2/2 + N/3}{N^3/6} = 1 - \frac{3}{N} + \frac{2}{N^2} \longright
 The dropped terms vanish **in proportion**.
 
 The correction even predicts the measured ratios: 8(1 + 3/(2N)) = **8.048, 8.024, 8.012** at N = 250, 500, 1000, against the measured 8.05, 8.02, 8.01.
+
+--
+
+## The sums you will meet
+
+| sum | exact | tilde |
+| --- | --- | --- |
+| 1 + 2 + … + N | N(N + 1)/2 | ~ N²/2 |
+| pairs i < j of N | N(N − 1)/2 | ~ N²/2 |
+| 1² + 2² + … + N² | N(N + 1)(2N + 1)/6 | ~ N³/3 |
+| triples i < j < k of N | N(N − 1)(N − 2)/6 | ~ N³/6 |
+| 1 + 2 + 4 + … + N (N a power of 2) | 2N − 1 | ~ 2N |
+| halvings of N down to 1 | ⌊lg N⌋ | ~ lg N |
+
+At N = 1000: 500,500 · 499,500 · 333,833,500 · 166,167,000 · 1999 · 9.
+
+--
+
+## Why pairs are ~ N²/2
+
+```cpp
+for (int i = 0; i < N; i++)
+    for (int j = 0; j < i; j++)   // runs i times
+        op();
+```
+
+$$\sum_{i=0}^{N-1} i = 0 + 1 + \dots + (N-1) = \frac{N(N-1)}{2} \sim \frac{N^2}{2}$$
+
+The pairs fill **half of the N × N square**, the triangle below its diagonal.
+
+--
+
+## A loop that looks like N lg N
+
+```cpp
+for (int i = 1; i < N; i *= 2)    // lg N values of i
+    for (int j = 0; j < i; j++)   // i iterations each
+        op();
+```
+
+Not lg N × N: the inner loop runs **1 + 2 + 4 + … + N/2** times.
+
+$$1 + 2 + 4 + \dots + \frac{N}{2} = N - 1 \sim N$$
+
+At N = 1024: **1023** operations, not 10,240.
+
+--
+
+## Your turn: count it
+
+```cpp
+for (int i = 0; i < N; i++)
+    for (int j = i; j < N; j++)
+        for (int k = 0; k < 3; k++)
+            op();
+```
+
+How many calls to `op()`, exactly and in tilde notation?
+
+<small>For each i the j loop runs N − i times: N + (N − 1) + … + 1 = N(N + 1)/2, times 3. Exactly **3N(N + 1)/2**, so **~ 3N²/2**: order N². At N = 10: 165.</small> <!-- .element: class="fragment" -->
 
 --
 

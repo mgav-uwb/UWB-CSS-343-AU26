@@ -6,7 +6,7 @@
   Needs:   the cost-model topic (order of growth).
   Demos:   none.
   Program: none.
-  Budget:  ~16 min, 8 slides.
+  Budget:  ~16 min, 11 slides.
 -->
 
 ### The order-of-growth classes
@@ -40,6 +40,35 @@
 
 --
 
+## Where lg N comes from
+
+```cpp
+int halvings(int n) {
+    int count = 0;
+    while (n > 1) { n /= 2; count++; }   // n: N, N/2, N/4, …, 1
+    return count;
+}
+```
+
+| N | 1 | 2 | 3 | 8 | 1000 | 10⁶ | 10⁹ |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| halvings | 0 | 1 | 1 | 3 | 9 | 19 | 29 |
+
+The count is **⌊lg N⌋**: **doubling N adds one step**.
+
+--
+
+## The logarithm facts we use
+
+- **lg N** means log₂ N: lg 2ᵏ = k, so lg 1024 = 10
+- **lg(ab) = lg a + lg b**: doubling N adds 1, since lg 2N = lg N + 1
+- **lg(Nᵏ) = k lg N**: so lg N² = 2 lg N
+- **change of base**: lg N = log₁₀ N / log₁₀ 2 ≈ 3.32 log₁₀ N
+
+The base changes only a **constant factor**, so "logarithmic" needs no base.
+
+--
+
 ## The expensive ones
 
 - **quadratic**: every pair, a loop inside a loop
@@ -55,6 +84,23 @@ Nesting **multiplies** the counts, which is why the exponents climb so fast.
 <img src="../../topics/figures/orders-of-growth.svg" style="width:84%">
 
 On a log-log plot each class is a **line whose slope is its exponent**.
+
+--
+
+## Your turn: classify the loop
+
+```cpp
+for (int i = 0; i < N; i++)                       // (a)
+    for (int j = 1; j < N; j *= 2) op();
+for (int i = N; i > 0; i /= 2)                    // (b)
+    for (int j = 0; j < i; j++) op();
+for (int i = 0; i < N; i++)                       // (c)
+    for (int j = 0; j < i; j++)
+        for (int k = 0; k < 100; k++) op();
+for (int i = 0; i * i < N; i++) op();             // (d)
+```
+
+<small>(a) N · lg N: **N lg N** (10,240 at N = 1024) · (b) N + N/2 + … + 1 ~ 2N: **N** (2047) · (c) 100 · N(N − 1)/2 ~ 50N²: **N²** · (d) i runs to √N: **√N** (32), between lg N and N.</small> <!-- .element: class="fragment" -->
 
 --
 
