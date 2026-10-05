@@ -209,6 +209,30 @@
         one of them serves, because they differ only by a constant factor, and
         constant factors are exactly what order-of-growth analysis discards.
       </p>
+      <p>
+        Different problems call for different basic operations, so there are several
+        cost models in common use. Each counts one kind of operation, and each is the
+        natural choice for a family of algorithms:
+      </p>
+      <table>
+        <tr><th>Cost model</th><th>What is counted</th><th>Where it is used</th></tr>
+        <tr><td>RAM model</td><td>every primitive operation (arithmetic, comparison, array access), each costing 1</td><td>the default behind \(O\), \(\Omega\) and \(\Theta\) statements</td></tr>
+        <tr><td>array accesses</td><td>each read or write of an array element</td><td>3-SUM (this chapter), union-find; Sedgewick &amp; Wayne&rsquo;s usual choice</td></tr>
+        <tr><td>compares</td><td>each comparison of two keys</td><td>searching and sorting; the \(n \log_2 n\) lower bound for comparison sorts counts compares</td></tr>
+        <tr><td>compares and exchanges</td><td>both, counted separately</td><td>elementary sorts: selection sort makes \(\sim n^2/2\) compares but only \(n - 1\) exchanges</td></tr>
+        <tr><td>probes</td><td>each element or slot inspected</td><td>binary search (at most \(\lfloor \log_2 n \rfloor + 1\)), hash tables</td></tr>
+        <tr><td>vertices and edges examined</td><td>each vertex visited, each adjacency entry scanned</td><td>graph search: \(V + E\)</td></tr>
+        <tr><td>bit operations</td><td>each operation on a single bit</td><td>arithmetic on large integers: schoolbook multiplication of two \(n\)-bit numbers takes \(\Theta(n^2)\)</td></tr>
+        <tr><td>block transfers</td><td>each block of \(B\) items moved between two levels of memory</td><td>the external-memory model of <a href="foundation-machine-models.html#exponent">Algorithms on Real Machines</a></td></tr>
+      </table>
+      <p>
+        The <strong>array-access cost model</strong> used for 3-SUM below counts every
+        read and write of an array element and treats everything else as free. It suits
+        algorithms whose work is dominated by touching data: for them, array accesses
+        grow like the running time. A single-operation model is justified only when the
+        counted operation dominates; if some other operation can run far more often
+        than the one counted, the count and the running time part ways.
+      </p>
       <div class="aside">
         <span class="tag">Why counting beats timing</span>
         An operation count is <em>exact</em> and <em>machine-independent</em>: rerun
