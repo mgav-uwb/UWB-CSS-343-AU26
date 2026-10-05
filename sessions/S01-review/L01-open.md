@@ -35,7 +35,7 @@
 - **Homework:** one per week, in C++, practice for the quiz
 - **Quiz:** Mondays, 20 minutes, on paper, on the previous week
 - **Programming assignments:** three (trees, graphs, dynamic programming)
-- **Exams:** midterm Mon Nov 9, final Mon Dec 14
+- **Exams:** midterm Mon Nov 9, final Wed Dec 16
 
 Quizzes and exams are **multiple choice, on paper**.
 
