@@ -87,11 +87,11 @@ They even explain the printed ratios exactly: C(2N)/C(N) = 4(2N − 1)/(N − 2)
 | sum | exact | tilde | at N = 1024 |
 | --- | --- | --- | --: |
 | 1 + 2 + … + N | N(N + 1)/2 | ~ N²/2 | 524,800 |
-| pairs i < j of N | N(N − 1)/2 | ~ N²/2 | 523,776 |
+| pairs i < j | N(N − 1)/2 | ~ N²/2 | 523,776 |
 | 1² + 2² + … + N² | N(N + 1)(2N + 1)/6 | ~ N³/3 | 358,438,400 |
-| triples i < j < k of N | N(N − 1)(N − 2)/6 | ~ N³/6 | 178,433,024 |
-| 1 + 2 + 4 + … + N (N a power of 2) | 2N − 1 | ~ 2N | 2,047 |
-| halvings of N down to 1 | ⌊lg N⌋ | ~ lg N | 10 |
+| triples i < j < k | N(N − 1)(N − 2)/6 | ~ N³/6 | 178,433,024 |
+| 1 + 2 + 4 + … + N, N = 2ᵏ | 2N − 1 | ~ 2N | 2,047 |
+| halvings of N to 1 | ⌊lg N⌋ | ~ lg N | 10 |
 
 --
 
