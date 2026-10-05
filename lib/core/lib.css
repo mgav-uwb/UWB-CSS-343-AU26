@@ -238,3 +238,12 @@
 
 /* the state band stays one line (full text on hover): a wrap mid-run would push the transport row */
 .u-infobar:not(.u-below) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* a hidden answer on a slide: <details class="answer"><summary>Reveal the answer</summary> … </details> */
+.reveal details.answer { margin: 14px auto 0; max-width: 92%; text-align: left; }
+.reveal details.answer > summary { display: inline-block; cursor: pointer; list-style: none; font: 600 0.6em system-ui, sans-serif;
+  color: #4b3ccc; background: #f3f0ff; border: 1px solid #c9bdff; border-radius: 999px; padding: 6px 18px; }
+.reveal details.answer > summary::-webkit-details-marker { display: none; }
+.reveal details.answer > summary:hover { border-color: #7c5cff; }
+.reveal details.answer[open] > summary { color: #66708a; background: #f7f8fb; border-color: #e3e7ee; }
+.reveal details.answer[open] { font-size: 0.85em; }

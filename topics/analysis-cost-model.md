@@ -6,7 +6,7 @@
   Needs:   the doubling-experiment topic; the counting-loops topic.
   Demos:   none.
   Program: none (numbers from topics/code/analysis-doubling/threesum.cpp).
-  Budget:  ~22 min, 15 slides.
+  Budget:  ~22 min, 16 slides.
 -->
 
 ### Model: count it from the code
@@ -109,19 +109,37 @@ The pairs fill **half of the N × N square**, the triangle below its diagonal.
 
 --
 
-## A loop that looks like N lg N
+## A true N lg N loop
 
 ```cpp
-for (int i = 1; i < N; i *= 2)    // lg N values of i
-    for (int j = 0; j < i; j++)   // i iterations each
+for (int i = 0; i < N; i++)          // N values of i
+    for (int j = 1; j < N; j *= 2)   // j = 1, 2, 4, …: ⌈lg N⌉ values
         op();
 ```
 
-Not lg N × N: the inner loop runs **1 + 2 + 4 + … + N/2** times.
+The inner loop does the **same** ⌈lg N⌉ steps for every i, so the total is a product:
 
-$$1 + 2 + 4 + \dots + \frac{N}{2} = N - 1 \sim N$$
+$$N \cdot \lceil \lg N \rceil \sim N \lg N$$
 
-At N = 1024: **1023** operations, not 10,240.
+At N = 1024: 1024 × 10 = **10,240** operations.
+
+--
+
+## Predict: is this N lg N too?
+
+```cpp
+for (int i = 1; i < N; i *= 2)    // i = 1, 2, 4, …
+    for (int j = 0; j < i; j++)   // i iterations
+        op();
+```
+
+Outer loop: lg N passes. Inner loop: up to N. How many calls at N = 1024? What order of growth?
+
+<details class="answer"><summary>Reveal the answer</summary>
+
+**1023**, linear: the inner count changes with i, so it is a sum, not a product. 1 + 2 + 4 + … + N/2 = N − 1 ~ N, not 10,240.
+
+</details>
 
 --
 
