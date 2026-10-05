@@ -7,7 +7,7 @@
   Needs:   the recursion topic (binary search); the growth-classes topic.
   Demos:   threesum-fast (binary search; two pointers); lib/measure/doubling.html (race, embedded).
   Programs: topics/code/faster-3sum/faster.cpp, twopointer.cpp
-  Budget:  ~30 min, 19 slides.
+  Budget:  ~31 min, 20 slides.
 -->
 
 ### Designing a faster 3-sum
@@ -146,13 +146,13 @@ pair (-5,  1): search for 4   probes a[3]=0, a[5]=2, a[6]=3, a[7]=4: found at 7 
 
 ## See the gap
 
-<div style="font-size:0.72em">
+<div style="font-size:0.8em">
 
-| N | 2-sum N² | 2-sum N log₂ N | 3-sum N³ | 3-sum N² log₂ N | 3-sum N² (two pointers) |
-| --: | --: | --: | --: | --: | --: |
-| 1000 | 999,000 | 10,979 | 498,501,000 | 5,915,535 | 996,904 |
-| 2000 | 3,998,000 | 23,937 | 3,994,002,000 | 25,670,081 | 3,993,112 |
-| 4000 | 15,996,000 | 51,928 | 31,976,004,000 | 110,834,631 | 15,980,046 |
+| N | 2-sum N² | 2-sum N log₂ N | 3-sum N³ | 3-sum N² log₂ N |
+| --: | --: | --: | --: | --: |
+| 1000 | 999,000 | 10,979 | 498,501,000 | 5,915,535 |
+| 2000 | 3,998,000 | 23,937 | 3,994,002,000 | 25,670,081 |
+| 4000 | 15,996,000 | 51,928 | 31,976,004,000 | 110,834,631 |
 
 </div>
 
@@ -248,6 +248,21 @@ $ ./twopointer 16000
 ```
 
 <small>Code: <a href="../../topics/code/faster-3sum/twopointer.cpp">twopointer.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
+
+--
+
+## The gap, with two pointers
+
+The same arrays as before, now with the third rung (array accesses, from faster.cpp):
+
+| N | N³ | N² log₂ N | N² (two pointers) |
+| --: | --: | --: | --: |
+| 1000 | 498,501,000 | 5,915,535 | 996,904 |
+| 2000 | 3,994,002,000 | 25,670,081 | 3,993,112 |
+| 4000 | 31,976,004,000 | 110,834,631 | 15,980,046 |
+
+At N = 4000 two pointers needs **7 times** fewer accesses than binary search and **2,000 times** fewer than brute force.
 
 --
 
