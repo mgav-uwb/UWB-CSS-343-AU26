@@ -104,6 +104,8 @@
 const params = new URLSearchParams(location.search);
 if (params.get("embed")) document.body.classList.add("embed");
 const NAMES = { brute: "brute force", bsearch: "binary search", twoptr: "two pointers" };
+// what each algorithm's count measures: each counts its own inner operation, so counts compare only within one algorithm
+const UNIT = { brute: "triples tested", bsearch: "probes", twoptr: "loop passes" };
 const $ = (id) => document.getElementById(id);
 if (params.get("alg") && $("alg").querySelector(`option[value="${params.get("alg")}"]`)) $("alg").value = params.get("alg");
 if (params.get("max")) {
@@ -138,7 +140,7 @@ function renderPivot() {
   const m = METRIC === "both" && algs.length > 1 ? "count" : METRIC;
   metricBar(algs.length > 1 ? ["count", "time"] : ["count", "time", "both"], m);
   const cols = m === "both" ? ["count", "time"] : [m];
-  head.innerHTML = `<tr><th style="text-align:left">N</th>` + algs.map((a) => cols.map((c) => `<th class="k-${a}">${algs.length > 1 ? NAMES[a] + " " : ""}${c}</th><th class="k-${a}">ratio</th>`).join("")).join("") + `</tr>`;
+  head.innerHTML = `<tr><th style="text-align:left">N</th>` + algs.map((a) => cols.map((c) => `<th class="k-${a}">${algs.length > 1 ? NAMES[a] + "<br>" : ""}${c === "count" ? UNIT[a] : c}</th><th class="k-${a}">ratio</th>`).join("")).join("") + `</tr>`;
   const tb = $("tab").querySelector("tbody"); tb.innerHTML = "";
   for (const N of Ns) {
     let tds = `<td style="text-align:left">${N.toLocaleString()}</td>`;

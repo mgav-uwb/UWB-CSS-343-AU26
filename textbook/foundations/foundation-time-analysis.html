@@ -217,6 +217,7 @@
       <table>
         <tr><th>Cost model</th><th>What is counted</th><th>Where it is used</th></tr>
         <tr><td>RAM model</td><td>every primitive operation (arithmetic, comparison, array access), each costing 1</td><td>the default behind \(O\), \(\Omega\) and \(\Theta\) statements</td></tr>
+        <tr><td>executions of the inner loop</td><td>each pass through the innermost loop body: one basic operation</td><td>the <code>ops</code> counter in the course&rsquo;s <code>threesum.cpp</code> and the doubling demo: \(n(n-1)(n-2)/6\) triples tested for 3-SUM</td></tr>
         <tr><td>array accesses</td><td>each read or write of an array element</td><td>3-SUM (this chapter), union-find; Sedgewick &amp; Wayne&rsquo;s usual choice</td></tr>
         <tr><td>compares</td><td>each comparison of two keys</td><td>searching and sorting; the \(n \log_2 n\) lower bound for comparison sorts counts compares</td></tr>
         <tr><td>compares and exchanges</td><td>both, counted separately</td><td>elementary sorts: selection sort makes \(\sim n^2/2\) compares but only \(n - 1\) exchanges</td></tr>
@@ -232,6 +233,18 @@
         grow like the running time. A single-operation model is justified only when the
         counted operation dominates; if some other operation can run far more often
         than the one counted, the count and the running time part ways.
+      </p>
+      <p>
+        The course&rsquo;s own counters use more than one of these models, so read the
+        unit before comparing numbers. <code>threesum.cpp</code> and the doubling demo
+        count executions of the inner loop: \(\binom{n}{3}\) for brute-force 3-SUM.
+        <code>faster.cpp</code> and <code>twopointer.cpp</code> count array accesses,
+        three per triple tested, so their brute-force count is three times larger,
+        \(\sim n^3/2\); the two counts differ by a constant factor and have the same
+        order of growth. The interactive demos keep several counters at once
+        (comparisons, reads, writes, swaps, link updates, nodes visited, hashes,
+        rotations, allocations), which reports one run under several cost models side
+        by side.
       </p>
       <div class="aside">
         <span class="tag">Why counting beats timing</span>
