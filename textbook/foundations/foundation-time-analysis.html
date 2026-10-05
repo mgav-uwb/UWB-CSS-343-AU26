@@ -391,13 +391,13 @@ fn count3(a: &amp;[i64]) -&gt; i64 {
       <h3>Why a log-log plot exposes the exponent</h3>
       <p>
         The ratio test and its graphical cousin are the same fact seen twice. Take
-        logarithms of the power law \(T(n) = a\,n^b\) (write \(\lg\) for
-        \(\log_2\)):
+        logarithms, base 2, of the power law \(T(n) = a\,n^b\) (some authors, Sedgewick and Cormen et al. among them,
+        write \(\lg\) for \(\log_2\); this text writes \(\log_2\)):
         \[
-          \lg T(n) = b\,\lg n + \lg a .
+          \log_2 T(n) = b\,\log_2 n + \log_2 a .
         \]
         That is the equation of a <strong>straight line</strong> in the coordinates
-        \((\lg n, \lg T)\) with <strong>slope \(b\)</strong>. So if you plot the
+        \((\log_2 n, \log_2 T)\) with <strong>slope \(b\)</strong>. So if you plot the
         measured times on log-log axes and see a straight line, you have strong
         evidence of a power law, and its slope is the order of growth,
         discovered with no reasoning about the algorithm at all. Reading the slope off
@@ -405,7 +405,7 @@ fn count3(a: &amp;[i64]) -&gt; i64 {
         recover the same \(b\).
       </p>
       <figure>
-        <svg viewBox="0 0 440 280" role="img" aria-label="A plot on log-log axes: the horizontal axis is labelled lg n and the vertical axis is labelled lg T(n). Four straight lines start from the same point at the lower left and fan upward with increasing steepness. From shallowest to steepest they are labelled log (slope approximately 0), linear (slope 1), quadratic (slope 2), and cubic (slope 3). On log-log axes a power law with exponent b is a straight line of slope b, so the steeper the line the larger the exponent.">
+        <svg viewBox="0 0 440 280" role="img" aria-label="A plot on log-log axes: the horizontal axis is labelled log₂ n and the vertical axis is labelled log₂ T(n). Four straight lines start from the same point at the lower left and fan upward with increasing steepness. From shallowest to steepest they are labelled log (slope approximately 0), linear (slope 1), quadratic (slope 2), and cubic (slope 3). On log-log axes a power law with exponent b is a straight line of slope b, so the steeper the line the larger the exponent.">
           <g stroke="#4a5163" stroke-width="1.4" fill="none">
             <line x1="62" y1="34" x2="62" y2="244"/>
             <line x1="62" y1="244" x2="418" y2="244"/>
@@ -423,8 +423,8 @@ fn count3(a: &amp;[i64]) -&gt; i64 {
             <text x="306" y="214">log (&asymp;0)</text>
           </g>
           <g font-family="system-ui, sans-serif" font-size="13" fill="#1a1c22">
-            <text x="30" y="42" transform="rotate(-90 30 42)">lg T(n)</text>
-            <text x="222" y="268" text-anchor="middle">lg n</text>
+            <text x="30" y="42" transform="rotate(-90 30 42)">log₂ T(n)</text>
+            <text x="222" y="268" text-anchor="middle">log₂ n</text>
           </g>
         </svg>
         <figcaption>
@@ -521,7 +521,7 @@ fn count3(a: &amp;[i64]) -&gt; i64 {
         <tr><th>exact frequency</th><th>tilde</th><th>order of growth</th></tr>
         <tr><td>\(n(n-1)(n-2)/6\)</td><td>\(\sim n^3/6\)</td><td>\(n^3\)</td></tr>
         <tr><td>\(n^2/2 - n/2\)</td><td>\(\sim n^2/2\)</td><td>\(n^2\)</td></tr>
-        <tr><td>\(\lg n + 1\)</td><td>\(\sim \lg n\)</td><td>\(\lg n\)</td></tr>
+        <tr><td>\(\log_2 n + 1\)</td><td>\(\sim \log_2 n\)</td><td>\(\log_2 n\)</td></tr>
       </table>
       <p>
         Order of growth strips both the machine constant and the lower-order terms,
@@ -567,9 +567,9 @@ fn count3(a: &amp;[i64]) -&gt; i64 {
       <table>
         <tr><th>order</th><th>name</th><th>code shape</th><th>example</th></tr>
         <tr><td>\(1\)</td><td>constant</td><td>a single statement</td><td>add two numbers</td></tr>
-        <tr><td>\(\lg n\)</td><td>logarithmic</td><td>halve each step</td><td>binary search</td></tr>
+        <tr><td>\(\log_2 n\)</td><td>logarithmic</td><td>halve each step</td><td>binary search</td></tr>
         <tr><td>\(n\)</td><td>linear</td><td>one loop</td><td>find the maximum</td></tr>
-        <tr><td>\(n\lg n\)</td><td>linearithmic</td><td>divide &amp; conquer</td><td>mergesort</td></tr>
+        <tr><td>\(n\log_2 n\)</td><td>linearithmic</td><td>divide &amp; conquer</td><td>mergesort</td></tr>
         <tr><td>\(n^2\)</td><td>quadratic</td><td>double loop</td><td>check all pairs</td></tr>
         <tr><td>\(n^3\)</td><td>cubic</td><td>triple loop</td><td>3-SUM</td></tr>
         <tr><td>\(2^n\)</td><td>exponential</td><td>all subsets</td><td>exhaustive search</td></tr>
@@ -601,7 +601,7 @@ fn count3(a: &amp;[i64]) -&gt; i64 {
       <table>
         <tr><th>growth</th><th>operations at \(n = 10^6\)</th><th>time</th></tr>
         <tr><td>\(n\)</td><td>\(10^6\)</td><td>\(1\) ms</td></tr>
-        <tr><td>\(n\lg n\)</td><td>\(\approx 2 \times 10^7\)</td><td>\(\approx 20\) ms</td></tr>
+        <tr><td>\(n\log_2 n\)</td><td>\(\approx 2 \times 10^7\)</td><td>\(\approx 20\) ms</td></tr>
         <tr><td>\(n^2\)</td><td>\(10^{12}\)</td><td>\(\approx 17\) minutes</td></tr>
         <tr><td>\(n^3\)</td><td>\(10^{18}\)</td><td>\(\approx 31\) years</td></tr>
         <tr><td>\(2^n\)</td><td>\(2^{1{,}000{,}000}\)</td><td>beyond the age of the universe</td></tr>
@@ -639,10 +639,10 @@ fn count3(a: &amp;[i64]) -&gt; i64 {
         a double loop, order \(n^2\). But look at what the inner loop is really doing:
         for each \(a[i]\), it asks &ldquo;is \(-a[i]\) somewhere in the array?&rdquo;
         That is a <em>search</em>, and search is slow on unordered data but fast on
-        sorted data. If we <strong>sort once</strong> up front (\(n\lg n\)), each
-        &ldquo;is \(-a[i]\) present?&rdquo; becomes a binary search in \(\lg n\), and
-        the whole thing is \(n\lg n + n \cdot \lg n = 2\,n\lg n\), which is
-        \(n\lg n\): we spent a sort to knock 2-SUM from quadratic down to
+        sorted data. If we <strong>sort once</strong> up front (\(n\log_2 n\)), each
+        &ldquo;is \(-a[i]\) present?&rdquo; becomes a binary search in \(\log_2 n\), and
+        the whole thing is \(n\log_2 n + n \cdot \log_2 n = 2\,n\log_2 n\), which is
+        \(n\log_2 n\): we spent a sort to knock 2-SUM from quadratic down to
         linearithmic.
       </p>
       <p>
@@ -671,10 +671,10 @@ fn count3(a: &amp;[i64]) -&gt; i64 {
       </div>
       <p>
         The sum rule is why a cheap preprocessing pass is &ldquo;free&rdquo; next to a
-        dominant loop: \(n\lg n + n^2\) is just \(n^2\), and \(n + n^2\) is \(n^2\).
+        dominant loop: \(n\log_2 n + n^2\) is just \(n^2\), and \(n + n^2\) is \(n^2\).
         The product rule is why nesting drives the exponent: \(n\) iterations of
-        \(\lg n\)-work is \(n\lg n\), and \(n^2\) iterations of \(\lg n\)-work is
-        \(n^2\lg n\). Getting these two straight (sequential adds, nested
+        \(\log_2 n\)-work is \(n\log_2 n\), and \(n^2\) iterations of \(\log_2 n\)-work is
+        \(n^2\log_2 n\). Getting these two straight (sequential adds, nested
         multiplies) is most of what analysis asks of you.
       </p>
       <h3>Lifting the idea to 3-SUM</h3>
@@ -682,7 +682,7 @@ fn count3(a: &amp;[i64]) -&gt; i64 {
         The same lever works one dimension up. Sort the array; then for each
         <em>pair</em> \(i \lt j\), binary-search for the third value
         \(-(a[i] + a[j])\). By the rules this is
-        \(n\lg n + n^2 \cdot \lg n = n^2\lg n\), already down from \(n^3\).
+        \(n\log_2 n + n^2 \cdot \log_2 n = n^2\log_2 n\), already down from \(n^3\).
         But we can do better still, and remove the log, by replacing the search with a
         <strong>two-pointer scan</strong>. Fix \(a[i]\); place <code>lo</code> just
         after \(i\) and <code>hi</code> at the end, and walk them toward each other,
@@ -795,10 +795,10 @@ fn count3fast(mut a: Vec&lt;i64&gt;) -&gt; i64 {
         cross. <span class="qed">&#8718;</span>
       </div>
       <p>
-        Now add it up. The sort is \(n\lg n\). The outer loop runs \(n\) times, each
+        Now add it up. The sort is \(n\log_2 n\). The outer loop runs \(n\) times, each
         firing a scan of at most \(n\) iterations, so the scanning work is
         \(n \cdot n = n^2\) by the product rule. By the sum rule
-        \(n\lg n + n^2 = n^2\): the sort vanishes beside the scans, and fast 3-SUM is
+        \(n\log_2 n + n^2 = n^2\): the sort vanishes beside the scans, and fast 3-SUM is
         \(\Theta(n^2)\).
       </p>
       <div class="ex">
@@ -835,12 +835,12 @@ fn count3fast(mut a: Vec&lt;i64&gt;) -&gt; i64 {
       <table>
         <tr><th>algorithm</th><th>idea</th><th>order</th><th>doubling ratio</th></tr>
         <tr><td>triple loop</td><td>test every triple</td><td>\(n^3\)</td><td>\(\times 8\)</td></tr>
-        <tr><td>sort + binary search</td><td>search for the third value</td><td>\(n^2\lg n\)</td><td>\(\times 4\) and a bit</td></tr>
+        <tr><td>sort + binary search</td><td>search for the third value</td><td>\(n^2\log_2 n\)</td><td>\(\times 4\) and a bit</td></tr>
         <tr><td>sort + two pointers</td><td>retire an index per step</td><td>\(n^2\)</td><td>\(\times 4\)</td></tr>
       </table>
       <p>
         The middle rung doubles by &ldquo;\(4\) and a bit&rdquo; because its
-        \(\lg n\) factor grows slowly with \(n\); the two-pointer rung is clean
+        \(\log_2 n\) factor grows slowly with \(n\); the two-pointer rung is clean
         \(n^2\), so it doubles by exactly \(4\). We turned a cubic algorithm into a
         quadratic one not by cleverness at the keyboard but by letting the analysis
         point at the waste.
@@ -848,7 +848,7 @@ fn count3fast(mut a: Vec&lt;i64&gt;) -&gt; i64 {
       <div class="aside">
         <span class="tag">Knowing when to stop: lower bounds</span>
         A <strong>lower bound</strong> is a floor no algorithm can beat. For 2-SUM,
-        \(n\lg n\) is a proven floor in the comparison model (the
+        \(n\log_2 n\) is a proven floor in the comparison model (the
         <a href="../sorting/foundation-sorting-lower-bound.html">Sorting Lower Bound</a> handout proves a
         lower bound of this kind). For 3-SUM, our \(n^2\) is essentially the floor:
         only log-factor shavings are known (Gr&oslash;nlund&ndash;Pettie, 2014), and
@@ -941,13 +941,13 @@ fn count3fast(mut a: Vec&lt;i64&gt;) -&gt; i64 {
         </li>
         <li>
           Give the order of growth of each expression, naming the rule you used:
-          (a) \(n\lg n + n^2\); (b) \(n \cdot \lg n\) (a loop of \(n\) iterations,
+          (a) \(n\log_2 n + n^2\); (b) \(n \cdot \log_2 n\) (a loop of \(n\) iterations,
           each a binary search); (c) \(n^2 + 100n + 5000\).
           <details>
             <summary>solution</summary>
             (a) \(n^2\), by the sum rule (sequential steps add; the larger term
-            \(n^2\) dominates \(n\lg n\)). (b) \(n\lg n\), by the product rule (nested
-            work multiplies: \(n\) iterations times \(\lg n\) each). (c) \(n^2\), by
+            \(n^2\) dominates \(n\log_2 n\)). (b) \(n\log_2 n\), by the product rule (nested
+            work multiplies: \(n\) iterations times \(\log_2 n\) each). (c) \(n^2\), by
             the sum rule again: the linear and constant terms are dominated,
             and constant factors are dropped.
           </details>

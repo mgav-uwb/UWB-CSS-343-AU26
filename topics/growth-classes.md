@@ -20,9 +20,9 @@
 | order | name | code shape | example |
 | --- | --- | --- | --- |
 | 1 | constant | a statement | add two numbers |
-| lg N | logarithmic | halve each step | binary search |
+| log₂ N | logarithmic | halve each step | binary search |
 | N | linear | one loop | find the maximum |
-| N lg N | linearithmic | divide and conquer | mergesort |
+| N log₂ N | linearithmic | divide and conquer | mergesort |
 | N² | quadratic | double loop | check all pairs |
 | N³ | cubic | triple loop | 3-sum |
 | 2ᴺ | exponential | every subset | exhaustive search |
@@ -40,7 +40,7 @@
 
 --
 
-## Where lg N comes from
+## Where log₂ N comes from
 
 ```cpp
 int halvings(int n) {
@@ -54,16 +54,18 @@ int halvings(int n) {
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | halvings | 0 | 1 | 1 | 3 | 9 | 19 | 29 |
 
-The count is **⌊lg N⌋**: **doubling N adds one step**.
+The count is **⌊log₂ N⌋**: **doubling N adds one step**.
+
+<small>Some authors write lg N for log₂ N; this course writes log₂.</small>
 
 --
 
 ## The logarithm facts we use
 
-- **lg N** means log₂ N: lg 2ᵏ = k, so lg 1024 = 10
-- **lg(ab) = lg a + lg b**: doubling N adds 1, since lg 2N = lg N + 1
-- **lg(Nᵏ) = k lg N**: so lg N² = 2 lg N
-- **change of base**: lg N = log₁₀ N / log₁₀ 2 ≈ 3.32 log₁₀ N
+- **log₂ N** means log₂ N: log₂ 2ᵏ = k, so log₂ 1024 = 10
+- **log₂(ab) = log₂ a + log₂ b**: doubling N adds 1, since log₂ 2N = log₂ N + 1
+- **log₂(Nᵏ) = k log₂ N**: so log₂ N² = 2 log₂ N
+- **change of base**: log₂ N = log₁₀ N / log₁₀ 2 ≈ 3.32 log₁₀ N
 
 The base changes only a **constant factor**, so "logarithmic" needs no base.
 
@@ -100,7 +102,7 @@ for (int i = 0; i < N; i++)                       // (c)
 for (int i = 0; i * i < N; i++) op();             // (d)
 ```
 
-<small>(a) N · lg N: **N lg N** (10,240 at N = 1024) · (b) N + N/2 + … + 1 ~ 2N: **N** (2047) · (c) 100 · N(N − 1)/2 ~ 50N²: **N²** · (d) i runs to √N: **√N** (32), between lg N and N.</small> <!-- .element: class="fragment" -->
+<small>(a) N · log₂ N: **N log₂ N** (10,240 at N = 1024) · (b) N + N/2 + … + 1 ~ 2N: **N** (2047) · (c) 100 · N(N − 1)/2 ~ 50N²: **N²** · (d) i runs to √N: **√N** (32), between log₂ N and N.</small> <!-- .element: class="fragment" -->
 
 --
 
@@ -111,7 +113,7 @@ At **N = 10⁶**, on a machine doing 10⁹ operations a second:
 | growth | time |
 | --- | --- |
 | N | 1 ms |
-| N lg N | 20 ms |
+| N log₂ N | 20 ms |
 | N² | about 17 minutes |
 | N³ | about 31 years |
 | 2ᴺ | longer than the age of the universe |

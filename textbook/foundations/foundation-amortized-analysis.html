@@ -352,7 +352,7 @@ impl DynArray {
         elements. Expansions are triggered precisely at the sizes
         \(m = 0, 1, 2, 4, \ldots, 2^j, \ldots\); during \(N\) appends the
         largest size at which an expansion can trigger is at most \(N-1\).
-        Writing \(J = \lfloor \lg (N-1) \rfloor\) (for \(N \ge 2\)), the total
+        Writing \(J = \lfloor \log_2 (N-1) \rfloor\) (for \(N \ge 2\)), the total
         number of copies is at most
         \[ \sum_{j=0}^{J} 2^{\,j} \;=\; 2^{\,J+1} - 1 \;\le\; 2(N-1) - 1
         \;\lt\; 2N, \]

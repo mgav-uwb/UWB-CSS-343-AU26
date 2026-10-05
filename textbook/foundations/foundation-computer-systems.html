@@ -348,8 +348,8 @@ for (c = 0; c &lt; n; c++) for (r = 0; r &lt; n; r++) sum += m[r * n + c];   <sp
         <tr><th>choice</th><th>same order of growth</th><th>usually faster in practice, because</th></tr>
         <tr><td>array or linked list</td><td>\(\Theta(N)\) scan</td><td>the array is contiguous: one miss per 16 <code>int</code>s, and prefetched</td></tr>
         <tr><td>open addressing (linear probing) or separate chaining</td><td>expected \(\Theta(1)\) search</td><td>probing reads adjacent slots; chaining follows a pointer per entry</td></tr>
-        <tr><td>quicksort or heapsort</td><td>\(\Theta(N \lg N)\)</td><td>quicksort&rsquo;s partition scans sequentially; heapsort jumps between \(i\) and \(2i\)</td></tr>
-        <tr><td>B-tree or binary search tree</td><td>\(\Theta(\lg N)\) search</td><td>a B-tree node fills whole lines with keys, so a search touches far fewer lines</td></tr>
+        <tr><td>quicksort or heapsort</td><td>\(\Theta(N \log_2 N)\)</td><td>quicksort&rsquo;s partition scans sequentially; heapsort jumps between \(i\) and \(2i\)</td></tr>
+        <tr><td>B-tree or binary search tree</td><td>\(\Theta(\log_2 N)\) search</td><td>a B-tree node fills whole lines with keys, so a search touches far fewer lines</td></tr>
       </table>
       <p>
         See <a href="../hashing/ds-hashing.html">Hashing</a>,
@@ -378,17 +378,17 @@ for (c = 0; c &lt; n; c++) for (r = 0; r &lt; n; r++) sum += m[r * n + c];   <sp
         Two results show the model at work. <strong>Scanning</strong> \(N\)
         consecutive items costs \(\lceil N / B \rceil\) transfers, not \(N\).
         <strong>Searching</strong> a sorted array by binary search costs about
-        \(\lg(N/B)\) transfers, because each probe lands in a new block until the
+        \(\log_2(N/B)\) transfers, because each probe lands in a new block until the
         remaining range fits in one block. A search tree whose nodes each hold
         about \(B\) keys has height about \(\log_B N\), and a search reads one
         block per level:
       </p>
       \[
-        \log_B N = \frac{\lg N}{\lg B}.
+        \log_B N = \frac{\log_2 N}{\log_2 B}.
       \]
       <p>
         For \(N = 10^9\) keys and blocks of \(B = 1000\) keys, binary search
-        needs about \(\lg(10^6) \approx 20\) transfers while the B-tree needs
+        needs about \(\log_2(10^6) \approx 20\) transfers while the B-tree needs
         \(\log_{1000} 10^9 = 3\). When a transfer is a disk read of several
         milliseconds, that is the difference between a tenth of a second and
         about fifteen milliseconds, and it is why databases and file systems are built on
@@ -658,7 +658,7 @@ low addresses    |  code (text)       |  the machine instructions
           <details>
             <summary>solution</summary>
             Scan: \(2^{30} / 2^9 = 2^{21} = 2{,}097{,}152\) transfers. Binary
-            search: about \(\lg(N/B) = 30 - 9 = 21\) transfers. Tree with fan-out
+            search: about \(\log_2(N/B) = 30 - 9 = 21\) transfers. Tree with fan-out
             512: height about \(\log_{512} 2^{30} = 30/9 \approx 3.3\), so 4
             transfers.
           </details>

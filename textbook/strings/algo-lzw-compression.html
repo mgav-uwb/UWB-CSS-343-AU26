@@ -786,10 +786,10 @@ def lzw_encode_trie(text, alphabet):
       <p>
         Now compression. The output is \(k\) codes, so with fixed-width codes
         of \(W\) bits the compressed size is \(kW\) bits against \(n \lceil
-        \lg R \rceil\) bits for the raw input. Everything therefore depends on
+        \log_2 R \rceil\) bits for the raw input. Everything therefore depends on
         \(k\), the number of phrases the input is parsed into. It can be as
         bad as \(n\): on an input whose every phrase is one character, LZW
-        emits one code per character and, since \(W &gt; \lceil \lg R \rceil\)
+        emits one code per character and, since \(W &gt; \lceil \log_2 R \rceil\)
         always, <em>expands</em> the data. The traced string is small enough to
         show this happening. <code>BARBARBARBAR</code> is \(12\) symbols over a
         \(3\)-symbol alphabet, \(24\) bits raw at \(2\) bits each; LZW emits
@@ -867,7 +867,7 @@ def lzw_encode_trie(text, alphabet):
         <span class="qed">&#8718;</span>
       </div>
       <p>
-        The consequence: with codes of width \(\lceil \lg (R + k) \rceil = O(\log
+        The consequence: with codes of width \(\lceil \log_2 (R + k) \rceil = O(\log
         n)\) bits, the output is \(O(k \log n) = O(n \log R)\) bits, the same
         order as the input. LZW can lose to the raw input by a constant factor
         on incompressible data, never by more, and the fixed overhead is what

@@ -78,7 +78,7 @@
 
   <div class="card grid">
     <div>
-      <table id="tab"><thead><tr><th style="text-align:left">alg</th><th>N</th><th>count</th><th>ratio</th><th>time (ms)</th><th>ratio</th><th>lg ratio</th></tr></thead><tbody></tbody></table>
+      <table id="tab"><thead><tr><th style="text-align:left">alg</th><th>N</th><th>count</th><th>ratio</th><th>time (ms)</th><th>ratio</th><th>log₂ ratio</th></tr></thead><tbody></tbody></table>
       <p class="note" id="countnote"></p>
     </div>
     <div>
@@ -89,11 +89,11 @@
 
   <div class="card explain">
     <p><b>What is counted.</b> Brute force: triples tested, exactly N(N&minus;1)(N&minus;2)/6.
-    Binary search: probes, one per pass of the search loop, at most &lfloor;lg N&rfloor; + 1 per pair.
+    Binary search: probes, one per pass of the search loop, at most &lfloor;log₂ N&rfloor; + 1 per pair.
     Two pointers: iterations of the pointer loop, at most (N&minus;1)(N&minus;2)/2.</p>
     <p><b>Reading the ratios.</b> For a cost a&middot;N<sup>b</sup> the ratio T(2N)/T(N) is 2<sup>b</sup>, so
-    lg ratio is the exponent b: about 3, 2 and 2. Binary search sits a little above 2 because its
-    lg N factor grows too. The slope on the log-log plot is the same b, fitted to the last three points.</p>
+    log₂ ratio is the exponent b: about 3, 2 and 2. Binary search sits a little above 2 because its
+    log₂ N factor grows too. The slope on the log-log plot is the same b, fitted to the last three points.</p>
     <p class="note">The C++ versions are <code>topics/code/analysis-doubling/threesum.cpp</code> and
     <code>topics/code/faster-3sum/twopointer.cpp</code>. JavaScript is slower than <code>-O2</code> C++ by a
     constant factor, which the ratios cancel.</p>
@@ -176,7 +176,7 @@ function render() {
   drawChart(METRIC === "count" ? "count" : "time");
 }
 
-function fitSlope(pts, val = (q) => q.ms) {   // least squares on the last three (lg N, lg value) points
+function fitSlope(pts, val = (q) => q.ms) {   // least squares on the last three (log₂ N, log₂ value) points
   const p = pts.slice(-3); if (p.length < 2) return null;
   const xs = p.map((q) => Math.log2(q.N)), ys = p.map((q) => Math.log2(val(q)));
   const mx = xs.reduce((a, b) => a + b) / xs.length, my = ys.reduce((a, b) => a + b) / ys.length;

@@ -353,7 +353,7 @@
         <a href="foundation-time-analysis.html">Analysis of Algorithms: Time</a>.
       </p>
       <table class="trace">
-        <tr><th>N</th><th>table</th><th>total time</th><th>per lookup</th><th>ratio</th><th>\(b = \lg(\text{ratio})\)</th></tr>
+        <tr><th>N</th><th>table</th><th>total time</th><th>per lookup</th><th>ratio</th><th>\(b = \log_2(\text{ratio})\)</th></tr>
         <tr><td>1,048,576</td><td>8 MiB</td><td>60.2 ms</td><td>57.4 ns</td><td>7.71</td><td>2.95</td></tr>
         <tr><td>2,097,152</td><td>16 MiB</td><td>165 ms</td><td>78.7 ns</td><td>2.74</td><td>1.45</td></tr>
         <tr><td>4,194,304</td><td>32 MiB</td><td>375 ms</td><td>89.4 ns</td><td>2.27</td><td>1.18</td></tr>
@@ -382,13 +382,13 @@
         doubling ratio is \(2^b \cdot c(2N)/c(N)\), so the measured exponent is
       </p>
       \[
-        b_{\text{local}} \;=\; b \;+\; \lg \frac{c(2N)}{c(N)} .
+        b_{\text{local}} \;=\; b \;+\; \log_2 \frac{c(2N)}{c(N)} .
       \]
       <p>
         Inside a level \(c(2N) = c(N)\) and the experiment reads off the true
         \(b\). In the doubling where the working set crosses from memory to a disk
         whose access time is 50,000 times that of memory, the term
-        \(\lg 50{,}000 \approx 15.6\) is added: the \(\Theta(N)\) lookups show
+        \(\log_2 50{,}000 \approx 15.6\) is added: the \(\Theta(N)\) lookups show
         \(b \approx 15.7\). After the crossing the ratio returns to 2, and the
         exponent to 1, because every lookup now costs about the same 5 ms.
       </p>
@@ -405,7 +405,7 @@
       <p>
         A doubling experiment that <em>spans</em> the crossing can still mislead.
         Over \(k\) doublings that include it, the apparent exponent is
-        \(b + \lg(c_{\text{after}}/c_{\text{before}})/k\). Measuring the lookups
+        \(b + \log_2(c_{\text{after}}/c_{\text{before}})/k\). Measuring the lookups
         from 64 MiB to 16 GiB, eight doublings, gives an apparent exponent of 2.96:
         a \(\Theta(N)\) program that looks cubic. A quadratic program measured over
         the same range would look like \(N^4\). This is a statement about the
@@ -582,9 +582,9 @@
         all change the cycles per instruction. None changes an order of growth:
         each is bounded by a constant on a given processor. They are nonetheless
         larger than the difference between many algorithms that differ in order.
-        At \(N = 10^6\), \(\lg N \approx 20\), so a \(\Theta(N \lg N)\) algorithm
+        At \(N = 10^6\), \(\log_2 N \approx 20\), so a \(\Theta(N \log_2 N)\) algorithm
         with a 50&times; better constant is faster than a \(\Theta(N)\) one up to
-        astronomically large \(N\) (until \(\lg N &gt; 50\), past \(10^{15}\)).
+        astronomically large \(N\) (until \(\log_2 N &gt; 50\), past \(10^{15}\)).
       </p>
 
       <!-- ============================================================ -->
@@ -605,10 +605,10 @@
       <table>
         <tr><th>algorithm</th><th>order</th><th>inner operations at \(N = 8000\)</th></tr>
         <tr><td>brute force, three loops</td><td>\(\Theta(N^3)\)</td><td>85,301,336,000</td></tr>
-        <tr><td>sort, then binary search for each pair</td><td>\(\Theta(N^2 \lg N)\)</td><td>about 415,948,000</td></tr>
+        <tr><td>sort, then binary search for each pair</td><td>\(\Theta(N^2 \log_2 N)\)</td><td>about 415,948,000</td></tr>
         <tr><td>sort, then two pointers for each \(i\)</td><td>\(\Theta(N^2)\)</td><td>about 32,000,000</td></tr>
       </table>
-      <p class="note">Brute force: \(N(N-1)(N-2)/6\) triples; binary search: \(\binom{N}{2}\) pairs times \(\lceil \lg N \rceil = 13\) probes; two pointers: about \(N^2/2\) steps.</p>
+      <p class="note">Brute force: \(N(N-1)(N-2)/6\) triples; binary search: \(\binom{N}{2}\) pairs times \(\lceil \log_2 N \rceil = 13\) probes; two pointers: about \(N^2/2\) steps.</p>
       <p>
         The factors are 205 and 2,666, and they grow without bound as \(N\) grows.
         No constant-factor technique in this chapter reaches them at large \(N\).
@@ -651,10 +651,10 @@
       <p>
         An asymptotic comparison is about large \(N\); a program runs at the
         \(N\) it is given. Insertion sort makes about \(N^2/4\) comparisons on
-        random input and mergesort about \(N \lg N\):
+        random input and mergesort about \(N \log_2 N\):
       </p>
       <table>
-        <tr><th>N</th><th>\(N^2/4\)</th><th>\(N \lg N\)</th></tr>
+        <tr><th>N</th><th>\(N^2/4\)</th><th>\(N \log_2 N\)</th></tr>
         <tr><td>8</td><td>16</td><td>24</td></tr>
         <tr><td>16</td><td>64</td><td>64</td></tr>
         <tr><td>32</td><td>256</td><td>160</td></tr>
@@ -760,14 +760,14 @@
           </details>
         </li>
         <li>
-          A \(\Theta(N \lg N)\) program accesses its data in random order. In the
+          A \(\Theta(N \log_2 N)\) program accesses its data in random order. In the
           doubling where its working set outgrows main memory (about 100 ns per
           access) and moves to an SSD (about 50 &micro;s), roughly what local
           exponent does a doubling experiment report?
           <details>
             <summary>solution</summary>
-            \(b_{\text{local}} \approx 1 + \lg(50{,}000/100) = 1 + \lg 500 \approx 1 +
-            9.0 = 10\), plus a few hundredths from the \(\lg N\) factor. The next
+            \(b_{\text{local}} \approx 1 + \log_2(50{,}000/100) = 1 + \log_2 500 \approx 1 +
+            9.0 = 10\), plus a few hundredths from the \(\log_2 N\) factor. The next
             doublings return to about 1.
           </details>
         </li>
@@ -777,7 +777,7 @@
           exponent does a fit over the four doublings suggest?
           <details>
             <summary>solution</summary>
-            \(1 + \lg(50{,}000)/4 \approx 1 + 15.6/4 \approx 4.9\). A program that is
+            \(1 + \log_2(50{,}000)/4 \approx 1 + 15.6/4 \approx 4.9\). A program that is
             linear looks like \(N^5\) over that range.
           </details>
         </li>
@@ -845,12 +845,12 @@
         </li>
         <li>
           In <code>branch.cpp</code>, sorting the values made the second loop 3.7
-          times faster. Sorting costs \(\Theta(N \lg N)\) and the loop costs
+          times faster. Sorting costs \(\Theta(N \log_2 N)\) and the loop costs
           \(\Theta(N)\). When is sorting first worth it?
           <details>
             <summary>solution</summary>
             Only when the loop runs over the same data many times: one pass saves
-            about \(3.07\) ns per value, while sorting costs \(\Theta(\lg N)\)
+            about \(3.07\) ns per value, while sorting costs \(\Theta(\log_2 N)\)
             comparisons per value, each of them a few nanoseconds. For a single pass
             sorting costs more than it saves; over many passes the one-time sort is
             repaid. It is the preprocessing trade of the faster 3-sum: pay once to

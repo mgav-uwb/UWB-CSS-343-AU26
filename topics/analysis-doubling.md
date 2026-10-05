@@ -125,9 +125,9 @@ Left: the raw curve. Right: the **log-log plot, a straight line of slope 3**.
 
 Take logs of T(N) = a·Nᵇ:
 
-$$\lg T(N) = b \lg N + \lg a$$
+$$\log\_2 T(N) = b \log\_2 N + \log\_2 a$$
 
-A **straight line** in (lg N, lg T) with **slope b** and intercept lg a.
+A **straight line** in (log₂ N, log₂ T) with **slope b** and intercept log₂ a.
 
 Plot log-log, read the slope, and you have the exponent, without knowing anything about the code.
 

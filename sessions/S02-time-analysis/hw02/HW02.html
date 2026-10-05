@@ -61,7 +61,7 @@
     <tr><th>TODO</th><th>Function</th><th>What it must do</th><th>Lecture</th></tr>
     <tr><td>1</td><td><code>estimateExponent</code></td><td>From measured counts at increasing sizes, the exponent <em>b</em> of a power law <em>a</em>·<em>n</em><sup><em>b</em></sup>, using the last two measurements. The sizes may grow by any factor, not only 2.</td><td>2</td></tr>
     <tr><td>2</td><td><code>predictCount</code></td><td>The count that power law predicts at a larger size, extrapolated from the last measurement.</td><td>2</td></tr>
-    <tr><td>3</td><td><code>countPairsWithDifference</code></td><td>How many pairs of distinct values differ by exactly <em>d</em>, in time proportional to <em>N</em> lg <em>N</em> or better.</td><td>2</td></tr>
+    <tr><td>3</td><td><code>countPairsWithDifference</code></td><td>How many pairs of distinct values differ by exactly <em>d</em>, in time proportional to <em>N</em> log₂ <em>N</em> or better.</td><td>2</td></tr>
     <tr><td>4a to 4c</td><td><code>witnessA</code>, <code>witnessB</code>, <code>witnessC</code></td><td>Constants that prove three claims: one in O, one in Ω, one in Θ.</td><td>3</td></tr>
     <tr><td>5</td><td><code>RecordPacked</code></td><td>The five members of <code>Record</code>, reordered so that <code>sizeof</code> is 16 instead of 32.</td><td>3</td></tr>
   </table>
@@ -79,7 +79,7 @@
   <pre>g++ -std=c++17 -O2 hw02.cpp -o hw02 &amp;&amp; ./hw02</pre>
   <ul>
     <li><strong>T1, T2</strong> the exponent and the prediction, on Lecture 2's 3-sum counts and on sizes that triple</li>
-    <li><strong>T3</strong> pairs with a given difference, including 200,000 values, which runs in well under a second when the algorithm is <em>N</em> lg <em>N</em> and takes far longer when it checks every pair</li>
+    <li><strong>T3</strong> pairs with a given difference, including 200,000 values, which runs in well under a second when the algorithm is <em>N</em> log₂ <em>N</em> and takes far longer when it checks every pair</li>
     <li><strong>T4</strong> each witness, checked for every <em>n</em> from <em>n</em><sub>0</sub> to 1,000,000</li>
     <li><strong>T5</strong> the size of both structs</li>
   </ul>

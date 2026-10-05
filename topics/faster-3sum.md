@@ -2,7 +2,7 @@
   TOPIC · Designing a faster 3-sum.
   Teaches: analysis guiding design; 2-sum by sorting and binary search; the
            sum and product rules for orders of growth; the preprocessing
-           trade; 3-sum in N² lg N and in N² with two pointers; the idea of a
+           trade; 3-sum in N² log₂ N and in N² with two pointers; the idea of a
            lower bound.
   Needs:   the recursion topic (binary search); the growth-classes topic.
   Demos:   threesum-fast (binary search; two pointers); lib/measure/doubling.html (race, embedded).
@@ -50,7 +50,7 @@ Read the inner loop as a question. For each a[i]:
 
 > Is **−a[i]** somewhere in the array?
 
-A scan answers it in N steps. If the array were **sorted**, binary search would answer it in about **lg N**.
+A scan answers it in N steps. If the array were **sorted**, binary search would answer it in about **log₂ N**.
 
 --
 
@@ -59,11 +59,11 @@ A scan answers it in N steps. If the array were **sorted**, binary search would 
 **Sort once**, then **binary-search** for each −a[i]:
 
 ```cpp
-long twoSumFast(vector<int> a) {           // N lg N
-    sort(a.begin(), a.end());              // N lg N, once
+long twoSumFast(vector<int> a) {           // N log₂ N
+    sort(a.begin(), a.end());              // N log₂ N, once
     int N = a.size(); long cnt = 0;
     for (int i = 0; i < N; i++)            // N searches,
-        if (rankOf(-a[i], a) > i) cnt++;   // lg N each
+        if (rankOf(-a[i], a) > i) cnt++;   // log₂ N each
     return cnt;
 }
 ```
@@ -76,14 +76,14 @@ long twoSumFast(vector<int> a) {           // N lg N
 
 Step A, **then** step B: the costs **add**, and the larger one determines the order of growth.
 
-Sort (N lg N), then N searches of lg N each:
+Sort (N log₂ N), then N searches of log₂ N each:
 
-$$N \lg N + N \lg N = 2N \lg N \quad\Rightarrow\quad \text{order } N \lg N$$
+$$N \log\_2 N + N \log\_2 N = 2N \log\_2 N \quad\Rightarrow\quad \text{order } N \log\_2 N$$
 
 | sum | order of growth |
 | --- | --- |
 | N + N² | N² |
-| N lg N + N² | N² |
+| N log₂ N + N² | N² |
 | N² + 100N + 5000 | N² |
 
 --
@@ -92,10 +92,10 @@ $$N \lg N + N \lg N = 2N \lg N \quad\Rightarrow\quad \text{order } N \lg N$$
 
 Work **nested** inside a loop **multiplies**: iterations × work per iteration.
 
-- N iterations × lg N each = **N lg N**
-- N² iterations × lg N each = **N² lg N**
+- N iterations × log₂ N each = **N log₂ N**
+- N² iterations × log₂ N each = **N² log₂ N**
 
-N iterations doing lg N work is N lg N, not N + lg N.
+N iterations doing log₂ N work is N log₂ N, not N + log₂ N.
 
 --
 
@@ -106,7 +106,7 @@ We **added** a sort to **remove** a loop:
 | 2-sum | order |
 | --- | --- |
 | brute force | N² |
-| sort + binary search | **N lg N** |
+| sort + binary search | **N log₂ N** |
 
 Spend a little up front so each lookup is cheap. Now lift the idea to 3-sum.
 
@@ -117,7 +117,7 @@ Spend a little up front so each lookup is cheap. Now lift the idea to 3-sum.
 Sort, then for each **pair** binary-search for −(a[i] + a[j]):
 
 ```cpp
-long threeSumFast(vector<int> a) {         // N^2 lg N
+long threeSumFast(vector<int> a) {         // N^2 log₂ N
     sort(a.begin(), a.end());
     int N = a.size(); long cnt = 0;
     for (int i = 0; i < N; i++)
@@ -127,7 +127,7 @@ long threeSumFast(vector<int> a) {         // N^2 lg N
 }
 ```
 
-Sum rule and product rule: N lg N + N² · lg N ⇒ **N² lg N**, down from N³.
+Sum rule and product rule: N log₂ N + N² · log₂ N ⇒ **N² log₂ N**, down from N³.
 
 --
 
@@ -148,7 +148,7 @@ pair (-5,  1): search for 4   probes a[3]=0, a[5]=2, a[6]=3, a[7]=4: found at 7 
 
 ```text
          2-sum                   3-sum
-   N     N^2        N lg N       N^3            N^2 lg N
+   N     N^2        N log₂ N       N^3            N^2 log₂ N
 1000     999000     10979        498501000      5915535
 2000     3998000    23937        3994002000     25670081
 4000     15996000   51912        31976004000    110849629
@@ -160,7 +160,7 @@ pair (-5,  1): search for 4   probes a[3]=0, a[5]=2, a[6]=3, a[7]=4: found at 7 
 
 --
 
-## Can the lg N go too?
+## Can the log₂ N go too?
 
 Fast 3-sum re-searches for every pair. On sorted data, fix a[i] and close **two pointers** in from the ends of the rest, with s = a[i] + a[lo] + a[hi]:
 
@@ -203,7 +203,7 @@ long threeSumTwoPointer(vector<int> a) {   // N^2
 }
 ```
 
-N lg N + N · N ⇒ **N²**: the lg N is gone.
+N log₂ N + N · N ⇒ **N²**: the log₂ N is gone.
 
 --
 
@@ -234,7 +234,7 @@ Trace every test. Which triples are counted, and how many tests run?
 | algorithm | idea | order | doubling ratio |
 | --- | --- | --- | --- |
 | threeSum | test every triple | N³ | 8 |
-| threeSumFast | sort; binary-search the third | N² lg N | a little over 4 |
+| threeSumFast | sort; binary-search the third | N² log₂ N | a little over 4 |
 | threeSumTwoPointer | sort; retire an index per step | N² | 4 |
 
 ```text

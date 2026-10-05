@@ -80,7 +80,7 @@ N² random reads over a working set W ∝ N; memory M; a fraction 1 − M/W faul
 | W / M | 0.3 → 0.6 | 0.6 → 1.2 | 1.2 → 2.4 | 2.4 → 4.8 | 4.8 → 9.6 |
 | --- | :-: | :-: | :-: | :-: | :-: |
 | T(2N) / T(N) | 4.0 | **336.7** | 13.9 | 5.4 | 4.5 |
-| b = lg ratio | 2.00 | **8.40** | 3.80 | 2.44 | 2.18 |
+| b = log₂ ratio | 2.00 | **8.40** | 3.80 | 2.44 | 2.18 |
 
 A spike at the boundary, then **back toward 2**. <a href="../../lib/measure/machine-model.html">Simulate it</a>
 
@@ -128,7 +128,7 @@ Same count, different order, Θ(N) both ways:
 
 ## Your turn: which wins, and when?
 
-Data far larger than the caches. **A:** N lg N random reads, 100 ns each. **B:** N² sequential reads, 0.3 ns each.
+Data far larger than the caches. **A:** N log₂ N random reads, 100 ns each. **B:** N² sequential reads, 0.3 ns each.
 
 **Faster at N = 10³, 10⁴, 10⁶, 10⁹?**
 
@@ -142,7 +142,7 @@ Data far larger than the caches. **A:** N lg N random reads, 100 ns each. **B:**
 
 ## What "optimizing" means for a programmer
 
-1. **change the algorithm:** the only lever on the exponent (3-sum: N³ → N² lg N → N²)
+1. **change the algorithm:** the only lever on the exponent (3-sum: N³ → N² log₂ N → N²)
 2. **change the data structure:** a hash table instead of a scan
 3. **lower the constant on the real machine:** locality, fewer allocations, predictable branches
 4. **choose for your N:** insertion sort below about 16 elements

@@ -39,9 +39,9 @@ Cost counted in comparisons, as a function of n:
 | | best case | worst case |
 | --- | :-: | :-: |
 | linear search | Θ(1): first element | Θ(n): absent |
-| binary search, sorted | Θ(1): the middle | Θ(lg n): absent |
+| binary search, sorted | Θ(1): the middle | Θ(log₂ n): absent |
 
-"Binary search is O(lg n)" usually means: its **worst case** is in **Θ(lg n)**.
+"Binary search is O(log₂ n)" usually means: its **worst case** is in **Θ(log₂ n)**.
 
 --
 
@@ -107,7 +107,7 @@ Over **all** mazes the cost is in **O(n²)** and in **Ω(1)**, and in no single 
 Every Θ so far belongs to **one algorithm**:
 
 - brute-force 3-sum: Θ(N³)
-- fast 3-sum: Θ(N² lg N)
+- fast 3-sum: Θ(N² log₂ N)
 - two-pointer 3-sum: Θ(N²)
 
 1. Is Θ(N³) a property of **the problem** 3-sum, or of **the algorithm**?
@@ -122,7 +122,7 @@ Talk to your neighbor: 60 seconds.
 An algorithm that solves the problem in Θ(f) shows the **problem** can be solved in **O(f)**:
 
 - brute force: 3-sum is in O(N³)
-- sort + binary search: in O(N² lg N)
+- sort + binary search: in O(N² log₂ N)
 - two pointers: in **O(N²)**, essentially the best known
 
 Each is a **witness**: the cost is **achievable**, never proved **necessary**. A better algorithm lowers it.
@@ -135,7 +135,7 @@ Each is a **witness**: the cost is **achievable**, never proved **necessary**. A
 
 | problem | algorithm | lower bound | status |
 | --- | :-: | :-: | --- |
-| comparison sorting | O(N lg N) | Ω(N lg N) | **settled** |
+| comparison sorting | O(N log₂ N) | Ω(N log₂ N) | **settled** |
 | 3-sum | O(N²) | Ω(N) | **gap: open** |
 
 Upper bound meets lower bound: the problem is in **Θ**, and optimizing is finished.
@@ -147,9 +147,9 @@ Upper bound meets lower bound: the problem is in **Θ**, and optimizing is finis
 Search a sorted array of N by comparisons: **N + 1** answers (a position, or absent).
 
 - a comparison algorithm is a **decision tree**: height h, at most **2ʰ** leaves
-- each answer needs a leaf: 2ʰ ≥ N + 1, so **h ≥ ⌈lg(N + 1)⌉**
+- each answer needs a leaf: 2ʰ ≥ N + 1, so **h ≥ ⌈log₂(N + 1)⌉**
 
-Binary search's worst case ⌊lg N⌋ + 1 matches: **10** at N = 1000, **20** at 10⁶.
+Binary search's worst case ⌊log₂ N⌋ + 1 matches: **10** at N = 1000, **20** at 10⁶.
 
 --
 
@@ -159,7 +159,7 @@ Binary search's worst case ⌊lg N⌋ + 1 matches: **10** at N = 1000, **20** at
 | --- | --- | --- |
 | `vector::push_back` | amortized constant | amortized Θ(1); one call Θ(N) |
 | `vector::operator[]` | constant | Θ(1) every call |
-| `map::find` | logarithmic | worst case Θ(lg N) |
+| `map::find` | logarithmic | worst case Θ(log₂ N) |
 | `unordered_map::find` | average constant, worst linear | average Θ(1), worst Θ(N) |
 | `std::sort` | O(N log N) comparisons | worst case (C++11 on) |
 
@@ -169,9 +169,9 @@ Binary search's worst case ⌊lg N⌋ + 1 matches: **10** at N = 1000, **20** at
 
 | claim | meaning |
 | --- | --- |
-| "mergesort is in Θ(N lg N)" | every input: at least and at most c·N lg N |
+| "mergesort is in Θ(N log₂ N)" | every input: at least and at most c·N log₂ N |
 | "quicksort's worst case is in Θ(N²)" | the worst input costs order N² |
-| "sorting is in Ω(N lg N)" | **no** comparison sort does better |
+| "sorting is in Ω(N log₂ N)" | **no** comparison sort does better |
 | "3-sum is in O(N²)" | some algorithm achieves N² |
 
 Name the **case**, the **set**, and whether the subject is an **algorithm** or a **problem**.
@@ -183,7 +183,7 @@ Name the **case**, the **set**, and whether the subject is an **algorithm** or a
 For each: **algorithm or problem? Which case? Which set?** Is it true?
 
 1. "Linear search is in Ω(n)."
-2. "Sorted-array search is in Ω(lg n)."
+2. "Sorted-array search is in Ω(log₂ n)."
 3. "`push_back` is in O(1)."
 4. "Insertion sort is in Θ(n²)."
 

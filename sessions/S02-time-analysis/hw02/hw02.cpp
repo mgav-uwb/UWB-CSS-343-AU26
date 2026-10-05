@@ -49,7 +49,7 @@ double predictCount(const vector<long long>& ns, const vector<long long>& counts
 // The values in a are DISTINCT (in no particular order), and d >= 1. Return
 // the number of pairs of values (x, y) in a with y - x == d.
 //
-// It must run in time proportional to N lg N or better: the tests include an
+// It must run in time proportional to N log₂ N or better: the tests include an
 // array of 400,000 values and stop any version that takes longer than a few
 // seconds, which rules out checking every pair. You may use std::sort.
 long countPairsWithDifference(vector<int> a, int d) {
@@ -64,7 +64,7 @@ long countPairsWithDifference(vector<int> a, int d) {
 // f(n) <= c * g(n) for EVERY n >= n0 (and f in Omega(g) by c * g(n) <= f(n)).
 // Return constants that prove each claim. Any valid constants earn full
 // credit; they need not be the smallest. Limits: every constant is at most
-// 1,000,000. lg is log base 2.
+// 1,000,000. log₂ is the logarithm base 2 (some books write lg).
 
 struct Witness      { double c;       long n0; };   // GIVEN
 struct ThetaWitness { double c1, c2;  long n0; };   // GIVEN
@@ -80,7 +80,7 @@ Witness witnessB() {
     // TODO 4b
     return {0, 0};
 }
-// (c)  n lg n + 5n  is in  Theta(n lg n):  c1 * n lg n <= n lg n + 5n <= c2 * n lg n
+// (c)  n log₂ n + 5n  is in  Theta(n log₂ n):  c1 * n log₂ n <= n log₂ n + 5n <= c2 * n log₂ n
 ThetaWitness witnessC() {
     // TODO 4c
     return {0, 0, 0};
@@ -134,7 +134,7 @@ int main() {
         vector<long long> n2 = {1000, 2000, 4000};
         vector<long long> c2 = {10979, 23937, 51912};
         double b = estimateExponent(n2, c2);
-        check(b > 1.05 && b < 1.2, "fast 2-sum's counts give a little over 1 (N lg N)");
+        check(b > 1.05 && b < 1.2, "fast 2-sum's counts give a little over 1 (N log₂ N)");
         // sizes that triple: 5 n^2 exactly
         vector<long long> n3 = {100, 300, 900};
         vector<long long> c3 = {50000, 450000, 4050000};
@@ -164,7 +164,7 @@ int main() {
         check(countPairsWithDifference({1, 2, 3}, 5) == 0 && countPairsWithDifference({42}, 1) == 0, "no pair: d too large; one element");
         vector<int> big;
         for (int i = 0; i < 200000; i++) big.push_back((i * 7919) % 200000);   // 0..199999, shuffled
-        check(countPairsWithDifference(big, 1000) == 199000, "0..199999 shuffled, d = 1000: 199,000 pairs (runs fast only if N lg N)");
+        check(countPairsWithDifference(big, 1000) == 199000, "0..199999 shuffled, d = 1000: 199,000 pairs (runs fast only if N log₂ N)");
     }
 
     cout << "T4 · witnesses (checked for every n from n0 to 1,000,000)\n";
@@ -185,7 +185,7 @@ int main() {
         ThetaWitness t = witnessC();
         auto f = [](double n) { return n * log2(n) + 5 * n; };
         auto g = [](double n) { return n * log2(n); };
-        check(okLower({t.c1, t.n0}, f, g) && okUpper({t.c2, t.n0}, f, g), "(c) n lg n + 5n in Theta(n lg n)");
+        check(okLower({t.c1, t.n0}, f, g) && okUpper({t.c2, t.n0}, f, g), "(c) n log₂ n + 5n in Theta(n log₂ n)");
     }
 
     cout << "T5 · RecordPacked\n";

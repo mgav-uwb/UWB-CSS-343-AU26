@@ -115,9 +115,9 @@ All of these are members of **O(n²)**:
 
 $$5n \in O(n^2)$$
 
-$$n \lg n \in O(n^2) \quad \text{and} \quad 3n^2 + 100n \in O(n^2)$$
+$$n \log\_2 n \in O(n^2) \quad \text{and} \quad 3n^2 + 100n \in O(n^2)$$
 
-The sets are **nested**: O(n) ⊂ O(n lg n) ⊂ O(n²) ⊂ O(n³).
+The sets are **nested**: O(n) ⊂ O(n log₂ n) ⊂ O(n²) ⊂ O(n³).
 
 Saying an algorithm's cost is in O(n²) says it is **at most** about n²; it could be linear.
 
@@ -224,7 +224,7 @@ Inside a formula, a set stands for **some member**: 2n² + 3n + 1 = 2n² + Θ(n)
 | count | membership |
 | --- | --- |
 | C(N, 3) = N(N − 1)(N − 2)/6 | ∈ Θ(N³) |
-| fast 3-sum's array accesses | ∈ Θ(N² lg N) |
+| fast 3-sum's array accesses | ∈ Θ(N² log₂ N) |
 | mergesort's buffer, 4N bytes | ∈ Θ(N) |
 
 **Tilde is stronger:** f ~ g implies f ∈ Θ(g), but not the reverse. 2N³ ∈ Θ(N³), yet 2N³ is not ~ N³.
@@ -250,11 +250,11 @@ The same rules hold for Θ.
 
 Each function is in **O** of the next, but **not in Ω** of it:
 
-$$1 \quad \lg n \quad \sqrt{n} \quad n \quad n \lg n \quad n^2 \quad n^3 \quad 2^n \quad n!$$
+$$1 \quad \log\_2 n \quad \sqrt{n} \quad n \quad n \log\_2 n \quad n^2 \quad n^3 \quad 2^n \quad n!$$
 
 **Limit test:** if f(n)/g(n) → 0, then f ∈ O(g) and f ∉ Ω(g).
 
-- lg n / nᵉ → 0 for every e > 0: a log loses to any positive power
+- log₂ n / nᵉ → 0 for every e > 0: a log loses to any positive power
 - nᵏ / 2ⁿ → 0 for every k: any polynomial loses to 2ⁿ
 
 --
@@ -277,9 +277,9 @@ If the limit of f(n)/g(n) as n → ∞ **exists**, it settles the comparison:
 
 For bases a, b > 1: $$\log\_a n = \frac{1}{\log\_b a} \cdot \log\_b n$$
 
-A **positive constant** factor, so it serves as c₁ and c₂. Example: lg n is about **1.443 · ln n**.
+A **positive constant** factor, so it serves as c₁ and c₂. Example: log₂ n is about **1.443 · ln n**.
 
-O(lg n), O(ln n), O(log₁₀ n) are **the same set**: write O(log n).
+O(log₂ n), O(ln n), O(log₁₀ n) are **the same set**: write O(log n).
 
 --
 
@@ -287,11 +287,11 @@ O(lg n), O(ln n), O(log₁₀ n) are **the same set**: write O(log n).
 
 **Claim:** for every fixed k, 2ⁿ ∉ O(nᵏ).
 
-**Proof.** If 2ⁿ ≤ c·nᵏ for all n ≥ n₀, take lg:
+**Proof.** If 2ⁿ ≤ c·nᵏ for all n ≥ n₀, take log₂:
 
-$$n \le \lg c + k \lg n$$
+$$n \le \log\_2 c + k \log\_2 n$$
 
-n − k lg n is unbounded: **contradiction**. ∎
+n − k log₂ n is unbounded: **contradiction**. ∎
 
 Crossovers: 2ⁿ ≥ n² from n = 4, ≥ n³ from 10, ≥ n¹⁰ from 59.
 
@@ -301,10 +301,10 @@ Crossovers: 2ⁿ ≥ n² from n = 4, ≥ n³ from 10, ≥ n¹⁰ from 59.
 
 Order by growth, slowest first; mark any two in the same Θ:
 
-$$n^2 \quad \sqrt{n} \quad n \lg n \quad 2^{\lg n} \quad \frac{n^2}{\lg n} \quad (\lg n)^2 \quad n^{1.5} \quad \lg(n!)$$
+$$n^2 \quad \sqrt{n} \quad n \log\_2 n \quad 2^{\log\_2 n} \quad \frac{n^2}{\log\_2 n} \quad (\log\_2 n)^2 \quad n^{1.5} \quad \log\_2(n!)$$
 
-$$(\lg n)^2 \prec \sqrt{n} \prec 2^{\lg n} \prec \lbrace n \lg n, \quad \lg(n!) \rbrace$$
-$$\prec n^{1.5} \prec n^2 / \lg n \prec n^2$$
+$$(\log\_2 n)^2 \prec \sqrt{n} \prec 2^{\log\_2 n} \prec \lbrace n \log\_2 n, \quad \log\_2(n!) \rbrace$$
+$$\prec n^{1.5} \prec n^2 / \log\_2 n \prec n^2$$
 <!-- .element: class="fragment" -->
 
 --
@@ -323,17 +323,17 @@ $$\prec n^{1.5} \prec n^2 / \lg n \prec n^2$$
 With a neighbor: **member or not?** Give witnesses or a contradiction.
 
 1. (n + 1)² ∈ Θ(n²)?
-2. lg(n²) ∈ O(lg n)?
+2. log₂(n²) ∈ O(log₂ n)?
 3. 2²ⁿ ∈ O(2ⁿ)?
 
-**Answers.** (1) Yes: n² ≤ (n + 1)² ≤ 4n² for n ≥ 1. (2) Yes: lg(n²) = 2 lg n, so c = 2. (3) No: 2²ⁿ/2ⁿ = 2ⁿ exceeds every constant c. <!-- .element: class="fragment" -->
+**Answers.** (1) Yes: n² ≤ (n + 1)² ≤ 4n² for n ≥ 1. (2) Yes: log₂(n²) = 2 log₂ n, so c = 2. (3) No: 2²ⁿ/2ⁿ = 2ⁿ exceeds every constant c. <!-- .element: class="fragment" -->
 
 --
 
 ## Your turn: two proofs
 
 1. Prove **5n³ + 2n ∈ Θ(n³)**: give c₁, c₂ and n₀.
-2. Prove **n² ∉ O(n lg n)**.
+2. Prove **n² ∉ O(n log₂ n)**.
 
-**(1)** For n ≥ 1: 5n³ ≤ 5n³ + 2n ≤ 5n³ + 2n³ = 7n³, so c₁ = 5, c₂ = 7, n₀ = 1. **(2)** Suppose n² ≤ c·n lg n for all n ≥ n₀. Dividing by n lg n gives n / lg n ≤ c, but n / lg n grows without bound: contradiction. <!-- .element: class="fragment" -->
+**(1)** For n ≥ 1: 5n³ ≤ 5n³ + 2n ≤ 5n³ + 2n³ = 7n³, so c₁ = 5, c₂ = 7, n₀ = 1. **(2)** Suppose n² ≤ c·n log₂ n for all n ≥ n₀. Dividing by n log₂ n gives n / log₂ n ≤ c, but n / log₂ n grows without bound: contradiction. <!-- .element: class="fragment" -->
 

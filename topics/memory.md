@@ -210,8 +210,8 @@ long fact(long n) { return n <= 1 ? 1 : n * fact(n - 1); }
 | function | deepest recursion | auxiliary space |
 | --- | :-: | :-: |
 | `fact(n)` | n frames | Θ(n) |
-| binary search, recursive | ⌊lg N⌋ + 1 frames | Θ(lg N) |
-| mergesort | about lg N frames | Θ(lg N), plus the Θ(N) buffer |
+| binary search, recursive | ⌊log₂ N⌋ + 1 frames | Θ(log₂ N) |
+| mergesort | about log₂ N frames | Θ(log₂ N), plus the Θ(N) buffer |
 
 --
 
@@ -249,7 +249,7 @@ void mergesort(vector<int>& a, int lo, int hi) {
 }
 ```
 
-The top merge's buffer holds N ints: **4N bytes**, order **N**. The recursion adds only **lg N** stack frames.
+The top merge's buffer holds N ints: **4N bytes**, order **N**. The recursion adds only **log₂ N** stack frames.
 
 --
 
@@ -338,7 +338,7 @@ The **fixed table is identical**; the cells **reached** follow the geometry.
 | --- | :-: | :-: |
 | array sum | N | 1 |
 | brute-force 3-sum | N³ | **1** |
-| mergesort | N lg N | N |
+| mergesort | N log₂ N | N |
 | BFS on an n × n grid | n² | n² |
 
 Often you can **spend memory to save time**: a hash table for fast lookup, a table of subproblem answers in dynamic programming.

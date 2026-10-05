@@ -91,7 +91,7 @@ They even explain the printed ratios exactly: C(2N)/C(N) = 4(2N − 1)/(N − 2)
 | 1² + 2² + … + N² | N(N + 1)(2N + 1)/6 | ~ N³/3 | 358,438,400 |
 | triples i < j < k | N(N − 1)(N − 2)/6 | ~ N³/6 | 178,433,024 |
 | 1 + 2 + 4 + … + N, N = 2ᵏ | 2N − 1 | ~ 2N | 2,047 |
-| halvings of N to 1 | ⌊lg N⌋ | ~ lg N | 10 |
+| halvings of N to 1 | ⌊log₂ N⌋ | ~ log₂ N | 10 |
 
 --
 
@@ -109,23 +109,23 @@ The pairs fill **half of the N × N square**, the triangle below its diagonal.
 
 --
 
-## A true N lg N loop
+## A true N log₂ N loop
 
 ```cpp
 for (int i = 0; i < N; i++)          // N values of i
-    for (int j = 1; j < N; j *= 2)   // j = 1, 2, 4, …: ⌈lg N⌉ values
+    for (int j = 1; j < N; j *= 2)   // j = 1, 2, 4, …: ⌈log₂ N⌉ values
         op();
 ```
 
-The inner loop does the **same** ⌈lg N⌉ steps for every i, so the total is a product:
+The inner loop does the **same** ⌈log₂ N⌉ steps for every i, so the total is a product:
 
-$$N \cdot \lceil \lg N \rceil \sim N \lg N$$
+$$N \cdot \lceil \log\_2 N \rceil \sim N \log\_2 N$$
 
 At N = 1024: 1024 × 10 = **10,240** operations.
 
 --
 
-## Predict: is this N lg N too?
+## Predict: is this N log₂ N too?
 
 ```cpp
 for (int i = 1; i < N; i *= 2)    // i = 1, 2, 4, …
@@ -133,7 +133,7 @@ for (int i = 1; i < N; i *= 2)    // i = 1, 2, 4, …
         op();
 ```
 
-Outer loop: lg N passes. Inner loop: up to N. How many calls at N = 1024? What order of growth?
+Outer loop: log₂ N passes. Inner loop: up to N. How many calls at N = 1024? What order of growth?
 
 <details class="answer"><summary>Reveal the answer</summary>
 
@@ -166,7 +166,7 @@ Drop the constant too, and keep the **shape**:
 | --- | --- | --- |
 | N(N − 1)(N − 2)/6 | ~ N³/6 | **N³** |
 | N²/2 − N/2 | ~ N²/2 | **N²** |
-| ⌊lg N⌋ + 1 | ~ lg N | **lg N** |
+| ⌊log₂ N⌋ + 1 | ~ log₂ N | **log₂ N** |
 
 The order of growth is the function of N the cost is **proportional to**.
 

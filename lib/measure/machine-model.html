@@ -85,10 +85,10 @@
   <section class="card about">
     <h2 style="font-size:17px;margin:0 0 4px">How to read it</h2>
     <p>Each row doubles <i>N</i>. The <b>ratio</b> is the cost at this <i>N</i> divided by the cost at half
-    this <i>N</i>, and <b>b</b> = lg(ratio) is the local exponent. For an algorithm whose cost in the RAM
+    this <i>N</i>, and <b>b</b> = log₂(ratio) is the local exponent. For an algorithm whose cost in the RAM
     model is &Theta;(<i>N</i><sup>b</sup>), the ratio is 2<sup>b</sup> while the working set stays in one
     memory level. In the doubling where the working set outgrows a level, the cost of one access rises, and
-    the local exponent becomes b + lg(new cost per access / old cost per access): highlighted in red. After
+    the local exponent becomes b + log₂(new cost per access / old cost per access): highlighted in red. After
     the crossing it returns to b, because the slower level also costs a constant per access. The dashed
     line in the chart has the RAM-model slope through the first point.</p>
     <p><b>The model.</b> A machine is a list of levels, fastest first, each with a capacity, a time per
@@ -191,7 +191,7 @@ function run() {
   // ---- summary ----
   const worst = rows.filter((r) => r.b != null).reduce((m, r) => (r.b > m.b ? r : m), { b: -Infinity });
   const tail = rows[rows.length - 1];
-  $("summary").innerHTML = `RAM-model exponent ${a.exp}${a.exp === 1 && $("algo").value === "merge" ? " (times lg N)" : ""}. ` +
+  $("summary").innerHTML = `RAM-model exponent ${a.exp}${a.exp === 1 && $("algo").value === "merge" ? " (times log₂ N)" : ""}. ` +
     (worst.b > a.exp + 0.35
       ? `Largest local exponent: <b style="color:#d0553f">${worst.b.toFixed(1)}</b> at N = ${worst.N.toLocaleString("en-US")}, where the working set moves into ${worst.level}. ` +
         (Math.abs(tail.b - a.exp) < 0.35 ? `In the last row b = ${tail.b.toFixed(2)}: the order of growth is unchanged.`
