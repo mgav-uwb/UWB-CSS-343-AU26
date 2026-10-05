@@ -78,7 +78,7 @@ $$\frac{N^3/6 - N^2/2 + N/3}{N^3/6} = 1 - \frac{3}{N} + \frac{2}{N^2} \longright
 
 The dropped terms vanish **in proportion**.
 
-The correction even predicts the measured ratios: 8(1 + 3/(2N)) = **8.048, 8.024, 8.012** at N = 250, 500, 1000, against the measured 8.05, 8.02, 8.01.
+The dropped terms even explain the doubling ratios: the count ratio C(2N)/C(N) ≈ 8(1 + 3/(2N)) = **8.048, 8.024, 8.012** at N = 250, 500, 1000, the ratios the program printed (8.05, 8.02, 8.01), approaching 8 from above.
 
 --
 
@@ -93,7 +93,7 @@ The correction even predicts the measured ratios: 8(1 + 3/(2N)) = **8.048, 8.024
 | 1 + 2 + 4 + … + N (N a power of 2) | 2N − 1 | ~ 2N |
 | halvings of N down to 1 | ⌊lg N⌋ | ~ lg N |
 
-At N = 1000: 500,500 · 499,500 · 333,833,500 · 166,167,000 · 1999 · 9.
+At N = 1000: 500,500 · 499,500 · 333,833,500 · 166,167,000 · 9 halvings. The powers-of-2 row needs N a power of 2: at N = 1024 it is 2047.
 
 --
 
