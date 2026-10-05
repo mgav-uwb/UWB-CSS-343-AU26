@@ -135,7 +135,7 @@ for (int i = 1; i < N; i *= 2)    // i = 1, 2, 4, …
 
 Outer loop: log₂ N passes. Inner loop: up to N. How many calls at N = 1024? What order of growth?
 
-<details class="answer"><summary>Reveal the answer</summary>
+<details class="answer"><summary>Answer:</summary>
 
 **1023**, linear: the inner count changes with i, so it is a sum, not a product. 1 + 2 + 4 + … + N/2 = N − 1 ~ N, not 10,240.
 
