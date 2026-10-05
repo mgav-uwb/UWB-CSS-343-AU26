@@ -78,7 +78,7 @@ $$\frac{N^3/6 - N^2/2 + N/3}{N^3/6} = 1 - \frac{3}{N} + \frac{2}{N^2} \longright
 
 The dropped terms vanish **in proportion**.
 
-They even explain the printed ratios: C(2N)/C(N) ≈ 8(1 + 3/(2N)) = **8.048, 8.024, 8.012** at N = 250, 500, 1000.
+They even explain the printed ratios exactly: C(2N)/C(N) = 4(2N − 1)/(N − 2) = 8 + 12/(N − 2) = **8.048, 8.024, 8.012** at N = 250, 500, 1000.
 
 --
 
