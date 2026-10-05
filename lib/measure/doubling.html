@@ -46,6 +46,10 @@
   body.embed .card { border: 0; padding: 4px 2px; margin: 0; }
   body.embed table { font-size: 16px; }
   body.embed .grid { grid-template-columns: 1.05fr 1fr; }
+  .metric { display: inline-flex; gap: 0; margin: 0 0 6px; border: 1px solid #d7dbe6; border-radius: 8px; overflow: hidden; }
+  .metric button { border: 0; background: #f7f8fb; color: #3a3f4d; font: 600 13px system-ui, sans-serif; padding: 4px 12px; cursor: pointer; }
+  .metric button.on { background: #7c5cff; color: #fff; }
+  body.embed .metric button { font-size: 15px; }
 </style>
 </head>
 <body>
@@ -112,32 +116,51 @@ let worker = null, rows = [];
 function sizesUpTo(max) { const s = []; for (let n = 250; n <= max; n *= 2) s.push(n); return s; }
 
 const EMBED = !!params.get("embed");
+// what the table and chart show: the exact count, the measured time, or both
+let METRIC = params.get("metric") || "both";
+function metricBar(opts = ["count", "time", "both"], on = METRIC) {
+  let bar = document.getElementById("metric");
+  if (!bar) {
+    bar = document.createElement("div"); bar.id = "metric"; bar.className = "metric";
+    $("tab").parentNode.insertBefore(bar, $("tab"));
+  }
+  bar.innerHTML = opts.map((m) => `<button data-m="${m}" class="${m === on ? "on" : ""}">${m}</button>`).join("");
+  bar.querySelectorAll("button").forEach((b) => (b.onclick = () => { METRIC = b.dataset.m; render(); }));
+}
+const fmtCount = (n) => n >= 1e9 ? (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? (n / 1e6).toFixed(2) + "M" : n >= 1e4 ? (n / 1e3).toFixed(1) + "K" : n.toLocaleString();
 
 // embedded on a slide: one row per N, one column pair per algorithm (fits 5 rows, not 15)
 function renderPivot() {
   const algs = ["brute", "bsearch", "twoptr"].filter((a) => rows.some((r) => r.alg === a));
   const Ns = [...new Set(rows.map((r) => r.N))].sort((x, y) => x - y);
   const head = $("tab").querySelector("thead");
-  head.innerHTML = `<tr><th style="text-align:left">N</th>` + algs.map((a) => `<th class="k-${a}">${NAMES[a]}</th><th class="k-${a}">ratio</th>`).join("") + `</tr>`;
+  // with three algorithms "both" would need 13 columns: offer count or time only
+  const m = METRIC === "both" && algs.length > 1 ? "count" : METRIC;
+  metricBar(algs.length > 1 ? ["count", "time"] : ["count", "time", "both"], m);
+  const cols = m === "both" ? ["count", "time"] : [m];
+  head.innerHTML = `<tr><th style="text-align:left">N</th>` + algs.map((a) => cols.map((c) => `<th class="k-${a}">${algs.length > 1 ? NAMES[a] + " " : ""}${c}</th><th class="k-${a}">ratio</th>`).join("")).join("") + `</tr>`;
   const tb = $("tab").querySelector("tbody"); tb.innerHTML = "";
   for (const N of Ns) {
     let tds = `<td style="text-align:left">${N.toLocaleString()}</td>`;
     for (const a of algs) {
       const r = rows.find((q) => q.alg === a && q.N === N), p = rows.find((q) => q.alg === a && q.N === N / 2 && !q.skip);
-      if (!r) tds += `<td></td><td></td>`;
-      else if (r.skip) tds += `<td colspan="2" style="color:#8a93a6">skipped</td>`;
-      else tds += `<td>${r.ms < 10 ? r.ms.toFixed(2) : r.ms.toFixed(0)} ms</td><td><b>${p ? (r.ms / p.ms).toFixed(1) : ""}</b></td>`;
+      if (!r) tds += `<td></td><td></td>`.repeat(cols.length);
+      else if (r.skip) tds += `<td colspan="${2 * cols.length}" style="color:#8a93a6">skipped</td>`;
+      else for (const c of cols) tds += c === "count"
+        ? `<td>${fmtCount(r.ops)}</td><td><b>${p ? (r.ops / p.ops).toFixed(2) : ""}</b></td>`
+        : `<td>${r.ms < 10 ? r.ms.toFixed(2) : r.ms.toFixed(0)} ms</td><td><b>${p ? (r.ms / p.ms).toFixed(1) : ""}</b></td>`;
     }
     const tr = document.createElement("tr"); tr.innerHTML = tds; tb.appendChild(tr);
   }
   const cr = algs.map((a) => { const q = rows.filter((r) => r.alg === a && !r.skip); return q.length > 1 ? `${NAMES[a]} ${(q.at(-1).ops / q.at(-2).ops).toFixed(2)}` : ""; }).filter(Boolean);
   const note = document.getElementById("countnote");
-  if (note) note.textContent = cr.length ? "count ratios at the last doubling: " + cr.join(" · ") : "";
-  drawChart();
+  if (note) note.textContent = m === "time" && cr.length ? "count ratios at the last doubling: " + cr.join(" · ") : "";
+  drawChart(m === "count" ? "count" : "time");
 }
 
 function render() {
   if (EMBED) return renderPivot();
+  metricBar();
   const tb = $("tab").querySelector("tbody"); tb.innerHTML = "";
   for (const r of rows) {
     const prev = rows.find((p) => p.alg === r.alg && p.N === r.N / 2);
@@ -150,28 +173,31 @@ function render() {
       : `<td class="alg k-${r.alg}">${NAMES[r.alg]}</td><td>${r.N.toLocaleString()}</td><td>${r.ops.toLocaleString()}</td><td>${or}</td><td>${r.ms < 10 ? r.ms.toFixed(2) : r.ms.toFixed(0)}</td><td>${trr}</td><td>${lg}</td>`;
     tb.appendChild(tr);
   }
-  drawChart();
+  drawChart(METRIC === "count" ? "count" : "time");
 }
 
-function fitSlope(pts) {               // least squares on the last three (lg N, lg T) points
+function fitSlope(pts, val = (q) => q.ms) {   // least squares on the last three (lg N, lg value) points
   const p = pts.slice(-3); if (p.length < 2) return null;
-  const xs = p.map((q) => Math.log2(q.N)), ys = p.map((q) => Math.log2(q.ms));
+  const xs = p.map((q) => Math.log2(q.N)), ys = p.map((q) => Math.log2(val(q)));
   const mx = xs.reduce((a, b) => a + b) / xs.length, my = ys.reduce((a, b) => a + b) / ys.length;
   let num = 0, den = 0; xs.forEach((x, i) => { num += (x - mx) * (ys[i] - my); den += (x - mx) ** 2; });
   return num / den;
 }
 
-function drawChart() {
-  const W = 440, H = 300, L = 46, R = 10, T = 10, B = 34;
+function drawChart(what = "time") {
+  const W = 440, H = 300, L = what === "count" ? 58 : 46, R = 10, T = 10, B = 34;
+  const V = what === "count" ? (r) => Math.max(r.ops, 1) : (r) => Math.max(r.ms, 0.01);
   const ok = rows.filter((r) => !r.skip && r.ms > 0);
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="log-log plot of time against N">`;
-  if (!ok.length) { $("chart").innerHTML = svg + `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" fill="#9aa3b5" font-size="13">log-log plot: time against N</text></svg>`; $("legend").innerHTML = ""; return; }
-  const xs = ok.map((r) => Math.log2(r.N)), ys = ok.map((r) => Math.log2(Math.max(r.ms, 0.01)));
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="log-log plot of ${what} against N">`;
+  if (!ok.length) { $("chart").innerHTML = svg + `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" fill="#9aa3b5" font-size="13">log-log plot: ${what} against N</text></svg>`; $("legend").innerHTML = ""; return; }
+  const xs = ok.map((r) => Math.log2(r.N)), ys = ok.map((r) => Math.log2(V(r)));
   const x0 = Math.min(...xs) - 0.3, x1 = Math.max(...xs) + 0.3, y0 = Math.floor(Math.min(...ys)) - 0.5, y1 = Math.ceil(Math.max(...ys)) + 0.5;
   const X = (v) => L + ((v - x0) / (x1 - x0)) * (W - L - R), Y = (v) => H - B - ((v - y0) / (y1 - y0)) * (H - T - B);
   for (let e = Math.ceil(y0); e <= y1; e++) {
     svg += `<line x1="${L}" x2="${W - R}" y1="${Y(e)}" y2="${Y(e)}" stroke="#eef0f4"/>`;
-    const ms = 2 ** e; svg += `<text x="${L - 6}" y="${Y(e) + 4}" text-anchor="end" font-size="10" fill="#8a93a6">${ms >= 1000 ? (ms / 1000).toFixed(ms >= 10000 ? 0 : 1) + " s" : ms >= 1 ? ms.toFixed(0) + " ms" : ms.toFixed(2)}</text>`;
+    const ms = 2 ** e;
+    const lab = what === "count" ? (e % 2 ? "" : fmtCount(Math.round(ms))) : ms >= 1000 ? (ms / 1000).toFixed(ms >= 10000 ? 0 : 1) + " s" : ms >= 1 ? ms.toFixed(0) + " ms" : ms.toFixed(2);
+    svg += `<text x="${L - 6}" y="${Y(e) + 4}" text-anchor="end" font-size="10" fill="#8a93a6">${lab}</text>`;
   }
   for (const r of [...new Set(ok.map((r) => r.N))]) svg += `<text x="${X(Math.log2(r))}" y="${H - B + 16}" text-anchor="middle" font-size="10" fill="#8a93a6">${r}</text>`;
   svg += `<text x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle" font-size="11" fill="#5c6270">N (log scale)</text>`;
@@ -179,10 +205,10 @@ function drawChart() {
   for (const alg of ["brute", "bsearch", "twoptr"]) {
     const pts = ok.filter((r) => r.alg === alg); if (!pts.length) continue;
     const col = getComputedStyle(document.documentElement).getPropertyValue("--" + alg).trim();
-    svg += `<polyline fill="none" stroke="${col}" stroke-width="2.5" points="${pts.map((r) => X(Math.log2(r.N)) + "," + Y(Math.log2(Math.max(r.ms, 0.01)))).join(" ")}"/>`;
-    pts.forEach((r) => { svg += `<circle cx="${X(Math.log2(r.N))}" cy="${Y(Math.log2(Math.max(r.ms, 0.01)))}" r="3.5" fill="${col}"/>`; });
-    const b = fitSlope(pts);
-    leg.push(`<span><i style="border-color:${col}"></i>${NAMES[alg]}${b != null ? `: slope ${b.toFixed(2)}` : ""}</span>`);
+    svg += `<polyline fill="none" stroke="${col}" stroke-width="2.5" points="${pts.map((r) => X(Math.log2(r.N)) + "," + Y(Math.log2(V(r)))).join(" ")}"/>`;
+    pts.forEach((r) => { svg += `<circle cx="${X(Math.log2(r.N))}" cy="${Y(Math.log2(V(r)))}" r="3.5" fill="${col}"/>`; });
+    const b = fitSlope(pts, V);
+    leg.push(`<span><i style="border-color:${col}"></i>${NAMES[alg]}${b != null ? `: ${what} slope ${b.toFixed(2)}` : ""}</span>`);
   }
   $("chart").innerHTML = svg + "</svg>"; $("legend").innerHTML = leg.join("");
 }
