@@ -109,19 +109,19 @@ The pairs fill **half of the N × N square**, the triangle below its diagonal.
 
 --
 
-## A true N log₂ N loop
+## An N log₂ N loop
 
 ```cpp
 for (int i = 0; i < N; i++)          // N values of i
-    for (int j = 1; j < N; j *= 2)   // j = 1, 2, 4, …: ⌈log₂ N⌉ values
+    for (int j = 1; j < i; j *= 2)   // ⌈log₂ i⌉ values
         op();
 ```
 
-The inner loop does the **same** ⌈log₂ N⌉ steps for every i, so the total is a product:
+Each i ≥ N/2 takes at least log₂ N − 1 steps; none takes more than log₂ N:
 
-$$N \cdot \lceil \log\_2 N \rceil \sim N \log\_2 N$$
+$$\frac{N}{2}(\log\_2 N - 1) \le \sum\_{i<N} \lceil \log\_2 i \rceil \le N \log\_2 N$$
 
-At N = 1024: 1024 × 10 = **10,240** operations.
+At N = 1024: **9,207** (N log₂ N = 10,240). Order **N log₂ N**.
 
 --
 
@@ -137,7 +137,7 @@ Outer loop: log₂ N passes. Inner loop: up to N. How many calls at N = 1024? Wh
 
 <details class="answer"><summary>Answer:</summary>
 
-**1023**, linear: the inner count changes with i, so it is a sum, not a product. 1 + 2 + 4 + … + N/2 = N − 1 ~ N, not 10,240.
+**1023**, linear: the inner count changes with i, so it is a sum, not a product. 1 + 2 + 4 + … + N/2 = N − 1 ~ N, against 9,207 when the inner loop doubles instead.
 
 </details>
 
