@@ -115,7 +115,7 @@ All of these are members of **O(n²)**:
 
 $$5n \in O(n^2)$$
 
-$$n \log\_2 n \in O(n^2) \quad \text{and} \quad 3n^2 + 100n \in O(n^2)$$
+$$n \log\_2 n \in O(n^2) \qquad 3n^2 + 100n \in O(n^2)$$
 
 The sets are **nested**: O(n) ⊂ O(n log₂ n) ⊂ O(n²) ⊂ O(n³).
 
@@ -250,7 +250,11 @@ The same rules hold for Θ.
 
 Each function is in **O** of the next, but **not in Ω** of it:
 
+<div style="font-size:0.88em">
+
 $$1 \quad \log\_2 n \quad \sqrt{n} \quad n \quad n \log\_2 n \quad n^2 \quad n^3 \quad 2^n \quad n!$$
+
+</div>
 
 **Limit test:** if f(n)/g(n) → 0, then f ∈ O(g) and f ∉ Ω(g).
 
@@ -301,7 +305,8 @@ Crossovers: 2ⁿ ≥ n² from n = 4, ≥ n³ from 10, ≥ n¹⁰ from 59.
 
 Order by growth, slowest first; mark any two in the same Θ:
 
-$$n^2 \quad \sqrt{n} \quad n \log\_2 n \quad 2^{\log\_2 n} \quad \frac{n^2}{\log\_2 n} \quad (\log\_2 n)^2 \quad n^{1.5} \quad \log\_2(n!)$$
+$$n^2 \quad \sqrt{n} \quad n \log\_2 n \quad 2^{\log\_2 n}$$
+$$\frac{n^2}{\log\_2 n} \quad (\log\_2 n)^2 \quad n^{1.5} \quad \log\_2(n!)$$
 
 <details class="answer"><summary>Answer:</summary>
 

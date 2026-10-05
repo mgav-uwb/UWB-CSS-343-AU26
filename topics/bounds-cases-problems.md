@@ -82,7 +82,9 @@ One `push_back` that triggers a regrowth copies **every** element: worst case **
 
 N pushes from empty: regrowths copy 1 + 2 + 4 + … < **2N** elements (1023 at N = 1000), plus N writes:
 
-$$\text{total} < 3N \quad\Rightarrow\quad \text{amortized cost per push} \in \Theta(1)$$
+$$\text{total} < 3N$$
+
+so the amortized cost per push is **Θ(1)**.
 
 **Amortized:** the total cost of **any** sequence of n operations, divided by n. A worst-case promise about totals: no probability, unlike the average case.
 

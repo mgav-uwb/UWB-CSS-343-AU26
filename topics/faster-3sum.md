@@ -78,11 +78,11 @@ Step A, **then** step B: the costs **add**, and the larger one determines the or
 
 Sort (N log₂ N), then N searches of log₂ N each:
 
-$$N \log\_2 N + N \log\_2 N = 2N \log\_2 N \quad\Rightarrow\quad \text{order } N \log\_2 N$$
+$$N \log\_2 N + N \log\_2 N = 2N \log\_2 N$$
 
 | sum | order of growth |
 | --- | --- |
-| N + N² | N² |
+| N log₂ N + N log₂ N | N log₂ N |
 | N log₂ N + N² | N² |
 | N² + 100N + 5000 | N² |
 
@@ -146,13 +146,15 @@ pair (-5,  1): search for 4   probes a[3]=0, a[5]=2, a[6]=3, a[7]=4: found at 7 
 
 ## See the gap
 
-```text
-         2-sum                   3-sum
-   N     N^2        N log₂ N       N^3            N^2 log₂ N
-1000     999000     10979        498501000      5915535
-2000     3998000    23937        3994002000     25670081
-4000     15996000   51912        31976004000    110849629
-```
+<div style="font-size:0.72em">
+
+| N | 2-sum N² | 2-sum N log₂ N | 3-sum N³ | 3-sum N² log₂ N | 3-sum N² (two pointers) |
+| --: | --: | --: | --: | --: | --: |
+| 1000 | 999,000 | 10,979 | 498,501,000 | 5,915,535 | 996,904 |
+| 2000 | 3,998,000 | 23,937 | 3,994,002,000 | 25,670,081 | 3,993,112 |
+| 4000 | 15,996,000 | 51,928 | 31,976,004,000 | 110,834,631 | 15,980,046 |
+
+</div>
 
 <img src="../../topics/figures/sum-costs.svg" style="width:62%">
 

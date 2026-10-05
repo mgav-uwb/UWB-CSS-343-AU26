@@ -131,7 +131,11 @@ Start at `k = n/2 = 4`; the root sinks **last**, when both its subtrees already 
    h         2^h      0            0
 ```
 
+<div style="font-size:0.8em">
+
 $$S = h \cdot 1 + (h-1) \cdot 2 + (h-2) \cdot 4 + \dots + 1 \cdot 2^{h-1}$$
+
+</div>
 
 --
 

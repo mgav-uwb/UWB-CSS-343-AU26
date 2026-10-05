@@ -103,7 +103,11 @@ for (int i = 0; i < N; i++)
         op();
 ```
 
+<div style="font-size:0.82em">
+
 $$\sum_{i=0}^{N-1} i = 0 + 1 + \dots + (N-1) = \frac{N(N-1)}{2} \sim \frac{N^2}{2}$$
+
+</div>
 
 The pairs fill **half of the N × N square**, the triangle below its diagonal.
 
