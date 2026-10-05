@@ -130,5 +130,9 @@ Edges `0→1, 1→0, 1→2, 2→3, 3→4, 4→2, 4→5`, neighbors in increasing
 
 Run pass 1 (post numbers), then pass 2 on the transpose. How many SCCs?
 
-<small>post: 0:12, 1:11, 2:10, 3:9, 4:8, 5:7 · reverse post-order 0 1 2 3 4 5 · pass 2 on Gᵀ: start 0 → {0, 1}; start 2 → {2, 3, 4}; start 5 → {5}. **Three** SCCs; the component graph is the path {0,1} → {2,3,4} → {5}.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+post: 0:12, 1:11, 2:10, 3:9, 4:8, 5:7 · reverse post-order 0 1 2 3 4 5 · pass 2 on Gᵀ: start 0 → {0, 1}; start 2 → {2, 3, 4}; start 5 → {5}. **Three** SCCs; the component graph is the path {0,1} → {2,3,4} → {5}.
+
+</details>
 

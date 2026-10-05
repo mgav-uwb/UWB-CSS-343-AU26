@@ -117,7 +117,11 @@ PQ entries are **(dist, vertex)**: shown after **every** pop and push:
    from 0: which vertex settles 2nd?  what is dist[1]?
 ```
 
-<small>Settle 0 (0) → relax: 1=4, 2=1. Nearest unsettled is **2** (dist 1) → **settles 2nd**; relax 2→1: 1+2=3 &lt; 4 → **dist[1]=3**. Then settle 1 (3), then 3 (6).</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+Settle 0 (0) → relax: 1=4, 2=1. Nearest unsettled is **2** (dist 1) → **settles 2nd**; relax 2→1: 1+2=3 &lt; 4 → **dist[1]=3**. Then settle 1 (3), then 3 (6).
+
+</details>
 
 --
 
@@ -130,7 +134,11 @@ PQ entries are **(dist, vertex)**: shown after **every** pop and push:
    from 0: which vertex settles 3rd?  what is dist[5]?
 ```
 
-<small>Settle order starts 0 (0), 1 (4), **2 (5)**: so **2 settles 3rd**. And **dist[5] = 11** via 0→3→4→5 = 6+2+3, beating the direct 0→5 = 20: a three-hop detour crushes the expensive direct edge.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+Settle order starts 0 (0), 1 (4), **2 (5)**: so **2 settles 3rd**. And **dist[5] = 11** via 0→3→4→5 = 6+2+3, beating the direct 0→5 = 20: a three-hop detour crushes the expensive direct edge.
+
+</details>
 
 --
 

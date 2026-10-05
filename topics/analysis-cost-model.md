@@ -154,7 +154,11 @@ for (int i = 0; i < N; i++)
 
 How many calls to `op()`, exactly and in tilde notation?
 
-<small>For each i the j loop runs N − i times: N + (N − 1) + … + 1 = N(N + 1)/2, times 3. Exactly **3N(N + 1)/2**, so **~ 3N²/2**: order N². At N = 10: 165.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+For each i the j loop runs N − i times: N + (N − 1) + … + 1 = N(N + 1)/2, times 3. Exactly **3N(N + 1)/2**, so **~ 3N²/2**: order N². At N = 10: 165.
+
+</details>
 
 --
 

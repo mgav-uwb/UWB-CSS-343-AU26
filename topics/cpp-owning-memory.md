@@ -27,7 +27,11 @@ int* makeB() { return new int(7); }
 
 **Which function has a bug?**
 
-<small>`makeA` returns the address of a variable that no longer exists. `makeB` is correct, and its caller must `delete` the result.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+`makeA` returns the address of a variable that no longer exists. `makeB` is correct, and its caller must `delete` the result.
+
+</details>
 
 --
 
@@ -80,7 +84,11 @@ b.setFirst(99);
 a.print();                  // ?
 ```
 
-<small>Output: `99 -> 5 -> 8`. The default copy duplicated the head **pointer**, so `a` and `b` share one chain.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+Output: `99 -> 5 -> 8`. The default copy duplicated the head **pointer**, so `a` and `b` share one chain.
+
+</details>
 
 <small>Code: <a href="../../topics/code/cpp-owning-memory/shallow.cpp">shallow.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 

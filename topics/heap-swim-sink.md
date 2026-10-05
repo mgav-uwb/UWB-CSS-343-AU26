@@ -66,7 +66,11 @@ Insert **95**: it lands at index 7: the **right child of 70**: then beats 70, th
 
 Into the heap `a = [ 90 80 70 30 60 50 ]`, **insert 85**. Where does it land?
 
-<small>append at index 7 (child of 70) → 85 beats 70, swap up to index 3 → 85 loses to parent 90, STOP. Final: [ 90 80 85 30 60 50 70 ]; 85 sits at index 3, having swum one level.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+append at index 7 (child of 70) → 85 beats 70, swap up to index 3 → 85 loses to parent 90, STOP. Final: [ 90 80 85 30 60 50 70 ]; 85 sits at index 3, having swum one level.
+
+</details>
 
 --
 
@@ -142,7 +146,11 @@ int delMax(MaxHeap& h) {
 
 Insert left us `a = [ 95 80 90 30 60 50 70 ]` (after inserting 95). Now run **delMax**. What comes back, and what remains?
 
-<small>swap 95 ↔ 70 (last), shrink → [ 70 80 90 30 60 50 ] → sink: 70 loses to the larger child 90, swap → 70 at index 3 beats its child 50, STOP. Returns 95; heap = [ 90 80 70 30 60 50 ]: exactly where insert started: delMax undid the insert.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+swap 95 ↔ 70 (last), shrink → [ 70 80 90 30 60 50 ] → sink: 70 loses to the larger child 90, swap → 70 at index 3 beats its child 50, STOP. Returns 95; heap = [ 90 80 70 30 60 50 ]: exactly where insert started: delMax undid the insert.
+
+</details>
 
 --
 

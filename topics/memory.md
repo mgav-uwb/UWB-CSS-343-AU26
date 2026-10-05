@@ -78,9 +78,13 @@ struct B { int b; char a; char c; };
 
 **Vote: `sizeof(A)`? `sizeof(B)`?**
 
-`A` is **12**: 3 bytes of padding after `a` to align `b`, and 3 after `c` to round the size up to 4. `B` is **8**: the two chars share the tail. <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
 
-Order fields from **largest to smallest** alignment to minimize padding. <!-- .element: class="fragment" -->
+`A` is **12**: 3 bytes of padding after `a` to align `b`, and 3 after `c` to round the size up to 4. `B` is **8**: the two chars share the tail.
+
+Order fields from **largest to smallest** alignment to minimize padding.
+
+</details>
 
 --
 

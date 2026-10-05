@@ -303,9 +303,12 @@ Order by growth, slowest first; mark any two in the same Θ:
 
 $$n^2 \quad \sqrt{n} \quad n \log\_2 n \quad 2^{\log\_2 n} \quad \frac{n^2}{\log\_2 n} \quad (\log\_2 n)^2 \quad n^{1.5} \quad \log\_2(n!)$$
 
+<details class="answer"><summary>Answer:</summary>
+
 $$(\log\_2 n)^2 \prec \sqrt{n} \prec 2^{\log\_2 n} \prec \lbrace n \log\_2 n, \quad \log\_2(n!) \rbrace$$
 $$\prec n^{1.5} \prec n^2 / \log\_2 n \prec n^2$$
-<!-- .element: class="fragment" -->
+
+</details>
 
 --
 
@@ -326,7 +329,11 @@ With a neighbor: **member or not?** Give witnesses or a contradiction.
 2. log₂(n²) ∈ O(log₂ n)?
 3. 2²ⁿ ∈ O(2ⁿ)?
 
-**Answers.** (1) Yes: n² ≤ (n + 1)² ≤ 4n² for n ≥ 1. (2) Yes: log₂(n²) = 2 log₂ n, so c = 2. (3) No: 2²ⁿ/2ⁿ = 2ⁿ exceeds every constant c. <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+(1) Yes: n² ≤ (n + 1)² ≤ 4n² for n ≥ 1. (2) Yes: log₂(n²) = 2 log₂ n, so c = 2. (3) No: 2²ⁿ/2ⁿ = 2ⁿ exceeds every constant c.
+
+</details>
 
 --
 
@@ -335,5 +342,9 @@ With a neighbor: **member or not?** Give witnesses or a contradiction.
 1. Prove **5n³ + 2n ∈ Θ(n³)**: give c₁, c₂ and n₀.
 2. Prove **n² ∉ O(n log₂ n)**.
 
-**(1)** For n ≥ 1: 5n³ ≤ 5n³ + 2n ≤ 5n³ + 2n³ = 7n³, so c₁ = 5, c₂ = 7, n₀ = 1. **(2)** Suppose n² ≤ c·n log₂ n for all n ≥ n₀. Dividing by n log₂ n gives n / log₂ n ≤ c, but n / log₂ n grows without bound: contradiction. <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+**(1)** For n ≥ 1: 5n³ ≤ 5n³ + 2n ≤ 5n³ + 2n³ = 7n³, so c₁ = 5, c₂ = 7, n₀ = 1. **(2)** Suppose n² ≤ c·n log₂ n for all n ≥ n₀. Dividing by n log₂ n gives n / log₂ n ≤ c, but n / log₂ n grows without bound: contradiction.
+
+</details>
 

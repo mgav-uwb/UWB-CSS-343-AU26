@@ -241,15 +241,16 @@
 
 /* a hidden answer on a slide: <details class="answer"><summary>Answer:</summary> … </details>
    "Answer:" with a chevron button that opens and closes the panel below it */
-.reveal details.answer { margin: 14px auto 0; max-width: 92%; text-align: left; }
-.reveal details.answer > summary { display: flex; align-items: center; gap: 12px; cursor: pointer; list-style: none;
+.reveal details.answer { margin: 8px auto 0; max-width: 92%; text-align: left; }
+.reveal details.answer > p:first-of-type { margin-top: 6px; }
+.reveal details.answer > summary { display: flex; align-items: center; gap: 10px; cursor: pointer; list-style: none;
   font-weight: 700; color: #2a2a3a; width: fit-content; }
 .reveal details.answer > summary::-webkit-details-marker { display: none; }
-.reveal details.answer > summary::after { content: ""; display: inline-block; width: 1.25em; height: 1.25em; border-radius: 50%;
-  border: 2px solid #c9bdff; background: #f3f0ff center / 55% no-repeat
-  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%237c5cff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+.reveal details.answer > summary::after { content: ""; display: inline-block; width: 0.95em; height: 0.95em; border-radius: 50%;
+  border: 1.5px solid #d3d7df; background: #f4f5f8 center / 55% no-repeat
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%239aa3b5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   transition: transform 0.2s; }
-.reveal details.answer > summary:hover::after { border-color: #7c5cff; }
+.reveal details.answer > summary:hover::after { border-color: #9aa3b5; }
 .reveal details.answer[open] > summary::after { transform: rotate(180deg); }
-.reveal details.answer[open] { font-size: 0.85em; }
-.reveal details.answer[open] > summary { font-size: 1.18em; }
+.reveal details.answer[open] { font-size: 0.8em; }
+.reveal details.answer[open] > summary { font-size: 1.25em; }

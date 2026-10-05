@@ -150,5 +150,9 @@ Edges `0→1, 0→4, 1→2, 2→3, 3→1, 4→3, 4→5, 5→0`, neighbors in inc
 
 Give pre and post for every vertex, then the type of each edge.
 
-<small>pre/post: 0 [1,12] · 1 [2,7] · 2 [3,6] · 3 [4,5] · 4 [8,11] · 5 [9,10]. Tree 0→1, 1→2, 2→3, 0→4, 4→5 · back 3→1, 5→0 · cross 4→3 · no forward edges. Two back edges: two cycles found.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+pre/post: 0 [1,12] · 1 [2,7] · 2 [3,6] · 3 [4,5] · 4 [8,11] · 5 [9,10]. Tree 0→1, 1→2, 2→3, 0→4, 4→5 · back 3→1, 5→0 · cross 4→3 · no forward edges. Two back edges: two cycles found.
+
+</details>
 

@@ -79,7 +79,11 @@ Same diamond, but vertex 0 stores its list as `[2, 1]`:
    what is the DFS visit order now?
 ```
 
-<small>Answer: dive 0 → 2 → 3, backtrack, then 1 (its edge to 3 is skipped): order **0 2 3 1**. The **set** of visited vertices never changes; the **order** depends on how each adjacency list is stored.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+Answer: dive 0 → 2 → 3, backtrack, then 1 (its edge to 3 is skipped): order **0 2 3 1**. The **set** of visited vertices never changes; the **order** depends on how each adjacency list is stored.
+
+</details>
 
 --
 

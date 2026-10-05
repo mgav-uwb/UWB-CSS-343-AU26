@@ -122,7 +122,11 @@ Output order = a topological order. Θ(V + E).
    in-degrees?  first three vertices output?
 ```
 
-<small>In-degrees: 0:0 · 1:1 · 2:1 · 3:3 · 4:1 · 5:2 · 6:1 · 7:2. Only source: 0. Output 0 frees 1; output 1 frees 2 (and drops 3 to 2): **0, 1, 2**: and the full run continues 3, 4, 5, 6, 7.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+In-degrees: 0:0 · 1:1 · 2:1 · 3:3 · 4:1 · 5:2 · 6:1 · 7:2. Only source: 0. Output 0 frees 1; output 1 frees 2 (and drops 3 to 2): **0, 1, 2**: and the full run continues 3, 4, 5, 6, 7.
+
+</details>
 
 --
 

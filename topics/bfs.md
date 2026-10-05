@@ -102,7 +102,11 @@ Both directions → **dist[v] = δ(v)**. ∎
    BFS from 0: what is dist[6]?
 ```
 
-<small>Layers: {0} → {1, 3, 5} → {2, 4, 6, 7}. So **dist[6] = 2** (via 0→5→6). Everything is within two edges of 0: this graph is shallow and wide from the source, the opposite of DFS's deep dive.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+Layers: {0} → {1, 3, 5} → {2, 4, 6, 7}. So **dist[6] = 2** (via 0→5→6). Everything is within two edges of 0: this graph is shallow and wide from the source, the opposite of DFS's deep dive.
+
+</details>
 
 --
 

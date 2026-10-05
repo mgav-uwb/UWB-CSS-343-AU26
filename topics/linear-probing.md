@@ -91,7 +91,11 @@ A **hit** stops on the key; a **miss** pays the **whole cluster** plus the empty
      0 1  2 3 4 5  6
 ```
 
-<small>h(22) = 22 mod 7 = 1 → slot 1 holds 8 → probe 2 (holds 15) → probe 3 (empty) → 22 goes in slot 3. Two collisions, then it lands.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+h(22) = 22 mod 7 = 1 → slot 1 holds 8 → probe 2 (holds 15) → probe 3 (empty) → 22 goes in slot 3. Two collisions, then it lands.
+
+</details>
 
 --
 

@@ -132,11 +132,14 @@ Data far larger than the caches. **A:** N log₂ N random reads, 100 ns each. **
 
 **Faster at N = 10³, 10⁴, 10⁶, 10⁹?**
 
+<details class="answer"><summary>Answer:</summary>
+
 | N | 10³ | 10⁴ | 10⁶ | 10⁹ |
 | --- | :-: | :-: | :-: | :-: |
 | A | 1.0 ms | 13 ms | 2.0 s | 50 min |
 | B | 0.3 ms | 30 ms | 300 s | 9.5 years |
-<!-- .element: class="fragment" -->
+
+</details>
 
 --
 

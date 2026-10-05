@@ -91,7 +91,11 @@ Keep **α = O(1)** → every operation is **O(1)** expected.
 
 **Insert 50.** Which bucket, how many compares, and what does the chain look like?
 
-<small>h(50) = 50 mod 7 = 1 → walk bucket 1: 1 ≠ 50, 15 ≠ 50 (2 compares) → link 50: [1] → 1 → 15 → 50. Chain length 3; every other bucket untouched.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+h(50) = 50 mod 7 = 1 → walk bucket 1: 1 ≠ 50, 15 ≠ 50 (2 compares) → link 50: [1] → 1 → 15 → 50. Chain length 3; every other bucket untouched.
+
+</details>
 
 --
 

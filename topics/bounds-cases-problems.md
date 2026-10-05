@@ -187,5 +187,9 @@ For each: **algorithm or problem? Which case? Which set?** Is it true?
 3. "`push_back` is in O(1)."
 4. "Insertion sort is in Θ(n²)."
 
-(1) worst case only (2) true: the decision tree (3) amortized only (4) worst and average only <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+(1) worst case only (2) true: the decision tree (3) amortized only (4) worst and average only
+
+</details>
 

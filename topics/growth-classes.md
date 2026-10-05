@@ -102,7 +102,11 @@ for (int i = 0; i < N; i++)                       // (c)
 for (int i = 0; i * i < N; i++) op();             // (d)
 ```
 
-<small>(a) N · log₂ N: **N log₂ N** (10,240 at N = 1024) · (b) N + N/2 + … + 1 ~ 2N: **N** (2047) · (c) 100 · N(N − 1)/2 ~ 50N²: **N²** · (d) i runs to √N: **√N** (32), between log₂ N and N.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+(a) N · log₂ N: **N log₂ N** (10,240 at N = 1024) · (b) N + N/2 + … + 1 ~ 2N: **N** (2047) · (c) 100 · N(N − 1)/2 ~ 50N²: **N²** · (d) i runs to √N: **√N** (32), between log₂ N and N.
+
+</details>
 
 --
 

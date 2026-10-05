@@ -58,7 +58,11 @@ for (long i = 0; i < n; i++)
 
 For *n* = 5, how many times does `ops++` run?
 
-<small>**10**: the inner loop runs 4, 3, 2, 1, 0 times.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+**10**: the inner loop runs 4, 3, 2, 1, 0 times.
+
+</details>
 
 --
 
@@ -87,7 +91,11 @@ for (long i = n; i >= 1; i /= 2)
 
 For *n* = 16, how many times does `ops++` run?
 
-<small>**5**: *i* takes the values 16, 8, 4, 2, 1. In general ⌊log₂ *n*⌋ + 1, which is 10 for *n* = 1000 and 20 for *n* = 1,000,000.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+**5**: *i* takes the values 16, 8, 4, 2, 1. In general ⌊log₂ *n*⌋ + 1, which is 10 for *n* = 1000 and 20 for *n* = 1,000,000.
+
+</details>
 
 --
 

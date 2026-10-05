@@ -78,7 +78,11 @@ void downUp(int n) {
 
 What does `downUp(3)` print?
 
-<small>Output: `3 2 1 1 2 3`. The first print runs on the way down, the second on the way back up.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+Output: `3 2 1 1 2 3`. The first print runs on the way down, the second on the way back up.
+
+</details>
 
 <small>Code: <a href="../../topics/code/recursion/recursion.cpp">recursion.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 
@@ -196,7 +200,11 @@ key    3  7 12 18 21 26 30 34 41 47 52 58 63 69 75
 | 3 | 12 | 14 | 13 | 69 | go left |
 | 4 | 12 | 12 | 12 | 63 | found at 12 |
 
-<small>Searching for 20, which is absent, also takes 4 probes: 34, 18, 26, 21, then `lo > hi`.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+Searching for 20, which is absent, also takes 4 probes: 34, 18, 26, 21, then `lo > hi`.
+
+</details>
 
 --
 

@@ -225,7 +225,11 @@ Sorted: **−7 −3 −2 0 1 2 4 5 9**. Fix a[i] = −7: lo at −3, hi at 9.
 
 Trace every test. Which triples are counted, and how many tests run?
 
-<small>(−3, 9): −1, lo++ · (−2, 9): <b>0</b>, count (−7, −2, 9) · (0, 5): −2, lo++ · (1, 5): −1, lo++ · (2, 5): <b>0</b>, count (−7, 2, 5) · lo and hi meet. <b>5 tests, 2 triples</b>, within the bound N − i − 2 = 7.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+(−3, 9): −1, lo++ · (−2, 9): <b>0</b>, count (−7, −2, 9) · (0, 5): −2, lo++ · (1, 5): −1, lo++ · (2, 5): <b>0</b>, count (−7, 2, 5) · lo and hi meet. <b>5 tests, 2 triples</b>, within the bound N − i − 2 = 7.
+
+</details>
 
 --
 

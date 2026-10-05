@@ -200,7 +200,11 @@ Insert **65** into:
    [20|30]   [60|70]
 ```
 
-<small>65 > 40 → leaf `[60|70]` is full → temp `[60|65|70]` → **split**, promote **65** → root becomes `[40|65]`, leaves `[20|30] [60] [70]`. Every leaf still at depth 1. ✓</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+65 > 40 → leaf `[60|70]` is full → temp `[60|65|70]` → **split**, promote **65** → root becomes `[40|65]`, leaves `[20|30] [60] [70]`. Every leaf still at depth 1. ✓
+
+</details>
 
 --
 

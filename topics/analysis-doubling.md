@@ -176,14 +176,15 @@ A different language or machine changes **a**, the constant; the exponent **b** 
 
 A program you have not seen:
 
-| N | time (s) |
-| --- | --- |
-| 1000 | 0.21 |
-| 2000 | 0.83 |
-| 4000 | 3.32 |
-| 8000 | ? |
+| N | 1000 | 2000 | 4000 | 8000 |
+| --- | --: | --: | --: | --: |
+| time (s) | 0.21 | 0.83 | 3.32 | ? |
 
 Estimate b, then predict T(8000) and T(16000).
 
-<small>Ratios 3.95, 4.00 → 2ᵇ ≈ 4 → **b ≈ 2**. T(8000) ≈ 4 × 3.32 ≈ **13.3 s**; T(16000) ≈ 4 × 13.3 ≈ **53 s**.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+Ratios 3.95, 4.00 → 2ᵇ ≈ 4 → **b ≈ 2**. T(8000) ≈ 4 × 3.32 ≈ **13.3 s**; T(16000) ≈ 4 × 13.3 ≈ **53 s**.
+
+</details>
 

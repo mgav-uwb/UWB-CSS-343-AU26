@@ -138,7 +138,11 @@ For a heap in `a[1..15]` (1-indexed):
 - the parent of `a[11]` is at index **?**
 - is `a[8]` a leaf? (n = 15)
 
-<small>children of 6: **12, 13** · parent of 11: **5** · a[8] leaf? its children would be 16, 17 > 15 → **yes, a leaf**.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+children of 6: **12, 13** · parent of 11: **5** · a[8] leaf? its children would be 16, 17 > 15 → **yes, a leaf**.
+
+</details>
 
 --
 

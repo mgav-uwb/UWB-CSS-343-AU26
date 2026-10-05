@@ -30,7 +30,11 @@ int main() {
 }
 ```
 
-<small>Output: `1 99 99`. `byValue` changed its own copy.</small> <!-- .element: class="fragment" -->
+<details class="answer"><summary>Answer:</summary>
+
+Output: `1 99 99`. `byValue` changed its own copy.
+
+</details>
 
 <small>Code: <a href="../../topics/code/cpp-passing-arguments/passing.cpp">passing.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 
