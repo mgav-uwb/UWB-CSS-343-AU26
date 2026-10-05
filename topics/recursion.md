@@ -80,6 +80,8 @@ What does `downUp(3)` print?
 
 <small>Output: `3 2 1 1 2 3`. The first print runs on the way down, the second on the way back up.</small> <!-- .element: class="fragment" -->
 
+<small>Code: <a href="../../topics/code/recursion/recursion.cpp">recursion.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## A list is recursive data

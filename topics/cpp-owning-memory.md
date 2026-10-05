@@ -82,6 +82,8 @@ a.print();                  // ?
 
 <small>Output: `99 -> 5 -> 8`. The default copy duplicated the head **pointer**, so `a` and `b` share one chain.</small> <!-- .element: class="fragment" -->
 
+<small>Code: <a href="../../topics/code/cpp-owning-memory/shallow.cpp">shallow.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## Two owners, one chain
@@ -165,6 +167,8 @@ live nodes after the block:  0
 
 Three lists of three nodes: **9** allocated, **0** left.
 
+<small>Code: <a href="../../topics/code/cpp-owning-memory/intlist.cpp">intlist.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## Checking for leaks
@@ -183,4 +187,6 @@ ERROR SUMMARY: 0 errors from 0 contexts
 
 - run it on every path the program can take
 - a submitted program is expected to produce this report
+
+<small>Code: <a href="../../topics/code/cpp-owning-memory/intlist.cpp">intlist.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 

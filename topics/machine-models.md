@@ -122,6 +122,8 @@ Same count, different order, Θ(N) both ways:
 | walk a list: memory order, then scattered | **52×** slower |
 | `if (x >= 128)`: sorted data, then random | about **4×** slower |
 
+<small>Code: <a href="../../topics/code/machine/branch_predict.cpp">branch_predict.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## Your turn: which wins, and when?
@@ -155,6 +157,8 @@ Summing 4,000,000 ints (`vector_locality.cpp`): array **0.3 ns** per element, li
 - traverse in memory order (row-major in C++)
 - order struct fields to avoid padding
 - `reserve` before pushing; reuse buffers
+
+<small>Code: <a href="../../topics/code/memory/vector_locality.cpp">vector_locality.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 
 --
 

@@ -111,3 +111,5 @@ for (long i = 0; i < n; i++)
 | 16 | 272 | 80 |
 | 1000 | 1,001,000 | 10,000 |
 
+<small>Code: <a href="../../topics/code/counting-loops/loops.cpp">loops.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+

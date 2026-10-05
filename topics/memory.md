@@ -100,6 +100,8 @@ HEAP BYTES FOR N ELEMENTS (measured)
 
 The bottom table is **measured**: every heap byte is counted as it is allocated.
 
+<small>Code: <a href="../../topics/code/memory/sizeof_demo.cpp">sizeof_demo.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## Stack and heap
@@ -223,6 +225,8 @@ long fact(long n) { return n <= 1 ? 1 : n * fact(n - 1); }
 
 Splitting is free; **merging** needs a scratch buffer, and that buffer is the memory.
 
+<small>Code: <a href="../../topics/code/memory/mergesort.cpp">mergesort.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## Mergesort: the code
@@ -276,6 +280,8 @@ The top merge's buffer holds N ints: **4N bytes**, order **N**. The recursion ad
 
 The memory is the table of predecessors, one per cell.
 
+<small>Code: <a href="../../topics/code/memory/bfs_grid.cpp">bfs_grid.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## What each cell stores
@@ -321,6 +327,8 @@ L-PATH     800         1598       1598        1        2560000
 ```
 
 The **fixed table is identical**; the cells **reached** follow the geometry.
+
+<small>Code: <a href="../../topics/code/memory/bfs_grid.cpp">bfs_grid.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 
 --
 

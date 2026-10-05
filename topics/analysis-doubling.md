@@ -51,6 +51,8 @@ Each line **doubles N** and prints the operation count, the time, and each one's
 
 **Before each line prints:** how much longer will it take?
 
+<small>Code: <a href="../../topics/code/analysis-doubling/threesum.cpp">threesum.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## What we observe

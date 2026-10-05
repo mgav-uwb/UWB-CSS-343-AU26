@@ -164,6 +164,8 @@ Counting **array accesses** instead of triples:
 
 A cost model lets us state a fact about the **algorithm**, not about one run on one machine.
 
+<small>Code: <a href="../../topics/code/faster-3sum/faster.cpp">faster.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## Model meets experiment

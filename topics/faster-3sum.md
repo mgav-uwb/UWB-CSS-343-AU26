@@ -156,6 +156,8 @@ pair (-5,  1): search for 4   probes a[3]=0, a[5]=2, a[6]=3, a[7]=4: found at 7 
 
 <img src="../../topics/figures/sum-costs.svg" style="width:62%">
 
+<small>Code: <a href="../../topics/code/faster-3sum/faster.cpp">faster.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## Can the lg N go too?
@@ -238,6 +240,8 @@ Trace every test. Which triples are counted, and how many tests run?
 ```text
 $ ./twopointer 16000
 ```
+
+<small>Code: <a href="../../topics/code/faster-3sum/twopointer.cpp">twopointer.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 
 --
 

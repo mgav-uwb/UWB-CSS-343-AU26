@@ -81,6 +81,8 @@ Worst case over every present and absent key, measured:
 
 For any *n*: ⌊log₂ *n*⌋ + 1.
 
+<small>Code: <a href="../../topics/code/recursion/recursion.cpp">recursion.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## Towers of Hanoi

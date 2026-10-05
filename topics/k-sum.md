@@ -193,6 +193,8 @@ Same answers, same number of checks.
 
 <small>Calls at *n* = 20: one per partial choice of 0, 1, 2 or 3 elements, 1 + 20 + 190 + 1,140 = 1,351.</small>
 
+<small>Code: <a href="../../topics/code/k-sum/ksum.cpp">ksum.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
+
 --
 
 ## What k costs
