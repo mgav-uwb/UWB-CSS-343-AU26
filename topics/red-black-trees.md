@@ -10,7 +10,9 @@
 
 ### Red-black trees
 
-<small>(~20 min)</small>
+> Guibas and Sedgewick named red-black trees in 1978; Sedgewick has said red was the color that printed best on their laser printer at Xerox PARC.
+
+<small>L. J. Guibas and R. Sedgewick, FOCS 1978</small>
 
 --
 

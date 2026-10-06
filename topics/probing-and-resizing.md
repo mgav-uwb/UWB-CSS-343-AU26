@@ -10,7 +10,9 @@
 
 ### Clustering, better probes, and resizing
 
-<small>(~22 min)</small>
+> Python's dict grows its table when it becomes two-thirds full.
+
+<small>CPython source, Objects/dictobject.c</small>
 
 --
 

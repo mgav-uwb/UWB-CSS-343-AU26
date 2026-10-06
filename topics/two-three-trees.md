@@ -10,7 +10,9 @@
 
 ### 2-3 trees
 
-<small>(~26 min)</small>
+> John Hopcroft invented 2-3 trees in 1970 but did not publish them; they first appeared in print in a 1974 textbook.
+
+<small>Aho, Hopcroft and Ullman, The Design and Analysis of Computer Algorithms, 1974</small>
 
 --
 

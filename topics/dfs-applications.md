@@ -11,7 +11,9 @@
 
 ### DFS numbering and edge types
 
-<small>(~25 min)</small>
+> Robert Tarjan's 1972 paper used a single depth-first search to find strongly connected components and biconnected components, each in linear time.
+
+<small>R. E. Tarjan, “Depth-First Search and Linear Graph Algorithms,” SIAM J. Computing 1(2), 1972</small>
 
 --
 

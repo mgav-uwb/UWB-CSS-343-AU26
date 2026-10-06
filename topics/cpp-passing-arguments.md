@@ -10,7 +10,9 @@ TOPIC · Passing arguments in C++.
 
 ### Passing arguments
 
-<small>(~7 min)</small>
+> C++ added references in its first commercial release, Cfront 1.0, in 1985, chiefly so that overloaded operators could take their arguments without copying them.
+
+<small>Bjarne Stroustrup, The Design and Evolution of C++, 1994</small>
 
 --
 

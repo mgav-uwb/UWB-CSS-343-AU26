@@ -11,7 +11,9 @@
 
 ### Model: count it from the code
 
-<small>(~22 min)</small>
+> "An algorithm must be seen to be believed."
+
+<small>Donald Knuth, The Art of Computer Programming, Volume 1, §1.1, 1968</small>
 
 --
 

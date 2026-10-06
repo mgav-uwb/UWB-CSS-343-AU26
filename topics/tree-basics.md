@@ -10,7 +10,9 @@
 
 ### Trees and binary trees
 
-<small>(~12 min)</small>
+> Arthur Cayley showed in 1889 that there are n<sup>n−2</sup> different trees on n labeled vertices.
+
+<small>A. Cayley, “A Theorem on Trees,” Quarterly Journal of Mathematics 23, 1889</small>
 
 --
 

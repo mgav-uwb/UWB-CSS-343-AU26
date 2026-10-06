@@ -10,7 +10,9 @@
 
 ### Ordered operations
 
-<small>(~12 min)</small>
+> In the GCC, Clang and Microsoft C++ standard libraries, std::map and std::set are red-black trees, which is how they support lower_bound and in-order iteration.
+
+<small>libstdc++, libc++ and Microsoft STL source</small>
 
 --
 

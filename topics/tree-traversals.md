@@ -10,7 +10,9 @@
 
 ### Traversals and expression trees
 
-<small>(~12 min)</small>
+> Jan Łukasiewicz invented parenthesis-free prefix notation in the 1920s. Its mirror image, reverse Polish notation, ran Hewlett-Packard calculators from the HP 9100A in 1968.
+
+<small>J. Łukasiewicz, 1920s; Hewlett-Packard 9100A, 1968</small>
 
 --
 

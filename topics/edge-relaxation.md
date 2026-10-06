@@ -10,7 +10,9 @@
 
 ### Edge relaxation
 
-<small>(~16 min)</small>
+> Lester Ford's 1956 RAND report introduced the step now called relaxation: lower a vertex's distance whenever an edge offers a shorter route.
+
+<small>L. R. Ford Jr., “Network Flow Theory,” RAND P-923, 1956</small>
 
 --
 

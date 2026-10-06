@@ -16,8 +16,9 @@
   .page{max-width:820px;margin:28px auto;background:var(--bg);padding:48px clamp(20px,6vw,64px) 64px;
         box-shadow:0 1px 4px #0002;border-radius:4px}
   h1{font-size:27px;line-height:1.25;margin:0 0 4px}
-  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 4px}
-  .src{color:var(--dim);font-size:13.5px;font-style:italic;margin:0 0 26px;border-bottom:1px solid var(--line);padding-bottom:18px}
+  .epigraph{margin:6px 0 20px;padding:4px 0 4px 16px;border-left:3px solid #b9c0d0;color:#33363f;font-style:italic;font-size:17px}
+  .epigraph.fact{font-style:normal;font-size:16px}
+  .epigraph cite{display:block;font-style:normal;font-size:13.5px;color:#5c6270;margin-top:4px}
   h2{font-size:20px;margin:34px 0 10px;padding-top:6px}
   h3{font-size:16.5px;margin:22px 0 6px;color:#2a2d36}
   p{margin:10px 0}
@@ -53,8 +54,10 @@
 <div class="page">
 
   <h1>Computing Environment:<br>The CSS Linux Lab &amp; How to Use It</h1>
-  <div class="subtitle">CSS 343 - Data Structures, Algorithms &amp; Discrete Mathematics II. Required setup. Practical guide.</div>
-  <div class="src">How to reach the school's Linux lab, transfer files, and compile &amp; run C++ there - including the rule for compiling <strong>template classes</strong>, and how to check for memory leaks with Valgrind. Every programming assignment is graded on this environment.</div>
+  <blockquote class="epigraph fact">
+    Unix began at Bell Labs in 1969, when Ken Thompson wrote its first version on a spare PDP-7. Linux, which the lab runs, was written from scratch in 1991 to behave like it.
+    <cite>D. M. Ritchie and K. Thompson, “The UNIX Time-Sharing System,” CACM 17(7), 1974; L. Torvalds, comp.os.minix, 1991</cite>
+  </blockquote>
 
   <p class="lead">C and C++ programs are <strong>OS-dependent</strong>: code that builds and runs on your laptop can behave differently - or fail to compile - on another system. To keep grading fair and reproducible, this course standardizes on <strong>Linux</strong>. You may write code in any editor or IDE you like, but <strong>all submitted code must compile and run on the CSS Linux lab</strong> with <code>g++ -std=c++17</code>, because that is where we grade it.</p>
 

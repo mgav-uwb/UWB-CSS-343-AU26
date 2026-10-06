@@ -10,7 +10,9 @@
 
 ### AVL deletion
 
-<small>(~12 min)</small>
+> An AVL insertion needs at most one single or double rotation; a deletion may need one at every level on the way up.
+
+<small>D. E. Knuth, The Art of Computer Programming, Volume 3, §6.2.3</small>
 
 --
 

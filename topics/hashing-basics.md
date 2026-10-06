@@ -10,7 +10,9 @@
 
 ### Hash tables and hash functions
 
-<small>(~24 min)</small>
+> In a room of 23 people, the chance that two share a birthday is just over 50%; with 70 people it is 99.9%.
+
+<small>The birthday problem; R. von Mises, 1939</small>
 
 --
 

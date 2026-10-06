@@ -10,7 +10,9 @@
 
 ### Graphs: vocabulary and counting
 
-<small>(~16 min)</small>
+> J. J. Sylvester coined the word “graph” in 1878, by analogy with the diagrams chemists drew of molecules.
+
+<small>J. J. Sylvester, “Chemistry and Algebra,” Nature 17, 1878</small>
 
 --
 

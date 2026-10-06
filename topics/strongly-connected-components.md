@@ -11,7 +11,9 @@
 
 ### Strongly connected components
 
-<small>(~20 min)</small>
+> S. Rao Kosaraju found the two-pass algorithm in 1978 but did not publish it; Micha Sharir published it independently in 1981.
+
+<small>M. Sharir, Computers & Mathematics with Applications 7, 1981</small>
 
 --
 

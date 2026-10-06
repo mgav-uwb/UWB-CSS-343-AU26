@@ -10,7 +10,9 @@
 
 ### Priority queues and the binary heap
 
-<small>(~30 min)</small>
+> Python's heapq module and C++'s std::priority_queue are both binary heaps stored in an array.
+
+<small>Python and C++ standard library documentation</small>
 
 --
 

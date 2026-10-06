@@ -11,7 +11,9 @@
 
 ### The order-of-growth classes
 
-<small>(~16 min)</small>
+> At one operation per nanosecond, 2<sup>100</sup> operations take about 4 × 10<sup>13</sup> years, about 2,900 times the age of the universe.
+
+<small>2<sup>100</sup> ns ≈ 1.3 × 10<sup>21</sup> s; age of the universe ≈ 13.8 billion years</small>
 
 --
 

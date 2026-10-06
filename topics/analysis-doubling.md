@@ -11,7 +11,9 @@
 
 ### Observe: the doubling experiment
 
-<small>(~24 min)</small>
+> Gordon Moore predicted in 1965 that the number of components on a chip would double every year; in 1975 he revised the period to two years.
+
+<small>G. E. Moore, “Cramming More Components onto Integrated Circuits,” Electronics 38(8), 1965</small>
 
 --
 

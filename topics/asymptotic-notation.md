@@ -21,7 +21,9 @@
 
 ### Asymptotic notation: O, Ω, Θ as sets
 
-<small>(~38 min)</small>
+> Paul Bachmann introduced the O notation in 1894; Donald Knuth proposed Ω and Θ with their present meanings in 1976.
+
+<small>D. E. Knuth, “Big Omicron and Big Omega and Big Theta,” SIGACT News, 1976</small>
 
 --
 

@@ -10,7 +10,9 @@
 
 ### Building a heap in linear time
 
-<small>(~26 min)</small>
+> Six months after Williams published heapsort, Robert Floyd built the heap bottom up, in linear time.
+
+<small>R. W. Floyd, “Algorithm 245: Treesort 3,” CACM 7(12), 1964</small>
 
 --
 

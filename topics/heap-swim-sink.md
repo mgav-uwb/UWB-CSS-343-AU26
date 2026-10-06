@@ -10,7 +10,9 @@
 
 ### Insert and delete-max: swim and sink
 
-<small>(~24 min)</small>
+> In an array heap the children of node k sit at 2k and 2k + 1, so the tree needs no pointers at all; Williams's 1964 heapsort already used this layout.
+
+<small>J. W. J. Williams, “Algorithm 232: Heapsort,” CACM 7(6), 1964</small>
 
 --
 

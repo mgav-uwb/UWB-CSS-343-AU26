@@ -17,8 +17,9 @@
   .page{max-width:820px;margin:28px auto;background:var(--bg);padding:48px clamp(20px,6vw,64px) 64px;
         box-shadow:0 1px 4px #0002;border-radius:4px}
   h1{font-size:27px;line-height:1.25;margin:0 0 4px}
-  .subtitle{color:var(--dim);font-size:15.5px;margin:0 0 4px}
-  .src{color:var(--dim);font-size:13.5px;font-style:italic;margin:0 0 26px;border-bottom:1px solid var(--line);padding-bottom:18px}
+  .epigraph{margin:6px 0 20px;padding:4px 0 4px 16px;border-left:3px solid #b9c0d0;color:#33363f;font-style:italic;font-size:17px}
+  .epigraph.fact{font-style:normal;font-size:16px}
+  .epigraph cite{display:block;font-style:normal;font-size:13.5px;color:#5c6270;margin-top:4px}
   h2{font-size:20px;margin:34px 0 10px;padding-top:6px}
   h3{font-size:16.5px;margin:22px 0 6px;color:#2a2d36}
   p{margin:10px 0}
@@ -56,10 +57,12 @@
 <div class="page">
 
   <h1>Finding Memory Leaks with Valgrind</h1>
-  <div class="subtitle">CSS 343 - Data Structures, Algorithms &amp; Discrete Mathematics II. Tooling handout. Practical guide.</div>
-  <div class="src">How to build for Valgrind, run it, and <strong>read its report</strong> - a clean run versus a real leak - with annotated transcripts. Every assignment that uses <code>new</code>/<code>delete</code> is graded leak-free with Valgrind. (Transcripts below are real output, captured on Ubuntu 24.04, g++ 13.3.0, Valgrind 3.22.)</div>
+  <blockquote class="epigraph fact">
+    Julian Seward released Valgrind in 2002. The name comes from Norse mythology: Valgrind is the main gate of Valhalla.
+    <cite>Valgrind FAQ</cite>
+  </blockquote>
 
-  <p class="lead">When you manage memory by hand, two questions decide your grade on the Memory criterion: <em>did every <code>new</code> get a matching <code>delete</code>?</em> and <em>did you ever touch memory you shouldn't?</em> Valgrind answers both. It runs your program on a simulated CPU, tracking every heap block and every access, and at exit tells you exactly <strong>how much leaked and where it was allocated</strong>.</p>
+  <p class="lead">When you manage memory by hand, two questions decide your grade on the Memory criterion: <em>did every <code>new</code> get a matching <code>delete</code>?</em> and <em>did you ever touch memory you shouldn't?</em> Valgrind answers both. It runs your program on a simulated CPU, tracking every heap block and every access, and at exit tells you exactly <strong>how much leaked and where it was allocated</strong>. (Transcripts below are real output, captured on Ubuntu 24.04, g++ 13.3.0, Valgrind 3.22.)</p>
 
   <div class="toc">
     <strong>Contents</strong>

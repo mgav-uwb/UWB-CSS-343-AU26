@@ -10,7 +10,9 @@
 
 ### Weighted graphs and shortest paths
 
-<small>(~22 min)</small>
+> Dijkstra first demonstrated his algorithm in 1956 on a map of 64 Dutch cities, so that each city fit in the ARMAC computer's 6-bit codes.
+
+<small>Interview with Philip Frana, CACM 53(8), 2010</small>
 
 --
 

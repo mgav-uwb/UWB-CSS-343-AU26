@@ -10,7 +10,9 @@
 
 ### Rotations
 
-<small>(~20 min)</small>
+> Rotations first appeared in the 1962 AVL paper. Every balanced BST since, including red-black trees, splay trees and treaps, restores its shape with the same two moves.
+
+<small>G. M. Adelson-Velsky and E. M. Landis, Doklady Akademii Nauk SSSR 146, 1962</small>
 
 --
 

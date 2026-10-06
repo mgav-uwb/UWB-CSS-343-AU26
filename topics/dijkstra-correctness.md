@@ -10,7 +10,9 @@
 
 ### Dijkstra: correctness and limits
 
-<small>(~20 min)</small>
+> OSPF, the main routing protocol inside large networks, has each router run Dijkstra's algorithm on the link costs it has learned.
+
+<small>RFC 2328, OSPF Version 2, 1998</small>
 
 --
 

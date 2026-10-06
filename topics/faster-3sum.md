@@ -12,7 +12,9 @@
 
 ### Designing a faster 3-sum
 
-<small>(~30 min)</small>
+> For decades 3-sum was conjectured to need about n² time. In 2014 Allan Grønlund and Seth Pettie showed that slightly less suffices.
+
+<small>A. Grønlund and S. Pettie, “Threesomes, Degenerates, and Love Triangles,” FOCS 2014</small>
 
 --
 

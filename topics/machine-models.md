@@ -24,7 +24,9 @@
 
 ### Machine models: when is a constant not constant?
 
-<small>(~20 min)</small>
+> "We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil."
+
+<small>Donald Knuth, Computing Surveys 6(4), 1974</small>
 
 --
 

@@ -10,7 +10,9 @@
 
 ### The greedy method
 
-<small>(~10 min)</small>
+> Jack Edmonds's 1971 paper “Matroids and the Greedy Algorithm” characterized exactly the structures on which the greedy method is always optimal.
+
+<small>J. Edmonds, Mathematical Programming 1, 1971</small>
 
 --
 

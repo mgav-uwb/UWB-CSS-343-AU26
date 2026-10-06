@@ -10,7 +10,9 @@
 
 ### The binary search tree: search and insert
 
-<small>(~18 min)</small>
+> Binary search trees were described independently around 1960 by P. F. Windley, by A. D. Booth and A. J. T. Colin, and by T. N. Hibbard.
+
+<small>D. E. Knuth, The Art of Computer Programming, Volume 3, §6.2.2</small>
 
 --
 

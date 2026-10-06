@@ -10,7 +10,9 @@
 
 ### Depth-first search
 
-<small>(~34 min)</small>
+> John Hopcroft and Robert Tarjan received the 1986 Turing Award “for fundamental achievements in the design and analysis of algorithms and data structures,” work built on depth-first search.
+
+<small>ACM Turing Award citation, 1986</small>
 
 --
 

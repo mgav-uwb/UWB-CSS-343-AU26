@@ -10,7 +10,9 @@
 
 ### The Θ(log n) guarantee
 
-<small>(~22 min)</small>
+> The sparsest AVL trees are Fibonacci trees, and their height never exceeds about 1.44 log₂ n.
+
+<small>D. E. Knuth, The Art of Computer Programming, Volume 3, §6.2.3</small>
 
 --
 

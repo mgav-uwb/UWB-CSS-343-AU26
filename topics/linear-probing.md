@@ -10,7 +10,9 @@
 
 ### Open addressing: linear probing
 
-<small>(~20 min)</small>
+> Donald Knuth's first analysis of an algorithm, written in 1962 and 1963, was of linear probing; he has said it shaped the rest of his career.
+
+<small>D. E. Knuth, “Notes on 'Open' Addressing,” 1963</small>
 
 --
 

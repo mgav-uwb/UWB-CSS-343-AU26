@@ -10,7 +10,9 @@
 
 ### Breadth-first search
 
-<small>(~32 min)</small>
+> Edward F. Moore published breadth-first search in 1959 to find the shortest path through a maze; C. Y. Lee found it independently in 1961 for routing wires.
+
+<small>E. F. Moore, 1959; C. Y. Lee, 1961</small>
 
 --
 

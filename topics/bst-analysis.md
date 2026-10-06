@@ -10,7 +10,9 @@
 
 ### How tall is a BST?
 
-<small>(~14 min)</small>
+> A BST built by random insertions has average depth about 2 ln n ≈ 1.39 log₂ n, only 39% more than a perfectly balanced tree.
+
+<small>D. E. Knuth, The Art of Computer Programming, Volume 3, §6.2.2</small>
 
 --
 

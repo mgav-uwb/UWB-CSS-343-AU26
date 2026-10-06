@@ -10,7 +10,9 @@
 
 ### Dijkstra's algorithm
 
-<small>(~32 min)</small>
+> Dijkstra published the algorithm in 1959 in a three-page paper that also gave the minimum spanning tree algorithm now credited to Prim.
+
+<small>E. W. Dijkstra, “A Note on Two Problems in Connexion with Graphs,” Numerische Mathematik 1, 1959</small>
 
 --
 

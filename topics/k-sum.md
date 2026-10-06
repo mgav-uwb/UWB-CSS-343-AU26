@@ -12,7 +12,9 @@ TOPIC · k-sum: from three nested loops to one recursive function.
 
 ### k-sum
 
-<small>(~25 min)</small>
+> Gajentaan and Overmars showed in 1995 that dozens of geometry problems, such as deciding whether any three points of a set lie on a line, are at least as hard as 3-sum.
+
+<small>A. Gajentaan and M. Overmars, Computational Geometry 5, 1995</small>
 
 --
 

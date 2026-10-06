@@ -10,7 +10,9 @@
 
 ### Balance and the AVL invariant
 
-<small>(~22 min)</small>
+> Georgy Adelson-Velsky, the A in AVL, was one of the developers of Kaissa, which won the first World Computer Chess Championship in 1974.
+
+<small>World Computer Chess Championship, Stockholm, 1974</small>
 
 --
 

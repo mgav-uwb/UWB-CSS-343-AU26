@@ -10,7 +10,9 @@
 
 ### Heapsort and priority queues in practice
 
-<small>(~20 min)</small>
+> Heapsort guarantees n log n in place, yet on modern machines it usually loses to quicksort: sink jumps across the array and misses the cache.
+
+<small>A. LaMarca and R. E. Ladner, “The Influence of Caches on the Performance of Sorting,” J. Algorithms 31, 1999</small>
 
 --
 

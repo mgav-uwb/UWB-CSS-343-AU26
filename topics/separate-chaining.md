@@ -10,7 +10,9 @@
 
 ### Separate chaining
 
-<small>(~16 min)</small>
+> Java's HashMap uses separate chaining and, since Java 8, turns any chain longer than eight entries into a red-black tree.
+
+<small>JEP 180, “Handle Frequent HashMap Collisions with Balanced Trees,” 2014</small>
 
 --
 

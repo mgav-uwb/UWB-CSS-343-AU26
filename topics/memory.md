@@ -17,7 +17,9 @@
 
 ### Memory: how many bytes?
 
-<small>(~31 min)</small>
+> The Apollo Guidance Computer had 2,048 words of erasable memory and 36,864 words of fixed memory, woven by hand as core rope.
+
+<small>E. C. Hall, Journey to the Moon, 1996</small>
 
 --
 

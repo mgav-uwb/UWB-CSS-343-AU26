@@ -12,7 +12,9 @@ TOPIC · Recursion.
 
 ### Recursion
 
-<small>(~28 min)</small>
+> ALGOL 60 was among the first languages to allow recursive procedures; Dijkstra showed the same year how a stack implements them.
+
+<small>E. W. Dijkstra, “Recursive Programming,” Numerische Mathematik 2, 1960</small>
 
 --
 

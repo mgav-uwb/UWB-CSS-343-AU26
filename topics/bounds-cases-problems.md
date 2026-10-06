@@ -17,7 +17,9 @@
 
 ### Bounds, cases, and problems
 
-<small>(~16 min)</small>
+> David Musser's introsort (1997) keeps quicksort's average case and caps its worst case at Θ(n log n) by switching to heapsort when the recursion gets too deep; most C++ libraries implement std::sort this way.
+
+<small>D. R. Musser, “Introspective Sorting and Selection Algorithms,” Software: Practice and Experience 27(8), 1997</small>
 
 --
 

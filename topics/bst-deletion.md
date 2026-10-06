@@ -10,7 +10,9 @@
 
 ### Deletion
 
-<small>(~12 min)</small>
+> Jeffrey Eppinger's 1983 experiments showed that long runs of random insertions and Hibbard deletions leave a BST less balanced than insertions alone.
+
+<small>J. L. Eppinger, “An Empirical Study of Insertion and Deletion in Binary Search Trees,” CACM 26(9), 1983</small>
 
 --
 

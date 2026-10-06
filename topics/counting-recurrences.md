@@ -11,7 +11,9 @@ TOPIC · Counting what a recursive function does.
 
 ### Counting recursion
 
-<small>(~11 min)</small>
+> Édouard Lucas published the Tower of Hanoi in 1883 with a legend of 64 golden disks; moving them all takes 2<sup>64</sup> − 1 moves.
+
+<small>É. Lucas (as N. Claus de Siam), La Tour d'Hanoï, 1883</small>
 
 --
 

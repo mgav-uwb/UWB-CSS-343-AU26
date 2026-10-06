@@ -11,7 +11,9 @@ TOPIC · Counting how often a loop body runs.
 
 ### Counting loops
 
-<small>(~11 min)</small>
+> Knuth's The Art of Computer Programming analyzes each program by writing beside every instruction the number of times it executes.
+
+<small>D. E. Knuth, The Art of Computer Programming, Volume 1, 1968</small>
 
 --
 

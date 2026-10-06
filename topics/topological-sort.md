@@ -10,7 +10,9 @@
 
 ### Topological sort
 
-<small>(~38 min)</small>
+> Stuart Feldman wrote make at Bell Labs in 1976. It rebuilds files in a topological order of their dependency graph.
+
+<small>S. I. Feldman, “Make: A Program for Maintaining Computer Programs,” Software: Practice and Experience 9, 1979</small>
 
 --
 

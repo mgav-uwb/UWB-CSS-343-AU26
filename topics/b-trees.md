@@ -10,7 +10,9 @@
 
 ### B-trees and B+ trees
 
-<small>(~24 min)</small>
+> SQLite keeps every table and every index of a database as a B-tree in one file, in pages of 4,096 bytes by default.
+
+<small>SQLite, Database File Format documentation</small>
 
 --
 

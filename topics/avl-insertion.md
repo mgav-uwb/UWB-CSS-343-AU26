@@ -10,7 +10,9 @@
 
 ### AVL insertion
 
-<small>(~24 min)</small>
+> Insert the keys 1, 2, …, 2<sup>k</sup> − 1 in order and a plain BST becomes a path; an AVL tree becomes a perfectly balanced tree.
+
+<small>Checked for k = 1 to 11 with the course's AVL code</small>
 
 --
 
