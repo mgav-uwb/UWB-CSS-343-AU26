@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,20 +121,10 @@
       </p>
 
       <h1>LZW Compression</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Algorithm.
-      </div>
-      <div class="src">
-        Dictionary coding: compress by naming repeated <em>substrings</em>
-        rather than by shortening individual symbols. The Lempel-Ziv-Welch
-        encoder and decoder in full, with a character-by-character trace of
-        an encode, the matching decode of that same code stream, and the
-        case in which the decoder receives a code it has not yet learned,
-        derived and worked step by step. The trie that makes the encoder run
-        in linear time, the phrase-count bound that explains what LZW can
-        and cannot compress, code width and dictionary resets in practice,
-        and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        LZW became the compression inside GIF images in 1987. Unisys began enforcing its patent on LZW in 1994, which led to the PNG format; the United States patent expired in 2003.
+        <cite>T. A. Welch, “A Technique for High-Performance Data Compression,” IEEE Computer 17(6), 1984</cite>
+      </blockquote>
 
       <p class="lead">
         <a href="../greedy/algo-huffman-coding.html"><em>Huffman

@@ -9,6 +9,10 @@
 
 **Lecture 8: Hashing**
 
+> Hans Peter Luhn proposed hashing with chaining in an internal IBM memorandum in January 1953.
+
+<small>D. E. Knuth, The Art of Computer Programming, Volume 3, §6.4</small>
+
 <small>Autumn 2026 · MW 1:15–3:15 · UW2-305 · Dr. Marcel Gavriliu</small>
 
 ---

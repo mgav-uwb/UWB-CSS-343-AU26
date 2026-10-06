@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,22 +121,10 @@
       </p>
 
       <h1>Counting Loop Iterations</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Foundation.
-      </div>
-      <div class="src">
-        How to find, exactly, how many times a statement inside loops runs, as a
-        function of the input size: the trip count of a single loop and its
-        off-by-one traps, loops in sequence and loops nested, inner loops whose
-        bounds depend on the outer index, loops that halve or double, and loops
-        whose count depends on the data. It ends with a five-step method and
-        exercises with solutions. What to do with a count once you have it (which
-        terms matter, and how counts compare) is the subject of
-        <a href="foundation-time-analysis.html">Analysis of Algorithms: Time</a>;
-        counting the calls of a recursive function is in
-        <a href="foundation-recursion.html#recur">Recursion &amp; Induction,
-        section 6</a>.
-      </div>
+      <blockquote class="epigraph fact">
+        In The Art of Computer Programming, Donald Knuth analyzes each program by writing beside every instruction the number of times it executes, then adding the counts.
+        <cite>D. E. Knuth, The Art of Computer Programming, Volume 1, 1968</cite>
+      </blockquote>
 
       <p class="lead">
         Every cost in this book starts as a count: how many comparisons a search
@@ -148,6 +134,11 @@
         \(n\) that is exactly right for every \(n\), and it can be checked by
         putting a counter in the loop and running it. This chapter teaches the few
         patterns that cover nearly every loop in the course.
+        What to do with a count once you have it is the subject of
+        <a href="foundation-time-analysis.html">Analysis of Algorithms: Time</a>;
+        counting the calls of a recursive function is in
+        <a href="foundation-recursion.html#recur">Recursion &amp; Induction,
+        section 6</a>.
       </p>
 
       <div class="toc">

@@ -47,11 +47,9 @@
         border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic;
-        margin: 0 0 26px; border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -149,20 +147,10 @@
       </p>
 
       <h1>Bloom Filters</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Data structure.
-      </div>
-      <div class="src">
-        Set membership in a few bits per key: the one-sided error contract
-        (false positives allowed, false negatives never), the bit array with
-        \(k\) hash functions, insert and query traced bit by bit on a 16-slot
-        filter (a true positive, a true negative, and a false positive built
-        from other keys&rsquo; bits), why deletion is impossible and how
-        counting filters restore it, the false-positive probability
-        \((1-e^{-kn/m})^k\) derived and tabulated, the optimal number of hash
-        functions, and where the space-for-certainty trade pays. With worked
-        examples, proofs, and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Burton Bloom’s 1970 paper motivated the filter with hyphenation: most words follow simple rules, and a compact filter in memory flags the few exceptions that need a lookup on disk.
+        <cite>B. H. Bloom, “Space/Time Trade-offs in Hash Coding with Allowable Errors,” CACM 13(7), 1970</cite>
+      </blockquote>
 
       <p class="lead">
         A hash table answers &ldquo;is key \(x\) in the set?&rdquo; exactly,

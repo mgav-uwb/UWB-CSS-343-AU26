@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -119,21 +117,10 @@
       </p>
 
       <h1>Skip Lists</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Data structure.
-      </div>
-      <div class="src">
-        A skip list is a sorted linked list with express lanes: each node gets a
-        random tower height by coin flips, and each level links the tall-enough
-        nodes in order. Search moves right along a level while the next key is
-        too small and drops a level otherwise; insert splices one new tower into
-        the levels its height reaches; delete unlinks one tower. Expected search,
-        insert, and delete cost is \(O(\log n)\), with the randomness in the
-        structure rather than the input, so no key sequence is bad. With a fixed
-        worked example carried through every operation, complete code, the
-        expected-cost argument, a comparison with the balanced search trees, and
-        exercises.
-      </div>
+      <blockquote class="epigraph">
+        &ldquo;Skip lists use probabilistic balancing rather than strictly enforced balancing and as a result the algorithms for insertion and deletion in skip lists are much simpler and significantly faster than equivalent algorithms for balanced trees.&rdquo;
+        <cite>William Pugh, “Skip Lists: A Probabilistic Alternative to Balanced Trees,” CACM 33(6), 1990</cite>
+      </blockquote>
 
       <div class="toc">
         <strong>Contents</strong>

@@ -9,6 +9,10 @@
 
 **Lecture 6: Balanced Trees II: 2-3, Red-Black, B and B+ Trees**
 
+> Bayer and McCreight invented B-trees at Boeing in 1970 and never said what the B stands for.
+
+<small>D. Comer, “The Ubiquitous B-Tree,” Computing Surveys 11(2), 1979</small>
+
 <small>Autumn 2026 · MW 1:15–3:15 · UW2-305 · Dr. Marcel Gavriliu</small>
 
 ---

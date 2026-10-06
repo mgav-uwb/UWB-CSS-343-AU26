@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -116,20 +114,10 @@
       </p>
 
       <h1>Treaps</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Data structure.
-      </div>
-      <div class="src">
-        A treap stores in each node a key and a randomly chosen priority, and
-        keeps binary-search-tree order on the keys and max-heap order on the
-        priorities at the same time. Those two constraints pin down exactly one
-        tree shape, and that shape is distributed like a binary search tree
-        built in random insertion order, so search, insert, and delete run in
-        expected \(\Theta(\log n)\) time with no balance bookkeeping at all.
-        With the uniqueness proof, insertion and deletion traced rotation by
-        rotation, the expected-depth argument, split and merge in one pass
-        each, a comparison with the worst-case balanced trees, and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Raimund Seidel and Cecilia Aragon introduced treaps in 1989; the name blends tree and heap. The underlying shape, the Cartesian tree, is Jean Vuillemin’s from 1980.
+        <cite>R. Seidel and C. R. Aragon, “Randomized Search Trees,” FOCS 1989</cite>
+      </blockquote>
 
       <div class="toc">
         <strong>Contents</strong>

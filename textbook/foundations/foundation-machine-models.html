@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,21 +121,10 @@
       </p>
 
       <h1>Algorithms on Real Machines</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Foundation.
-      </div>
-      <div class="src">
-        What the machine does to an asymptotic bound: every bound is a statement
-        about a cost model; costs that stay within constant limits leave the order
-        of growth unchanged however large the constants are; a memory hierarchy
-        makes the cost of one access a step function of the working set, which a
-        doubling experiment sees as a knee; the exponent changes only when the cost
-        of a basic step grows with the input; pipelines, superscalar execution and
-        branch prediction change constant factors; and what it means for a
-        programmer to optimize a program. Builds on the
-        <a href="foundation-computer-systems.html">Computer Systems Primer</a> and
-        <a href="foundation-asymptotic-notation.html">Asymptotic Notation</a>.
-      </div>
+      <blockquote class="epigraph">
+        &ldquo;We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil.&rdquo;
+        <cite>Donald Knuth, “Structured Programming with go to Statements,” Computing Surveys 6(4), 1974</cite>
+      </blockquote>
 
       <p class="lead">
         An analysis that says an algorithm runs in \(\Theta(N^2)\) time counts

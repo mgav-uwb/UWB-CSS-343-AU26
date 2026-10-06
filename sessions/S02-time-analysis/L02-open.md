@@ -10,6 +10,10 @@
 
 **Lecture 2: Analysis of Algorithms, Time**
 
+> "Whenever any result is sought by its aid, the question will then arise: By what course of calculation can these results be arrived at by the machine in the shortest time?"
+
+<small>Charles Babbage, Passages from the Life of a Philosopher, 1864</small>
+
 <small>Autumn 2026 · MW 1:15–3:15 · UW2-305 · Dr. Marcel Gavriliu</small>
 
 ---

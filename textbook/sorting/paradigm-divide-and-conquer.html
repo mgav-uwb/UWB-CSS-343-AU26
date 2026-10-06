@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,19 +121,10 @@
       </p>
 
       <h1>Divide-and-Conquer</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Design paradigm.
-      </div>
-      <div class="src">
-        Divide-and-conquer as a design paradigm: split a problem into
-        subproblems, solve them recursively, and combine the answers. The cost
-        obeys a recurrence \(T(n) = a\,T(n/b) + f(n)\), and the master theorem
-        reads the recurrence&rsquo;s solution at a glance. With every case worked
-        in full, a numeric level-by-level table for each, the recursion-tree
-        argument behind the theorem&rsquo;s three cases, a recurrence the theorem
-        cannot classify and the substitution proof that settles it, a link to the
-        level-sum demo, and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        In 1960 Andrey Kolmogorov conjectured that multiplying two n-digit numbers takes on the order of n² operations. Within a week, Anatoly Karatsuba, a student in his seminar, found a divide-and-conquer method using about n<sup>1.585</sup>.
+        <cite>A. A. Karatsuba, “The Complexity of Computations,” Proc. Steklov Institute of Mathematics 211, 1995</cite>
+      </blockquote>
 
       <p class="lead">
         You sorted in CSS 342; the frame here is

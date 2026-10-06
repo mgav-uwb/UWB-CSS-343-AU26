@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,19 +121,10 @@
       </p>
 
       <h1>The Sorting Lower Bound</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Foundation.
-      </div>
-      <div class="src">
-        The decision-tree argument that any algorithm sorting \(n\) keys by
-        comparisons alone makes \(\Omega(n\log n)\) comparisons in the worst
-        case: \(n!\) orderings need \(n!\) leaves, and a binary tree that
-        tall has height \(\log_2(n!) = \Theta(n\log n)\). Includes the tree
-        drawn in full for \(n = 3\) with every ordering walked to its leaf, the
-        two-sided bound on \(\log_2(n!)\) without Stirling, and the
-        non-comparison sorts (counting, radix) the bound does not cover.
-        With exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Sorting five keys needs at least ⌈log₂ 120⌉ = 7 comparisons, and seven are enough. For twelve keys the bound is 29, but the true minimum is 30.
+        <cite>D. E. Knuth, The Art of Computer Programming, Volume 3, §5.3.1</cite>
+      </blockquote>
 
       <p class="lead">
         Sorting has a provable difficulty floor: any algorithm that orders

@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -122,23 +120,10 @@
       </p>
 
       <h1>The Greedy Method</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Design paradigm.
-      </div>
-      <div class="src">
-        The greedy method in general: what it is (make the locally best choice
-        and never reconsider), the change-making pair that shows the same rule
-        succeeding and failing, the two properties that license it
-        (greedy-choice and optimal substructure), the exchange argument that
-        proves them, the classic failure cases, and where greedy sits among the
-        design paradigms. The course&rsquo;s specific greedy algorithms live in
-        their own handouts:
-        <a href="../graphs/algo-dijkstra.html">Dijkstra&rsquo;s Algorithm</a>,
-        <a href="../graphs/algo-prim.html">Prim&rsquo;s Algorithm</a>,
-        <a href="../graphs/algo-kruskal.html">Kruskal&rsquo;s Algorithm</a>,
-        <a href="algo-interval-scheduling.html">Interval Scheduling</a>, and
-        <a href="algo-huffman-coding.html">Huffman Coding</a>.
-      </div>
+      <blockquote class="epigraph fact">
+        Jack Edmonds’s 1971 paper “Matroids and the Greedy Algorithm” characterized exactly the structures on which the greedy method is always optimal.
+        <cite>J. Edmonds, Mathematical Programming 1, 1971</cite>
+      </blockquote>
 
       <p class="lead">
         Three of this course&rsquo;s algorithms (Dijkstra, Prim, and

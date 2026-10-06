@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,18 +121,10 @@
       </p>
 
       <h1>Tries &amp; Ternary Search Trees</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Data structure.
-      </div>
-      <div class="src">
-        Keys with exploitable structure: when keys are strings, a trie stores
-        them along paths of characters, so search and insert cost the key
-        <em>length</em> (independent of how many keys are stored) and prefix
-        queries (autocomplete, longest-prefix match) come free. R-way tries,
-        their space cost, and the two fixes (compressed tries and ternary
-        search tries). With worked traces, full implementations, links to the
-        demos, and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Edward Fredkin coined “trie” in 1960 from the middle of “retrieval.” He pronounced it like “tree”; most people now say “try” to tell the two apart.
+        <cite>E. Fredkin, “Trie Memory,” CACM 3(9), 1960</cite>
+      </blockquote>
 
       <p class="lead">
         Every symbol table so far has treated its keys as opaque: a binary

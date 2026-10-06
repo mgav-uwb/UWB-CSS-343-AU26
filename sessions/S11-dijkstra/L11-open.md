@@ -9,6 +9,10 @@
 
 **Lecture 11: Graphs III: Dijkstra Shortest Paths**
 
+> "It is the algorithm for the shortest path, which I designed in about twenty minutes."
+
+<small>Edsger Dijkstra, interview with Philip Frana, CACM 53(8), 2010</small>
+
 <small>Autumn 2026 · MW 1:15–3:15 · UW2-305 · Dr. Marcel Gavriliu</small>
 
 ---

@@ -47,11 +47,9 @@
         border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic;
-        margin: 0 0 26px; border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -149,24 +147,10 @@
       </p>
 
       <h1>Count-Min Sketch</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Data structure.
-      </div>
-      <div class="src">
-        Frequency estimation for streams in space that does not grow with the
-        number of distinct items: the \(d \times w\) counter matrix with one
-        pairwise-independent hash function per row, update as \(d\)
-        increments, estimate as the minimum over the \(d\) rows, a full trace
-        of twelve updates on a \(3 \times 8\) sketch with stated hash
-        functions (heavy hitter estimated exactly, a rare item overestimated
-        by collisions, a phantom count for an item never seen), the
-        never-underestimates guarantee proved, the \((\varepsilon, \delta)\)
-        error bound proved from Markov&rsquo;s inequality with the sizing
-        \(w = \lceil e/\varepsilon \rceil\) and
-        \(d = \lceil \ln(1/\delta) \rceil\), the heavy-hitters application,
-        and the comparison with Bloom filters and hash tables. With worked
-        examples, proofs, and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Graham Cormode and S. Muthukrishnan introduced the count-min sketch in 2004. Its table size depends on the accuracy wanted, not on the length of the stream.
+        <cite>G. Cormode and S. Muthukrishnan, “An Improved Data Stream Summary: The Count-Min Sketch and its Applications,” J. Algorithms 55, 2005</cite>
+      </blockquote>
 
       <p class="lead">
         A router sees ten million packets a minute and someone asks which

@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -125,22 +123,10 @@
       </p>
 
       <h1>Context-Free Grammars &amp; Parsing</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Foundation.
-      </div>
-      <div class="src">
-        Grammars as generators of languages: terminals, nonterminals,
-        productions, start symbol. Leftmost and rightmost derivations and the
-        parse tree they share, worked on one arithmetic-expression grammar.
-        Ambiguity exhibited as two parse trees for a single string and removed
-        by stratifying the grammar by precedence. A proof that the regular
-        languages are a <em>strict</em> subset of the context-free languages,
-        with \(\texttt{a}^n\texttt{b}^n\) as the separating example and the
-        pumping-lemma argument given in full. Pushdown automata in an aside.
-        Two parsers implemented and traced: recursive descent (linear, top-down)
-        and the CYK dynamic-programming parser (cubic, any grammar), with a
-        verified parse trace and a filled CYK table. With exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        John Backus described the syntax of ALGOL 58 with a grammar notation in 1959. Peter Naur used it in the ALGOL 60 report, and it became Backus–Naur form.
+        <cite>J. W. Backus, ICIP Paris, 1959; P. Naur (ed.), Report on the Algorithmic Language ALGOL 60, 1960</cite>
+      </blockquote>
 
       <p class="lead">
         <a href="algo-regex-automata.html"><em>Regular Expressions &amp;

@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,20 +121,10 @@
       </p>
 
       <h1>The Floyd&ndash;Warshall Algorithm</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
-      </div>
-      <div class="src">
-        All-pairs shortest paths by dynamic programming. The subproblem is
-        derived rather than handed down: restricting which vertices a path may
-        pass <em>through</em> turns a min over \(V\) choices into a min over two,
-        and the whole algorithm into a triple loop. A matrix-by-matrix trace on a
-        four-vertex digraph, path reconstruction from the <code>next</code>
-        matrix, why negative edges are fine and how negative cycles announce
-        themselves on the diagonal, the \(\Theta(V^3)\) time and
-        \(\Theta(V^2)\) space accounting, and when \(V\) runs of Dijkstra beat
-        it. With exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Robert Floyd’s “Algorithm 97: Shortest Path” (1962) is a few lines of ALGOL. Stephen Warshall published the same triple loop for transitive closure that year, and Bernard Roy in 1959.
+        <cite>R. W. Floyd, CACM 5(6), 1962; S. Warshall, JACM 9, 1962</cite>
+      </blockquote>
 
       <p class="lead">
         The <a href="algo-dijkstra.html">Dijkstra handout</a> solves

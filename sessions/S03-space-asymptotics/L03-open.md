@@ -9,6 +9,10 @@
 
 **Lecture 3: Memory and Asymptotic Notation**
 
+> Grace Hopper handed out pieces of wire 11.8 inches long, the distance light travels in a nanosecond, to show why memory far from the processor costs time.
+
+<small>Grace Hopper, showing a nanosecond on Late Night with David Letterman, 1986</small>
+
 <small>Autumn 2026 · MW 1:15–3:15 · UW2-305 · Dr. Marcel Gavriliu</small>
 
 ---

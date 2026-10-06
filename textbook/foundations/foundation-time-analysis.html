@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -122,22 +120,10 @@
       </p>
 
       <h1>Analysis of Algorithms: Time</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Foundation.
-      </div>
-      <div class="src">
-        How long does a program take, and how do we answer scientifically rather
-        than by guessing? We fix a <em>cost model</em> and a <em>basic operation</em>,
-        count how often it runs, and read off the <em>order of growth</em>:
-        the function of \(n\) the cost is proportional to. Two independent routes
-        reach it: a <em>doubling experiment</em> that measures the exponent from
-        running-time ratios, and a <em>counting</em> argument that derives the same
-        exponent from the code. Tilde notation keeps the leading term and discards
-        the rest. The 3-SUM problem runs throughout, first as a \(\Theta(n^3)\)
-        triple loop and then, once analysis tells us where the waste is, as a
-        \(\Theta(n^2)\) sort-and-scan. With worked traces, verified numbers, code in
-        four languages, and exercises.
-      </div>
+      <blockquote class="epigraph">
+        &ldquo;As soon as an Analytical Engine exists, it will necessarily guide the future course of the science. Whenever any result is sought by its aid, the question will then arise: By what course of calculation can these results be arrived at by the machine in the shortest time?&rdquo;
+        <cite>Charles Babbage, Passages from the Life of a Philosopher, 1864</cite>
+      </blockquote>
 
       <p class="lead">
         Every choice this course makes (which tree, which sort, which graph

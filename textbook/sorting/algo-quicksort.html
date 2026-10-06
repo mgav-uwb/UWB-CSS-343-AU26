@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,20 +121,10 @@
       </p>
 
       <h1>Quicksort</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Algorithm (divide-and-conquer).
-      </div>
-      <div class="src">
-        Quicksort: partition the array around a pivot so the pivot lands in its
-        final position, then recurse on each side, in place, with no merge
-        buffer. The Lomuto and Hoare partition schemes with worked traces and
-        measured swap counts, the honest average-case argument
-        (\(\approx 1.39\,n\log_2 n\) comparisons), the recursion unrolled level
-        by level, the two degenerate pivots behind the quadratic worst case and
-        the pivot choices that defeat it, the \(\Theta(\log n)\) expected stack
-        depth, 3-way partitioning for duplicates, and how library sorts choose
-        in practice. With demos and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Tony Hoare invented quicksort in 1959, as a visiting student in Moscow, to sort the words of sentences for a machine translation project.
+        <cite>C. A. R. Hoare, “Quicksort,” The Computer Journal 5(1), 1962</cite>
+      </blockquote>
 
       <p class="lead">
         Quicksort sorts in place by divide-and-conquer with the work in the

@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -122,22 +120,10 @@
       </p>
 
       <h1>Trees &amp; Binary Search Trees</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Data structure.
-      </div>
-      <div class="src">
-        The first real data structure of the term. Tree vocabulary
-        (root, leaf, depth, height, subtree) and the recursive definition that
-        drives every algorithm here; binary trees, their shapes, and their
-        traversals, with expression trees as a first payoff; then the
-        <strong>binary search tree</strong> as an <em>ordered symbol table</em>:
-        search, insert, the order-based operations (min/max, floor/ceiling,
-        rank/select, range), and Hibbard deletion, ending in the one
-        analysis that governs them all: every operation costs
-        \(\Theta(\text{height})\), a random tree is shallow
-        (\(\sim 1.39\log_2 n\)) but a sorted insert is a \(\Theta(n)\) path. With
-        worked traces, proofs, links to the interactive demo, and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Thomas Hibbard’s 1962 paper analyzed binary search trees built from random insertions and gave the deletion method that still carries his name.
+        <cite>T. N. Hibbard, “Some Combinatorial Properties of Certain Trees With Applications to Searching and Sorting,” JACM 9, 1962</cite>
+      </blockquote>
 
       <p class="lead">
         The <a href="../foundations/foundation-time-analysis.html"><em>Analysis of

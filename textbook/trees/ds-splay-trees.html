@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -127,24 +125,10 @@
       </p>
 
       <h1>Splay Trees</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Data structure.
-      </div>
-      <div class="src">
-        A splay tree is a binary search tree that stores no balance
-        information at all and rebalances itself as a side effect of being
-        used: every access rotates the touched node to the root by a specific
-        sequence of double rotations. The three step cases (zig, zig-zig,
-        zig-zag) are given individually with before/after trees, then combined
-        in a fully unrolled splay of a node at depth 5. Search, insert and
-        delete are each one or two splays plus \(O(1)\) pointer work. The cost
-        argument is amortized: the sum-of-log-subtree-sizes potential gives
-        \(3\log_2 n + 1\) amortized per operation, while a single operation can
-        still cost \(\Theta(n)\). Closes with the working-set and scanning
-        behavior that makes splay trees act like a self-tuning cache, a
-        comparison against AVL and red-black trees, and exercises with
-        solutions.
-      </div>
+      <blockquote class="epigraph fact">
+        Daniel Sleator and Robert Tarjan conjectured in 1985 that splay trees are, up to a constant factor, as fast as any binary search tree on every sequence of accesses. The dynamic optimality conjecture is still open.
+        <cite>D. D. Sleator and R. E. Tarjan, “Self-Adjusting Binary Search Trees,” JACM 32(3), 1985</cite>
+      </blockquote>
 
       <div class="toc">
         <strong>Contents</strong>

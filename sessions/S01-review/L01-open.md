@@ -10,6 +10,10 @@
 
 **Lecture 1: Review of C++, Recursion, and Counting**
 
+> "Beware of bugs in the above code; I have only proved it correct, not tried it."
+
+<small>Donald Knuth, note to Peter van Emde Boas, 1977</small>
+
 <small>Autumn 2026 · MW 1:15–3:15 · Dr. Marcel Gavriliu</small>
 
 ---

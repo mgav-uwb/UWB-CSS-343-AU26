@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -122,24 +120,10 @@
       </p>
 
       <h1>P, NP &amp; Reductions</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Foundation.
-      </div>
-      <div class="src">
-        The vocabulary for saying that a problem is hard rather than that an
-        algorithm is slow. Decision problems and input encodings; the class P;
-        the class NP defined by verifiers, with a Hamiltonian-cycle certificate
-        checked step by step on a concrete graph; the containments
-        \(\mathrm{P} \subseteq \mathrm{NP} \subseteq \mathrm{EXP}\) proved;
-        polynomial-time reductions, their closure and transitivity properties,
-        and the direction rule that decides which way a reduction must run; the
-        Independent Set / Vertex Cover reduction worked in both directions on a
-        seven-vertex graph; NP-hardness, NP-completeness and the Cook&ndash;Levin
-        theorem; what an NP-completeness proof licenses in practice, worked
-        through the 2-approximation for Vertex Cover, its
-        \(O(2^k)\) branching search, and the pseudo-polynomial knapsack table.
-        With exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Stephen Cook proved in 1971 that satisfiability is NP-complete. A year later Richard Karp showed that 21 other problems, among them the knapsack problem and the traveling salesman problem, are NP-complete too.
+        <cite>S. A. Cook, “The Complexity of Theorem-Proving Procedures,” STOC 1971; R. M. Karp, “Reducibility Among Combinatorial Problems,” 1972</cite>
+      </blockquote>
 
       <p class="lead">
         Most of this catalog answers the question &ldquo;how fast is this

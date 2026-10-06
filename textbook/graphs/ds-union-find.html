@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,18 +121,10 @@
       </p>
 
       <h1>Union-Find</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Data structure.
-      </div>
-      <div class="src">
-        A tiny structure, two integer arrays, that answers &ldquo;are these two
-        things connected?&rdquo; under a stream of merges. Quick-find and
-        quick-union set up the trade; weighting bounds every tree&rsquo;s height by
-        \(\log_2 N\) through a doubling argument; path compression drives the
-        amortized cost down to the inverse Ackermann function, near-constant for
-        every practical purpose. With code in four languages, the demo, and
-        exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Robert Tarjan proved in 1975 that union by rank with path compression costs, per operation, time proportional to the inverse Ackermann function, which is at most 4 for any input that could ever be stored.
+        <cite>R. E. Tarjan, “Efficiency of a Good But Not Linear Set Union Algorithm,” JACM 22(2), 1975</cite>
+      </blockquote>
 
       <p class="lead">
         <strong>Union-find</strong> is a structure so small it is two integer

@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -120,17 +118,10 @@
       </p>
 
       <h1>Topological Sort</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Algorithm.
-      </div>
-      <div class="src">
-        Ordering the vertices of a digraph so that every edge points forward.
-        Directed acyclic graphs, when a topological order exists (exactly when
-        the graph is acyclic), and two algorithms that construct one:
-        Kahn&rsquo;s algorithm and DFS reverse post-order, both proved correct
-        in \(\Theta(V+E)\), each doubling as a cycle detector. With
-        machine-generated traces, links to the interactive demo, and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Arthur Kahn published the first topological-sort algorithm in 1962, to order the activities of large project-scheduling (PERT) networks.
+        <cite>A. B. Kahn, “Topological Sorting of Large Networks,” CACM 5(11), 1962</cite>
+      </blockquote>
 
       <p class="lead">
         Digraph vocabulary and the adjacency-list representation are in

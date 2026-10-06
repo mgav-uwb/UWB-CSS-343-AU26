@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h2.part { font-size: 23px; margin: 48px 0 8px; padding-top: 22px; border-top: 2px solid var(--line); }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
@@ -127,19 +125,10 @@
         not render the math or reach the demos.
       </p>
       <h1>Longest Common Subsequence</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Algorithm (dynamic programming).
-      </div>
-      <div class="src">
-        The longest common subsequence (LCS): subsequence versus substring, the
-        prefix-pair recurrence and why it is correct, the worked
-        \(\Theta(mn)\) table for <code>AGCAT</code>/<code>GAC</code>, the
-        traceback that spells the subsequence, complete code, the sanity
-        invariants that catch off-by-one bugs, and where the same table runs in
-        practice (<code>diff</code>, merge tools, sequence alignment). The
-        method itself is the <a href="paradigm-dp-method.html">Dynamic Programming
-        Method</a> handout. With demos and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        The Unix diff program, written by James Hunt and Douglas McIlroy in 1976, compares two files by finding a longest common subsequence of their lines.
+        <cite>J. W. Hunt and M. D. McIlroy, “An Algorithm for Differential File Comparison,” Bell Labs CSTR 41, 1976</cite>
+      </blockquote>
 
       <p class="lead">
         Dynamic programming solves a problem by trying every choice and caching

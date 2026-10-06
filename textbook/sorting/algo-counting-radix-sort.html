@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -119,20 +117,10 @@
       </p>
 
       <h1>Counting Sort &amp; Radix Sort</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Algorithm.
-      </div>
-      <div class="src">
-        Sorting without comparisons: key-indexed counting sorts \(n\) keys
-        drawn from \(\{0,\dots,R-1\}\) in \(\Theta(n+R)\), stably, by using
-        each key as an array index. Least-significant-digit (LSD) radix sort
-        chains \(d\) counting passes to sort \(d\)-digit keys in
-        \(\Theta(d(n+R))\); stability is what makes the chaining correct.
-        With the counting pass fully unrolled, a digit-by-digit radix trace,
-        a counterexample showing an unstable pass breaking the sort, the
-        most-significant-digit (MSD) variant sketched, the radix-\(R\)
-        tradeoff, a bucket-sort aside, and exercises.
-      </div>
+      <blockquote class="epigraph fact">
+        Radix sort is older than electronic computers: punched-card sorting machines, descended from Herman Hollerith’s 1890 census equipment, sorted a deck one digit column at a time, least significant first.
+        <cite>D. E. Knuth, The Art of Computer Programming, Volume 3, §5.2.5</cite>
+      </blockquote>
 
       <p class="lead">
         The <a href="foundation-sorting-lower-bound.html">sorting lower

@@ -9,6 +9,10 @@
 
 **Lecture 10: Graphs II: DFS Applications, Topological Sort**
 
+> Trémaux described depth-first search for escaping mazes in the 1800s; in 1973 Hopcroft and Tarjan built linear-time graph algorithms on it.
+
+<small>É. Lucas, Récréations mathématiques, 1882; Hopcroft and Tarjan, CACM, 1973</small>
+
 <small>Autumn 2026 · MW 1:15–3:15 · UW2-305 · Dr. Marcel Gavriliu</small>
 
 ---

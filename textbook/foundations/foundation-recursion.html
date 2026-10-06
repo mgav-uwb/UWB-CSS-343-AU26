@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -122,19 +120,10 @@
       </p>
 
       <h1>Recursion &amp; Induction</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Foundation.
-      </div>
-      <div class="src">
-        The reference for the recursive reasoning the rest of the course text
-        assumes. Base case and recursive case; the call stack traced frame by
-        frame; structural recursion as the pattern behind every tree algorithm;
-        mathematical induction and strong induction, each stated and used in full
-        proofs of program correctness; converting a recursion to a loop with an
-        explicit stack; tail recursion; the four ways recursion goes wrong
-        (missing base case, non-decreasing argument, exponential recomputation,
-        stack overflow); and solving simple recurrences by unrolling.
-      </div>
+      <blockquote class="epigraph fact">
+        ALGOL 60 was among the first programming languages to allow recursive procedures. Edsger Dijkstra showed the same year how a stack of activation records implements them, the mechanism every C++ call still uses.
+        <cite>E. W. Dijkstra, “Recursive Programming,” Numerische Mathematik 2, 1960</cite>
+      </blockquote>
 
       <p class="lead">
         A recursive procedure solves a problem by calling itself on a smaller

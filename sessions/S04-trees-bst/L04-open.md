@@ -10,6 +10,10 @@
 
 **Lecture 4: Trees and Binary Search Trees**
 
+> Binary search was first published in 1946, but the first version correct for every n did not appear until 1962.
+
+<small>D. E. Knuth, The Art of Computer Programming, Volume 3, §6.2.1</small>
+
 <small>Autumn 2026 · MW 1:15–3:15 · UW2-305 · Dr. Marcel Gavriliu</small>
 
 ---

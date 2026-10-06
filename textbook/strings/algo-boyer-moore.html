@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -123,17 +121,10 @@
       </p>
 
       <h1>Boyer&ndash;Moore</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Algorithm.
-      </div>
-      <div class="src">
-        Substring search at practical speed: compare each alignment right to
-        left, and on a mismatch let the mismatched text character decide the
-        jump, skipping up to a whole pattern length for one comparison. The
-        bad-character rule with a worked trace, the good-suffix rule, and the
-        quadratic worst case that the linear-guarantee fixes address. With
-        the race demo, and exercises.
-      </div>
+      <blockquote class="epigraph">
+        &ldquo;GNU grep is fast because it avoids looking at every input byte.&rdquo;
+        <cite>Mike Haertel, author of GNU grep, “why GNU grep is fast,” freebsd-current mailing list, 2010</cite>
+      </blockquote>
 
       <p class="lead">
         <a href="algo-kmp.html"><em>Knuth&ndash;Morris&ndash;Pratt</em></a>

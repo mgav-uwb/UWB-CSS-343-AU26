@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -122,20 +120,10 @@
       </p>
 
       <h1>Space Complexity</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Foundation.
-      </div>
-      <div class="src">
-        The second half of the analysis toolkit: a program&rsquo;s memory cost.
-        We count actual bytes (primitive sizes, struct layout, alignment and
-        padding, the price of a pointer), then separate where memory lives
-        (stack vs heap), watch space grow as a function of \(N\), pay the hidden
-        rent of recursion (call-stack depth), distinguish in-place from auxiliary
-        space, and trade time against space. Order-of-growth notation
-        (\(O,\Omega,\Theta\)) is used only in passing here; its formal definitions
-        and proofs live in the companion
-        <a href="foundation-asymptotic-notation.html">Asymptotic Notation reading</a>.
-      </div>
+      <blockquote class="epigraph fact">
+        The Apollo Guidance Computer that landed astronauts on the Moon had 2,048 words of erasable memory and 36,864 words of fixed memory, woven by hand as core rope.
+        <cite>Eldon C. Hall, Journey to the Moon: The History of the Apollo Guidance Computer, 1996</cite>
+      </blockquote>
 
       <p class="lead">
         The <a href="foundation-time-analysis.html"><em>Analysis of Algorithms:

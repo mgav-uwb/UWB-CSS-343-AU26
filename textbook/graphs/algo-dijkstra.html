@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -122,20 +120,10 @@
       </p>
 
       <h1>Dijkstra&rsquo;s Algorithm</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Algorithm (greedy).
-      </div>
-      <div class="src">
-        Edges now carry weights, and &ldquo;shortest&rdquo; means least total
-        weight rather than fewest edges. The one operation every shortest-path
-        algorithm is built from (edge relaxation); Dijkstra&rsquo;s greedy
-        ordering of it, a proof that the greedy choice is correct when weights are
-        nonnegative, the priority-queue implementation that makes it
-        \(O(E\log V)\), and the exact line of the proof that negative weights
-        break. With worked traces, the correctness proof, links to the interactive
-        demos, and exercises. The greedy method in general is the companion
-        <a href="../greedy/paradigm-greedy-method.html">Greedy Method</a> handout.
-      </div>
+      <blockquote class="epigraph">
+        &ldquo;It is the algorithm for the shortest path, which I designed in about twenty minutes.&rdquo;
+        <cite>Edsger Dijkstra, on a café terrace in Amsterdam in 1956; interview with Philip Frana, CACM 53(8), 2010</cite>
+      </blockquote>
 
       <p class="lead">
         The <a href="algo-bfs.html">BFS handout</a> gave us

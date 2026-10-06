@@ -34,11 +34,9 @@
         box-shadow: 0 1px 4px #0002; border-radius: 4px;
       }
       h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
-      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
-      .src {
-        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
-        border-bottom: 1px solid var(--line); padding-bottom: 18px;
-      }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
       h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
       h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
       p { margin: 10px 0; }
@@ -119,21 +117,10 @@
       </p>
 
       <h1>Maximum Flow &amp; Minimum Cut</h1>
-      <div class="subtitle">
-        Data Structures &amp; Algorithms. Algorithm.
-      </div>
-      <div class="src">
-        How much material can be pushed from a source to a sink through a network
-        of capacitated pipes, and what bottleneck stops it. Flow networks,
-        capacity and conservation, \(s\)-\(t\) cuts and the weak-duality bound,
-        residual graphs with their undo arcs, the Ford-Fulkerson augmenting-path
-        method unrolled iteration by iteration (including one augmentation that
-        pushes flow back along an edge already carrying flow), termination and
-        integrality with integer capacities, the max-flow min-cut theorem with
-        proof, the Edmonds-Karp breadth-first refinement and its
-        \(O(VE^2)\) bound, the pathological-capacity example that motivates it,
-        bipartite matching as a worked reduction, and exercises with solutions.
-      </div>
+      <blockquote class="epigraph fact">
+        The max-flow min-cut problem was first posed in a classified 1955 RAND study of the Soviet rail network into Eastern Europe, by T. E. Harris and F. S. Ross; what they wanted was the minimum cut.
+        <cite>A. Schrijver, “On the History of the Transportation and Maximum Flow Problems,” Mathematical Programming 91, 2002</cite>
+      </blockquote>
 
       <p class="lead">
         A pipeline network carries oil from a well to a refinery; every pipe has a
