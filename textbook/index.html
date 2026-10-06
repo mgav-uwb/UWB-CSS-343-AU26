@@ -171,14 +171,22 @@
       const PARTS = [
         {
           name: "Foundations",
-          note: "The analysis toolkit, and the limits of what algorithms can do.",
+          note: "The machine, the language, and the proof technique the rest of the text builds on.",
           items: [
-            ["foundations/foundation-cpp-essentials.html", "C++ for Data Structures", "foundation", "",
-             "References and pointers, passing arguments, heap ownership, the Rule of Three, the standard library, and tools that find memory errors."],
-            ["foundations/foundation-counting-loops.html", "Counting Loop Iterations", "foundation", "",
-             "Trip counts and off-by-one, loops in sequence and nested, dependent loops as sums, halving loops, data-dependent loops, and a five-step method."],
             ["foundations/foundation-computer-systems.html", "Computer Systems Primer", "foundation", "",
              "The memory hierarchy with measured latencies, caches and locality, the external-memory model, processes, virtual memory and swap, and the compiler."],
+            ["foundations/foundation-cpp-essentials.html", "C++ for Data Structures", "foundation", "",
+             "References and pointers, passing arguments, heap ownership, the Rule of Three, the standard library, and tools that find memory errors."],
+            ["foundations/foundation-recursion.html", "Recursion &amp; Induction", "foundation", "",
+             "Base cases and the call stack, proofs by ordinary and strong induction, and converting recursion to iteration."]
+          ]
+        },
+        {
+          name: "Complexity Analysis",
+          note: "Counting operations and bytes, measuring growth, and the notation for comparing it.",
+          items: [
+            ["foundations/foundation-counting-loops.html", "Counting Loop Iterations", "foundation", "",
+             "Trip counts and off-by-one, loops in sequence and nested, dependent loops as sums, halving loops, data-dependent loops, and a five-step method."],
             ["foundations/foundation-time-analysis.html", "Analysis of Algorithms: Time", "foundation", "",
              "Counting the operations that matter, the doubling method, and reading growth from measurements."],
             ["foundations/foundation-space-complexity.html", "Space Complexity", "foundation", "",
@@ -187,14 +195,8 @@
              "O, Omega and Theta defined as sets of functions, with the algebra for comparing growth rates."],
             ["foundations/foundation-machine-models.html", "Algorithms on Real Machines", "foundation", "",
              "Cost models and what they hide: when slow memory, swapping and processor features change only the constant, when the exponent changes, and what optimizing a program means."],
-            ["foundations/foundation-recursion.html", "Recursion &amp; Induction", "foundation", "",
-             "Base cases and the call stack, proofs by ordinary and strong induction, and converting recursion to iteration."],
             ["foundations/foundation-amortized-analysis.html", "Amortized Analysis", "foundation", "",
-             "Aggregate, banker's and potential methods, worked on the doubling array and the binary counter."],
-            ["foundations/foundation-p-np.html", "P, NP &amp; Reductions", "foundation", "",
-             "Verifiers and certificates, polynomial-time reductions, NP-completeness, and what a hardness proof licenses."],
-            ["foundations/foundation-computability.html", "Turing Machines &amp; Computability", "foundation", "",
-             "A precise machine model, decidable versus recognizable languages, and the halting problem by diagonalization."]
+             "Aggregate, banker's and potential methods, worked on the doubling array and the binary counter."]
           ]
         },
         {
@@ -349,6 +351,16 @@
              "Regular expressions, Thompson's construction to an NFA, simulation, and determinization."],
             ["strings/foundation-context-free-grammars.html", "Context-Free Grammars &amp; Parsing", "foundation", "",
              "Grammars and parse trees, ambiguity and how precedence removes it, recursive descent and CYK parsing."]
+          ]
+        },
+        {
+          name: "Computability &amp; Intractability",
+          note: "What no algorithm can do, and what no efficient algorithm is known to do.",
+          items: [
+            ["foundations/foundation-p-np.html", "P, NP &amp; Reductions", "foundation", "",
+             "Verifiers and certificates, polynomial-time reductions, NP-completeness, and what a hardness proof licenses."],
+            ["foundations/foundation-computability.html", "Turing Machines &amp; Computability", "foundation", "",
+             "A precise machine model, decidable versus recognizable languages, and the halting problem by diagonalization."]
           ]
         }
       ];
