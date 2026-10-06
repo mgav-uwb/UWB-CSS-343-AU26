@@ -38,6 +38,7 @@
 ## Reading for this week
 
 - <a href="../../textbook/foundations/foundation-time-analysis.html">Analysis of Algorithms: Time</a> (today)
+- <a href="../../textbook/foundations/foundation-counting-loops.html#pair">Counting Loop Iterations, §6: Which loop doubles</a> (today; the proofs use Wednesday's Θ)
 - <a href="../../textbook/foundations/foundation-space-complexity.html">Space Complexity</a> (Wednesday)
 - <a href="../../textbook/foundations/foundation-asymptotic-notation.html">Asymptotic Notation</a> (Wednesday)
 
