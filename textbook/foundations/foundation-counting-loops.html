@@ -371,6 +371,114 @@ for (int i = 0; i &lt; n; i++)
         largest inner count by the outer trip count gives an upper bound, not the
         count; the sum gives the count.
       </p>
+      <h3 id="pair">Which loop doubles: \(n \log_2 n\) or linear</h3>
+      <p>
+        The two loops below look alike: each nests a loop whose bound is the outer
+        index, and each has one loop that doubles. They differ only in <em>which</em>
+        loop doubles, and their counts are of different orders.
+      </p>
+      <pre><span class="cm">// A: the inner loop doubles</span>
+for (int i = 0; i &lt; n; i++)
+    for (int j = 1; j &lt; i; j *= 2)
+        ops++;
+
+<span class="cm">// B: the outer loop doubles</span>
+for (int i = 1; i &lt; n; i *= 2)
+    for (int j = 0; j &lt; i; j++)
+        ops++;</pre>
+      <p>
+        Both counts rest on one fact about a doubling loop. (In A, <code>j</code> must
+        start at 1: a variable that starts at 0 and doubles stays 0, and the loop
+        never ends.)
+      </p>
+      <div class="thm">
+        <span class="tag">Lemma (doubling loop)</span>
+        For an integer \(i \ge 1\), the loop <code>for (j = 1; j &lt; i; j *= 2)</code>
+        runs exactly \(\lceil \log_2 i \rceil\) times. For \(i = 0\) it runs 0 times.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> Before iteration \(t = 0, 1, 2, \ldots\) the variable
+        holds \(j = 2^t\), and that iteration runs exactly when \(2^t &lt; i\). The
+        iterations that run are therefore \(t = 0, 1, \ldots, k - 1\), where \(k\) is
+        the smallest integer with \(2^k \ge i\). Taking \(\log_2\), \(k\) is the smallest
+        integer with \(k \ge \log_2 i\), which is \(\lceil \log_2 i \rceil\). For
+        \(i = 0\) the test \(1 &lt; 0\) fails at once.<span class="qed">∎</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (loop A)</span>
+        Loop A runs \(\displaystyle C_A(n) = \sum_{i=2}^{n-1} \lceil \log_2 i \rceil\)
+        times. For every \(n \ge 4\),
+        \[
+          \tfrac{1}{6}\, n \log_2 n \;\le\; \lfloor n/2 \rfloor (\log_2 n - 1) \;\le\; C_A(n)
+          \;\le\; n \lceil \log_2 n \rceil \;\le\; 2\, n \log_2 n ,
+        \]
+        so \(C_A(n) \in \Theta(n \log_2 n)\) with witnesses \(c_1 = 1/6\),
+        \(c_2 = 2\), \(n_0 = 4\). When \(n = 2^k\) the count is exactly
+        \(C_A(n) = n \log_2 n - n - \log_2 n + 1\).
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> By the lemma the inner loop runs
+        \(\lceil \log_2 i \rceil\) times for each \(i\); the terms for \(i = 0\) and
+        \(i = 1\) are 0, which gives the sum.
+        <br><em>Upper bound.</em> There are \(n - 2\) terms, each at most
+        \(\lceil \log_2 (n-1) \rceil \le \lceil \log_2 n \rceil\), so
+        \(C_A(n) \le n \lceil \log_2 n \rceil\). Since
+        \(\lceil \log_2 n \rceil \le \log_2 n + 1 \le 2 \log_2 n\) for \(n \ge 2\),
+        this is at most \(2 n \log_2 n\).
+        <br><em>Lower bound.</em> Keep only the terms with
+        \(i \ge \lceil n/2 \rceil\); there are \(n - \lceil n/2 \rceil = \lfloor n/2 \rfloor\)
+        of them, and each is at least \(\log_2 (n/2) = \log_2 n - 1\). Dropping the
+        other terms only lowers the sum, so
+        \(C_A(n) \ge \lfloor n/2 \rfloor (\log_2 n - 1)\). For \(n \ge 4\),
+        \(\lfloor n/2 \rfloor \ge n/3\) and \(\log_2 n - 1 \ge \tfrac12 \log_2 n\), so
+        the bound is at least \(\tfrac16 n \log_2 n\).
+        <br><em>Exact count for \(n = 2^k\).</em> Group the terms by their value: the
+        \(2^{m-1}\) integers \(i\) with \(2^{m-1} &lt; i \le 2^m\) all have
+        \(\lceil \log_2 i \rceil = m\). For \(m = 1, \ldots, k\) these groups cover
+        \(i = 2, \ldots, 2^k\); the sum stops at \(i = n - 1 = 2^k - 1\), so subtract
+        the one term \(m = k\) for \(i = 2^k\):
+        \[
+          C_A(2^k) = \sum_{m=1}^{k} m\, 2^{m-1} - k = \bigl((k-1)\,2^k + 1\bigr) - k ,
+        \]
+        using \(\sum_{m=1}^{k} m\, 2^{m-1} = (k-1)2^k + 1\) (induction on \(k\): adding
+        \((k+1)2^k\) to \((k-1)2^k + 1\) gives \(k\,2^{k+1} + 1\)). With \(n = 2^k\) and
+        \(k = \log_2 n\) this is \(n \log_2 n - n - \log_2 n + 1\).<span class="qed">∎</span>
+      </div>
+      <div class="thm">
+        <span class="tag">Proposition (loop B)</span>
+        For \(n \ge 2\), loop B runs \(C_B(n) = 2^{K+1} - 1\) times, where
+        \(K = \lceil \log_2 n \rceil - 1\), and
+        \[
+          n - 1 \;\le\; C_B(n) \;&lt;\; 2n - 1 ,
+        \]
+        so \(C_B(n) \in \Theta(n)\). When \(n\) is a power of 2, \(C_B(n) = n - 1\) exactly.
+      </div>
+      <div class="proof">
+        <strong>Proof.</strong> The outer variable takes the values \(i = 2^t\) for
+        \(t = 0, 1, \ldots\) while \(2^t &lt; n\); by the argument of the lemma the last
+        value is \(2^K\) with \(K = \lceil \log_2 n \rceil - 1\). The inner loop runs
+        \(i\) times, so
+        \[
+          C_B(n) = \sum_{t=0}^{K} 2^t = 2^{K+1} - 1
+        \]
+        by the geometric sum of section 5. By the choice of \(K\),
+        \(2^K &lt; n \le 2^{K+1}\). The right inequality gives
+        \(C_B(n) \ge n - 1\); the left one gives \(2^{K+1} &lt; 2n\), so
+        \(C_B(n) &lt; 2n - 1\). When \(n = 2^k\), \(K = k - 1\) and
+        \(C_B(n) = 2^k - 1 = n - 1\).<span class="qed">∎</span>
+      </div>
+      <div style="overflow-x:auto"><table>
+        <tr><th>\(n\)</th><th>A: inner loop doubles</th><th>\(n \log_2 n\)</th><th>B: outer loop doubles</th></tr>
+        <tr><td>1000</td><td>8,967</td><td>9,966</td><td>1,023</td></tr>
+        <tr><td>1024</td><td>9,207</td><td>10,240</td><td>1,023</td></tr>
+      </table></div>
+      <p>
+        In A the inner count changes with \(i\), but slowly: half of the values of
+        \(i\) are at least \(n/2\), and each of those pays nearly \(\log_2 n\). In B
+        the inner count doubles with each outer step, so the last pass alone is about
+        half of the total, and the sum of a doubling sequence is less than twice its
+        last term.
+      </p>
 
       <!-- ============================================================ -->
       <h2 id="data">7. Loops whose count depends on the data</h2>
@@ -497,6 +605,19 @@ for (k = 0; k &lt; n; k++) for (m = 0; m &lt; 3; m++) ops++;</pre>
             The outer values are 1, 2, 4, 8, 16, 32, 64, and the inner loop runs
             that many times: \(1 + 2 + \cdots + 64 = 127\). A sum of doublings, less
             than twice the last term, so less than \(2n\) in general.
+          </details>
+        </li>
+        <li>
+          Both loops double:
+          <code>for (i = 1; i &lt; n; i *= 2) for (j = 1; j &lt; i; j *= 2) ops++;</code>.
+          Give the exact count for \(n = 1024\) and the order of growth.
+          <details>
+            <summary>solution</summary>
+            The outer variable takes the values \(2^t\), \(t = 0, \ldots, K\) with
+            \(K = \lceil \log_2 n \rceil - 1\), and by the doubling-loop lemma the inner
+            loop runs \(\lceil \log_2 2^t \rceil = t\) times. The count is
+            \(0 + 1 + \cdots + K = K(K+1)/2\): 45 for \(n = 1024\) (\(K = 9\)), and
+            \(\Theta((\log_2 n)^2)\).
           </details>
         </li>
         <li>
