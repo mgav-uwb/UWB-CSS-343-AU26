@@ -60,13 +60,14 @@
   <p class="sub">A doubling experiment on a machine you choose. Nothing here is timed: the cost of every
   step comes from a model of the machine&rsquo;s memory levels, so the numbers are exact for the model
   and the same on every computer. Change the machine or the access pattern and watch where the doubling
-  ratio stops being 2<sup>b</sup>.</p>
+  ratio stops being 2<sup>b</sup>. The machines include real ones, from the PDP-1 to a MacBook Pro.</p>
 
   <section class="card">
     <div class="row">
       <label>machine <select id="machine"></select></label>
       <label>algorithm <select id="algo"></select></label>
     </div>
+    <p class="note" id="spec"></p>
     <details class="levels" id="levels"><summary>edit the machine&rsquo;s memory levels</summary>
       <table class="lv" id="lv"></table>
       <p class="note">Capacity in bytes (accepts 32K, 16M, 4G, inf), time per access in the machine&rsquo;s unit,
@@ -80,6 +81,19 @@
       <div class="tablewrap"><table id="tab"></table></div>
     </div>
     <p class="summary" id="summary"></p>
+  </section>
+
+  <section class="card wide" id="comparecard">
+    <h2 style="font-size:17px;margin:0 0 6px">Every machine, one input</h2>
+    <div class="row">
+      <label>N <select id="cmpN"></select></label>
+      <span class="note">the algorithm chosen above, run on each machine below (oldest first)</span>
+    </div>
+    <div class="tablewrap" style="margin-top:8px;max-height:none"><table id="cmp"></table></div>
+    <p class="note">Only the memory system is modeled: each access costs what the level holding the data charges.
+    On the oldest machines that is close to the whole story, since an instruction took about one memory cycle;
+    on current machines it leaves out parallelism (many cores, vector units, overlapped misses), which would make
+    them faster still.</p>
   </section>
 
   <section class="card about">
@@ -103,12 +117,16 @@
     about 4, 15 and 100 ns) and a typical 50 &micro;s for its solid-state drive (SSD). The small machine
     has 64 MiB of memory and swaps to a hard disk with a 5 ms access time.
     The million-cycle machine charges 10<sup>6</sup> cycles for every memory access: its ratios never change.
+    The real machines, from the PDP-1 (1959) to a 2024 supercomputer node, use memory sizes, cycle times
+    and disk access times rounded from published specifications, and typical measured latencies for current
+    processors: approximations that show the shape of each hierarchy, not benchmarks. Each one is in nanoseconds,
+    so the same run can be compared across 65 years of machines.
     The source is <a href="machine-model.js"><code>machine-model.js</code></a>.</p>
   </section>
 </div>
 
 <script type="module">
-import { MACHINES, ALGOS, table, human, bytes, levelOf, GiB } from "./machine-model.js";
+import { MACHINES, HISTORIC, ALGOS, table, human, bytes, levelOf, GiB } from "./machine-model.js";
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 if (params.get("embed")) document.body.classList.add("embed");
@@ -116,9 +134,11 @@ if (params.get("embed")) document.body.classList.add("embed");
 // a working copy of the chosen preset, editable in the levels table
 let machine = null;
 const clone = (m) => ({ ...m, levels: m.levels.map((l) => ({ ...l })) });
-$("machine").innerHTML = Object.entries(MACHINES).map(([k, m]) => `<option value="${k}">${m.name}</option>`).join("");
+const ALL = { ...MACHINES, ...HISTORIC };
+const opts = (o) => Object.entries(o).map(([k, m]) => `<option value="${k}">${m.name}</option>`).join("");
+$("machine").innerHTML = `<optgroup label="Models">${opts(MACHINES)}</optgroup><optgroup label="Real machines, 1959 to 2024">${opts(HISTORIC)}</optgroup>`;
 $("algo").innerHTML = Object.entries(ALGOS).map(([k, a]) => `<option value="${k}">${a.name}</option>`).join("");
-if (params.get("machine") && MACHINES[params.get("machine")]) $("machine").value = params.get("machine");
+if (params.get("machine") && ALL[params.get("machine")]) $("machine").value = params.get("machine");
 else $("machine").value = "swap";
 if (params.get("algo") && ALGOS[params.get("algo")]) $("algo").value = params.get("algo");
 else $("algo").value = "lookups";
@@ -145,7 +165,7 @@ function drawLevels() {
   });
 }
 
-const fmtT = (t) => machine.unit === "ns" ? human(t) : `${t.toPrecision(3)} ${machine.unit}`;
+const fmtT = (t) => machine.unit === "ns" ? when(t) : `${t.toPrecision(3)} ${machine.unit}`;
 const fmtPer = (t) => machine.unit === "ns" ? (t < 1000 ? `${t.toPrecision(3)} ns` : human(t)) : t.toPrecision(3);
 
 function run() {
@@ -186,7 +206,7 @@ function run() {
     const p = rows[i - 1], q = rows[i];
     s += `<line x1="${X(p.N).toFixed(1)}" y1="${Y(p.T).toFixed(1)}" x2="${X(q.N).toFixed(1)}" y2="${Y(q.T).toFixed(1)}" stroke="${hot(q) ? "#d0553f" : "#7c5cff"}" stroke-width="${hot(q) ? 3 : 2.2}"/>`;
   }
-  for (const r of rows) s += `<circle cx="${X(r.N).toFixed(1)}" cy="${Y(r.T).toFixed(1)}" r="3" fill="${hot(r) ? "#d0553f" : "#7c5cff"}"><title>N = ${r.N.toLocaleString("en-US")}: ${fmtT(r.T)}${r.b == null ? "" : ", b = " + r.b.toFixed(2)}</title></circle>`;
+  for (const r of rows) s += `<circle cx="${X(r.N).toFixed(1)}" cy="${Y(r.T).toFixed(1)}" r="3" fill="${hot(r) ? "#d0553f" : "#7c5cff"}"><title>N = ${r.N.toLocaleString("en-US")}: ${machine.unit === "ns" ? human(r.T) : fmtT(r.T)}${r.b == null ? "" : ", b = " + r.b.toFixed(2)}</title></circle>`;
   $("chart").innerHTML = s + `</svg>`;
   // ---- summary ----
   const worst = rows.filter((r) => r.b != null).reduce((m, r) => (r.b > m.b ? r : m), { b: -Infinity });
@@ -199,9 +219,32 @@ function run() {
       : `Every doubling shows b close to ${a.exp}: on this machine the cost of an access does not change with N.`);
 }
 
-function choose() { machine = clone(MACHINES[$("machine").value]); drawLevels(); run(); }
+// ---- every real machine on one input ----
+const NS = [1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9];
+$("cmpN").innerHTML = NS.map((n) => `<option value="${n}">${n.toLocaleString("en-US")}</option>`).join("");
+$("cmpN").value = "10000";
+const sci = (x) => (([m, e]) => `${m} × 10<sup>${+e}</sup>`)(x.toExponential(1).split("e"));
+const YRNS = 365.25 * 86400e9;
+const when = (ns) => { const y = ns / YRNS; return y >= 1e5 ? `${sci(y)} years` : y >= 1000 ? `${Math.round(y).toLocaleString("en-US")} years` : human(ns); };
+const times = (x) => x < 10 ? `${x.toFixed(1)}×` : x < 1e4 ? `${Math.round(x).toLocaleString("en-US")}×` : (([m, e]) => `${m} × 10<sup>${+e}</sup>`)(x.toExponential(1).split("e"));
+function compare() {
+  const key = $("algo").value, a = ALGOS[key], N = +$("cmpN").value, W = a.W(N);
+  const rows = Object.entries(HISTORIC).map(([k, m]) => ({ k, m, T: a.cost(m, N), lv: m.levels[levelOf(m, W)].name }));
+  const best = Math.min(...rows.map((r) => r.T));
+  $("cmp").innerHTML = `<tr><th style="text-align:left">machine</th><th style="text-align:left">working set of ${bytes(W)} is in</th><th>time</th><th>per access</th><th>vs. fastest</th></tr>` +
+    rows.map((r) => `<tr${r.k === $("machine").value ? ' style="background:#f1edff"' : ""}><td class="l">${r.m.name}</td><td class="l">${r.lv}</td>
+      <td>${when(r.T)}</td><td>${human(r.T / a.accesses(N))}</td>
+      <td>${r.T === best ? "fastest" : times(r.T / best)}</td></tr>`).join("");
+}
+
+function choose() {
+  machine = clone(ALL[$("machine").value]);
+  $("spec").textContent = machine.spec ? machine.spec + "." : "";
+  drawLevels(); run(); compare();
+}
 $("machine").onchange = choose;
-$("algo").onchange = run;
+$("algo").onchange = () => { run(); compare(); };
+$("cmpN").onchange = compare;
 choose();
 </script>
 </body>
