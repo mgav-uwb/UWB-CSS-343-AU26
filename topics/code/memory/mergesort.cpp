@@ -1,4 +1,4 @@
-// CSS 343 · topic program: mergesort's O(N) auxiliary space.
+// CSS 343 - topic program: mergesort's O(N) auxiliary space.
 //   g++ -std=c++17 -O2 mergesort.cpp -o mergesort && ./mergesort
 // The full algorithm. The memory point: each merge allocates a scratch buffer;
 // the largest single buffer (the top-level merge) is N ints = 4N bytes, so the

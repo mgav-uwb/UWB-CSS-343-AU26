@@ -1,4 +1,4 @@
-// CSS 343 · PA1: BinTree: one interface, three trees.
+// CSS 343 - PA1: BinTree: one interface, three trees.
 // A binary search tree of int keys whose BALANCING POLICY is chosen at
 // construction:
 //   Mode::VANILLA : plain BST: no rebalancing (remove supported, Hibbard)
@@ -55,7 +55,7 @@ public:
     // benchmark harness) is:
     //   1. afterwards this tree holds the UNION of the two key sets (shared
     //      keys once); `other` is unchanged; self-merge is safe
-    //   2. the result is a valid BST and its height is ≤ 2·ceil(log2(n+1))
+    //   2. the result is a valid BST and its height is <= 2*ceil(log2(n+1))
     //   3. the tree remains internally consistent for its mode: later
     //      insert()s must still keep the mode's height guarantee
     //   4. you record what the merge cost: set auxBytes_ to the PEAK number

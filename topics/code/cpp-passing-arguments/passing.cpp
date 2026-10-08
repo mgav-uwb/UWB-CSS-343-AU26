@@ -1,4 +1,4 @@
-// CSS 343 · topic program: three ways to pass an argument, and what const
+// CSS 343 - topic program: three ways to pass an argument, and what const
 // reference buys.
 //
 //   build:  g++ -std=c++17 -O2 passing.cpp -o passing

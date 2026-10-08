@@ -1,4 +1,4 @@
-// CSS 343 · topic program: what a vector costs, and why layout changes speed.
+// CSS 343 - topic program: what a vector costs, and why layout changes speed.
 //   g++ -std=c++17 -O2 vector_locality.cpp -o vector_locality && ./vector_locality
 //   g++ -std=c++17 -O0 vector_locality.cpp -o vl0 && ./vl0     (stack bytes per frame)
 // Shows: sizeof(vector<int>) (the header), capacity doubling and the total

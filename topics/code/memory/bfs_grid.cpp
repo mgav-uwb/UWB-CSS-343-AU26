@@ -1,4 +1,4 @@
-// CSS 343 · topic program: BFS SHORTEST PATH on an n x n grid: O(n^2) memory,
+// CSS 343 - topic program: BFS SHORTEST PATH on an n x n grid: O(n^2) memory,
 // and how that memory depends on the GEOMETRY of the maze.
 //   g++ -std=c++17 -O2 bfs_grid.cpp -o bfs_grid && ./bfs_grid
 //

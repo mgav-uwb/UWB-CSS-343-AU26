@@ -1,4 +1,4 @@
-// CSS 343 · topic program: counting bytes in C++.
+// CSS 343 - topic program: counting bytes in C++.
 //   g++ -std=c++17 -O2 sizeof_demo.cpp -o sizeof_demo && ./sizeof_demo
 // Shows: primitive sizes, struct PADDING (alignment), and the memory an
 // array of N ints vs a linked list of N ints ACTUALLY costs.

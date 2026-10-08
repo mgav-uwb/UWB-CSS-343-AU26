@@ -1,4 +1,4 @@
-// CSS 343 · topic program: a class that owns heap memory, and the Rule of
+// CSS 343 - topic program: a class that owns heap memory, and the Rule of
 // Three (destructor, copy constructor, copy assignment).
 //
 //   build:       g++ -std=c++17 -g intlist.cpp -o intlist

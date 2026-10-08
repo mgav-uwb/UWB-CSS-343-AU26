@@ -1,4 +1,4 @@
-// CSS 343 · PA2: Part 4 race harness (GIVEN, apart from the marked paste).
+// CSS 343 - PA2: Part 4 race harness (GIVEN, apart from the marked paste).
 // Times all-pairs shortest paths two ways on one graph file:
 //   (a) your GraphM::findShortestPath()   (linear-scan Dijkstra from every source)
 //   (b) your Homework 6 dijkstra, called once per source

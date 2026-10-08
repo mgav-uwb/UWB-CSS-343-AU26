@@ -1,4 +1,4 @@
-// CSS 343 · PA2: GraphM specification.
+// CSS 343 - PA2: GraphM specification.
 // Adjacency-MATRIX graph with ALL-PAIRS Dijkstra in the O(V^2)-per-source
 // linear-scan form (no priority queue anywhere), plus path reconstruction
 // through prev_node. Part 4 of the assignment races it against your

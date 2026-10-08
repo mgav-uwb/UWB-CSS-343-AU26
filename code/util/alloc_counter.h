@@ -1,4 +1,4 @@
-// CSS 343 · code library: alloc_counter.h
+// CSS 343 - code library: alloc_counter.h
 // Count every byte a program allocates with new, by replacing the global
 // operator new and operator delete. Include it in EXACTLY ONE .cpp file of a
 // program (it defines functions, so a second inclusion is a linker error).

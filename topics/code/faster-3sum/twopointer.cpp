@@ -1,4 +1,4 @@
-// CSS 343 · topic program: 3-sum in N^2 with two pointers
+// CSS 343 - topic program: 3-sum in N^2 with two pointers
 //
 // The whole order-of-growth ladder for 3-sum, side by side:
 //   ThreeSum            brute force, every triple           ~ N^3

@@ -1,4 +1,4 @@
-// CSS 343 · PA2: given driver. Exercises BOTH classes on simple_graph.txt,
+// CSS 343 - PA2: given driver. Exercises BOTH classes on simple_graph.txt,
 // which holds TWO graphs: your buildGraph must leave the stream positioned
 // for the next one. Its output must match expected-output.txt EXACTLY:
 //
@@ -20,7 +20,7 @@ int main() {
     for (;;) {
         GraphM g;
         if (g.buildGraph(inM) != 1) break;
-        cout << "=== GraphM · graph " << ++gNo << " (" << g.getSize() << " nodes) ===\n";
+        cout << "=== GraphM - graph " << ++gNo << " (" << g.getSize() << " nodes) ===\n";
         g.findShortestPath();
         g.displayAllPaths();
         if (gNo == 1) {
@@ -43,7 +43,7 @@ int main() {
     for (;;) {
         GraphL g;
         if (g.buildGraph(inL) != 1) break;
-        cout << "=== GraphL · graph " << ++gNo << " (" << g.getSize() << " nodes) ===\n";
+        cout << "=== GraphL - graph " << ++gNo << " (" << g.getSize() << " nodes) ===\n";
         g.displayGraph();
         cout << "edgeList(1): " << g.edgeList(1) << '\n';
         cout << "DFS from 1:  " << g.DFSorder() << '\n';

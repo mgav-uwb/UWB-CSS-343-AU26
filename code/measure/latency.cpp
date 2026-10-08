@@ -1,4 +1,4 @@
-// CSS 343 · program: how long does one memory read take?
+// CSS 343 - program: how long does one memory read take?
 //
 // Pointer chasing: an array of indices forms ONE random cycle through every
 // slot, and the loop follows it (i = next[i]). Each read depends on the one

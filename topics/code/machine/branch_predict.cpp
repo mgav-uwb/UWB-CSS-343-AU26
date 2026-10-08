@@ -1,4 +1,4 @@
-// CSS 343 · topic program: the same count, a different constant (branch prediction).
+// CSS 343 - topic program: the same count, a different constant (branch prediction).
 //   g++ -std=c++17 -O2 branch_predict.cpp -o branch_predict && ./branch_predict
 // Sums the elements >= 128 of 16M random bytes, first in random order, then
 // sorted. Both loops execute exactly the same instructions the same number of

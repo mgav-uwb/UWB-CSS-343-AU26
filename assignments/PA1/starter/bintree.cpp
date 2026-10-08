@@ -1,4 +1,4 @@
-// CSS 343 · PA1: BinTree implementation SKELETON.
+// CSS 343 - PA1: BinTree implementation SKELETON.
 // Every method is a TODO except displayTree (given, for debugging). The
 // skeleton compiles and links as-is; fill the TODOs and re-diff against
 // expected-output.txt as you go.
@@ -6,7 +6,7 @@
 // The AVL fix-up is Lecture 5's: heights, balance factors, the four rotation
 // cases on the way back up the insertion path. Count every single rotation.
 // REDBLACK mode is EXTRA CREDIT: the three-if left-leaning insert of the
-// Red-Black Trees chapter and Lecture 6 (rotate-left · rotate-right ·
+// Red-Black Trees chapter and Lecture 6 (rotate-left, rotate-right,
 // flip-colors), with the root kept black. If you skip it, let REDBLACK mode
 // behave like VANILLA.
 //
@@ -97,8 +97,8 @@ bool BinTree::insert(int key) {
 // ---- TODO 5: remove (VANILLA only) --------------------------------------------------
 bool BinTree::remove(int key) {
     // TODO: if mode_ != Mode::VANILLA return false (leave the tree unchanged).
-    //       Otherwise Hibbard: leaf → unlink; one child → splice; two children
-    //       → copy the in-order successor's key down, remove the successor.
+    //       Otherwise Hibbard: leaf -> unlink; one child -> splice; two children
+    //       -> copy the in-order successor's key down, remove the successor.
     (void)key;
     return false;
 }

@@ -1,4 +1,4 @@
-// CSS 343 · Homework 1: C++, recursion, counting.
+// CSS 343 - Homework 1: C++, recursion, counting.
 // Fill in the TODOs, then run the program.
 //
 //   build:        g++ -std=c++17 -g hw01.cpp -o hw01
@@ -180,7 +180,7 @@ static void check(bool ok, const string& what) {
 int main() {
     const vector<int> keys358 = {3, 5, 8};
 
-    cout << "T1 · destructor\n";
+    cout << "T1 - destructor\n";
     long base = liveNodes;
     {
         IntList a;
@@ -189,7 +189,7 @@ int main() {
     }
     check(liveNodes - base == 0, "0 nodes alive after the list goes out of scope");
 
-    cout << "T2 · copy constructor\n";
+    cout << "T2 - copy constructor\n";
     base = liveNodes;
     {
         IntList a;
@@ -207,7 +207,7 @@ int main() {
     }
     check(liveNodes - base == 0, "both lists freed, each node once");
 
-    cout << "T3 · copy assignment\n";
+    cout << "T3 - copy assignment\n";
     base = liveNodes;
     {
         IntList a, c;
@@ -230,7 +230,7 @@ int main() {
     }
     check(liveNodes - base == 0, "every node freed at the end of the scope");
 
-    cout << "T4 · sum\n";
+    cout << "T4 - sum\n";
     {
         IntList a;
         a.pushBack(3); a.pushBack(5); a.pushBack(8);
@@ -242,7 +242,7 @@ int main() {
         check(sum(big.first()) == 500500, "1 + 2 + ... + 1000 = 500500");
     }
 
-    cout << "T5 · occurrences\n";
+    cout << "T5 - occurrences\n";
     {
         IntList a;
         for (int k : {4, 1, 4, 4, 9, 4}) a.pushBack(k);
@@ -251,7 +251,7 @@ int main() {
         check(occurrences(a.first(), 7) == 0 && occurrences(nullptr, 4) == 0, "7 does not appear; the empty chain holds nothing");
     }
 
-    cout << "T6 · lower bound\n";
+    cout << "T6 - lower bound\n";
     {
         const vector<int> a = {3, 7, 12, 18, 21, 26, 30, 34, 41, 47, 52, 58, 63, 69, 75};
         int n = a.size();
@@ -271,7 +271,7 @@ int main() {
         check(lowerBound(dup, 3, 2, 5, q0) == 3 && q0 == 0, "an empty range returns lo and makes 0 probes");
     }
 
-    cout << "T7 · find every k-sum\n";
+    cout << "T7 - find every k-sum\n";
     {
         const vector<int> small = {-40, -20, -10, 0, 5, 10, 30, 40};
         vector<int> picked;

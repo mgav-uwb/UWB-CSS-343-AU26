@@ -1,4 +1,4 @@
-// CSS 343 · program: three ways to multiply two n x n matrices, the same
+// CSS 343 - program: three ways to multiply two n x n matrices, the same
 // n^3 multiply-adds each, in different memory orders.
 //   i-j-k  the textbook loop: B is read down a column, one cache line per read
 //   i-k-j  the two inner loops swapped: every inner read is sequential

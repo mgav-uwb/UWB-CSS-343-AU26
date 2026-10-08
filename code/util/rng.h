@@ -1,4 +1,4 @@
-// CSS 343 · code library: rng.h
+// CSS 343 - code library: rng.h
 // A small random number generator that gives the SAME sequence on every
 // compiler and standard library. (std::mt19937 does too, but the
 // std::uniform_int_distribution and std::shuffle built on it do not: g++ and

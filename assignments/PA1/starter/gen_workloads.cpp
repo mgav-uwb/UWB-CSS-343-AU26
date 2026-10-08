@@ -1,4 +1,4 @@
-// CSS 343 · PA1: benchmark workload generator (GIVEN; the single source of
+// CSS 343 - PA1: benchmark workload generator (GIVEN; the single source of
 // truth for the benchmark inputs: the grading harness reads the SAME files).
 //
 //   g++ -std=c++17 -O2 gen_workloads.cpp -o gen && ./gen

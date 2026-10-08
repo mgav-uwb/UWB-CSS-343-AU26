@@ -1,4 +1,4 @@
-// CSS 343 · PA2: GraphL specification.
+// CSS 343 - PA2: GraphL specification.
 // Adjacency-LIST graph: an array of GraphNodes, each heading a RAW singly
 // linked list of EdgeNodes. Every new edge is INSERTED AT THE HEAD: an O(1)
 // insert whose visible consequence is that each node's list holds its edges

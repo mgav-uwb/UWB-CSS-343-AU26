@@ -1,4 +1,4 @@
-// CSS 343 · topic program: 3-sum and the doubling experiment
+// CSS 343 - topic program: 3-sum and the doubling experiment
 //
 // The 3-sum problem: count the triples (i<j<k) with a[i]+a[j]+a[k] == 0.
 // We instrument the algorithm to COUNT operations (exact, machine-independent)

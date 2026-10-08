@@ -1,4 +1,4 @@
-// CSS 343 · Homework 5: hash tables and graph search.
+// CSS 343 - Homework 5: hash tables and graph search.
 // Fill in the TODOs, then run the program.
 //
 //   build:       g++ -std=c++17 -O2 hw05.cpp -o hw05
@@ -18,7 +18,7 @@
 using namespace std;
 
 // ============================================================================
-// Part A · open addressing (Lecture 8)
+// Part A - open addressing (Lecture 8)
 // ============================================================================
 // GIVEN: a fixed-size open-addressing table of non-negative int keys. slot[i]
 // holds a key, or EMPTY. The table never resizes. M is prime.
@@ -75,7 +75,7 @@ bool lpRemove(OATable& t, int k) {
 }
 
 // ============================================================================
-// Part B · separate chaining with resizing (Lecture 8)
+// Part B - separate chaining with resizing (Lecture 8)
 // ============================================================================
 // GIVEN: a chaining table of non-negative int keys, h(k) = k mod M.
 struct ChainTable {
@@ -97,7 +97,7 @@ bool chainInsert(ChainTable& t, int k) {
 }
 
 // ============================================================================
-// Part C · graph search (Lecture 9)
+// Part C - graph search (Lecture 9)
 // ============================================================================
 // Graphs are adjacency lists: adj[u] lists the neighbors of vertex u, for
 // vertices 0..V-1 (V = adj.size()). An undirected graph lists each edge in
@@ -155,7 +155,7 @@ static bool isPath(const vector<vector<int>>& adj, const vector<int>& p, int s, 
 }
 
 int main() {
-    cout << "T1 · dhInsert\n";
+    cout << "T1 - dhInsert\n";
     {
         OATable t(11);                                    // the slides' example: Q = 7
         int a = dhInsert(t, 89, 7), b = dhInsert(t, 18, 7), c = dhInsert(t, 40, 7), d = dhInsert(t, 29, 7);
@@ -166,7 +166,7 @@ int main() {
         check(f.n == 5 && dhInsert(f, 25, 3) == -1, "a full table rejects a new key with -1");
     }
 
-    cout << "T2 · lpRemove\n";
+    cout << "T2 - lpRemove\n";
     {
         OATable t(11);
         for (int k : {14, 25, 36}) lpInsert(t, k);        // all home to 3: slots 3, 4, 5
@@ -179,7 +179,7 @@ int main() {
         check(ok, "a cluster that wraps past the last slot is repaired");
     }
 
-    cout << "T3 · chainInsert\n";
+    cout << "T3 - chainInsert\n";
     {
         ChainTable t(3);
         for (int k : {1, 4, 7, 2, 5, 8}) chainInsert(t, k);    // n = 6 = 2M: no resize yet
@@ -190,7 +190,7 @@ int main() {
         check(ok, "the seventh key resizes to M = 7 and rehashes in chain order");
     }
 
-    cout << "T4 · componentSizes\n";
+    cout << "T4 - componentSizes\n";
     {
         auto g = undirected(6, {{0, 3}, {2, 4}, {4, 5}});
         check(componentSizes(g) == vector<int>({2, 1, 3}), "components {0,3}, {1}, {2,4,5}: sizes 2, 1, 3");
@@ -200,7 +200,7 @@ int main() {
         check(componentSizes(undirected(200000, es)) == vector<int>({200000}), "a path through 200,000 vertices is one component");
     }
 
-    cout << "T5 · gridSteps\n";
+    cout << "T5 - gridSteps\n";
     {
         vector<string> g = {"..#.",
                             "S.#.",
@@ -218,7 +218,7 @@ int main() {
         check(gridSteps(room) == 3, "an open room: 3 moves");
     }
 
-    cout << "T6 · bfsPath\n";
+    cout << "T6 - bfsPath\n";
     {
         //  0 -> 1 -> 2 -> 3,  0 -> 4 -> 3,  3 -> 5
         vector<vector<int>> g = {{1, 4}, {2}, {3}, {5}, {3}, {}};

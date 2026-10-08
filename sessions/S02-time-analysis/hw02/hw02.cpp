@@ -1,4 +1,4 @@
-// CSS 343 · Homework 2: analysis of algorithms, time and memory.
+// CSS 343 - Homework 2: analysis of algorithms, time and memory.
 // Fill in the TODOs, then run the program.
 //
 //   build:   g++ -std=c++17 -O2 hw02.cpp -o hw02
@@ -16,7 +16,7 @@
 using namespace std;
 
 // ============================================================================
-// Part A · The doubling experiment, generalized (Lecture 2)
+// Part A - The doubling experiment, generalized (Lecture 2)
 // ============================================================================
 
 // ---- TODO 1: estimateExponent -----------------------------------------------
@@ -42,14 +42,14 @@ double predictCount(const vector<long long>& ns, const vector<long long>& counts
 }
 
 // ============================================================================
-// Part B · Design with a sort (Lecture 2)
+// Part B - Design with a sort (Lecture 2)
 // ============================================================================
 
 // ---- TODO 3: countPairsWithDifference ---------------------------------------
 // The values in a are DISTINCT (in no particular order), and d >= 1. Return
 // the number of pairs of values (x, y) in a with y - x == d.
 //
-// It must run in time proportional to N log₂ N or better: the tests include an
+// It must run in time proportional to N log2 N or better: the tests include an
 // array of 400,000 values and stop any version that takes longer than a few
 // seconds, which rules out checking every pair. You may use std::sort.
 long countPairsWithDifference(vector<int> a, int d) {
@@ -58,13 +58,13 @@ long countPairsWithDifference(vector<int> a, int d) {
 }
 
 // ============================================================================
-// Part C · Witnesses for asymptotic notation (Lecture 3)
+// Part C - Witnesses for asymptotic notation (Lecture 3)
 // ============================================================================
 // A claim f in O(g) is proved by constants c > 0 and n0 >= 1 with
 // f(n) <= c * g(n) for EVERY n >= n0 (and f in Omega(g) by c * g(n) <= f(n)).
 // Return constants that prove each claim. Any valid constants earn full
 // credit; they need not be the smallest. Limits: every constant is at most
-// 1,000,000. log₂ is the logarithm base 2 (some books write lg).
+// 1,000,000. log2 is the logarithm base 2 (some books write lg).
 
 struct Witness      { double c;       long n0; };   // GIVEN
 struct ThetaWitness { double c1, c2;  long n0; };   // GIVEN
@@ -80,14 +80,14 @@ Witness witnessB() {
     // TODO 4b
     return {0, 0};
 }
-// (c)  n log₂ n + 5n  is in  Theta(n log₂ n):  c1 * n log₂ n <= n log₂ n + 5n <= c2 * n log₂ n
+// (c)  n log2 n + 5n  is in  Theta(n log2 n):  c1 * n log2 n <= n log2 n + 5n <= c2 * n log2 n
 ThetaWitness witnessC() {
     // TODO 4c
     return {0, 0, 0};
 }
 
 // ============================================================================
-// Part D · Counting bytes (Lecture 3)
+// Part D - Counting bytes (Lecture 3)
 // ============================================================================
 
 // GIVEN: a record as someone first wrote it.
@@ -124,7 +124,7 @@ static void check(bool ok, const char* what) {
 static bool near(double x, double want, double tol) { return fabs(x - want) <= tol; }
 
 int main() {
-    cout << "T1 · estimateExponent\n";
+    cout << "T1 - estimateExponent\n";
     {
         // brute-force 3-sum, triples tested (Lecture 2's experiment)
         vector<long long> ns = {250, 500, 1000, 2000};
@@ -134,7 +134,7 @@ int main() {
         vector<long long> n2 = {1000, 2000, 4000};
         vector<long long> c2 = {10979, 23937, 51912};
         double b = estimateExponent(n2, c2);
-        check(b > 1.05 && b < 1.2, "fast 2-sum's counts give a little over 1 (N log₂ N)");
+        check(b > 1.05 && b < 1.2, "fast 2-sum's counts give a little over 1 (N log2 N)");
         // sizes that triple: 5 n^2 exactly
         vector<long long> n3 = {100, 300, 900};
         vector<long long> c3 = {50000, 450000, 4050000};
@@ -145,7 +145,7 @@ int main() {
         check(near(estimateExponent(n4, c4), 2.0, 1e-9), "uses the last two measurements");
     }
 
-    cout << "T2 · predictCount\n";
+    cout << "T2 - predictCount\n";
     {
         vector<long long> ns = {250, 500, 1000, 2000};
         vector<long long> cs = {2573000, 20708500, 166167000, 1331334000};
@@ -156,7 +156,7 @@ int main() {
         check(near(predictCount(n3, c3, 1800), 16200000.0, 1e-3), "5n^2 at n = 1800: 16,200,000");
     }
 
-    cout << "T3 · countPairsWithDifference\n";
+    cout << "T3 - countPairsWithDifference\n";
     {
         check(countPairsWithDifference({1, 5, 3, 4, 2}, 2) == 3, "{1,5,3,4,2}, d = 2: (1,3) (2,4) (3,5)");
         check(countPairsWithDifference({8, 12, 16, 4, 0, 20}, 4) == 5, "multiples of 4, d = 4: 5 pairs");
@@ -164,10 +164,10 @@ int main() {
         check(countPairsWithDifference({1, 2, 3}, 5) == 0 && countPairsWithDifference({42}, 1) == 0, "no pair: d too large; one element");
         vector<int> big;
         for (int i = 0; i < 200000; i++) big.push_back((i * 7919) % 200000);   // 0..199999, shuffled
-        check(countPairsWithDifference(big, 1000) == 199000, "0..199999 shuffled, d = 1000: 199,000 pairs (runs fast only if N log₂ N)");
+        check(countPairsWithDifference(big, 1000) == 199000, "0..199999 shuffled, d = 1000: 199,000 pairs (runs fast only if N log2 N)");
     }
 
-    cout << "T4 · witnesses (checked for every n from n0 to 1,000,000)\n";
+    cout << "T4 - witnesses (checked for every n from n0 to 1,000,000)\n";
     {
         auto okUpper = [](Witness w, auto f, auto g) {
             if (!(w.c > 0 && w.c <= 1e6 && w.n0 >= 1 && w.n0 <= 1000000)) return false;
@@ -185,10 +185,10 @@ int main() {
         ThetaWitness t = witnessC();
         auto f = [](double n) { return n * log2(n) + 5 * n; };
         auto g = [](double n) { return n * log2(n); };
-        check(okLower({t.c1, t.n0}, f, g) && okUpper({t.c2, t.n0}, f, g), "(c) n log₂ n + 5n in Theta(n log₂ n)");
+        check(okLower({t.c1, t.n0}, f, g) && okUpper({t.c2, t.n0}, f, g), "(c) n log2 n + 5n in Theta(n log2 n)");
     }
 
-    cout << "T5 · RecordPacked\n";
+    cout << "T5 - RecordPacked\n";
     {
         cout << "  sizeof(Record) = " << sizeof(Record) << ", sizeof(RecordPacked) = " << sizeof(RecordPacked) << "\n";
         check(sizeof(RecordPacked) == 16, "sizeof(RecordPacked) == 16");

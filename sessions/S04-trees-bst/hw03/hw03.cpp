@@ -1,4 +1,4 @@
-// CSS 343 · Homework 3: recursion on binary trees.
+// CSS 343 - Homework 3: recursion on binary trees.
 // Fill in the TODOs, then run the program.
 //
 //   build:       g++ -std=c++17 -g hw03.cpp -o hw03
@@ -111,7 +111,7 @@ int main() {
     Node* t = nullptr;
     for (int k : {50, 30, 70, 20, 40, 60, 80, 35, 90}) t = insert(t, k);
 
-    cout << "T1 · isBST\n";
+    cout << "T1 - isBST\n";
     {
         Node* one = leaf(1);
         check(isBST(t) && isBST(nullptr) && isBST(one), "the example tree, the empty tree and a single node are BSTs");
@@ -126,7 +126,7 @@ int main() {
         destroy(bad); destroy(bad2); destroy(bad3);
     }
 
-    cout << "T2 · lowestCommonAncestor\n";
+    cout << "T2 - lowestCommonAncestor\n";
     {
         auto lca = [&](int a, int b) { const Node* r = lowestCommonAncestor(t, a, b); return r ? r->key : -1; };
         check(lca(20, 40) == 30, "LCA(20, 40) = 30");
@@ -135,7 +135,7 @@ int main() {
         check(lca(60, 60) == 60, "LCA(60, 60) = 60");
     }
 
-    cout << "T3 · isAVL\n";
+    cout << "T3 - isAVL\n";
     {
         check(isAVL(t) && isAVL(nullptr), "the example tree and the empty tree are balanced");
         Node* chain = nullptr;
@@ -158,7 +158,7 @@ int main() {
         destroy(big);
     }
 
-    cout << "T4 · toInfix\n";
+    cout << "T4 - toInfix\n";
     {
         Node* e1 = opNode('+', leaf(2), opNode('*', leaf(3), leaf(4)));
         check(toInfix(e1) == "(2+(3*4))", "2 + 3 * 4 gives (2+(3*4))");
@@ -171,7 +171,7 @@ int main() {
         destroy(e1); destroy(e2); destroy(e3); destroy(e4);
     }
 
-    cout << "T5 · countInRange\n";
+    cout << "T5 - countInRange\n";
     {
         visits = 0;
         check(countInRange(t, 35, 65) == 4, "keys in [35, 65]: 35, 40, 50, 60");

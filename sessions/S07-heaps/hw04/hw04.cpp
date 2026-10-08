@@ -1,4 +1,4 @@
-// CSS 343 · Homework 4: heaps, priority queues, and balanced-tree invariants.
+// CSS 343 - Homework 4: heaps, priority queues, and balanced-tree invariants.
 // Fill in the TODOs, then run the program.
 //
 //   build:       g++ -std=c++17 -O2 hw04.cpp -o hw04
@@ -16,7 +16,7 @@
 using namespace std;
 
 // ============================================================================
-// Part A · d-ary heaps (Lecture 7)
+// Part A - d-ary heaps (Lecture 7)
 // ============================================================================
 // A d-ary max-heap stores a complete d-ary tree in a vector, 0-BASED: the
 // children of index i are d*i + 1, d*i + 2, ..., d*i + d (those that are < n),
@@ -40,7 +40,7 @@ void buildDary(vector<int>& a, int d) {
 }
 
 // ============================================================================
-// Part B · using a priority queue (Lecture 7)
+// Part B - using a priority queue (Lecture 7)
 // ============================================================================
 // For these two you may use std::priority_queue. A MIN-heap of ints is
 //     priority_queue<int, vector<int>, greater<int>> pq;
@@ -67,7 +67,7 @@ vector<int> mergeSorted(const vector<vector<int>>& lists) {
 }
 
 // ============================================================================
-// Part C · balanced-tree invariants (Lecture 6)
+// Part C - balanced-tree invariants (Lecture 6)
 // ============================================================================
 
 // GIVEN: a left-leaning red-black node. `red` is the color of the link from the
@@ -122,7 +122,7 @@ static RB* rb(int k, bool red, RB* l = nullptr, RB* r = nullptr) { return new RB
 static void freeRB(RB* t) { if (!t) return; freeRB(t->left); freeRB(t->right); delete t; }
 
 int main() {
-    cout << "T1 · sinkDary\n";
+    cout << "T1 - sinkDary\n";
     {
         vector<int> a = {1, 9, 8, 7, 6, 5, 4};             // binary: root 1 sinks via 9
         sinkDary(a, 0, 7, 2);
@@ -138,7 +138,7 @@ int main() {
         check(e == vector<int>({9, 1, 2}), "a node already larger than its children stays");
     }
 
-    cout << "T2 · buildDary\n";
+    cout << "T2 - buildDary\n";
     {
         vector<int> a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         buildDary(a, 2);
@@ -153,7 +153,7 @@ int main() {
         check(one == vector<int>({7}) && none.empty(), "one element and no elements");
     }
 
-    cout << "T3 · kthLargest\n";
+    cout << "T3 - kthLargest\n";
     {
         vector<int> a = {7, 2, 9, 4, 9, 1, 5};
         check(kthLargest(a, 1) == 9 && kthLargest(a, 2) == 9 && kthLargest(a, 3) == 7,
@@ -164,7 +164,7 @@ int main() {
         check(kthLargest(big, 10) == 999990, "the 10th largest of 0..999999 shuffled is 999990");
     }
 
-    cout << "T4 · mergeSorted\n";
+    cout << "T4 - mergeSorted\n";
     {
         vector<vector<int>> ls = {{1, 4, 9}, {2, 3, 10, 11}, {}, {4, 5}};
         check(mergeSorted(ls) == vector<int>({1, 2, 3, 4, 4, 5, 9, 10, 11}), "four lists, one empty, a repeat kept");
@@ -172,7 +172,7 @@ int main() {
         check(mergeSorted({{-3, 0, 8}}) == vector<int>({-3, 0, 8}), "a single list comes back unchanged");
     }
 
-    cout << "T5 · llrbBlackHeight\n";
+    cout << "T5 - llrbBlackHeight\n";
     {
         //      20 (black)
         //     /   \
@@ -191,7 +191,7 @@ int main() {
         freeRB(t); freeRB(r); freeRB(two); freeRB(lop);
     }
 
-    cout << "T6 · minKeysBTree\n";
+    cout << "T6 - minKeysBTree\n";
     {
         check(minKeysBTree(3, 0) == 1 && minKeysBTree(3, 2) == 7, "order 3 (a 2-3 tree): 1 key at height 0, 7 at height 2");
         check(minKeysBTree(5, 1) == 5, "order 5, height 1: a root of 1 key over two leaves of 2");

@@ -1,4 +1,4 @@
-// CSS 343 · PA2: GraphL implementation skeleton. Every method is a TODO.
+// CSS 343 - PA2: GraphL implementation skeleton. Every method is a TODO.
 #include "graphl.h"
 #include <stack>
 #include <queue>

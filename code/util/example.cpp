@@ -1,4 +1,4 @@
-// CSS 343 · code library: example.cpp, the three utilities together.
+// CSS 343 - code library: example.cpp, the three utilities together.
 //   g++ -std=c++17 -O2 example.cpp -o example && ./example
 #include <cstdio>
 #include <vector>

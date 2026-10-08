@@ -1,4 +1,4 @@
-// CSS 343 · topic program: designing a faster algorithm
+// CSS 343 - topic program: designing a faster algorithm
 //
 // Five algorithms for the same family of problems, with their operation counts,
 // so the order-of-growth differences are visible:

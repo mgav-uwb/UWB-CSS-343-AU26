@@ -1,4 +1,4 @@
-// CSS 343 · topic program: recursion, traced and counted.
+// CSS 343 - topic program: recursion, traced and counted.
 //   1. work before and after the recursive call
 //   2. recursion on a list and on a tree
 //   3. binary search, with every probe printed

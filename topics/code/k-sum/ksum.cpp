@@ -1,4 +1,4 @@
-// CSS 343 · topic program: 3-sum with loops, k-sum with recursion.
+// CSS 343 - topic program: 3-sum with loops, k-sum with recursion.
 // Counts the sum checks each version performs and the calls the recursion
 // makes, and compares both with the binomial coefficients.
 //

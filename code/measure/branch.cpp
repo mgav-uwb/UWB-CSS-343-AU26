@@ -1,4 +1,4 @@
-// CSS 343 · program: the same work, with a branch the processor can or cannot predict.
+// CSS 343 - program: the same work, with a branch the processor can or cannot predict.
 //
 // Two experiments over the same 16,777,216 random values in 0..255, each run on
 // the values in random order and then on the same values sorted:

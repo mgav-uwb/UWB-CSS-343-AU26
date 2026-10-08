@@ -1,4 +1,4 @@
-// CSS 343 · PA2: Part 4 graph generator (GIVEN).
+// CSS 343 - PA2: Part 4 graph generator (GIVEN).
 //   g++ -std=c++17 -O2 gen_graphs.cpp -o gen && ./gen
 // Writes dense_V.txt and sparse_V.txt for V = 200, 400, 800, 1600 in the PA2
 // file format (fixed seed: everyone measures the same graphs):

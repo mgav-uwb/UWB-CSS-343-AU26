@@ -1,4 +1,4 @@
-// CSS 343 · PA1: given driver. Runs the SAME experiment in all three modes,
+// CSS 343 - PA1: given driver. Runs the SAME experiment in all three modes,
 // then a merge. Deterministic: its output must match expected-output.txt:
 //
 //   g++ -std=c++17 -g bintree.cpp driver.cpp -o pa1
@@ -41,7 +41,7 @@ int main() {
     for (int k : {50, 30, 70, 30, 50}) cout << "insert " << k << ": " << (v.insert(k) ? "ok" : "dup") << '\n';
     cout << "inorder: " << v;
     cout << "contains 30 / 99: " << v.contains(30) << " / " << v.contains(99) << '\n';
-    cout << "remove 30 (vanilla): " << v.remove(30) << " → " << v;
+    cout << "remove 30 (vanilla): " << v.remove(30) << " -> " << v;
     BinTree a(Mode::AVL);
     a.insert(1); a.insert(2);
     cout << "remove in AVL mode is refused: " << a.remove(1) << ", tree intact: " << a;
@@ -51,7 +51,7 @@ int main() {
     cout << "\n=== mergeWith: evens (AVL) absorb odds (VANILLA), some overlap ===\n";
     BinTree evens(Mode::AVL), odds(Mode::VANILLA);
     for (int k = 0; k <= 30; k += 2) evens.insert(k);
-    for (int k = 1; k <= 30; k += 3) odds.insert(k);      // 1,4,7,…,28 (some even = overlap)
+    for (int k = 1; k <= 30; k += 3) odds.insert(k);      // 1,4,7,...,28 (some even = overlap)
     evens.mergeWith(odds);
     cout << "merged: size=" << evens.size()
          << " heightOK=" << (evens.treeHeight() <= 10 ? "yes" : "NO") << '\n';   // 2*ceil(log2(22)) = 10
@@ -60,6 +60,6 @@ int main() {
     cout << "aux bytes reported: " << (evens.mergeAuxBytes() >= 0 ? "yes" : "NO") << '\n';
     evens.insert(99); evens.insert(98); evens.insert(97);
     cout << "post-merge inserts keep the AVL bound: "
-         << (evens.treeHeight() <= 8 ? "yes" : "NO") << '\n';                    // 1.44*log2(26) ≈ 6.8 → ≤ 8
+         << (evens.treeHeight() <= 8 ? "yes" : "NO") << '\n';                    // 1.44*log2(26) ~ 6.8 -> <= 8
     return 0;
 }

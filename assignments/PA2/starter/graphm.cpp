@@ -1,4 +1,4 @@
-// CSS 343 · PA2: GraphM implementation skeleton. Every method is a TODO.
+// CSS 343 - PA2: GraphM implementation skeleton. Every method is a TODO.
 #include "graphm.h"
 #include <iomanip>
 

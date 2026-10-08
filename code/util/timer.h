@@ -1,4 +1,4 @@
-// CSS 343 · code library: timer.h
+// CSS 343 - code library: timer.h
 // Wall-clock timing for experiments, on std::chrono::steady_clock (which never
 // jumps when the system clock is adjusted).
 //

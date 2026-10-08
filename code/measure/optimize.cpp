@@ -1,4 +1,4 @@
-// CSS 343 · program: what the optimizer does to a timing experiment.
+// CSS 343 - program: what the optimizer does to a timing experiment.
 //
 // countTriples is brute-force 3-sum. Build it twice and compare:
 //   g++ -std=c++17 -O0 optimize.cpp -o opt0 && ./opt0

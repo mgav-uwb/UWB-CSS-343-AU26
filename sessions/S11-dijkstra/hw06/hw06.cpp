@@ -1,4 +1,4 @@
-// CSS 343 · Homework 6: directed graphs and shortest paths.
+// CSS 343 - Homework 6: directed graphs and shortest paths.
 // Fill in the TODOs, then run the program.
 //
 //   build:       g++ -std=c++17 -O2 hw06.cpp -o hw06
@@ -24,7 +24,7 @@
 using namespace std;
 
 // ============================================================================
-// Part A · depth-first search on digraphs (Lecture 10)
+// Part A - depth-first search on digraphs (Lecture 10)
 // ============================================================================
 
 // ---- TODO 1: hasCycle ----------------------------------------------------------
@@ -65,7 +65,7 @@ vector<int> sccLabels(const vector<vector<int>>& adj) {
 }
 
 // ============================================================================
-// Part B · shortest paths (Lecture 11)
+// Part B - shortest paths (Lecture 11)
 // ============================================================================
 const long long UNREACHABLE = LLONG_MAX;
 
@@ -116,7 +116,7 @@ int main() {
     // the course DAG: 0->1, 0->3, 1->2, 1->3, 2->3, 0->5, 3->4, 3->7, 4->5, 5->6, 4->7
     vector<vector<int>> dag = {{1, 3, 5}, {2, 3}, {3}, {4, 7}, {5, 7}, {6}, {}, {}};
 
-    cout << "T1 · hasCycle\n";
+    cout << "T1 - hasCycle\n";
     {
         check(!hasCycle(dag), "the course DAG has no cycle");
         vector<vector<int>> cyc = dag; cyc[6].push_back(2);          // 2->3->4->5->6->2
@@ -126,7 +126,7 @@ int main() {
         check(hasCycle(loop) && !hasCycle(diamond), "a self-loop is a cycle; a diamond is not");
     }
 
-    cout << "T2 · topoOrderMin\n";
+    cout << "T2 - topoOrderMin\n";
     {
         check(topoOrderMin(dag) == vector<int>({0, 1, 2, 3, 4, 5, 6, 7}), "the course DAG: 0 1 2 3 4 5 6 7");
         vector<vector<int>> g = {{}, {0}, {0}, {1, 2}, {}};            // 3->1, 3->2, 1->0, 2->0
@@ -135,7 +135,7 @@ int main() {
         check(topoOrderMin(cyc).empty(), "a digraph with a cycle gives an empty order");
     }
 
-    cout << "T3 · sccLabels\n";
+    cout << "T3 - sccLabels\n";
     {
         //  0 <-> 1 -> 2 -> 3 -> 4 -> 2,  4 -> 5,  5 -> 5
         vector<vector<int>> g = {{1}, {0, 2}, {3}, {4}, {2, 5}, {5}};
@@ -151,7 +151,7 @@ int main() {
     vector<vector<pair<int,int>>> w = {{{1, 4}, {3, 6}, {5, 20}}, {{2, 1}, {3, 5}}, {{3, 8}},
                                        {{4, 2}, {7, 11}}, {{5, 3}, {7, 7}}, {{6, 9}}, {}, {}};
 
-    cout << "T4 · dijkstra\n";
+    cout << "T4 - dijkstra\n";
     {
         check(dijkstra(w, 0) == vector<long long>({0, 4, 5, 6, 8, 11, 20, 15}), "from 0: 0 4 5 6 8 11 20 15 (vertex 5 by the detour 0 3 4 5, not the edge 0 5)");
         check(dijkstra(w, 3) == vector<long long>({U, U, U, 0, 2, 5, 14, 9}), "from 3: vertices 0, 1, 2 are unreachable");
@@ -159,7 +159,7 @@ int main() {
         check(dijkstra(big, 0)[2] == 4000000000LL, "distances beyond the range of int");
     }
 
-    cout << "T5 · dagShortest\n";
+    cout << "T5 - dagShortest\n";
     {
         check(dagShortest(w, 0) == dijkstra(w, 0), "on the weighted course DAG it agrees with Dijkstra");
         vector<vector<pair<int,int>>> neg = {{{1, 5}, {2, 2}}, {{3, -4}}, {{3, 1}}, {}};   // 0 1 3 costs 1

@@ -1,4 +1,4 @@
-// CSS 343 · program: same operation count, different running time.
+// CSS 343 - program: same operation count, different running time.
 //
 // Two experiments, each doing EXACTLY the same number of additions both ways:
 //   1. sum an n x n matrix by rows, then by columns
