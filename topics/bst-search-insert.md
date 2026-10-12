@@ -30,7 +30,7 @@ A BST is an **ordered symbol table**: a **map** of **(key → value)** pairs, lo
 
 At **every** node: all keys in its **left** subtree are **smaller**, all keys in its **right** subtree are **larger**: a recursive invariant, **not merely "sorted"**.
 
-<img src="../../topics/figures/trees/fig-02-anatomy-bst.jpeg" alt="Anatomy of a BST: each node's key exceeds every key in its left subtree and is below every key in its right subtree; a value rides along" style="height:196px">
+<img src="../../topics/figures/trees/fig-02-anatomy-bst.svg" alt="Anatomy of a BST: each node's key exceeds every key in its left subtree and is below every key in its right subtree; a value rides along" style="height:250px">
 
 So search is a **guided descent** (compare, go left or right), and in-order visits the keys **sorted**.
 

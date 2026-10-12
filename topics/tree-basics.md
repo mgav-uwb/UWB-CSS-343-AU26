@@ -33,7 +33,7 @@ A **tree** is nodes joined by **links** (edges); each link is **null** or points
 
 <small>binary = at most two children per node (defined below); the vocabulary is the same for all trees</small>
 
-<img src="../../topics/figures/trees/fig-01-anatomy-binary-tree.webp" alt="Anatomy of a tree: root, a left link, the right child of the root, a subtree, and null links" style="width:46%">
+<img src="../../topics/figures/trees/fig-01-anatomy-binary-tree.svg" alt="Anatomy of a binary tree: the root, a left link, the right child of the root, a subtree, null links, a leaf, and a parent of two children" style="width:84%">
 
 
 --

@@ -28,9 +28,9 @@ Everything reduces to **one question: how tall is the tree?**
 
 ## Best, typical, worst
 
-<img src="../../topics/figures/trees/fig-07-bst-shapes-best-typical-worst.webp" alt="BST possibilities: a balanced best case, a typical case, and a worst-case path" style="height:420px">
+<img src="../../topics/figures/trees/fig-07-bst-shapes-best-typical-worst.svg" alt="The same seven keys inserted in four orders: a balanced best case, a typical case, and two worst-case paths from sorted and reverse-sorted input" style="width:96%">
 
-<small>The same keys, three shapes: **balanced** (height ~log₂ n), **typical**, and a **path** (height n−1). Cost follows height: so which one do we usually get?</small>
+<small>The same keys, different insertion orders: **balanced** (height ~log₂ n), **typical**, and a **path** (height n−1) from sorted or reverse-sorted input. Cost follows height: so which one do we usually get?</small>
 
 --
 
@@ -57,9 +57,9 @@ Everything reduces to **one question: how tall is the tree?**
 
 ## What "typical" really looks like
 
-<img src="../../topics/figures/trees/fig-08-typical-bst-256-keys.jpeg" alt="A typical BST built from 256 random keys: bushy and shallow" style="width:66%">
+<img src="../../topics/figures/trees/fig-08-typical-bst-256-keys.svg" alt="A BST built from 256 random keys: average depth 8.2 against log2 256 = 8, height 16" style="height:340px">
 
-<small>A BST from **256 random keys**: bushy and shallow (~**1.39 log₂ n** deep), not a path. Random insertion ≈ random quicksort pivots.</small>
+<small>A BST from **256 random keys**: bushy and shallow, average depth **8.2** against log₂ 256 = 8, not a path. Random insertion ≈ random quicksort pivots.</small>
 
 --
 
