@@ -25,7 +25,7 @@
 - **post-order**: left, right, node
 - **level-order**: top-to-bottom, left-to-right, using a **queue** (like BFS)
 
-**In-order of a *search* tree visits the keys in sorted order**.
+**NOTE:** In-order traversal of a *search* tree visits the keys in sorted order.
 
 --
 
