@@ -81,11 +81,15 @@ Each method is a short recursion, written out below.
 Search defines a **path** from the root (compare, go left or right) ending in a **hit** (a node with the key) or a **miss** (falling off a **null link**):
 
 ```cpp
-Value* get(Node* t, const Key& key) {
+Node* find(Node* t, const Key& key) {   // private: the node
     if (!t) return nullptr;             // miss (null link)
-    if (key == t->key) return &t->val;  // hit
-    if (key < t->key) return get(t->left, key);
-    else              return get(t->right, key);
+    if (key == t->key) return t;        // hit
+    if (key < t->key) return find(t->left, key);
+    else              return find(t->right, key);
+}
+Value* get(const Key& key) {            // public: the value only
+    Node* n = find(root, key);
+    return n ? &n->val : nullptr;
 }
 ```
 --

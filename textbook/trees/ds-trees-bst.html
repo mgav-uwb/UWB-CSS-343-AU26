@@ -566,7 +566,8 @@ fn inorder(t: &amp;Option&lt;Box&lt;Node&gt;&gt;) {
   <button class="ct-tab" data-lang="rs">Rust</button>
 </div>
 <pre class="ct-pane" data-lang="cpp">// A BST node (Sedgewick&#x27;s ordered symbol table): key, value, two links, and a
-// subtree-size count. get returns a pointer to the value or null; put inserts.
+// subtree-size count. find returns the node or null (private: a caller holding
+// the node could change its key); get exposes only the value; put inserts.
 struct Node {
     Key   key;   Value val;
     Node* left  = nullptr;
@@ -575,10 +576,14 @@ struct Node {
 };
 int size(Node* t) { return t ? t-&gt;size : 0; }      // null-safe
 
-Value* get(Node* t, const Key&amp; key) {
+Node* find(Node* t, const Key&amp; key) {
     if (!t) return nullptr;             // miss: fell off a null link
-    if (key == t-&gt;key) return &amp;t-&gt;val;  // hit
-    return key &lt; t-&gt;key ? get(t-&gt;left, key) : get(t-&gt;right, key);
+    if (key == t-&gt;key) return t;        // hit
+    return key &lt; t-&gt;key ? find(t-&gt;left, key) : find(t-&gt;right, key);
+}
+Value* get(Node* root, const Key&amp; key) {
+    Node* n = find(root, key);
+    return n ? &amp;n-&gt;val : nullptr;
 }
 Node* put(Node* t, const Key&amp; key, const Value&amp; val) {
     if (!t) return new Node{key, val};  // grow at the null link
