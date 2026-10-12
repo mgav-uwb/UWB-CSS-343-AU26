@@ -79,6 +79,8 @@ Sedgewick proves it with a recurrence, the same one as quicksort's.
 
 So a random BST is only **~39% costlier** than a perfectly balanced one: and unlike binary search in a sorted array, it gives **O(log n) insertion**, not linear.
 
+<small>**Why?** Both find the insertion point in ~log n compares. A **sorted array** must then shift every larger key one slot right to open a gap: up to **n moves**. A **BST** hangs the new node from the **null link** where the search ended: **no other node moves**, so insertion costs only the search path.</small>
+
 --
 
 ## Demo: theory meets measurement
