@@ -170,7 +170,7 @@
         '<button data-act="post">post</button>' +
         '<button data-act="level">level</button></span>' +
         window.VizPlayer.tpButtonsHTML() + window.VizPlayer.speedHTML(),
-      output: "visit order"
+      output: "visit orders"
     });
     var ctx = sc.ctx;
     var ctrls = { setStatus: sc.setStatus, on: sc.on, btn: sc.btn };
@@ -209,6 +209,16 @@
       }
       return out;
     }
+    // complete visit sequence of each order, for the output list
+    var ORDERS = ["pre", "in", "post", "level"], FULL = {};
+    ORDERS.forEach(function (o) {
+      FULL[o] = compute(o).filter(function (e) { return e.emit; }).map(function (e) { return e.node.key; });
+    });
+    sc.outEl.classList.add("trav-out");
+    sc.outEl.addEventListener("click", function (e) {      // clicking a row selects that order
+      var row = e.target.closest && e.target.closest("[data-order]");
+      if (row) restart(row.getAttribute("data-order"));
+    });
     function setActive() {
       ["pre", "in", "post", "level"].forEach(function (o) {
         var b = ctrls.btn(o); if (b) b.classList.toggle("alt", o !== order);
@@ -241,8 +251,16 @@
         }
       });
 
-      // the enumeration so far goes to the output half (HTML, not canvas)
-      sc.setOutput(outputSoFar(pos).join(" "));
+      // all four orders listed in grey; the selected one lights its keys orange as they are visited
+      var hit = outputSoFar(pos).length;
+      sc.outEl.innerHTML = ORDERS.map(function (o) {
+        var keys = FULL[o].map(function (k, i) {
+          var cls = o !== order || i >= hit ? "" : i === hit - 1 && justEmitted ? "hit now" : "hit";
+          return '<span class="' + cls + '">' + k + "</span>";
+        }).join(" ");
+        return '<div class="trav-row' + (o === order ? " sel" : "") + '" data-order="' + o + '">' +
+          '<span class="lab">' + o + ":</span>" + keys + "</div>";
+      }).join("");
     }
     function status() {
       var keys = outputSoFar(pos), curEv = pos > 0 ? ev[pos - 1] : null;
