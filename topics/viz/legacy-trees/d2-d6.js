@@ -170,7 +170,7 @@
         '<button data-act="post">post</button>' +
         '<button data-act="level">level</button></span>' +
         window.VizPlayer.tpButtonsHTML() + window.VizPlayer.speedHTML(),
-      output: "visit orders"
+      output: " "
     });
     var ctx = sc.ctx;
     var ctrls = { setStatus: sc.setStatus, on: sc.on, btn: sc.btn };
@@ -215,6 +215,7 @@
       FULL[o] = compute(o).filter(function (e) { return e.emit; }).map(function (e) { return e.node.key; });
     });
     sc.outEl.classList.add("trav-out");
+    sc.outEl.parentElement.classList.add("trav-half");     // the four cards replace the output panel
     sc.outEl.addEventListener("click", function (e) {      // clicking a row selects that order
       var row = e.target.closest && e.target.closest("[data-order]");
       if (row) restart(row.getAttribute("data-order"));
@@ -259,7 +260,7 @@
           return '<span class="' + cls + '">' + k + "</span>";
         }).join(" ");
         return '<div class="trav-row' + (o === order ? " sel" : "") + '" data-order="' + o + '">' +
-          '<span class="lab">' + o + ":</span>" + keys + "</div>";
+          '<div class="lab">' + o + "-order</div>" + keys + "</div>";
       }).join("");
     }
     function status() {
