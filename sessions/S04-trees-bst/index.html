@@ -77,6 +77,10 @@
       transition: "slide",
       plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX],
     });
+    // an opened Answer grows the slide: re-center it so it stays on screen
+    document.addEventListener("toggle", function (e) {
+      if (e.target.matches && e.target.matches("details.answer")) Reveal.layout();
+    }, true);
   </script>
   <!-- Presenter companion: press N for a synced notes tab (see lib/presenter.js) -->
   <script src="../../lib/presenter.js"></script>

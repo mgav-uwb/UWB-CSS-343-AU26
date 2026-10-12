@@ -73,13 +73,19 @@ The proof is a recurrence, the same one as quicksort's.
 
 --
 
-## Proposition D: and why it pays off
+## Proposition D: insertion
 
 > **Proposition D.** Insertions and search **misses** also use **~ 1.39 log₂ N** compares on average.
 
-So a random BST is only **~39% costlier** than a perfectly balanced one: and unlike binary search in a sorted array, it gives **O(log n) insertion**, not linear.
+So a random BST is only **~39% costlier** than a balanced one, and inserts in **O(log n)**.
 
-<small>**Why?** Both find the insertion point in ~log n compares. A **sorted array** must then shift every larger key one slot right to open a gap: up to **n moves**. A **BST** hangs the new node from the **null link** where the search ended: **no other node moves**, so insertion costs only the search path.</small>
+**Why?** A sorted array inserts in **linear** time.
+
+<details class="answer"><summary>Answer:</summary>
+
+Both find the spot in ~log n compares. The **array** then shifts every larger key right (up to **n moves**); the **BST** hangs the node on the **null link** where the search ended (**nothing moves**).
+
+</details>
 
 --
 
