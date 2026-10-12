@@ -38,7 +38,7 @@ So search is a **guided descent** (compare, go left or right), and in-order visi
 
 ## Representation: the node carries a count
 
-Sedgewick's node adds a **subtree size** (node count) to support the ordered operations:
+The node adds a **subtree size** (node count) to support the ordered operations:
 
 ```cpp
 struct Node {

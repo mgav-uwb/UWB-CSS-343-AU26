@@ -20,7 +20,7 @@
 
 Every BST operation walks **one or two paths** root→down: **Θ(depth)** each, worst case **Θ(height)**.
 
-> **Proposition E (Sedgewick).** In a BST, all operations take time proportional to the **height** of the tree, in the worst case.
+> **Proposition E.** In a BST, all operations take time proportional to the **height** of the tree, in the worst case.
 
 Everything reduces to **one question: how tall is the tree?**
 
@@ -69,7 +69,7 @@ Compares for a search **hit** = 1 + the node's **depth**; summing all depths giv
 
 > **Proposition C.** Search hits in a BST built from **N random** keys use **~ 2 ln N ≈ 1.39 log₂ N** compares on average.
 
-Sedgewick proves it with a recurrence, the same one as quicksort's.
+The proof is a recurrence, the same one as quicksort's.
 
 --
 
@@ -103,7 +103,7 @@ So a random BST is only **~39% costlier** than a perfectly balanced one: and unl
 
 --
 
-## Cost summary (Sedgewick fig-09)
+## Cost summary
 
 | implementation | search worst | insert worst | search avg | insert avg |
 |---|:---:|:---:|:---:|:---:|
