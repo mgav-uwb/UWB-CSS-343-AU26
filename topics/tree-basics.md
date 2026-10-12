@@ -97,7 +97,7 @@ Classic uses:
 </pre>
 </div>
 
-<small>Click a **+** slot to add a leaf, a leaf to remove it; the badges report **full / perfect / complete / balanced**. Try the presets.</small>
+<small>Click a **+** slot to add a leaf, a leaf to remove it; the badges report **full / perfect / complete / balanced**. Try the numbered shapes and **random**; **hide answers** turns the badges into a quiz.</small>
 
 --
 

@@ -136,16 +136,16 @@
   // ========================================================================
   function buildTreeShapes(el) {
     var H = 320;
+    // numbered shape buttons: the names would give the answer away
+    var SHAPES = ["perfect", "complete", "full", "balanced", "generic", "maxdepth"];
     // S04 layout: preset actions on top (shapes | tools) · canvas (badges live on it)
     var g = C.scaffold(el, {
       w: W, h: H,
       actions:
-        '<span class="grp"><button data-act="perfect">perfect</button>' +
-        '<button data-act="complete">complete</button>' +
-        '<button data-act="full">full</button>' +
-        '<button data-act="balanced">balanced</button></span>' +
-        '<span class="grp"><button class="alt" data-act="generic">generic</button>' +
-        '<button class="alt" data-act="maxdepth">max depth</button>' +
+        '<span class="grp">' +
+        SHAPES.map(function (k, i) { return '<button data-act="' + k + '" title="shape ' + (i + 1) + '">' + (i + 1) + '</button>'; }).join("") +
+        '<button data-act="random">random</button></span>' +
+        '<span class="grp"><button class="alt" data-act="hide">hide answers</button>' +
         '<button class="alt" data-act="clear">🗑 clear</button></span>'
     });
     var cv = { ctx: g.ctx, canvas: g.canvas };
@@ -165,6 +165,42 @@
       maxdepth: function () { return n(1, null, n(2, n(3, null, n(4, n(5), null)), null)); }, // zig-zag path: every node 1 child → height n−1
       clear: function () { return null; }
     };
+
+    // ---- random: pick a target kind so every badge outcome comes up ----
+    function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+    function count(t) { return t ? 1 + count(t.left) + count(t.right) : 0; }
+    function shapeKey(t) { return t ? "(" + shapeKey(t.left) + shapeKey(t.right) + ")" : "."; }
+    function completeTree(nn) {                       // array-indexed: node i has kids 2i, 2i+1
+      function b(i) { return i > nn ? null : n(i, b(2 * i), b(2 * i + 1)); }
+      return b(1);
+    }
+    function growTree(target, pair) {                 // add random leaves (pairs keep it full), depth <= 4
+      var t = n(1);
+      for (var guard = 0; count(t) < target && guard < 200; guard++) {
+        var open = [];
+        (function w(x, d) { if (!x) return;
+          if (d < 4 && (pair ? !x.left && !x.right : !x.left || !x.right)) open.push(x);
+          w(x.left, d + 1); w(x.right, d + 1);
+        })(t, 0);
+        if (!open.length) break;
+        var x = open[rint(0, open.length - 1)];
+        if (pair) { x.left = n(0); x.right = n(0); }
+        else if (!x.left && (!x.right || Math.random() < 0.5)) x.left = n(0);
+        else x.right = n(0);
+      }
+      return t;
+    }
+    function randomTree() {
+      var kind = rint(0, 3), t;
+      for (var tries = 0; tries < 50; tries++) {
+        if (kind === 0) t = completeTree(rint(5, 15));
+        else if (kind === 1) t = growTree(2 * rint(3, 7) + 1, true);
+        else t = growTree(rint(6, 13), false);
+        if (kind === 2 && (!isBalanced(t) || isComplete(t))) continue;   // balanced, not complete
+        if (height(t) >= 3 && shapeKey(t) !== shapeKey(root)) break;
+      }
+      return t;
+    }
 
     function relabel() { var i = 1; (function w(t) { if (!t) return; t.key = i++; w(t.left); w(t.right); })(root); }
 
@@ -211,15 +247,17 @@
 
     // ---- the classifier badges: big color-coded pills right below the tree ----
     var BADGE_H = 34, BADGE_BAND = 52;               // pill height + band reserved at the canvas bottom
+    var hidden = false;                              // quiz mode: badges show "?"
     function drawBadges(ctx) {
       var items = [
         ["full", isFull(root)], ["perfect", isPerfect(root)],
         ["complete", isComplete(root)], ["balanced", isBalanced(root)]
       ];
+      if (hidden) items = items.map(function (it) { return [it[0], null]; });
       var y = H - BADGE_BAND / 2 - 4, gap = 14, padX = 16;
       ctx.font = "700 17px system-ui, sans-serif"; ctx.textBaseline = "middle";
       var widths = items.map(function (it) {
-        return ctx.measureText(it[0] + (it[1] ? "  ✓" : "  ✗")).width + 2 * padX;
+        return ctx.measureText(it[0] + "  ✓").width + 2 * padX;
       });
       var total = widths.reduce(function (a, b) { return a + b; }, 0) + gap * (items.length - 1);
       var x = (W - total) / 2;
@@ -227,10 +265,11 @@
         var ok = it[1], w = widths[i];
         ctx.beginPath();
         if (ctx.roundRect) ctx.roundRect(x, y - BADGE_H / 2, w, BADGE_H, 9); else ctx.rect(x, y - BADGE_H / 2, w, BADGE_H);
-        ctx.fillStyle = ok ? K.paleGreen : K.paleRed; ctx.fill();
-        ctx.lineWidth = 2; ctx.strokeStyle = ok ? K.green : K.red; ctx.stroke();
-        ctx.fillStyle = ok ? K.green : K.red; ctx.textAlign = "center";
-        ctx.fillText(it[0] + (ok ? "  ✓" : "  ✗"), x + w / 2, y + 1);
+        var fg = ok === null ? K.dim : ok ? K.green : K.red;
+        ctx.fillStyle = ok === null ? "#f1f3f7" : ok ? K.paleGreen : K.paleRed; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = fg; ctx.stroke();
+        ctx.fillStyle = fg; ctx.textAlign = "center";
+        ctx.fillText(it[0] + (ok === null ? "  ?" : ok ? "  ✓" : "  ✗"), x + w / 2, y + 1);
         x += w + gap;
       });
     }
@@ -270,7 +309,8 @@
       });
       slots().forEach(drawSlot);
       drawBadges(cv.ctx);
-      ctrls.setStatus("click + to add a leaf · click a leaf to remove it: watch the badges react");
+      ctrls.setStatus(hidden ? "answers hidden: which of the four does this tree satisfy?"
+        : "click + to add a leaf · click a leaf to remove it: watch the badges react");
     }
 
     function drawSlot(s) {
@@ -311,18 +351,29 @@
       for (var i = 0; i < ls.length; i++) {
         if (near(ls[i].x, ls[i].y, R + 4)) { removeLeaf(ls[i]); removed = true; break; }
       }
-      if (removed) { relabel(); render(); return; }
+      if (removed) { relabel(); mark(null); render(); return; }
       // a "+" slot?
       var sl = slots();
       for (var j = 0; j < sl.length; j++) {
-        if (near(sl[j].x, sl[j].y, 14)) { sl[j].parent[sl[j].side] = node(0); relabel(); render(); return; }
+        if (near(sl[j].x, sl[j].y, 14)) { sl[j].parent[sl[j].side] = node(0); relabel(); mark(null); render(); return; }
       }
     });
 
+    function mark(act) {                             // highlight the shape on screen
+      SHAPES.concat(["random"]).forEach(function (k) { g.btn(k).classList.toggle("on", k === act); });
+    }
     ctrls.on(function (act) {
-      if (PRE[act]) { root = PRE[act](); relabel(); render(); }
+      if (act === "hide") {
+        hidden = !hidden;
+        g.btn("hide").textContent = hidden ? "show answers" : "hide answers";
+        g.btn("hide").classList.toggle("on", hidden);
+        render(); return;
+      }
+      if (act === "random") { root = randomTree(); relabel(); mark(act); render(); return; }
+      if (PRE[act]) { root = PRE[act](); relabel(); mark(act); render(); }
     });
 
+    mark("complete");
     root = PRE.complete(); // start on a 3-level tree (complete ✓, but not full/perfect)
     relabel();
     render();
