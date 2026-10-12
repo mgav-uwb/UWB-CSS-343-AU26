@@ -132,5 +132,5 @@ This is a **post-order** computation: children before parent. No precedence rule
 </pre>
 </div>
 
-<small>Type any expression → **Build** its tree (precedence sets the shape: try `(2+3)*4` vs `2+3*4`). **Evaluate** computes it **bottom-up**, each value bubbling up to the root.</small>
+<small>Pick an example or type your own (`+ - * / ^`, unary `-`, parentheses) → **Build** its tree: precedence and associativity set the shape. **Evaluate** computes it **bottom-up**, each value bubbling up to the root.</small>
 

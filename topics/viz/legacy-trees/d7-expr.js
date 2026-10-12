@@ -3,11 +3,16 @@
    the SHAPE), then EVALUATES the tree recursively, bottom-up (post-order):
    each node's value is computed from its children and bubbles up to the root.
 
-   Grammar (recursive descent, standard precedence + left associativity):
-     expr   := term (('+'|'-') term)*
-     term   := factor (('*'|'/') factor)*
-     factor := NUMBER | '(' expr ')'
+   Grammar (recursive descent; + - * / left-associative, ^ right-associative,
+   unary minus binds looser than ^ so -2^2 = -(2^2)):
+     expr    := term (('+'|'-') term)*
+     term    := unary (('*'|'/') unary)*
+     unary   := '-' unary | power
+     power   := primary ('^' unary)?
+     primary := NUMBER | '(' expr ')'
    Node: operator {op,left,right,value} | operand {val,left:null,right:null,value}.
+   Unary minus is op "neg" with one child, on the RIGHT, so in-order still reads
+   the infix expression.
    Wires .algo-viz[data-algo="expr-tree"]. Uses window.VizCore. No deps. */
 (function () {
   "use strict";
@@ -20,11 +25,14 @@
     while (i < s.length) {
       var c = s[i];
       if (c === " " || c === "\t") { i++; continue; }
-      if (c >= "0" && c <= "9") {
+      if ((c >= "0" && c <= "9") || c === ".") {
         var num = "";
-        while (i < s.length && s[i] >= "0" && s[i] <= "9") num += s[i++];
+        while (i < s.length && ((s[i] >= "0" && s[i] <= "9") || s[i] === ".")) num += s[i++];
+        if (isNaN(Number(num))) throw new Error("bad number '" + num + "'");
         toks.push({ t: "num", v: num });
-      } else if (c === "+" || c === "-" || c === "*" || c === "/" || c === "x" || c === "×") {
+      } else if (c === "−") {
+        toks.push({ t: "op", v: "-" }); i++;
+      } else if (c === "+" || c === "-" || c === "*" || c === "/" || c === "^" || c === "x" || c === "×") {
         toks.push({ t: "op", v: (c === "x" || c === "×") ? "*" : c }); i++;
       } else if (c === "(" || c === ")") {
         toks.push({ t: c }); i++;
@@ -48,13 +56,22 @@
       return node;
     }
     function term() {
-      var node = factor();
+      var node = unary();
       while (peek() && peek().t === "op" && (peek().v === "*" || peek().v === "/")) {
-        var op = eat("op").v; node = bin(op, node, factor());
+        var op = eat("op").v; node = bin(op, node, unary());
       }
       return node;
     }
-    function factor() {
+    function unary() {
+      if (peek() && peek().t === "op" && peek().v === "-") { eat("op"); return bin("neg", null, unary()); }
+      return power();
+    }
+    function power() {
+      var base = primary();
+      if (peek() && peek().t === "op" && peek().v === "^") { eat("op"); return bin("^", base, unary()); }
+      return base;
+    }
+    function primary() {
       var k = peek();
       if (!k) throw new Error("unexpected end");
       if (k.t === "num") { pos++; return leaf(k.v); }
@@ -69,8 +86,10 @@
 
   // ---- helpers ------------------------------------------------------------
   function isLeaf(t) { return t && t.left == null && t.right == null; }
-  function lbl(t) { return t.op != null ? (t.op === "*" ? "×" : t.op) : t.val; }
+  function lbl(t) { return t.op != null ? (t.op === "*" ? "×" : t.op === "neg" || t.op === "-" ? "−" : t.op) : t.val; }
   function applyOp(op, a, b) {
+    if (op === "neg") return -b;
+    if (op === "^") return Math.pow(a, b);
     if (op === "+") return a + b;
     if (op === "-") return a - b;
     if (op === "*") return a * b;
@@ -79,6 +98,31 @@
   function fmt(x) { return (typeof x === "number" && !Number.isInteger(x)) ? Math.round(x * 100) / 100 : x; }
   function postorder(t, out) { if (!t) return; postorder(t.left, out); postorder(t.right, out); out.push(t); }
   function clearEval(t) { if (!t) return; t.evaluated = false; t.value = null; clearEval(t.left); clearEval(t.right); }
+
+  // value of one node from its children's values (a "neg" node has only a right child)
+  function evalNode(n) {
+    n.value = isLeaf(n) ? Number(n.val) : applyOp(n.op, n.left ? n.left.value : null, n.right.value);
+    n.evaluated = true;
+  }
+  function depth(t) { return t ? 1 + Math.max(depth(t.left), depth(t.right)) : 0; }
+
+  // prebuilt examples for the dropdown: [expression, what it shows]
+  var EXAMPLES = [
+    ["2+3*4", "precedence"],
+    ["(2+3)*4", "parentheses"],
+    ["2*3+4*5", "two products"],
+    ["(1+2)*(3+4)", "two sums"],
+    ["8-3-2", "left associative"],
+    ["8-(3-2)", "regrouped"],
+    ["100/(2+3)/4", "division chain"],
+    ["((7-1)*(4+2))/(9-6)", "nested parentheses"],
+    ["1+2+3+4+5+6", "a tall chain"],
+    ["2^3^2", "right associative"],
+    ["(2^3)^2", "regrouped power"],
+    ["-(4+5)*2", "unary minus"],
+    ["3*-2+10", "unary minus operand"],
+    ["-2^2", "minus vs power"]
+  ];
 
   // ---- visualizer ---------------------------------------------------------
   function buildExprTree(el) {
@@ -89,14 +133,24 @@
       actions:
         '<span class="grp"><button data-act="build">Build</button>' +
         '<button data-act="eval">Evaluate</button></span>' +
-        '<span class="grp"><input type="text" placeholder="e.g. (2+3)*4" aria-label="expression"></span>' +
+        '<span class="grp"><select data-act="example" aria-label="example">' +
+        EXAMPLES.map(function (e, i) { return '<option value="' + i + '">' + e[0] + "   (" + e[1] + ")</option>"; }).join("") +
+        '<option value="custom">custom…</option></select>' +
+        '<input type="text" placeholder="e.g. (2+3)*4" aria-label="expression"></span>' +
         window.VizPlayer.tpButtonsHTML() + window.VizPlayer.speedHTML(),
       output: "result"
     });
     var ctx = sc.ctx;
     var input = sc.actionsEl.querySelector("input");
     var ctrls = { setStatus: sc.setStatus, on: sc.on, input: input };
-    input.value = el.getAttribute("data-expr") || "2+3*4";
+    var picker = sc.actionsEl.querySelector('select[data-act="example"]');
+    input.value = el.getAttribute("data-expr") || EXAMPLES[0][0];
+    // the dropdown names the example in the box, or "custom" once the box is edited
+    function syncPicker() {
+      var i = EXAMPLES.map(function (e) { return e[0]; }).indexOf(input.value.trim());
+      picker.value = i >= 0 ? String(i) : "custom";
+    }
+    syncPicker();
 
     var v = { root: null, order: [], pos: 0, hi: null, done: false, timer: null, src: "", speedMs: SPEED };
     var playBtn = sc.btn("play");
@@ -129,7 +183,8 @@
     function render() {
       C.clear(ctx, W, H);
       if (!v.root) { C.emptyMsg(ctx, W, H, "enter an expression and press Build"); updateOut(); return; }
-      C.layoutBinary(v.root, W, H, { margin: 42, level: 52, top: 38 });
+      var d = depth(v.root);                         // tall trees get tighter levels to stay on the canvas
+      C.layoutBinary(v.root, W, H, { margin: 42, level: d > 1 ? Math.min(52, (H - 38 - 44) / (d - 1)) : 52, top: 38 });
       C.drawTree(ctx, v.root, { r: R, colorOf: colorOf, labelOf: lbl, font: "600 16px system-ui, sans-serif" });
       drawValues();
       updateOut();
@@ -139,7 +194,7 @@
       stopEval();
       var src = ctrls.input.value.trim(), tree;
       try { tree = parse(src); }
-      catch (err) { ctrls.setStatus("couldn't parse “" + src + "”: try e.g. (2+3)*4"); return; }
+      catch (err) { ctrls.setStatus("couldn't parse “" + src + "” (" + err.message + "): use numbers, + − × / ^ and ( )"); return; }
       v.root = tree; v.src = src; v.order = []; v.pos = 0; v.hi = null; v.done = false;
       clearEval(tree); render();
       ctrls.setStatus("tree built: precedence set its shape. Press ▶ to evaluate bottom-up.");
@@ -160,9 +215,7 @@
       p = Math.max(0, Math.min(p, v.order.length));
       clearEval(v.root);
       for (var i = 0; i < p; i++) {
-        var n = v.order[i];
-        if (isLeaf(n)) { n.value = Number(n.val); n.evaluated = true; }
-        else { n.value = applyOp(n.op, n.left.value, n.right.value); n.evaluated = true; }
+        evalNode(v.order[i]);
       }
       v.pos = p; v.done = false; v.hi = p > 0 ? v.order[p - 1] : null;
       render();
@@ -181,14 +234,10 @@
         stopEval(); return false;
       }
       var n = v.order[v.pos++]; v.hi = n;
-      if (isLeaf(n)) {
-        n.value = Number(n.val); n.evaluated = true;
-        ctrls.setStatus("operand " + n.val + ": its value is " + n.val);
-      } else {
-        var a = n.left.value, b = n.right.value, r = applyOp(n.op, a, b);
-        n.value = r; n.evaluated = true;
-        ctrls.setStatus(lbl(n) + " :  " + fmt(a) + " " + lbl(n) + " " + fmt(b) + " = " + fmt(r));
-      }
+      evalNode(n);
+      if (isLeaf(n)) ctrls.setStatus("operand " + n.val + ": its value is " + n.val);
+      else if (n.op === "neg") ctrls.setStatus("unary − :  −(" + fmt(n.right.value) + ") = " + fmt(n.value));
+      else ctrls.setStatus(lbl(n) + " :  " + fmt(n.left.value) + " " + lbl(n) + " " + fmt(n.right.value) + " = " + fmt(n.value));
       render(); return true;
     }
     function playToggle() {
@@ -200,7 +249,12 @@
 
     sc.actionsEl.addEventListener("change", function (e) {
       if (e.target.getAttribute && e.target.getAttribute("data-act") === "speed") v.speedMs = parseInt(e.target.value, 10) || SPEED;
+      if (e.target === picker) {
+        if (picker.value === "custom") { input.value = ""; input.focus(); stopEval(); v.root = null; render(); ctrls.setStatus("type an expression and press Build (or Enter)"); }
+        else { input.value = EXAMPLES[+picker.value][0]; doBuild(); }
+      }
     });
+    input.addEventListener("input", syncPicker);
     ctrls.on(function (act) {
       if (act === "build") doBuild();
       else if (act === "eval") { startEval(); playToggle(); }
