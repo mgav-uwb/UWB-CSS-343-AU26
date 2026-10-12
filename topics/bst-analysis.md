@@ -79,7 +79,7 @@ The proof is a recurrence, the same one as quicksort's.
 
 So a random BST is only **~39% costlier** than a balanced one, and inserts in **O(log n)**.
 
-**Why?** A sorted array inserts in **linear** time.
+By contrast, a sorted array inserts in **linear** time. **Why?**
 
 <details class="answer"><summary>Answer:</summary>
 
