@@ -38,15 +38,16 @@ const SLIDE_SPECS = {
     costs: ["compare", "rotation"], chrome: { showCosts: true },
     width: 820, height: 300,
   },
-  // the same keys into a plain BST and an AVL tree, side by side
+  // the same keys into a plain BST and an AVL tree, side by side: Build inserts
+  // the box's keys into both from empty, key by key; it opens with 1..16 loaded
   "avl-vs-bst": {
     panels: [
       { title: "plain BST", make: () => new BST(), renderer: (c) => new TreeRenderer(c, { labels: "none" }) },
       { title: "AVL (rebalances)", make: () => new AVL(), renderer: (c) => new TreeRenderer(c, { labels: "bf" }) },
     ],
     op: (s, v) => s.insert(v),
-    initial: "",
-    sequence: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+    initial: "1..16",
+    buildStep: (s, k) => s.insert(k),
     speedControl: true, finishButton: true,
     width: 400, height: 215,
   },
