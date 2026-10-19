@@ -329,6 +329,59 @@
              (each leaf key carries its own record; a key such
               as 30 or 60 appears twice: once as a router,
               once in a leaf)</pre>
+      <div class="def">
+        <span class="tag">Definition (routing in a B+ tree)</span>
+        At a router node with routers \(s_1 \lt s_2 \lt \cdots \lt s_m\), a key
+        \(k\) follows child \(i\), where \(i\) is the number of routers
+        \(\le k\): child \(0\) if \(k \lt s_1\), child \(i\) if
+        \(s_i \le k \lt s_{i+1}\), child \(m\) if \(k \ge s_m\). Less goes
+        left; <strong>equal goes right</strong>. Every key in a subtree is at least
+        the router to its left and less than the router to its right, and a router
+        is a copy of the first key of the subtree to its right at the time it was
+        made.
+      </div>
+      <p>
+        In the index above, a search for \(30\) reads the router
+        \([30\,|\,60]\), finds \(30 \le 30 \lt 60\) and follows child
+        \(1\) to the leaf \([30\,|\,45]\). The router \(30\) does not end the
+        search: it carries no record, so every search ends in a leaf.
+      </p>
+      <p>
+        A key appears twice because of how routers are made:
+      </p>
+      <ul>
+        <li>a <strong>leaf split copies</strong>: a full leaf splits into two, and the
+        new right leaf&rsquo;s first key is copied up as a router while it stays in
+        the leaf with its record (a borrow between two leaves likewise rewrites the
+        router between them to a copy of the right leaf&rsquo;s new first key);</li>
+        <li>a <strong>router split moves</strong>: a full router node splits around
+        its middle router, which goes up and is gone from the node below, exactly as
+        in a B-tree; a router needs no copy, so no new duplicate appears;</li>
+        <li>a <strong>delete leaves routers alone</strong> unless leaves borrow or
+        merge: once its key is deleted a router may match no key in the tree, and it
+        still separates its two sides correctly.</li>
+      </ul>
+      <div class="ex">
+        <span class="tag">Example (one key copied up, then moved up)</span>
+        Insert \(50\) into the order-3 index above (a node holds at most 2 keys).
+        <pre>  1. 50 descends: router [30|60], 30 &le; 50 &lt; 60, child 1: the leaf
+     [30|45] becomes [30|45|50], three keys: split.
+
+  2. leaf split: [30|45] and [50], linked into the chain; 50 is COPIED
+     up, and the router node becomes [30|50|60], three routers: split.
+
+  3. router split: [30] and [60]; 50 MOVES up into a new root.
+
+                [ 50 ]
+               /      \
+           [30]        [60]
+          /    \      /    \
+     [10|20] &rarr; [30|45] &rarr; [50] &rarr; [60|90] &rarr; &empty;</pre>
+        Now \(50\) is the root&rsquo;s router and a key in its leaf, and \(30\)
+        and \(60\) are routers and leaf keys as well. Deleting \(30\) next turns
+        its leaf into \([45]\) (still at least one key, so no repair) and leaves
+        the router \(30\) in place, a correct separator that is no longer a key.
+      </div>
       <p>
         Because the leaves form a sorted linked list, a range query such as
         <code>SELECT * WHERE age BETWEEN 20 AND 40</code> descends once to find
@@ -562,7 +615,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.0
+        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

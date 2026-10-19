@@ -4,7 +4,7 @@
   Needs:   2-3 trees, the computer systems primer (memory hierarchy).
   Demos:   btree-insert (slide spec), bplus (registry)
   Program: none
-  Budget:  ~27 min, 18 slides.
+  Budget:  ~31 min, 20 slides.
   Ported from Summer 2026 L05-2-3-b-trees.md, parts 4, 5.
 -->
 
@@ -166,6 +166,36 @@ An index on `age`, order 3 (routers only: no records upstairs):
 
 --
 
+## Routers: less goes left, equal or more goes right
+
+At routers `[30 | 60]`, a key k goes to:
+
+- **child 0** if k < 30
+- **child 1** if 30 ≤ k < 60
+- **child 2** if k ≥ 60
+
+**Equal goes right.** A router is a copy of the first key of the subtree to its right, so a search for 30 passes router 30 and ends in the leaf `[30|45]`.
+
+--
+
+## Why a key appears twice
+
+- **leaf split**: the new leaf's first key is **copied** up, and stays in its leaf
+- **router split**: the middle router **moves** up: no new copy
+- **delete**: a router can outlive its key, and still separates correctly
+
+Insert 50 into that index, `[30|60]` (order 3):
+
+```text
+           [ 50 ]          50 copied up from [30|45|50],
+          /      \         then moved up from [30|50|60]
+      [30]        [60]
+     /    \      /    \
+ [10|20]→[30|45]→[50]→[60|90]
+```
+
+--
+
 ## Range scans for free
 
 Because the leaves form a **sorted linked list**, a range query descends **once**, then **walks the chain**:
@@ -181,7 +211,7 @@ Because the leaves form a **sorted linked list**, a range query descends **once*
 
 ## Demo: B+ tree
 
-<div class="algo-viz" data-algo="bplus" data-config='{"height":200}'>
+<div class="algo-viz" data-algo="bplus" data-config='{"height":185}'>
 <pre class="viz-fallback">
    B+ tree, order 4: keys 5, 10, ..., 100 inserted in shuffled order
 

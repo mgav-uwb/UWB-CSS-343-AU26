@@ -139,7 +139,7 @@ void flipColors(Node* h) {
 </pre>
 </div>
 
-<small>One move at a time, then the three places a key can land on a 3-node, then cascades. Red links are drawn thick and red.</small>
+<small>One move at a time, then the three places a key can land on a 3-node, then cascades. **Red** line: a red link. **Purple** line: the link that moves to a new parent. Filled purple: where the move applies.</small>
 
 --
 
@@ -194,7 +194,7 @@ Two children: delete the **successor**, write it in. Going back up: the insert f
 </pre>
 </div>
 
-<small>Every button starts from the same tree. Watch for the flip that **merges** and the rotations that turn it into a **borrow**.</small>
+<small>Every button starts from the same tree: watch for the flip that **merges** and the rotations that turn it into a **borrow**. **Purple** line: the link the search follows next.</small>
 
 --
 

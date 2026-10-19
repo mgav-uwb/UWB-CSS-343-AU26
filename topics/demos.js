@@ -74,7 +74,7 @@ const SLIDE_SPECS = {
   "rb-insert": {
     make: () => new RedBlack(),
     initial: "1..24:1:RAND",
-    renderer: (c) => new TreeRenderer(c, { labels: "none" }),
+    renderer: (c) => new TreeRenderer(c, { labels: "none", mark: "#7c5cff" }), // purple marks: red is only a red link
     buildStep: (s, k) => s.insert(k),
     ops: [
       { name: "Insert", arg: "number", run: (s, v) => s.insert(v) },
