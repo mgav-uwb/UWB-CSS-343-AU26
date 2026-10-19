@@ -1,10 +1,10 @@
 <!--
   TOPIC · Red-black trees.
-  Teaches: a 2-3 tree encoded in a binary tree with red links; the left-leaning red-black invariants; rotate-left, rotate-right and flip-colors; flip-colors is a 2-3 split; height at most 2 log2 n; red-black against AVL.
+  Teaches: a 2-3 tree encoded in a binary tree with red links; the left-leaning red-black invariants; rotate-left, rotate-right and flip-colors; flip-colors is a 2-3 split; delete as the 2-3 merge and borrow (moveRedLeft, moveRedRight); height at most 2 log2 n; red-black against AVL.
   Needs:   2-3 trees, avl rotations.
-  Demos:   rb-insert (slide spec)
+  Demos:   rb-moves (registry), rb-insert (slide spec), rb-delete (registry)
   Program: none
-  Budget:  ~20 min, 13 slides.
+  Budget:  ~27 min, 16 slides.
   Ported from Summer 2026 L05-2-3-b-trees.md, parts 3.
 -->
 
@@ -119,6 +119,30 @@ void flipColors(Node* h) {
 
 --
 
+## Demo: the three moves
+
+<div class="algo-viz" data-algo="rb-moves">
+<pre class="viz-fallback">
+   rotateLeft(20): 40 rises, 30 moves across, the red link now leans left
+
+        20                         40
+       /  \  (red)           (red) /  \
+     10    40          →         20    50
+          /  \                  /  \
+        30    50              10    30
+
+   insert into the 3-node [30|50] (50 black, 30 red):
+     70 → flipColors(50)                               → 50(30, 70)
+     10 → rotateRight(50), flipColors(30)               → 30(10, 50)
+     40 → rotateLeft(30), rotateRight(50), flipColors(40) → 40(30, 50)
+[ interactive demo: open this deck on the course site ]
+</pre>
+</div>
+
+<small>One move at a time, then the three places a key can land on a 3-node, then cascades. Red links are drawn thick and red.</small>
+
+--
+
 ## Demo: red-black insert
 
 <div class="algo-viz" data-algo="rb-insert">
@@ -131,7 +155,46 @@ void flipColors(Node* h) {
 </pre>
 </div>
 
-<small>**Red links** (thick, red) are the glued 3-nodes. Insert and watch the fix-ups: a **rotateLeft** leans a red left, a **flipColors** splits a 4-node. Black-height stays equal on every path. (Delete works too: more on that next.)</small>
+<small>**Red links** (thick, red) are glued 3-nodes: **rotateLeft** leans one left, **flipColors** splits a 4-node. Click a key, then Run, to delete it.</small>
+
+--
+
+## Delete: merge and borrow, in color
+
+Never remove a key from a 2-node. Before stepping into one, `moveRedLeft` / `moveRedRight`:
+
+- **flipColors**: the parent's key comes down, the 2-3 **merge**
+- sibling is a 3-node: flip, **rotate**, flip, the 2-3 **borrow**
+
+Two children: delete the **successor**, write it in. Going back up: the insert fix-ups.
+
+--
+
+## Demo: red-black delete
+
+<div class="algo-viz" data-algo="rb-delete">
+<pre class="viz-fallback">
+   one tree, keys 10..150 (red links marked R):
+
+                     110
+              /              \
+          50 R                130
+         /     \            /     \
+       30        90       120      150
+      /  \      /  \              /
+    20   40   70 R  100        140 R
+    /         /  \
+  10 R      60    80
+
+   delete 60:  moveRedLeft merges (one flip)
+   delete 10:  moveRedLeft borrows (flip, two rotations, flip)
+   delete 80:  moveRedRight merges;  delete 140: moveRedRight borrows
+   delete 50:  two children: delete the successor 60, write it in
+[ interactive demo: open this deck on the course site ]
+</pre>
+</div>
+
+<small>Every button starts from the same tree. Watch for the flip that **merges** and the rotations that turn it into a **borrow**.</small>
 
 --
 
