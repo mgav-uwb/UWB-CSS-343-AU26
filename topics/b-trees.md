@@ -2,9 +2,9 @@
   TOPIC · B-trees and B+ trees.
   Teaches: nodes with many keys; one node per disk block; M-ary search trees and the order property; B-tree insertion by split and promote; B+ trees with values in linked leaves and range scans; choosing the order M; which balanced tree to use when.
   Needs:   2-3 trees, the computer systems primer (memory hierarchy).
-  Demos:   btree-insert (slide spec)
+  Demos:   btree-insert (slide spec), bplus (registry)
   Program: none
-  Budget:  ~24 min, 17 slides.
+  Budget:  ~27 min, 18 slides.
   Ported from Summer 2026 L05-2-3-b-trees.md, parts 4, 5.
 -->
 
@@ -176,6 +176,27 @@ Because the leaves form a **sorted linked list**, a range query descends **once*
 ```
 
 `ORDER BY`, `BETWEEN`, and pagination are all just sequential leaf walks.
+
+--
+
+## Demo: B+ tree
+
+<div class="algo-viz" data-algo="bplus" data-config='{"height":200}'>
+<pre class="viz-fallback">
+   B+ tree, order 4: keys 5, 10, ..., 100 inserted in shuffled order
+
+                     [ 25 | 55 ]
+              /           |            \
+          [15]        [35|45]        [70|80|90]
+   leaves: [5|10]→[15|20]→[25|30]→[35|40]→[45|50]→[55|60|65]→[70|75]→[80|85]→[90|95|100]
+
+   range 20 60: descend [25|55] → [15] → leaf [15|20], then follow the
+   chain: 20 25 30 35 40 45 50 55 60, stop at 65. 7 node reads.
+[ interactive demo: open this deck on the course site ]
+</pre>
+</div>
+
+<small>Grey nodes hold routers only; every key is in a white leaf, and the arrows are the chain. **Range** descends once, then walks the leaves. Try `insert 57`, `delete 75`, `delete 5`, or click a key to delete it.</small>
 
 --
 

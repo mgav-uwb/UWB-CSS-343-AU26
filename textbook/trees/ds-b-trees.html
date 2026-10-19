@@ -361,6 +361,18 @@
         is fastest at. Extending the range to \(90\) would simply continue the
         walk into \([60\,|\,90]\), one more leaf read, with no extra descent.
       </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=bplus">B+ tree demo</a>. Pick the <em>textbook
+        index</em> preset and run <code>range 20 40</code>: the same three node reads as
+        the example above, with the NEXT link lit as the scan crosses it. The default
+        tree (order 4) has two router levels: <code>range 20 60</code> reads 2 routers
+        and 5 leaves; <code>insert 57</code> splits a leaf (60 is copied up and stays in
+        its leaf) and then a router node (70 moves up); <code>delete 75</code> borrows
+        from a sibling and rewrites the router between them; deleting 25 and then 5
+        merges leaves, drops their routers, and merges two router nodes. Clicking a key
+        puts it in the box with Delete selected.
+      </div>
       <table>
         <tr><th></th><th>B-tree</th><th>B+ tree</th></tr>
         <tr><td>records stored</td><td>in <strong>all</strong> nodes</td><td><strong>leaves only</strong></td></tr>
