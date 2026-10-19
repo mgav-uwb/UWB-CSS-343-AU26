@@ -43,7 +43,7 @@
     var ctrls = C.makeControls(el,
       '<input type="number" placeholder="key" aria-label="key" style="width:56px">' +
       '<button data-act="insert">Insert</button><button data-act="search">Search</button><button data-act="delete">Delete</button>' +
-      '<button class="alt" data-act="replay">▶ replay</button><button class="alt" data-act="reset">Reset</button>');
+      '<button class="alt" data-act="restart" title="restart: back to the first frame">⏮</button><button class="alt" data-act="replay">▶ replay</button><button class="alt" data-act="ff" title="finish: sweep to the last frame at 1024× (press again to jump to the end)">⏩ 1024×</button><button class="alt" data-act="reset">Reset</button>');
     var input = ctrls.input, ctx = canvas.getContext("2d");
     var v = { tree: new E.AVL(), frames: [], fi: 0, timer: null, onPath: {}, cur: null, last: null };
     v.tree.build(seq);
@@ -86,8 +86,26 @@
       if (f.pause) { v.paused = true; setReplay("continue"); return; }     // stop to predict the rotation
       if (v.fi < v.frames.length) v.timer = setTimeout(tick, SPEED);
     }
-    function resume() { v.paused = false; setReplay("replay"); tick(); }
-    function playFrames(frames) { clearTimeout(v.timer); v.paused = false; setReplay("replay"); v.frames = frames; v.fi = 0; tick(); }
+    function resume() { stopSweep(); v.paused = false; setReplay("replay"); tick(); }
+    function playFrames(frames) { stopSweep(); clearTimeout(v.timer); v.paused = false; setReplay("replay"); v.frames = frames; v.fi = 0; tick(); }
+
+    // ⏮ restart / ⏩ 1024× finish (the demo library's transport, lib/core/player.js)
+    var sw = null;                                     // the running finish sweep, if any
+    function stopSweep() { if (sw) { sw.cancel(); sw = null; } }
+    function showAt(i) { var f = v.frames[i]; draw(f); v.fi = i + 1; }
+    function playing() { return !v.paused && v.fi > 0 && v.fi < v.frames.length; }
+    function restart() {                               // a running playback keeps playing from frame 0
+      if (!v.frames.length) return;
+      var was = !(sw && sw.running()) && playing(); stopSweep(); clearTimeout(v.timer); v.paused = false; setReplay("replay"); v.fi = 0;
+      if (was) tick();
+      else { showAt(0); if (v.fi < v.frames.length) { v.paused = true; setReplay("continue"); } }
+    }
+    function finish() {                                // sweep the rest, past every pause; again = jump to the end
+      if (sw && sw.running()) { sw.jump(); return; }
+      if (!v.frames.length) return;
+      clearTimeout(v.timer); v.paused = false; setReplay("replay");
+      sw = window.VizPlayer.sweep(Math.max(0, v.fi - 1), v.frames.length - 1, SPEED, showAt, function () { sw = null; });
+    }
 
     function framesFor(kind, k) {
       var preRoot = v.tree.snapshot(), frames = [], superset, ranks, rn, lvl, touch, newKey = null, plainRoot = null, finalRoot, ghost = null, z = null;
@@ -138,6 +156,7 @@
 
     function op(kind, k) {
       if (isNaN(k)) return;
+      stopSweep();
       if (kind === "delete" && !E.find(v.tree.root, k)) { v.onPath = {}; var rr = ranksOf(v.tree.root); draw({ root: v.tree.root, pos: posFor(v.tree.root, rr.rank, rr.n, lvlOf([v.tree.root])), cur: null, lit: {}, fixed: {}, msg: k + " is not in the tree" }); return; }
       v.last = { kind: kind, k: k }; var f = framesFor(kind, k); if (f) playFrames(f);
     }
@@ -148,14 +167,16 @@
       else if (act === "delete") op("delete", key());
       else if (act === "search") op("search", key());
       else if (act === "replay") { if (v.paused) resume(); else if (v.last) op(v.last.kind, v.last.k); }
-      else if (act === "reset") { clearTimeout(v.timer); v.paused = false; setReplay("replay"); v.tree = new E.AVL(); v.tree.build(seq); idle(); }
+      else if (act === "restart") restart();
+      else if (act === "ff") finish();
+      else if (act === "reset") { stopSweep(); clearTimeout(v.timer); v.paused = false; setReplay("replay"); v.frames = []; v.fi = 0; v.tree = new E.AVL(); v.tree.build(seq); idle(); }
     });
     input.addEventListener("keydown", function (e) { if (e.key === "Enter") op("search", key()); });
     canvas.addEventListener("click", function (e) {
       if (v.timer && v.fi < v.frames.length) return;
       var rr = ranksOf(v.tree.root), pos = posFor(v.tree.root, rr.rank, rr.n, lvlOf([v.tree.root])), r = canvas.getBoundingClientRect(), px = (e.clientX - r.left) * W / r.width, py = (e.clientY - r.top) * H / r.height, hit = null;
       for (var kk in pos) { var pt = pos[kk]; if ((pt.x - px) * (pt.x - px) + (pt.y - py) * (pt.y - py) <= (R + 2) * (R + 2)) { hit = parseInt(kk, 10); break; } }
-      if (hit != null) op("search", hit);
+      if (hit != null) { input.value = hit; op("search", hit); }   // the key lands in the box, ready for Delete
     });
     canvas.style.cursor = "pointer";
 

@@ -2,12 +2,31 @@
 //  • recursion-stack brackets above the array show the DIVIDE phase and depth (O(log N))
 //  • each MERGE interleaves the two runs cell-by-cell into a visible tmp buffer row
 //  • the memory gauge tracks the scratch buffer (rises/falls, peaks at 4N → O(N))
-// Driven by a fine-grained event trace; Play/Step/Reset + Speed.
+// Driven by a fine-grained event trace; ⏮ / Play / Step / ⏩ 1024× / Speed,
+// and 🔀 Shuffle for a new random array.
 (function () {
   const SLATE = '#334155', PURPLE = '#7c5cff', LPURPLE = '#a78bfa', DPURPLE = '#5b3ff0',
         AMBER = '#d39a00', GREY = '#cbd2e0', INK = '#2a2a3a', GREYT = '#94a3b8';
   const N = 32, ITEM = 4, MAXB = ITEM * N;           // 4N bytes = peak buffer
   const LOGN = Math.ceil(Math.log2(N));              // 5
+
+  // FINISH sweep (the demo library's ⏩ 1024×, lib/core/player.js): frames
+  // from..to at 1024x the per-frame tick, the whole sweep at least 1.5 s so the
+  // motion reads; show(i) must catch up to frame i (indices can be skipped).
+  function sweep(from, to, msPerFrame, show) {
+    const span = to - from, dur = Math.max(1500, span * msPerFrame / 1024);
+    let t0 = null, at = from, live = span > 0;
+    const h = { running: () => live, cancel: () => { live = false; },
+                jump: () => { if (!live) return; live = false; if (at !== to) { at = to; show(to); } } };
+    if (live) requestAnimationFrame(function tick(ts) {
+      if (!live) return;
+      if (t0 === null) t0 = ts;
+      const p = Math.min(1, (ts - t0) / dur), i = from + Math.round(span * p);
+      if (i !== at) { at = i; show(i); }
+      if (p < 1) requestAnimationFrame(tick); else live = false;
+    });
+    return h;
+  }
 
   function init(root) {
     if (root._viz) return;
@@ -18,7 +37,7 @@
     mem.width = 380;  mem.height = 380;
     const P = prog.getContext('2d'), M = mem.getContext('2d');
 
-    let arr = [], events = [], idx = 0, timer = null;
+    let arr = [], arr0 = [], events = [], idx = 0, timer = null, sw = null;
     // display state
     let stack = [], cur = null, tmp = null, cmp = null, bufBytes = 0, peak = 0, bufHist = [];
     const speeds = [['0.5×', 120], ['1×', 55], ['2×', 24]]; let si = 1;
@@ -51,9 +70,21 @@
     function reset() {
       arr = Array.from({ length: N }, (_, i) => i + 1);
       for (let i = N - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+      arr0 = arr.slice();
       genEvents();
+      stop(); rewind();
+    }
+    // back to frame 0 of the SAME array (Shuffle draws a new one)
+    function rewind() {
+      arr = arr0.slice();
       idx = 0; stack = []; cur = null; tmp = null; cmp = null; bufBytes = 0; peak = 0; bufHist = [0];
-      stop(); draw();
+      draw();
+    }
+    function restart() { if (sw) { sw.cancel(); sw = null; } rewind(); }   // a running playback keeps playing
+    function finish() {                       // sweep the rest; a second press jumps to the end
+      if (sw && sw.running()) { sw.jump(); return; }
+      stop();
+      sw = sweep(idx, events.length, speeds[si][1], (i) => { while (idx < i) apply(events[idx++]); draw(); });
     }
 
     function apply(e) {
@@ -76,8 +107,8 @@
       draw();
       if (idx >= events.length) stop();
     }
-    function play() { if (timer) return; timer = setInterval(doStep, speeds[si][1]); }
-    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    function play() { if (timer) return; if (sw) { sw.cancel(); sw = null; } timer = setInterval(doStep, speeds[si][1]); }
+    function stop() { if (sw) { sw.cancel(); sw = null; } if (timer) { clearInterval(timer); timer = null; } }
 
     function draw() {
       const W = prog.width, H = prog.height, MW = mem.width, MH = mem.height;
@@ -155,15 +186,27 @@
     // controls (+ inject a Speed button)
     root.querySelector('[data-act=play]').onclick  = () => (timer ? stop() : play());
     root.querySelector('[data-act=step]').onclick  = () => { stop(); doStep(); };
-    root.querySelector('[data-act=reset]').onclick = reset;
     const ctrls = root.querySelector('.viz-controls');
+    const playB = root.querySelector('[data-act=play]'), stepB = root.querySelector('[data-act=step]');
+    const shuf = root.querySelector('[data-act=reset]');   // Reset draws a NEW array: say so (⏮ rewinds)
+    shuf.textContent = '🔀 Shuffle'; shuf.title = 'a new random array, back at the start';
+    shuf.onclick = reset;
+    const rb = document.createElement('button');
+    rb.textContent = '⏮'; rb.title = 'restart: back to the first frame'; rb.dataset.act = 'restart';
+    rb.onclick = restart;
+    ctrls.insertBefore(rb, playB);
+    const fb = document.createElement('button');
+    fb.textContent = '⏩ 1024×'; fb.title = 'finish: sweep to the last frame at 1024× (press again to jump to the end)'; fb.dataset.act = 'ff';
+    fb.onclick = finish;
+    stepB.after(fb);
     const sb = document.createElement('button');
     sb.textContent = 'Speed ' + speeds[si][0];
     sb.onclick = () => { si = (si + 1) % speeds.length; sb.textContent = 'Speed ' + speeds[si][0]; if (timer) { stop(); play(); } };
-    ctrls.insertBefore(sb, root.querySelector('.viz-status'));
+    fb.after(sb);
+    sb.after(shuf);
 
     reset();
-    root._viz = { doStep, play, reset, runToEnd: () => { while (idx < events.length) apply(events[idx++]); draw(); } };
+    root._viz = { doStep, play, reset, restart, finish, runToEnd: () => { while (idx < events.length) apply(events[idx++]); draw(); } };
   }
 
   window.initVizMergesort = () =>

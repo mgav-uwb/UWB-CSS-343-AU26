@@ -62,6 +62,24 @@
     return { seed, goalDist: gd, open, unvisited: unvis, exploredPct: Math.round(100 * (open - unvis) / open) };
   };
 
+  // FINISH sweep (the demo library's ⏩ 1024×, lib/core/player.js): frames
+  // from..to at 1024x the per-frame tick, the whole sweep at least 1.5 s so the
+  // motion reads; show(i) must catch up to frame i (indices can be skipped).
+  function sweep(from, to, msPerFrame, show) {
+    const span = to - from, dur = Math.max(1500, span * msPerFrame / 1024);
+    let t0 = null, at = from, live = span > 0;
+    const h = { running: () => live, cancel: () => { live = false; },
+                jump: () => { if (!live) return; live = false; if (at !== to) { at = to; show(to); } } };
+    if (live) requestAnimationFrame(function tick(ts) {
+      if (!live) return;
+      if (t0 === null) t0 = ts;
+      const p = Math.min(1, (ts - t0) / dur), i = from + Math.round(span * p);
+      if (i !== at) { at = i; show(i); }
+      if (p < 1) requestAnimationFrame(tick); else live = false;
+    });
+    return h;
+  }
+
   function init(root) {
     if (root._viz) return;
     const prog = root.querySelector('.viz-progress');
@@ -72,7 +90,7 @@
     mem.width = 380; mem.height = prog.height;
     const P = prog.getContext('2d'), M = mem.getContext('2d');
 
-    let maze, visited, parent, frontier, visitedCount, peakQ, qHist, vHist, pathSet, done, timer = null;
+    let maze, visited, parent, frontier, visitedCount, peakQ, qHist, vHist, pathSet, done, timer = null, sw = null, total = 0;
 
     function reset() {
       maze = buildMaze(SEED);                  // FIXED maze every time
@@ -81,7 +99,17 @@
       visited[START[0]][START[1]] = true;
       frontier = [START]; visitedCount = 1; peakQ = 1;
       qHist = [1]; vHist = [1]; pathSet = null; done = false;
+      // layers until BFS stops: the goal's distance, or (unreachable) until the frontier empties
+      const dist = bfsDist(maze), gd = dist[GOAL[0]][GOAL[1]];
+      total = gd >= 0 ? gd : 1 + Math.max(...dist.flat());
       stop(); draw();
+    }
+    // the maze is FIXED, so reset IS a rewind: ⏮ restart keeps a running playback playing
+    function restart() { const was = !!timer; reset(); if (was) play(); }
+    function finish() {                       // sweep the rest; a second press jumps to the end
+      if (sw && sw.running()) { sw.jump(); return; }
+      stop();
+      sw = sweep(qHist.length - 1, total, 130, (i) => { while (!done && qHist.length - 1 < i) doStep(); });
     }
 
     function buildPath() {
@@ -108,8 +136,9 @@
       draw();
     }
 
-    function play() { if (timer) return; timer = setInterval(doStep, 130); }
+    function play() { if (timer) return; if (sw) { sw.cancel(); sw = null; } timer = setInterval(doStep, 130); }
     function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    function stopAll() { if (sw) { sw.cancel(); sw = null; } stop(); }
 
     function draw() {
       P.clearRect(0, 0, prog.width, prog.height);
@@ -159,10 +188,17 @@
     }
 
     root.querySelector('[data-act=play]').onclick  = () => (timer ? stop() : play());
-    root.querySelector('[data-act=step]').onclick  = () => { stop(); doStep(); };
-    root.querySelector('[data-act=reset]').onclick = reset;
+    root.querySelector('[data-act=step]').onclick  = () => { stopAll(); doStep(); };
+    const rb = root.querySelector('[data-act=reset]');     // Reset is exactly a rewind here: it becomes ⏮
+    rb.textContent = '⏮'; rb.title = 'restart: back to the first frame';
+    rb.onclick = () => { if (sw) { sw.cancel(); sw = null; } restart(); };
+    root.querySelector('.viz-controls').insertBefore(rb, root.querySelector('[data-act=play]'));
+    const fb = document.createElement('button');
+    fb.textContent = '⏩ 1024×'; fb.title = 'finish: sweep to the last frame at 1024× (press again to jump to the end)'; fb.dataset.act = 'ff';
+    fb.onclick = finish;
+    root.querySelector('[data-act=step]').after(fb);
     reset();
-    root._viz = { doStep, play, reset };
+    root._viz = { doStep, play, reset, restart, finish };
   }
 
   window.initVizBfs = () =>

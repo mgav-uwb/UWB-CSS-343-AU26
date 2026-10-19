@@ -323,6 +323,7 @@
       var pt = canvasXY(e);
       var n = nodeAt(pt.x, pt.y);                    // 1) node → relabel
       if (n) {
+        input.value = String(n.key);                 // its key lands in the key box, ready for Find / Delete
         var b = v.tree.editBounds(n);
         var entries = b ? v.tree.keysBetween(b.lo, b.hi) : [];
         if (!entries.length) { v.setStatus("no other key fits at " + n.key + "'s position"); return; }

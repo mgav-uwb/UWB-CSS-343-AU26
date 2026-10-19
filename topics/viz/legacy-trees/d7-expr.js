@@ -133,11 +133,11 @@
       actions:
         '<span class="grp"><button data-act="build">Build</button>' +
         '<button data-act="eval">Evaluate</button></span>' +
-        '<span class="grp"><select data-act="example" aria-label="example">' +
+        '<span class="grp"><select data-act="example" aria-label="example" style="max-width:250px">' +
         EXAMPLES.map(function (e, i) { return '<option value="' + i + '">' + e[0] + "   (" + e[1] + ")</option>"; }).join("") +
         '<option value="custom">custom…</option></select>' +
         '<input type="text" placeholder="e.g. (2+3)*4" aria-label="expression"></span>' +
-        window.VizPlayer.tpButtonsHTML() + window.VizPlayer.speedHTML(),
+        window.VizPlayer.playerHTML(),
       output: "result"
     });
     var ctx = sc.ctx;
@@ -242,10 +242,22 @@
     }
     function playToggle() {
       if (v.timer) { stopEval(); return; }
-      ensure();
+      stopSweep(); ensure();
       (function go() { if (stepOnce()) { v.timer = setTimeout(go, v.speedMs); syncPlay(); } else stopEval(); })();
     }
-    function stopEval() { clearTimeout(v.timer); v.timer = null; syncPlay(); }
+    function stopEval() { stopSweep(); clearTimeout(v.timer); v.timer = null; syncPlay(); }
+    var sw = null;                                   // the running ⏩ finish sweep, if any
+    function stopSweep() { if (sw) { sw.cancel(); sw = null; } }
+    function markDone() {
+      if (v.root && v.root.evaluated) { v.done = true; v.hi = v.root; render(); ctrls.setStatus("done: result = " + fmt(v.root.value)); }
+    }
+    function finish() {                              // ⏩ 1024×: sweep the rest; again = jump to the end
+      if (sw && sw.running()) { sw.jump(); return; }
+      stopEval();
+      if (!v.root || v.done) return;                 // already finished: nothing left to sweep
+      ensure();
+      sw = window.VizPlayer.sweep(v.pos, v.order.length, v.speedMs, applyTo, function () { sw = null; markDone(); });
+    }
 
     sc.actionsEl.addEventListener("change", function (e) {
       if (e.target.getAttribute && e.target.getAttribute("data-act") === "speed") v.speedMs = parseInt(e.target.value, 10) || SPEED;
@@ -257,12 +269,12 @@
     input.addEventListener("input", syncPicker);
     ctrls.on(function (act) {
       if (act === "build") doBuild();
-      else if (act === "eval") { startEval(); playToggle(); }
-      else if (act === "rev") { stopEval(); applyTo(0); }
+      else if (act === "eval") { stopEval(); startEval(); playToggle(); }
+      else if (act === "rev") { stopSweep(); applyTo(0); }          // restart: a running playback keeps playing
       else if (act === "bk1") { stopEval(); applyTo(v.pos - 1); }
       else if (act === "play") playToggle();
       else if (act === "fw1") { stopEval(); stepOnce(); }
-      else if (act === "ff") { stopEval(); ensure(); applyTo(v.order.length); if (v.root && v.root.evaluated) { v.done = true; v.hi = v.root; render(); ctrls.setStatus("done: result = " + fmt(v.root.value)); } }
+      else if (act === "ff") finish();
     });
     ctrls.input.addEventListener("keydown", function (e) { if (e.key === "Enter") doBuild(); });
 

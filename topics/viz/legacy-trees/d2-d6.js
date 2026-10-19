@@ -40,7 +40,7 @@
     all.forEach(function (n) { n.posB = { x: n.x, y: n.y }; });
 
     // S04 layout: transport + speed on top (the phases ARE the steps; no other actions apply)
-    var sc = C.scaffold(el, { w: W, h: H, actions: window.VizPlayer.tpButtonsHTML() + window.VizPlayer.speedHTML() });
+    var sc = C.scaffold(el, { w: W, h: H, actions: window.VizPlayer.playerHTML() });
     var cv = { ctx: sc.ctx, canvas: sc.canvas }, ctx = sc.ctx;
     var ctrls = { setStatus: sc.setStatus, on: sc.on };
 
@@ -128,25 +128,37 @@
       raf = requestAnimationFrame(frame);
     }
     function goTo(p, then) { phase = Math.max(0, Math.min(LAST, p)); settle(then); }
-    function stopPlay() { clearTimeout(playTimer); playTimer = null; }
+    var playing = false, sw = null;                     // sw: the running ⏩ finish sweep, if any
+    function stopSweep() { if (sw) { sw.cancel(); sw = null; } }
+    function stopPlay() { stopSweep(); clearTimeout(playTimer); playTimer = null; playing = false; }
+    function next() {
+      goTo(phase + 1, function () {
+        if (playing && phase < LAST) playTimer = setTimeout(next, stepMs + 500); else playing = false;
+      });
+    }
     function play() {
       stopPlay();
       if (phase >= LAST) phase = -1;                    // ▶ at the end restarts
-      (function next() {
-        goTo(phase + 1, function () {
-          if (phase < LAST) playTimer = setTimeout(next, stepMs + 500);
-        });
-      })();
+      playing = true; next();
+    }
+    function restart() {                                // ⏮: a running playback keeps playing from phase 0
+      var was = playing; stopPlay();
+      goTo(0, function () { if (was) { playing = true; playTimer = setTimeout(next, stepMs + 500); } });
+    }
+    function finish() {                                 // ⏩ 1024×: sweep the phases; again = jump to the end
+      if (sw && sw.running()) { sw.jump(); return; }
+      stopPlay();
+      sw = window.VizPlayer.sweep(phase, LAST, stepMs + 500, function (p) { goTo(p); }, function () { sw = null; });
     }
     sc.actionsEl.addEventListener("change", function (e) {
       if (e.target.getAttribute && e.target.getAttribute("data-act") === "speed") stepMs = parseInt(e.target.value, 10) || 650;
     });
     ctrls.on(function (act) {
-      if (act === "rev") { stopPlay(); goTo(0); }
+      if (act === "rev") restart();
       else if (act === "bk1") { stopPlay(); goTo(phase - 1); }
       else if (act === "play") play();
       else if (act === "fw1") { stopPlay(); goTo(phase + 1); }
-      else if (act === "ff") { stopPlay(); goTo(LAST); }
+      else if (act === "ff") finish();
     });
     setPos(0); show();
     ctrls.setStatus(MSG[0] + "   (▶ Play steps through the conversion)");
@@ -169,7 +181,7 @@
         '<button data-act="in">in</button>' +
         '<button data-act="post">post</button>' +
         '<button data-act="level">level</button></span>' +
-        window.VizPlayer.tpButtonsHTML() + window.VizPlayer.speedHTML(),
+        window.VizPlayer.playerHTML(),
       output: " "
     });
     var ctx = sc.ctx;
@@ -178,7 +190,9 @@
     var order = "in", ev = [], pos = 0, timer = null, speedMs = 650;
     var playBtn = sc.btn("play");
     function syncPlay() { playBtn.textContent = timer ? "⏸" : "▶"; playBtn.title = timer ? "pause" : "play"; }
-    function pause() { clearTimeout(timer); timer = null; syncPlay(); }
+    var sw = null;                                   // the running ⏩ finish sweep, if any
+    function stopSweep() { if (sw) { sw.cancel(); sw = null; } }
+    function pause() { stopSweep(); clearTimeout(timer); timer = null; syncPlay(); }
 
     // Event trace of the traversal. Every node TOUCH is a step:
     //   emit:false → recursion is passing through the node (descending, or
@@ -286,8 +300,15 @@
       if (pos < ev.length) { pos++; render(); status(); return true; }
       return false;
     }
+    function show(p) { pos = p; render(); status(); }
+    function finish() {                              // ⏩ 1024×: sweep the rest; again = jump to the end
+      if (sw && sw.running()) { sw.jump(); return; }
+      pause();
+      sw = window.VizPlayer.sweep(pos, ev.length, speedMs, show, function () { sw = null; });
+    }
     function playToggle() {
       if (timer) { pause(); return; }
+      stopSweep();
       if (pos >= ev.length) pos = 0;                 // ▶ at the end restarts
       (function go() { if (step()) { timer = setTimeout(go, speedMs); syncPlay(); } else pause(); })();
     }
@@ -296,11 +317,11 @@
     });
     ctrls.on(function (act) {
       if (act === "pre" || act === "in" || act === "post" || act === "level") restart(act);
-      else if (act === "rev") { pause(); pos = 0; render(); status(); }
+      else if (act === "rev") { stopSweep(); show(0); }        // restart: a running playback keeps playing
       else if (act === "bk1") { pause(); if (pos > 0) pos--; render(); status(); }
       else if (act === "play") playToggle();
       else if (act === "fw1") { pause(); step(); }
-      else if (act === "ff") { pause(); pos = ev.length; render(); status(); }
+      else if (act === "ff") finish();
     });
     restart("in");
   }

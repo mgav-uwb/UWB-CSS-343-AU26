@@ -108,5 +108,5 @@ Every removed node is freed exactly once: **no leaks**.
 </pre>
 </div>
 
-<small>Press **▶** to build, then **Delete** a leaf, a one-child node, and a two-child node (e.g. `E`). **via** switches **successor ↔ predecessor**; scrub with **⏮ ◁ ▶ ▷ ⏭** (◁ steps *backward*, resurrecting the key).</small>
+<small>Press **▶** to build, then **Delete** a leaf, a one-child node, and a two-child node (e.g. `E`). **via** switches **successor ↔ predecessor**; scrub with **⏮ ◁ ▶ ▷ ⏩ 1024×** (◁ steps *backward*, resurrecting the key).</small>
 

@@ -140,5 +140,5 @@ Elementary BSTs only add the one new link at the bottom: but the same up-the-pat
 </pre>
 </div>
 
-<small>Press **▶** to build: repeats (`E`, `A`) **update the value, no new node** → **10 nodes, 13 inserts**. Scrub with **⏮ ◁ ▶ ▷ ⏭**; the strip's **⚙ menu** edits / shuffles / sorts the sequence; click a **+**, an **edge**, or a **node**.</small>
+<small>Press **▶** to build: repeats (`E`, `A`) **update the value, no new node** → **10 nodes, 13 inserts**. Scrub with **⏮ ◁ ▶ ▷ ⏩ 1024×**; the strip's **⚙ menu** edits / shuffles / sorts the sequence; click a **+**, an **edge**, or a **node**.</small>
 
