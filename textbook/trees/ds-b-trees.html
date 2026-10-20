@@ -348,6 +348,15 @@
         lesson is to match the node size to the unit of I/O; historically the
         original motivation (Bayer &amp; McCreight, 1972).
       </p>
+      <div class="aside">
+        <span class="tag">Splitting on the way down</span>
+        At an even order, a B-tree can instead split every full node on the way down,
+        before it overflows, and borrow or merge before entering a node at its minimum,
+        so that an update never climbs back up: one pass, and fewer locks when many
+        updates share the tree. The <a href="ds-top-down-trees.html"><em>Top-Down
+        Balanced Trees</em></a> chapter covers it and compares it with the bottom-up
+        repairs here.
+      </div>
       <!-- ============================================================ -->
       <h2 id="bplus">2. B+ trees: values in the leaves</h2>
       <p>
@@ -666,7 +675,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.4
+        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.5
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

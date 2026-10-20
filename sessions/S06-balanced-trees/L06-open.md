@@ -42,4 +42,5 @@
 
 - <a href="../../textbook/trees/ds-two-three-trees.html">2-3 Trees</a>, <a href="../../textbook/trees/ds-red-black-trees.html">Red-Black Trees</a>, <a href="../../textbook/trees/ds-b-trees.html">B-Trees & B+ Trees</a> (today)
 - <a href="../../textbook/heaps/ds-heaps-pq.html">Heaps & Priority Queues</a>, <a href="../../textbook/heaps/algo-heapsort.html">Heapsort</a> (Wednesday)
+- Supplemental, not assigned: <a href="../../textbook/trees/ds-top-down-trees.html">Top-Down Balanced Trees</a>
 

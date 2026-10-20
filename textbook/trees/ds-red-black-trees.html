@@ -2886,8 +2886,11 @@ impl RedBlackTree {
         the way down it merges or borrows before stepping into a 2-node (its helpers
         are named <code>moveRedLeft</code> and <code>moveRedRight</code>), so the key
         it removes is never a black leaf and no black link goes missing. It performs
-        the same 2-3 merges and borrows, ahead of time, and restores the left-leaning
-        shape on the way back up.
+        2-3 merges and borrows ahead of time, at every 2-node on the search path
+        whether or not the removal needs them, and restores the left-leaning shape on
+        the way back up. The <a href="ds-top-down-trees.html#llrb-delete"><em>Top-Down
+        Balanced Trees</em></a> chapter gives its code and compares the two deletes; the
+        <a href="../../lib/demo.html?ds=llrb-top-down">top-down delete demo</a> runs it.
       </div>
 
       <!-- ============================================================ -->
@@ -3124,7 +3127,7 @@ impl RedBlackTree {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Red-Black Trees v2.0
+        Data Structures &amp; Algorithms &middot; Red-Black Trees v2.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
