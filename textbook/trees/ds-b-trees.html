@@ -251,7 +251,7 @@
         the 2-3 tree&rsquo;s node at width \(M\), sized so that one node fills one
         disk block. As in the 2-3 node, one spare key slot holds the overflow of an
         insertion until the node splits; the keys stay sorted, so the overflowed
-        node&rsquo;s median is <code>key[M/2]</code> (integer division), the key the
+        node&rsquo;s middle key is <code>key[(M-1)/2]</code> (integer division), the key the
         split promotes. Search scans (or binary-searches) the keys
         of a node already in memory and follows one child: one block read per level.
       </p>
@@ -666,7 +666,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.3
+        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.4
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

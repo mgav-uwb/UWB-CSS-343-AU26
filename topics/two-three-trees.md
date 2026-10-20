@@ -42,12 +42,13 @@ That is the **2-3 tree**.
 
 Every node is one of two kinds:
 
-```text
+<div>
+<img src="../../topics/figures/trees/tt-nodes.svg" style="height:211px" alt="
    2-node (1 key)          3-node (2 keys)
        [ b ]                 [ a | c ]
        /   \                /    |    \
-    < b     > b          < a  a..c    > c
-```
+    &lt; b     &gt; b          &lt; a  a..c    &gt; c">
+</div>
 
 - **2-node**: 1 key, 2 children (an ordinary BST node)
 - **3-node**: 2 keys `a < c`, **3 children**: less than `a`, between `a` and `c`, greater than `c`
@@ -89,15 +90,15 @@ Height is therefore between **log₃ n** (all 3-nodes) and **log₂ n** (all 2-n
 
 ## Search is just "pick a door"
 
-```text
+<div>
+<img src="../../topics/figures/trees/tt-search.svg" style="height:300px" alt="
                   [ 50 ]
            /                \
      [ 20 | 35 ]        [ 70 | 85 ]
     /    |     \       /    |     \
  [10] [25|30] [40|45][60|65][75|80][90|95]
-```
-
-Search **65**: `65 > 50` → right → `[70|85]`; `65 < 70` → left → leaf `[60|65]` → found.
+   search 65: 65 &gt; 50 right, 65 &lt; 70 left, found in [60|65]">
+</div>
 
 Three levels, three "pick a door" decisions. Search cost = one comparison group per level = **Θ(height) = Θ(log n)**.
 
@@ -136,9 +137,10 @@ Two cases: the leaf is a **2-node** or a **3-node**.
 
 The leaf has room. A 2-node becomes a 3-node. **No height change.**
 
-```text
- insert 15 into [10]        →     [10 | 15]
-```
+<div>
+<img src="../../topics/figures/trees/tt-insert-2node.svg" style="height:142px" alt="
+ insert 15 into [10]        →     [10 | 15]">
+</div>
 
 Done. The tree stayed perfectly balanced because nothing moved.
 
@@ -148,14 +150,14 @@ Done. The tree stayed perfectly balanced because nothing moved.
 
 A 3-node is full. Adding a key makes a temporary **4-node** (3 keys): not allowed. **Split** it:
 
-```text
+<div>
+<img src="../../topics/figures/trees/tt-insert-3node.svg" style="height:166px" alt="
  insert 40 into [30|50]  →  temp [30|40|50]
-
         promote the MIDDLE (40) up
                  [40]
                 /    \
-             [30]    [50]
-```
+             [30]    [50]">
+</div>
 
 The middle key **moves up to the parent**; the node splits into two 2-nodes.
 
@@ -171,29 +173,29 @@ The promoted key joins the **parent**. If the parent was a 3-node, **it** overfl
 
 ## Split: where the three pieces go
 
-A full leaf `[a|c]` plus a new key `b` (temp `[a|b|c]`) splits cleanly:
+<div>
+<img src="../../topics/figures/trees/tt-split.svg" style="height:240px" alt="
+             [ d ]                           [ b | d ]
+            /     \                         /    |    \
+   temp [a | b | c]   E        →         [a]    [c]    E
+       /  |   |  \                      /  \   /  \
+      A   B   C   D                    A   B  C   D
+   b (key[1]) moves up; a keeps A, B; c takes C, D">
+</div>
 
-```text
-       temp [ a | b | c ]
-                 ↓
-              [ b ]          b promotes
-             /     \
-          [a]      [c]       a, c become two 2-nodes
-```
-
-The **middle** key always promotes; the smaller and larger stay as leaves. In-order order is untouched.
+A temp 4-node, at a leaf or inside the tree: the **middle** key (`key[1]`) moves up; `a` keeps the two left children, `c` the two right ones. In-order is untouched.
 
 --
 
 ## The root split: the tree grows up
 
-```text
+<div>
+<img src="../../topics/figures/trees/tt-root-split.svg" style="height:262px" alt="
   promote reaches a full ROOT [p|q], new middle m:
-
        temp [ p | m | q ]          [ m ]     ← NEW root
                           →       /     \
-                               [p]      [q]     +1 level
-```
+                               [p]      [q]     +1 level">
+</div>
 
 A new root appears and **every** leaf is one level deeper: all still level. This is the **only** way the height grows.
 
@@ -203,15 +205,14 @@ A new root appears and **every** leaf is one level deeper: all still level. This
 
 Insert **50, 30, 70, 10, 20** into an empty 2-3 tree:
 
-```text
+<div>
+<img src="../../topics/figures/trees/tt-sequence.svg" style="height:313px" alt="
  50 → [50]
  30 → [30|50]
  70 → [30|50|70]  split → [50] over [30] [70]
  10 → into [30] → [10|30]
- 20 → [10|20|30]  split → promote 20 → root [20|50]
-```
-
-The root fills, then splits: the tree gains its second level at the top.
+ 20 → [10|20|30]  split → promote 20 → root [20|50]">
+</div>
 
 --
 
@@ -219,15 +220,24 @@ The root fills, then splits: the tree gains its second level at the top.
 
 Insert **65** into:
 
-```text
+<div>
+<img src="../../topics/figures/trees/tt-practice.svg" style="height:160px" alt="
         [ 40 ]
        /      \
-   [20|30]   [60|70]
-```
+   [20|30]   [60|70]">
+</div>
 
 <details class="answer"><summary>Answer:</summary>
 
 65 > 40 → leaf `[60|70]` is full → temp `[60|65|70]` → **split**, promote **65** → root becomes `[40|65]`, leaves `[20|30] [60] [70]`. Every leaf still at depth 1. ✓
+
+<div>
+<img src="../../topics/figures/trees/tt-practice-answer.svg" style="height:167px" alt="
+   65 &gt; 40 → leaf [60|70] → temp [60|65|70] → split, promote 65
+        [ 40 | 65 ]
+       /     |     \
+   [20|30]  [60]   [70]">
+</div>
 
 </details>
 
@@ -278,55 +288,55 @@ Either way, removal always happens at a leaf: the same discipline as insert's "a
 
 ## Predecessor or successor?
 
-**Either works.** They are the key's two neighbors in sorted order, and both sit in a leaf, so either can take its place; the rest of the delete is the same.
+**Either works**: the key's two neighbors in sorted order, both in a leaf.
 
-```text
+<div>
+<img src="../../topics/figures/trees/tt-pred-succ.svg" style="height:260px" alt="
    delete 30 from   [ 30 | 60 ]
                    /     |     \
               [10|20]  [40]  [70|80]
-
    predecessor 20:  [10|20] shrinks to [10]       no repair
    successor   40:  [40] empties, borrows 20      one repair
-   both end at      [20|60] over [10], [40], [70|80]
-```
+   both end at      [20|60] over [10], [40], [70|80]">
+</div>
 
-The final trees can differ in general; both are valid. We use the **predecessor** (so do the demo and the red-black delete).
+The trees can differ in general; both are valid. We use the **predecessor**, as the red-black delete does.
 
 --
 
 ## Underflow: BORROW from a sibling
 
-Removing a key can leave a node with **0 keys**. If a sibling has **2 keys** (can spare one), rotate a key through the parent:
+A node left with **0 keys** borrows from a sibling with **2 keys**, through the parent:
 
-```text
+<div>
+<img src="../../topics/figures/trees/tt-borrow.svg" style="height:169px" alt="
  before:        [ 30 ]      delete 10: [10] underflows
                 /      \     (0 keys); right sibling has
             [10]     [40|50] 2 keys, can lend one
  after (borrow through the parent):
                 [ 40 ]
                /      \
-           [30]      [50]
-```
-
-30 drops down to fill the gap; 40 rises to replace it: done in one step.
+           [30]      [50]">
+</div>
 
 --
 
-## Otherwise: MERGE with a sibling
+## Otherwise: MERGE
 
-If every sibling is at the minimum (1 key), merge instead: pull the parent's key down:
+No sibling can spare a key: **merge**, pulling the parent's key down:
 
-```text
+<div>
+<img src="../../topics/figures/trees/tt-merge.svg" style="height:143px" alt="
  before:      [ 20 | 50 ]    delete 10: [10] underflows;
              /     |     \    [30] has only 1 key too -
          [10]   [30]    [60]  no one can lend. MERGE.
  after (merge [ ] + 20 + [30], parent shrinks):
              [ 50 ]
             /      \
-       [20|30]    [60]
-```
+       [20|30]    [60]">
+</div>
 
-The parent **loses** a key: which may underflow **it** too, cascading up. If the **root** empties, its child becomes the new root: the tree **shrinks** a level.
+The parent **loses** a key and may underflow too, cascading up. An emptied **root** goes: the tree **shrinks** a level.
 
 --
 

@@ -28,25 +28,31 @@ A 2-3 node holds 1–2 keys. Why stop at 2? A **B-tree of order M** lets each no
 
 Reading from disk/SSD isn't ≈1× RAM: it's **≈10⁵× slower**, and it comes a whole **block** (page) at a time. So the cost that matters is **number of node accesses = disk reads**, not comparisons.
 
-```text
+<div>
+<img src="../../topics/figures/trees/bt-latency.svg" style="height:241px" alt="
    register  ~1 ns
    RAM      ~100 ns
-   SSD      ~100 µs      ← ~1000× RAM
-   disk     ~10 ms       ← ~100000× RAM
-```
+   SSD      ~100 µs      ← ~1,000 × RAM
+   disk     ~10 ms       ← ~100,000 × RAM
+   (log scale)">
+</div>
 
 --
 
-## Make each node one disk block
+## One node, one disk block
 
-Size a node to fill **one block** → each node holds **hundreds** of keys → the tree is only a few levels deep. Height = **log_M n**.
+A node fills **one block**: **hundreds** of keys, so only about **log<sub>M</sub> n** levels.
 
-```text
-   order M = 1000,  n = 1,000,000,000 keys
-   height ≈ log_1000(10^9) = 3
-```
+<div>
+<img src="../../topics/figures/trees/bt-levels.svg" style="height:234px" alt="
+   order M = 1000:
+   level 0:          1 node      999 keys
+   level 1:      1,000 nodes
+   level 2:  1,000,000 nodes     3 full levels: 999,999,999 keys
+   levels ≈ log_1000(10^9) = 3, so 3 block reads">
+</div>
 
-A **billion** keys, any lookup in **≈3 disk reads**. That is why databases and filesystems use B-trees.
+A **billion** keys, any lookup in **3 disk reads**: why databases and filesystems use B-trees.
 
 --
 
@@ -54,11 +60,12 @@ A **billion** keys, any lookup in **≈3 disk reads**. That is why databases and
 
 Generalize the search rule: a node holds a **sorted array** of up to `M−1` keys and `M` child pointers.
 
-```text
+<div>
+<img src="../../topics/figures/trees/bt-mary-node.svg" style="height:192px" alt="
    [ k1 | k2 | … | k_{M-1} ]
     /   |    |         \
-  <k1  k1..k2  …       >k_{M-1}
-```
+  &lt;k1  k1..k2  …       &gt;k_{M-1}">
+</div>
 
 One block read brings the whole key array into memory; a single in-memory binary search picks the child. **1 disk read per level.**
 
@@ -132,14 +139,13 @@ The same keys in an order-1000 B-tree: **3 reads** (≈30 ms). **10× fewer** bl
 
 Insert **55** into a full leaf `[60|70|80|90]`:
 
-```text
-  temp [55|60|70|80|90]   (5 keys: overflow at M)
-              ↓  split, promote the middle (70)
-        parent gains 70
-      [ … | 70 | … ]
-       /          \
-  [55|60]        [80|90]
-```
+<div>
+<img src="../../topics/figures/trees/bt-insert.svg" style="height:134px" alt="
+        [30]                        [30]                          [30 | 70]
+       /    \        insert 55     /    \           split        /    |    \
+  [10|20] [60|70|80|90]   →   [10|20] [55|60|70|80|90]   →   [10|20] [55|60] [80|90]
+                                      5 keys: overflow at M     70 moves up">
+</div>
 
 Split at **M keys**, promote the **middle**, two half-full nodes remain: same rule, wider node.
 
@@ -158,19 +164,20 @@ Value-free internal nodes fan out even wider → even shorter trees.
 
 ## B+ tree structure
 
-An index on `age`, order 3 (routers only: no records upstairs):
+An index on `age`, order 3:
 
-```text
-  internal:          [ 30 | 60 ]
+<div>
+<img src="../../topics/figures/trees/bt-bplus.svg" style="height:176px" alt="
+  routers:           [ 30 | 60 ]
                     /      |      \
   leaves:   [10|20] → [30|45] → [60|90] → ∅
              ●  ●       ●  ●      ●  ●
-             (each leaf key carries its own record)
-```
+             (each leaf key carries its own record)">
+</div>
 
-- **internal** nodes: keys + child pointers, **no records**
+- **routers**: keys and child pointers, **no records**
 - **leaves**: every key with its record, chained left → right
-- a key can appear **twice**: as a router (30, 60) and in a leaf
+- a key can appear **twice**: router and leaf key (30, 60)
 
 --
 
@@ -205,19 +212,20 @@ At routers `[30 | 60]`, a key k goes to:
 
 ## Why a key appears twice
 
-- **leaf split**: the new leaf's first key is **copied** up, and stays in its leaf
-- **router split**: the middle router **moves** up: no new copy
-- **delete**: a router can outlive its key, and still separates correctly
+- **leaf split**: the new leaf's first key is **copied** up
+- **router split**: the middle router **moves** up
+- **delete**: a router can outlive its key, still separating correctly
 
-Insert 50 into that index, `[30|60]` (order 3):
-
-```text
-           [ 50 ]          50 copied up from [30|45|50],
-          /      \         then moved up from [30|50|60]
+<div>
+<img src="../../topics/figures/trees/bt-bplus-insert.svg" style="height:306px" alt="
+   leaf split: [30|45|50] → [30|45] and [50]; 50 copied up → routers [30|50|60]: overflow
+   router split: 50 moves up
+           [ 50 ]
+          /      \
       [30]        [60]
      /    \      /    \
- [10|20]→[30|45]→[50]→[60|90]
-```
+ [10|20]→[30|45]→[50]→[60|90]">
+</div>
 
 --
 
@@ -225,10 +233,17 @@ Insert 50 into that index, `[30|60]` (order 3):
 
 Because the leaves form a **sorted linked list**, a range query descends **once**, then **walks the chain**:
 
-```text
+`SELECT * WHERE age BETWEEN 20 AND 40`:
+
+<div>
+<img src="../../topics/figures/trees/bt-range.svg" style="height:171px" alt="
    SELECT * WHERE age BETWEEN 20 AND 40
    → find 20 in the leaves → follow leaf links until 40
-```
+                 [ 30 | 60 ]
+        20 &lt; 30 /
+   [10|20] → [30|45] → [60|90] → ∅
+   20, 30 in range; 45 &gt; 40: stop">
+</div>
 
 `ORDER BY`, `BETWEEN`, and pagination are all just sequential leaf walks.
 
@@ -272,11 +287,13 @@ B+ packs more keys per internal block → higher fan-out, shorter tree, faster r
 
 Pick M so a node **fills one disk block**:
 
-```text
+<div>
+<img src="../../topics/figures/trees/bt-block.svg" style="height:198px" alt="
    block 4096 B, key 8 B, pointer 8 B
-   internal ≈ M·8 (ptrs) + (M−1)·8 (keys) ≈ 4096
-   →  M ≈ 256
-```
+   [p0|k1|p1|k2|p2| … |k255|p255]
+   256 · 8 (pointers) + 255 · 8 (keys) = 4,088 ≤ 4,096
+   →  M = 256">
+</div>
 
 Bigger blocks or smaller keys → larger M → shallower tree.
 
@@ -290,18 +307,19 @@ Bigger blocks or smaller keys → larger M → shallower tree.
 | **AVL** | rotations, bf ∈ ±1 | ≤ 1.44 log₂n | **read-heavy** (tightest) |
 | **red-black** | rotations + colors | ≤ 2 log₂n | **write-heavy** (std lib) |
 | **2-3** | split & promote | log n | teaching / basis of RB |
-| **B / B+** | split & promote | log_M n | **disk / databases** |
+| **B / B+** | split & promote | log<sub>M</sub> n | **disk / databases** |
 
 --
 
 ## Which one do I reach for?
 
-```text
+<div>
+<img src="../../topics/figures/trees/bt-choose.svg" style="height:329px" alt="
    in RAM, read-heavy      →  AVL
    in RAM, general/mutable  →  red-black  (std::map)
    on disk / a database     →  B+ tree
-   learning / interviews    →  2-3  (explains red-black)
-```
+   learning / interviews    →  2-3  (explains red-black)">
+</div>
 
 All Θ(log n); the machine and the workload pick the winner.
 

@@ -4,7 +4,7 @@
   Needs:   2-3 trees (including delete), avl rotations.
   Demos:   rb-convert, rb-insert-cases, rb-moves, rb-delete (registry), rb-insert (slide spec)
   Program: none
-  Budget:  ~50 min, 33 slides.
+  Budget:  ~50 min, 34 slides.
   Ported from Summer 2026 L05-2-3-b-trees.md, parts 3; restructured violation-first 2026-10-19.
 -->
 
@@ -129,15 +129,31 @@ private:
 
 ## What an insert can break
 
-| lands in | becomes | violation |
-|---|---|---|
-| 2-node, below | 3-node | **none** |
-| 2-node, above | 3-node | red link **leans right** |
-| 3-node, above both | **4-node** | **two red children** |
-| 3-node, below both | **4-node** | **two reds in a row** |
-| 3-node, between | **4-node** | two reds in a row, **leaning right** |
+<div>
+<img src="../../topics/figures/trees/rb-insert-breaks.svg" style="height:420px" alt="
+   before → after (R marks a red link; the 2-3 node below each tree)
+   insert 30 into [50]:      50  →   50        [50] → [30|50]       no violation
+                                   R /
+                                   30
+   insert 70 into [50]:      50  →   50        [50] → [50|70]       a red link leans right
+                                       \ R
+                                        70
+   insert 70 into [30|50]:   50  →   50        [30|50] → [30|50|70] two red children
+                           R /     R / \ R
+                           30      30   70
+   insert 10 into [30|50]:   50  →     50      [30|50] → [10|30|50] two reds in a row
+                           R /       R /
+                           30        30
+                                   R /
+                                   10
+   insert 40 into [30|50]:   50  →   50        [30|50] → [30|40|50] two reds in a row, leaning right
+                           R /     R /
+                           30      30
+                                     \ R
+                                      40">
+</div>
 
-Later, from repairs: a split sends a red link **up** (the same five places, one level up); at the top, a **red root**.
+Later, from repairs: a red link sent **up**; a **red root**.
 
 --
 
@@ -214,12 +230,22 @@ The repair depends on the **parent** (2-node or 3-node), the empty node's **plac
 
 ## What the 2-3 delete does
 
-| parent | sibling | 2-3 repair | then |
-|---|---|---|---|
-| any | a **3-node** | **borrow**: parent key down, sibling key up | done |
-| 3-node | **2-nodes** | **merge**: parent key down into a sibling | done |
-| 2-node | a **2-node** | **merge** | empty parent: **moves up** |
-| none | | drop the empty root | one level shorter |
+<div>
+<img src="../../topics/figures/trees/rb-23-delete.svg" style="height:371px" alt="
+   ( ) is the empty node
+   a sibling is a 3-node: borrow            [40]                 [60]
+                                            /   \        →       /   \
+                                          ( )  [60|70]        [40]  [70]      done
+   3-node parent, 2-node siblings: merge   [30|60]               [60]
+                                           /  |  \       →       /    \
+                                         ( ) [40] [70]       [30|40]  [70]    done
+   2-node parent, 2-node sibling: merge     [40]                 ( )
+                                            /   \        →        |
+                                          ( )   [60]           [40|60]        the empty node moves up
+   the empty node is the root: drop it      ( )
+                                             |           →     [40|60]        one level shorter
+                                          [40|60]">
+</div>
 
 --
 
@@ -240,14 +266,26 @@ The repair depends on the **parent** (2-node or 3-node), the empty node's **plac
 
 ## Fixing an insert
 
-| violation | fix |
-|---|---|
-| a red link leans right | **rotateLeft** |
-| two reds in a row, leaning left | **rotateRight** |
-| two red children (a 4-node) | **flipColors**: the 2-3 split |
-| a red root | **recolor** it black |
+<div>
+<img src="../../topics/figures/trees/rb-insert-fixes.svg" style="height:420px" alt="
+   (R marks a red link)
+   a red link leans right:   50              70        2-3 tree unchanged: [50|70]
+                               \ R  rotateLeft(50)   R /
+                                70      →         50
+   two reds in a row:        50              30        2-3 tree unchanged: [10|30|50]
+                           R /   rotateRight(50)  R / \ R
+                           30         →         10    50
+                         R /
+                         10
+   two red children:         50              50 (red)  2-3 split: [30|50|70] → [50] over [30], [70]
+                           R / \ R flipColors(50) / \
+                           30   70      →       30   70
+   a red root:            50 (red)           50        2-3 tree unchanged
+                           /  \ recolor 50 black / \
+                          30   70     →       30   70">
+</div>
 
-Each fix is constant time, at the node where the violation is.
+Each fix: constant time, where the violation is.
 
 --
 
@@ -356,41 +394,53 @@ void RedBlackTree::insert(int key) {
 
 --
 
-## Repairs under a 2-node [p]
+## Repairs under a 2-node
 
-| empty | sibling | repair | moves |
-|---|---|---|---|
-| left | [c\|s] | borrow | rotateRight(s), rotateLeft(p); p, s black |
-| left | [s] | merge, up | s red; rotateLeft(p) |
-| right | [c\|s] | borrow | rotateRight(p); c, p black |
-| right | [s] | merge, up | s red |
-
-<small>[c|s]: s black, c its red left child.</small>
-
---
-
-## Repairs under a 3-node [r|g]: borrow
-
-| empty | sibling | moves |
-|---|---|---|
-| left | middle [c\|s] | rotateRight(s), rotateLeft(r); r, s black |
-| middle | left [c\|s] | rotateRight(r); c, r black |
-| middle | right [c\|s] | rotateRight(s), rotateLeft(g), rotateRight(g); g, s black |
-| right | middle [c\|s] | rotateLeft(r), rotateRight(g); c, g black |
-
-<small>[r|g]: g black, r its red left child. The repair ends.</small>
+<div>
+<img src="../../topics/figures/trees/rb-repairs-2node.svg" style="height:528px" alt="
+   ( ) is the empty node; R marks a red link
+   empty left, sibling [60|70]: borrow    40(( ), 70(R 60))  rotateRight(70), rotateLeft(40), recolor 40, 70 black   →  60(40, 70)     done
+   empty left, sibling [60]: merge        40(( ), 60)        recolor 60 red, rotateLeft(40)                        →  ( ) over 60(R 40)  the empty node moves up
+   empty right, sibling [10|20]: borrow   40(20(R 10), ( ))  rotateRight(40), recolor 10, 40 black                 →  20(10, 40)     done
+   empty right, sibling [20]: merge       40(20, ( ))        recolor 20 red                                        →  ( ) over 40(R 20)  the empty node moves up">
+</div>
 
 --
 
-## Repairs under a 3-node [r|g]: merge
+## Borrow: an empty end child
 
-| empty | sibling | moves |
-|---|---|---|
-| left | middle [s] | r black, s red; rotateLeft(r) |
-| middle | left [s] (both 2-nodes) | r black, s red |
-| right | middle [s] | rotateRight(g); g black, s red |
+<div>
+<img src="../../topics/figures/trees/rb-repairs-3borrow-ends.svg" style="height:466px" alt="
+   parent [30|60]: 60 black, 30 its red left child; ( ) is the empty node
+   empty left, middle sibling [40|50]:     rotateRight(50), rotateLeft(30), recolor 30, 50 black   →  parent [40|60]   done
+   empty right, middle sibling [40|50]:    rotateLeft(30), rotateRight(60), recolor 40, 60 black   →  parent [30|50]   done">
+</div>
 
-The parent gives up one key and stays a 2-node: **the repair ends**.
+--
+
+## Borrow: the empty middle
+
+<div>
+<img src="../../topics/figures/trees/rb-repairs-3borrow-middle.svg" style="height:390px" alt="
+   parent [30|60]: 60 black, 30 its red left child; ( ) is the empty node
+   empty middle, left sibling [10|20]:     rotateRight(30), recolor 10, 30 black                   →  parent [20|60]   done
+   empty middle, left [10], right [70|80]: rotateRight(80), rotateLeft(60), rotateRight(60),
+                                           recolor 60, 80 black                                    →  parent [30|70]   done">
+</div>
+
+The middle borrows from the **left** sibling if it can, otherwise from the right.
+
+--
+
+## Merge under a 3-node
+
+<div>
+<img src="../../topics/figures/trees/rb-repairs-3merge.svg" style="height:528px" alt="
+   parent [30|60]: 60 black, 30 its red left child; ( ) is the empty node
+   empty left, middle sibling [40]:         recolor 30 black, 40 red, rotateLeft(30)   →  [60] over [30|40], [70]   done
+   empty middle, siblings [10] and [70]:    recolor 30 black, 10 red                   →  [60] over [10|30], [70]   done
+   empty right, middle sibling [40]:        rotateRight(60), recolor 60 black, 40 red  →  [30] over [10], [40|60]   done">
+</div>
 
 --
 
