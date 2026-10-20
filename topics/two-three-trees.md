@@ -59,7 +59,7 @@ Every node is one of two kinds:
 ```cpp
 struct Node23 {
     int     n;          // keys in use: 1 = a 2-node, 2 = a 3-node
-    int     key[3];     // key[0] < key[1]; key[2] only mid-insert
+    int     key[3];     // sorted; a third key only mid-insert
     Node23* child[4];   // n + 1 children, all null in a leaf
 };
 
@@ -73,7 +73,7 @@ private:
 };
 ```
 
-One node type with a key count. The spare slot holds the temporary 4-node an insert makes, until it splits.
+One node type with a key count. Keys stay sorted, so `child[i]` holds the keys between `key[i-1]` and `key[i]`. The spare slots hold the temporary 4-node an insert makes; its middle key is `key[1]`.
 
 --
 

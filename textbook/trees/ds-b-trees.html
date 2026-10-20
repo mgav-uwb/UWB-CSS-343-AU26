@@ -250,12 +250,14 @@
         A node is a sorted key array, a child array one longer, and a count; it is
         the 2-3 tree&rsquo;s node at width \(M\), sized so that one node fills one
         disk block. As in the 2-3 node, one spare key slot holds the overflow of an
-        insertion until the node splits. Search scans (or binary-searches) the keys
+        insertion until the node splits; the keys stay sorted, so the overflowed
+        node&rsquo;s median is <code>key[M/2]</code> (integer division), the key the
+        split promotes. Search scans (or binary-searches) the keys
         of a node already in memory and follows one child: one block read per level.
       </p>
       <pre>  struct BTreeNode {
       int        n;              <span class="cm">// keys in use: &lceil;M/2&rceil; - 1 to M - 1 (the root: 1 to M - 1)</span>
-      int        key[M];         <span class="cm">// sorted; key[M-1] only mid-insert</span>
+      int        key[M];         <span class="cm">// sorted; an M-th key only mid-insert</span>
       BTreeNode* child[M + 1];   <span class="cm">// n + 1 children; none in a leaf</span>
       bool       leaf;
   };
@@ -664,7 +666,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.2
+        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.3
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

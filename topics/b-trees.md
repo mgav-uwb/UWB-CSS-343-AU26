@@ -81,7 +81,7 @@ The min-children rule keeps nodes **at least half full** → guaranteed shallow.
 
 ```cpp
 struct BTreeNode {
-    int   key[M];           // sorted keys (≤ M-1; one spare slot mid-overflow)
+    int   key[M];           // sorted; an M-th key only mid-insert
     BTreeNode* child[M+1];  // one more than keys
     int   n;                // current # of keys
     bool  leaf;

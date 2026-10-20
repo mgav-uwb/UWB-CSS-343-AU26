@@ -198,12 +198,20 @@
         One node type serves both kinds: room for two keys and three children, and a
         count that says which kind the node is. One spare key slot and one spare
         child pointer give a node room to hold the temporary 4-node an insertion
-        creates just before it splits (&sect;3). Search descends one node per level,
-        comparing against at most two keys.
+        creates just before it splits (&sect;3). The keys stay sorted, so
+        <code>child[i]</code> holds the keys between <code>key[i-1]</code> and
+        <code>key[i]</code>: an insertion shifts every larger key one slot right,
+        together with the child pointer to its right. A temporary 4-node is
+        therefore <code>key[0] &lt; key[1] &lt; key[2]</code> over
+        <code>child[0..3]</code>, and its middle key is <code>key[1]</code>. The split
+        sends <code>key[1]</code> up; <code>key[0]</code> keeps <code>child[0]</code>
+        and <code>child[1]</code>, and <code>key[2]</code> takes <code>child[2]</code>
+        and <code>child[3]</code>. Search descends one node per level, comparing
+        against at most two keys.
       </p>
       <pre>  struct Node23 {
       int     n;              <span class="cm">// keys in use: 1 = a 2-node, 2 = a 3-node</span>
-      int     key[3];         <span class="cm">// key[0] &lt; key[1]; key[2] only mid-insert</span>
+      int     key[3];         <span class="cm">// sorted; a third key only mid-insert</span>
       Node23* child[4];       <span class="cm">// n + 1 children, all null in a leaf</span>
   };
 
@@ -725,7 +733,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; 2-3 Trees v1.1
+        Data Structures &amp; Algorithms &middot; 2-3 Trees v1.2
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
