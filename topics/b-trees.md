@@ -4,7 +4,7 @@
   Needs:   2-3 trees, the computer systems primer (memory hierarchy).
   Demos:   btree-insert (slide spec), bplus (registry)
   Program: none
-  Budget:  ~31 min, 20 slides.
+  Budget:  ~33 min, 21 slides.
   Ported from Summer 2026 L05-2-3-b-trees.md, parts 4, 5.
 -->
 
@@ -86,6 +86,14 @@ struct BTreeNode {
     int   n;                // current # of keys
     bool  leaf;
 };
+
+class BTree {
+    BTreeNode* root;        // one node = one disk block
+public:
+    bool contains(int key) const;   // one block read per level
+    void insert(int key);           // split full nodes upward
+    void remove(int key);           // borrow or merge upward
+};
 ```
 
 Search: binary-search `key[]` in RAM, follow `child[i]`. **One node = one block = one disk read.**
@@ -163,6 +171,23 @@ An index on `age`, order 3 (routers only: no records upstairs):
 - **internal** nodes: keys + child pointers, **no records**
 - **leaves**: every key with its record, chained left → right
 - a key can appear **twice**: as a router (30, 60) and in a leaf
+
+--
+
+## A B+ node, in code
+
+```cpp
+struct BPlusNode {
+    bool       leaf;
+    int        n;              // keys in use
+    int        key[M];         // routers, or a leaf's keys
+    BPlusNode* child[M + 1];   // router only: n + 1 children
+    Record*    rec[M];         // leaf only: rec[i] is key[i]'s record
+    BPlusNode* next;           // leaf only: the next leaf, or null
+};
+```
+
+Routers carry **no records**; only leaves do, and `next` chains the leaves in key order.
 
 --
 

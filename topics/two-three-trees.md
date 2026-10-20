@@ -4,7 +4,7 @@
   Needs:   avl balance (for contrast), bst search and insert.
   Demos:   tt-insert (slide spec)
   Program: none
-  Budget:  ~26 min, 23 slides.
+  Budget:  ~29 min, 25 slides.
   Ported from Summer 2026 L05-2-3-b-trees.md, parts 1, 2.
 -->
 
@@ -51,6 +51,29 @@ Every node is one of two kinds:
 
 - **2-node**: 1 key, 2 children (an ordinary BST node)
 - **3-node**: 2 keys `a < c`, **3 children**: less than `a`, between `a` and `c`, greater than `c`
+
+--
+
+## A 2-3 node, in code
+
+```cpp
+struct Node23 {
+    int     n;          // keys in use: 1 = a 2-node, 2 = a 3-node
+    int     key[3];     // key[0] < key[1]; key[2] only mid-insert
+    Node23* child[4];   // n + 1 children, all null in a leaf
+};
+
+class TwoThreeTree {
+public:
+    bool contains(int key) const;   // pick a door at each node
+    void insert(int key);           // add in a leaf, split upward
+    void remove(int key);           // remove in a leaf, borrow or merge
+private:
+    Node23* root = nullptr;
+};
+```
+
+One node type with a key count. The spare slot holds the temporary 4-node an insert makes, until it splits.
 
 --
 
@@ -247,9 +270,27 @@ Short answer: **not conceptually**: it's the mirror image of insert. **Merge and
 Search down for the key. Two cases:
 
 - it's in a **leaf** → remove it directly
-- it's **internal** → swap with the **in-order predecessor** (rightmost key of its left subtree: always a leaf), remove *that* copy instead
+- it's **internal** → swap with the **in-order predecessor** (rightmost key of its left subtree: always in a leaf), remove *that* copy instead
 
-Either way, removal always happens at a leaf: same discipline as insert's "always land in a leaf." <small>(Hibbard deletion used the *successor*; this is its mirror; both are valid.)</small>
+Either way, removal always happens at a leaf: the same discipline as insert's "always land in a leaf."
+
+--
+
+## Predecessor or successor?
+
+**Either works.** They are the key's two neighbors in sorted order, and both sit in a leaf, so either can take its place; the rest of the delete is the same.
+
+```text
+   delete 30 from   [ 30 | 60 ]
+                   /     |     \
+              [10|20]  [40]  [70|80]
+
+   predecessor 20:  [10|20] shrinks to [10]       no repair
+   successor   40:  [40] empties, borrows 20      one repair
+   both end at      [20|60] over [10], [40], [70|80]
+```
+
+The final trees can differ in general; both are valid. We use the **predecessor** (so do the demo and the red-black delete).
 
 --
 

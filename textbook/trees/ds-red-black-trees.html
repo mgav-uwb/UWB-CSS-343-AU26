@@ -134,9 +134,12 @@
       <div class="toc">
         <strong>Contents</strong>
         <ol>
-          <li><a href="#redblack">Red-black BSTs: a 2-3 tree in binary</a></li>
-          <li><a href="#moves">The three restoring moves</a></li>
-          <li><a href="#deletion">Deletion</a></li>
+          <li><a href="#redblack">A 2-3 tree in binary</a></li>
+          <li><a href="#code">The data structure</a></li>
+          <li><a href="#insert">Insertion: what can break</a></li>
+          <li><a href="#deletion">Deletion: what can break</a></li>
+          <li><a href="#moves">Fixing an insert</a></li>
+          <li><a href="#delete-fixes">Fixing a delete</a></li>
           <li><a href="#rb-height">Why the height is \(\Theta(\log n)\)</a></li>
           <li><a href="#ex-redblack">Exercises (with solutions)</a></li>
         </ol>
@@ -144,104 +147,985 @@
 
       <p class="lead">
         The <a href="ds-avl-trees.html">AVL tree</a> keeps a binary search tree
-        balanced with rotations; the <a href="ds-two-three-trees.html">2-3
+        (BST) balanced with rotations; the <a href="ds-two-three-trees.html">2-3
         tree</a> reaches the same \(\Theta(\log n)\) guarantee by splitting
         full nodes and promoting their middle keys, but it is awkward to code
         directly. The <strong>red-black BST</strong> closes that gap: an
-        ordinary binary search tree with one colour bit per link that encodes
+        ordinary binary search tree with one color bit per node that encodes
         a 2-3 tree exactly, inheriting its balance while keeping a single node
         type. It is the balanced tree real libraries ship.
       </p>
 
       <!-- ============================================================ -->
-      <h2 id="redblack">1. Red-black BSTs: a 2-3 tree in binary</h2>
+      <h2 id="redblack">1. A 2-3 tree in binary</h2>
       <p>
-        The <a href="ds-two-three-trees.html">2-3 tree</a> is elegant but painful to implement: two node types, split logic,
-        promotion, new roots: many cases and much pointer surgery. In real code
-        we would rather have <em>one</em> node type. The idea, due to Sedgewick, is to
-        represent a 2-3 tree as an ordinary <strong>binary</strong> tree, using a
-        single <strong>colour bit</strong> on each link to remember where the 3-nodes
-        were.
+        The <a href="ds-two-three-trees.html">2-3 tree</a> is simple to describe
+        and awkward to implement: two node types, splits that create nodes,
+        promotions, new roots. A red-black BST stores the same tree with one node
+        type, the binary node of a BST, plus one bit per node that records which
+        binary nodes belong to the same 2-3 node.
       </p>
-      <div class="def">
-        <span class="tag">Definition (left-leaning red-black BST)</span>
-        A <strong>left-leaning red-black BST</strong> is a BST whose links are coloured
-        red or black so that: (1) red links <strong>lean left</strong> (no
-        right-leaning red link); (2) no node has two red links in a row; and (3)
-        <strong>black balance</strong> holds: every root-to-null path crosses the
-        same number of black links. By convention a node&rsquo;s stored colour is the
-        colour of the link <em>to its parent</em>, and the root link is black.
-      </div>
+      <h3>One 2-3 node at a time</h3>
+      <ul>
+        <li>A <strong>2-node</strong> \([a]\) becomes one node \(a\); the
+        2-node&rsquo;s two subtrees become \(a\)&rsquo;s two children.</li>
+        <li>A <strong>3-node</strong> \([a\,|\,b]\) becomes two nodes joined by a
+        <strong>red link</strong>: \(b\), with \(a\) as its left child. The
+        3-node&rsquo;s three subtrees hang under the two keys by key range: keys
+        below \(a\) under \(a\)&rsquo;s left, keys between \(a\) and \(b\) under
+        \(a\)&rsquo;s right, keys above \(b\) under \(b\)&rsquo;s right.</li>
+      </ul>
       <p>
-        A red link is the &ldquo;glue&rdquo; inside a 3-node. A 3-node \([a\,|\,c]\)
-        becomes two BST nodes joined by a red link; a 2-node is a plain black-linked
-        node. Read a red link as &ldquo;these two nodes are really one 3-node,&rdquo;
-        and the three invariants become the 2-3 rules in disguise: &ldquo;no two reds
-        in a row&rdquo; is &ldquo;no node has a third key&rdquo; (the 4-node we must
-        split), and &ldquo;equal black-height&rdquo; is &ldquo;all 2-3 leaves at the
-        same depth.&rdquo;
+        Every other link is <strong>black</strong>. The bit is stored in the child:
+        a node is <em>red</em> when the link from its parent is red, so a red node
+        is the smaller key of a 3-node, glued to the larger one. The root has no
+        parent link and is black.
       </p>
       <figure>
-        <svg viewBox="0 0 520 220" role="img" aria-label="The 2-3 to red-black correspondence. On the left, labeled 'one 3-node': a single 3-node holding 30 and 50 with three leaf children holding 10, 40, and 70, in left-to-right order. An arrow points to the right picture, the same five keys as a binary tree: 50 is the root, joined to its left child 30 by a thick red link labeled 'red link' (30 is drawn in red); 30 has left child 10 and right child 40; 50 has right child 70; every other link is black. In-order traversal gives 10, 30, 40, 50, 70 in both pictures.">
-          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="600" text-anchor="middle">
-            <!-- LEFT: 3-node with three children -->
-            <g stroke="#4a5163" stroke-width="1.5" fill="none">
-              <line x1="55"  y1="60" x2="40"  y2="150"/>
-              <line x1="85"  y1="62" x2="85"  y2="150"/>
-              <line x1="115" y1="60" x2="130" y2="150"/>
-            </g>
-            <rect x="46" y="32" width="78" height="28" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-            <line x1="85" y1="32" x2="85" y2="60" stroke="#c8ccd6" stroke-width="1"/>
-            <text x="66" y="51">30</text><text x="104" y="51">50</text>
-            <circle cx="40"  cy="164" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="40"  y="169">10</text>
-            <circle cx="85"  cy="164" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="85"  y="169">40</text>
-            <circle cx="130" cy="164" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="130" y="169">70</text>
-            <text x="85" y="200" font-size="11.5" font-weight="400" fill="#5c6270">one 3-node</text>
-            <!-- arrow -->
-            <text x="240" y="112" font-size="22" font-weight="400" fill="#5c6270">&#8594;</text>
-            <!-- RIGHT: binary encoding -->
-            <line x1="368" y1="52" x2="330" y2="108" stroke="#c0392b" stroke-width="4"/>   <!-- red 50->30 -->
-            <line x1="384" y1="54" x2="430" y2="108" stroke="#4a5163" stroke-width="1.6"/> <!-- black 50->70 -->
-            <line x1="315" y1="128" x2="295" y2="168" stroke="#4a5163" stroke-width="1.6"/><!-- 30->10 -->
-            <line x1="333" y1="128" x2="360" y2="168" stroke="#4a5163" stroke-width="1.6"/><!-- 30->40 -->
-            <circle cx="376" cy="40"  r="17" fill="#fff" stroke="#2a2d36" stroke-width="1.7"/><text x="376" y="45">50</text>
-            <circle cx="322" cy="112" r="17" fill="#fff" stroke="#c0392b" stroke-width="2.2"/><text x="322" y="117" fill="#c0392b">30</text>
-            <circle cx="430" cy="112" r="17" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/><text x="430" y="117">70</text>
-            <circle cx="288" cy="182" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="288" y="187">10</text>
-            <circle cx="366" cy="182" r="16" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/><text x="366" y="187">40</text>
-            <text x="352" y="80" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="start">red link</text>
-          </g>
-        </svg>
+<!-- gen:rb encode-nodes -->
+<svg viewBox="0 0 738 322" role="img" style="max-width:886px" font-family="system-ui, sans-serif" aria-label="Encoding one 2-3 node. A 2-node: 2-3 view: the node holding a at the top; the node holding a has children, left to right, subtree A, subtree B, becomes a at the root; a has left child subtree A by a black link and right child subtree B by a black link. A 3-node: 2-3 view: the node holding a and b at the top; the node holding a and b has children, left to right, subtree A, subtree B, subtree C, becomes, leaning left, b at the root; b has left child a by a red link and right child subtree C by a black link; a has left child subtree A by a black link and right child subtree B by a black link; or, leaning right, a at the root; a has left child subtree A by a black link and right child b by a red link; b has left child subtree B by a black link and right child subtree C by a black link.">
+<text x="10" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">a 2-node: one black node</text>
+<line x1="33" y1="61" x2="25" y2="90" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="59" y1="61" x2="67" y2="90" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M25,90 L10,120 L40,120 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="25" y="113" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">A</text>
+<path d="M67,90 L52,120 L82,120 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="67" y="113" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">B</text>
+<rect x="33" y="35" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="46" y="53" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">a</text>
+<text x="142" y="73" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="142" y="89" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">becomes</text>
+<line x1="251" y1="47" x2="217" y2="87" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="251" y1="47" x2="285" y2="87" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M217,87 L202,119 L232,119 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="217" y="112" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">A</text>
+<circle cx="251" cy="47" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="251" y="52" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a</text>
+<path d="M285,87 L270,119 L300,119 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="285" y="112" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">B</text>
+<text x="10" y="159" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">a 3-node: two nodes joined by a red link</text>
+<line x1="41" y1="222" x2="25" y2="251" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="67" y1="222" x2="67" y2="251" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="93" y1="222" x2="109" y2="251" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M25,251 L10,281 L40,281 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="25" y="274" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">A</text>
+<path d="M67,251 L52,281 L82,281 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="67" y="274" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">B</text>
+<path d="M109,251 L94,281 L124,281 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="109" y="274" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">C</text>
+<rect x="41" y="196" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="67" y1="196" x2="67" y2="222" stroke="#c8ccd6" stroke-width="1"/>
+<text x="54" y="214" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">a</text>
+<text x="80" y="214" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">b</text>
+<text x="184" y="234" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="184" y="250" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">left-leaning</text>
+<line x1="293" y1="233" x2="259" y2="273" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="293" y1="233" x2="327" y2="273" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="361" y1="183" x2="293" y2="233" stroke="#c0392b" stroke-width="4"/>
+<line x1="361" y1="183" x2="395" y2="223" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M259,273 L244,305 L274,305 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="259" y="298" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">A</text>
+<circle cx="293" cy="233" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="293" y="238" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">a</text>
+<path d="M327,273 L312,305 L342,305 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="327" y="298" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">B</text>
+<circle cx="361" cy="183" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="361" y="188" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">b</text>
+<path d="M395,223 L380,255 L410,255 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="395" y="248" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">C</text>
+<text x="486" y="234" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="486" y="250" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">or, right-leaning</text>
+<line x1="603" y1="183" x2="569" y2="223" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="603" y1="183" x2="671" y2="233" stroke="#c0392b" stroke-width="4"/>
+<line x1="671" y1="233" x2="637" y2="273" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="671" y1="233" x2="705" y2="273" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M569,223 L554,255 L584,255 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="569" y="248" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">A</text>
+<circle cx="603" cy="183" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="603" y="188" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a</text>
+<path d="M637,273 L622,305 L652,305 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="637" y="298" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">B</text>
+<circle cx="671" cy="233" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="671" y="238" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">b</text>
+<path d="M705,273 L690,305 L720,305 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="705" y="298" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">C</text>
+</svg>
+<!-- /gen:rb encode-nodes -->
         <figcaption>
-          The 2-3 &harr; red-black correspondence. The 3-node \([30\,|\,50]\) with
-          children \(10, 40, 70\) becomes the binary tree with \(50\) black at the
-          root, a <span style="color:#c0392b;font-weight:700">red</span> left link to
-          \(30\) (that red link <em>is</em> the 3-node&rsquo;s glue), and children
-          \(10, 40, 70\) hung underneath. In-order is \(10, 30, 40, 50, 70\) in both.
-          Collapsing the red link back into its parent recovers the 3-node exactly.
+          Encoding one 2-3 node. A 2-node is one black node. A 3-node
+          \([a\,|\,b]\) is two nodes joined by a
+          <span style="color:#c0392b;font-weight:700">red</span> link, leaning
+          left (\(b\) on top, \(a\) its red left child) or right (\(a\) on top,
+          \(b\) its red right child). Subtrees \(A\), \(B\), \(C\) keep their key
+          ranges, so the in-order sequence \(A, a, B, b, C\) is the same in all
+          three pictures.
         </figcaption>
       </figure>
-      <!-- ============================================================ -->
-      <h2 id="moves">2. The three restoring moves</h2>
+
+      <h3>Left or right</h3>
       <p>
-        Insertion is a normal BST insert with the new link coloured <strong>red</strong>
-        (a new key always tries to join an existing node as a 3-node), followed by a
-        walk back up applying whichever of three constant-time fix-ups restores the
-        invariants:
+        Nothing forces the red link to the left. A 3-node \([a\,|\,b]\) can just as
+        well become \(a\) with \(b\) as its red <em>right</em> child, the three
+        subtrees under \(a\)&rsquo;s left, \(b\)&rsquo;s left and \(b\)&rsquo;s
+        right. That right-leaning encoding is also a binary search tree with the
+        same keys in the same order, and it puts the same black links on every path.
+        What matters is choosing one side for every 3-node: then each 2-3 tree has
+        exactly one encoding, and the repairs of sections 5 and 6 handle one shape
+        of 3-node instead of two. This chapter, following Sedgewick, uses the
+        left-leaning encoding. A right-leaning red-black BST is its mirror image,
+        with every rule and every repair mirrored left for right.
       </p>
-      <pre>  right child red, left child black   &rarr;  rotateLeft
-  left red AND its left child red     &rarr;  rotateRight
-  both children red                   &rarr;  flipColors</pre>
+      <div class="aside">
+        <span class="tag">Other red-black trees</span>
+        The red-black tree as Guibas and Sedgewick introduced it, and as Cormen et
+        al. present it, lets red links lean either way and lets a black node have
+        two red children: it encodes a 2-3-4 tree, whose nodes hold up to three
+        keys. Its rules are stated for colored nodes and its repairs are organized
+        by the colors of a node&rsquo;s relatives rather than by 2-3 nodes; the
+        height bound and the costs are the same.
+      </div>
+
+      <h3>The rules</h3>
+      <div class="def">
+        <span class="tag">Definition (left-leaning red-black BST)</span>
+        A <strong>left-leaning red-black BST</strong> is a BST whose links are
+        colored red or black (each node stores the color of the link from its
+        parent) so that:
+        <ol>
+          <li>the <strong>root is black</strong>;</li>
+          <li><strong>red links lean left</strong>: a red node is a left child;</li>
+          <li><strong>no node has two red links</strong>: a red node has no red
+          child, and no node has two red children;</li>
+          <li><strong>black balance</strong>: every path from the root to a null
+          link crosses the same number of black links.</li>
+        </ol>
+      </div>
+      <p>
+        Each rule is a 2-3 fact. Rules 2 and 3 say that each 2-3 node is a 2-node or
+        a left-leaning 3-node: a 4-node \([a\,|\,b\,|\,c]\) would need two red links
+        at one node. Rule 4 says that the 2-3 leaves are all at one depth: the black
+        links are exactly the 2-3 tree&rsquo;s edges, so a path crosses one black
+        link per 2-3 level.
+      </p>
+
+      <h3>Whole trees, both ways</h3>
+      <p>
+        Encoding a whole 2-3 tree applies the node rule to every node, from the root
+        down. Decoding collapses every red link into its parent, which recovers each
+        2-3 node and so the whole tree.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a three-level 2-3 tree, encoded and decoded)</span>
+        The 2-3 tree has root \([40]\), children \([20]\) and \([60\,|\,80]\), and
+        leaves \([10], [30]\) under \([20]\) and \([50], [70], [90\,|\,95]\) under
+        \([60\,|\,80]\). From the top:
+        <ol>
+          <li>\([40]\), a 2-node: the black root \(40\).</li>
+          <li>\([20]\), a 2-node: a black node \(20\), the root&rsquo;s left
+          child.</li>
+          <li>\([60\,|\,80]\), a 3-node: \(80\), black, the root&rsquo;s right
+          child, with \(60\) as its red left child.</li>
+          <li>\([10]\) and \([30]\): black children of \(20\).</li>
+          <li>\([50]\) and \([70]\): black children of \(60\) (keys below \(60\),
+          and keys between \(60\) and \(80\)).</li>
+          <li>\([90\,|\,95]\): \(95\), black, \(80\)&rsquo;s right child, with
+          \(90\) as its red left child.</li>
+        </ol>
+        <figure class="wide">
+<!-- gen:rb encode-tree -->
+<svg viewBox="0 0 1054 244" role="img" style="max-width:1265px;min-width:560px" font-family="system-ui, sans-serif" aria-label="A three-level 2-3 tree and its two red-black encodings. 2-3 view: the node holding 40 at the top; the node holding 40 has children, left to right, the node holding 20, the node holding 60 and 80; the node holding 20 has children, left to right, the node holding 10, the node holding 30; the node holding 60 and 80 has children, left to right, the node holding 50, the node holding 70, the node holding 90 and 95. Left-leaning: 40 at the root; 40 has left child 20 by a black link and right child 80 by a black link; 20 has left child 10 by a black link and right child 30 by a black link; 80 has left child 60 by a red link and right child 95 by a black link; 60 has left child 50 by a black link and right child 70 by a black link; 95 has left child 90 by a red link. Right-leaning: 40 at the root; 40 has left child 20 by a black link and right child 60 by a black link; 20 has left child 10 by a black link and right child 30 by a black link; 60 has left child 50 by a black link and right child 80 by a red link; 80 has left child 70 by a black link and right child 90 by a black link; 90 has right child 95 by a red link.">
+<line x1="29" y1="126" x2="23" y2="150" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="55" y1="126" x2="61" y2="150" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="117.5" y1="126" x2="99" y2="150" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="143.5" y1="126" x2="137" y2="150" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="169.5" y1="126" x2="188" y2="150" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="79.8" y1="76" x2="42" y2="100" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="105.8" y1="76" x2="143.5" y2="100" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="10" y="150" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="23" y="168" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<rect x="48" y="150" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="61" y="168" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="29" y="100" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="42" y="118" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="86" y="150" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="99" y="168" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="124" y="150" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="137" y="168" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<rect x="162" y="150" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="188" y1="150" x2="188" y2="176" stroke="#c8ccd6" stroke-width="1"/>
+<text x="175" y="168" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="201" y="168" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">95</text>
+<rect x="117.5" y="100" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="143.5" y1="100" x2="143.5" y2="126" stroke="#c8ccd6" stroke-width="1"/>
+<text x="130.5" y="118" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="156.5" y="118" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<rect x="79.8" y="50" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="92.8" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="112" y="229" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">2-3 tree</text>
+<text x="257" y="107" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="257" y="123" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">encode</text>
+<line x1="345" y1="91" x2="315" y2="135" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="345" y1="91" x2="375" y2="135" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="405" y1="47" x2="345" y2="91" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="405" y1="47" x2="525" y2="91" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="465" y1="135" x2="435" y2="179" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="465" y1="135" x2="495" y2="179" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="525" y1="91" x2="465" y2="135" stroke="#c0392b" stroke-width="4"/>
+<line x1="525" y1="91" x2="585" y2="135" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="585" y1="135" x2="555" y2="179" stroke="#c0392b" stroke-width="4"/>
+<circle cx="315" cy="135" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="315" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<circle cx="345" cy="91" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="345" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="375" cy="135" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="375" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<circle cx="405" cy="47" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="405" y="52" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="435" cy="179" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="435" y="184" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<circle cx="465" cy="135" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="465" y="140" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">60</text>
+<circle cx="495" cy="179" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="495" y="184" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<circle cx="525" cy="91" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="525" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<circle cx="555" cy="179" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="555" y="184" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">90</text>
+<circle cx="585" cy="135" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="585" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">95</text>
+<text x="454" y="229" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">left-leaning</text>
+<text x="672" y="107" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="672" y="123" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">or, leaning right</text>
+<line x1="781" y1="69" x2="751" y2="113" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="781" y1="69" x2="811" y2="113" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="841" y1="25" x2="781" y2="69" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="841" y1="25" x2="901" y2="69" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="901" y1="69" x2="871" y2="113" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="901" y1="69" x2="961" y2="113" stroke="#c0392b" stroke-width="4"/>
+<line x1="961" y1="113" x2="931" y2="157" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="961" y1="113" x2="991" y2="157" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="991" y1="157" x2="1021" y2="201" stroke="#c0392b" stroke-width="4"/>
+<circle cx="751" cy="113" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="751" y="118" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<circle cx="781" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="781" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="811" cy="113" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="811" y="118" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<circle cx="841" cy="25" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="841" y="30" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="871" cy="113" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="871" y="118" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<circle cx="901" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="901" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="931" cy="157" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="931" y="162" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<circle cx="961" cy="113" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="961" y="118" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">80</text>
+<circle cx="991" cy="157" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="991" y="162" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<circle cx="1021" cy="201" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="1021" y="206" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">95</text>
+<text x="890" y="229" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">right-leaning</text>
+</svg>
+<!-- /gen:rb encode-tree -->
+          <figcaption>
+            The 2-3 tree (left), its left-leaning encoding (middle) and its
+            right-leaning encoding (right). Collapsing the red links of either
+            encoding gives back the 2-3 tree.
+          </figcaption>
+        </figure>
+        Decoding reads the encoding the other way: \(40\), \(20\), \(10\),
+        \(30\), \(50\) and \(70\) have no red child, so each is a 2-node; \(80\)
+        with its red child \(60\) is \([60\,|\,80]\), and \(95\) with \(90\) is
+        \([90\,|\,95]\). Every path from the root crosses three black links,
+        counting the root&rsquo;s, one per 2-3 level.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=rb-convert">Encoding demo</a>. Three 2-3
+        trees encoded node by node and decoded back, left-leaning and
+        right-leaning, with the 2-3 tree beside the red-black BST.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="code">2. The data structure</h2>
+      <p>
+        A red-black BST is one node type, a BST node with one extra bit, and a tree
+        object that owns the root. Search is the BST search unchanged; insert and
+        delete are the BST operations followed by repairs.
+      </p>
+      <div class="code-tabs" data-snippet="trees/redblack-node">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// One node per key. `red` is the color of the link from the parent: a red
+// node is glued to its parent as one 2-3 node (the smaller key of a 3-node).
+struct RBNode {
+    int     key;
+    RBNode* left  = nullptr;
+    RBNode* right = nullptr;
+    bool    red   = true;          // a new node joins its parent&#x27;s 2-3 node
+    explicit RBNode(int k) : key(k) {}
+};
+
+// a null link is black
+bool isRed(const RBNode* h) { return h != nullptr &amp;&amp; h-&gt;red; }
+
+class RedBlackTree {
+public:
+    bool contains(int key) const;  // BST search: colors play no part
+    void insert(int key);          // BST insert, new node red, then fix (section 5)
+    void remove(int key);          // BST delete, then repair (section 6)
+private:
+    RBNode* root = nullptr;        // always black
+};
+
+bool RedBlackTree::contains(int key) const {
+    RBNode* h = root;
+    while (h != nullptr) {
+        if (key == h-&gt;key) return true;
+        h = (key &lt; h-&gt;key) ? h-&gt;left : h-&gt;right;
+    }
+    return false;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// One node per key. `red` is the color of the link from the parent: a red
+// node is glued to its parent as one 2-3 node (the smaller key of a 3-node).
+class RBNode {
+    int key;
+    RBNode left, right;
+    boolean red = true;            // a new node joins its parent&#x27;s 2-3 node
+    RBNode(int key) { this.key = key; }
+}
+
+class RedBlackTree {
+    private RBNode root;           // always black
+
+    // a null link is black
+    static boolean isRed(RBNode h) { return h != null &amp;&amp; h.red; }
+
+    boolean contains(int key) {    // BST search: colors play no part
+        RBNode h = root;
+        while (h != null) {
+            if (key == h.key) return true;
+            h = (key &lt; h.key) ? h.left : h.right;
+        }
+        return false;
+    }
+    // insert(key): BST insert, new node red, then fix (section 5)
+    // remove(key): BST delete, then repair (section 6)
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># One node per key. `red` is the color of the link from the parent: a red
+# node is glued to its parent as one 2-3 node (the smaller key of a 3-node).
+class RBNode:
+    def __init__(self, key):
+        self.key = key
+        self.left = None
+        self.right = None
+        self.red = True              # a new node joins its parent&#x27;s 2-3 node
+
+def is_red(h):                       # None links are black
+    return h is not None and h.red
+
+class RedBlackTree:
+    def __init__(self):
+        self.root = None             # always black
+
+    def contains(self, key):         # BST search: colors play no part
+        h = self.root
+        while h is not None:
+            if key == h.key:
+                return True
+            h = h.left if key &lt; h.key else h.right
+        return False
+    # insert(key): BST insert, new node red, then fix (section 5)
+    # remove(key): BST delete, then repair (section 6)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// One node per key. `red` is the color of the link from the parent: a red
+// node is glued to its parent as one 2-3 node (the smaller key of a 3-node).
+type Link = Option&lt;Box&lt;RBNode&gt;&gt;;
+
+struct RBNode {
+    key: i32,
+    left: Link,
+    right: Link,
+    red: bool,                       // a new node starts red
+}
+
+// a None link is black
+fn is_red(h: &amp;Link) -&gt; bool { h.as_ref().map_or(false, |n| n.red) }
+
+struct RedBlackTree {
+    root: Link,                      // always black
+}
+
+impl RedBlackTree {
+    fn contains(&amp;self, key: i32) -&gt; bool {   // BST search: colors play no part
+        let mut h = &amp;self.root;
+        while let Some(n) = h {
+            if key == n.key { return true; }
+            h = if key &lt; n.key { &amp;n.left } else { &amp;n.right };
+        }
+        false
+    }
+    // insert(key): BST insert, new node red, then fix (section 5)
+    // remove(key): BST delete, then repair (section 6)
+}</pre>
+<!--/ct--></div>
+      <p>
+        A new node starts red (section 3 says why). <code>isRed</code> treats a
+        null link as black, so a rule can be tested at a node without first checking
+        that its children exist.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="insert">3. Insertion: what can break</h2>
+      <p>
+        An insert begins as a plain BST insert: search for the key, and attach a new
+        node where the search falls off the tree. The new node is colored
+        <strong>red</strong>.
+      </p>
+      <p>
+        <strong>Why red.</strong> A new black node would add a black link to the
+        paths through it and to no other path, breaking black balance (rule 4) on
+        every insert. A red node adds no black link anywhere, so rule 4 holds; what a
+        red node can break is one of the rules about red links (1, 2 or 3). In 2-3
+        terms a red node is a key that joins its parent&rsquo;s 2-3 node, which is
+        where a 2-3 insert puts a new key.
+      </p>
+      <p>
+        Which rule breaks depends on where the new node lands: in a 2-node or a
+        3-node, and below, between or above its keys. In 2-3 terms there are only two
+        outcomes: a 2-node becomes a 3-node, or a 3-node becomes a 4-node, which a 2-3
+        tree does not allow.
+      </p>
+      <table>
+        <tr><th>the new key \(x\) lands</th><th>the 2-3 node becomes</th><th>red-black shape</th><th>violation</th></tr>
+        <tr><td>in a 2-node, below its key</td><td>a 3-node</td><td>\(x\) a red left child</td><td>none</td></tr>
+        <tr><td>in a 2-node, above its key</td><td>a 3-node</td><td>\(x\) a red right child</td><td>a red link leans right (rule 2)</td></tr>
+        <tr><td>in a 3-node, above both keys</td><td>a 4-node</td><td>the larger key has two red children</td><td>two red children (rule 3)</td></tr>
+        <tr><td>in a 3-node, below both keys</td><td>a 4-node</td><td>\(x\) a red left child of the red key</td><td>two reds in a row (rule 3)</td></tr>
+        <tr><td>in a 3-node, between its keys</td><td>a 4-node</td><td>\(x\) a red right child of the red key</td><td>two reds in a row, the second leaning right (rules 3 and 2)</td></tr>
+      </table>
+      <figure class="wide">
+<!-- gen:rb insert-catalog -->
+<svg viewBox="0 0 504 378" role="img" style="max-width:605px;min-width:504px" font-family="system-ui, sans-serif" aria-label="The five places a new red node can land. into a 2-node, smaller, 30 into [50]: 50 at the root; 50 has left child 30 by a red link; the 2-3 node becomes 2-3 view: the node holding 30 and 50 at the top; no violation. into a 2-node, larger, 70 into [50]: 50 at the root; 50 has right child 70 by a red link; the 2-3 node becomes 2-3 view: the node holding 50 and 70 at the top; a red link leans right. into a 3-node, larger, 70 into [30|50]: 50 at the root; 50 has left child 30 by a red link and right child 70 by a red link; the 2-3 node becomes 2-3 view: the node holding 30 and 50 and 70 at the top; two red children. into a 3-node, smaller, 10 into [30|50]: 50 at the root; 50 has left child 30 by a red link; 30 has left child 10 by a red link; the 2-3 node becomes 2-3 view: the node holding 10 and 30 and 50 at the top; two reds in a row. into a 3-node, between, 40 into [30|50]: 50 at the root; 50 has left child 30 by a red link; 30 has right child 40 by a red link; the 2-3 node becomes 2-3 view: the node holding 30 and 40 and 50 at the top; two reds in a row, leaning right.">
+<text x="180.4" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">into a 2-node, smaller</text>
+<line x1="191.4" y1="45" x2="161.4" y2="89" stroke="#c0392b" stroke-width="4"/>
+<circle cx="161.4" cy="89" r="21" fill="#fde7bf"/>
+<circle cx="161.4" cy="89" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="161.4" y="94" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
+<circle cx="191.4" cy="45" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="191.4" y="50" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="154.4" y="114" width="26" height="26" fill="#fde7bf"/>
+<rect x="154.4" y="114" width="52" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="180.4" y1="114" x2="180.4" y2="140" stroke="#c8ccd6" stroke-width="1"/>
+<text x="167.4" y="132" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="193.4" y="132" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="180.4" y="153" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">no violation</text>
+<text x="326" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">into a 2-node, larger</text>
+<line x1="307" y1="45" x2="337" y2="89" stroke="#c0392b" stroke-width="4"/>
+<circle cx="307" cy="45" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="307" y="50" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<circle cx="337" cy="89" r="21" fill="#fde7bf"/>
+<circle cx="337" cy="89" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="337" y="94" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">70</text>
+<rect x="326" y="114" width="26" height="26" fill="#fde7bf"/>
+<rect x="300" y="114" width="52" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="326" y1="114" x2="326" y2="140" stroke="#c8ccd6" stroke-width="1"/>
+<text x="313" y="132" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="339" y="132" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="326" y="153" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">a red link leans right</text>
+<text x="77.2" y="213" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">into a 3-node, larger</text>
+<line x1="73.2" y1="235" x2="43.2" y2="279" stroke="#c0392b" stroke-width="4"/>
+<line x1="73.2" y1="235" x2="103.2" y2="279" stroke="#c0392b" stroke-width="4"/>
+<circle cx="43.2" cy="279" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="43.2" y="284" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
+<circle cx="73.2" cy="235" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="73.2" y="240" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<circle cx="103.2" cy="279" r="21" fill="#fde7bf"/>
+<circle cx="103.2" cy="279" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="103.2" y="284" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">70</text>
+<rect x="90.2" y="304" width="26" height="26" fill="#fde7bf"/>
+<rect x="38.2" y="304" width="78" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="64.2" y1="304" x2="64.2" y2="330" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="90.2" y1="304" x2="90.2" y2="330" stroke="#c8ccd6" stroke-width="1"/>
+<text x="51.2" y="322" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="77.2" y="322" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="103.2" y="322" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="77.2" y="343" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">two red children</text>
+<text x="222.8" y="191" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">into a 3-node, smaller</text>
+<line x1="218.8" y1="257" x2="188.8" y2="301" stroke="#c0392b" stroke-width="4"/>
+<line x1="248.8" y1="213" x2="218.8" y2="257" stroke="#c0392b" stroke-width="4"/>
+<circle cx="188.8" cy="301" r="21" fill="#fde7bf"/>
+<circle cx="188.8" cy="301" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="188.8" y="306" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">10</text>
+<circle cx="218.8" cy="257" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="218.8" y="262" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
+<circle cx="248.8" cy="213" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="248.8" y="218" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="183.8" y="326" width="26" height="26" fill="#fde7bf"/>
+<rect x="183.8" y="326" width="78" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="209.8" y1="326" x2="209.8" y2="352" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="235.8" y1="326" x2="235.8" y2="352" stroke="#c8ccd6" stroke-width="1"/>
+<text x="196.8" y="344" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="222.8" y="344" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="248.8" y="344" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="222.8" y="365" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">two reds in a row</text>
+<text x="397.2" y="191" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">into a 3-node, between</text>
+<line x1="363.2" y1="257" x2="393.2" y2="301" stroke="#c0392b" stroke-width="4"/>
+<line x1="423.2" y1="213" x2="363.2" y2="257" stroke="#c0392b" stroke-width="4"/>
+<circle cx="363.2" cy="257" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="363.2" y="262" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
+<circle cx="393.2" cy="301" r="21" fill="#fde7bf"/>
+<circle cx="393.2" cy="301" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="393.2" y="306" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">40</text>
+<circle cx="423.2" cy="213" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="423.2" y="218" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="384.2" y="326" width="26" height="26" fill="#fde7bf"/>
+<rect x="358.2" y="326" width="78" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="384.2" y1="326" x2="384.2" y2="352" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="410.2" y1="326" x2="410.2" y2="352" stroke="#c8ccd6" stroke-width="1"/>
+<text x="371.2" y="344" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="397.2" y="344" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="423.2" y="344" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="397.2" y="365" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">two reds in a row, leaning right</text>
+</svg>
+<!-- /gen:rb insert-catalog -->
+        <figcaption>
+          The five places a new red node can land, each above the 2-3 node it makes
+          (shaded: the new key). Only the first breaks no rule. The second is a
+          3-node drawn leaning right; the other three are a 4-node, drawn in three
+          different ways.
+        </figcaption>
+      </figure>
+      <p>
+        Two more violations arise later, during repairs, never from the attach
+        itself. Splitting a 4-node (section 5) sends its middle key up into the
+        parent&rsquo;s 2-3 node by a red link, and that red link lands in one of the
+        same five places one level up. A split at the top leaves the root red,
+        breaking rule 1.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=rb-insert-cases&amp;config=%7B%22fix%22%3Afalse%7D">Red-black
+        insert demo, violations only</a>. Each case attaches one red node to a small
+        tree and names the rule it breaks, beside the 2-3 tree. The
+        <a href="../../lib/demo.html?ds=rb-insert-cases">full version</a> also fixes
+        it (section 5).
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="deletion">4. Deletion: what can break</h2>
+      <p>A delete also begins as a plain BST delete, in two steps.</p>
+      <p>
+        <strong>Step 1: bring the key to the bottom.</strong> If the key&rsquo;s node
+        has two children, swap the key with its <strong>in-order
+        predecessor</strong>, the largest key in its left subtree (go left once,
+        then right to the end). No key lies between a key and its predecessor, so
+        after the swap the only key out of order is the one being deleted, now in
+        the predecessor&rsquo;s old node, which has no right child. The
+        <strong>in-order successor</strong>, the smallest key in the right subtree,
+        works equally well, mirrored. This chapter uses the predecessor, as the
+        <a href="ds-two-three-trees.html#delete">2-3 delete</a> does, so the
+        red-black delete and the 2-3 delete stay in step and end with the same 2-3
+        tree.
+      </p>
+      <p>
+        <strong>Step 2: remove it.</strong> The node now holding the key has at most
+        one child, and in a left-leaning red-black BST that leaves three kinds of
+        node. (A node with only a right child cannot occur: that child&rsquo;s link
+        would be red and lean right, breaking rule 2, or black and add a black link
+        on one side only, breaking rule 4.)
+      </p>
+      <ul>
+        <li>A <strong>red leaf</strong>, the smaller key of a 3-node at the bottom of
+        the 2-3 tree. Remove it: only a red link goes, so every path keeps its black
+        links. <strong>No violation.</strong></li>
+        <li>A <strong>black node with one child</strong>. The child is a red leaf,
+        and the two are a 3-node at the bottom. The child takes the node&rsquo;s
+        place and turns black, so the paths through it cross the same black links as
+        before. <strong>No violation.</strong></li>
+        <li>A <strong>black leaf</strong>, a 2-node at the bottom. Removing it
+        removes a black link from the paths through it, which now cross one black
+        link fewer than every other path. <strong>Violation: black balance (rule
+        4).</strong></li>
+      </ul>
+      <figure class="wide">
+<!-- gen:rb delete-removal -->
+<svg viewBox="0 0 614 432" role="img" style="max-width:737px;min-width:560px" font-family="system-ui, sans-serif" aria-label="Removing a key from the bottom, the red-black BST before and after (left) and the 2-3 tree before and after (right). a red leaf: delete 10 from [10|20], no violation. Before: 40 at the root; 40 has left child 20 by a black link and right child 60 by a black link; 20 has left child 10 by a red link. After: 40 at the root; 40 has left child 20 by a black link and right child 60 by a black link. As 2-3 trees: before, 2-3 view: the node holding 40 at the top; the node holding 40 has children, left to right, the node holding 10 and 20, the node holding 60; after, 2-3 view: the node holding 40 at the top; the node holding 40 has children, left to right, the node holding 20, the node holding 60. one child: delete 20 from [10|20], no violation. Before: 40 at the root; 40 has left child 20 by a black link and right child 60 by a black link; 20 has left child 10 by a red link. After: 40 at the root; 40 has left child 10 by a black link and right child 60 by a black link. As 2-3 trees: before, 2-3 view: the node holding 40 at the top; the node holding 40 has children, left to right, the node holding 10 and 20, the node holding 60; after, 2-3 view: the node holding 40 at the top; the node holding 40 has children, left to right, the node holding 10, the node holding 60. a black leaf: delete 20, a black link goes missing. Before: 40 at the root; 40 has left child 20 by a black link and right child 60 by a black link. After: 40 at the root; 40 has left child an empty node (a missing black) by a black link and right child 60 by a black link. As 2-3 trees: before, 2-3 view: the node holding 40 at the top; the node holding 40 has children, left to right, the node holding 20, the node holding 60; after, 2-3 view: the node holding 40 at the top; the node holding 40 has children, left to right, an empty node, the node holding 60.">
+<text x="10" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">a red leaf: delete 10 from [10|20], no violation</text>
+<line x1="57" y1="91" x2="25" y2="135" stroke="#c0392b" stroke-width="4"/>
+<line x1="89" y1="47" x2="57" y2="91" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="89" y1="47" x2="121" y2="91" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="25" cy="135" r="21" fill="#fde7bf"/>
+<circle cx="25" cy="135" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="25" y="140" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">10</text>
+<circle cx="57" cy="91" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="57" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="89" cy="47" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="89" y="52" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="121" cy="91" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="121" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="197" y="85" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="197" y="101" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">remove 10</text>
+<line x1="297" y1="69" x2="265" y2="113" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="297" y1="69" x2="329" y2="113" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="265" cy="113" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="265" y="118" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="297" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="297" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="329" cy="113" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="329" y="118" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<line x1="373" y1="34" x2="373" y2="148" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="432.5" y1="78" x2="420" y2="104" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="458.5" y1="78" x2="471" y2="104" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="394" y="104" width="26" height="26" fill="#fde7bf"/>
+<rect x="394" y="104" width="52" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="420" y1="104" x2="420" y2="130" stroke="#c8ccd6" stroke-width="1"/>
+<text x="407" y="122" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="433" y="122" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="458" y="104" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="471" y="122" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="432.5" y="52" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="445.5" y="70" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="512" y="85" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<line x1="559" y1="78" x2="553" y2="104" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="585" y1="78" x2="591" y2="104" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="540" y="104" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="553" y="122" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="578" y="104" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="591" y="122" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="559" y="52" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="572" y="70" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="10" y="179" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">one child: delete 20 from [10|20], no violation</text>
+<line x1="57" y1="247" x2="25" y2="291" stroke="#c0392b" stroke-width="4"/>
+<line x1="89" y1="203" x2="57" y2="247" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="89" y1="203" x2="121" y2="247" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="25" cy="291" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="25" y="296" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">10</text>
+<circle cx="57" cy="247" r="21" fill="#fde7bf"/>
+<circle cx="57" cy="247" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="57" y="252" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="89" cy="203" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="89" y="208" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="121" cy="247" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="121" y="252" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="197" y="241" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="197" y="257" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">remove 20</text>
+<line x1="297" y1="225" x2="265" y2="269" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="297" y1="225" x2="329" y2="269" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="265" cy="269" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="265" y="274" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<circle cx="297" cy="225" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="297" y="230" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="329" cy="269" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="329" y="274" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<line x1="373" y1="190" x2="373" y2="304" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="432.5" y1="234" x2="420" y2="260" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="458.5" y1="234" x2="471" y2="260" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="420" y="260" width="26" height="26" fill="#fde7bf"/>
+<rect x="394" y="260" width="52" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="420" y1="260" x2="420" y2="286" stroke="#c8ccd6" stroke-width="1"/>
+<text x="407" y="278" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="433" y="278" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="458" y="260" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="471" y="278" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="432.5" y="208" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="445.5" y="226" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="512" y="241" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<line x1="559" y1="234" x2="553" y2="260" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="585" y1="234" x2="591" y2="260" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="540" y="260" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="553" y="278" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<rect x="578" y="260" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="591" y="278" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="559" y="208" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="572" y="226" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="10" y="335" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">a black leaf: delete 20, a black link goes missing</text>
+<line x1="73" y1="361" x2="41" y2="405" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="73" y1="361" x2="105" y2="405" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="41" cy="405" r="21" fill="#fde7bf"/>
+<circle cx="41" cy="405" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="41" y="410" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="73" cy="361" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="73" y="366" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="105" cy="405" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="105" y="410" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="197" y="377" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="197" y="393" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">remove 20</text>
+<line x1="297" y1="361" x2="265" y2="405" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="297" y1="361" x2="329" y2="405" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="265" cy="405" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="297" cy="361" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="297" y="366" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="329" cy="405" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="329" y="410" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<line x1="373" y1="346" x2="373" y2="420" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="426" y1="370" x2="420" y2="396" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="452" y1="370" x2="458" y2="396" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="407" y="396" width="26" height="26" fill="#fde7bf"/>
+<rect x="407" y="396" width="26" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="420" y="414" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="445" y="396" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="458" y="414" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="426" y="344" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="439" y="362" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="512" y="377" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<line x1="559" y1="370" x2="553" y2="396" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="585" y1="370" x2="591" y2="396" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="540" y="396" width="26" height="26" rx="6" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<rect x="578" y="396" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="591" y="414" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="559" y="344" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="572" y="362" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+</svg>
+<!-- /gen:rb delete-removal -->
+        <figcaption>
+          The three removals at the bottom, each beside the 2-3 tree. A red leaf or a
+          node with one child holds a key of a 3-node, and the 3-node becomes a
+          2-node. A black leaf is a 2-node: removing it leaves an empty node, drawn
+          dashed.
+        </figcaption>
+      </figure>
+      <p>
+        The violation has a place: the spot where the black leaf was. The figures and
+        the demos draw an <strong>empty node</strong> there. It stands for the missing
+        black link (counted as one black link, it balances every path again), and in
+        the 2-3 tree it is exactly the empty node a 2-3 delete leaves when a leaf
+        loses its only key. The repair depends on the empty node&rsquo;s surroundings
+        in the 2-3 tree: its parent is a 2-node or a 3-node, the empty node is the
+        parent&rsquo;s left, middle or right child, and a sibling next to it is a
+        2-node or a 3-node. In the red-black BST the five positions look like this:
+      </p>
+      <figure class="wide">
+<!-- gen:rb delete-positions -->
+<svg viewBox="0 0 824 268" role="img" style="max-width:989px;min-width:560px" font-family="system-ui, sans-serif" aria-label="The five places the empty node can sit, each as a red-black shape above the 2-3 shape it encodes. 2-node parent, left: p at the root; p has left child an empty node (a missing black) by a black link and right child subtree S by a black link; as a 2-3 tree, 2-3 view: the node holding p at the top; the node holding p has children, left to right, an empty node, subtree S. 2-node parent, right: p at the root; p has left child subtree S by a black link and right child an empty node (a missing black) by a black link; as a 2-3 tree, 2-3 view: the node holding p at the top; the node holding p has children, left to right, subtree S, an empty node. 3-node parent, left: g at the root; g has left child r by a red link and right child subtree U by a black link; r has left child an empty node (a missing black) by a black link and right child subtree S by a black link; as a 2-3 tree, 2-3 view: the node holding r and g at the top; the node holding r and g has children, left to right, an empty node, subtree S, subtree U. 3-node parent, middle: g at the root; g has left child r by a red link and right child subtree U by a black link; r has left child subtree S by a black link and right child an empty node (a missing black) by a black link; as a 2-3 tree, 2-3 view: the node holding r and g at the top; the node holding r and g has children, left to right, subtree S, an empty node, subtree U. 3-node parent, right: g at the root; g has left child r by a red link and right child an empty node (a missing black) by a black link; r has left child subtree S by a black link and right child subtree U by a black link; as a 2-3 tree, 2-3 view: the node holding r and g at the top; the node holding r and g has children, left to right, subtree S, subtree U, an empty node. S and U are the sibling subtrees.">
+<text x="70.8" y="46" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">2-node parent, left</text>
+<line x1="66.8" y1="68" x2="32.8" y2="114" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="66.8" y1="68" x2="100.8" y2="104" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="32.8" cy="114" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="66.8" cy="68" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="66.8" y="73" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">p</text>
+<path d="M100.8,104 L85.8,136 L115.8,136 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="100.8" y="129" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<line x1="56.8" y1="179" x2="49.8" y2="199" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="82.8" y1="179" x2="89.8" y2="202" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="36.8" y="199" width="26" height="26" rx="6" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<path d="M89.8,202 L74.8,232 L104.8,232 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="89.8" y="225" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<rect x="56.8" y="153" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="69.8" y="171" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">p</text>
+<text x="203.6" y="46" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">2-node parent, right</text>
+<line x1="199.6" y1="68" x2="165.6" y2="104" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="199.6" y1="68" x2="233.6" y2="114" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M165.6,104 L150.6,136 L180.6,136 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="165.6" y="129" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<circle cx="199.6" cy="68" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="199.6" y="73" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">p</text>
+<circle cx="233.6" cy="114" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<line x1="191.6" y1="179" x2="184.6" y2="202" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="217.6" y1="179" x2="224.6" y2="199" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M184.6,202 L169.6,232 L199.6,232 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="184.6" y="225" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<rect x="211.6" y="199" width="26" height="26" rx="6" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<rect x="191.6" y="153" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="204.6" y="171" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">p</text>
+<text x="362.6" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">3-node parent, left</text>
+<line x1="324.6" y1="91" x2="290.6" y2="137" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="324.6" y1="91" x2="358.6" y2="127" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="392.6" y1="45" x2="324.6" y2="91" stroke="#c0392b" stroke-width="4"/>
+<line x1="392.6" y1="45" x2="426.6" y2="81" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="290.6" cy="137" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="324.6" cy="91" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="324.6" y="96" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">r</text>
+<path d="M358.6,127 L343.6,159 L373.6,159 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="358.6" y="152" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<circle cx="392.6" cy="45" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="392.6" y="50" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">g</text>
+<path d="M426.6,81 L411.6,113 L441.6,113 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="426.6" y="106" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">U</text>
+<line x1="335.6" y1="202" x2="320.6" y2="222" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="361.6" y1="202" x2="360.6" y2="225" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="387.6" y1="202" x2="402.6" y2="225" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="307.6" y="222" width="26" height="26" rx="6" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<path d="M360.6,225 L345.6,255 L375.6,255 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="360.6" y="248" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<path d="M402.6,225 L387.6,255 L417.6,255 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="402.6" y="248" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">U</text>
+<rect x="335.6" y="176" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="361.6" y1="176" x2="361.6" y2="202" stroke="#c8ccd6" stroke-width="1"/>
+<text x="348.6" y="194" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">r</text>
+<text x="374.6" y="194" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">g</text>
+<text x="544.6" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">3-node parent, middle</text>
+<line x1="506.6" y1="91" x2="472.6" y2="127" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="506.6" y1="91" x2="540.6" y2="137" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="574.6" y1="45" x2="506.6" y2="91" stroke="#c0392b" stroke-width="4"/>
+<line x1="574.6" y1="45" x2="608.6" y2="81" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M472.6,127 L457.6,159 L487.6,159 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="472.6" y="152" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<circle cx="506.6" cy="91" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="506.6" y="96" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">r</text>
+<circle cx="540.6" cy="137" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="574.6" cy="45" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="574.6" y="50" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">g</text>
+<path d="M608.6,81 L593.6,113 L623.6,113 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="608.6" y="106" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">U</text>
+<line x1="518.6" y1="202" x2="504.6" y2="225" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="544.6" y1="202" x2="544.6" y2="222" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="570.6" y1="202" x2="584.6" y2="225" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M504.6,225 L489.6,255 L519.6,255 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="504.6" y="248" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<rect x="531.6" y="222" width="26" height="26" rx="6" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<path d="M584.6,225 L569.6,255 L599.6,255 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="584.6" y="248" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">U</text>
+<rect x="518.6" y="176" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="544.6" y1="176" x2="544.6" y2="202" stroke="#c8ccd6" stroke-width="1"/>
+<text x="531.6" y="194" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">r</text>
+<text x="557.6" y="194" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">g</text>
+<text x="726.6" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">3-node parent, right</text>
+<line x1="688.6" y1="91" x2="654.6" y2="127" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="688.6" y1="91" x2="722.6" y2="127" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="756.6" y1="45" x2="688.6" y2="91" stroke="#c0392b" stroke-width="4"/>
+<line x1="756.6" y1="45" x2="790.6" y2="91" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M654.6,127 L639.6,159 L669.6,159 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="654.6" y="152" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<circle cx="688.6" cy="91" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="688.6" y="96" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">r</text>
+<path d="M722.6,127 L707.6,159 L737.6,159 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="722.6" y="152" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">U</text>
+<circle cx="756.6" cy="45" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="756.6" y="50" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">g</text>
+<circle cx="790.6" cy="91" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<line x1="701.6" y1="202" x2="686.6" y2="225" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="727.6" y1="202" x2="728.6" y2="225" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="753.6" y1="202" x2="768.6" y2="222" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M686.6,225 L671.6,255 L701.6,255 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="686.6" y="248" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">S</text>
+<path d="M728.6,225 L713.6,255 L743.6,255 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="728.6" y="248" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">U</text>
+<rect x="755.6" y="222" width="26" height="26" rx="6" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<rect x="701.6" y="176" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<line x1="727.6" y1="176" x2="727.6" y2="202" stroke="#c8ccd6" stroke-width="1"/>
+<text x="714.6" y="194" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">r</text>
+<text x="740.6" y="194" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">g</text>
+</svg>
+<!-- /gen:rb delete-positions -->
+        <figcaption>
+          Where the empty node (dashed) can sit, as red-black shapes above the 2-3
+          shapes they encode; \(S\) and \(U\) are the sibling subtrees. Under a 2-node
+          \([p]\) it is \(p\)&rsquo;s left or right child. Under a 3-node
+          \([r\,|\,g]\) it hangs from the red node \(r\) (left or middle child) or
+          from the black node \(g\) (right child).
+        </figcaption>
+      </figure>
+      <table>
+        <tr><th>the empty node&rsquo;s parent</th><th>a sibling next to it</th><th>2-3 repair</th><th>afterwards</th></tr>
+        <tr><td>a 2-node or a 3-node</td><td>is a 3-node</td><td><strong>borrow</strong>: the parent&rsquo;s key between them comes down into the empty node, and the sibling&rsquo;s nearer key goes up into its place</td><td>done</td></tr>
+        <tr><td>a 3-node</td><td>every one is a 2-node</td><td><strong>merge</strong>: the parent&rsquo;s key comes down and joins a sibling in one 3-node</td><td>done: the parent becomes a 2-node</td></tr>
+        <tr><td>a 2-node</td><td>is a 2-node</td><td><strong>merge</strong></td><td>the parent is empty now: the missing black moves up one level</td></tr>
+        <tr><td>none: the empty node is above the root</td><td></td><td>drop it</td><td>done: every path lost the same black link, and the tree is one level shorter</td></tr>
+      </table>
+      <p>
+        An empty middle child has a sibling on each side: the 2-3 delete borrows from
+        the left one if it can, then from the right one, and otherwise merges with the
+        left one. A merge under a 2-node parent is the only case that moves the empty
+        node up, so the repair makes at most one change per level of the tree.
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=rb-delete&amp;config=%7B%22fix%22%3Afalse%7D">Red-black
+        delete demo, violations only</a>. Each case removes one key from a small tree
+        and stops at the violation and its situation: the parent, the empty
+        node&rsquo;s place under it, and the siblings.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="moves">5. Fixing an insert</h2>
+      <p>
+        Each insert violation has its own fix, a constant-time change to a few links
+        or colors at the node where the violation is:
+      </p>
+      <ul>
+        <li>a red link leans right: <code>rotateLeft</code>;</li>
+        <li>two reds in a row, both leaning left: <code>rotateRight</code>;</li>
+        <li>two red children: <code>flipColors</code>;</li>
+        <li>a red root: recolor it black.</li>
+      </ul>
+      <h3>Rotations: a red link turned the other way</h3>
       <p>
         <code>rotateLeft</code> and <code>rotateRight</code> are the order-preserving
-        pointer surgery of the <a href="ds-avl-trees.html"><em>AVL Trees</em></a> handout, with one extra line to carry the colour;
-        <code>flipColors</code> is the encoding of a 2-3 split. A node with two red
-        children is a temporary 4-node, and flipping all three colours pushes the
-        middle key up (the node turns red, &ldquo;joining its parent&rdquo;) while its
-        two children become independent black 2-nodes: precisely
-        &ldquo;promote the middle and split,&rdquo; expressed in colour. If the parent
-        now has two reds of its own, the flip cascades upward exactly as the 2-3 split
-        did.
+        pointer surgery of the <a href="ds-avl-trees.html"><em>AVL Trees</em></a>
+        handout with one extra line to carry the color: the node that rises takes the
+        old top&rsquo;s color, and the node that drops turns red. Turned on a red
+        link, a rotation changes how a 2-3 node is drawn and nothing else:
+        <code>rotateLeft</code> turns a 3-node leaning right into one leaning left,
+        and <code>rotateRight</code> turns a 4-node drawn as two reds in a row into
+        one drawn as a node with two red children.
+      </p>
+      <figure>
+<!-- gen:rb rotate -->
+<svg viewBox="0 0 504 208" role="img" style="max-width:605px" font-family="system-ui, sans-serif" aria-label="rotateLeft and rotateRight as inverses. Left panel, before rotateLeft(h): h at the root, whose link from above has some color c; h has left child subtree A by a black link and right child x by a red link; x has left child subtree B by a black link and right child subtree C by a black link. Right panel, after rotateLeft(h), which rotateRight(x) undoes: x at the root, whose link from above has some color c; x has left child h by a red link and right child subtree C by a black link; h has left child subtree A by a black link and right child subtree B by a black link. Subtree B, highlighted, is the only subtree that changes parent: it moves from x's left to h's right. The link from above keeps its color c: x takes h's old color and h turns red.">
+<line x1="59" y1="14" x2="59" y2="36" stroke="#9aa3b5" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="68" y="27" font-size="12" font-style="italic" font-weight="400" fill="#5c6270" text-anchor="start">color c</text>
+<line x1="59" y1="51" x2="25" y2="91" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="59" y1="51" x2="127" y2="101" stroke="#c0392b" stroke-width="4"/>
+<line x1="127" y1="101" x2="93" y2="141" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="127" y1="101" x2="161" y2="141" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M25,91 L10,123 L40,123 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="25" y="116" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">A</text>
+<circle cx="59" cy="51" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="59" y="56" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">h</text>
+<path d="M93,141 L78,173 L108,173 Z" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.4"/>
+<text x="93" y="166" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">B</text>
+<circle cx="127" cy="101" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="127" y="106" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">x</text>
+<path d="M161,141 L146,173 L176,173 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="161" y="166" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">C</text>
+<text x="97" y="193" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">red link leans right</text>
+<text x="252" y="75" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="252" y="91" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">rotateLeft(h)</text>
+<text x="252" y="117" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">←</text>
+<text x="252" y="133" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">rotateRight(x)</text>
+<line x1="437" y1="14" x2="437" y2="36" stroke="#9aa3b5" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="446" y="27" font-size="12" font-style="italic" font-weight="400" fill="#5c6270" text-anchor="start">color c</text>
+<line x1="369" y1="101" x2="335" y2="141" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="369" y1="101" x2="403" y2="141" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="437" y1="51" x2="369" y2="101" stroke="#c0392b" stroke-width="4"/>
+<line x1="437" y1="51" x2="471" y2="91" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M335,141 L320,173 L350,173 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="335" y="166" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">A</text>
+<circle cx="369" cy="101" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="369" y="106" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">h</text>
+<path d="M403,141 L388,173 L418,173 Z" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.4"/>
+<text x="403" y="166" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">B</text>
+<circle cx="437" cy="51" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="437" y="56" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">x</text>
+<path d="M471,91 L456,123 L486,123 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="471" y="116" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">C</text>
+<text x="407" y="193" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">red link leans left</text>
+</svg>
+<!-- /gen:rb rotate -->
+        <figcaption>
+          <code>rotateLeft(h)</code> and <code>rotateRight(x)</code> undo each
+          other. Before the left rotation the red link leans right, from \(h\)
+          down to \(x\); after it, the same red link leans left, from \(x\) down
+          to \(h\). The link above the pair keeps its color \(c\): \(x\)
+          takes \(h\)&rsquo;s old color and \(h\) turns red. Only the shaded
+          subtree \(B\) (keys between \(h\) and \(x\)) changes parent; \(A\)
+          and \(C\) stay where they were, so in-order is \(A, h, B, x, C\) on
+          both sides.
+        </figcaption>
+      </figure>
+      <h3>flipColors: the 2-3 split</h3>
+      <p>
+        A node with two red children is a 4-node. <code>flipColors</code> makes both
+        children black and the node red: the two children become separate 2-nodes,
+        and the middle key joins its parent&rsquo;s 2-3 node by a red link. That is
+        the 2-3 split, promote the middle key, expressed in color. The red link it
+        sends up can break a rule one level up, and the same fixes apply there, just
+        as a 2-3 split can overflow the parent.
       </p>
       <figure>
 <!-- gen:rb flip -->
@@ -362,7 +1246,7 @@
         <figcaption>
           <code>flipColors(b)</code> is a 2-3 split. Above: \(b\) has two red
           children, so \(a, b, c\) form a temporary 4-node; flipping the three
-          colours makes \(a\) and \(c\) black and the link above \(b\) red.
+          colors makes \(a\) and \(c\) black and the link above \(b\) red.
           Below, the same two states with every red link collapsed: the 4-node
           \([a\,|\,b\,|\,c]\) splits, \(b\) joins its parent \(p\), and
           \(a\) and \(c\) become separate 2-nodes. Subtrees \(A\) to \(E\)
@@ -377,24 +1261,19 @@
   <button class="ct-tab" data-lang="py">Python</button>
   <button class="ct-tab" data-lang="rs">Rust</button>
 </div>
-<pre class="ct-pane" data-lang="cpp">// Left-leaning red-black BST: the three constant-time moves that maintain a
-// 2-3 tree&#x27;s shape. A node&#x27;s `red` flag = the colour of the link to its PARENT;
-// a null link counts as black.
-struct Node { int key; Node *left = nullptr, *right = nullptr; bool red = true; };
-
-bool isRed(Node* h) { return h &amp;&amp; h-&gt;red; }    // null links are black
-
-Node* rotateLeft(Node* h) {        // h&#x27;s right link leans red; lean it left
-    Node* x = h-&gt;right;
+<pre class="ct-pane" data-lang="cpp">// Left-leaning red-black BST: the three constant-time moves (RBNode and isRed
+// are defined with the tree class).
+RBNode* rotateLeft(RBNode* h) {        // h&#x27;s right link leans red; lean it left
+    RBNode* x = h-&gt;right;
     h-&gt;right = x-&gt;left;
     x-&gt;left  = h;
-    x-&gt;red = h-&gt;red;               // x inherits h&#x27;s colour
+    x-&gt;red = h-&gt;red;               // x inherits h&#x27;s color
     h-&gt;red = true;                 // h is now glued under x by a red link
     return x;                      // x is the new subtree root
 }
 
-Node* rotateRight(Node* h) {       // mirror image of rotateLeft
-    Node* x = h-&gt;left;
+RBNode* rotateRight(RBNode* h) {       // mirror image of rotateLeft
+    RBNode* x = h-&gt;left;
     h-&gt;left  = x-&gt;right;
     x-&gt;right = h;
     x-&gt;red = h-&gt;red;
@@ -402,31 +1281,24 @@ Node* rotateRight(Node* h) {       // mirror image of rotateLeft
     return x;
 }
 
-void flipColors(Node* h) {         // two red children = a temporary 4-node
+void flipColors(RBNode* h) {         // two red children = a temporary 4-node
     h-&gt;red        = !h-&gt;red;       // push the middle key UP (h &quot;promotes&quot;)
     h-&gt;left-&gt;red  = !h-&gt;left-&gt;red; // the two children become black 2-nodes
     h-&gt;right-&gt;red = !h-&gt;right-&gt;red;
 }</pre>
-<pre class="ct-pane" data-lang="java" hidden>// Left-leaning red-black BST: the three constant-time moves. A node&#x27;s `red`
-// flag = the colour of the link to its PARENT; a null link counts as black.
-static class Node {
-    int key; Node left, right; boolean red = true;
-    Node(int k) { key = k; }
-}
-
-static boolean isRed(Node h) { return h != null &amp;&amp; h.red; }
-
-static Node rotateLeft(Node h) {      // right link leans red -&gt; lean it left
-    Node x = h.right;
+<pre class="ct-pane" data-lang="java" hidden>// Left-leaning red-black BST: the three constant-time moves (RBNode and isRed
+// are defined with the tree class).
+static RBNode rotateLeft(RBNode h) {      // right link leans red -&gt; lean it left
+    RBNode x = h.right;
     h.right = x.left;
     x.left  = h;
-    x.red = h.red;                     // x inherits h&#x27;s colour
+    x.red = h.red;                     // x inherits h&#x27;s color
     h.red = true;                      // h is now glued under x by a red link
     return x;
 }
 
-static Node rotateRight(Node h) {     // mirror image of rotateLeft
-    Node x = h.left;
+static RBNode rotateRight(RBNode h) {     // mirror image of rotateLeft
+    RBNode x = h.left;
     h.left  = x.right;
     x.right = h;
     x.red = h.red;
@@ -434,27 +1306,18 @@ static Node rotateRight(Node h) {     // mirror image of rotateLeft
     return x;
 }
 
-static void flipColors(Node h) {      // two red children = a temporary 4-node
+static void flipColors(RBNode h) {      // two red children = a temporary 4-node
     h.red       = !h.red;              // push the middle key UP (h &quot;promotes&quot;)
     h.left.red  = !h.left.red;         // children become black 2-nodes
     h.right.red = !h.right.red;
 }</pre>
-<pre class="ct-pane" data-lang="py" hidden># Left-leaning red-black BST: the three constant-time moves. A node&#x27;s `red`
-# flag = the colour of the link to its PARENT; a missing link counts as black.
-class Node:
-    def __init__(self, key):
-        self.key = key
-        self.left = self.right = None
-        self.red = True
-
-def is_red(h):                       # None links are black
-    return h is not None and h.red
-
+<pre class="ct-pane" data-lang="py" hidden># Left-leaning red-black BST: the three constant-time moves (RBNode and is_red
+# are defined with the tree class).
 def rotate_left(h):                  # right link leans red -&gt; lean it left
     x = h.right
     h.right = x.left
     x.left = h
-    x.red, h.red = h.red, True       # x inherits h&#x27;s colour; h turns red
+    x.red, h.red = h.red, True       # x inherits h&#x27;s color; h turns red
     return x                         # x is the new subtree root
 
 def rotate_right(h):                 # mirror image of rotate_left
@@ -468,24 +1331,19 @@ def flip_colors(h):                  # two red children = a temporary 4-node
     h.red = not h.red                # push the middle key UP (h &quot;promotes&quot;)
     h.left.red = not h.left.red      # children become black 2-nodes
     h.right.red = not h.right.red</pre>
-<pre class="ct-pane" data-lang="rs" hidden>// Left-leaning red-black BST moves. `red` = colour of the link to the PARENT;
-// a None link counts as black. Children are Option&lt;Box&lt;Node&gt;&gt;, so we take/put
-// the boxes to move subtrees around without aliasing.
-type Link = Option&lt;Box&lt;Node&gt;&gt;;
-struct Node { key: i32, left: Link, right: Link, red: bool }
-
-fn is_red(h: &amp;Link) -&gt; bool { h.as_ref().map_or(false, |n| n.red) }
-
-fn rotate_left(mut h: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {   // right link leans red
+<pre class="ct-pane" data-lang="rs" hidden>// Left-leaning red-black BST: the three moves (RBNode, Link and is_red are
+// defined with the tree type). Children are Option&lt;Box&lt;RBNode&gt;&gt;, so we
+// take/put the boxes to move subtrees around without aliasing.
+fn rotate_left(mut h: Box&lt;RBNode&gt;) -&gt; Box&lt;RBNode&gt; {   // right link leans red
     let mut x = h.right.take().unwrap();
     h.right = x.left.take();
-    x.red = h.red;                 // x inherits h&#x27;s colour
+    x.red = h.red;                 // x inherits h&#x27;s color
     h.red = true;                  // h is now glued under x by a red link
     x.left = Some(h);
     x                              // x is the new subtree root
 }
 
-fn rotate_right(mut h: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {  // mirror image
+fn rotate_right(mut h: Box&lt;RBNode&gt;) -&gt; Box&lt;RBNode&gt; {  // mirror image
     let mut x = h.left.take().unwrap();
     h.left = x.right.take();
     x.red = h.red;
@@ -494,84 +1352,22 @@ fn rotate_right(mut h: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {  // mirror image
     x
 }
 
-fn flip_colors(h: &amp;mut Box&lt;Node&gt;) {               // two red children = 4-node
+fn flip_colors(h: &amp;mut Box&lt;RBNode&gt;) {               // two red children = 4-node
     h.red = !h.red;                               // push the middle key up
     if let Some(l) = h.left.as_mut() { l.red = !l.red; }
     if let Some(r) = h.right.as_mut() { r.red = !r.red; }
 }</pre>
 <p class="ct-src">source: <code>code/trees/redblack-ops.cpp &middot; code/trees/redblack-ops.java &middot; code/trees/redblack-ops.py &middot; code/trees/redblack-ops.rs</code></p>
 <!--/ct--></div>
-      <figure>
-<!-- gen:rb rotate -->
-<svg viewBox="0 0 504 208" role="img" style="max-width:605px" font-family="system-ui, sans-serif" aria-label="rotateLeft and rotateRight as inverses. Left panel, before rotateLeft(h): h at the root, whose link from above has some colour c; h has left child subtree A by a black link and right child x by a red link; x has left child subtree B by a black link and right child subtree C by a black link. Right panel, after rotateLeft(h), which rotateRight(x) undoes: x at the root, whose link from above has some colour c; x has left child h by a red link and right child subtree C by a black link; h has left child subtree A by a black link and right child subtree B by a black link. Subtree B, highlighted, is the only subtree that changes parent: it moves from x's left to h's right. The link from above keeps its colour c: x takes h's old colour and h turns red.">
-<line x1="59" y1="14" x2="59" y2="36" stroke="#9aa3b5" stroke-width="1.6" stroke-dasharray="4 3"/>
-<text x="68" y="27" font-size="12" font-style="italic" font-weight="400" fill="#5c6270" text-anchor="start">colour c</text>
-<line x1="59" y1="51" x2="25" y2="91" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="59" y1="51" x2="127" y2="101" stroke="#c0392b" stroke-width="4"/>
-<line x1="127" y1="101" x2="93" y2="141" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="127" y1="101" x2="161" y2="141" stroke="#4a5163" stroke-width="1.6"/>
-<path d="M25,91 L10,123 L40,123 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
-<text x="25" y="116" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">A</text>
-<circle cx="59" cy="51" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="59" y="56" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">h</text>
-<path d="M93,141 L78,173 L108,173 Z" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.4"/>
-<text x="93" y="166" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">B</text>
-<circle cx="127" cy="101" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="127" y="106" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">x</text>
-<path d="M161,141 L146,173 L176,173 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
-<text x="161" y="166" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">C</text>
-<text x="97" y="193" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">red link leans right</text>
-<text x="252" y="75" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<text x="252" y="91" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">rotateLeft(h)</text>
-<text x="252" y="117" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">←</text>
-<text x="252" y="133" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">rotateRight(x)</text>
-<line x1="437" y1="14" x2="437" y2="36" stroke="#9aa3b5" stroke-width="1.6" stroke-dasharray="4 3"/>
-<text x="446" y="27" font-size="12" font-style="italic" font-weight="400" fill="#5c6270" text-anchor="start">colour c</text>
-<line x1="369" y1="101" x2="335" y2="141" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="369" y1="101" x2="403" y2="141" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="437" y1="51" x2="369" y2="101" stroke="#c0392b" stroke-width="4"/>
-<line x1="437" y1="51" x2="471" y2="91" stroke="#4a5163" stroke-width="1.6"/>
-<path d="M335,141 L320,173 L350,173 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
-<text x="335" y="166" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">A</text>
-<circle cx="369" cy="101" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="369" y="106" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">h</text>
-<path d="M403,141 L388,173 L418,173 Z" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.4"/>
-<text x="403" y="166" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">B</text>
-<circle cx="437" cy="51" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="437" y="56" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">x</text>
-<path d="M471,91 L456,123 L486,123 Z" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
-<text x="471" y="116" font-size="13" font-weight="600" fill="#3a3f4a" text-anchor="middle">C</text>
-<text x="407" y="193" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">red link leans left</text>
-</svg>
-<!-- /gen:rb rotate -->
-        <figcaption>
-          <code>rotateLeft(h)</code> and <code>rotateRight(x)</code> undo each
-          other. Before the left rotation the red link leans right, from \(h\)
-          down to \(x\); after it, the same red link leans left, from \(x\) down
-          to \(h\). The link above the pair keeps its colour \(c\): \(x\)
-          takes \(h\)&rsquo;s old colour and \(h\) turns red. Only the shaded
-          subtree \(B\) (keys between \(h\) and \(x\)) changes parent; \(A\)
-          and \(C\) stay where they were, so in-order is \(A, h, B, x, C\) on
-          both sides.
-        </figcaption>
-      </figure>
-      <p>
-        Only nodes move in a rotation; the in-order sequence is unchanged, exactly as
-        for the rotations of the <a href="ds-avl-trees.html"><em>AVL Trees</em></a> handout. &ldquo;Left-leaning&rdquo; is what keeps the case count at three
-        rather than the classic red-black tree&rsquo;s six (Sedgewick&rsquo;s
-        simplification), and it is why the whole of insertion is BST-insert plus
-        these three \(O(1)\) moves applied bottom-up.
-      </p>
 
-      <h3>Insertion: BST insert, then the three moves</h3>
+      <h3>Insert, assembled</h3>
       <p>
-        Search ignores colours entirely: a red-black BST <em>is</em> a binary search
-        tree, so <code>get</code> is the unchanged descent of the
+        Search ignores colors entirely: a red-black BST <em>is</em> a binary search
+        tree, so search is the unchanged descent of the
         <a href="ds-trees-bst.html"><em>Trees &amp; Binary Search Trees</em></a>
-        handout, a hit on an equal key and a miss when it falls off a null link.
-        Insertion is that same descent, a new node attached by a
-        <strong>red</strong> link, and then the three moves tested in a fixed order
-        at every node on the way back up.
+        handout. Insertion is that same descent, a new node attached by a
+        <strong>red</strong> link, and then the three tests below at every node on
+        the way back up, in a fixed order, followed by recoloring the root black.
       </p>
       <div class="code-tabs" data-snippet="trees/redblack-insert">
 <div class="ct-tabs" role="tablist">
@@ -583,40 +1379,39 @@ fn flip_colors(h: &amp;mut Box&lt;Node&gt;) {               // two red children 
 <pre class="ct-pane" data-lang="cpp">// LLRB insert: an ordinary BST insert whose new link is RED, then the three
 // moves tested in this order at every node on the way back up. The order
 // matters: leaning left first turns the other two tests into simple ones.
-Node* fixUp(Node* h) {
+RBNode* fixUp(RBNode* h) {
     if (isRed(h-&gt;right) &amp;&amp; !isRed(h-&gt;left))     h = rotateLeft(h);   // lean left
     if (isRed(h-&gt;left) &amp;&amp; isRed(h-&gt;left-&gt;left)) h = rotateRight(h);  // two reds
     if (isRed(h-&gt;left) &amp;&amp; isRed(h-&gt;right))      flipColors(h);       // 4-node
     return h;
 }
-Node* put(Node* h, int key) {
-    if (!h) return new Node{key};              // new node: its link is red
+RBNode* put(RBNode* h, int key) {
+    if (!h) return new RBNode{key};              // new node: its link is red
     if      (key &lt; h-&gt;key) h-&gt;left  = put(h-&gt;left,  key);
     else if (key &gt; h-&gt;key) h-&gt;right = put(h-&gt;right, key);
     return fixUp(h);                           // restore the three invariants
 }
-void insert(Node*&amp; root, int key) {
+void RedBlackTree::insert(int key) {
     root = put(root, key);
     root-&gt;red = false;                         // the root link is always black
 }</pre>
 <pre class="ct-pane" data-lang="java" hidden>// LLRB insert: an ordinary BST insert whose new link is RED, then the three
 // moves tested in this order at every node on the way back up.
-static Node fixUp(Node h) {
+static RBNode fixUp(RBNode h) {
     if (isRed(h.right) &amp;&amp; !isRed(h.left))    h = rotateLeft(h);    // lean left
     if (isRed(h.left) &amp;&amp; isRed(h.left.left)) h = rotateRight(h);   // two reds
     if (isRed(h.left) &amp;&amp; isRed(h.right))     flipColors(h);        // 4-node
     return h;
 }
-static Node put(Node h, int key) {
-    if (h == null) return new Node(key);       // new node: its link is red
+static RBNode put(RBNode h, int key) {
+    if (h == null) return new RBNode(key);       // new node: its link is red
     if      (key &lt; h.key) h.left  = put(h.left,  key);
     else if (key &gt; h.key) h.right = put(h.right, key);
     return fixUp(h);                           // restore the three invariants
 }
-static Node insert(Node root, int key) {
+void insert(int key) {                         // a RedBlackTree method
     root = put(root, key);
     root.red = false;                          // the root link is always black
-    return root;
 }</pre>
 <pre class="ct-pane" data-lang="py" hidden># LLRB insert: an ordinary BST insert whose new link is RED, then the three
 # moves tested in this order at every node on the way back up.
@@ -631,20 +1426,19 @@ def fix_up(h):
 
 def put(h, key):
     if h is None:
-        return Node(key)                       # new node: its link is red
+        return RBNode(key)                       # new node: its link is red
     if key &lt; h.key:
         h.left = put(h.left, key)
     elif key &gt; h.key:
         h.right = put(h.right, key)
     return fix_up(h)                           # restore the three invariants
 
-def insert(root, key):
-    root = put(root, key)
-    root.red = False                           # the root link is always black
-    return root</pre>
+def insert(self, key):                         # a RedBlackTree method
+    self.root = put(self.root, key)
+    self.root.red = False                      # the root link is always black</pre>
 <pre class="ct-pane" data-lang="rs" hidden>// LLRB insert over owned links. take() moves a child out so it can be rotated
 // and put back; the three moves are tested in the same fixed order.
-fn fix_up(mut h: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {
+fn fix_up(mut h: Box&lt;RBNode&gt;) -&gt; Box&lt;RBNode&gt; {
     if is_red(&amp;h.right) &amp;&amp; !is_red(&amp;h.left) { h = rotate_left(h); }
     if is_red(&amp;h.left) &amp;&amp; is_red(&amp;h.left.as_ref().unwrap().left) {
         h = rotate_right(h);
@@ -652,29 +1446,32 @@ fn fix_up(mut h: Box&lt;Node&gt;) -&gt; Box&lt;Node&gt; {
     if is_red(&amp;h.left) &amp;&amp; is_red(&amp;h.right) { flip_colors(&amp;mut h); }
     h
 }
-fn put(h: Link, key: i32) -&gt; Box&lt;Node&gt; {
+fn put(h: Link, key: i32) -&gt; Box&lt;RBNode&gt; {
     let mut n = match h {
         None =&gt; return Box::new(                // new node: its link is red
-            Node { key, left: None, right: None, red: true }),
+            RBNode { key, left: None, right: None, red: true }),
         Some(n) =&gt; n,
     };
     if      key &lt; n.key { n.left  = Some(put(n.left.take(),  key)); }
     else if key &gt; n.key { n.right = Some(put(n.right.take(), key)); }
     fix_up(n)
 }
-fn insert(root: Link, key: i32) -&gt; Link {
-    let mut r = put(root, key);
-    r.red = false;                             // the root link is always black
-    Some(r)
+impl RedBlackTree {
+    fn insert(&amp;mut self, key: i32) {
+        let mut r = put(self.root.take(), key);
+        r.red = false;                         // the root link is always black
+        self.root = Some(r);
+    }
 }</pre>
 <p class="ct-src">source: <code>code/trees/redblack-insert.cpp &middot; code/trees/redblack-insert.java &middot; code/trees/redblack-insert.py &middot; code/trees/redblack-insert.rs</code></p>
 <!--/ct--></div>
       <p>
-        Three tests, in that order, at every node on the path. Everything below is
-        a trace of which of them fire, and when.
+        Three tests, in that order, at every node on the path; each fires only on the
+        violation it fixes. Everything below is a trace of which of them fire, and
+        when.
       </p>
       <div class="ex">
-        <span class="tag">Example (each of the three moves, from one 3-node)</span>
+        <span class="tag">Example (the three 3-node violations, fixed)</span>
         Start each time from the 3-node \([30\,|\,50]\): \(50\) black at the
         root with a red left link to \(30\). Where the new key falls relative to
         those two decides which tests fire.
@@ -791,7 +1588,7 @@ fn insert(root: Link, key: i32) -&gt; Link {
 <!-- /gen:rb insert-cases -->
           <figcaption>
             The three cases, every move drawn; the shaded node is where the next
-            move applies, and each row ends with the root&rsquo;s link recoloured
+            move applies, and each row ends with the root&rsquo;s link recolored
             black. All three end in the shape a 2-3 tree reaches by splitting a
             4-node: the middle key black at the top, the other two as its black
             children. Every root-to-null path crosses two black links in all three
@@ -888,441 +1685,277 @@ fn insert(root: Link, key: i32) -&gt; Link {
       </figure>
       <div class="demo">
         <span class="tag">Interactive</span>
-        <a href="../../lib/demo.html?ds=rb-moves">Red-black moves demo</a>. Each
-        primitive on its own (<code>rotateLeft</code>, <code>rotateRight</code>,
-        <code>flipColors</code>), then the three insertions into the 3-node
-        \([30\,|\,50]\) above and a cascade, one move per step, forward and
-        back.
+        <a href="../../lib/demo.html?ds=rb-insert-cases">Red-black insert demo</a>.
+        Every place a key can land, each on its own small tree beside the 2-3 tree:
+        the violation is named, then each fix runs, one per step, including splits
+        whose red link breaks a rule one level up and a split that reaches the root.
       </div>
       <div class="demo">
         <span class="tag">Interactive</span>
-        <a href="../../lib/demo.html?ds=redblack">Red-black BST demo</a>. Red links are
-        drawn thick and red: each is a glued 3-node. Insert an ascending run
-        \(10, 20, 30, \dots\) to trigger every fix-up: a <code>rotateLeft</code> leans
-        a red link left, a <code>flipColors</code> splits a 4-node and pushes a red up.
-        Every root-to-null path keeps the same number of black links, and the tree
-        never exceeds \(2\log_2 n\) tall no matter the insertion order. Its Delete
-        button runs the algorithm of <a href="#deletion">Deletion</a> below.
-      </div>
-      <!-- ============================================================ -->
-      <h2 id="deletion">3. Deletion</h2>
-      <p>
-        In a 2-3 tree, a key can be removed outright only from a 3-node at the
-        bottom; removing the only key of a 2-node leaves an empty node, which
-        <a href="ds-two-three-trees.html#delete">2-3 deletion</a> repairs by
-        borrowing or merging. The left-leaning red-black delete never creates the
-        empty node. It works <strong>top-down</strong>: on the way down to the key
-        it keeps the current node \(h\) or its left child red, so the 2-3 node
-        being visited always holds at least two keys, and the key finally removed
-        sits in a 3-node or a temporary 4-node. Removing it changes no black link.
-      </p>
-      <p>
-        When the search is about to go left and both <code>h.left</code> and
-        <code>h.left.left</code> are black (the left child is a 2-node),
-        <code>moveRedLeft(h)</code> brings a key down into it:
-      </p>
-      <ul>
-        <li>if <code>h.right.left</code> is black (the right sibling is a 2-node too),
-        <code>flipColors(h)</code> alone: a <strong>merge</strong>. The key of
-        \(h\) comes down from the parent node and joins the two 2-node siblings in a
-        temporary 4-node;</li>
-        <li>if <code>h.right.left</code> is red (the right sibling is a 3-node),
-        <code>flipColors(h)</code>, <code>rotateRight(h.right)</code>,
-        <code>rotateLeft(h)</code>, <code>flipColors(h)</code>: a
-        <strong>borrow</strong>. The key of \(h\) comes down into the left child and
-        the sibling&rsquo;s smallest key goes up to replace it.</li>
-      </ul>
-      <p>
-        <code>moveRedRight(h)</code> is the mirror image for a search going right:
-        <code>flipColors(h)</code>, then, if <code>h.left.left</code> is red,
-        <code>rotateRight(h)</code> and <code>flipColors(h)</code>. A search going
-        right also starts with <code>rotateRight(h)</code> whenever
-        <code>h.left</code> is red, which turns the red link onto the side the search
-        takes.
-      </p>
-      <figure class="wide">
-<!-- gen:rb move-red-left -->
-<svg viewBox="0 0 602 552" role="img" style="max-width:722px;min-width:560px" font-family="system-ui, sans-serif" aria-label="moveRedLeft at node 30, the two cases. In both the search is about to go left from 30 into 10, a 2-node. merge: the sibling [50] is a 2-node. Red-black BST before, descending left from 30 toward 10: 70 at the root; 70 has left child 30 by a red link and right child 90 by a black link; 30 has left child 10 by a black link and right child 50 by a black link. After flipColors(30): 70 at the root; 70 has left child 30 by a black link and right child 90 by a black link; 30 has left child 10 by a red link and right child 50 by a red link. As 2-3 trees: before, 2-3 view: the node holding 30 and 70 at the top; the node holding 30 and 70 has children, left to right, the node holding 10, the node holding 50, the node holding 90; after, 2-3 view: the node holding 70 at the top; the node holding 70 has children, left to right, the node holding 10 and 30 and 50, the node holding 90. The temporary 4-node 10, 30, 50 has a right-leaning red link that the way back up repairs. borrow: the sibling [40|50] is a 3-node. Red-black BST before, descending left from 30 toward 10: 70 at the root; 70 has left child 30 by a red link and right child 90 by a black link; 30 has left child 10 by a black link and right child 50 by a black link; 50 has left child 40 by a red link. After flipColors(30), rotateRight(50), rotateLeft(30), flipColors(40): 70 at the root; 70 has left child 40 by a red link and right child 90 by a black link; 40 has left child 30 by a black link and right child 50 by a black link; 30 has left child 10 by a red link. As 2-3 trees: before, 2-3 view: the node holding 30 and 70 at the top; the node holding 30 and 70 has children, left to right, the node holding 10, the node holding 40 and 50, the node holding 90; after, 2-3 view: the node holding 40 and 70 at the top; the node holding 40 and 70 has children, left to right, the node holding 10 and 30, the node holding 50, the node holding 90.">
-<text x="42" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">merge: the sibling [50] is a 2-node</text>
-<line x1="89" y1="93" x2="57" y2="139" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="89" y1="93" x2="121" y2="139" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="153" y1="47" x2="89" y2="93" stroke="#c0392b" stroke-width="4"/>
-<line x1="153" y1="47" x2="185" y2="93" stroke="#4a5163" stroke-width="1.6"/>
-<circle cx="57" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="57" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<circle cx="89" cy="93" r="21" fill="#fde7bf"/>
-<circle cx="89" cy="93" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="89" y="98" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
-<circle cx="121" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="121" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<circle cx="153" cy="47" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="153" y="52" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
-<circle cx="185" cy="93" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="185" y="98" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
-<text x="301" y="87" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<text x="301" y="103" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">flipColors(30)</text>
-<line x1="441" y1="93" x2="409" y2="139" stroke="#c0392b" stroke-width="4"/>
-<line x1="441" y1="93" x2="473" y2="139" stroke="#c0392b" stroke-width="4"/>
-<line x1="505" y1="47" x2="441" y2="93" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="505" y1="47" x2="537" y2="93" stroke="#4a5163" stroke-width="1.6"/>
-<circle cx="409" cy="139" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="409" y="144" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">10</text>
-<circle cx="441" cy="93" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="441" y="98" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<circle cx="473" cy="139" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="473" y="144" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">50</text>
-<circle cx="505" cy="47" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="505" y="52" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
-<circle cx="537" cy="93" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="537" y="98" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
-<line x1="124" y1="194" x2="112" y2="220" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="150" y1="194" x2="150" y2="220" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="176" y1="194" x2="188" y2="220" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="99" y="220" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="112" y="238" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<rect x="137" y="220" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="150" y="238" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<rect x="175" y="220" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="188" y="238" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
-<rect x="124" y="168" width="26" height="26" fill="#fde7bf"/>
-<rect x="124" y="168" width="52" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="150" y1="168" x2="150" y2="194" stroke="#c8ccd6" stroke-width="1"/>
-<text x="137" y="186" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<text x="163" y="186" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
-<text x="294" y="201" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<text x="294" y="217" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">2-3: 30 comes down and</text>
-<text x="294" y="230" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">merges with 10 and 50</text>
-<line x1="445" y1="194" x2="426" y2="220" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="471" y1="194" x2="490" y2="220" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="413" y="220" width="26" height="26" fill="#fde7bf"/>
-<rect x="387" y="220" width="78" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="413" y1="220" x2="413" y2="246" stroke="#c8ccd6" stroke-width="1"/>
-<line x1="439" y1="220" x2="439" y2="246" stroke="#c8ccd6" stroke-width="1"/>
-<text x="400" y="238" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<text x="426" y="238" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<text x="452" y="238" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<rect x="477" y="220" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="490" y="238" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
-<rect x="445" y="168" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="458" y="186" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
-<text x="10" y="273" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">borrow: the sibling [40|50] is a 3-node</text>
-<line x1="57" y1="343" x2="25" y2="389" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="57" y1="343" x2="121" y2="389" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="121" y1="389" x2="89" y2="435" stroke="#c0392b" stroke-width="4"/>
-<line x1="153" y1="297" x2="57" y2="343" stroke="#c0392b" stroke-width="4"/>
-<line x1="153" y1="297" x2="185" y2="343" stroke="#4a5163" stroke-width="1.6"/>
-<circle cx="25" cy="389" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="25" y="394" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<circle cx="57" cy="343" r="21" fill="#fde7bf"/>
-<circle cx="57" cy="343" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="57" y="348" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
-<circle cx="89" cy="435" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="89" y="440" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">40</text>
-<circle cx="121" cy="389" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="121" y="394" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<circle cx="153" cy="297" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="153" y="302" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
-<circle cx="185" cy="343" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="185" y="348" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
-<text x="301" y="360" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<text x="301" y="376" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">flipColors(30), rotateRight(50),</text>
-<text x="301" y="389" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">rotateLeft(30), flipColors(40)</text>
-<line x1="441" y1="389" x2="409" y2="435" stroke="#c0392b" stroke-width="4"/>
-<line x1="473" y1="343" x2="441" y2="389" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="473" y1="343" x2="505" y2="389" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="537" y1="297" x2="473" y2="343" stroke="#c0392b" stroke-width="4"/>
-<line x1="537" y1="297" x2="569" y2="343" stroke="#4a5163" stroke-width="1.6"/>
-<circle cx="409" cy="435" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="409" y="440" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">10</text>
-<circle cx="441" cy="389" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="441" y="394" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<circle cx="473" cy="343" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="473" y="348" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">40</text>
-<circle cx="505" cy="389" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="505" y="394" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<circle cx="537" cy="297" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="537" y="302" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
-<circle cx="569" cy="343" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="569" y="348" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
-<line x1="118" y1="490" x2="93" y2="516" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="144" y1="490" x2="144" y2="516" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="170" y1="490" x2="195" y2="516" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="80" y="516" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="93" y="534" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<rect x="118" y="516" width="26" height="26" fill="#fde7bf"/>
-<rect x="118" y="516" width="52" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="144" y1="516" x2="144" y2="542" stroke="#c8ccd6" stroke-width="1"/>
-<text x="131" y="534" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<text x="157" y="534" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<rect x="182" y="516" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="195" y="534" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
-<rect x="118" y="464" width="26" height="26" fill="#fde7bf"/>
-<rect x="118" y="464" width="52" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="144" y1="464" x2="144" y2="490" stroke="#c8ccd6" stroke-width="1"/>
-<text x="131" y="482" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<text x="157" y="482" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
-<text x="301" y="497" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<text x="301" y="513" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">2-3: 30 comes down,</text>
-<text x="301" y="526" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">40 goes up</text>
-<line x1="438.5" y1="490" x2="420" y2="516" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="464.5" y1="490" x2="471" y2="516" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="490.5" y1="490" x2="509" y2="516" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="420" y="516" width="26" height="26" fill="#fde7bf"/>
-<rect x="394" y="516" width="52" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="420" y1="516" x2="420" y2="542" stroke="#c8ccd6" stroke-width="1"/>
-<text x="407" y="534" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<text x="433" y="534" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<rect x="458" y="516" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="471" y="534" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<rect x="496" y="516" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="509" y="534" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
-<rect x="438.5" y="464" width="26" height="26" fill="#fde7bf"/>
-<rect x="438.5" y="464" width="52" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="464.5" y1="464" x2="464.5" y2="490" stroke="#c8ccd6" stroke-width="1"/>
-<text x="451.5" y="482" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<text x="477.5" y="482" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
-</svg>
-<!-- /gen:rb move-red-left -->
-        <figcaption>
-          <code>moveRedLeft(30)</code>, about to descend from \(30\) into the
-          2-node \(10\). Above, the right sibling \(50\) is a 2-node: one
-          <code>flipColors</code> turns \(10, 30, 50\) into a temporary 4-node,
-          the 2-3 merge (its right-leaning red link is repaired on the way back up).
-          Below, the sibling \([40\,|\,50]\) is a 3-node: four moves bring
-          \(30\) down beside \(10\) and send \(40\) up, the 2-3 borrow. Shaded
-          keys are the ones that move between nodes.
-        </figcaption>
-      </figure>
-      <p>Three more rules complete the algorithm.</p>
-      <ul>
-        <li><strong>The root.</strong> If both children of the root are black, the
-        root is coloured red before the descent, so the helpers have a red link to
-        move down. It is coloured black again at the end.</li>
-        <li><strong>Internal keys.</strong> A key found at a node with a right child
-        is replaced by its in-order successor (the minimum of the right subtree), and
-        that minimum is then deleted from the right subtree by <code>deleteMin</code>,
-        the same descent always going left. A key found at a node with no right child
-        is at the bottom and is removed.</li>
-        <li><strong>On the way back up,</strong> <code>balance(h)</code> applies the
-        three tests of insertion at every node of the path, in the same order, which
-        removes the temporary right-leaning red links and 4-nodes the descent
-        created.</li>
-      </ul>
-      <p>
-        Each level costs a constant number of moves, so delete, like insert, is
-        \(\Theta(\log n)\).
-      </p>
-      <figure class="wide">
-<!-- gen:rb delete-cases -->
-<svg viewBox="0 0 738 628" role="img" style="max-width:886px;min-width:560px" font-family="system-ui, sans-serif" aria-label="Four deletions, each shown as the red-black BST before and after (left) and the 2-3 tree it encodes before and after (right). delete 30: a key in a 3-node at the bottom. Red-black BST built by inserting 10, 20, 30, 40: 20 at the root; 20 has left child 10 by a black link and right child 40 by a black link; 40 has left child 30 by a red link; after the delete: 20 at the root; 20 has left child 10 by a black link and right child 40 by a black link. As 2-3 trees: before, 2-3 view: the node holding 20 at the top; the node holding 20 has children, left to right, the node holding 10, the node holding 30 and 40; after, 2-3 view: the node holding 20 at the top; the node holding 20 has children, left to right, the node holding 10, the node holding 40. delete 10: merge (the sibling 30 is a 2-node). Red-black BST built by inserting 10, 20, 30, 40, 50: 40 at the root; 40 has left child 20 by a red link and right child 50 by a black link; 20 has left child 10 by a black link and right child 30 by a black link; after the delete: 40 at the root; 40 has left child 30 by a black link and right child 50 by a black link; 30 has left child 20 by a red link. As 2-3 trees: before, 2-3 view: the node holding 20 and 40 at the top; the node holding 20 and 40 has children, left to right, the node holding 10, the node holding 30, the node holding 50; after, 2-3 view: the node holding 40 at the top; the node holding 40 has children, left to right, the node holding 20 and 30, the node holding 50. delete 10: borrow (the sibling 30|40 is a 3-node). Red-black BST built by inserting 10, 20, 30, 40: 20 at the root; 20 has left child 10 by a black link and right child 40 by a black link; 40 has left child 30 by a red link; after the delete: 30 at the root; 30 has left child 20 by a black link and right child 40 by a black link. As 2-3 trees: before, 2-3 view: the node holding 20 at the top; the node holding 20 has children, left to right, the node holding 10, the node holding 30 and 40; after, 2-3 view: the node holding 30 at the top; the node holding 30 has children, left to right, the node holding 20, the node holding 40. delete 20: an internal key (successor 30). Red-black BST built by inserting 10, 20, 30, 40: 20 at the root; 20 has left child 10 by a black link and right child 40 by a black link; 40 has left child 30 by a red link; after the delete: 30 at the root; 30 has left child 10 by a black link and right child 40 by a black link. As 2-3 trees: before, 2-3 view: the node holding 20 at the top; the node holding 20 has children, left to right, the node holding 10, the node holding 30 and 40; after, 2-3 view: the node holding 30 at the top; the node holding 30 has children, left to right, the node holding 10, the node holding 40.">
-<text x="10" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">delete 30: a key in a 3-node at the bottom</text>
-<line x1="73" y1="47" x2="41" y2="91" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="73" y1="47" x2="137" y2="91" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="137" y1="91" x2="105" y2="135" stroke="#c0392b" stroke-width="4"/>
-<circle cx="41" cy="91" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="41" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<circle cx="73" cy="47" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="73" y="52" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<circle cx="105" cy="135" r="21" fill="#fde7bf"/>
-<circle cx="105" cy="135" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="105" y="140" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
-<circle cx="137" cy="91" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="137" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<text x="240" y="85" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<text x="240" y="101" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">no moves</text>
-<line x1="367" y1="69" x2="335" y2="113" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="367" y1="69" x2="399" y2="113" stroke="#4a5163" stroke-width="1.6"/>
-<circle cx="335" cy="113" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="335" y="118" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<circle cx="367" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="367" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<circle cx="399" cy="113" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="399" y="118" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<line x1="459" y1="34" x2="459" y2="148" stroke="#c8ccd6" stroke-width="1"/>
-<line x1="511.5" y1="81" x2="499" y2="101" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="537.5" y1="81" x2="550" y2="101" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="486" y="101" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="499" y="119" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<rect x="524" y="101" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="550" y1="101" x2="550" y2="127" stroke="#c8ccd6" stroke-width="1"/>
-<text x="537" y="119" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<text x="563" y="119" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<rect x="511.5" y="55" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="524.5" y="73" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<text x="610" y="85" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<line x1="670" y1="81" x2="664" y2="101" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="696" y1="81" x2="702" y2="101" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="651" y="101" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="664" y="119" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<rect x="689" y="101" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="702" y="119" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<rect x="670" y="55" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="683" y="73" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<text x="10" y="179" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">delete 10: merge (the sibling 30 is a 2-node)</text>
-<line x1="57" y1="247" x2="25" y2="291" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="57" y1="247" x2="89" y2="291" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="121" y1="203" x2="57" y2="247" stroke="#c0392b" stroke-width="4"/>
-<line x1="121" y1="203" x2="153" y2="247" stroke="#4a5163" stroke-width="1.6"/>
-<circle cx="25" cy="291" r="21" fill="#fde7bf"/>
-<circle cx="25" cy="291" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="25" y="296" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<circle cx="57" cy="247" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="57" y="252" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">20</text>
-<circle cx="89" cy="291" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="89" y="296" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<circle cx="121" cy="203" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="121" y="208" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<circle cx="153" cy="247" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="153" y="252" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<text x="240" y="241" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<text x="240" y="257" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">moveRedLeft(20):</text>
-<text x="240" y="270" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">merge</text>
-<line x1="351" y1="247" x2="319" y2="291" stroke="#c0392b" stroke-width="4"/>
-<line x1="383" y1="203" x2="351" y2="247" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="383" y1="203" x2="415" y2="247" stroke="#4a5163" stroke-width="1.6"/>
-<circle cx="319" cy="291" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="319" y="296" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">20</text>
-<circle cx="351" cy="247" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="351" y="252" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<circle cx="383" cy="203" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="383" y="208" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<circle cx="415" cy="247" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="415" y="252" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<line x1="459" y1="190" x2="459" y2="304" stroke="#c8ccd6" stroke-width="1"/>
-<line x1="505" y1="237" x2="493" y2="257" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="531" y1="237" x2="531" y2="257" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="557" y1="237" x2="569" y2="257" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="480" y="257" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="493" y="275" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<rect x="518" y="257" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="531" y="275" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<rect x="556" y="257" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="569" y="275" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<rect x="505" y="211" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="531" y1="211" x2="531" y2="237" stroke="#c8ccd6" stroke-width="1"/>
-<text x="518" y="229" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<text x="544" y="229" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<text x="610" y="241" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<line x1="676.5" y1="237" x2="664" y2="257" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="702.5" y1="237" x2="715" y2="257" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="638" y="257" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="664" y1="257" x2="664" y2="283" stroke="#c8ccd6" stroke-width="1"/>
-<text x="651" y="275" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<text x="677" y="275" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<rect x="702" y="257" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="715" y="275" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
-<rect x="676.5" y="211" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="689.5" y="229" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<text x="10" y="335" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">delete 10: borrow (the sibling 30|40 is a 3-node)</text>
-<line x1="73" y1="359" x2="41" y2="403" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="73" y1="359" x2="137" y2="403" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="137" y1="403" x2="105" y2="447" stroke="#c0392b" stroke-width="4"/>
-<circle cx="41" cy="403" r="21" fill="#fde7bf"/>
-<circle cx="41" cy="403" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="41" y="408" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<circle cx="73" cy="359" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="73" y="364" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<circle cx="105" cy="447" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="105" y="452" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
-<circle cx="137" cy="403" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="137" y="408" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<text x="240" y="397" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<text x="240" y="413" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">moveRedLeft(20):</text>
-<text x="240" y="426" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">borrow</text>
-<line x1="367" y1="381" x2="335" y2="425" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="367" y1="381" x2="399" y2="425" stroke="#4a5163" stroke-width="1.6"/>
-<circle cx="335" cy="425" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="335" y="430" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<circle cx="367" cy="381" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="367" y="386" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<circle cx="399" cy="425" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="399" y="430" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<line x1="459" y1="346" x2="459" y2="460" stroke="#c8ccd6" stroke-width="1"/>
-<line x1="511.5" y1="393" x2="499" y2="413" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="537.5" y1="393" x2="550" y2="413" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="486" y="413" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="499" y="431" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<rect x="524" y="413" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="550" y1="413" x2="550" y2="439" stroke="#c8ccd6" stroke-width="1"/>
-<text x="537" y="431" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<text x="563" y="431" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<rect x="511.5" y="367" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="524.5" y="385" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<text x="610" y="397" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<line x1="670" y1="393" x2="664" y2="413" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="696" y1="393" x2="702" y2="413" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="651" y="413" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="664" y="431" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<rect x="689" y="413" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="702" y="431" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<rect x="670" y="367" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="683" y="385" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<text x="10" y="491" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">delete 20: an internal key (successor 30)</text>
-<line x1="73" y1="515" x2="41" y2="559" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="73" y1="515" x2="137" y2="559" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="137" y1="559" x2="105" y2="603" stroke="#c0392b" stroke-width="4"/>
-<circle cx="41" cy="559" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="41" y="564" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<circle cx="73" cy="515" r="21" fill="#fde7bf"/>
-<circle cx="73" cy="515" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="73" y="520" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<circle cx="105" cy="603" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="105" y="608" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
-<circle cx="137" cy="559" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="137" y="564" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<text x="240" y="553" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<text x="240" y="569" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">deleteMin removes 30,</text>
-<text x="240" y="582" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">30 replaces 20</text>
-<line x1="367" y1="537" x2="335" y2="581" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="367" y1="537" x2="399" y2="581" stroke="#4a5163" stroke-width="1.6"/>
-<circle cx="335" cy="581" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="335" y="586" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<circle cx="367" cy="537" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="367" y="542" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<circle cx="399" cy="581" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="399" y="586" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<line x1="459" y1="502" x2="459" y2="616" stroke="#c8ccd6" stroke-width="1"/>
-<line x1="511.5" y1="549" x2="499" y2="569" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="537.5" y1="549" x2="550" y2="569" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="486" y="569" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="499" y="587" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<rect x="524" y="569" width="52" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<line x1="550" y1="569" x2="550" y2="595" stroke="#c8ccd6" stroke-width="1"/>
-<text x="537" y="587" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-<text x="563" y="587" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<rect x="511.5" y="523" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="524.5" y="541" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<text x="610" y="553" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
-<line x1="670" y1="549" x2="664" y2="569" stroke="#4a5163" stroke-width="1.5"/>
-<line x1="696" y1="549" x2="702" y2="569" stroke="#4a5163" stroke-width="1.5"/>
-<rect x="651" y="569" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="664" y="587" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<rect x="689" y="569" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="702" y="587" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
-<rect x="670" y="523" width="26" height="26" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="683" y="541" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
-</svg>
-<!-- /gen:rb delete-cases -->
-        <figcaption>
-          Four deletions, each beside the 2-3 tree it encodes. Deleting \(30\)
-          removes a key from a 3-node at the bottom: no moves. Deleting \(10\)
-          from the second tree merges (\(20\) comes down beside \(30\)); from
-          the third it borrows (\(20\) comes down, \(30\) goes up). Deleting the
-          internal key \(20\) copies in its successor \(30\) and deletes
-          \(30\) from the bottom. In every result each root-to-null path crosses
-          the same number of black links.
-        </figcaption>
-      </figure>
-      <div class="demo">
-        <span class="tag">Interactive</span>
-        <a href="../../lib/demo.html?ds=rb-delete">Red-black delete demo</a>. The
-        deletions above, one move per step: the descent with its
-        <code>moveRedLeft</code> and <code>moveRedRight</code>, the successor copy,
-        and <code>balance</code> on the way back up.
+        <a href="../../lib/demo.html?ds=rb-moves">Red-black moves demo</a>.
+        <code>rotateLeft</code>, <code>rotateRight</code> and
+        <code>flipColors</code>, one at a time, beside the 2-3 tree: a rotation of a
+        red link leaves the 2-3 tree unchanged, a flip splits a 4-node.
       </div>
 
       <!-- ============================================================ -->
-      <h2 id="rb-height">4. Why the height is \(\Theta(\log n)\)</h2>
+      <h2 id="delete-fixes">6. Fixing a delete</h2>
+      <p>
+        The missing black is repaired the way a 2-3 delete repairs an empty node, one
+        level at a time, and each 2-3 repair is a few rotations and recolorings in the
+        red-black BST.
+      </p>
+      <ul>
+        <li><strong>Merge</strong>, when every sibling next to the empty node is a
+        2-node. The parent&rsquo;s key comes down and joins the sibling. In
+        red-black terms a merge is a recolor: the sibling turns red, joining the
+        parent key&rsquo;s node, and the parent&rsquo;s key, if it was red (part of a
+        3-node), turns black, leaving the parent&rsquo;s node. If the merged 3-node
+        leans right, <code>rotateLeft</code> fixes it, the same fix as for an insert.
+        Under a 3-node parent the repair ends there. Under a 2-node parent the
+        parent has lost its only key: the empty node is now above the merged node,
+        and the repair repeats one level up.</li>
+        <li><strong>Borrow</strong>, when a sibling next to the empty node is a
+        3-node. The parent&rsquo;s key comes down into the empty node and the
+        sibling&rsquo;s nearer key goes up into its place. In red-black terms, one to
+        three rotations bring the sibling&rsquo;s key into the parent&rsquo;s
+        position, and a recolor makes its two neighbors black 2-nodes. The empty node
+        is filled and the repair ends.</li>
+        <li><strong>At the root</strong>, the empty node above the root is dropped:
+        every path misses the same black link, so black balance holds, and the tree
+        is one level shorter.</li>
+      </ul>
+      <p>
+        Every case, with \([p]\) a 2-node (\(p\) black), \([r\,|\,g]\) a 3-node
+        (\(g\) black, \(r\) its red left child), and a 3-node sibling \([c\,|\,s]\)
+        drawn as \(s\) black with \(c\) its red left child:
+      </p>
+      <table>
+        <tr><th>parent</th><th>empty node</th><th>sibling</th><th>repair</th><th>red-black moves</th></tr>
+        <tr><td>\([p]\)</td><td>left</td><td>\([c\,|\,s]\)</td><td>borrow</td><td><code>rotateRight(s)</code>, <code>rotateLeft(p)</code>, recolor \(p, s\) black</td></tr>
+        <tr><td>\([p]\)</td><td>left</td><td>\([s]\)</td><td>merge, moves up</td><td>recolor \(s\) red, <code>rotateLeft(p)</code></td></tr>
+        <tr><td>\([p]\)</td><td>right</td><td>\([c\,|\,s]\)</td><td>borrow</td><td><code>rotateRight(p)</code>, recolor \(c, p\) black</td></tr>
+        <tr><td>\([p]\)</td><td>right</td><td>\([s]\)</td><td>merge, moves up</td><td>recolor \(s\) red</td></tr>
+        <tr><td>\([r\,|\,g]\)</td><td>left</td><td>middle \([c\,|\,s]\)</td><td>borrow</td><td><code>rotateRight(s)</code>, <code>rotateLeft(r)</code>, recolor \(r, s\) black</td></tr>
+        <tr><td>\([r\,|\,g]\)</td><td>left</td><td>middle \([s]\)</td><td>merge</td><td>recolor \(r\) black and \(s\) red, <code>rotateLeft(r)</code></td></tr>
+        <tr><td>\([r\,|\,g]\)</td><td>middle</td><td>left \([c\,|\,s]\)</td><td>borrow</td><td><code>rotateRight(r)</code>, recolor \(c, r\) black</td></tr>
+        <tr><td>\([r\,|\,g]\)</td><td>middle</td><td>left a 2-node, right \([c\,|\,s]\)</td><td>borrow</td><td><code>rotateRight(s)</code>, <code>rotateLeft(g)</code>, <code>rotateRight(g)</code>, recolor \(g, s\) black</td></tr>
+        <tr><td>\([r\,|\,g]\)</td><td>middle</td><td>both 2-nodes, left \([s]\)</td><td>merge</td><td>recolor \(r\) black and \(s\) red</td></tr>
+        <tr><td>\([r\,|\,g]\)</td><td>right</td><td>middle \([c\,|\,s]\)</td><td>borrow</td><td><code>rotateLeft(r)</code>, <code>rotateRight(g)</code>, recolor \(c, g\) black</td></tr>
+        <tr><td>\([r\,|\,g]\)</td><td>right</td><td>middle \([s]\)</td><td>merge</td><td><code>rotateRight(g)</code>, recolor \(g\) black and \(s\) red</td></tr>
+      </table>
+      <figure class="wide">
+<!-- gen:rb delete-fixes -->
+<svg viewBox="0 0 1051 628" role="img" style="max-width:1261px;min-width:560px" font-family="system-ui, sans-serif" aria-label="Four delete repairs, the red-black BST after each move; the dashed node is the empty node that marks the missing black. merge under a 2-node: delete 20 from [40] over [20], [60]: remove 20 gives 40 at the root; 40 has left child an empty node (a missing black) by a black link and right child 60 by a black link; then recolor 60 red gives 40 at the root; 40 has left child an empty node (a missing black) by a black link and right child 60 by a red link; then rotateLeft(40) gives an empty node (a missing black) at the root; an empty node (a missing black) has left child 60 by a black link; 60 has left child 40 by a red link; then drop the empty root gives 60 at the root; 60 has left child 40 by a red link. merge under a 3-node: delete 40 from [30|60] over [10], [40], [70]: remove 40 gives 60 at the root; 60 has left child 30 by a red link and right child 70 by a black link; 30 has left child 10 by a black link and right child an empty node (a missing black) by a black link; then recolor 30 black and 10 red gives 60 at the root; 60 has left child 30 by a black link and right child 70 by a black link; 30 has left child 10 by a red link. borrow under a 2-node: delete 60 from [40] over [10|20], [60]: remove 60 gives 40 at the root; 40 has left child 20 by a black link and right child an empty node (a missing black) by a black link; 20 has left child 10 by a red link; then rotateRight(40) gives 20 at the root; 20 has left child 10 by a red link and right child 40 by a red link; 40 has right child an empty node (a missing black) by a black link; then recolor 10, 40 black gives 20 at the root; 20 has left child 10 by a black link and right child 40 by a black link. borrow under a 2-node: delete 20 from [40] over [20], [60|70]: remove 20 gives 40 at the root; 40 has left child an empty node (a missing black) by a black link and right child 70 by a black link; 70 has left child 60 by a red link; then rotateRight(70) gives 40 at the root; 40 has left child an empty node (a missing black) by a black link and right child 60 by a black link; 60 has right child 70 by a red link; then rotateLeft(40) gives 60 at the root; 60 has left child 40 by a red link and right child 70 by a red link; 40 has left child an empty node (a missing black) by a black link; then recolor 40, 70 black gives 60 at the root; 60 has left child 40 by a black link and right child 70 by a black link.">
+<text x="10" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">merge under a 2-node: delete 20 from [40] over [20], [60]</text>
+<line x1="85" y1="69" x2="55" y2="113" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="85" y1="69" x2="115" y2="113" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="55" cy="113" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="85" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="85" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="115" cy="113" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="115" y="118" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="227.1" y="85" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="227.1" y="101" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">recolor 60 red</text>
+<line x1="361.2" y1="69" x2="331.2" y2="113" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="361.2" y1="69" x2="391.2" y2="113" stroke="#c0392b" stroke-width="4"/>
+<circle cx="331.2" cy="113" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="361.2" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="361.2" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="391.2" cy="113" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="391.2" y="118" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">60</text>
+<text x="503.3" y="85" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="503.3" y="101" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">rotateLeft(40)</text>
+<line x1="637.4" y1="91" x2="607.4" y2="135" stroke="#c0392b" stroke-width="4"/>
+<line x1="667.4" y1="47" x2="637.4" y2="91" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="607.4" cy="135" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="607.4" y="140" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">40</text>
+<circle cx="637.4" cy="91" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="637.4" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="667.4" cy="47" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="795.3" y="85" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="795.3" y="101" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">drop the empty root</text>
+<line x1="960.1" y1="69" x2="930.1" y2="113" stroke="#c0392b" stroke-width="4"/>
+<circle cx="930.1" cy="113" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="930.1" y="118" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">40</text>
+<circle cx="960.1" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="960.1" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="10" y="179" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">merge under a 3-node: delete 40 from [30|60] over [10], [40], [70]</text>
+<line x1="55" y1="247" x2="25" y2="291" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="55" y1="247" x2="85" y2="291" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="115" y1="203" x2="55" y2="247" stroke="#c0392b" stroke-width="4"/>
+<line x1="115" y1="203" x2="145" y2="247" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="25" cy="291" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="25" y="296" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<circle cx="55" cy="247" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="55" y="252" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
+<circle cx="85" cy="291" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="115" cy="203" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="115" y="208" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="145" cy="247" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="145" y="252" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="233.4" y="241" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="233.4" y="257" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">recolor 30 black</text>
+<text x="233.4" y="270" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">and 10 red</text>
+<line x1="358.8" y1="247" x2="328.8" y2="291" stroke="#c0392b" stroke-width="4"/>
+<line x1="388.8" y1="203" x2="358.8" y2="247" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="388.8" y1="203" x2="418.8" y2="247" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="328.8" cy="291" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="328.8" y="296" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">10</text>
+<circle cx="358.8" cy="247" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="358.8" y="252" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<circle cx="388.8" cy="203" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="388.8" y="208" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="418.8" cy="247" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="418.8" y="252" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="10" y="335" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">borrow under a 2-node: delete 60 from [40] over [10|20], [60]</text>
+<line x1="70" y1="403" x2="40" y2="447" stroke="#c0392b" stroke-width="4"/>
+<line x1="100" y1="359" x2="70" y2="403" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="100" y1="359" x2="130" y2="403" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="40" cy="447" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="40" y="452" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">10</text>
+<circle cx="70" cy="403" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="70" y="408" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="100" cy="359" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="100" y="364" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="130" cy="403" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="230.3" y="397" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="230.3" y="413" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">rotateRight(40)</text>
+<line x1="352.5" y1="359" x2="322.5" y2="403" stroke="#c0392b" stroke-width="4"/>
+<line x1="352.5" y1="359" x2="382.5" y2="403" stroke="#c0392b" stroke-width="4"/>
+<line x1="382.5" y1="403" x2="412.5" y2="447" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="322.5" cy="403" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="322.5" y="408" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">10</text>
+<circle cx="352.5" cy="359" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="352.5" y="364" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="382.5" cy="403" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="382.5" y="408" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">40</text>
+<circle cx="412.5" cy="447" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="528.5" y="397" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="528.5" y="413" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">recolor 10, 40 black</text>
+<line x1="681.5" y1="381" x2="651.5" y2="425" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="681.5" y1="381" x2="711.5" y2="425" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="651.5" cy="425" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="651.5" y="430" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<circle cx="681.5" cy="381" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="681.5" y="386" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="711.5" cy="425" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="711.5" y="430" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="10" y="491" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">borrow under a 2-node: delete 20 from [40] over [20], [60|70]</text>
+<line x1="70" y1="515" x2="40" y2="559" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="70" y1="515" x2="130" y2="559" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="130" y1="559" x2="100" y2="603" stroke="#c0392b" stroke-width="4"/>
+<circle cx="40" cy="559" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="70" cy="515" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="70" y="520" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="100" cy="603" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="100" y="608" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">60</text>
+<circle cx="130" cy="559" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="130" y="564" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="230.3" y="553" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="230.3" y="569" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">rotateRight(70)</text>
+<line x1="352.5" y1="515" x2="322.5" y2="559" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="352.5" y1="515" x2="382.5" y2="559" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="382.5" y1="559" x2="412.5" y2="603" stroke="#c0392b" stroke-width="4"/>
+<circle cx="322.5" cy="559" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="352.5" cy="515" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="352.5" y="520" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="382.5" cy="559" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="382.5" y="564" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="412.5" cy="603" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="412.5" y="608" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">70</text>
+<text x="509.6" y="553" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="509.6" y="569" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">rotateLeft(40)</text>
+<line x1="628.7" y1="559" x2="598.7" y2="603" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="658.7" y1="515" x2="628.7" y2="559" stroke="#c0392b" stroke-width="4"/>
+<line x1="658.7" y1="515" x2="688.7" y2="559" stroke="#c0392b" stroke-width="4"/>
+<circle cx="598.7" cy="603" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="4 3"/>
+<circle cx="628.7" cy="559" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="628.7" y="564" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">40</text>
+<circle cx="658.7" cy="515" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="658.7" y="520" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="688.7" cy="559" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="688.7" y="564" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">70</text>
+<text x="804.7" y="553" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="804.7" y="569" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">recolor 40, 70 black</text>
+<line x1="957.7" y1="537" x2="927.7" y2="581" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="957.7" y1="537" x2="987.7" y2="581" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="927.7" cy="581" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="927.7" y="586" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<circle cx="957.7" cy="537" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="957.7" y="542" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="987.7" cy="581" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="987.7" y="586" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+</svg>
+<!-- /gen:rb delete-fixes -->
+        <figcaption>
+          Four repairs, the red-black BST after each move (dashed: the empty node).
+          A merge under a 2-node: \(60\) turns red and <code>rotateLeft</code> leans
+          \([40\,|\,60]\) left, the empty node moves above the root, and dropping it
+          ends the delete. A merge under a 3-node: one recolor. Two borrows under a
+          2-node: from the left sibling one rotation, from the right sibling two, each
+          followed by a recolor.
+        </figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Example (a merge, then a borrow one level up)</span>
+        Delete \(10\) from the 2-3 tree with root \([40]\), children \([20]\) and
+        \([60\,|\,80]\), and leaves \([10], [30]\) and \([50], [70], [90]\). In the
+        red-black BST, \(40\) is the black root; \(20\) is black with black children
+        \(10\) and \(30\); \(80\) is black with \(60\) as its red left child (over
+        \(50\) and \(70\)) and \(90\) as its black right child.
+        <ol>
+          <li>The search reaches \(10\), a black leaf. Removing it leaves the empty
+          node as \(20\)&rsquo;s left child: black balance is broken.</li>
+          <li>The empty node&rsquo;s parent \([20]\) is a 2-node and its sibling
+          \([30]\) is a 2-node: <strong>merge</strong>. Recolor \(30\) red; the
+          3-node \([20\,|\,30]\) now leans right, so <code>rotateLeft(20)</code>
+          makes \(30\) black with \(20\) its red left child. \([20]\) gave up its only
+          key, so the empty node is now \(40\)&rsquo;s left child, above
+          \([20\,|\,30]\).</li>
+          <li>Its parent \([40]\) is a 2-node and its sibling \([60\,|\,80]\) is a
+          3-node: <strong>borrow</strong>. <code>rotateRight(80)</code> brings \(60\)
+          up inside the sibling, <code>rotateLeft(40)</code> lifts \(60\) into
+          \(40\)&rsquo;s place with \(40\) below it, and recoloring \(40\) and
+          \(80\) black puts \(40\) where the empty node was.</li>
+        </ol>
+        The result: \(60\) black at the root; \(40\) black with children \(30\)
+        (black, with \(20\) its red left child) and \(50\); \(80\) black with children
+        \(70\) and \(90\). In 2-3 terms, \([60]\) over \([40]\) (over
+        \([20\,|\,30]\) and \([50]\)) and \([80]\) (over \([70]\) and \([90]\)),
+        exactly what the 2-3 delete gives.
+      </div>
+      <p>
+        Every case is a constant number of moves at one level, and the empty node
+        climbs only through merges under 2-node parents, so the repair costs
+        \(O(\log n)\) on top of the \(\Theta(\log n)\) search: delete, like insert,
+        is \(\Theta(\log n)\).
+      </p>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=rb-delete">Red-black delete demo</a>. Every
+        case on its own small tree beside the 2-3 tree: the three removals, the
+        eleven repairs, and three deletes whose repair moves up a level, one move per
+        step.
+      </div>
+      <div class="demo">
+        <span class="tag">Interactive</span>
+        <a href="../../lib/demo.html?ds=redblack">Red-black BST demo</a>. Build a tree
+        from any keys, then insert, delete and search, each violation and repair
+        narrated; click a key to fill the Delete box.
+      </div>
+      <div class="aside">
+        <span class="tag">Top-down delete</span>
+        Sedgewick&rsquo;s published left-leaning delete works top-down instead: on
+        the way down it merges or borrows before stepping into a 2-node (its helpers
+        are named <code>moveRedLeft</code> and <code>moveRedRight</code>), so the key
+        it removes is never a black leaf and no black link goes missing. It performs
+        the same 2-3 merges and borrows, ahead of time, and restores the left-leaning
+        shape on the way back up.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="rb-height">7. Why the height is \(\Theta(\log n)\)</h2>
       <div class="thm">
         <span class="tag">Theorem (red-black height)</span>
         A red-black BST on \(n\) keys has height at most \(2\log_2 n\), so search,
@@ -1345,7 +1978,7 @@ fn insert(root: Link, key: i32) -&gt; Link {
         The bound is looser than AVL&rsquo;s \(1.44\log_2 n\) (a red-black tree
         can be up to twice as tall) but still \(\Theta(\log n)\), and it is
         reached with far fewer restructuring operations per update. That trade is why a
-        red-black BST, being just one node type plus one colour bit, is the balanced
+        red-black BST, being just one node type plus one color bit, is the balanced
         tree real libraries ship: C++&rsquo;s <code>std::map</code> and
         <code>std::set</code>, Java&rsquo;s <code>TreeMap</code> and
         <code>TreeSet</code>, and the Linux kernel&rsquo;s scheduler among them.
@@ -1357,18 +1990,18 @@ fn insert(root: Link, key: i32) -&gt; Link {
         collapse-the-red-links map. This is Sedgewick &amp; Wayne&rsquo;s central
         insight: do not analyse the red-black tree directly: recognise it as a
         2-3 tree in a costume and inherit everything already proved. Cormen et al.
-        develop the classic (not-left-leaning) red-black tree from five colour axioms
+        develop the classic (not-left-leaning) red-black tree from five color axioms
         instead; the two agree on the \(\Theta(\log n)\) guarantee and differ mainly in
         how many cases the code must handle.
       </div>
 
       <!-- ============================================================ -->
-      <h2 id="ex-redblack">5. Exercises (with solutions)</h2>
+      <h2 id="ex-redblack">8. Exercises (with solutions)</h2>
       <ol>
         <li>
           Convert the 2-3 tree whose root is the 3-node \([40\,|\,80]\) with children
           \([20], [60], [100]\) into a left-leaning red-black BST. Give each
-          node&rsquo;s colour and its parent link.
+          node&rsquo;s color and its parent link.
           <details>
             <summary>solution</summary>
             The root 3-node \([40\,|\,80]\) becomes \(80\) (black, since it is the root)
@@ -1399,7 +2032,7 @@ fn insert(root: Link, key: i32) -&gt; Link {
         <li>
           Insert the keys \(S, E, A, R, C\), in that order, into an empty
           left-leaning red-black BST. List the moves each insertion fires and
-          draw the final tree with its link colours.
+          draw the final tree with its link colors.
           <details>
             <summary>solution</summary>
             <strong>S</strong>: the root, black. <strong>E</strong>: \(E \lt S\),
@@ -1436,9 +2069,9 @@ fn insert(root: Link, key: i32) -&gt; Link {
             one of the two child links, so it loses one black link at the top and
             gains one just below: the count is unchanged, and paths that avoid
             the node are untouched. For a rotation, the two nodes involved
-            exchange colours (\(x\) inherits \(h\)&rsquo;s colour and \(h\)
+            exchange colors (\(x\) inherits \(h\)&rsquo;s color and \(h\)
             becomes red), and the subtree that changes parent moves across a link
-            of the same colour it had before, so every path through the subtree
+            of the same color it had before, so every path through the subtree
             still crosses the same number of black links. Since the new link of
             an insertion is red, it adds no black link anywhere either, which is
             why black balance is the one invariant an insertion never has to
@@ -1448,27 +2081,24 @@ fn insert(root: Link, key: i32) -&gt; Link {
         <li>
           Insert \(10, 20, 30, 40, 50\) in that order into an empty left-leaning
           red-black BST (the last tree of the ascending figure), then delete
-          \(40\). List the moves the deletion makes and give the final tree. What
+          \(40\). List the steps of the deletion and give the final tree. What
           does the deletion do in the 2-3 tree?
           <details>
             <summary>solution</summary>
-            The tree is \(40\) black at the root with a red left link to \(20\);
+            The tree is \(40\) black at the root with a red left child \(20\);
             \(20\) has black children \(10\) and \(30\); \(50\) is the
-            root&rsquo;s black right child. The root has a red child, so it stays
-            black. The search for \(40\) goes right at the root (an equal key is
-            handled on the right), and the root&rsquo;s left link is red, so
-            <code>rotateRight(40)</code> comes first: \(20\) becomes the black root
-            and \(40\) its red right child, with children \(30\) and \(50\).
-            The search goes right again, into \(40\). There, \(50\) and its left
-            link are black, so <code>moveRedRight(40)</code> runs; \(40\)&rsquo;s
-            left child \(30\) has no red left child, so it is a single
-            <code>flipColors(40)</code>, a merge: \(40\) turns black and \(30\) and
-            \(50\) red. Now \(40\) is found with a right child, so its successor
-            \(50\) replaces it and <code>deleteMin</code> removes the old \(50\),
-            which has no left child. No test fires on the way back up.
+            root&rsquo;s black right child. \(40\) has two children, so it swaps
+            with its in-order predecessor \(30\) (one step left to \(20\), then
+            right to \(30\)): \(30\) is now at the root, and \(40\) sits where
+            \(30\) was, a black leaf. Removing it leaves the empty node as
+            \(20\)&rsquo;s right child, and black balance is broken. The empty
+            node&rsquo;s parent is the 3-node \([20\,|\,30]\) (\(20\) red,
+            \(30\) black) and the empty node is its middle child; both siblings,
+            \([10]\) and \([50]\), are 2-nodes, so the repair is a merge with
+            the left one: recolor \(20\) black and \(10\) red.
             <figure>
 <!-- gen:rb ex-delete -->
-<svg viewBox="0 0 432 138" role="img" style="max-width:518px" font-family="system-ui, sans-serif" aria-label="Deleting 40 from the tree built by inserting 10, 20, 30, 40, 50. Before: 40 at the root; 40 has left child 20 by a red link and right child 50 by a black link; 20 has left child 10 by a black link and right child 30 by a black link. After: 20 at the root; 20 has left child 10 by a black link and right child 50 by a black link; 50 has left child 30 by a red link.">
+<svg viewBox="0 0 432 138" role="img" style="max-width:518px" font-family="system-ui, sans-serif" aria-label="Deleting 40 from the tree built by inserting 10, 20, 30, 40, 50. Before: 40 at the root; 40 has left child 20 by a red link and right child 50 by a black link; 20 has left child 10 by a black link and right child 30 by a black link. After: 30 at the root; 30 has left child 20 by a black link and right child 50 by a black link; 20 has left child 10 by a red link.">
 <line x1="57" y1="69" x2="25" y2="113" stroke="#4a5163" stroke-width="1.6"/>
 <line x1="57" y1="69" x2="89" y2="113" stroke="#4a5163" stroke-width="1.6"/>
 <line x1="121" y1="25" x2="57" y2="69" stroke="#c0392b" stroke-width="4"/>
@@ -1486,33 +2116,79 @@ fn insert(root: Link, key: i32) -&gt; Link {
 <text x="153" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
 <text x="232" y="63" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
 <text x="232" y="79" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">delete 40</text>
-<line x1="335" y1="25" x2="303" y2="69" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="335" y1="25" x2="399" y2="69" stroke="#4a5163" stroke-width="1.6"/>
-<line x1="399" y1="69" x2="367" y2="113" stroke="#c0392b" stroke-width="4"/>
-<circle cx="303" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="303" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
-<circle cx="335" cy="25" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
-<text x="335" y="30" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
-<circle cx="367" cy="113" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
-<text x="367" y="118" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">30</text>
+<line x1="335" y1="69" x2="303" y2="113" stroke="#c0392b" stroke-width="4"/>
+<line x1="367" y1="25" x2="335" y2="69" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="367" y1="25" x2="399" y2="69" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="303" cy="113" r="15" fill="#fff" stroke="#c0392b" stroke-width="2.2"/>
+<text x="303" y="118" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">10</text>
+<circle cx="335" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="335" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="367" cy="25" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="367" y="30" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
 <circle cx="399" cy="69" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
 <text x="399" y="74" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
 </svg>
 <!-- /gen:rb ex-delete -->
             </figure>
-            The result is \(20\) black at the root with black children \(10\) and
-            \(50\), and \(30\) a red left child of \(50\). In the 2-3 tree,
-            \([20\,|\,40]\) over \([10], [30], [50]\) loses the internal key
-            \(40\): its successor \(50\) takes its place, the leaf that held
-            \(50\) empties, and since its sibling \([30]\) is a 2-node the two
-            merge with the key \(50\) from the parent, giving \([20]\) over
-            \([10]\) and \([30\,|\,50]\).
+            The result is \(30\) black at the root, \(20\) black as its left
+            child with \(10\) its red left child, and \(50\) black as its right
+            child. In the 2-3 tree, \([20\,|\,40]\) over \([10], [30], [50]\)
+            loses the internal key \(40\): its predecessor \(30\) takes its
+            place, the leaf \([30]\) empties, and since neither sibling can spare
+            a key it merges with \([10]\) and the key \(20\) from the parent,
+            giving \([30]\) over \([10\,|\,20]\) and \([50]\).
+          </details>
+        </li>
+        <li>
+          Encode the 2-3 tree with root \([40]\) and leaves \([20\,|\,30]\) and
+          \([60]\) as a left-leaning red-black BST. Then, each time starting from
+          that tree, insert \(35\), \(10\) and \(50\). For each insert, say where
+          the new red node lands, which rule it breaks, and which fixes run.
+          <details>
+            <summary>solution</summary>
+            The encoding: \(40\) black at the root, \(30\) black as its left child
+            with \(20\) its red left child, \(60\) black as its right child.
+            <ul>
+              <li><strong>35</strong> lands above both keys of the 3-node
+              \([20\,|\,30]\), as \(30\)&rsquo;s red right child: \(30\) has two
+              red children, the 4-node \([20\,|\,30\,|\,35]\) (rule 3).
+              <code>flipColors(30)</code> splits it: \(20\) and \(35\) turn black
+              and \(30\) joins \([40]\) as its red left child, the 3-node
+              \([30\,|\,40]\), which breaks no rule.</li>
+              <li><strong>10</strong> lands below both keys, as \(20\)&rsquo;s red
+              left child: two reds in a row, \(30\) to \(20\) to \(10\) (rule 3).
+              <code>rotateRight(30)</code> lifts \(20\) with red children \(10\)
+              and \(30\), and <code>flipColors(20)</code> splits that 4-node:
+              \(20\) joins \([40]\) as \([20\,|\,40]\).</li>
+              <li><strong>50</strong> lands below the key of the 2-node \([60]\),
+              as its red left child: the 3-node \([50\,|\,60]\), leaning left. No
+              rule breaks and no fix runs.</li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          Encode the 2-3 tree with root \([30\,|\,60]\) and leaves \([10]\),
+          \([40]\) and \([70]\), then delete \(10\). Where is the empty node, which
+          repair applies, and which red-black moves carry it out?
+          <details>
+            <summary>solution</summary>
+            The encoding: \(60\) black at the root, \(30\) its red left child with
+            black children \(10\) and \(40\), and \(70\) black as the root&rsquo;s
+            right child. \(10\) is a black leaf, so removing it leaves the empty
+            node as \(30\)&rsquo;s left child: the left child of the 3-node
+            \([30\,|\,60]\). Its sibling, the middle child \([40]\), is a 2-node,
+            so the repair is a merge: \(30\) comes down and joins \(40\), and the
+            parent keeps \(60\). In red-black terms: recolor \(30\) black and
+            \(40\) red, which leaves a red link leaning right, then
+            <code>rotateLeft(30)</code>. The result is \(60\) black at the root,
+            \(40\) black as its left child with \(30\) its red left child, and
+            \(70\): the 2-3 tree \([60]\) over \([30\,|\,40]\) and \([70]\).
           </details>
         </li>
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Red-Black Trees v1.1
+        Data Structures &amp; Algorithms &middot; Red-Black Trees v2.0
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

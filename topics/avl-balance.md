@@ -132,6 +132,14 @@ int height(Node* t){ return t ? t->height : -1; }
 int bf(Node* t){ return height(t->left) - height(t->right); }
 void fix(Node* t){ t->height = 1 + max(height(t->left),
                                        height(t->right)); }
+
+class AVLTree {
+    Node* root = nullptr;
+public:
+    bool contains(const Key& k) const;  // the BST search
+    void insert(const Key& k, Value v); // BST insert + rebalance
+    void remove(const Key& k);          // BST delete + rebalance
+};
 ```
 
 --
@@ -177,7 +185,7 @@ That is why **one upward pass** is enough.
 </pre>
 </div>
 
-<small>Every node shows its **bf**. **Insert** does a **plain insert** (the leaf appears), then recomputes bf **up the path**: a node **hits bf ±2** (red), and it can *only* be **on the path** (off-path **bf stay 0**). The demo **pauses** on that imbalance; a **rotation** fixes it.</small>
+<small>**Insert** is a plain insert, then bf is recomputed **up the path**: a node **hits bf ±2** (red) only **on the path**; off-path nodes keep **bf 0**. The demo **pauses** there; a **rotation** fixes it.</small>
 
 --
 

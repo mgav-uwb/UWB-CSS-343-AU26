@@ -49,7 +49,7 @@ const SLIDE_SPECS = {
     initial: "1..16",
     buildStep: (s, k) => s.insert(k),
     speedControl: true, finishButton: true,
-    width: 400, height: 215,
+    width: 400, height: 200,
   },
   "tt-insert": {
     make: () => new TwoThree(),
@@ -73,15 +73,17 @@ const SLIDE_SPECS = {
   },
   "rb-insert": {
     make: () => new RedBlack(),
-    initial: "1..24:1:RAND",
-    renderer: (c) => new TreeRenderer(c, { labels: "none", mark: "#7c5cff" }), // purple marks: red is only a red link
+    initial: "1..14:1:RAND",
+    // the 2-3 tree it encodes beside it; purple marks: red is only a red link
+    renderer: [(c) => new MultiwayTreeRenderer(c, { mark: "#7c5cff" }), (c) => new TreeRenderer(c, { labels: "none", mark: "#7c5cff" })],
+    layout: "row", cols: [360, 540], labels: ["2-3 tree", "red-black BST"],
     buildStep: (s, k) => s.insert(k),
     ops: [
       { name: "Insert", arg: "number", run: (s, v) => s.insert(v) },
       { name: "Delete", arg: "number", run: (s, v) => s.delete(v) },
     ],
     costs: ["compare", "rotation", "link"], chrome: { showCosts: true },
-    width: 900, height: 250,
+    width: 900, height: 230,
   },
   "heap-insert": {
     title: "heap", make: () => new MaxHeap(),

@@ -193,6 +193,39 @@
         it is &ldquo;left, middle, or right&rdquo; depending on how the search key
         compares to the two stored keys.
       </p>
+      <h3>In code</h3>
+      <p>
+        One node type serves both kinds: room for two keys and three children, and a
+        count that says which kind the node is. One spare key slot and one spare
+        child pointer give a node room to hold the temporary 4-node an insertion
+        creates just before it splits (&sect;3). Search descends one node per level,
+        comparing against at most two keys.
+      </p>
+      <pre>  struct Node23 {
+      int     n;              <span class="cm">// keys in use: 1 = a 2-node, 2 = a 3-node</span>
+      int     key[3];         <span class="cm">// key[0] &lt; key[1]; key[2] only mid-insert</span>
+      Node23* child[4];       <span class="cm">// n + 1 children, all null in a leaf</span>
+  };
+
+  class TwoThreeTree {
+  public:
+      bool contains(int key) const;  <span class="cm">// &sect;2: pick a door at each node</span>
+      void insert(int key);          <span class="cm">// &sect;3: add in a leaf, split upward</span>
+      void remove(int key);          <span class="cm">// &sect;4: remove in a leaf, borrow or merge</span>
+  private:
+      Node23* root = nullptr;
+  };
+
+  bool TwoThreeTree::contains(int key) const {
+      Node23* h = root;
+      while (h != nullptr) {
+          int i = 0;
+          while (i &lt; h-&gt;n &amp;&amp; key &gt; h-&gt;key[i]) i++;  <span class="cm">// first key &ge; the target</span>
+          if (i &lt; h-&gt;n &amp;&amp; key == h-&gt;key[i]) return true;
+          h = h-&gt;child[i];                             <span class="cm">// the door: child i</span>
+      }
+      return false;
+  }</pre>
       <div class="thm">
         <span class="tag">Invariant (perfect balance)</span>
         A 2-3 tree keeps <em>every</em> leaf at the <em>same</em> depth, at all
@@ -424,7 +457,7 @@
         Insertion is \(\Theta(\log n)\), and we never wrote a rotation. This
         split-and-promote rule is exactly what recurs, wider, in B-trees (the
         <a href="ds-b-trees.html"><em>B-Trees &amp; B+ Trees</em></a> handout), and,
-        encoded with a colour bit, in red-black trees (the
+        encoded with a color bit, in red-black trees (the
         <a href="ds-red-black-trees.html"><em>Red-Black Trees</em></a> handout).
       </p>
       <div class="demo">
@@ -447,10 +480,24 @@
       <p>
         <strong>Step 1: get down to a leaf.</strong> If the key sits in an internal
         node, swap it with its in-order predecessor (the rightmost key of its left
-        subtree, always a leaf), and delete that copy instead: the same trick
-        every BST-family delete uses (the Hibbard delete of <a href="ds-trees-bst.html"><em>Trees &amp; Binary Search Trees</em></a> reached for the
-        successor; either side works). Removal therefore always happens at a leaf.
+        subtree, always in a leaf), and delete that copy instead. Removal therefore
+        always happens at a leaf.
       </p>
+      <div class="aside">
+        <span class="tag">Predecessor or successor</span>
+        The in-order <strong>successor</strong> (the leftmost key of the subtree to
+        the key&rsquo;s right, also always in a leaf) works equally well. The
+        predecessor and the successor are the key&rsquo;s two neighbors in sorted
+        order, so either one can take its place without breaking the order, and the
+        rest of the delete (remove from a leaf, then borrow or merge) is the same.
+        The two choices remove from different leaves, so the repairs that follow can
+        differ and so can the final trees; both are valid 2-3 trees. The Hibbard
+        delete of <a href="ds-trees-bst.html"><em>Trees &amp; Binary Search
+        Trees</em></a> uses the successor. This chapter, the 2-3 demo and the
+        red-black delete of the <a href="ds-red-black-trees.html#deletion"><em>Red-Black
+        Trees</em></a> handout use the predecessor, so the 2-3 tree and its
+        red-black encoding make the same changes step for step.
+      </div>
       <p>
         <strong>Step 2: fix underflow.</strong> Removing a key from a leaf that held
         only one key leaves it empty (an <em>underflow</em>). Two repairs, chosen by
@@ -565,15 +612,24 @@
   [10]   [40]  [70|80]</pre>
         Had that leaf been the 2-node \([20]\) instead, removing the copy would
         have emptied it, and one of the three leaf repairs above would have
-        followed. Every deletion reduces to this: reach a leaf, remove there,
-        then borrow or merge upward.
+        followed. The successor works the same way from the other side:
+        <pre>  the successor of 30 is 40, the leftmost key of the subtree just right
+  of it. Copy 40 up over the 30, then delete the leaf&rsquo;s copy: the leaf [40]
+  empties, and its left sibling [10|20] can spare a key, so BORROW:
+  40 drops back into the empty leaf and 20 rises to replace it.
+
+     [ 20 | 60 ]          the same tree as with the predecessor, one
+    /     |     \         repair later.
+  [10]   [40]  [70|80]</pre>
+        Every deletion reduces to this: reach a leaf, remove there, then borrow or
+        merge upward.
       </div>
       <p>
         Both moves are \(O(1)\), applied along a single root-to-leaf path, so deletion
         is \(\Theta(\log n)\) like insertion. The full case analysis (which sibling,
         which side, cascading merges) is why 2-3 code is fussy to write by hand;
-        precisely the fussiness the red-black encoding of the <a href="ds-red-black-trees.html"><em>Red-Black Trees</em></a> handout tames into a
-        handful of uniform recolour-and-rotate moves.
+        the red-black encoding of the <a href="ds-red-black-trees.html"><em>Red-Black Trees</em></a> handout keeps the same case analysis but
+        stores it with one node type, each case a few rotations and recolorings.
       </p>
       <div class="demo">
         <span class="tag">Interactive</span>
@@ -669,7 +725,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; 2-3 Trees v1.0
+        Data Structures &amp; Algorithms &middot; 2-3 Trees v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

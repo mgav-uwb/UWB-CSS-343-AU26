@@ -245,6 +245,41 @@
         lookup may finish early, whereas the B+ tree of &sect;2 always walks all
         the way down to a leaf.
       </div>
+      <h3>In code</h3>
+      <p>
+        A node is a sorted key array, a child array one longer, and a count; it is
+        the 2-3 tree&rsquo;s node at width \(M\), sized so that one node fills one
+        disk block. As in the 2-3 node, one spare key slot holds the overflow of an
+        insertion until the node splits. Search scans (or binary-searches) the keys
+        of a node already in memory and follows one child: one block read per level.
+      </p>
+      <pre>  struct BTreeNode {
+      int        n;              <span class="cm">// keys in use: &lceil;M/2&rceil; - 1 to M - 1 (the root: 1 to M - 1)</span>
+      int        key[M];         <span class="cm">// sorted; key[M-1] only mid-insert</span>
+      BTreeNode* child[M + 1];   <span class="cm">// n + 1 children; none in a leaf</span>
+      bool       leaf;
+  };
+
+  class BTree {
+  public:
+      bool contains(int key) const;  <span class="cm">// one node (one block read) per level</span>
+      void insert(int key);          <span class="cm">// add in a leaf, split full nodes upward</span>
+      void remove(int key);          <span class="cm">// remove, then borrow or merge upward</span>
+  private:
+      BTreeNode* root = nullptr;
+  };
+
+  bool BTree::contains(int key) const {
+      BTreeNode* h = root;
+      while (h != nullptr) {
+          int i = 0;
+          while (i &lt; h-&gt;n &amp;&amp; key &gt; h-&gt;key[i]) i++;   <span class="cm">// first key &ge; the target</span>
+          if (i &lt; h-&gt;n &amp;&amp; key == h-&gt;key[i]) return true;
+          if (h-&gt;leaf) return false;
+          h = h-&gt;child[i];                              <span class="cm">// read the next block</span>
+      }
+      return false;
+  }</pre>
       <p>
         Insertion is the 2-3 rule at width \(M\), as the demo shows.
       </p>
@@ -329,6 +364,20 @@
              (each leaf key carries its own record; a key such
               as 30 or 60 appears twice: once as a router,
               once in a leaf)</pre>
+      <p>
+        In code, a B+ node is a B-tree node whose fields depend on its kind: a router
+        node holds keys and children only, and a leaf holds keys with their records
+        and a pointer to the next leaf, the link that makes the leaves one sorted
+        list.
+      </p>
+      <pre>  struct BPlusNode {
+      bool       leaf;
+      int        n;              <span class="cm">// keys in use</span>
+      int        key[M];         <span class="cm">// routers, or a leaf's keys (one spare slot)</span>
+      BPlusNode* child[M + 1];   <span class="cm">// router only: n + 1 children</span>
+      Record*    rec[M];         <span class="cm">// leaf only: rec[i] is key[i]&rsquo;s record</span>
+      BPlusNode* next;           <span class="cm">// leaf only: the next leaf in key order, or null</span>
+  };</pre>
       <div class="def">
         <span class="tag">Definition (routing in a B+ tree)</span>
         At a router node with routers \(s_1 \lt s_2 \lt \cdots \lt s_m\), a key
@@ -615,7 +664,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.1
+        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.2
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

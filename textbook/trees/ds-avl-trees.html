@@ -324,9 +324,20 @@
   };
   int  height(Node* t){ return t ? t-&gt;height : -1; }
   int  bf(Node* t){ return height(t-&gt;left) - height(t-&gt;right); }
-  void fix(Node* t){ t-&gt;height = 1 + max(height(t-&gt;left), height(t-&gt;right)); }</pre>
+  void fix(Node* t){ t-&gt;height = 1 + max(height(t-&gt;left), height(t-&gt;right)); }
+
+  class AVLTree {
+  public:
+      bool contains(int key) const;  <span class="cm">// the BST search: heights play no part</span>
+      void insert(int key);          <span class="cm">// BST insert, then fix heights and rotate (&sect;5)</span>
+      void remove(int key);          <span class="cm">// BST delete, then fix heights and rotate (&sect;6)</span>
+  private:
+      Node* root = nullptr;
+  };</pre>
       <p>
-        One extra <code>int</code> per node is the entire space cost of balance.
+        One extra <code>int</code> per node is the entire space cost of balance, and
+        the tree object is a BST&rsquo;s: it owns the root, and its insert and remove
+        are the BST operations plus the repairs of &sect;5 and &sect;6.
         <code>fix</code> recomputes a node&rsquo;s height from its children&rsquo;s
         cached heights, and <code>bf</code> reads their difference; both are
         \(O(1)\) and are called on the way back up an update. Verifying that a whole
@@ -1458,7 +1469,7 @@ fn insert(t: Link, key: i32) -&gt; Link {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; AVL Trees v1.0
+        Data Structures &amp; Algorithms &middot; AVL Trees v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
