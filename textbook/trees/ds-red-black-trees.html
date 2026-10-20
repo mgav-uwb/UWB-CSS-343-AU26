@@ -149,21 +149,21 @@
         The <a href="ds-avl-trees.html">AVL tree</a> keeps a binary search tree
         (BST) balanced with rotations; the <a href="ds-two-three-trees.html">2-3
         tree</a> reaches the same \(\Theta(\log n)\) guarantee by splitting
-        full nodes and promoting their middle keys, but it is awkward to code
-        directly. The <strong>red-black BST</strong> closes that gap: an
-        ordinary binary search tree with one color bit per node that encodes
-        a 2-3 tree exactly, inheriting its balance while keeping a single node
-        type. It is the balanced tree real libraries ship.
+        full nodes and promoting their middle keys. The <strong>red-black
+        BST</strong> is an ordinary binary search tree with one color bit per node
+        that encodes a 2-3 tree exactly, so it inherits the 2-3 tree&rsquo;s
+        balance while every node holds one key and two links. Search is the BST
+        search; insert and delete perform the 2-3 tree&rsquo;s splits, borrows and
+        merges as rotations and recolors. Its classic form is the balanced tree
+        real libraries ship.
       </p>
 
       <!-- ============================================================ -->
       <h2 id="redblack">1. A 2-3 tree in binary</h2>
       <p>
-        The <a href="ds-two-three-trees.html">2-3 tree</a> is simple to describe
-        and awkward to implement: two node types, splits that create nodes,
-        promotions, new roots. A red-black BST stores the same tree with one node
-        type, the binary node of a BST, plus one bit per node that records which
-        binary nodes belong to the same 2-3 node.
+        A red-black BST stores a <a href="ds-two-three-trees.html">2-3 tree</a>
+        in the binary nodes of a BST, one key per node, plus one bit per node that
+        records which binary nodes belong to the same 2-3 node.
       </p>
       <h3>One 2-3 node at a time</h3>
       <ul>
@@ -282,7 +282,8 @@
         two red children: it encodes a 2-3-4 tree, whose nodes hold up to three
         keys. Its rules are stated for colored nodes and its repairs are organized
         by the colors of a node&rsquo;s relatives rather than by 2-3 nodes; the
-        height bound and the costs are the same.
+        height bound and the \(\Theta(\log n)\) costs are the same, and it makes
+        fewer rotations per update (section 7).
       </div>
 
       <h3>The rules</h3>
@@ -2881,6 +2882,20 @@ impl RedBlackTree {
         narrated; click a key to fill the Delete box.
       </div>
       <div class="aside">
+        <span class="tag">What the encoding saves</span>
+        Every operation that only reads the tree (search, minimum, maximum, floor,
+        ceiling, in-order traversal) is the BST code unchanged, every node holds
+        exactly one key, and a repair only rewires nodes that already exist: an
+        insert creates one node and a delete frees one. The encoding does not remove
+        cases. The table above has eleven delete cases, each its own pattern of
+        rotations and recolors. In the 2-3 node of the <a
+        href="ds-two-three-trees.html"><em>2-3 Trees</em></a> handout, which keeps
+        its keys and children in arrays with a count, the same eleven cases are four
+        short array operations: borrow from the left sibling or the right, merge with
+        the left sibling or the right, each indexed by the empty node&rsquo;s
+        position in its parent.
+      </div>
+      <div class="aside">
         <span class="tag">Top-down delete</span>
         Sedgewick&rsquo;s published left-leaning delete works top-down instead: on
         the way down it merges or borrows before stepping into a 2-node (its helpers
@@ -2915,12 +2930,16 @@ impl RedBlackTree {
       </div>
       <p>
         The bound is looser than AVL&rsquo;s \(1.44\log_2 n\) (a red-black tree
-        can be up to twice as tall) but still \(\Theta(\log n)\), and it is
-        reached with far fewer restructuring operations per update. That trade is why a
-        red-black BST, being just one node type plus one color bit, is the balanced
+        can be up to twice as tall) but still \(\Theta(\log n)\). The classic
+        red-black tree of Cormen et al. restructures less than AVL: at most two
+        rotations per insert and three per delete, where an AVL delete can rotate at
+        every level. That trade is why the classic red-black BST is the balanced
         tree real libraries ship: C++&rsquo;s <code>std::map</code> and
         <code>std::set</code>, Java&rsquo;s <code>TreeMap</code> and
-        <code>TreeSet</code>, and the Linux kernel&rsquo;s scheduler among them.
+        <code>TreeSet</code>, and the Linux kernel&rsquo;s scheduler among them. The
+        left-leaning form of this chapter does not keep those bounds: its fixes run
+        at every node on the way back up, and an update can rotate at every
+        level.
       </p>
       <div class="aside">
         <span class="tag">The correspondence is the whole point</span>
@@ -3127,7 +3146,7 @@ impl RedBlackTree {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Red-Black Trees v2.1
+        Data Structures &amp; Algorithms &middot; Red-Black Trees v2.2
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

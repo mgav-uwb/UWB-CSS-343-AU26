@@ -252,10 +252,9 @@
         <span class="qed">&#8718;</span>
       </div>
       <p>
-        This is a <em>stronger</em> balance condition than AVL&rsquo;s, yet,
-        remarkably, it is <em>easier</em> to maintain, because of how
-        insertion works (&sect;3). The one-sentence reason, worth planting now: a
-        2-3 tree <strong>grows at the root, not the leaves</strong>. A BST adds a new
+        This is a <em>stronger</em> balance condition than AVL&rsquo;s, and
+        insertion keeps it without a rotation (&sect;3), because a 2-3 tree
+        <strong>grows at the root, not the leaves</strong>. A BST adds a new
         <em>leaf</em>, so one side can sink deeper and the tree tilts; a 2-3 tree
         pushes growth <em>upward</em>, adding a level at the very top, which lowers
         every leaf by one simultaneously. The &ldquo;same depth&rdquo; invariant is
@@ -263,10 +262,10 @@
       </p>
       <div class="aside">
         <span class="tag">A family, not one tree</span>
-        Sedgewick &amp; Wayne (&sect;3.3) treat the 2-3 tree chiefly as a stepping
-        stone: it is conceptually clean but awkward to code directly (two node types,
-        much pointer surgery), so its real value is that it <em>explains</em> the
-        <a href="ds-red-black-trees.html">red-black BST</a>, which is the balanced tree real libraries ship.
+        Sedgewick &amp; Wayne (&sect;3.3) treat the 2-3 tree chiefly as the
+        explanation of the <a href="ds-red-black-trees.html">red-black BST</a>,
+        which stores a 2-3 tree in the binary nodes of a BST and, in its classic
+        form, is the balanced tree real libraries ship.
         Everything in this family (2-3, red-black, B-trees) is the one
         mechanism &ldquo;split a full node, promote its middle key,&rdquo; tuned to a
         different node width and a different level of the memory hierarchy.
@@ -634,10 +633,10 @@
       </div>
       <p>
         Both moves are \(O(1)\), applied along a single root-to-leaf path, so deletion
-        is \(\Theta(\log n)\) like insertion. The full case analysis (which sibling,
-        which side, cascading merges) is why 2-3 code is fussy to write by hand;
-        the red-black encoding of the <a href="ds-red-black-trees.html"><em>Red-Black Trees</em></a> handout keeps the same case analysis but
-        stores it with one node type, each case a few rotations and recolorings.
+        is \(\Theta(\log n)\) like insertion. The red-black encoding of the <a
+        href="ds-red-black-trees.html"><em>Red-Black Trees</em></a> handout keeps
+        this case analysis (which sibling, which side, cascading merges) and stores
+        the tree in binary nodes, each case a few rotations and recolorings.
         Insertion and deletion repair here on the way back up, after the change; in a
         tree whose nodes have room for it, the 2-3-4 tree, both repairs can run on the
         way down instead (<a href="ds-top-down-trees.html"><em>Top-Down Balanced
@@ -737,7 +736,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; 2-3 Trees v1.3
+        Data Structures &amp; Algorithms &middot; 2-3 Trees v1.4
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

@@ -16,11 +16,14 @@
 
 --
 
-## 2-3 is elegant… but painful to code
+## A 2-3 tree stored in a BST
 
-Two node types, split logic, promotion, new roots: lots of cases, lots of pointer surgery. In real code we'd rather have **one** node type.
+Store a 2-3 tree as an ordinary **binary** tree, with one **color bit** per node to remember where the 3-nodes were.
 
-**Idea:** store a 2-3 tree as an ordinary **binary** tree, with one **color bit** per node to remember where the 3-nodes were.
+- search, min, max, floor, in-order: the **BST code**, unchanged
+- every node holds **one key** and two links
+- repairs only rewire existing nodes: **rotations** and **recolors**
+- the cases stay: each 2-3 split, borrow and merge becomes a rotation and recolor pattern
 
 --
 
@@ -531,13 +534,13 @@ Combine with part 1 (`b ≤ log₂ n`): **height ≤ 2 log₂ n = Θ(log n)**, g
 
 ## Why we care
 
-Because a red-black BST is **one node type + one color bit**, it's the balanced tree that real libraries ship:
+The classic red-black BST (Cormen et al.) is the balanced tree real libraries ship:
 
 - C++ `std::map` / `std::set`
 - Java `TreeMap` / `TreeSet`
 - the Linux kernel scheduler, and more
 
-Guaranteed **Θ(log n)**, height **≤ 2 log₂ n**, with plain-BST code plus recoloring.
+Guaranteed **Θ(log n)**, height **≤ 2 log₂ n**, at most **2 rotations per insert** and **3 per delete**.
 
 --
 
