@@ -26,16 +26,18 @@ Two node types, split logic, promotion, new roots: lots of cases, lots of pointe
 
 ## Encode one 2-3 node
 
-```text
+<div>
+<img src="../../topics/figures/trees/rb-encode-nodes.svg" style="height:200px" alt="
    2-node  →  one black node       3-node  →  two nodes and a RED link
     [ a ]          a                [ a | b ]          b
     /   \         / \               /   |   \       R /  \
    A     B       A   B             A    B    C       a    C
                                                     / \
                                                    A   B
-```
+   (R marks the red link)">
+</div>
 
-- every 2-3 edge becomes a **black** link; the glue inside a 3-node is **red** (marked R)
+- every 2-3 edge becomes a **black** link; the glue inside a 3-node is **red**
 - a node is **red** when the link from its parent is red; the **root** is black
 - subtrees keep their key ranges, so in-order is unchanged
 
@@ -43,18 +45,20 @@ Two node types, split logic, promotion, new roots: lots of cases, lots of pointe
 
 ## Left or right?
 
-```text
+<div>
+<img src="../../topics/figures/trees/rb-left-right.svg" style="height:200px" alt="
     [ a | b ]        left-leaning        right-leaning
     /   |   \             b                   a
    A    B    C         R /  \               /  \ R
                         a    C             A    b
                        / \                     / \
                       A   B                   B   C
-```
+   (R marks the red link)">
+</div>
 
-- both are BSTs: same keys, same order, same black links on every path
-- choose **one** side for every 3-node: each 2-3 tree then has **one** encoding, and the repairs handle one shape, not two
-- we lean **left** (Sedgewick); right-leaning is the mirror image, every rule and repair mirrored
+- both are BSTs: same keys, same order, same black links
+- pick **one** side for every 3-node: **one** encoding per 2-3 tree, one shape to repair
+- we lean **left** (Sedgewick); right-leaning mirrors every rule
 
 --
 
@@ -163,25 +167,37 @@ Later, from repairs: a split sends a red link **up** (the same five places, one 
 
 --
 
-## Delete, step 2: three kinds of removal
+## Delete, step 2: remove it
 
-```text
-   red leaf a            one child: delete b         black leaf x
-      b                     b                          p
-   R /    →    b         R /    →    a (black)        / \    →     p
-    a                     a                          x   S        / \
-                                                                ( )  S
-```
+<div>
+<img src="../../topics/figures/trees/rb-delete-removal.svg" style="height:390px" alt="
+   a red leaf: delete 10 from [10|20], no violation
+        40                 40          2-3:  [40]               [40]
+       /  \       →       /  \              /    \      →      /    \
+     20    60           20    60       [10|20]   [60]       [20]   [60]
+   R /
+   10
+   one child: delete 20 from [10|20], no violation
+        40                 40          2-3:  [40]               [40]
+       /  \       →       /  \              /    \      →      /    \
+     20    60           10    60       [10|20]   [60]       [10]   [60]
+   R /
+   10
+   a black leaf: delete 20, a black link goes missing
+        40                 40          2-3:  [40]               [40]
+       /  \       →       /  \              /    \      →      /    \
+     20    60          ( )    60         [20]    [60]       [ ]    [60]
+   (R marks a red link; ( ) and [ ] are the empty node)">
+</div>
 
-- **red leaf** (smaller key of a bottom 3-node): only a red link goes: **no violation**
-- **black node with one child** (a red leaf): the child moves up, turns black: **no violation**
-- **black leaf** (a bottom 2-node): its paths lose a black link: **black balance broken**
+Only the **black leaf** breaks a rule: a black link goes missing (dashed).
 
 --
 
 ## The missing black: where it can sit
 
-```text
+<div>
+<img src="../../topics/figures/trees/rb-delete-positions.svg" style="height:250px" alt="
    under a 2-node [p]            under a 3-node [r|g]
        p          p              g             g             g
       / \        / \          R / \         R / \         R / \
@@ -189,7 +205,8 @@ Later, from repairs: a split sends a red link **up** (the same five places, one 
                              / \           / \           / \
                            ( )  S         S  ( )        S   U
      left        right        left         middle        right
-```
+   (R marks a red link; ( ) is the empty node; S and U are sibling subtrees)">
+</div>
 
 The repair depends on the **parent** (2-node or 3-node), the empty node's **place** (left, middle, right) and the **sibling** next to it (2-node or 3-node).
 
