@@ -1,11 +1,11 @@
 <!--
   TOPIC · Heapsort and priority queues in practice.
-  Teaches: heapsort as selection sort with a heap; sorting down in place; a worked trace; heapsort among the n log n sorts; library priority queues; common heap bugs.
+  Teaches: heapsort as selection sort with a heap; sorting down in place (C++); a worked trace; heapsort among the n log n sorts; library priority queues; common heap bugs.
   Needs:   heapify.
-  Demos:   heap-sort (slide spec)
+  Demos:   heap-sort (slide spec); figure hp-sort-down (tools/gen-heap-figures.mjs)
   Program: none
   Budget:  ~20 min, 8 slides.
-  Ported from Summer 2026 L06-heaps-pq.md, parts 8, 9.
+  Ported from Summer 2026 L06-heaps-pq.md, parts 8, 9; figures and class-style code 2026-10-21.
 -->
 
 ### Heapsort and priority queues in practice
@@ -16,47 +16,49 @@
 
 --
 
-## Selection sort, done smart
+## Selection sort with a heap
 
-Selection sort repeatedly finds the max of what's left: by **Θ(n) scan**. A heap **is** a find-max machine:
+Selection sort repeatedly finds the max of what is left, by a **Θ(n) scan**. A heap finds the max in **Θ(log n)**:
 
-```text
-   find the max of the rest:   scan Θ(n)  →  delMax Θ(log n)
-   ─────────────────────────────────────────────────────────
-   n rounds:                   Θ(n²)      →  Θ(n log n)
-```
+| step                      | selection sort | heapsort       |
+| ------------------------- | -------------- | -------------- |
+| find the max of the rest  | scan, Θ(n)     | delMax, Θ(log n) |
+| n rounds                  | **Θ(n²)**      | **Θ(n log n)** |
 
-And `delMax` already **parks the max at the end** (swap `a[1] ↔ a[n]`): the sorted pile grows in the same array, free. That's **heapsort**.
+And `delMax` already **parks the max at the end** (`swap a[1], a[n]`), so the sorted part grows in the same array. That is **heapsort**.
 
 --
 
 ## Sort down, in place
 
-```text
-   heapify: for k = n/2 .. 1:  sink(k, n)     // Θ(n)
-   for end = n down to 2:                     // n − 1 rounds
-       swap(a[1], a[end]);     // park the max at a[end]
-       sink(1, end − 1);       // re-heapify the rest
+```cpp
+// Sort a[1..n] ascending, in place.
+void heapsort(int a[], int n) {
+    heapify(a, n);                     // Theta(n)
+    for (int end = n; end > 1; end--) {
+        std::swap(a[1], a[end]);   // the max of a[1..end] to its final place
+        sink(a, 1, end - 1);       // a[1..end-1] is a heap again
+    }
+}
 ```
 
 **Loop invariant:** `a[1..end]` is a heap of the `end` **smallest** keys; `a[end+1..n]` holds the rest, **sorted, in final position**.
 
-The heap shrinks from the right; the sorted tail grows: **no extra array**.
+The heap shrinks from the right and the sorted tail grows: **no extra array**.
 
 --
 
 ## Sort down: worked
 
-```text
+<div><img src="../../topics/figures/heaps/hp-sort-down.svg" style="height:380px" alt="
    heap:   [ 95 90 70 80 60 ]          heap | sorted
    swap 95↔end, sink:  90 80 70 60 | 95
    swap 90↔end, sink:  80 60 70    | 90 95
    swap 80↔end, sink:  70 60       | 80 90 95
    swap 70↔end, sink:  60          | 70 80 90 95
-                                    | 60 70 80 90 95  ✓
-```
+                                    | 60 70 80 90 95"></div>
 
-Each round: park the max at the boundary, re-sink the new root.
+Each round: swap the max to the boundary, sink the new root. The bar is the heap | sorted boundary.
 
 --
 
@@ -74,7 +76,7 @@ Each round: park the max at the boundary, re-sink the new root.
 </pre>
 </div>
 
-<small>**Heapify**, then **Sort Down** (grayed out until Heapify runs: you can't sort down a non-heap); the sorted tail grows on the right, all in **one** array. **Heapsort** = both phases at once.</small>
+<small>**Heapify**, then **Sort Down** (grayed out until Heapify runs: a non-heap cannot be sorted down); the sorted tail grows on the right, all in **one** array. **Heapsort** runs both phases.</small>
 
 --
 
@@ -84,27 +86,27 @@ Each round: park the max at the boundary, re-sink the new root.
 | ------------- | -------------- | -------- | ------- | --------------------- |
 | mergesort     | Θ(n log n)     | **Θ(n)** | **yes** | needs a buffer        |
 | quicksort     | **Θ(n²)**      | Θ(log n) | no      | fastest constants     |
-| **heapsort**  | **Θ(n log n)** | **Θ(1)** | no      | the safety net        |
+| **heapsort**  | **Θ(n log n)** | **Θ(1)** | no      | the fallback          |
 
-Heapsort is the only one **guaranteed** `n log n` **and** in place: which is why `std::sort` (**introsort**) falls back to it when quicksort recurses too deep.
+Of the three, only heapsort is **guaranteed** `n log n` **and** in place; `std::sort` (**introsort**) falls back to it when quicksort recurses too deep.
 
 --
 
 ## Library priority queues
 
-You will rarely hand-roll one:
+You will rarely write one yourself:
 
 - **C++**: `std::priority_queue`: **max**-heap
 - **Java**: `java.util.PriorityQueue`: **min**-heap
 - **Python**: `heapq`: **min**-heap (negate keys for max)
 
-All are binary heaps: push/pop Θ(log n), build Θ(n), peek Θ(1).
+All are binary heaps: push and pop Θ(log n), build Θ(n), peek Θ(1).
 
 --
 
 ## Common heap bugs
 
-- **wrong direction**: min-heap where you meant max (or vice-versa)
+- **wrong direction**: a min-heap where you meant max (or the reverse)
 - **sink not picking the larger child**: a bigger key stays below a smaller one
 - **off-by-one**: 1-indexed math (`k/2`) on a 0-indexed array
 - **n inserts** (Θ(n log n)) where **heapify** (Θ(n)) was intended
