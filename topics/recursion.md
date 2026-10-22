@@ -143,7 +143,8 @@ int height(const TNode* t) {
 In parentheses: the height of the subtree rooted at that node.
 
 - size = **7**
-- height = **4**, along 50, 30, 40, 45
+- height = **4** nodes, along 50, 30, 40, 45
+- counted in **links**, as the textbook does: **3** (empty −1, one node 0)
 
 --
 

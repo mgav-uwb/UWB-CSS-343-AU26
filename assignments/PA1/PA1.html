@@ -68,7 +68,7 @@
   </ul>
   <p>Then you run the same adversarial input through the modes and measure what each policy buys. The class
   carries its own counters (<code>rotations()</code>, <code>colorFlips()</code>), so the theory becomes numbers
-  your code produces: sorted keys 1 to 1023 give height 1023 in a plain BST and 10 in an AVL tree, at a price of
+  your code produces: sorted keys 1 to 1023 give a <code>treeHeight()</code> of 1023 in a plain BST and 10 in an AVL tree, at a price of
   1013 rotations.</p>
   <p>The second half is an operation the lectures do not give you: <code>mergeWith</code>, which combines two
   trees into one. You get a contract (the correct union, a height bound, the other tree untouched) and design the
@@ -83,7 +83,11 @@
       <em>same keys and same structure</em>; the mode is not compared, so the same keys inserted in
       <code>VANILLA</code> and <code>AVL</code> trees are usually <code>!=</code>.</li>
     <li><strong>Queries:</strong> <code>isEmpty</code>, <code>size</code>, <code>contains</code>,
-      <code>treeHeight()</code> (the number of nodes on the longest path; an empty tree has height 0).</li>
+      <code>treeHeight()</code> (the number of nodes on the longest path; an empty tree has height 0, a single node
+      height 1). <strong>This counts nodes, so it is one more than the height in the textbook and Lectures 4 to 6, which
+      counts links (edges): there an empty tree has height &minus;1 and a single node height 0.</strong> If your AVL nodes
+      store the lectures' height (a leaf 0, null &minus;1), <code>treeHeight()</code> is the root's stored height plus 1,
+      and 0 for an empty tree.</li>
     <li><strong><code>insert</code>, per mode.</strong> A duplicate returns <code>false</code> in every mode. Then the
       mode's fix-up: nothing for <code>VANILLA</code>; for <code>AVL</code>, update heights on the way up and apply
       the four rotation cases. (Extra credit: <code>REDBLACK</code>, the three-if left-leaning insert with the root

@@ -73,7 +73,7 @@ int BinTree::size() const {
     return 0;      // TODO
 }
 int BinTree::treeHeight() const {
-    return 0;      // TODO: #nodes on the longest root-to-leaf path (empty = 0)
+    return 0;      // TODO: #nodes on the longest root-to-leaf path (empty = 0, one node = 1)
 }
 bool BinTree::contains(int key) const {
     (void)key;

@@ -35,7 +35,9 @@ public:
     Mode mode() const;
     bool isEmpty() const;
     int  size() const;
-    int  treeHeight() const;                    // #nodes on the longest path; empty = 0
+    int  treeHeight() const;                    // #nodes on the longest path; empty = 0,
+                                                // one node = 1. The textbook counts edges
+                                                // instead (empty = -1): one less.
     bool contains(int key) const;
 
     bool insert(int key);                       // false on duplicate. After the plain
@@ -78,7 +80,9 @@ private:
         int   key;
         Node* left   = nullptr;
         Node* right  = nullptr;
-        int   height = 0;                       // for AVL bookkeeping (your convention)
+        int   height = 0;                       // for AVL bookkeeping (your convention; with
+                                                // the lectures' leaf = 0, null = -1, treeHeight()
+                                                // is root->height + 1)
         bool  red    = false;                   // for REDBLACK bookkeeping
     };
     Node* root;
