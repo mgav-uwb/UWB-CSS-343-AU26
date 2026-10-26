@@ -551,13 +551,16 @@ fn hash(s: &amp;str, m: i64) -&gt; i64 {
       <div class="ex">
         <span class="tag">Example (hashing &ldquo;CAT&rdquo;)</span>
         Take \(R = 31\), \(M = 100\), and ASCII codes
-        \(\texttt{C}=67,\ \texttt{A}=65,\ \texttt{T}=84\). The running value:
-        <pre>  h = 0
-  'C':  h = (31&middot;0   + 67) mod 100 = 67
-  'A':  h = (31&middot;67  + 65) mod 100 = (2077 + 65) mod 100 = 42
-  'T':  h = (31&middot;42  + 84) mod 100 = (1302 + 84) mod 100 = 86
-  &rarr; slot 86</pre>
-        Every character reaches the final value: change one letter and the
+        \(\texttt{C}=67,\ \texttt{A}=65,\ \texttt{T}=84\). The running value,
+        starting from \(h = 0\):
+        \[
+          \begin{aligned}
+            \texttt{C}:\quad h &amp;= (31 \cdot 0 + 67) \bmod 100 = 67 \\
+            \texttt{A}:\quad h &amp;= (31 \cdot 67 + 65) \bmod 100 = 2142 \bmod 100 = 42 \\
+            \texttt{T}:\quad h &amp;= (31 \cdot 42 + 84) \bmod 100 = 1386 \bmod 100 = 86
+          \end{aligned}
+        \]
+        so &ldquo;CAT&rdquo; goes to slot \(86\). Every character reaches the final value: change one letter and the
         result moves. That sensitivity is exactly the uniformity we want. The
         pass is \(O(L)\), one multiply-add-mod per character; this is in
         essence Java&rsquo;s <code>String.hashCode</code>.
@@ -729,10 +732,15 @@ let mut m: HashMap&lt;Point, i32&gt; = HashMap::new();</pre>
       </div>
       <div class="ex">
         <span class="tag">Example (worked hashes)</span>
-        FNV-1a of <code>"Hi"</code>, one byte at a time:
-        <pre>  start:          14695981039346656037
-  byte 'H' (72):  (h XOR 72) * prime = 12638232280532398647
-  byte 'i' (105): (h XOR 105) * prime =   659600357151446458</pre>
+        FNV-1a of <code>"Hi"</code>, one byte at a time
+        (\(\texttt{H} = 72\), \(\texttt{i} = 105\), arithmetic modulo \(2^{64}\)):
+        \[
+          \begin{aligned}
+            h_0 &amp;= 14695981039346656037 \\
+            h_1 &amp;= (h_0 \oplus 72) \cdot p = 12638232280532398647 \\
+            h_2 &amp;= (h_1 \oplus 105) \cdot p = 659600357151446458
+          \end{aligned}
+        \]
         And Fibonacci hashing the eight consecutive keys \(1,2,\dots,8\) into a
         \(16\)-slot table gives slots \(9, 3, 13, 7, 1, 11, 5, 15\): eight
         distinct slots, spread across the table with no run of neighbors, exactly
@@ -3109,7 +3117,7 @@ fn fib_hash(k: u32, p: u32) -&gt; u32 {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Hashing v1.1 &middot; prepared by
+        Data Structures &amp; Algorithms &middot; Hashing v1.2 &middot; prepared by
         Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

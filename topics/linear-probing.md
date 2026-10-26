@@ -20,9 +20,7 @@
 
 Keep **every key in the array itself**. On a collision, **probe** for another open slot by a fixed rule: the simplest is **linear probing**:
 
-```text
-   h(k), h(k)+1, h(k)+2, …   (all mod M)
-```
+$$h(k), \enspace h(k)+1, \enspace h(k)+2, \enspace \dots \pmod M$$
 
 Walk forward until an **empty slot**; the key lives where the walk ends.
 
@@ -30,7 +28,7 @@ Walk forward until an **empty slot**; the key lives where the walk ends.
 
 ## Linear probing: insert
 
-`M = 11`, `h(k) = k mod 11`; insert 14, 25, 36:
+$M = 11$, $h(k) = k \bmod 11$; insert 14, 25, 36:
 
 <div><img src="../../topics/figures/hashing/hs-lp-insert.svg" style="height:300px" alt="
    M = 11,  h(k) = k mod 11.   insert 14, 25, 36:
@@ -40,15 +38,15 @@ Walk forward until an **empty slot**; the key lives where the walk ends.
    [ _ _ _ 14 25 36 _ _ _ _ _ ]
      0 1 2  3  4  5"></div>
 
-14, 25, 36 differ by **11** = `M`, so they share home slot 3 and line up in a **cluster**.
+14, 25, 36 differ by $11 = M$, so they share home slot 3 and line up in a **cluster**.
 
 --
 
 ## The probing invariant
 
-> From `h(k)` to where `k` actually sits, every slot is **occupied**: **no hole inside a cluster**.
+> From $h(k)$ to where $k$ actually sits, every slot is **occupied**: **no hole inside a cluster**.
 
-- **insert** maintains it: `k` fills the *first* empty slot of its run
+- **insert** maintains it: $k$ fills the *first* empty slot of its run
 - so **search** may stop at the first empty slot: a hole *proves* absence
 - and **deletion** had better not punch a hole… (two slides)
 
@@ -65,7 +63,7 @@ Walk forward until an **empty slot**; the key lives where the walk ends.
      return NOT FOUND               // empty ⇒ not present
 ```
 
-The invariant makes the miss rule sound: **an empty slot proves `k` is absent**.
+The invariant makes the miss rule sound: **an empty slot proves $k$ is absent**.
 
 --
 
@@ -84,7 +82,7 @@ A **hit** stops on the key; a **miss** pays the **whole cluster** plus the empty
 
 ## Practice: where does it land?
 
-`M = 7`, `h(k) = k mod 7`, linear probing. Table currently:
+$M = 7$, $h(k) = k \bmod 7$, linear probing. Table currently:
 
 <div><img src="../../topics/figures/hashing/hs-lp-practice.svg" style="height:86px" alt="
    [ _ 8 15 _ _ _ 20 ]     insert 22?
@@ -158,7 +156,7 @@ Each key after the hole comes out and goes back in. 25 finds its home free; 36 p
 </pre>
 </div>
 
-<small>**Delete 14** and watch the repair: the hole opens, then **25 and 36 re-insert** to close the run. Then **Search 25**: still reachable. Compare with the chaining demo's delete: one unlink vs a cluster rebuild.</small>
+<small>**Delete 14**: the hole opens, then **25 and 36 re-insert** to close the run. **Search 25** still finds it. Chaining's delete was one unlink.</small>
 
 --
 
@@ -170,7 +168,7 @@ Each key after the hole comes out and goes back in. 25 finds its home free; 36 p
 | memory       | pointer per node      | **just the array**        |
 | cache        | pointer-chasing, poor | adjacent probes, **great**|
 | delete       | **unlink, trivial**   | tombstone / re-insert     |
-| full table   | never (α can pass 1)  | hard stop at α = 1        |
+| full table   | never ($\alpha$ can pass 1)  | hard stop at $\alpha = 1$  |
 
-Open addressing often **wins in practice** at low α: the cache is that important.
+Open addressing often **wins in practice** at low $\alpha$: the cache is that important.
 

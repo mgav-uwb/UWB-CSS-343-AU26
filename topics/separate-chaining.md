@@ -20,9 +20,9 @@
 
 Each array slot heads a **linked list** (a *chain*) of all keys that hash there:
 
-`M = 5`, `h(k) = k mod 5`, keys 12, 17, 22, 5:
+$M = 5$, $h(k) = k \bmod 5$, keys 12, 17, 22, 5:
 
-<div><img src="../../topics/figures/hashing/hs-chain-table.svg" style="height:187px" alt="
+<div><img src="../../topics/figures/hashing/hs-chain-table.svg" style="height:172px" alt="
    M = 5,  h(k) = k mod 5,  keys 12, 17, 22, 5:
    [0] → 5                    5 mod 5 = 0
    [1]
@@ -43,13 +43,13 @@ Colliders simply **join the same bucket's chain**. No key is ever turned away: t
    delete(k):  i = h(k); find k in the chain, UNLINK it
 ```
 
-Each is: **one hash** + **a walk of one short chain**. The other `M−1` buckets are never touched.
+Each is: **one hash** + **a walk of one short chain**. The other $M-1$ buckets are never touched.
 
 --
 
 ## Chaining: a worked insert
 
-`M = 5`, `h(k) = k mod 5`. Insert 12, 22, 5, 17:
+$M = 5$, $h(k) = k \bmod 5$. Insert 12, 22, 5, 17:
 
 <div><img src="../../topics/figures/hashing/hs-chain-insert.svg" style="height:170px" alt="
    12 → 12%5 = 2      [2] → 12
@@ -61,39 +61,37 @@ Colliders just extend the chain: no probing, no displacement, nothing else moves
 
 --
 
-## Load factor: and the expected chain
+## The load factor
 
-```text
-   load factor   α = n / M      (keys per slot)
-```
+The **load factor** is the number of keys per slot:
 
-Under uniform hashing each key picks its bucket independently, so
+$$\alpha = \frac{n}{M}$$
 
-```text
-   E[chain length]  =  n · (1/M)  =  α
-```
+Each key hits a given bucket with probability $1/M$:
 
-- a **miss** walks a whole chain: ≈ **α** compares
-- a **hit** stops partway: ≈ **1 + α/2** compares
+$$E[\text{chain length}] = n \cdot \frac{1}{M} = \alpha$$
 
-Keep **α = O(1)** → every operation is **O(1)** expected.
+- a **miss** walks a whole chain: $\approx \alpha$ compares
+- a **hit** stops partway: $\approx 1 + \alpha/2$ compares
+
+Keep $\alpha = O(1)$ → every operation is $O(1)$ expected.
 
 --
 
 ## Chaining: your turn
 
-`M = 7`, `h(k) = k mod 7`, holding the **odd keys 1..21**:
+$M = 7$, $h(k) = k \bmod 7$, holding the **odd keys 1..21**:
 
 <div><img src="../../topics/figures/hashing/hs-chain-odd.svg" style="height:143px" alt="
    [0] → 7 → 21    [1] → 1 → 15    [2] → 9
    [3] → 3 → 17    [4] → 11        [5] → 5 → 19
    [6] → 13"></div>
 
-**Insert 50.** Which bucket, how many compares, and what does the chain look like?
+**Insert 50:** which bucket, how many compares, what chain?
 
 <details class="answer"><summary>Answer:</summary>
 
-h(50) = 50 mod 7 = 1 → walk bucket 1: 1 ≠ 50, 15 ≠ 50 (2 compares) → link 50: [1] → 1 → 15 → 50. Chain length 3; every other bucket untouched.
+$h(50) = 1$; compare 1, 15 (2 compares); link: 1 → 15 → 50.
 
 </details>
 
@@ -111,7 +109,7 @@ h(50) = 50 mod 7 = 1 → walk bucket 1: 1 ≠ 50, 15 ≠ 50 (2 compares) → lin
 </pre>
 </div>
 
-<small>The chains **hang below** their buckets. **Search** walks one chain and never touches the other six. **Delete** unlinks one node: nothing else moves. Insert a few colliders (29, 36, 43 all hash to 1…) and watch one chain grow; that's α at work.</small>
+<small>**Search** walks one chain and never touches the other six. **Delete** unlinks one node: nothing else moves. Insert 29, 36, 43 (all hash to 1) and watch one chain grow: $\alpha$ at work.</small>
 
 --
 
@@ -140,5 +138,5 @@ h(50) = 50 mod 7 = 1 → walk bucket 1: 1 ≠ 50, 15 ≠ 50 (2 compares) → lin
 </pre>
 </div>
 
-<small>The same flood: but the table **doubles M and rehashes everything at α = 1**. Run the flood preset and watch the chains **shorten mid-build**. THIS is the actor behind "expected Θ(1)".</small>
+<small>The same flood: but the table **doubles $M$ and rehashes everything at $\alpha = 1$**. Run the flood preset and watch the chains **shorten mid-build**. THIS is the actor behind "expected Θ(1)".</small>
 

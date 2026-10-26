@@ -34,18 +34,16 @@ Growth probability ≈ **(L+2)/M**: the rich get richer; runs also **merge**.
 
 Probe at increasing **squared** offsets:
 
-```text
-   ( h(k) + i² ) mod M       i = 1, 2, 3, …
-```
+$$\bigl(h(k) + i^2\bigr) \bmod M, \quad i = 1, 2, 3, \dots$$
 
 22, 33, 44, 55 (all at slot 0) are in; insert 66:
 
-<div><img src="../../topics/figures/hashing/hs-quad-66.svg" style="height:130px" alt="
+<div><img src="../../topics/figures/hashing/hs-quad-66.svg" style="height:110px" alt="
    [ 22 33 _ _ 44 66 _ _ _ 55 _ ]
    insert 66: h = 0 taken; 0 + 1 = 1 taken; 0 + 4 = 4 taken;
    0 + 9 = 9 taken; (0 + 16) mod 11 = 5: place 66"></div>
 
-Colliders **leave the neighborhood** instead of extending a run. (Catch: it may miss free slots; keep **α < ½** and M prime.)
+Colliders **leave the neighborhood** instead of extending a run. (Catch: it may miss free slots; keep $\alpha$ < ½ and $M$ prime.)
 
 --
 
@@ -53,10 +51,9 @@ Colliders **leave the neighborhood** instead of extending a run. (Catch: it may 
 
 Use a **second hash function** for the step size:
 
-```text
-   ( h(k) + i · h2(k) ) mod M
-   e.g.  h2(k) = 7 − (k mod 7)     (never 0!)
-```
+$$\bigl(h(k) + i \cdot h\_2(k)\bigr) \bmod M$$
+
+For example $h\_2(k) = 7 - (k \bmod 7)$, which is never 0.
 
 Colliding keys get **different strides** → even same-home keys part ways → effectively **no clustering**.
 
@@ -64,7 +61,7 @@ Colliding keys get **different strides** → even same-home keys part ways → e
 
 ## Double hashing: worked
 
-`M = 11` (prime), `h(x) = x mod 11`, `h2(x) = 7 − (x mod 7)`:
+$M = 11$ (prime), $h(x) = x \bmod 11$, $h\_2(x) = 7 - (x \bmod 7)$:
 
 <div><img src="../../topics/figures/hashing/hs-double.svg" style="height:410px" alt="
    89 → 89 mod 11 = 1                   [ _ 89 _ _ _ _ _ _ _ _ _ ]
@@ -81,11 +78,11 @@ Colliding keys get **different strides** → even same-home keys part ways → e
 
 | method        | step        | clustering            |
 | ------------- | ----------- | --------------------- |
-| **linear**    | `+1`        | primary (worst)       |
-| **quadratic** | `+i²`       | secondary             |
-| **double**    | `+i·h2(k)`  | ~none (best)          |
+| **linear**    | $+1$        | primary (worst)       |
+| **quadratic** | $+i^2$      | secondary             |
+| **double**    | $+i \cdot h\_2(k)$ | ~none (best)  |
 
-Yet real libraries mostly use **linear** probing: with a strong hash and **low α**, its cache behavior beats the others' better distribution.
+Yet real libraries mostly use **linear** probing: with a strong hash and **low $\alpha$**, its cache behavior beats the others' better distribution.
 
 --
 
@@ -107,18 +104,15 @@ Yet real libraries mostly use **linear** probing: with a strong hash and **low �
 
 ## What does a probe cost, ideally?
 
-Idealize: every probe lands on an **occupied slot with probability α**, independently. Then a **miss** probes until the first empty slot:
+Idealize: every probe lands on an **occupied slot with probability $\alpha$**, independently. Then a **miss** probes until the first empty slot:
 
-```text
-   E[probes] = 1 + α + α² + α³ + ⋯ = 1/(1−α)
-```
+$$E[\text{probes}] = 1 + \alpha + \alpha^2 + \alpha^3 + \cdots = \frac{1}{1-\alpha}$$
 
-A geometric series: the cost curve is **1/(1−α)**:
+A geometric series: the cost curve is $1/(1-\alpha)$:
 
-```text
-   α:        0.25   0.5    0.75   0.9
-   probes:   1.3    2      4      10
-```
+| $\alpha$ | 0.25 | 0.5 | 0.75 | 0.9 |
+| -------- | ---- | --- | ---- | --- |
+| probes   | 1.3  | 2   | 4    | 10  |
 
 --
 
@@ -126,19 +120,19 @@ A geometric series: the cost curve is **1/(1−α)**:
 
 Rule-of-thumb ceilings before resizing:
 
-| scheme            | keep α ≤            |
+| scheme            | keep $\alpha \le$     |
 | ----------------- | ------------------- |
 | separate chaining | ~1 (even a bit more)|
 | double hashing    | ~0.7                |
 | linear probing    | **~0.5**            |
 
-The more a scheme clusters, the **lower** the α it tolerates. Crossing the ceiling → **resize**.
+The more a scheme clusters, the **lower** the $\alpha$ it tolerates. Crossing the ceiling → **resize**.
 
 --
 
 ## Resizing (rehashing)
 
-When α crosses the threshold, **grow the table** and re-insert everything:
+When $\alpha$ crosses the threshold, **grow the table** and re-insert everything:
 
 ```text
    if (2 * n >= M) {              // α reached ½
@@ -147,7 +141,7 @@ When α crosses the threshold, **grow the table** and re-insert everything:
    }
 ```
 
-Each key gets a **new** `h(k) mod M`: you can't copy slots. A resize is Θ(n), but doubling makes it **amortized O(1)** per insert.
+Each key gets a **new** $h(k) \bmod M$: you can't copy slots. A resize is Θ(n), but doubling makes it **amortized O(1)** per insert.
 
 --
 
@@ -163,7 +157,7 @@ Each key gets a **new** `h(k) mod M`: you can't copy slots. A resize is Θ(n), b
 </pre>
 </div>
 
-<small>Insert any key: α crosses **½**, the table **doubles**, and every key **rehashes**: watch 6 and 14 split apart (they collided at M = 8, they don't at M = 16). One Θ(n) rebuild, then α is back at ¼.</small>
+<small>Insert any key: $\alpha$ crosses **½**, the table **doubles**, and every key **rehashes**: watch 6 and 14 split apart (they collided at $M = 8$, they don't at $M = 16$). One Θ(n) rebuild, then $\alpha$ is back at ¼.</small>
 
 --
 

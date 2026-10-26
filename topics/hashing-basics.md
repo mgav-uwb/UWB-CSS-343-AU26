@@ -30,7 +30,7 @@ The price: **collisions**, and the loss of **order** (no min / max / range). Man
 
 ## The dream: an array indexed by key
 
-If keys were integers `0 … M−1`, we'd just use an **array**:
+If keys were integers $0, \dots, M-1$, we'd just use an **array**:
 
 ```text
    a[key] = value;        // insert
@@ -43,13 +43,13 @@ Direct addressing is perfect: but only if keys are **small integers**. Real keys
 
 ## The hash function
 
-A **hash function** maps any key to an array index in `[0, M)`:
+A **hash function** maps any key to an array index in $[0, M)$:
 
-```text
-   h : keys  →  { 0, 1, …, M−1 }
+$$h : \text{keys} \to \lbrace 0, 1, \dots, M-1 \rbrace$$
 
-   index = h(key);
-   table[index] ← key       // insert
+```cpp
+index = h(key);
+table[index] = key;      // insert
 ```
 
 Compute the index, jump straight there. No comparisons, no tree walk.
@@ -58,7 +58,7 @@ Compute the index, jump straight there. No comparisons, no tree walk.
 
 ## A hash table
 
-`M = 10`, `h(k) = k mod 10`:
+$M = 10$, $h(k) = k \bmod 10$:
 
 <div><img src="../../topics/figures/hashing/hs-table.svg" style="height:300px" alt="
    M = 10,  h(k) = k mod 10
@@ -66,13 +66,13 @@ Compute the index, jump straight there. No comparisons, no tree walk.
    insert 33 → slot 3      [ _ _ _ 33 _ 25 _ 47 _ _ ]
    insert 47 → slot 7        0 1 2 3  4 5  6 7  8 9"></div>
 
-An **array of size M** + a **hash function** = a hash table. Search `47`: compute `h(47) = 7`, look at slot 7. Done.
+An **array of size $M$** + a **hash function** = a hash table. Search 47: compute $h(47) = 7$, look at slot 7. Done.
 
 --
 
 ## Collisions are unavoidable
 
-Two different keys can hash to the **same** slot: `h(25) = h(35) = 5`.
+Two different keys can hash to the **same** slot: $h(25) = h(35) = 5$.
 
 - **pigeonhole:** the key universe is bigger than M → some keys **must** share a slot
 - **birthday paradox:** collisions arrive far earlier than intuition says: with M = 365 slots, **23 keys** suffice for a 50% collision
@@ -83,16 +83,17 @@ Two different keys can hash to the **same** slot: `h(25) = h(35) = 5`.
 
 ## Why √M keys already collide
 
-Insert keys one by one; each new key must **miss** all previous ones:
+Insert $n$ keys; each must **miss** all earlier ones:
 
-```text
-   P(no collision after n keys)
-     = (1 − 1/M)(1 − 2/M) ⋯ (1 − (n−1)/M)
-     ≈ exp( −(1 + 2 + ⋯ + (n−1)) / M )     [1−x ≈ e^−x]
-     = exp( −n(n−1) / 2M )
-```
+$$
+\begin{aligned}
+P(\text{no collision}) &= \left(1 - \frac{1}{M}\right)\left(1 - \frac{2}{M}\right) \cdots \left(1 - \frac{n-1}{M}\right) \\\\
+&\approx \exp\left(-\frac{1 + 2 + \cdots + (n-1)}{M}\right) \\\\
+&= \exp\left(-\frac{n(n-1)}{2M}\right)
+\end{aligned}
+$$
 
-This drops to ½ when `n ≈ 1.18 √M`. For `M = 365`: `n ≈ 23`. ✓
+using $1 - x \approx e^{-x}$. This drops to ½ when $n \approx 1.18 \sqrt{M}$. For $M = 365$: $n \approx 23$. ✓
 
 --
 
@@ -124,19 +125,19 @@ The two answers are **chaining** and **open addressing**. Both are only as good 
 
 For integer keys, the workhorse:
 
-```text
-   h(k) = k mod M            M = 97:  h(12345) = 26
-```
+$$h(k) = k \bmod M$$
 
-- **M prime** mixes **all** the bits of `k`
-- `M = 2^p` uses only the **low p bits**: any pattern in the keys (even IDs, addresses) clumps
+For example, $M = 97$ gives $h(12345) = 26$.
+
+- **$M$ prime** mixes **all** the bits of $k$
+- $M = 2^p$ uses only the **low $p$ bits**: any pattern in the keys (even IDs, addresses) clumps
 - powers of 10: same trap with low **digits**
 
 --
 
 ## Hashing strings
 
-Treat a string as a big number in base R (e.g. 31), via **Horner's method**:
+Treat a string as a big number in base $R$ (e.g. 31), via **Horner's method**:
 
 ```text
 int hash(const string& s, int M) {
@@ -153,17 +154,17 @@ Every character affects the result; one pass, O(len).
 
 ## Worked: hashing a string
 
-`hash("CAT")` with `R = 31`, `M = 100`, ASCII C=67 A=65 T=84:
+`hash("CAT")` with $R = 31$, $M = 100$, ASCII C = 67, A = 65, T = 84, starting at $h = 0$:
 
-```text
-   h = 0
-   'C': h = (31·0  + 67)  % 100 = 67
-   'A': h = (31·67 + 65)  % 100 = (2077+65)%100 = 42
-   'T': h = (31·42 + 84)  % 100 = (1302+84)%100 = 86
-   → slot 86
-```
+$$
+\begin{aligned}
+\texttt{C}: \quad h &= (31 \cdot 0 + 67) \bmod 100 = 67 \\\\
+\texttt{A}: \quad h &= (31 \cdot 67 + 65) \bmod 100 = 2142 \bmod 100 = 42 \\\\
+\texttt{T}: \quad h &= (31 \cdot 42 + 84) \bmod 100 = 1386 \bmod 100 = 86
+\end{aligned}
+$$
 
-One left-to-right pass; the mod at each step prevents overflow.
+Slot 86, in one left-to-right pass; the mod at each step prevents overflow.
 
 --
 
@@ -172,7 +173,7 @@ One left-to-right pass; the mod at each step prevents overflow.
 In practice, two steps:
 
 1. **hashCode**: the object produces an integer (Java `hashCode()`, C++ `std::hash<T>`)
-2. **compress**: reduce that integer to `[0, M)` with `mod M`
+2. **compress**: reduce that integer to $[0, M)$ with $\bmod M$
 
 ```text
    index = (obj.hashCode() & 0x7fffffff) % M;   // mask the sign

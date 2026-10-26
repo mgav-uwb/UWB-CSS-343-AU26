@@ -12,10 +12,10 @@
 ## Recap
 
 - a **hash function** turns a key into an index; collisions are unavoidable
-- **separate chaining**: a list per slot; expected cost Θ(1 + α)
+- **separate chaining**: a list per slot; expected cost $\Theta(1 + \alpha)$
 - **linear probing**: probe forward to an empty slot; deletion must keep probe paths intact
 - **clustering** makes probing degrade; double hashing spreads the probes
-- **resize** when α crosses a threshold: rehash every key into a table twice as large
+- **resize** when $\alpha$ crosses a threshold: rehash every key into a table twice as large
 
 --
 
