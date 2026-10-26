@@ -2,7 +2,7 @@
   TOPIC · Hash tables and hash functions.
   Teaches: computing an index instead of comparing keys; the hash function and the hash table; collisions are unavoidable (the birthday bound); chaining and probing in one sentence each; good hash functions; modular hashing with a prime M; hashing strings by Horner's rule; hash code then compress; the uniform hashing assumption.
   Needs:   the asymptotic notation topic.
-  Demos:   none
+  Demos:   none; figures hs-bet, hs-table, hs-two-ways (tools/gen-hash-figures.mjs)
   Program: none
   Budget:  ~24 min, 14 slides.
   Ported from Summer 2026 L07-hashing.md, parts 1, 2.
@@ -18,14 +18,11 @@
 
 ## A different bet
 
-Every search so far **compares** keys: Θ(log n) at best (balanced trees).
+Trees **compare** keys; hashing **computes** where the key lives:
 
-Here: **compute** where the key lives.
-
-```text
-   trees:    is k < node? go left/right…   Θ(log n)
-   hashing:  index = h(k); table[index]    Θ(1) ??
-```
+<div><img src="../../topics/figures/hashing/hs-bet.svg" style="height:200px" alt="
+   trees:    is k &lt; node? go left/right…   Θ(log n)
+   hashing:  index = h(k); table[index]    Θ(1) ??"></div>
 
 The price: **collisions**, and the loss of **order** (no min / max / range). Managing that price is the whole lecture.
 
@@ -61,13 +58,13 @@ Compute the index, jump straight there. No comparisons, no tree walk.
 
 ## A hash table
 
-```text
-   M = 10,  h(k) = k mod 10
+`M = 10`, `h(k) = k mod 10`:
 
+<div><img src="../../topics/figures/hashing/hs-table.svg" style="height:300px" alt="
+   M = 10,  h(k) = k mod 10
    insert 25 → slot 5      table:
    insert 33 → slot 3      [ _ _ _ 33 _ 25 _ 47 _ _ ]
-   insert 47 → slot 7        0 1 2 3  4 5  6 7  8 9
-```
+   insert 47 → slot 7        0 1 2 3  4 5  6 7  8 9"></div>
 
 An **array of size M** + a **hash function** = a hash table. Search `47`: compute `h(47) = 7`, look at slot 7. Done.
 
@@ -101,14 +98,12 @@ This drops to ½ when `n ≈ 1.18 √M`. For `M = 365`: `n ≈ 23`. ✓
 
 ## Two ways to resolve collisions
 
-```text
+<div><img src="../../topics/figures/hashing/hs-two-ways.svg" style="height:158px" alt="
    separate chaining          open addressing
    (a list per slot)          (probe for another slot)
-
    [3]→33                     [ _ _ _ 33 _ 25 35 47 _ _ ]
    [5]→25→35                    35 collided at 5, probed to 6
-   [7]→47
-```
+   [7]→47"></div>
 
 The two answers are **chaining** and **open addressing**. Both are only as good as the hash function feeding them, so hash functions come first.
 

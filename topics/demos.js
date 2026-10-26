@@ -17,7 +17,7 @@
 // their own .legacy-viz class and are still started by the lecture page.
 
 import { initDeckDemos, AVL, BST, TwoThree, RedBlack, MaxHeap, TreeRenderer, MultiwayTreeRenderer, ArrayRenderer, HeapTreeRenderer,
-  LinearProbing, OpenAddressing, SeparateChaining, ChainRenderer, chainingInfo, openAddressingInfo, renderStateStack,
+  LinearProbing, SeparateChaining, ChainRenderer, chainingInfo, openAddressingInfo,
   Graph, graphInfo, GraphRenderer, renderTraceTable, WeightedGraph } from "../lib/deck.js";
 import { DEMOS } from "../lib/demos/registry.js";
 
@@ -299,19 +299,6 @@ const GRAPH_SPECS = {
 
 // static figures drawn from the engines (they cannot drift from the demos)
 function mountStatic() {
-  const dw = document.getElementById("double-worked");
-  if (dw && !dw.__mounted) {
-    dw.__mounted = true;
-    renderStateStack(dw, {
-      make: () => new OpenAddressing(11, { probe: "double", q: 7, resizeAt: Infinity }),
-      steps: [
-        { run: (s) => s.insert(89), caption: "insert 89 · h(89) = 1 → slot 1" },
-        { run: (s) => s.insert(18), caption: "insert 18 · h(18) = 7 → slot 7" },
-        { run: (s) => s.insert(40), caption: "insert 40 · h(40) = 7 taken · h2(40) = 7−5 = 2 · (7+2) mod 11 → slot 9" },
-        { run: (s) => s.insert(29), caption: "insert 29 · h(29) = 7 taken · h2(29) = 7−1 = 6 · (7+6) mod 11 → slot 2" },
-      ],
-    });
-  }
   const bw = document.getElementById("bfs-worked");
   if (bw && !bw.__mounted) {
     bw.__mounted = true;

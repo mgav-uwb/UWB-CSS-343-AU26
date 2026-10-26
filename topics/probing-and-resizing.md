@@ -2,7 +2,7 @@
   TOPIC · Clustering, better probes, and resizing.
   Teaches: primary clustering; quadratic probing and double hashing; choosing a probe sequence; the ideal cost of a probe; load-factor thresholds; resizing by rehashing; the cost of hashing; hashing against balanced BSTs; std::map against std::unordered_map.
   Needs:   linear probing, separate chaining.
-  Demos:   probe-race, hash-resize (slide specs); the double-hashing state stack
+  Demos:   probe-race, hash-resize (slide specs); figures hs-cluster, hs-quad-66, hs-double (tools/gen-hash-figures.mjs)
   Program: none
   Budget:  ~22 min, 14 slides.
   Ported from Summer 2026 L07-hashing.md, parts 5, 6, 7.
@@ -16,19 +16,17 @@
 
 --
 
-## Primary clustering snowballs
+## Primary clustering
 
-A cluster doesn't just slow its own keys: it **grows faster the longer it is**:
+A cluster **grows faster the longer it is**:
 
-```text
+<div><img src="../../topics/figures/hashing/hs-cluster.svg" style="height:300px" alt="
    cluster of length L  (slots s … s+L−1)
-
    a new key homed ANYWHERE in those L slots
-  : or in the free slot at either end -
-   extends the run  →  length L+1
-```
+   or in the free slot at either end
+   extends the run  →  length L+1"></div>
 
-Growth probability ≈ **(L+2)/M**: the rich get richer. Long runs also **merge** into longer ones.
+Growth probability ≈ **(L+2)/M**: the rich get richer; runs also **merge**.
 
 --
 
@@ -38,10 +36,16 @@ Probe at increasing **squared** offsets:
 
 ```text
    ( h(k) + i² ) mod M       i = 1, 2, 3, …
-   → offsets 1, 4, 9, 16, …
 ```
 
-Jumps spread the probes out → colliding keys **leave the neighborhood** instead of extending it. (Trade-off: can't always reach every slot: keep **α < ½** and M prime.)
+22, 33, 44, 55 (all at slot 0) are in; insert 66:
+
+<div><img src="../../topics/figures/hashing/hs-quad-66.svg" style="height:130px" alt="
+   [ 22 33 _ _ 44 66 _ _ _ 55 _ ]
+   insert 66: h = 0 taken; 0 + 1 = 1 taken; 0 + 4 = 4 taken;
+   0 + 9 = 9 taken; (0 + 16) mod 11 = 5: place 66"></div>
+
+Colliders **leave the neighborhood** instead of extending a run. (Catch: it may miss free slots; keep **α < ½** and M prime.)
 
 --
 
@@ -62,7 +66,13 @@ Colliding keys get **different strides** → even same-home keys part ways → e
 
 `M = 11` (prime), `h(x) = x mod 11`, `h2(x) = 7 − (x mod 7)`:
 
-<div id="double-worked" style="max-width:620px;margin:0 auto;text-align:left"></div>
+<div><img src="../../topics/figures/hashing/hs-double.svg" style="height:410px" alt="
+   89 → 89 mod 11 = 1                   [ _ 89 _ _ _ _ _ _ _ _ _ ]
+   18 → 18 mod 11 = 7                   [ _ 89 _ _ _ _ _ 18 _ _ _ ]
+   40 → 40 mod 11 = 7 taken;
+         h2(40) = 7 − (40 mod 7) = 2   (7 + 2) mod 11 = 9  → slot 9
+   29 → 29 mod 11 = 7 taken;
+         h2(29) = 7 − (29 mod 7) = 6   (7 + 6) mod 11 = 2  → slot 2"></div>
 
 
 --

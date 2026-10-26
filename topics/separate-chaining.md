@@ -2,7 +2,7 @@
   TOPIC · Separate chaining.
   Teaches: a list per slot; insert, search and delete; the load factor and the expected chain length; what happens when M is fixed and n grows; resizing.
   Needs:   hashing basics.
-  Demos:   hash-chain, hash-chain-resize (slide specs)
+  Demos:   hash-chain, hash-chain-resize (slide specs); figures hs-chain-table, hs-chain-insert, hs-chain-odd (tools/gen-hash-figures.mjs)
   Program: none
   Budget:  ~16 min, 9 slides.
   Ported from Summer 2026 L07-hashing.md, parts 3.
@@ -20,15 +20,15 @@
 
 Each array slot heads a **linked list** (a *chain*) of all keys that hash there:
 
-```text
-   M = 5,  h(k) = k mod 5,  keys 12, 17, 22, 5:
+`M = 5`, `h(k) = k mod 5`, keys 12, 17, 22, 5:
 
+<div><img src="../../topics/figures/hashing/hs-chain-table.svg" style="height:187px" alt="
+   M = 5,  h(k) = k mod 5,  keys 12, 17, 22, 5:
    [0] → 5                    5 mod 5 = 0
    [1]
    [2] → 12 → 17 → 22         all ≡ 2 (mod 5)
    [3]
-   [4]
-```
+   [4]"></div>
 
 Colliders simply **join the same bucket's chain**. No key is ever turned away: the array never "fills up."
 
@@ -51,12 +51,11 @@ Each is: **one hash** + **a walk of one short chain**. The other `M−1` buckets
 
 `M = 5`, `h(k) = k mod 5`. Insert 12, 22, 5, 17:
 
-```text
+<div><img src="../../topics/figures/hashing/hs-chain-insert.svg" style="height:170px" alt="
    12 → 12%5 = 2      [2] → 12
    22 → 22%5 = 2      [2] → 12 → 22        (collision: join)
     5 →  5%5 = 0      [0] → 5
-   17 → 17%5 = 2      [2] → 12 → 22 → 17   (chain length 3)
-```
+   17 → 17%5 = 2      [2] → 12 → 22 → 17   (chain length 3)"></div>
 
 Colliders just extend the chain: no probing, no displacement, nothing else moves.
 
@@ -85,11 +84,10 @@ Keep **α = O(1)** → every operation is **O(1)** expected.
 
 `M = 7`, `h(k) = k mod 7`, holding the **odd keys 1..21**:
 
-```text
+<div><img src="../../topics/figures/hashing/hs-chain-odd.svg" style="height:143px" alt="
    [0] → 7 → 21    [1] → 1 → 15    [2] → 9
    [3] → 3 → 17    [4] → 11        [5] → 5 → 19
-   [6] → 13
-```
+   [6] → 13"></div>
 
 **Insert 50.** Which bucket, how many compares, and what does the chain look like?
 

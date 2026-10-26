@@ -2,9 +2,9 @@
   TOPIC · Open addressing: linear probing.
   Teaches: probing for an empty slot; insert and search; the probing invariant; why deletion breaks searches and the two fixes (re-insert the cluster, tombstones); chaining against probing.
   Needs:   hashing basics.
-  Demos:   hash-probe, hash-delete (slide specs)
+  Demos:   hash-probe, hash-delete (slide specs); figures hs-lp-insert, hs-lp-search, hs-lp-practice, hs-lp-naive, hs-lp-reinsert (tools/gen-hash-figures.mjs)
   Program: none
-  Budget:  ~20 min, 12 slides.
+  Budget:  ~20 min, 13 slides.
   Ported from Summer 2026 L07-hashing.md, parts 4.
 -->
 
@@ -30,17 +30,17 @@ Walk forward until an **empty slot**; the key lives where the walk ends.
 
 ## Linear probing: insert
 
-```text
+`M = 11`, `h(k) = k mod 11`; insert 14, 25, 36:
+
+<div><img src="../../topics/figures/hashing/hs-lp-insert.svg" style="height:300px" alt="
    M = 11,  h(k) = k mod 11.   insert 14, 25, 36:
    h(14)=3 → slot 3 (empty)              place 14
    h(25)=3 → 3 taken (14) → 4 (empty)    place 25
    h(36)=3 → 3, 4 taken → 5 (empty)      place 36
-
    [ _ _ _ 14 25 36 _ _ _ _ _ ]
-     0 1 2  3  4  5
-```
+     0 1 2  3  4  5"></div>
 
-14, 25, 36 differ by exactly **11**: keys a multiple of `M` apart *always* share a home slot. They line up in a **cluster** at 3, 4, 5.
+14, 25, 36 differ by **11** = `M`, so they share home slot 3 and line up in a **cluster**.
 
 --
 
@@ -71,14 +71,12 @@ The invariant makes the miss rule sound: **an empty slot proves `k` is absent**.
 
 ## Worked: search hit vs miss
 
-```text
+<div><img src="../../topics/figures/hashing/hs-lp-search.svg" style="height:217px" alt="
    [ _ _ _ 14 25 36 _ _ _ _ _ ]   (the cluster)
      0 1 2  3  4  5
-
    search 36: h=3 → 14≠36 → 25≠36 → 36 ✓   (3 probes, HIT)
    search 47: h=3 → 14 → 25 → 36 → slot 6
-              EMPTY → NOT FOUND              (4 probes, MISS)
-```
+              EMPTY → NOT FOUND              (4 probes, MISS)"></div>
 
 A **hit** stops on the key; a **miss** pays the **whole cluster** plus the empty slot.
 
@@ -88,10 +86,9 @@ A **hit** stops on the key; a **miss** pays the **whole cluster** plus the empty
 
 `M = 7`, `h(k) = k mod 7`, linear probing. Table currently:
 
-```text
+<div><img src="../../topics/figures/hashing/hs-lp-practice.svg" style="height:86px" alt="
    [ _ 8 15 _ _ _ 20 ]     insert 22?
-     0 1  2 3 4 5  6
-```
+     0 1  2 3 4 5  6"></div>
 
 <details class="answer"><summary>Answer:</summary>
 
@@ -122,12 +119,10 @@ h(22) = 22 mod 7 = 1 → slot 1 holds 8 → probe 2 (holds 15) → probe 3 (empt
 
 Delete 14 by **emptying its slot**: and you punch a **hole in the cluster**:
 
-```text
+<div><img src="../../topics/figures/hashing/hs-lp-naive.svg" style="height:236px" alt="
    [ _ _ _ 14 25 36 _ … ]      naive delete 14:
      0 1 2  3  4  5            [ _ _ _ _ 25 36 _ … ]
-
-   search 25: h(25) = 3 → slot 3 EMPTY → "not found"  ✗
-```
+   search 25: h(25) = 3 → slot 3 EMPTY → &quot;not found&quot;  ✗"></div>
 
 25 is **still in the table**: but the hole broke its probe path. The invariant, violated.
 
@@ -138,10 +133,15 @@ Delete 14 by **emptying its slot**: and you punch a **hole in the cluster**:
 1. **Tombstone:** mark the slot "deleted": searches **walk through** it, inserts may **reuse** it. Simple; tombstones accumulate until the table is rebuilt (a resize).
 2. **Re-insert the cluster** (Sedgewick): empty the slot, then take every key **after the hole** in the cluster and insert it again: the run is rebuilt hole-free.
 
-```text
+--
+
+## Delete 14 by re-insertion
+
+<div><img src="../../topics/figures/hashing/hs-lp-reinsert.svg" style="height:320px" alt="
    delete 14:  [ _ _ _ _ 25 36 _ ]  → re-insert 25, 36
-               [ _ _ _ 25 36 _ _ ]  ✓ invariant restored
-```
+               [ _ _ _ 25 36 _ _ ]  ✓ invariant restored"></div>
+
+Each key after the hole comes out and goes back in. 25 finds its home free; 36 probes past 25 to slot 4. Keys can end up **closer** to home than before.
 
 --
 
