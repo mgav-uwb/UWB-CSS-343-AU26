@@ -132,16 +132,23 @@ The more a scheme clusters, the **lower** the $\alpha$ it tolerates. Crossing th
 
 ## Resizing (rehashing)
 
-When $\alpha$ crosses the threshold, **grow the table** and re-insert everything:
+Past the threshold, **double $M$** and re-insert every key:
 
-```text
-   if (2 * n >= M) {              // α reached ½
-       M = 2 * M;                 // double the array
-       rehash EVERY key into the new table
-   }
+```cpp
+// the last line of insert(k):
+if (2 * n >= M) resize(2 * M);             // load factor reached 1/2
+
+void LinearProbing::resize(int newM) {
+    std::vector<int> old = table;
+    table.assign(newM, EMPTY);             // a fresh, empty array
+    M = newM;
+    n = 0;
+    for (int k : old)
+        if (k != EMPTY) insert(k);         // rehash: a new home
+}
 ```
 
-Each key gets a **new** $h(k) \bmod M$: you can't copy slots. A resize is Θ(n), but doubling makes it **amortized O(1)** per insert.
+Each key gets a **new** $h(k) \bmod M$: you can't copy slots. A resize is $\Theta(n)$, but doubling makes it **amortized $O(1)$** per insert.
 
 --
 
@@ -167,7 +174,7 @@ Under uniform hashing, with a bounded load factor:
 
 | operation                | expected | worst case |
 | ------------------------ | -------- | ---------- |
-| search / insert / delete | **Θ(1)** | **Θ(n)**   |
+| search / insert / delete | $\boldsymbol{\Theta(1)}$ | $\boldsymbol{\Theta(n)}$ |
 
 The worst case (every key in one bucket/cluster) needs a **bad hash or an adversary**: it doesn't happen by chance with a good hash.
 
@@ -177,8 +184,8 @@ The worst case (every key in one bucket/cluster) needs a **bad hash or an advers
 
 |                                       | hash table   | balanced BST   |
 | ------------------------------------- | ------------ | -------------- |
-| search / insert / delete              | **Θ(1)** avg | Θ(log n)       |
-| worst case                            | Θ(n)         | **Θ(log n)**   |
+| search / insert / delete              | $\boldsymbol{\Theta(1)}$ **avg** | $\Theta(\log\_2 n)$ |
+| worst case                            | $\Theta(n)$ | $\boldsymbol{\Theta(\log\_2 n)}$ |
 | **ordered ops** (min/max/floor/range) | **no**       | **yes**        |
 | iterate in sorted order               | no           | yes            |
 
@@ -191,7 +198,7 @@ Hashing wins on raw speed. The BST wins on **order**: and on a **guaranteed** wo
 |           | `std::map`         | `std::unordered_map` |
 | --------- | ------------------ | -------------------- |
 | structure | **red-black tree** | **hash table**       |
-| lookup    | Θ(log n)           | Θ(1) avg             |
+| lookup    | $\Theta(\log\_2 n)$ | $\Theta(1)$ avg |
 | iteration | **sorted**         | arbitrary order      |
 | needs     | `operator<`        | `std::hash` + `==`   |
 

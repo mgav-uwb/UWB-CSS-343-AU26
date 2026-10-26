@@ -32,9 +32,9 @@ The price: **collisions**, and the loss of **order** (no min / max / range). Man
 
 If keys were integers $0, \dots, M-1$, we'd just use an **array**:
 
-```text
-   a[key] = value;        // insert
-   return a[key];         // search: Θ(1)!
+```cpp
+a[key] = value;          // insert: one array write
+return a[key];           // search: one array read
 ```
 
 Direct addressing is perfect: but only if keys are **small integers**. Real keys are strings, big numbers, objects; a universe **astronomically larger** than any array.
@@ -48,7 +48,7 @@ A **hash function** maps any key to an array index in $[0, M)$:
 $$h : \text{keys} \to \lbrace 0, 1, \dots, M-1 \rbrace$$
 
 ```cpp
-index = h(key);
+int index = h(key);
 table[index] = key;      // insert
 ```
 
@@ -114,7 +114,7 @@ The two answers are **chaining** and **open addressing**. Both are only as good 
 
 1. **deterministic**: same key → same index
 2. **uniform**: spreads keys evenly over `[0, M)`
-3. **fast**: O(1) to compute
+3. **fast**: $O(1)$ to compute
 4. **uses the whole key**: every bit matters
 
 **Uniform** is the property that governs performance.
@@ -139,16 +139,18 @@ For example, $M = 97$ gives $h(12345) = 26$.
 
 Treat a string as a big number in base $R$ (e.g. 31), via **Horner's method**:
 
-```text
-int hash(const string& s, int M) {
+```cpp
+// Horner's method: fold a string into one index, base R = 31.
+int hash(const std::string& s, int M) {
+    const long R = 31;
     long h = 0;
-    for (char c : s)
-        h = (R * h + c) % M;      // R = 31
+    for (unsigned char c : s)    // a byte, 0..255
+        h = (R * h + c) % M;     // reduce each step; no overflow
     return (int)h;
 }
 ```
 
-Every character affects the result; one pass, O(len).
+One pass, $O(\text{length})$: every character counts.
 
 --
 
@@ -175,17 +177,21 @@ In practice, two steps:
 1. **hashCode**: the object produces an integer (Java `hashCode()`, C++ `std::hash<T>`)
 2. **compress**: reduce that integer to $[0, M)$ with $\bmod M$
 
-```text
-   index = (obj.hashCode() & 0x7fffffff) % M;   // mask the sign
+```java
+int index = (key.hashCode() & 0x7fffffff) % M;      // Java: clear the sign bit
+```
+
+```cpp
+size_t index = std::hash<std::string>()(key) % M;   // C++: already unsigned
 ```
 
 --
 
 ## The uniform hashing assumption
 
-All of hashing's O(1) analysis rests on one idealization:
+All of hashing's $O(1)$ analysis rests on one idealization:
 
 > **Uniform hashing:** each key is equally likely to hash to any of the M slots, independently.
 
-A good hash makes this *approximately* true. A bad one clumps keys: and performance collapses to O(n).
+A good hash makes this *approximately* true. A bad one clumps keys: and performance collapses to $O(n)$.
 

@@ -519,14 +519,16 @@
   <button class="ct-tab" data-lang="rs">Rust</button>
 </div>
 <pre class="ct-pane" data-lang="cpp">// Horner&#x27;s method: fold a string into one index, base R = 31.
-int hash(const string&amp; s, int M) {
+int hash(const std::string&amp; s, int M) {
+    const long R = 31;
     long h = 0;
-    for (char c : s)
+    for (unsigned char c : s)    // a byte, 0..255
         h = (R * h + c) % M;     // reduce each step; no overflow
     return (int)h;
 }</pre>
 <pre class="ct-pane" data-lang="java" hidden>// Horner&#x27;s method: fold a string into one index, base R = 31.
 static int hash(String s, int M) {
+    final long R = 31;
     long h = 0;
     for (char c : s.toCharArray())
         h = (R * h + c) % M;     // reduce each step; no overflow
@@ -534,12 +536,14 @@ static int hash(String s, int M) {
 }</pre>
 <pre class="ct-pane" data-lang="py" hidden># Horner&#x27;s method: fold a string into one index, base R = 31.
 def hash_str(s, M):
+    R = 31
     h = 0
     for c in s:
         h = (R * h + ord(c)) % M   # reduce each step
     return h</pre>
 <pre class="ct-pane" data-lang="rs" hidden>// Horner&#x27;s method: fold a string into one index, base R = 31.
 fn hash(s: &amp;str, m: i64) -&gt; i64 {
+    const R: i64 = 31;
     let mut h: i64 = 0;
     for c in s.chars() {
         h = (R * h + c as i64) % m;   // reduce each step
@@ -601,10 +605,36 @@ fn hash(s: &amp;str, m: i64) -&gt; i64 {
         and the <em>table</em> knows its size \(M\) and compresses that
         integer into a slot with \(\bmod\, M\):
       </p>
-      <pre>index = (obj.hashCode() &amp; 0x7fffffff) % M;   <span class="cm">// mask the sign bit</span></pre>
+      <div class="code-tabs" data-snippet="hashing/compress">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// hashCode, then compress. std::hash returns an unsigned size_t,
+// so the remainder is already a valid index.
+size_t index = std::hash&lt;std::string&gt;()(key) % M;</pre>
+<pre class="ct-pane" data-lang="java" hidden>// hashCode, then compress. hashCode() may be negative, and so would
+// be its remainder: clear the sign bit first.
+int index = (key.hashCode() &amp; 0x7fffffff) % M;</pre>
+<pre class="ct-pane" data-lang="py" hidden># hash, then compress. hash() may be negative, but % with a
+# positive M never is.
+index = hash(key) % M</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// hash, then compress. The hasher returns an unsigned u64.
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+
+let mut hasher = DefaultHasher::new();
+key.hash(&amp;mut hasher);
+let index = (hasher.finish() % m as u64) as usize;</pre>
+<p class="ct-src">source: <code>code/hashing/compress.cpp &middot; code/hashing/compress.java &middot; code/hashing/compress.py &middot; code/hashing/compress.rs</code></p>
+<!--/ct--></div>
       <p>
-        The mask <code>&amp; 0x7fffffff</code> clears the sign bit so that a
-        negative <code>hashCode</code> does not produce a negative index. When
+        Java&rsquo;s <code>hashCode</code> may be negative, and so would its
+        remainder, so the mask <code>&amp; 0x7fffffff</code> clears the sign bit
+        first. C++ and Rust hashes are unsigned, and Python&rsquo;s
+        <code>%</code> is never negative for a positive \(M\). When
         you hash your own struct, combine the fields the same way a string
         combines its characters (multiply the running hash by a small
         constant and add the next field), so that, for a point,
@@ -879,10 +909,133 @@ fn fib_hash(k: u32, p: u32) -&gt; u32 {
         linked-list operation on <em>one</em> short chain, never touching the
         other \(M-1\) buckets:
       </p>
-      <pre>  search(k):  i = h(k); walk the chain at T[i] comparing keys
-  insert(k):  i = h(k); scan the chain for a duplicate,
-              then link k in (O(1) once you are there)
-  delete(k):  i = h(k); find k in the chain, UNLINK it</pre>
+      <div class="code-tabs" data-snippet="hashing/chain-ops">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Separate chaining: bucket i holds the chain of keys k with h(k) == i.
+class ChainedTable {
+public:
+    explicit ChainedTable(int M) : M(M), table(M) {}
+    bool search(int k) const;
+    void insert(int k);
+    void remove(int k);
+private:
+    int h(int k) const { return k % M; }   // keys are non-negative
+    int M;
+    std::vector&lt;std::list&lt;int&gt;&gt; table;     // one chain per bucket
+};
+
+bool ChainedTable::search(int k) const {
+    for (int x : table[h(k)])              // walk ONE chain
+        if (x == k) return true;
+    return false;
+}
+
+void ChainedTable::insert(int k) {
+    if (!search(k))                        // no duplicate keys
+        table[h(k)].push_back(k);          // link at the tail
+}
+
+void ChainedTable::remove(int k) {
+    table[h(k)].remove(k);                 // find k, unlink it
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Separate chaining: bucket i holds the chain of keys k with h(k) == i.
+public class ChainedTable {
+    private final int M;
+    private final List&lt;LinkedList&lt;Integer&gt;&gt; table = new ArrayList&lt;&gt;();
+
+    public ChainedTable(int M) {
+        this.M = M;
+        for (int i = 0; i &lt; M; i++)
+            table.add(new LinkedList&lt;&gt;());     // one chain per bucket
+    }
+
+    private int h(int k) { return k % M; }     // keys are non-negative
+
+    public boolean search(int k) {
+        for (int x : table.get(h(k)))          // walk ONE chain
+            if (x == k) return true;
+        return false;
+    }
+
+    public void insert(int k) {
+        if (!search(k))                        // no duplicate keys
+            table.get(h(k)).addLast(k);        // link at the tail
+    }
+
+    public void remove(int k) {
+        // remove(Object), not remove(int index): find k, unlink it
+        table.get(h(k)).remove(Integer.valueOf(k));
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Separate chaining: bucket i holds the chain of keys k with h(k) == i.
+# A Python list stands in for each linked chain.
+class ChainedTable:
+    def __init__(self, M):
+        self.M = M
+        self.table = [[] for i in range(M)]   # one chain per bucket
+
+    def h(self, k):
+        return k % self.M
+
+    def search(self, k):
+        for x in self.table[self.h(k)]:        # walk ONE chain
+            if x == k:
+                return True
+        return False
+
+    def insert(self, k):
+        if not self.search(k):                 # no duplicate keys
+            self.table[self.h(k)].append(k)    # link at the tail
+
+    def remove(self, k):
+        chain = self.table[self.h(k)]
+        if k in chain:
+            chain.remove(k)                    # find k, unlink it</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Separate chaining: bucket i holds the chain of keys k with h(k) == i.
+// A Vec stands in for each linked chain.
+pub struct ChainedTable {
+    m: usize,
+    table: Vec&lt;Vec&lt;u32&gt;&gt;,                     // one chain per bucket
+}
+
+impl ChainedTable {
+    pub fn new(m: usize) -&gt; Self {
+        ChainedTable { m, table: vec![Vec::new(); m] }
+    }
+
+    fn h(&amp;self, k: u32) -&gt; usize { k as usize % self.m }
+
+    pub fn search(&amp;self, k: u32) -&gt; bool {
+        for &amp;x in &amp;self.table[self.h(k)] {    // walk ONE chain
+            if x == k { return true; }
+        }
+        false
+    }
+
+    pub fn insert(&amp;mut self, k: u32) {
+        if !self.search(k) {                  // no duplicate keys
+            let i = self.h(k);
+            self.table[i].push(k);            // link at the tail
+        }
+    }
+
+    pub fn remove(&amp;mut self, k: u32) {
+        let i = self.h(k);
+        for j in 0..self.table[i].len() {
+            if self.table[i][j] == k {
+                self.table[i].remove(j);      // find k, unlink it
+                return;
+            }
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/hashing/chain-ops.cpp &middot; code/hashing/chain-ops.java &middot; code/hashing/chain-ops.py &middot; code/hashing/chain-ops.rs</code></p>
+<!--/ct--></div>
       <p>
         Deletion is a plain splice: find the node and remove it, and no other key
         moves. Hold that thought: open addressing will make deletion
@@ -1330,12 +1483,147 @@ fn fib_hash(k: u32, p: u32) -&gt; u32 {
           of a cluster punches a hole, and a hole is exactly what search
           reads as &ldquo;absent.&rdquo;</li>
       </ul>
-      <pre>search(k):
-    i = h(k)
-    while T[i] is occupied:
-        if T[i] == k: return FOUND
-        i = (i + 1) mod M          <span class="cm">// next slot</span>
-    return NOT FOUND               <span class="cm">// empty slot &rArr; k absent</span></pre>
+      <div class="code-tabs" data-snippet="hashing/linear-probing">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Linear probing: every key lives in the array itself.
+const int EMPTY = -1;                      // keys are non-negative
+
+class LinearProbing {
+public:
+    explicit LinearProbing(int M) : M(M), table(M, EMPTY) {}
+    bool search(int k) const;
+    void insert(int k);
+private:
+    int h(int k) const { return k % M; }
+    int M;
+    int n = 0;                             // number of keys
+    std::vector&lt;int&gt; table;
+};
+
+bool LinearProbing::search(int k) const {
+    int i = h(k);
+    while (table[i] != EMPTY) {            // the run that starts at h(k)
+        if (table[i] == k) return true;    // hit
+        i = (i + 1) % M;                   // next slot, wrapping past M-1
+    }
+    return false;                          // an empty slot: k is absent
+}
+
+void LinearProbing::insert(int k) {
+    int i = h(k);
+    while (table[i] != EMPTY) {
+        if (table[i] == k) return;         // already present
+        i = (i + 1) % M;
+    }
+    table[i] = k;                          // the first empty slot of the run
+    n++;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Linear probing: every key lives in the array itself.
+public class LinearProbing {
+    private static final int EMPTY = -1;       // keys are non-negative
+    private int M;
+    private int n = 0;                         // number of keys
+    private int[] table;
+
+    public LinearProbing(int M) {
+        this.M = M;
+        table = new int[M];
+        Arrays.fill(table, EMPTY);
+    }
+
+    private int h(int k) { return k % M; }
+
+    public boolean search(int k) {
+        int i = h(k);
+        while (table[i] != EMPTY) {            // the run that starts at h(k)
+            if (table[i] == k) return true;    // hit
+            i = (i + 1) % M;                   // next slot, wrapping past M-1
+        }
+        return false;                          // an empty slot: k is absent
+    }
+
+    public void insert(int k) {
+        int i = h(k);
+        while (table[i] != EMPTY) {
+            if (table[i] == k) return;         // already present
+            i = (i + 1) % M;
+        }
+        table[i] = k;                          // the first empty slot of the run
+        n++;
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Linear probing: every key lives in the list itself.
+EMPTY = None
+
+class LinearProbing:
+    def __init__(self, M):
+        self.M = M
+        self.n = 0                             # number of keys
+        self.table = [EMPTY] * M
+
+    def h(self, k):
+        return k % self.M
+
+    def search(self, k):
+        i = self.h(k)
+        while self.table[i] is not EMPTY:      # the run that starts at h(k)
+            if self.table[i] == k:
+                return True                    # hit
+            i = (i + 1) % self.M               # next slot, wrapping past M-1
+        return False                           # an empty slot: k is absent
+
+    def insert(self, k):
+        i = self.h(k)
+        while self.table[i] is not EMPTY:
+            if self.table[i] == k:
+                return                         # already present
+            i = (i + 1) % self.M
+        self.table[i] = k                      # the first empty slot of the run
+        self.n += 1</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Linear probing: every key lives in the array itself.
+pub struct LinearProbing {
+    m: usize,
+    n: usize,                                 // number of keys
+    table: Vec&lt;Option&lt;u32&gt;&gt;,                  // None: an empty slot
+}
+
+impl LinearProbing {
+    pub fn new(m: usize) -&gt; Self {
+        LinearProbing { m, n: 0, table: vec![None; m] }
+    }
+
+    fn h(&amp;self, k: u32) -&gt; usize { k as usize % self.m }
+
+    pub fn search(&amp;self, k: u32) -&gt; bool {
+        let mut i = self.h(k);
+        while let Some(x) = self.table[i] {   // the run that starts at h(k)
+            if x == k { return true; }        // hit
+            i = (i + 1) % self.m;             // next slot, wrapping past m-1
+        }
+        false                                 // an empty slot: k is absent
+    }
+
+    pub fn insert(&amp;mut self, k: u32) {
+        let mut i = self.h(k);
+        while let Some(x) = self.table[i] {
+            if x == k { return; }             // already present
+            i = (i + 1) % self.m;
+        }
+        self.table[i] = Some(k);              // the first empty slot of the run
+        self.n += 1;
+    }
+}</pre>
+<p class="ct-src">source: <code>code/hashing/linear-probing.cpp &middot; code/hashing/linear-probing.java &middot; code/hashing/linear-probing.py &middot; code/hashing/linear-probing.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Both loops end at an empty slot, and one always exists because the
+        table grows before it fills (see <a href="#load">resizing</a>).
+      </p>
       <div class="ex">
         <span class="tag">Example (search: hit versus miss)</span>
         In the cluster \(14, 25, 36\) at slots \(3\)&ndash;\(5\):
@@ -2701,10 +2989,113 @@ fn fib_hash(k: u32, p: u32) -&gt; u32 {
       </p>
 
       <h3>Resizing (rehashing)</h3>
-      <pre>if (2 * n &gt;= M) {              <span class="cm">// alpha reached 1/2</span>
-    M = 2 * M;                 <span class="cm">// double the array</span>
-    rehash every key into the new table
+      <div class="code-tabs" data-snippet="hashing/resize">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// insert, now growing the table; LinearProbing gains a private
+// member function void resize(int newM).
+void LinearProbing::insert(int k) {
+    int i = h(k);
+    while (table[i] != EMPTY) {
+        if (table[i] == k) return;         // already present
+        i = (i + 1) % M;
+    }
+    table[i] = k;
+    n++;
+    if (2 * n &gt;= M) resize(2 * M);         // load factor reached 1/2
+}
+
+// Every key&#x27;s home h(k) = k % M changes with M: re-insert each one.
+void LinearProbing::resize(int newM) {
+    std::vector&lt;int&gt; old = table;
+    table.assign(newM, EMPTY);             // a fresh, empty array
+    M = newM;
+    n = 0;
+    for (int k : old)
+        if (k != EMPTY) insert(k);         // rehash: a new home
 }</pre>
+<pre class="ct-pane" data-lang="java" hidden>public class LinearProbing {
+    // fields, constructor, h, and search as before
+
+    public void insert(int k) {
+        int i = h(k);
+        while (table[i] != EMPTY) {
+            if (table[i] == k) return;         // already present
+            i = (i + 1) % M;
+        }
+        table[i] = k;
+        n++;
+        if (2 * n &gt;= M) resize(2 * M);         // load factor reached 1/2
+    }
+
+    // Every key&#x27;s home h(k) = k % M changes with M: re-insert each one.
+    private void resize(int newM) {
+        int[] old = table;
+        table = new int[newM];                 // a fresh, empty array
+        Arrays.fill(table, EMPTY);
+        M = newM;
+        n = 0;
+        for (int k : old)
+            if (k != EMPTY) insert(k);         // rehash: a new home
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>class LinearProbing:
+    # __init__, h, and search as before
+
+    def insert(self, k):
+        i = self.h(k)
+        while self.table[i] is not EMPTY:
+            if self.table[i] == k:
+                return                         # already present
+            i = (i + 1) % self.M
+        self.table[i] = k
+        self.n += 1
+        if 2 * self.n &gt;= self.M:               # load factor reached 1/2
+            self.resize(2 * self.M)
+
+    # Every key&#x27;s home h(k) = k % M changes with M: re-insert each one.
+    def resize(self, new_M):
+        old = self.table
+        self.table = [EMPTY] * new_M           # a fresh, empty list
+        self.M = new_M
+        self.n = 0
+        for k in old:
+            if k is not EMPTY:
+                self.insert(k)                 # rehash: a new home</pre>
+<pre class="ct-pane" data-lang="rs" hidden>impl LinearProbing {
+    // new, h, and search as before
+
+    pub fn insert(&amp;mut self, k: u32) {
+        let mut i = self.h(k);
+        while let Some(x) = self.table[i] {
+            if x == k { return; }             // already present
+            i = (i + 1) % self.m;
+        }
+        self.table[i] = Some(k);
+        self.n += 1;
+        if 2 * self.n &gt;= self.m {             // load factor reached 1/2
+            self.resize(2 * self.m);
+        }
+    }
+
+    // Every key&#x27;s home h(k) = k % m changes with m: re-insert each one.
+    fn resize(&amp;mut self, new_m: usize) {
+        let old = std::mem::replace(&amp;mut self.table, vec![None; new_m]);
+        self.m = new_m;
+        self.n = 0;
+        for slot in old {
+            if let Some(k) = slot {
+                self.insert(k);               // rehash: a new home
+            }
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/hashing/resize.cpp &middot; code/hashing/resize.java &middot; code/hashing/resize.py &middot; code/hashing/resize.rs</code></p>
+<!--/ct--></div>
       <p>
         A resize cannot copy slots, because each key&rsquo;s index is
         \(h(k) \bmod M\) and \(M\) has changed; every key must be hashed anew into
@@ -3117,7 +3508,7 @@ fn fib_hash(k: u32, p: u32) -&gt; u32 {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Hashing v1.2 &middot; prepared by
+        Data Structures &amp; Algorithms &middot; Hashing v1.3 &middot; prepared by
         Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

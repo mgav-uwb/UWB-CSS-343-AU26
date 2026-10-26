@@ -36,11 +36,22 @@ Colliders simply **join the same bucket's chain**. No key is ever turned away: t
 
 ## Chaining: the operations
 
-```text
-   search(k):  i = h(k); walk the chain at table[i]
-   insert(k):  i = h(k); scan for a duplicate, then
-               link k into the chain: O(1) once there
-   delete(k):  i = h(k); find k in the chain, UNLINK it
+```cpp
+// table[i]: bucket i's chain, a std::list<int>
+bool ChainedTable::search(int k) const {
+    for (int x : table[h(k)])              // walk ONE chain
+        if (x == k) return true;
+    return false;
+}
+
+void ChainedTable::insert(int k) {
+    if (!search(k))                        // no duplicate keys
+        table[h(k)].push_back(k);          // link at the tail
+}
+
+void ChainedTable::remove(int k) {
+    table[h(k)].remove(k);                 // find k, unlink it
+}
 ```
 
 Each is: **one hash** + **a walk of one short chain**. The other $M-1$ buckets are never touched.

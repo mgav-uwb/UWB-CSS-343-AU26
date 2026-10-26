@@ -54,13 +54,16 @@ $M = 11$, $h(k) = k \bmod 11$; insert 14, 25, 36:
 
 ## Linear probing: search
 
-```text
-   search(k):
-     i = h(k)
-     while table[i] is occupied:
-        if table[i] == k: return FOUND
-        i = (i + 1) mod M           // next slot
-     return NOT FOUND               // empty ⇒ not present
+```cpp
+// table[i]: a key, or EMPTY (-1)
+bool LinearProbing::search(int k) const {
+    int i = h(k);
+    while (table[i] != EMPTY) {            // the run that starts at h(k)
+        if (table[i] == k) return true;    // hit
+        i = (i + 1) % M;                   // next slot, wrapping past M-1
+    }
+    return false;                          // an empty slot: k is absent
+}
 ```
 
 The invariant makes the miss rule sound: **an empty slot proves $k$ is absent**.
