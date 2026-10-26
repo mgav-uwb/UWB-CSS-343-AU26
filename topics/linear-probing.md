@@ -1,10 +1,10 @@
 <!--
   TOPIC · Open addressing: linear probing.
-  Teaches: probing for an empty slot; insert and search; the probing invariant; why deletion breaks searches and the two fixes (re-insert the cluster, tombstones); chaining against probing.
+  Teaches: probing for an empty slot; insert and search; the probing invariant; why deletion breaks searches and the two fixes (re-insert the cluster, tombstones); the rule a delete must keep (every key on its own probe path, across the end of the array too); chaining against probing.
   Needs:   hashing basics.
   Demos:   hash-probe, hash-delete (slide specs); figures hs-lp-insert, hs-lp-search, hs-lp-practice, hs-lp-naive, hs-lp-reinsert (tools/gen-hash-figures.mjs)
   Program: none
-  Budget:  ~20 min, 13 slides.
+  Budget:  ~21 min, 14 slides. The appendix topic linear-probing-deletion.md carries the wrap example and the shift delete.
   Ported from Summer 2026 L07-hashing.md, parts 4.
 -->
 
@@ -143,6 +143,16 @@ Delete 14 by **emptying its slot**: and you punch a **hole in the cluster**:
                [ _ _ _ 25 36 _ _ ]  ✓ invariant restored"></div>
 
 Each key after the hole comes out and goes back in. 25 finds its home free; 36 probes past 25 to slot 4. Keys can end up **closer** to home than before.
+
+--
+
+## The rule a delete must keep
+
+> Every key stays on its own **probe path** $h(k), h(k)+1, \dots \pmod M$, with no empty slot before it.
+
+- re-insert starts at $h(k)$ and steps $\bmod M$: a key lands **on its own path**, at or before its old slot
+- the scan over the cluster steps $\bmod M$ too, so it follows a cluster **across the end** of the array
+- no slot numbers are compared: the wrap needs **no special case**
 
 --
 

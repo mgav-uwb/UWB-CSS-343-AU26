@@ -1980,6 +1980,274 @@ impl LinearProbing {
           \(36\) rehashes to \(3\) (taken by \(25\)) and probes to \(4\). Keys can
           end up <em>closer</em> to home than before the delete.</li>
       </ol>
+      <p>
+        In code, re-insertion finds \(k\), empties its slot, and lifts and
+        re-inserts each key after it until the cluster ends:
+      </p>
+      <div class="code-tabs" data-snippet="hashing/delete-reinsert">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// remove, by re-insertion; LinearProbing gains a public member
+// function void remove(int k).
+void LinearProbing::remove(int k) {
+    int i = h(k);
+    while (table[i] != k) {                // find k
+        if (table[i] == EMPTY) return;     // k is absent
+        i = (i + 1) % M;
+    }
+    table[i] = EMPTY;                      // the hole
+    n--;
+    // the rest of the cluster, wrapping past M-1 like any probe
+    for (int j = (i + 1) % M; table[j] != EMPTY; j = (j + 1) % M) {
+        int key = table[j];                // lift each later key out
+        table[j] = EMPTY;
+        n--;
+        insert(key);                       // and insert it again from h(key)
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>public class LinearProbing {
+    // fields, constructor, h, search, and insert as before
+
+    // remove, by re-insertion
+    public void remove(int k) {
+        int i = h(k);
+        while (table[i] != k) {                // find k
+            if (table[i] == EMPTY) return;     // k is absent
+            i = (i + 1) % M;
+        }
+        table[i] = EMPTY;                      // the hole
+        n--;
+        // the rest of the cluster, wrapping past M-1 like any probe
+        for (int j = (i + 1) % M; table[j] != EMPTY; j = (j + 1) % M) {
+            int key = table[j];                // lift each later key out
+            table[j] = EMPTY;
+            n--;
+            insert(key);                       // and insert it again from h(key)
+        }
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>class LinearProbing:
+    # __init__, h, search, and insert as before
+
+    # remove, by re-insertion
+    def remove(self, k):
+        i = self.h(k)
+        while self.table[i] != k:              # find k
+            if self.table[i] is EMPTY:
+                return                         # k is absent
+            i = (i + 1) % self.M
+        self.table[i] = EMPTY                  # the hole
+        self.n -= 1
+        # the rest of the cluster, wrapping past M-1 like any probe
+        j = (i + 1) % self.M
+        while self.table[j] is not EMPTY:
+            key = self.table[j]                # lift each later key out
+            self.table[j] = EMPTY
+            self.n -= 1
+            self.insert(key)                   # and insert it again from h(key)
+            j = (j + 1) % self.M</pre>
+<pre class="ct-pane" data-lang="rs" hidden>impl LinearProbing {
+    // remove, by re-insertion
+    pub fn remove(&amp;mut self, k: u32) {
+        let mut i = self.h(k);
+        while self.table[i] != Some(k) {          // find k
+            if self.table[i].is_none() {
+                return;                           // k is absent
+            }
+            i = (i + 1) % self.m;
+        }
+        self.table[i] = None;                     // the hole
+        self.n -= 1;
+        // the rest of the cluster, wrapping past m-1 like any probe
+        let mut j = (i + 1) % self.m;
+        while let Some(key) = self.table[j] {
+            self.table[j] = None;                 // lift each later key out
+            self.n -= 1;
+            self.insert(key);                     // and insert it again from h(key)
+            j = (j + 1) % self.m;
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/hashing/delete-reinsert.cpp &middot; code/hashing/delete-reinsert.java &middot; code/hashing/delete-reinsert.py &middot; code/hashing/delete-reinsert.rs</code></p>
+<!--/ct--></div>
+      <p>
+        <strong>The rule every delete must keep: each key stays on its own probe
+        path.</strong> A search for \(k\) visits \(h(k), h(k)+1, h(k)+2, \dots\)
+        (mod \(M\)) and stops at the first empty slot, so \(k\) must sit on
+        that sequence with no empty slot between \(h(k)\) and \(k\). A key
+        moved to a slot that comes <em>before</em> its home on that sequence, a
+        slot its search never visits, is lost. Re-insertion keeps the rule
+        without testing anything. The scan over the cluster steps
+        \(j \leftarrow (j+1) \bmod M\), so it follows a cluster across the end
+        of the array, and each lifted key goes back through the ordinary insert,
+        which starts at \(h(k)\) and walks forward. The key lands on the first
+        empty slot of its own probe path, at or before its old slot (which is
+        empty now). No slot numbers are compared, so the wrap needs no special
+        case.
+      </p>
+      <div class="ex">
+        <span class="tag">Example (a delete across the end of the array)</span>
+        With \(M = 11\), insert \(31, 42, 11, 53\): \(31\), \(42\) and
+        \(53\) are homed at \(9\), and \(11\) at \(0\), so the cluster runs
+        through slots \(9, 10, 0, 1\). Delete \(31\):
+        <figure class="wide">
+<!-- gen:hs lp-delete-wrap -->
+<svg viewBox="0 0 741 361" role="img" style="max-width:889px" font-family="system-ui, sans-serif" aria-label="Delete 31 by re-insertion from a cluster that runs across the end of the array (M = 11): 31 and 42 at slots 9 and 10, then 11 at 0 and 53 at 1; 31, 42 and 53 are homed at 9, 11 at 0. start: M = 11: 11 at 0, 53 at 1, 31 at 9, 42 at 10; the rest empty (one cluster: slots 9, 10, 0, 1). delete 31: M = 11: 11 at 0, 53 at 1, 42 at 10; the rest empty (empty slot 9). re-insert 42: M = 11: 11 at 0, 53 at 1, 42 at 9; the rest empty (lift it out of slot 10; h(42) = 9 is free). re-insert 11: M = 11: 11 at 0, 53 at 1, 42 at 9; the rest empty (lift it out of slot 0; h(11) = 0 is free (the scan went on from slot 10 to slot 0)). re-insert 53: M = 11: 11 at 0, 42 at 9, 53 at 10; the rest empty (lift it out of slot 1; 9 taken: slot 10 slot 2 is empty: done).">
+<text x="84.4" y="44.2" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">start</text>
+<rect x="116.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.4" y="45.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="131.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="146.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.4" y="45.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="161.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="176.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="206.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="221.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="236.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="251.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="266.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="281.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="296.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="311.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="326.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="341.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="356.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="371.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="386.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="401.4" y="45.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">31</text>
+<text x="401.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="416.4" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="431.4" y="45.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="431.4" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="480.4" y="44.2" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">one cluster: slots 9, 10, 0, 1</text>
+<text x="84.4" y="106.4" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">delete 31</text>
+<rect x="116.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.4" y="107.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="131.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="146.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.4" y="107.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="161.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="176.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="206.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="221.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="236.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="251.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="266.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="281.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="296.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="311.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="326.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="341.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="356.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="371.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="386.4" y="89.4" width="30" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2" stroke-dasharray="4 3"/>
+<text x="401.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="416.4" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="431.4" y="107.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="431.4" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="480.4" y="106.4" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">empty slot 9</text>
+<text x="84.4" y="168.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">re-insert 42</text>
+<rect x="116.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.4" y="169.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="131.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="146.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.4" y="169.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="161.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="176.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="206.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="221.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="236.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="251.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="266.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="281.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="296.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="311.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="326.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="341.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="356.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="371.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="386.4" y="151.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="401.4" y="169.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">42</text>
+<text x="401.4" y="188.6" font-size="10" font-weight="700" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="416.4" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="431.4" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="401.4" y="200.6" font-size="10.5" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-style="italic">h</text>
+<text x="480.4" y="168.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">lift it out of slot 10; h(42) = 9 is free</text>
+<text x="84.4" y="242.8" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">re-insert 11</text>
+<rect x="116.4" y="225.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2" stroke-dasharray="4 3"/>
+<text x="131.4" y="243.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">11</text>
+<text x="131.4" y="262.8" font-size="10" font-weight="700" fill="#0a7d4d" text-anchor="middle">0</text>
+<rect x="146.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.4" y="243.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="161.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="176.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="206.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="221.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="236.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="251.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="266.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="281.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="296.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="311.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="326.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="341.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="356.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="371.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="386.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="401.4" y="243.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="401.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="416.4" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="431.4" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="131.4" y="274.8" font-size="10.5" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-style="italic">h</text>
+<text x="480.4" y="235.8" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">lift it out of slot 0; h(11) = 0 is free</text>
+<text x="480.4" y="249.8" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">(the scan went on from slot 10 to slot 0)</text>
+<text x="84.4" y="317" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">re-insert 53</text>
+<rect x="116.4" y="300" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.4" y="318" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="131.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="146.4" y="300" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="161.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="176.4" y="300" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="206.4" y="300" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="221.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="236.4" y="300" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="251.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="266.4" y="300" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="281.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="296.4" y="300" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="311.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="326.4" y="300" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="341.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="356.4" y="300" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="371.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="386.4" y="300" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="401.4" y="318" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="401.4" y="337" font-size="10" font-weight="700" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="416.4" y="300" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="431.4" y="318" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">53</text>
+<text x="431.4" y="337" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="401.4" y="349" font-size="10.5" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-style="italic">h</text>
+<path d="M404.4,299 Q416.4,276.6 428.4,299" fill="none" stroke="#4a5163" stroke-width="1.6"/><path d="M428.4,299 L422.5,294.8 L428.2,291.7 Z" fill="#4a5163"/>
+<text x="480.4" y="310" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">lift it out of slot 1; 9 taken: slot 10</text>
+<text x="480.4" y="324" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">slot 2 is empty: done</text>
+</svg>
+<!-- /gen:hs lp-delete-wrap -->
+        </figure>
+        The scan passes slot \(10\) and continues at slot \(0\). \(11\) goes
+        back to its home. \(53\), homed at \(9\), probes past \(42\) into
+        slot \(10\): it moves from slot \(1\) back across the end of the
+        array, to a slot nearer its home on its probe path
+        \(9, 10, 0, 1\).
+      </div>
       <div class="ex">
         <span class="tag">Example (tombstone delete, step by step)</span>
         The same table (\(M = 11\), the cluster \(14, 25, 36\) at slots
@@ -2168,9 +2436,456 @@ impl LinearProbing {
         whatever relied on that bridge. And to even <em>find</em> &ldquo;the last
         key of this home&rsquo;s run&rdquo; you must walk the cluster anyway,
         at which point fix 2 is doing strictly more useful work for the same walk.
-        Fix 2 <em>is</em> the disciplined form of &ldquo;pull a later key into the
-        hole&rdquo;: it moves a key only when its home \(h(k)\) lets it legally
-        slide up, and closes the gap step by step so no bridge is ever severed.
+        Re-insertion, and the shift below, are the disciplined forms of
+        &ldquo;pull a later key into the hole&rdquo;: a key moves only along its
+        own probe path, toward its home, and the gap closes step by step so no
+        bridge is ever severed.
+      </div>
+      <div class="aside">
+        <span class="tag">Deleting by shifting, without rehashing</span>
+        Re-insertion recomputes \(h\) for every key after the hole and walks each
+        one from its home, so a cluster of length \(L\) can cost
+        \(\Theta(L^2)\) probes. Knuth&rsquo;s deletion for linear probing
+        (Algorithm R in <em>The Art of Computer Programming</em>, Vol. 3,
+        &sect;6.4) makes one pass, \(\Theta(L)\): it moves each later key of the
+        cluster straight back into the hole when the move is legal, and the hole
+        moves to where that key was. The test is the probe-path rule. Count the
+        steps from slot \(a\) forward to slot \(b\), wrapping past \(M-1\):
+        \[ d(a, b) = (b - a) \bmod M. \]
+        A key in slot \(j\) with home \(r = h(k)\) may move into the hole at
+        slot \(i\) exactly when the hole comes earlier on its probe path than its
+        own slot:
+        \[ d(r, i) < d(r, j). \]
+        Otherwise the hole lies before \(r\) on the probe path, a slot a search
+        for the key never visits, and the key stays. One comparison of distances
+        covers the wrap; there is no case for a cluster that crosses the end.
+        <div class="code-tabs" data-snippet="hashing/delete-shift">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// remove, by shifting; LinearProbing gains a public member function
+// void remove(int k) and a private one, int dist(int a, int b) const.
+
+// The number of steps from slot a forward to slot b, wrapping past M-1.
+int LinearProbing::dist(int a, int b) const {
+    return (b - a + M) % M;
+}
+
+void LinearProbing::remove(int k) {
+    int i = h(k);
+    while (table[i] != k) {                // find k
+        if (table[i] == EMPTY) return;     // k is absent
+        i = (i + 1) % M;
+    }
+    table[i] = EMPTY;                      // the hole
+    n--;
+    for (int j = (i + 1) % M; table[j] != EMPTY; j = (j + 1) % M) {
+        int r = h(table[j]);               // the home of the key in slot j
+        if (dist(r, i) &lt; dist(r, j)) {     // the hole is on its probe path
+            table[i] = table[j];           // move the key back into the hole
+            table[j] = EMPTY;
+            i = j;                         // the hole moves to slot j
+        }
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>public class LinearProbing {
+    // fields, constructor, h, search, and insert as before
+
+    // The number of steps from slot a forward to slot b, wrapping past M-1.
+    private int dist(int a, int b) {
+        return (b - a + M) % M;
+    }
+
+    // remove, by shifting
+    public void remove(int k) {
+        int i = h(k);
+        while (table[i] != k) {                // find k
+            if (table[i] == EMPTY) return;     // k is absent
+            i = (i + 1) % M;
+        }
+        table[i] = EMPTY;                      // the hole
+        n--;
+        for (int j = (i + 1) % M; table[j] != EMPTY; j = (j + 1) % M) {
+            int r = h(table[j]);               // the home of the key in slot j
+            if (dist(r, i) &lt; dist(r, j)) {     // the hole is on its probe path
+                table[i] = table[j];           // move the key back into the hole
+                table[j] = EMPTY;
+                i = j;                         // the hole moves to slot j
+            }
+        }
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>class LinearProbing:
+    # __init__, h, search, and insert as before
+
+    # The number of steps from slot a forward to slot b, wrapping past M-1.
+    def dist(self, a, b):
+        return (b - a) % self.M                # % with a positive M is never negative
+
+    # remove, by shifting
+    def remove(self, k):
+        i = self.h(k)
+        while self.table[i] != k:              # find k
+            if self.table[i] is EMPTY:
+                return                         # k is absent
+            i = (i + 1) % self.M
+        self.table[i] = EMPTY                  # the hole
+        self.n -= 1
+        j = (i + 1) % self.M
+        while self.table[j] is not EMPTY:
+            r = self.h(self.table[j])          # the home of the key in slot j
+            if self.dist(r, i) &lt; self.dist(r, j):   # the hole is on its probe path
+                self.table[i] = self.table[j]  # move the key back into the hole
+                self.table[j] = EMPTY
+                i = j                          # the hole moves to slot j
+            j = (j + 1) % self.M</pre>
+<pre class="ct-pane" data-lang="rs" hidden>impl LinearProbing {
+    // The number of steps from slot a forward to slot b, wrapping past m-1.
+    fn dist(&amp;self, a: usize, b: usize) -&gt; usize {
+        (b + self.m - a) % self.m
+    }
+
+    // remove, by shifting
+    pub fn remove(&amp;mut self, k: u32) {
+        let mut i = self.h(k);
+        while self.table[i] != Some(k) {          // find k
+            if self.table[i].is_none() {
+                return;                           // k is absent
+            }
+            i = (i + 1) % self.m;
+        }
+        self.table[i] = None;                     // the hole
+        self.n -= 1;
+        let mut j = (i + 1) % self.m;
+        while let Some(key) = self.table[j] {
+            let r = self.h(key);                  // the home of the key in slot j
+            if self.dist(r, i) &lt; self.dist(r, j) {    // the hole is on its probe path
+                self.table[i] = Some(key);        // move the key back into the hole
+                self.table[j] = None;
+                i = j;                            // the hole moves to slot j
+            }
+            j = (j + 1) % self.m;
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/hashing/delete-shift.cpp &middot; code/hashing/delete-shift.java &middot; code/hashing/delete-shift.py &middot; code/hashing/delete-shift.rs</code></p>
+<!--/ct--></div>
+        The same delete as the example above, by shifting:
+        <figure class="wide">
+<!-- gen:hs lp-shift -->
+<svg viewBox="0 0 698 455" role="img" style="max-width:838px" font-family="system-ui, sans-serif" aria-label="Delete 31 by shifting from the cluster across the end of the array (M = 11). A key with home r in slot j moves back into the hole i only if the hole is on its probe path: d(r, i) &lt; d(r, j), where d(a, b) = (b − a) mod 11 counts the steps forward from a to b. start: M = 11: 11 at 0, 53 at 1, 31 at 9, 42 at 10; the rest empty (one cluster: slots 9, 10, 0, 1). delete 31: M = 11: 11 at 0, 53 at 1, 42 at 10; the rest empty (empty slot 9: the hole). 42 in slot 10 home 9: M = 11: 11 at 0, 53 at 1, 42 at 9; the rest empty (d(9, 9) = 0 &lt; d(9, 10) = 1: on its path: move it to slot 9). 11 in slot 0 home 0: M = 11: 11 at 0, 53 at 1, 42 at 9; the rest empty (d(0, 10) = 10 ≥ d(0, 0) = 0: not on its path: it stays). 53 in slot 1 home 9: M = 11: 11 at 0, 42 at 9, 53 at 10; the rest empty (d(9, 10) = 1 &lt; d(9, 1) = 3: on its path: move it to slot 10). end: M = 11: 11 at 0, 42 at 9, 53 at 10; the rest empty (slot 2 is empty: the cluster ends every key is on its probe path).">
+<text x="90.6" y="47.4" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">start</text>
+<rect x="122.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="48.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="137.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="152.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="48.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="167.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="182.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="197.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="212.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="227.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="242.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="257.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="272.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="287.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="302.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="317.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="332.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="347.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="362.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="377.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="392.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="407.6" y="48.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">31</text>
+<text x="407.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="422.6" y="30.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="437.6" y="48.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="437.6" y="67.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="486.6" y="47.4" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">one cluster: slots 9, 10, 0, 1</text>
+<text x="90.6" y="112.8" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">delete 31</text>
+<rect x="122.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="113.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="137.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="152.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="113.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="167.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="182.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="197.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="212.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="227.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="242.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="257.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="272.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="287.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="302.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="317.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="332.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="347.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="362.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="377.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="392.6" y="95.8" width="30" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2" stroke-dasharray="4 3"/>
+<text x="407.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="422.6" y="95.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="437.6" y="113.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="437.6" y="132.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="486.6" y="112.8" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">empty slot 9: the hole</text>
+<text x="90.6" y="171.2" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">42 in slot 10</text>
+<text x="90.6" y="185.2" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">home 9</text>
+<rect x="122.6" y="161.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="179.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="137.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="152.6" y="161.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="179.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="167.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="182.6" y="161.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="197.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="212.6" y="161.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="227.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="242.6" y="161.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="257.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="272.6" y="161.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="287.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="302.6" y="161.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="317.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="332.6" y="161.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="347.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="362.6" y="161.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="377.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="392.6" y="161.2" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="407.6" y="179.2" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">42</text>
+<text x="407.6" y="198.2" font-size="10" font-weight="700" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="422.6" y="161.2" width="30" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2" stroke-dasharray="4 3"/>
+<text x="437.6" y="198.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="407.6" y="210.2" font-size="10.5" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-style="italic">h</text>
+<path d="M434.6,160.2 Q422.6,137.8 410.6,160.2" fill="none" stroke="#4a5163" stroke-width="1.6"/><path d="M410.6,160.2 L410.8,152.9 L416.5,156 Z" fill="#4a5163"/>
+<text x="486.6" y="171.2" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">d(9, 9) = 0 &lt; d(9, 10) = 1:</text>
+<text x="486.6" y="185.2" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">on its path: move it to slot 9</text>
+<text x="90.6" y="248.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">11 in slot 0</text>
+<text x="90.6" y="262.6" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">home 0</text>
+<rect x="122.6" y="238.6" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="137.6" y="256.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="137.6" y="275.6" font-size="10" font-weight="700" fill="#0a7d4d" text-anchor="middle">0</text>
+<rect x="152.6" y="238.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="256.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="167.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="182.6" y="238.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="197.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="212.6" y="238.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="227.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="242.6" y="238.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="257.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="272.6" y="238.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="287.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="302.6" y="238.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="317.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="332.6" y="238.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="347.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="362.6" y="238.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="377.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="392.6" y="238.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="407.6" y="256.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="407.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="422.6" y="238.6" width="30" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2" stroke-dasharray="4 3"/>
+<text x="437.6" y="275.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="137.6" y="287.6" font-size="10.5" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-style="italic">h</text>
+<text x="486.6" y="248.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">d(0, 10) = 10 ≥ d(0, 0) = 0:</text>
+<text x="486.6" y="262.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">not on its path: it stays</text>
+<text x="90.6" y="326" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">53 in slot 1</text>
+<text x="90.6" y="340" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">home 9</text>
+<rect x="122.6" y="316" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="334" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="137.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="152.6" y="316" width="30" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2" stroke-dasharray="4 3"/>
+<text x="167.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="182.6" y="316" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="197.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="212.6" y="316" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="227.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="242.6" y="316" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="257.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="272.6" y="316" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="287.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="302.6" y="316" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="317.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="332.6" y="316" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="347.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="362.6" y="316" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="377.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="392.6" y="316" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="407.6" y="334" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="407.6" y="353" font-size="10" font-weight="700" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="422.6" y="316" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="437.6" y="334" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">53</text>
+<text x="437.6" y="353" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="407.6" y="365" font-size="10.5" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-style="italic">h</text>
+<path d="M164.6,315 Q110.6,286.2 110.6,329 L110.6,368 Q110.6,374 116.6,374 L443.6,374 Q449.6,374 449.6,368 L449.6,349" fill="none" stroke="#4a5163" stroke-width="1.6" stroke-dasharray="4 3"/><path d="M449.6,343 L452.9,349.5 L446.4,349.5 Z" fill="#4a5163"/>
+<text x="486.6" y="326" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">d(9, 10) = 1 &lt; d(9, 1) = 3:</text>
+<text x="486.6" y="340" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">on its path: move it to slot 10</text>
+<text x="90.6" y="422.4" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">end</text>
+<rect x="122.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="423.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="137.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="152.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="182.6" y="405.4" width="30" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="197.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="212.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="227.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="242.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="257.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="272.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="287.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="302.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="317.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="332.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="347.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="362.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="377.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="392.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="407.6" y="423.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="407.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="422.6" y="405.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="437.6" y="423.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="437.6" y="442.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="486.6" y="415.4" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">slot 2 is empty: the cluster ends</text>
+<text x="486.6" y="429.4" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">every key is on its probe path</text>
+</svg>
+<!-- /gen:hs lp-shift -->
+        </figure>
+        It ends exactly where re-insertion did, without computing a single
+        new probe walk. The tempting shortcut compares slot numbers instead,
+        moving the key when \(r \le i\). That works on a cluster that does not
+        wrap and fails on one that does, because slot numbers jump from
+        \(M-1\) back to \(0\) while the probe path runs straight on:
+        <figure class="wide">
+<!-- gen:hs lp-shift-naive -->
+<svg viewBox="0 0 790 299" role="img" style="max-width:948px" font-family="system-ui, sans-serif" aria-label="The same delete with the wrong test: move a key back when its home slot number is at most the hole's (r ≤ i). The cluster runs across the end of the array, so slot numbers do not follow the probe path. start: M = 11: 11 at 0, 53 at 1, 31 at 9, 42 at 10; the rest empty (one cluster: slots 9, 10, 0, 1). delete 31, move when home ≤ hole: M = 11: 53 at 1, 42 at 9, 11 at 10; the rest empty (11: home 0 ≤ hole 10, so it moved to slot 10, a slot its search never reaches ✗). search 11: M = 11: 53 at 1, 42 at 9, 11 at 10; the rest empty (h(11) = 0 is empty: not found ✗ 11 is in slot 10). search 53: M = 11: 53 at 1, 42 at 9, 11 at 10; the rest empty (42, 11, then empty slot 0: not found ✗ 53 is in slot 1).">
+<text x="109.2" y="44.2" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">start</text>
+<rect x="141.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="156.2" y="45.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="156.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="171.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="186.2" y="45.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="186.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="201.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="216.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="231.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="246.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="261.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="276.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="291.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="306.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="321.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="351.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="366.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="381.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="396.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="411.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="426.2" y="45.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">31</text>
+<text x="426.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="441.2" y="27.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="456.2" y="45.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="456.2" y="64.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="505.2" y="44.2" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">one cluster: slots 9, 10, 0, 1</text>
+<text x="109.2" y="99.4" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">delete 31, move</text>
+<text x="109.2" y="113.4" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">when home ≤ hole</text>
+<rect x="141.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="156.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="171.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="186.2" y="107.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="186.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="201.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="216.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="231.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="246.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="261.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="276.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="291.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="306.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="321.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="351.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="366.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="381.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="396.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="411.2" y="89.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="426.2" y="107.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="426.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="441.2" y="89.4" width="30" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="456.2" y="107.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="456.2" y="126.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="505.2" y="99.4" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">11: home 0 ≤ hole 10, so it moved to slot 10,</text>
+<text x="505.2" y="113.4" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">a slot its search never reaches ✗</text>
+<text x="109.2" y="168.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">search 11</text>
+<rect x="141.2" y="151.6" width="30" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="156.2" y="188.6" font-size="10" font-weight="700" fill="#0a7d4d" text-anchor="middle">0</text>
+<rect x="171.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="186.2" y="169.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="186.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="201.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="216.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="231.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="246.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="261.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="276.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="291.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="306.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="321.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="351.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="366.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="381.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="396.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="411.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="426.2" y="169.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="426.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="441.2" y="151.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="456.2" y="169.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="456.2" y="188.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="156.2" y="200.6" font-size="10.5" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-style="italic">h</text>
+<text x="505.2" y="161.6" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">h(11) = 0 is empty: not found ✗</text>
+<text x="505.2" y="175.6" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">11 is in slot 10</text>
+<text x="109.2" y="242.8" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">search 53</text>
+<rect x="141.2" y="225.8" width="30" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="156.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="171.2" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="186.2" y="243.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">53</text>
+<text x="186.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="201.2" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="216.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="231.2" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="246.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="261.2" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="276.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="291.2" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="306.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="321.2" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="351.2" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="366.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="381.2" y="225.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="396.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="411.2" y="225.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="426.2" y="243.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<text x="426.2" y="262.8" font-size="10" font-weight="700" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="441.2" y="225.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="456.2" y="243.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="456.2" y="262.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="426.2" y="274.8" font-size="10.5" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-style="italic">h</text>
+<path d="M429.2,224.8 Q441.2,202.4 453.2,224.8" fill="none" stroke="#4a5163" stroke-width="1.6"/><path d="M453.2,224.8 L447.3,220.6 L453,217.5 Z" fill="#4a5163"/>
+<path d="M459.2,224.8 Q483.2,202.4 483.2,238.8 L483.2,277.8 Q483.2,283.8 477.2,283.8 L152.2,283.8 Q146.2,283.8 146.2,277.8 L146.2,258.8" fill="none" stroke="#4a5163" stroke-width="1.6" stroke-dasharray="4 3"/><path d="M146.2,252.8 L149.4,259.3 L142.9,259.3 Z" fill="#4a5163"/>
+<text x="505.2" y="235.8" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">42, 11, then empty slot 0: not found ✗</text>
+<text x="505.2" y="249.8" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">53 is in slot 1</text>
+</svg>
+<!-- /gen:hs lp-shift-naive -->
+        </figure>
+        Here \(11\), homed at slot \(0\), is moved to slot \(10\), which its
+        search never visits, and the hole left in slot \(0\) also cuts off
+        \(53\).
       </div>
       <div class="aside">
         <span class="tag">What is a tombstone, concretely?</span>
@@ -3505,10 +4220,55 @@ void LinearProbing::resize(int newM) {
             miss.
           </details>
         </li>
+        <li>
+          A linear-probing table with \(M = 7\) and \(h(k) = k \bmod 7\) holds:
+          <figure class="wide">
+<!-- gen:hs lp-shift-practice -->
+<svg viewBox="0 0 304 63" role="img" style="max-width:365px" font-family="system-ui, sans-serif" aria-label="Linear probing with M = 7 and h(k) = k mod 7: M = 7: 20 at 0, 7 at 1, 27 at 2, 13 at 6; the rest empty. Delete 13 by shifting: which keys move?">
+<text x="72" y="31" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">delete 13?</text>
+<rect x="84" y="14" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="99" y="32" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<text x="99" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="14" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="129" y="32" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="129" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="144" y="14" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="159" y="32" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<text x="159" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="174" y="14" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="189" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="204" y="14" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="219" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="234" y="14" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="249" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="264" y="14" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="279" y="32" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">13</text>
+<text x="279" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+</svg>
+<!-- /gen:hs lp-shift-practice -->
+          </figure>
+          Delete \(13\) by shifting. Which keys move, and where? What goes wrong
+          if the test is \(r \le i\) instead of \(d(r, i) < d(r, j)\)?
+          <details>
+            <summary>solution</summary>
+            The homes: \(h(13) = h(20) = h(27) = 6\), \(h(7) = 0\); the
+            cluster is slots \(6, 0, 1, 2\). Empty slot \(6\) (the hole).
+            \(20\) in slot \(0\): \(d(6, 6) = 0 < d(6, 0) = 1\), so it moves to
+            \(6\) and the hole moves to \(0\). \(7\) in slot \(1\):
+            \(d(0, 0) = 0 < d(0, 1) = 1\), so it moves to \(0\); hole \(1\).
+            \(27\) in slot \(2\): \(d(6, 1) = 2 < d(6, 2) = 3\), so it moves to
+            \(1\); hole \(2\). Slot \(3\) is empty: done, with
+            <code>[7 27 _ _ _ _ 20]</code>. With \(r \le i\), \(20\)
+            (\(6 \le 6\)) and \(7\) (\(0 \le 0\)) move as before, but \(27\)
+            (\(6 \le 1\) is false) stays in slot \(2\) behind the hole at slot
+            \(1\). A search for \(27\) walks \(6\) (\(20\)), \(0\) (\(7\)),
+            reaches the empty slot \(1\), and reports \(27\) absent.
+          </details>
+        </li>
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Hashing v1.3 &middot; prepared by
+        Data Structures &amp; Algorithms &middot; Hashing v1.4 &middot; prepared by
         Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
