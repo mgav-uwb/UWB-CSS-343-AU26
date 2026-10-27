@@ -14,7 +14,7 @@
 
 > At one operation per nanosecond, $2^{100}$ operations take about $4 \times 10^{13}$ years, about 2,900 times the age of the universe.
 
-<small>2<sup>100</sup> ns ≈ 1.3 × 10<sup>21</sup> s; age of the universe ≈ 13.8 billion years</small>
+<small>$2^{100}$ ns $\approx 1.3 \times 10^{21}$ s; age of the universe $\approx$ 13.8 billion years</small>
 
 --
 
@@ -59,7 +59,7 @@ int halvings(int n) {
 
 The count is $\boldsymbol{\lfloor \log\_2 N \rfloor}$: **doubling** $\boldsymbol{N}$ **adds one step**.
 
-<small>Some authors write lg N for log₂ N; this course writes log₂.</small>
+<small>Some authors write $\lg N$ for $\log\_2 N$; this course writes $\log\_2$.</small>
 
 --
 

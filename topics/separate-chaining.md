@@ -149,5 +149,5 @@ $h(50) = 1$; compare 1, 15 (2 compares); link: 1 → 15 → 50.
 </pre>
 </div>
 
-<small>The same flood: but the table **doubles $M$ and rehashes everything at $\alpha = 1$**. Run the flood preset and watch the chains **shorten mid-build**. THIS is the actor behind "expected Θ(1)".</small>
+<small>The same flood: but the table **doubles $M$ and rehashes everything at $\alpha = 1$**. Run the flood preset and watch the chains **shorten mid-build**. THIS is the actor behind "expected $\Theta(1)$".</small>
 

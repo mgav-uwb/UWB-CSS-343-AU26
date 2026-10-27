@@ -81,7 +81,7 @@ Two different keys can hash to the **same** slot: $h(25) = h(35) = 5$.
 
 --
 
-## Why √M keys already collide
+## Why $\sqrt{M}$ keys collide
 
 Insert $n$ keys; each must **miss** all earlier ones:
 
@@ -93,7 +93,7 @@ P(\text{no collision}) &= \left(1 - \frac{1}{M}\right)\left(1 - \frac{2}{M}\righ
 \end{aligned}
 $$
 
-using $1 - x \approx e^{-x}$. This drops to ½ when $n \approx 1.18 \sqrt{M}$. For $M = 365$: $n \approx 23$. ✓
+using $1 - x \approx e^{-x}$. This drops to $\tfrac{1}{2}$ when $n \approx 1.18 \sqrt{M}$. For $M = 365$: $n \approx 23$. ✓
 
 --
 

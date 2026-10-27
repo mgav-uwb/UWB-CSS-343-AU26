@@ -10,7 +10,7 @@
 
 ### Representing a graph
 
-> In 2011 Facebook had 721 million active users and 69 billion friendships. An adjacency matrix would have held about 5 × 10<sup>17</sup> entries, fewer than one in three million of them nonzero.
+> In 2011 Facebook had 721 million active users and 69 billion friendships. An adjacency matrix would have held about $5 \times 10^{17}$ entries, fewer than one in three million of them nonzero.
 
 <small>J. Ugander et al., “The Anatomy of the Facebook Social Graph,” arXiv:1111.4503, 2011</small>
 

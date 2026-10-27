@@ -43,7 +43,7 @@ $$\bigl(h(k) + i^2\bigr) \bmod M, \quad i = 1, 2, 3, \dots$$
    insert 66: h = 0 taken; 0 + 1 = 1 taken; 0 + 4 = 4 taken;
    0 + 9 = 9 taken; (0 + 16) mod 11 = 5: place 66"></div>
 
-Colliders **leave the neighborhood** instead of extending a run. (Catch: it may miss free slots; keep $\alpha$ < ½ and $M$ prime.)
+Colliders **leave the neighborhood** instead of extending a run. (Catch: it may miss free slots; keep $\alpha < \tfrac{1}{2}$ and $M$ prime.)
 
 --
 
@@ -164,7 +164,7 @@ Each key gets a **new** $h(k) \bmod M$: you can't copy slots. A resize is $\Thet
 </pre>
 </div>
 
-<small>Insert any key: $\alpha$ crosses **½**, the table **doubles**, and every key **rehashes**: watch 6 and 14 split apart (they collided at $M = 8$, they don't at $M = 16$). One Θ(n) rebuild, then $\alpha$ is back at ¼.</small>
+<small>Insert any key: $\alpha$ crosses $\boldsymbol{\tfrac{1}{2}}$, the table **doubles**, and every key **rehashes**: watch 6 and 14 split apart (they collided at $M = 8$, they don't at $M = 16$). One $\Theta(n)$ rebuild, then $\alpha$ is back at $\tfrac{1}{4}$.</small>
 
 --
 
