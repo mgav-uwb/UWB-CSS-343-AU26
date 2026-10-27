@@ -29,13 +29,13 @@ It is the _only_ structural move AVL needs.
 
 ## Right rotation: the picture
 
-```text
+<div><img src="../../topics/figures/avl/av-rot-right.svg" style="height:230px" alt="
       y                 x
      / \              /   \
     x   C     →      A     y
    / \                    / \
   A   B                  B   C
-```
+"></div>
 
 `B` (keys between x and y) moves from x's right to y's left. `x` rises, `y` sinks.
 
@@ -53,19 +53,19 @@ Node* rotateRight(Node* y) {
 }
 ```
 
-Three pointer writes, two height updates: all **O(1)**.
+Three pointer writes, two height updates: all $O(1)$.
 
 --
 
 ## Left rotation: the mirror
 
-```text
+<div><img src="../../topics/figures/avl/av-rot-left.svg" style="height:185px" alt="
     x                     y
    / \                  /   \
   A   y       →        x     C
      / \              / \
     B   C            A   B
-```
+"></div>
 
 ```cpp
 Node* rotateLeft(Node* x) {
@@ -81,15 +81,15 @@ Node* rotateLeft(Node* x) {
 
 ## Order is preserved
 
-In-order of both trees is the same: **A · x · B · y · C**.
+In-order of both trees is the same: **A x B y C**.
 
-```text
+<div><img src="../../topics/figures/avl/av-rot-order.svg" style="height:240px" alt="
    y            x
   / \          / \
  x   C   ≡    A   y      in-order:  A x B y C
 / \              / \
 A  B            B  C
-```
+"></div>
 
 Rotations move _structure_, never _order_: so search still works after any rotation.
 
@@ -97,9 +97,9 @@ Rotations move _structure_, never _order_: so search still works after any rotat
 
 ## The middle subtree re-hangs
 
-Right-rotate at **50** (child **30** rises). **B = `40(35,45)`**: the keys *between* 30 and 50: is the one subtree that **changes parent**:
+Right-rotate at **50**: **B** = `40(35,45)`, the keys *between* 30 and 50, is the one subtree that **changes parent**:
 
-```text
+<div><img src="../../topics/figures/avl/av-middle.svg" style="height:200px" alt="
        50                        30
       /  \                      /   \
     30    75        →         20     50
@@ -107,7 +107,7 @@ Right-rotate at **50** (child **30** rises). **B = `40(35,45)`**: the keys *betw
   20   40                   10    40    75
  /    /  \                        /  \
 10  35  45                       35  45
-```
+"></div>
 
 Only **B** re-hangs (30's right → 50's left): the single line **`y->left = x->right`**; the whole subtree follows one pointer, in-order unchanged.
 
@@ -134,16 +134,17 @@ Only **B** re-hangs (30's right → 50's left): the single line **`y->left = x->
 
 ## The four imbalance shapes
 
-When a node `z` goes to **bf ±2**, the direction of the two steps below it names the case:
+Two steps down the taller side of `z` name the case:
 
+<div><img src="../../topics/figures/avl/av-cases.svg" style="height:370px" alt="
 | case   | the two steps     | fix                           |
-| ------ | ----------------- | ----------------------------- |
-| **LL** | left, then left   | one **right** rotation        |
-| **RR** | right, then right | one **left** rotation         |
-| **LR** | left, then right  | **double** (left, then right) |
-| **RL** | right, then left  | **double** (right, then left) |
+| LL     | left, then left   | one right rotation            |
+| RR     | right, then right | one left rotation             |
+| LR     | left, then right  | double (left, then right)     |
+| RL     | right, then left  | double (right, then left)     |
+"></div>
 
-Straight (LL/RR) → one rotation. Kinked (LR/RL) → two.
+Straight (LL, RR): one rotation. Kinked (LR, RL): two.
 
 --
 

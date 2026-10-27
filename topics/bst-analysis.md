@@ -10,7 +10,7 @@
 
 ### How tall is a BST?
 
-> A BST built by random insertions has average depth about 2 ln n ≈ 1.39 log₂ n, only 39% more than a perfectly balanced tree.
+> A BST built by random insertions has average depth about $2 \ln n \approx 1.39 \log\_2 n$, only 39% more than a perfectly balanced tree.
 
 <small>D. E. Knuth, The Art of Computer Programming, Volume 3, §6.2.2</small>
 
@@ -18,7 +18,7 @@
 
 ## Cost = the length of a path = depth
 
-Every BST operation walks **one or two paths** root→down: **Θ(depth)** each, worst case **Θ(height)**.
+Every BST operation walks **one or two paths** root→down: $\Theta(\text{depth})$ each, worst case $\Theta(\text{height})$.
 
 > **Proposition E.** In a BST, all operations take time proportional to the **height** of the tree, in the worst case.
 
@@ -30,7 +30,7 @@ Everything reduces to **one question: how tall is the tree?**
 
 <img src="../../topics/figures/trees/fig-07-bst-shapes-best-typical-worst.svg" alt="The same seven keys inserted in four orders: a balanced best case, a typical case, and two worst-case paths from sorted and reverse-sorted input" style="width:96%">
 
-<small>The same keys, different insertion orders: **balanced** (height ~log₂ n), **typical**, and a **path** (height n−1) from sorted or reverse-sorted input. Cost follows height: so which one do we usually get?</small>
+<small>The same keys, different insertion orders: **balanced** (height about $\log\_2 n$), **typical**, and a **path** (height $n - 1$) from sorted or reverse-sorted input. Cost follows height: so which one do we usually get?</small>
 
 --
 
@@ -51,7 +51,7 @@ Everything reduces to **one question: how tall is the tree?**
 </pre>
 </div>
 
-<small>**Shuffle** the right tree: sorted insertion → a **path**; random → **bushy** (~1.39 log₂ n average depth). Same keys, different shapes.</small>
+<small>**Shuffle** the right tree: sorted insertion → a **path**; random → **bushy** (average depth about $1.39 \log\_2 n$). Same keys, different shapes.</small>
 
 --
 
@@ -59,7 +59,7 @@ Everything reduces to **one question: how tall is the tree?**
 
 <img src="../../topics/figures/trees/fig-08-typical-bst-256-keys.svg" alt="A BST built from 256 random keys: average depth 8.2 against log2 256 = 8, height 16" style="height:340px">
 
-<small>A BST from **256 random keys**: bushy and shallow, average depth **8.2** against log₂ 256 = 8, not a path. Random insertion ≈ random quicksort pivots.</small>
+<small>A BST from **256 random keys**: bushy and shallow, average depth **8.2** against $\log\_2 256 = 8$, not a path. Random insertion ≈ random quicksort pivots.</small>
 
 --
 
@@ -67,7 +67,7 @@ Everything reduces to **one question: how tall is the tree?**
 
 Compares for a search **hit** = 1 + the node's **depth**; summing all depths gives the **internal path length**.
 
-> **Proposition C.** Search hits in a BST built from **N random** keys use **~ 2 ln N ≈ 1.39 log₂ N** compares on average.
+> **Proposition C.** Search hits in a BST built from $N$ **random** keys use $\sim 2 \ln N \approx 1.39 \log\_2 N$ compares on average.
 
 The proof is a recurrence, the same one as quicksort's.
 
@@ -75,21 +75,19 @@ The proof is a recurrence, the same one as quicksort's.
 
 ## Proposition D: insertion
 
-> **Proposition D.** Insertions and search **misses** also use **~ 1.39 log₂ N** compares on average.
+> **Proposition D.** Insertions and search **misses** also use $\sim 1.39 \log\_2 N$ compares on average.
 
-So a random BST is only **~39% costlier** than a balanced one, and inserts in **O(log n)**.
-
-By contrast, a sorted array inserts in **linear** time. **Why?**
+A random BST costs only **about 39% more** than a balanced one and inserts in $O(\log n)$; a sorted array inserts in **linear** time. **Why?**
 
 <details class="answer"><summary>Answer:</summary>
 
-Both find the spot in ~log n compares. The **array** then shifts every larger key right (up to **n moves**); the **BST** hangs the node on the **null link** where the search ended (**nothing moves**).
+Both find the spot in about $\log\_2 n$ compares. The **array** shifts every larger key right (up to $n$ moves); the **BST** hangs the node on a **null link** (**nothing moves**).
 
 </details>
 
 --
 
-## Demo: theory meets measurement
+## Demo: theory meets data
 
 <div class="algo-viz" data-algo="bst-experiments">
 <pre class="viz-fallback">
@@ -105,7 +103,7 @@ Both find the spot in ~log n compares. The **array** then shifts every larger ke
 </pre>
 </div>
 
-<small>**Run trial**: build random BSTs of growing N, plot the average compares. The measured cost tracks **1.39 log₂ N − 1.85**: a random BST stays shallow.</small>
+<small>**Run trial**: random BSTs of growing $N$; the average compares track $1.39 \log\_2 N - 1.85$, so a random BST stays shallow.</small>
 
 --
 
@@ -113,9 +111,9 @@ Both find the spot in ~log n compares. The **array** then shifts every larger ke
 
 | implementation | search worst | insert worst | search avg | insert avg |
 |---|:---:|:---:|:---:|:---:|
-| unordered list | Θ(n) | Θ(n) | Θ(n) | Θ(n) |
-| sorted array | Θ(log n) | Θ(n) | Θ(log n) | **Θ(n)** |
-| **BST** | Θ(n) | Θ(n) | **Θ(log n)** | **Θ(log n)** |
+| unordered list | $\Theta(n)$ | $\Theta(n)$ | $\Theta(n)$ | $\Theta(n)$ |
+| sorted array | $\Theta(\log n)$ | $\Theta(n)$ | $\Theta(\log n)$ | $\boldsymbol{\Theta(n)}$ |
+| **BST** | $\Theta(n)$ | $\Theta(n)$ | $\boldsymbol{\Theta(\log n)}$ | $\boldsymbol{\Theta(\log n)}$ |
 
 Only the BST has **logarithmic insert on average**: a sorted array's is linear. Its one weakness is the **worst case**.
 
@@ -123,10 +121,10 @@ Only the BST has **logarithmic insert on average**: a sorted array's is linear. 
 
 ## Height ≠ average depth
 
-Two different "log n"s for a random BST:
+Two different logarithms for a random BST:
 
-- average **depth** (internal path length) → **~1.39 log₂ N** (Prop C)
-- average **height** → **~2.99 log₂ N** (Robson; Devroye): taller, still logarithmic
+- average **depth** (internal path length) → $\sim 1.39 \log\_2 N$ (Prop C)
+- average **height** → $\sim 2.99 \log\_2 N$ (Robson; Devroye): taller, still logarithmic
 
-**Random is a hope, not a guarantee**: sorted input builds a path, height **n−1** → **balanced trees**: Θ(log n) for *any* order.
+**Random is a hope, not a guarantee**: sorted input builds a path, height $n - 1$ → **balanced trees**: $\Theta(\log n)$ for *any* order.
 

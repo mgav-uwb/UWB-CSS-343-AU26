@@ -20,18 +20,18 @@
 
 For a BST, every BST operation walks **one root-to-leaf path**, so
 
-- search / insert / delete are all **Θ(height)**
-- a binary tree's height ranges from **log₂ n** (balanced) to **n − 1** (a path)
+- search / insert / delete are all $\Theta(\text{height})$
+- a binary tree's height ranges from $\log\_2 n$ (balanced) to $n - 1$ (a path)
 
 The whole game is: **keep the height small**.
 
 --
 
-## The worst case: sorted input
+## Worst case: sorted input
 
 Insert **1, 2, 3, 4, 5** into a plain BST: each key is the largest so far, so it hangs off the right, forming a path:
 
-```text
+<div><img src="../../topics/figures/avl/av-path.svg" style="height:200px" alt="
    1
     \
      2
@@ -41,9 +41,9 @@ Insert **1, 2, 3, 4, 5** into a plain BST: each key is the largest so far, so it
          4
           \
            5
-```
+"></div>
 
-A sorted (or reverse-sorted) sequence (common in practice) reduces a BST to a linked list.
+Search and insert now cost $\Theta(n)$. Sorted or reverse-sorted input, common in practice, reduces a BST to a linked list.
 
 --
 
@@ -72,12 +72,12 @@ A sorted (or reverse-sorted) sequence (common in practice) reduces a BST to a li
 
 ## What would "balanced" even mean?
 
-Ideally: **perfectly balanced**: every leaf at depth ⌊log₂ n⌋. But keeping a tree _perfectly_ balanced on each insert costs too much (you'd rebuild large chunks).
+Ideally: **perfectly balanced**: every leaf at depth $\lfloor \log\_2 n \rfloor$. But keeping a tree _perfectly_ balanced on each insert costs too much (you'd rebuild large chunks).
 
 The AVL idea: **relax** perfect balance just enough that
 
 - it's **cheap** to restore on each insert, yet
-- the height stays **Θ(log n)**
+- the height stays $\Theta(\log n)$
 
 --
 
@@ -87,34 +87,38 @@ The AVL idea: **relax** perfect balance just enough that
 
 > **The AVL invariant.** Every node stays **balanced**: its two subtrees' heights differ by **at most 1**.
 
-The **balance factor** is the lean: **bf(x) = height(left) − height(right)**: the invariant is **bf ∈ {−1, 0, +1}**.
+The **balance factor** is the lean:
+
+$$\mathrm{bf}(x) = \mathrm{height}(\text{left}) - \mathrm{height}(\text{right})$$
+
+The invariant: $\mathrm{bf}(x) \in \lbrace -1, 0, +1 \rbrace$ at every node.
 
 --
 
 ## Balance factor, by picture
 
-```text
+<div><img src="../../topics/figures/avl/av-bf-shapes.svg" style="height:240px" alt="
    bf = 0        bf = +1        bf = +2  ✗
      •             •               •
     / \           /               /
    •   •         •               •
                                  /
                                 •
-```
+"></div>
 
-- heights within **1** → balanced (`−1, 0, +1`)
+- heights within **1** → balanced: $-1, 0, +1$
 - a difference of **2** → we must fix it (a rotation)
 
-Height convention: **height(null) = −1**, a leaf has height **0**.
+Height convention: $\mathrm{height}(\text{null}) = -1$, so a leaf has height $0$.
 
 --
 
 ## Perfectly balanced vs balanced
 
-- **perfectly balanced**: all leaves at depth ≈ log₂ n; beautiful, but too rigid to maintain per insert
-- **balanced (AVL)**: subtree heights differ by ≤ 1 at every node; a little slack → cheap to maintain
+- **perfectly balanced**: all leaves at depth $\approx \log\_2 n$; beautiful, but too rigid to maintain per insert
+- **balanced (AVL)**: subtree heights differ by at most 1 at every node; a little slack → cheap to maintain
 
-AVL is **not** perfectly balanced: just **balanced**, which is _close enough_ that height stays **Θ(log n)**.
+AVL is **not** perfectly balanced: just **balanced**, which is _close enough_ that height stays $\Theta(\log n)$.
 
 --
 
@@ -122,17 +126,13 @@ AVL is **not** perfectly balanced: just **balanced**, which is _close enough_ th
 
 ```cpp
 struct Node {
-    Key   key;   Value val;
-    Node* left  = nullptr;
-    Node* right = nullptr;
-    int   height = 0;        // leaf = 0, null = -1
+    Key   key;   Value val;   int height = 0;   // leaf = 0, null = -1
+    Node* left = nullptr;     Node* right = nullptr;
 };
-
 int height(Node* t){ return t ? t->height : -1; }
 int bf(Node* t){ return height(t->left) - height(t->right); }
 void fix(Node* t){ t->height = 1 + max(height(t->left),
                                        height(t->right)); }
-
 class AVLTree {
     Node* root = nullptr;
 public:
@@ -146,15 +146,15 @@ public:
 
 ## Reading a tree: the balance factors
 
-```text
+<div><img src="../../topics/figures/avl/av-read-bf.svg" style="height:220px" alt="
       8   bf = +1
      / \
     4   9    bf 0, 0
    / \
   2   6    bf 0, 0
-```
+"></div>
 
-Left subtree of 8 has height 1, right has height 0 → **bf(8) = +1** (still legal). Every other node is 0.
+Left subtree of 8 has height 1, right has height 0, so $\mathrm{bf}(8) = 1 - 0 = +1$ (still legal). Every other node is 0.
 
 --
 
@@ -162,7 +162,7 @@ Left subtree of 8 has height 1, right has height 0 → **bf(8) = +1** (still leg
 
 An insert or delete changes heights **only along its root-to-leaf path**. So:
 
-- only nodes **on that path** can reach bf ±2
+- only nodes **on that path** can reach $\mathrm{bf} = \pm 2$
 - we check and fix **on the way back up**: nowhere else
 
 That is why **one upward pass** is enough.
@@ -193,7 +193,7 @@ That is why **one upward pass** is enough.
 
 1. **insert / delete** like an ordinary BST
 2. update **heights** on the way back up
-3. wherever a node's **bf hits ±2**, apply a **rotation** to restore it
+3. wherever a node's balance factor hits $\pm 2$, apply a **rotation** to restore it
 
 The one new tool is the **rotation**.
 

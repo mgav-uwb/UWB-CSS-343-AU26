@@ -18,11 +18,11 @@
 
 ## Ordered operations: more than a set
 
-Beyond get/put: the **ordered API**, each in Θ(height):
+Beyond get/put: the **ordered API**, each in $\Theta(\text{height})$:
 
 - **min / max**: leftmost / rightmost node
-- **floor(k) / ceiling(k)**: largest key ≤ k / smallest key ≥ k
-- **select(i) / rank(k)**: key of rank i / # keys < k (uses `size`)
+- **floor(k) / ceiling(k)**: largest key $\le k$ / smallest key $\ge k$
+- **select(i) / rank(k)**: the key of rank $i$ / the number of keys $< k$ (uses `size`)
 - **range**: `keys(lo, hi)`: the keys in `[lo, hi]`, in order
 
 --
@@ -30,8 +30,8 @@ Beyond get/put: the **ordered API**, each in Θ(height):
 ## min / max, floor / ceiling
 
 - **min / max**: follow `left` / `right` links to the end.
-- **floor(k)** = largest key ≤ k.
-- **ceiling(k)** = smallest key ≥ k.
+- **floor(k)** = largest key $\le k$.
+- **ceiling(k)** = smallest key $\ge k$.
 
 ```cpp
 Node* floor(Node* t, const Key& k) {   // largest key ≤ k
@@ -43,7 +43,7 @@ Node* floor(Node* t, const Key& k) {   // largest key ≤ k
 }
 ```
 
-`ceiling` mirrors it (swap left/right and ≤/≥).
+`ceiling` mirrors it (swap left/right and $\le$/$\ge$).
 
 --
 
@@ -69,7 +69,7 @@ Node* floor(Node* t, const Key& k) {   // largest key ≤ k
 
 ## select / rank: the count field earns its keep
 
-With **`size`** on every node, both are Θ(height):
+With **`size`** on every node, both are $\Theta(\text{height})$:
 
 ```cpp
 Key select(Node* t, int i) {             // key of rank i
@@ -115,10 +115,10 @@ int rank(Node* t, const Key& k) {        // # keys < k
 An **in-order** traversal, pruned: recurse into a side only if it could hold in-range keys.
 
 ```cpp
-void keys(Node* t, Queue& q, Key lo, Key hi) {
+void keys(Node* t, queue<Key>& q, Key lo, Key hi) {
     if (!t) return;
     if (lo < t->key)  keys(t->left,  q, lo, hi);
-    if (lo <= t->key && t->key <= hi) q.enqueue(t->key);
+    if (lo <= t->key && t->key <= hi) q.push(t->key);
     if (t->key < hi)  keys(t->right, q, lo, hi);
 }
 ```
@@ -132,7 +132,7 @@ Returns `[lo, hi]` **in sorted order**, in time **height + output size**.
 A **BST / ordered map** shines where you need **order** (a hash table can't):
 
 - **autocomplete** → **range** search
-- **nearest key** (≥ / ≤) → **floor / ceiling**
+- **nearest key** ($\ge$ / $\le$) → **floor / ceiling**
 - **leaderboards** → **rank / select**
 - **date / price ranges** → **range** query
 - **`std::map` / `std::set`** = balanced BSTs

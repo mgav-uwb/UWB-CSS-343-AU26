@@ -15,7 +15,7 @@
 - **rotations** fix an imbalance in constant time and keep the BST order
 - **insertion**: BST insert, then rebalance on the way up; one rotation (single or double) suffices
 - **deletion**: BST delete, then rebalance; rotations may cascade up the path
-- **height** at most about **1.44 log₂ n**, so every operation is Θ(log n) in the worst case
+- **height** at most about $1.44 \log\_2 n$, so every operation is $\Theta(\log n)$ in the worst case
 
 --
 

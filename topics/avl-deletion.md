@@ -35,19 +35,21 @@ Insertion needs **one** rotation. Deletion is different:
 - rebalancing there can shorten the _parent_: which may now violate
 - so a rotation may be needed at **each** node up the path
 
-Still **O(log n)** rotations total (the path is log-tall), but not just one.
+Still $O(\log n)$ rotations total (the path is $O(\log n)$ tall), but not just one.
 
 --
 
-## Which rotation? Same balance factors
+## Which rotation?
 
-At a node that hit **bf ±2** after a delete, read the **taller** side's child:
+Left at $+2$: the left child's balance factor picks the fix.
 
-- **left-heavy**, left child bf ≥ 0 → **right** rotation (LL)
-- **left-heavy**, left child bf < 0 → **double** (LR)
-- **right-heavy**, mirror → **left** / **double** (RL)
+<div><img src="../../topics/figures/avl/av-del-cases.svg" style="height:350px" alt="
+- left-heavy, left child bf ≥ 0 → right rotation (LL)
+- left-heavy, left child bf < 0 → double (LR)
+- right-heavy, mirror → left / double (RL)
+"></div>
 
-Exactly the `rebalance` of AVL insertion: no new cases.
+Same code as insertion; right-heavy is the mirror.
 
 --
 
@@ -75,15 +77,15 @@ Node* erase(Node* t, const Key& k) {
 
 ## Worked: a delete that rotates
 
-Delete **1**: the right side is now too tall (bf −2):
+Delete **1**: the right side is now too tall, $\mathrm{bf}(3) = -2$:
 
-```text
+<div><img src="../../topics/figures/avl/av-del.svg" style="height:220px" alt="
      3            3 (bf −2)        4
     / \            \              / \
    1   4    →        4      →     3   5
         \            \
          5            5
-```
+"></div>
 
 Removing 1 leaves 3 right-heavy (RR) → one **rotateLeft(3)** restores it.
 

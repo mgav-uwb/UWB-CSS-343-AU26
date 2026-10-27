@@ -11,12 +11,12 @@
 
 ## Recap
 
-- **height** is between log₂ n and n − 1
+- **height** is between $\log\_2 n$ and $n - 1$
 - **traversals**: pre, in, post, level; in-order of a BST is sorted
-- **BST**: search, insert, delete in **Θ(height)**
+- **BST**: search, insert, delete in $\Theta(\text{height})$
 - **ordered operations**: min/max, floor/ceiling, select/rank, range
 - **deletion**: Hibbard, by the in-order successor
-- random insertion order gives ~**1.39 log₂ N**; sorted order gives a path
+- random insertion order gives $\sim 1.39 \log\_2 N$; sorted order gives a path
 
 --
 

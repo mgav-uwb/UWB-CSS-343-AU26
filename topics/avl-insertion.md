@@ -10,7 +10,7 @@
 
 ### AVL insertion
 
-> Insert the keys 1, 2, …, 2<sup>k</sup> − 1 in order and a plain BST becomes a path; an AVL tree becomes a perfectly balanced tree.
+> Insert the keys $1, 2, \ldots, 2^k - 1$ in order and a plain BST becomes a path; an AVL tree becomes a perfectly balanced tree.
 
 <small>Checked for k = 1 to 11 with the course's AVL code</small>
 
@@ -20,7 +20,7 @@
 
 1. **insert** the new key at a leaf (ordinary BST insert)
 2. returning up the path, **`fix`** each node's height
-3. at the **first** node whose **bf becomes ±2**, apply **one** rotation
+3. at the **first** node whose balance factor becomes $\pm 2$, apply **one** rotation
 
 That single rotation restores the height the subtree had _before_ the insert → the whole tree is balanced again.
 
@@ -30,13 +30,13 @@ That single rotation restores the height the subtree had _before_ the insert →
 
 `z` is left-heavy and its left child leans left too. Insert **1** into `3 ← 2`:
 
-```text
+<div><img src="../../topics/figures/avl/av-ll.svg" style="height:230px" alt="
     3 (bf +2)             2
    /                     / \
   2          →          1   3
  /
 1
-```
+"></div>
 
 One **rotateRight(3)**: and `2` becomes the root of a balanced subtree.
 
@@ -46,13 +46,13 @@ One **rotateRight(3)**: and `2` becomes the root of a balanced subtree.
 
 `z` is right-heavy and its right child leans right. Insert **3** into `1 → 2`:
 
-```text
+<div><img src="../../topics/figures/avl/av-rr.svg" style="height:230px" alt="
   1 (bf −2)              2
    \                    / \
     2         →        1   3
      \
       3
-```
+"></div>
 
 One **rotateLeft(1)**: the sorted-ascending case, now self-correcting.
 
@@ -62,13 +62,13 @@ One **rotateLeft(1)**: the sorted-ascending case, now self-correcting.
 
 `z` is left-heavy but its left child leans **right** (a kink). Insert **2** into `3 ← 1`:
 
-```text
+<div><img src="../../topics/figures/avl/av-lr.svg" style="height:225px" alt="
     3            3            2
    /            /            / \
   1     →      2      →     1   3
    \          /
     2        1
-```
+"></div>
 
 **rotateLeft(1)** straightens it into LL, then **rotateRight(3)** finishes.
 
@@ -78,13 +78,13 @@ One **rotateLeft(1)**: the sorted-ascending case, now self-correcting.
 
 `z` is right-heavy but its right child leans **left**. Insert **2** into `1 → 3`:
 
-```text
+<div><img src="../../topics/figures/avl/av-rl.svg" style="height:225px" alt="
   1            1                2
    \            \              / \
     3     →      2      →     1   3
    /              \
   2                3
-```
+"></div>
 
 **rotateRight(3)** straightens into RR, then **rotateLeft(1)** finishes.
 
@@ -142,14 +142,14 @@ Same shape as the BST insert, plus **`rebalance`** on the way up.
 
 Sorted input: a **height-6 path** in a plain BST. The AVL rotates as it goes:
 
-```text
+<div><img src="../../topics/figures/avl/av-seq.svg" style="height:210px" alt="
  after 1,2,3     after 4,5         after 6,7
    2               2                  4
   / \             / \                / \
  1   3           1   4              2   6
                     / \            / \ / \
                    3   5          1  3 5  7
-```
+"></div>
 
 Seven worst-case inserts → **height 2**, never a path.
 
@@ -166,5 +166,5 @@ Seven worst-case inserts → **height 2**, never a path.
 </pre>
 </div>
 
-<small>Auto-runs **insert 160**: descend → **plain-insert** the leaf → recompute **bf** up the path: it **pauses** at bf −2 (node **140**) so you can **predict the rotation**, then **▶ continue** rotates it. Every node shows its bf; only the path changes. (Full sandbox with all ops: the **Demos** page.)</small>
+<small>Auto-runs **insert 160**: descend → **plain-insert** the leaf → recompute **bf** up the path: it **pauses** at bf $-2$ (node **140**) so you can **predict the rotation**, then **▶ continue** rotates it. Every node shows its bf; only the path changes. (Full sandbox with all ops: the **Demos** page.)</small>
 

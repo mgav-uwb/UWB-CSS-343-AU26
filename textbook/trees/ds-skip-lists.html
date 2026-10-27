@@ -192,66 +192,106 @@
         list; everything above it is an index into that list.
       </p>
       <figure>
-        <svg viewBox="0 0 700 186" role="img" aria-label="The fixed example skip list with four levels. Level 0, the bottom, links head to 4, 9, 13, 22, 27, 34, 38, 42, 50, 55, then nil. Level 1 links head to 9, 22, 34, 42, 50. Level 2 links head to 9, 34, 50. Level 3, the top, links head to 34 only. Each key occupies one column, and its boxes stack into a tower whose height is the number of levels it appears in.">
-          <g font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">
-            <!-- level lines -->
-            <g stroke="#b9c0d0" stroke-width="1.4">
-              <line x1="67" y1="31"  x2="672" y2="31"/>
-              <line x1="67" y1="71"  x2="672" y2="71"/>
-              <line x1="67" y1="111" x2="672" y2="111"/>
-              <line x1="67" y1="151" x2="672" y2="151"/>
-            </g>
-            <g fill="#7a8296" font-size="12">
-              <text x="684" y="35">&#8709;</text><text x="684" y="75">&#8709;</text>
-              <text x="684" y="115">&#8709;</text><text x="684" y="155">&#8709;</text>
-            </g>
-            <!-- head tower -->
-            <g>
-              <rect x="23" y="16"  width="44" height="30" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-              <rect x="23" y="56"  width="44" height="30" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-              <rect x="23" y="96"  width="44" height="30" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-              <rect x="23" y="136" width="44" height="30" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-              <g fill="#0a7d4d" font-size="11.5" font-weight="600">
-                <text x="45" y="35">L3</text><text x="45" y="75">L2</text>
-                <text x="45" y="115">L1</text><text x="45" y="155">L0</text>
-              </g>
-            </g>
-            <!-- key towers: heights 4:1 9:3 13:1 22:2 27:1 34:4 38:1 42:2 50:3 55:1 -->
-            <g fill="#fff" stroke="#2a2d36" stroke-width="1.5">
-              <rect x="83"  y="136" width="44" height="30" rx="5"/>
-              <rect x="143" y="56"  width="44" height="30" rx="5"/>
-              <rect x="143" y="96"  width="44" height="30" rx="5"/>
-              <rect x="143" y="136" width="44" height="30" rx="5"/>
-              <rect x="203" y="136" width="44" height="30" rx="5"/>
-              <rect x="263" y="96"  width="44" height="30" rx="5"/>
-              <rect x="263" y="136" width="44" height="30" rx="5"/>
-              <rect x="323" y="136" width="44" height="30" rx="5"/>
-              <rect x="383" y="16"  width="44" height="30" rx="5"/>
-              <rect x="383" y="56"  width="44" height="30" rx="5"/>
-              <rect x="383" y="96"  width="44" height="30" rx="5"/>
-              <rect x="383" y="136" width="44" height="30" rx="5"/>
-              <rect x="443" y="136" width="44" height="30" rx="5"/>
-              <rect x="503" y="96"  width="44" height="30" rx="5"/>
-              <rect x="503" y="136" width="44" height="30" rx="5"/>
-              <rect x="563" y="56"  width="44" height="30" rx="5"/>
-              <rect x="563" y="96"  width="44" height="30" rx="5"/>
-              <rect x="563" y="136" width="44" height="30" rx="5"/>
-              <rect x="623" y="136" width="44" height="30" rx="5"/>
-            </g>
-            <g font-weight="600" fill="#1a1c22">
-              <text x="105" y="156">4</text>
-              <text x="165" y="76">9</text><text x="165" y="116">9</text><text x="165" y="156">9</text>
-              <text x="225" y="156">13</text>
-              <text x="285" y="116">22</text><text x="285" y="156">22</text>
-              <text x="345" y="156">27</text>
-              <text x="405" y="36">34</text><text x="405" y="76">34</text><text x="405" y="116">34</text><text x="405" y="156">34</text>
-              <text x="465" y="156">38</text>
-              <text x="525" y="116">42</text><text x="525" y="156">42</text>
-              <text x="585" y="76">50</text><text x="585" y="116">50</text><text x="585" y="156">50</text>
-              <text x="625" y="156" text-anchor="start">55</text>
-            </g>
-          </g>
-        </svg>
+        <!-- gen:sk base -->
+<svg viewBox="0 0 682 152" role="img" style="max-width:818px" font-family="system-ui, sans-serif" aria-label="The example skip list, top level first: L3: head 34 nil; L2: head 9 34 50 nil; L1: head 9 22 34 42 50 nil; L0: head 4 9 13 22 27 34 38 42 50 55 nil.">
+<line x1="50" y1="130" x2="60" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M66,130 L59,126 L59,134 Z" fill="#4a5163"/>
+<line x1="100" y1="130" x2="118" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,130 L117,126 L117,134 Z" fill="#4a5163"/>
+<line x1="158" y1="130" x2="176" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M182,130 L175,126 L175,134 Z" fill="#4a5163"/>
+<line x1="216" y1="130" x2="234" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M240,130 L233,126 L233,134 Z" fill="#4a5163"/>
+<line x1="274" y1="130" x2="292" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M298,130 L291,126 L291,134 Z" fill="#4a5163"/>
+<line x1="332" y1="130" x2="350" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,130 L349,126 L349,134 Z" fill="#4a5163"/>
+<line x1="390" y1="130" x2="408" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,130 L407,126 L407,134 Z" fill="#4a5163"/>
+<line x1="448" y1="130" x2="466" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,130 L465,126 L465,134 Z" fill="#4a5163"/>
+<line x1="506" y1="130" x2="524" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,130 L523,126 L523,134 Z" fill="#4a5163"/>
+<line x1="564" y1="130" x2="582" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,130 L581,126 L581,134 Z" fill="#4a5163"/>
+<line x1="622" y1="130" x2="644" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M650,130 L643,126 L643,134 Z" fill="#4a5163"/>
+<text x="659" y="135" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="118" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="134" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L0</text>
+<line x1="50" y1="94" x2="118" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,94 L117,90 L117,98 Z" fill="#4a5163"/>
+<line x1="158" y1="94" x2="234" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M240,94 L233,90 L233,98 Z" fill="#4a5163"/>
+<line x1="274" y1="94" x2="350" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,94 L349,90 L349,98 Z" fill="#4a5163"/>
+<line x1="390" y1="94" x2="466" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,94 L465,90 L465,98 Z" fill="#4a5163"/>
+<line x1="506" y1="94" x2="524" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,94 L523,90 L523,98 Z" fill="#4a5163"/>
+<line x1="564" y1="94" x2="644" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M650,94 L643,90 L643,98 Z" fill="#4a5163"/>
+<text x="659" y="99" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="82" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="98" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L1</text>
+<line x1="50" y1="58" x2="118" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,58 L117,54 L117,62 Z" fill="#4a5163"/>
+<line x1="158" y1="58" x2="350" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,58 L349,54 L349,62 Z" fill="#4a5163"/>
+<line x1="390" y1="58" x2="524" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,58 L523,54 L523,62 Z" fill="#4a5163"/>
+<line x1="564" y1="58" x2="644" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M650,58 L643,54 L643,62 Z" fill="#4a5163"/>
+<text x="659" y="63" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="46" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="62" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L2</text>
+<line x1="50" y1="22" x2="350" y2="22" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,22 L349,18 L349,26 Z" fill="#4a5163"/>
+<line x1="390" y1="22" x2="644" y2="22" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M650,22 L643,18 L643,26 Z" fill="#4a5163"/>
+<text x="659" y="27" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="10" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="26" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L3</text>
+<rect x="66" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="83" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="124" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="182" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="199" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">13</text>
+<rect x="240" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="257" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="240" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="257" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="298" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<rect x="356" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="356" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="356" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="356" y="10" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<rect x="472" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="472" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="530" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="530" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="530" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="588" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">55</text>
+</svg>
+<!-- /gen:sk base -->
         <figcaption>
           The fixed example list used throughout this handout: keys
           \(4, 9, 13, 22, 27, 34, 38, 42, 50, 55\) with tower heights
@@ -260,11 +300,6 @@
           the end of each level.
         </figcaption>
       </figure>
-      <p>In text form, with dashes standing for the forward links:</p>
-      <pre>L3  head ------------------------------- 34 -------------------------&gt; nil
-L2  head ------- 9 --------------------- 34 -------------- 50 -------&gt; nil
-L1  head ------- 9 --------- 22 -------- 34 -------- 42 -- 50 -------&gt; nil
-L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- 34 -- 38 -- 42 -- 50 -- 55 -&gt; nil</pre>
       <div class="aside">
         <span class="tag">A note on the example</span>
         In real use the heights come out of the random number generator; here
@@ -355,15 +390,124 @@ L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- 34 -- 38 -- 42 -- 50 -- 55 -&gt; nil</p
         <code>pred = [27, 22, 9, head]</code> for levels \(0\ldots 3\). The
         flips give heads then tails: height \(2\), levels \(0\) and \(1\), no
         level increase. Two splices:
-        <pre>L1:  22 -&gt; <span class="hit">30</span> -&gt; 34      <span class="cm">(30.next[1] = 22.next[1]; 22.next[1] = 30)</span>
-L0:  27 -&gt; <span class="hit">30</span> -&gt; 34      <span class="cm">(30.next[0] = 27.next[0]; 27.next[0] = 30)</span></pre>
+        <table class="trace">
+<tr><th>level</th><th>after the splice</th><th>pointer writes</th></tr>
+<tr><td>L1</td><td class="upd">22 &rarr; 30 &rarr; 34</td><td><code>30.next[1] = 22.next[1]; 22.next[1] = 30</code></td></tr>
+<tr><td>L0</td><td class="upd">27 &rarr; 30 &rarr; 34</td><td><code>30.next[0] = 27.next[0]; 27.next[0] = 30</code></td></tr>
+</table>
         Levels \(2\) and \(3\) are untouched; <code>pred[2] = 9</code> and
-        <code>pred[3] = \)head\(</code> were recorded but unused because the
+        <code>pred[3] = head</code> were recorded but unused because the
         tower is too short to reach them. The list is now:
-        <pre>L3  head ------------------------------------- 34 -------------------------&gt; nil
-L2  head ------- 9 --------------------------- 34 -------------- 50 -------&gt; nil
-L1  head ------- 9 --------- 22 -------- <span class="hit">30</span> -- 34 -------- 42 -- 50 -------&gt; nil
-L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- <span class="hit">30</span> -- 34 -- 38 -- 42 -- 50 -- 55 -&gt; nil</pre>
+        <figure>
+<!-- gen:sk ins-30 -->
+<svg viewBox="0 0 740 152" role="img" style="max-width:888px" font-family="system-ui, sans-serif" aria-label="After inserting 30 with height 2: L3: head 34 nil; L2: head 9 34 50 nil; L1: head 9 22 30 34 42 50 nil; L0: head 4 9 13 22 27 30 34 38 42 50 55 nil.">
+<line x1="50" y1="130" x2="60" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M66,130 L59,126 L59,134 Z" fill="#4a5163"/>
+<line x1="100" y1="130" x2="118" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,130 L117,126 L117,134 Z" fill="#4a5163"/>
+<line x1="158" y1="130" x2="176" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M182,130 L175,126 L175,134 Z" fill="#4a5163"/>
+<line x1="216" y1="130" x2="234" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M240,130 L233,126 L233,134 Z" fill="#4a5163"/>
+<line x1="274" y1="130" x2="292" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M298,130 L291,126 L291,134 Z" fill="#4a5163"/>
+<line x1="332" y1="130" x2="350" y2="130" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M356,130 L349,126 L349,134 Z" fill="#c98a1a"/>
+<line x1="390" y1="130" x2="408" y2="130" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M414,130 L407,126 L407,134 Z" fill="#c98a1a"/>
+<line x1="448" y1="130" x2="466" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,130 L465,126 L465,134 Z" fill="#4a5163"/>
+<line x1="506" y1="130" x2="524" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,130 L523,126 L523,134 Z" fill="#4a5163"/>
+<line x1="564" y1="130" x2="582" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,130 L581,126 L581,134 Z" fill="#4a5163"/>
+<line x1="622" y1="130" x2="640" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M646,130 L639,126 L639,134 Z" fill="#4a5163"/>
+<line x1="680" y1="130" x2="702" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,130 L701,126 L701,134 Z" fill="#4a5163"/>
+<text x="717" y="135" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="118" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="134" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L0</text>
+<line x1="50" y1="94" x2="118" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,94 L117,90 L117,98 Z" fill="#4a5163"/>
+<line x1="158" y1="94" x2="234" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M240,94 L233,90 L233,98 Z" fill="#4a5163"/>
+<line x1="274" y1="94" x2="350" y2="94" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M356,94 L349,90 L349,98 Z" fill="#c98a1a"/>
+<line x1="390" y1="94" x2="408" y2="94" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M414,94 L407,90 L407,98 Z" fill="#c98a1a"/>
+<line x1="448" y1="94" x2="524" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,94 L523,90 L523,98 Z" fill="#4a5163"/>
+<line x1="564" y1="94" x2="582" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,94 L581,90 L581,98 Z" fill="#4a5163"/>
+<line x1="622" y1="94" x2="702" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,94 L701,90 L701,98 Z" fill="#4a5163"/>
+<text x="717" y="99" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="82" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="98" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L1</text>
+<line x1="50" y1="58" x2="118" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,58 L117,54 L117,62 Z" fill="#4a5163"/>
+<line x1="158" y1="58" x2="408" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,58 L407,54 L407,62 Z" fill="#4a5163"/>
+<line x1="448" y1="58" x2="582" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,58 L581,54 L581,62 Z" fill="#4a5163"/>
+<line x1="622" y1="58" x2="702" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,58 L701,54 L701,62 Z" fill="#4a5163"/>
+<text x="717" y="63" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="46" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="62" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L2</text>
+<line x1="50" y1="22" x2="408" y2="22" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,22 L407,18 L407,26 Z" fill="#4a5163"/>
+<line x1="448" y1="22" x2="702" y2="22" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,22 L701,18 L701,26 Z" fill="#4a5163"/>
+<text x="717" y="27" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="10" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="26" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L3</text>
+<rect x="66" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="83" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="124" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="182" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="199" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">13</text>
+<rect x="240" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="257" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="240" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="257" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="298" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<rect x="356" y="118" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="373" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="356" y="82" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="373" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="414" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="10" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="472" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<rect x="530" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="530" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="588" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="588" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="588" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="646" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="663" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">55</text>
+</svg>
+<!-- /gen:sk ins-30 -->
+</figure>
       </div>
       <div class="ex">
         <span class="tag">Trace: insert 47, flips H,H,H,H,T (height 5, level increase)</span>
@@ -376,16 +520,149 @@ L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- <span class="hit">30</span> -- 34 -- 38
         \(5\), one more than the list&rsquo;s four levels: a new empty level
         L4 is added to the head, with <code>pred[4] = head</code>. Five
         splices, bottom to top:
-        <pre>L0:  42 -&gt; <span class="hit">47</span> -&gt; 50
-L1:  42 -&gt; <span class="hit">47</span> -&gt; 50
-L2:  34 -&gt; <span class="hit">47</span> -&gt; 50
-L3:  34 -&gt; <span class="hit">47</span> -&gt; nil
-L4:  head -&gt; <span class="hit">47</span> -&gt; nil    <span class="cm">(the new top level: just head and 47)</span></pre>
-        <pre>L4  head ------------------------------------------------------- <span class="hit">47</span> -------------&gt; nil
-L3  head ------------------------------------- 34 -------------- <span class="hit">47</span> -------------&gt; nil
-L2  head ------- 9 --------------------------- 34 -------------- <span class="hit">47</span> -- 50 -------&gt; nil
-L1  head ------- 9 --------- 22 -------- 30 -- 34 -------- 42 -- <span class="hit">47</span> -- 50 -------&gt; nil
-L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- 30 -- 34 -- 38 -- 42 -- <span class="hit">47</span> -- 50 -- 55 -&gt; nil</pre>
+        <table class="trace">
+<tr><th>level</th><th>after the splice</th></tr>
+<tr><td>L0</td><td class="upd">42 &rarr; 47 &rarr; 50</td></tr>
+<tr><td>L1</td><td class="upd">42 &rarr; 47 &rarr; 50</td></tr>
+<tr><td>L2</td><td class="upd">34 &rarr; 47 &rarr; 50</td></tr>
+<tr><td>L3</td><td class="upd">34 &rarr; 47 &rarr; nil</td></tr>
+<tr><td>L4</td><td class="upd">head &rarr; 47 &rarr; nil (the new top level: just head and 47)</td></tr>
+</table>
+        <figure>
+<!-- gen:sk ins-47 -->
+<svg viewBox="0 0 798 188" role="img" style="max-width:958px" font-family="system-ui, sans-serif" aria-label="After inserting 47 with height 5, which adds level 4: L4: head 47 nil; L3: head 34 47 nil; L2: head 9 34 47 50 nil; L1: head 9 22 30 34 42 47 50 nil; L0: head 4 9 13 22 27 30 34 38 42 47 50 55 nil.">
+<line x1="50" y1="166" x2="60" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M66,166 L59,162 L59,170 Z" fill="#4a5163"/>
+<line x1="100" y1="166" x2="118" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,166 L117,162 L117,170 Z" fill="#4a5163"/>
+<line x1="158" y1="166" x2="176" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M182,166 L175,162 L175,170 Z" fill="#4a5163"/>
+<line x1="216" y1="166" x2="234" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M240,166 L233,162 L233,170 Z" fill="#4a5163"/>
+<line x1="274" y1="166" x2="292" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M298,166 L291,162 L291,170 Z" fill="#4a5163"/>
+<line x1="332" y1="166" x2="350" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,166 L349,162 L349,170 Z" fill="#4a5163"/>
+<line x1="390" y1="166" x2="408" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,166 L407,162 L407,170 Z" fill="#4a5163"/>
+<line x1="448" y1="166" x2="466" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,166 L465,162 L465,170 Z" fill="#4a5163"/>
+<line x1="506" y1="166" x2="524" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,166 L523,162 L523,170 Z" fill="#4a5163"/>
+<line x1="564" y1="166" x2="582" y2="166" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M588,166 L581,162 L581,170 Z" fill="#c98a1a"/>
+<line x1="622" y1="166" x2="640" y2="166" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M646,166 L639,162 L639,170 Z" fill="#c98a1a"/>
+<line x1="680" y1="166" x2="698" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M704,166 L697,162 L697,170 Z" fill="#4a5163"/>
+<line x1="738" y1="166" x2="760" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M766,166 L759,162 L759,170 Z" fill="#4a5163"/>
+<text x="775" y="171" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="154" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="170" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L0</text>
+<line x1="50" y1="130" x2="118" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,130 L117,126 L117,134 Z" fill="#4a5163"/>
+<line x1="158" y1="130" x2="234" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M240,130 L233,126 L233,134 Z" fill="#4a5163"/>
+<line x1="274" y1="130" x2="350" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,130 L349,126 L349,134 Z" fill="#4a5163"/>
+<line x1="390" y1="130" x2="408" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,130 L407,126 L407,134 Z" fill="#4a5163"/>
+<line x1="448" y1="130" x2="524" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,130 L523,126 L523,134 Z" fill="#4a5163"/>
+<line x1="564" y1="130" x2="582" y2="130" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M588,130 L581,126 L581,134 Z" fill="#c98a1a"/>
+<line x1="622" y1="130" x2="640" y2="130" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M646,130 L639,126 L639,134 Z" fill="#c98a1a"/>
+<line x1="680" y1="130" x2="760" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M766,130 L759,126 L759,134 Z" fill="#4a5163"/>
+<text x="775" y="135" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="118" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="134" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L1</text>
+<line x1="50" y1="94" x2="118" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,94 L117,90 L117,98 Z" fill="#4a5163"/>
+<line x1="158" y1="94" x2="408" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,94 L407,90 L407,98 Z" fill="#4a5163"/>
+<line x1="448" y1="94" x2="582" y2="94" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M588,94 L581,90 L581,98 Z" fill="#c98a1a"/>
+<line x1="622" y1="94" x2="640" y2="94" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M646,94 L639,90 L639,98 Z" fill="#c98a1a"/>
+<line x1="680" y1="94" x2="760" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M766,94 L759,90 L759,98 Z" fill="#4a5163"/>
+<text x="775" y="99" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="82" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="98" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L2</text>
+<line x1="50" y1="58" x2="408" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,58 L407,54 L407,62 Z" fill="#4a5163"/>
+<line x1="448" y1="58" x2="582" y2="58" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M588,58 L581,54 L581,62 Z" fill="#c98a1a"/>
+<line x1="622" y1="58" x2="760" y2="58" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M766,58 L759,54 L759,62 Z" fill="#c98a1a"/>
+<text x="775" y="63" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="46" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="62" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L3</text>
+<line x1="50" y1="22" x2="582" y2="22" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M588,22 L581,18 L581,26 Z" fill="#c98a1a"/>
+<line x1="622" y1="22" x2="760" y2="22" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M766,22 L759,18 L759,26 Z" fill="#c98a1a"/>
+<text x="775" y="27" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="10" width="40" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.6"/>
+<text x="30" y="26" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">L4</text>
+<rect x="66" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="83" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="124" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="182" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="199" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">13</text>
+<rect x="240" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="257" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="240" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="257" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="298" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<rect x="356" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="356" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="414" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="472" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<rect x="530" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="530" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="588" y="154" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="605" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="588" y="118" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="605" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="588" y="82" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="605" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="588" y="46" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="605" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="588" y="10" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="605" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="646" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="663" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="646" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="663" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="646" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="663" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="704" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="721" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">55</text>
+</svg>
+<!-- /gen:sk ins-47 -->
+</figure>
         No other node moves, ever: an insertion writes the new tower&rsquo;s
         \(h\) pointers and rewrites \(h\) predecessor pointers, and nothing
         else in the structure changes. Compare the
@@ -422,11 +699,125 @@ L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- 30 -- 34 -- 38 -- 42 -- <span class="hi
         </table>
         L4 is untouched (\(34\)&rsquo;s tower never reached it) and still
         holds \(47\), so the level count stays put:
-        <pre>L4  head ------------------------------------------------- 47 -------------&gt; nil
-L3  head ------------------------------------------------- 47 -------------&gt; nil
-L2  head ------- 9 --------------------------------------- 47 -- 50 -------&gt; nil
-L1  head ------- 9 --------- 22 -------- 30 -------- 42 -- 47 -- 50 -------&gt; nil
-L0  head - 4 --- 9 --- 13 -- 22 -- 27 -- 30 -- 38 -- 42 -- 47 -- 50 -- 55 -&gt; nil</pre>
+        <figure>
+<!-- gen:sk del-34 -->
+<svg viewBox="0 0 740 188" role="img" style="max-width:888px" font-family="system-ui, sans-serif" aria-label="After deleting 34: L4: head 47 nil; L3: head 47 nil; L2: head 9 47 50 nil; L1: head 9 22 30 42 47 50 nil; L0: head 4 9 13 22 27 30 38 42 47 50 55 nil.">
+<line x1="50" y1="166" x2="60" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M66,166 L59,162 L59,170 Z" fill="#4a5163"/>
+<line x1="100" y1="166" x2="118" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,166 L117,162 L117,170 Z" fill="#4a5163"/>
+<line x1="158" y1="166" x2="176" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M182,166 L175,162 L175,170 Z" fill="#4a5163"/>
+<line x1="216" y1="166" x2="234" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M240,166 L233,162 L233,170 Z" fill="#4a5163"/>
+<line x1="274" y1="166" x2="292" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M298,166 L291,162 L291,170 Z" fill="#4a5163"/>
+<line x1="332" y1="166" x2="350" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,166 L349,162 L349,170 Z" fill="#4a5163"/>
+<line x1="390" y1="166" x2="408" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,166 L407,162 L407,170 Z" fill="#4a5163"/>
+<line x1="448" y1="166" x2="466" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,166 L465,162 L465,170 Z" fill="#4a5163"/>
+<line x1="506" y1="166" x2="524" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,166 L523,162 L523,170 Z" fill="#4a5163"/>
+<line x1="564" y1="166" x2="582" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,166 L581,162 L581,170 Z" fill="#4a5163"/>
+<line x1="622" y1="166" x2="640" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M646,166 L639,162 L639,170 Z" fill="#4a5163"/>
+<line x1="680" y1="166" x2="702" y2="166" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,166 L701,162 L701,170 Z" fill="#4a5163"/>
+<text x="717" y="171" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="154" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="170" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L0</text>
+<line x1="50" y1="130" x2="118" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,130 L117,126 L117,134 Z" fill="#4a5163"/>
+<line x1="158" y1="130" x2="234" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M240,130 L233,126 L233,134 Z" fill="#4a5163"/>
+<line x1="274" y1="130" x2="350" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,130 L349,126 L349,134 Z" fill="#4a5163"/>
+<line x1="390" y1="130" x2="466" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,130 L465,126 L465,134 Z" fill="#4a5163"/>
+<line x1="506" y1="130" x2="524" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,130 L523,126 L523,134 Z" fill="#4a5163"/>
+<line x1="564" y1="130" x2="582" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,130 L581,126 L581,134 Z" fill="#4a5163"/>
+<line x1="622" y1="130" x2="702" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,130 L701,126 L701,134 Z" fill="#4a5163"/>
+<text x="717" y="135" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="118" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="134" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L1</text>
+<line x1="50" y1="94" x2="118" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,94 L117,90 L117,98 Z" fill="#4a5163"/>
+<line x1="158" y1="94" x2="524" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,94 L523,90 L523,98 Z" fill="#4a5163"/>
+<line x1="564" y1="94" x2="582" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,94 L581,90 L581,98 Z" fill="#4a5163"/>
+<line x1="622" y1="94" x2="702" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,94 L701,90 L701,98 Z" fill="#4a5163"/>
+<text x="717" y="99" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="82" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="98" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L2</text>
+<line x1="50" y1="58" x2="524" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,58 L523,54 L523,62 Z" fill="#4a5163"/>
+<line x1="564" y1="58" x2="702" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,58 L701,54 L701,62 Z" fill="#4a5163"/>
+<text x="717" y="63" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="46" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="62" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L3</text>
+<line x1="50" y1="22" x2="524" y2="22" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,22 L523,18 L523,26 Z" fill="#4a5163"/>
+<line x1="564" y1="22" x2="702" y2="22" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,22 L701,18 L701,26 Z" fill="#4a5163"/>
+<text x="717" y="27" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="10" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="26" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L4</text>
+<rect x="66" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="83" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="124" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="182" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="199" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">13</text>
+<rect x="240" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="257" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="240" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="257" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="298" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<rect x="356" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="356" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="414" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<rect x="472" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="472" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="530" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="530" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="530" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="530" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="530" y="10" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">47</text>
+<rect x="588" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="588" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="588" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="646" y="154" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="663" y="170.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">55</text>
+</svg>
+<!-- /gen:sk del-34 -->
+</figure>
         For contrast, deleting \(47\) next would unlink at all five levels
         and leave <em>both</em> L4 and L3 empty (\(34\), the only other
         occupant of L3, is already gone), so the list level would drop by two,
@@ -941,16 +1332,133 @@ impl SkipList {
             four levels, so height \(4\) exactly fills them: <em>no</em>
             level increase. Using <code>pred = [13, 9, 9, head]</code> from
             the previous exercise:
-            <pre>L0:  13 -&gt; 21 -&gt; 22
-L1:   9 -&gt; 21 -&gt; 22
-L2:   9 -&gt; 21 -&gt; 34
-L3: head -&gt; 21 -&gt; 34</pre>
+            <table class="trace">
+<tr><th>level</th><th>after the splice</th></tr>
+<tr><td>L0</td><td class="upd">13 &rarr; 21 &rarr; 22</td></tr>
+<tr><td>L1</td><td class="upd">9 &rarr; 21 &rarr; 22</td></tr>
+<tr><td>L2</td><td class="upd">9 &rarr; 21 &rarr; 34</td></tr>
+<tr><td>L3</td><td class="upd">head &rarr; 21 &rarr; 34</td></tr>
+</table>
             (The successor differs by level because \(22\)&rsquo;s tower
             stops at L1 and \(9\)&rsquo;s at L2.) Result:
-            <pre>L3  head ------------- 21 -------------- 34 -------------------------&gt; nil
-L2  head ------- 9 --- 21 -------------- 34 -------------- 50 -------&gt; nil
-L1  head ------- 9 --- 21 -- 22 -------- 34 -------- 42 -- 50 -------&gt; nil
-L0  head - 4 --- 9 --- 13 -- 21 -- 22 -- 27 -- 34 -- 38 -- 42 -- 50 -- 55 -&gt; nil</pre>
+            <figure>
+<!-- gen:sk ins-21 -->
+<svg viewBox="0 0 740 152" role="img" style="max-width:888px" font-family="system-ui, sans-serif" aria-label="After inserting 21 with height 4: L3: head 21 34 nil; L2: head 9 21 34 50 nil; L1: head 9 21 22 34 42 50 nil; L0: head 4 9 13 21 22 27 34 38 42 50 55 nil.">
+<line x1="50" y1="130" x2="60" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M66,130 L59,126 L59,134 Z" fill="#4a5163"/>
+<line x1="100" y1="130" x2="118" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,130 L117,126 L117,134 Z" fill="#4a5163"/>
+<line x1="158" y1="130" x2="176" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M182,130 L175,126 L175,134 Z" fill="#4a5163"/>
+<line x1="216" y1="130" x2="234" y2="130" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M240,130 L233,126 L233,134 Z" fill="#c98a1a"/>
+<line x1="274" y1="130" x2="292" y2="130" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M298,130 L291,126 L291,134 Z" fill="#c98a1a"/>
+<line x1="332" y1="130" x2="350" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,130 L349,126 L349,134 Z" fill="#4a5163"/>
+<line x1="390" y1="130" x2="408" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,130 L407,126 L407,134 Z" fill="#4a5163"/>
+<line x1="448" y1="130" x2="466" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,130 L465,126 L465,134 Z" fill="#4a5163"/>
+<line x1="506" y1="130" x2="524" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,130 L523,126 L523,134 Z" fill="#4a5163"/>
+<line x1="564" y1="130" x2="582" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,130 L581,126 L581,134 Z" fill="#4a5163"/>
+<line x1="622" y1="130" x2="640" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M646,130 L639,126 L639,134 Z" fill="#4a5163"/>
+<line x1="680" y1="130" x2="702" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,130 L701,126 L701,134 Z" fill="#4a5163"/>
+<text x="717" y="135" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="118" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="134" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L0</text>
+<line x1="50" y1="94" x2="118" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,94 L117,90 L117,98 Z" fill="#4a5163"/>
+<line x1="158" y1="94" x2="234" y2="94" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M240,94 L233,90 L233,98 Z" fill="#c98a1a"/>
+<line x1="274" y1="94" x2="292" y2="94" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M298,94 L291,90 L291,98 Z" fill="#c98a1a"/>
+<line x1="332" y1="94" x2="408" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,94 L407,90 L407,98 Z" fill="#4a5163"/>
+<line x1="448" y1="94" x2="524" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,94 L523,90 L523,98 Z" fill="#4a5163"/>
+<line x1="564" y1="94" x2="582" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,94 L581,90 L581,98 Z" fill="#4a5163"/>
+<line x1="622" y1="94" x2="702" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,94 L701,90 L701,98 Z" fill="#4a5163"/>
+<text x="717" y="99" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="82" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="98" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L1</text>
+<line x1="50" y1="58" x2="118" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,58 L117,54 L117,62 Z" fill="#4a5163"/>
+<line x1="158" y1="58" x2="234" y2="58" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M240,58 L233,54 L233,62 Z" fill="#c98a1a"/>
+<line x1="274" y1="58" x2="408" y2="58" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M414,58 L407,54 L407,62 Z" fill="#c98a1a"/>
+<line x1="448" y1="58" x2="582" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M588,58 L581,54 L581,62 Z" fill="#4a5163"/>
+<line x1="622" y1="58" x2="702" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,58 L701,54 L701,62 Z" fill="#4a5163"/>
+<text x="717" y="63" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="46" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="62" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L2</text>
+<line x1="50" y1="22" x2="234" y2="22" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M240,22 L233,18 L233,26 Z" fill="#c98a1a"/>
+<line x1="274" y1="22" x2="408" y2="22" stroke="#c98a1a" stroke-width="2.2"/>
+<path d="M414,22 L407,18 L407,26 Z" fill="#c98a1a"/>
+<line x1="448" y1="22" x2="702" y2="22" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M708,22 L701,18 L701,26 Z" fill="#4a5163"/>
+<text x="717" y="27" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="10" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="26" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L3</text>
+<rect x="66" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="83" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="124" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="124" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="182" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="199" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">13</text>
+<rect x="240" y="118" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="257" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">21</text>
+<rect x="240" y="82" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="257" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">21</text>
+<rect x="240" y="46" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="257" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">21</text>
+<rect x="240" y="10" width="34" height="24" rx="5" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="257" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">21</text>
+<rect x="298" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="298" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="356" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<rect x="414" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="414" y="10" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="472" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<rect x="530" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="530" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="588" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="588" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="588" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="605" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="646" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="663" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">55</text>
+</svg>
+<!-- /gen:sk ins-21 -->
+</figure>
             One more head would have made height \(5\) and forced a new L4.
           </details>
         </li>
@@ -966,13 +1474,102 @@ L0  head - 4 --- 9 --- 13 -- 21 -- 22 -- 27 -- 34 -- 38 -- 42 -- 50 -- 55 -&gt; 
             (next \(9\)). <code>pred = [4, head, head, head]</code>;
             <code>pred[0].next[0]</code> is \(9\): present, height \(3\).
             Unlink levels \(0\ldots2\):
-            <pre>L2: head -&gt; 34   <span class="cm">(was head -&gt; 9 -&gt; 34)</span>
-L1: head -&gt; 22   <span class="cm">(was head -&gt; 9 -&gt; 22)</span>
-L0:    4 -&gt; 13   <span class="cm">(was 4 -&gt; 9 -&gt; 13)</span></pre>
-            <pre>L3  head ------------------------- 34 -------------------------&gt; nil
-L2  head ------------------------- 34 -------------- 50 -------&gt; nil
-L1  head ------------- 22 -------- 34 -------- 42 -- 50 -------&gt; nil
-L0  head - 4 -- 13 -- 22 -- 27 -- 34 -- 38 -- 42 -- 50 -- 55 --&gt; nil</pre>
+            <table class="trace">
+<tr><th>level</th><th>before</th><th>after</th></tr>
+<tr><td>L2</td><td>head &rarr; 9 &rarr; 34</td><td class="upd">head &rarr; 34</td></tr>
+<tr><td>L1</td><td>head &rarr; 9 &rarr; 22</td><td class="upd">head &rarr; 22</td></tr>
+<tr><td>L0</td><td>4 &rarr; 9 &rarr; 13</td><td class="upd">4 &rarr; 13</td></tr>
+</table>
+            <figure>
+<!-- gen:sk del-9 -->
+<svg viewBox="0 0 624 152" role="img" style="max-width:749px" font-family="system-ui, sans-serif" aria-label="After deleting 9: L3: head 34 nil; L2: head 34 50 nil; L1: head 22 34 42 50 nil; L0: head 4 13 22 27 34 38 42 50 55 nil.">
+<line x1="50" y1="130" x2="60" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M66,130 L59,126 L59,134 Z" fill="#4a5163"/>
+<line x1="100" y1="130" x2="118" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M124,130 L117,126 L117,134 Z" fill="#4a5163"/>
+<line x1="158" y1="130" x2="176" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M182,130 L175,126 L175,134 Z" fill="#4a5163"/>
+<line x1="216" y1="130" x2="234" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M240,130 L233,126 L233,134 Z" fill="#4a5163"/>
+<line x1="274" y1="130" x2="292" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M298,130 L291,126 L291,134 Z" fill="#4a5163"/>
+<line x1="332" y1="130" x2="350" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M356,130 L349,126 L349,134 Z" fill="#4a5163"/>
+<line x1="390" y1="130" x2="408" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,130 L407,126 L407,134 Z" fill="#4a5163"/>
+<line x1="448" y1="130" x2="466" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,130 L465,126 L465,134 Z" fill="#4a5163"/>
+<line x1="506" y1="130" x2="524" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M530,130 L523,126 L523,134 Z" fill="#4a5163"/>
+<line x1="564" y1="130" x2="586" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M592,130 L585,126 L585,134 Z" fill="#4a5163"/>
+<text x="601" y="135" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="118" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="134" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L0</text>
+<line x1="50" y1="94" x2="176" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M182,94 L175,90 L175,98 Z" fill="#4a5163"/>
+<line x1="216" y1="94" x2="292" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M298,94 L291,90 L291,98 Z" fill="#4a5163"/>
+<line x1="332" y1="94" x2="408" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M414,94 L407,90 L407,98 Z" fill="#4a5163"/>
+<line x1="448" y1="94" x2="466" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,94 L465,90 L465,98 Z" fill="#4a5163"/>
+<line x1="506" y1="94" x2="586" y2="94" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M592,94 L585,90 L585,98 Z" fill="#4a5163"/>
+<text x="601" y="99" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="82" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="98" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L1</text>
+<line x1="50" y1="58" x2="292" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M298,58 L291,54 L291,62 Z" fill="#4a5163"/>
+<line x1="332" y1="58" x2="466" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M472,58 L465,54 L465,62 Z" fill="#4a5163"/>
+<line x1="506" y1="58" x2="586" y2="58" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M592,58 L585,54 L585,62 Z" fill="#4a5163"/>
+<text x="601" y="63" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="46" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="62" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L2</text>
+<line x1="50" y1="22" x2="292" y2="22" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M298,22 L291,18 L291,26 Z" fill="#4a5163"/>
+<line x1="332" y1="22" x2="586" y2="22" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M592,22 L585,18 L585,26 Z" fill="#4a5163"/>
+<text x="601" y="27" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="10" y="10" width="40" height="24" rx="5" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="30" y="26" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">L3</text>
+<rect x="66" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="83" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="124" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="141" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">13</text>
+<rect x="182" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="199" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="182" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="199" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">22</text>
+<rect x="240" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="257" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<rect x="298" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="298" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="298" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="298" y="10" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="315" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">34</text>
+<rect x="356" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="373" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<rect x="414" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="414" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="431" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">42</text>
+<rect x="472" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="472" y="82" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="98.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="472" y="46" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="489" y="62.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="530" y="118" width="34" height="24" rx="5" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="547" y="134.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">55</text>
+</svg>
+<!-- /gen:sk del-9 -->
+</figure>
             The list level is set by the <em>tallest</em> tower.
             \(9\)&rsquo;s height was \(3\), but \(34\)&rsquo;s tower (height
             \(4\)) still occupies L3, so the top level is not empty and
@@ -1049,7 +1646,7 @@ L0  head - 4 -- 13 -- 22 -- 27 -- 34 -- 38 -- 42 -- 50 -- 55 --&gt; nil</pre>
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Skip Lists v1.0
+        Data Structures &amp; Algorithms &middot; Skip Lists v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

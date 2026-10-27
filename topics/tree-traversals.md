@@ -52,13 +52,13 @@ No recursion: a **queue** sweeps the tree top-to-bottom, left-to-right.
 
 ```cpp
 void levelOrder(Node* t) {
-    Queue q;  q.enqueue(t);
+    queue<Node*> q;  q.push(t);
     while (!q.empty()) {
-        Node* n = q.dequeue();
+        Node* n = q.front();  q.pop();
         if (!n) continue;
         visit(n->item);
-        q.enqueue(n->left);
-        q.enqueue(n->right);
+        q.push(n->left);
+        q.push(n->right);
     }
 }
 ```
@@ -84,18 +84,18 @@ void levelOrder(Node* t) {
 
 --
 
-## Expression trees: the tree *is* the meaning
+## Expression trees
 
-**Operators** internal, **operands** leaves. The **shape encodes precedence**, so `(2+3)×4` and `2+(3×4)` are *different trees* with different values:
+The tree *is* the meaning: **operators** internal, **operands** leaves, and the **shape encodes precedence**:
 
-```text
+<div><img src="../../topics/figures/trees/bs-expr.svg" style="height:210px" alt="
    (2 + 3) × 4 = 20          2 + (3 × 4) = 14
          ×                         +
         / \                       / \
        +   4                     2   ×
       / \                           / \
      2   3                         3   4
-```
+"></div>
 
 Parentheses / precedence pick the **tree**; the tree then says exactly what to do.
 
@@ -132,5 +132,5 @@ This is a **post-order** computation: children before parent. No precedence rule
 </pre>
 </div>
 
-<small>Pick an example or type your own (`+ - * / ^`, unary `-`, parentheses) → **Build** its tree: precedence and associativity set the shape. **Evaluate** computes it **bottom-up**, each value bubbling up to the root.</small>
+<small>Pick an example or type your own (`+ - * / ^`, unary `-`, parentheses) → **Build**: precedence and associativity set the shape. **Evaluate** computes it **bottom-up**.</small>
 

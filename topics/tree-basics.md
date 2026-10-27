@@ -10,7 +10,7 @@
 
 ### Trees and binary trees
 
-> Arthur Cayley showed in 1889 that there are n<sup>n−2</sup> different trees on n labeled vertices.
+> Arthur Cayley showed in 1889 that there are $n^{n-2}$ different trees on $n$ labeled vertices.
 
 <small>A. Cayley, “A Theorem on Trees,” Quarterly Journal of Mathematics 23, 1889</small>
 
@@ -75,7 +75,7 @@ Classic uses:
 | **full** | every node has **0 or 2** children |
 | **perfect** | full **and** all leaves at the **same** level |
 | **complete** | every level filled except possibly the **last**, packed **left** |
-| **balanced** | at every node, subtree **heights differ by ≤ 1** |
+| **balanced** | at every node, subtree **heights differ by at most 1** |
 
 **Every complete tree is balanced: not conversely.**
 
@@ -101,16 +101,16 @@ Classic uses:
 
 --
 
-## Min and max height for n nodes
+## Min and max height for $n$ nodes
 
-- **minimum** ≈ **⌊log₂ n⌋**: every level packed (balanced/complete)
-- **maximum** = **n − 1**: a degenerate **path**
+- **minimum** $\lfloor \log\_2 n \rfloor$: every level packed (balanced/complete)
+- **maximum** $n - 1$: a degenerate **path**
 
-In one line: **a binary tree's height ranges from log n to n**, and *which* you get decides every operation's cost.
+In one line: **a binary tree's height ranges from about $\log\_2 n$ to $n$**, and *which* you get decides every operation's cost.
 
 --
 
-## Demo: height ranges from log₂ n to n
+## Demo: height from $\log\_2 n$ to $n$
 
 <div class="algo-viz" data-algo="tree-height">
 <pre class="viz-fallback">
@@ -126,5 +126,5 @@ In one line: **a binary tree's height ranges from log n to n**, and *which* you 
 </pre>
 </div>
 
-<small>Drag **n**: the **shortest** tree (height ⌊log₂ n⌋) beside the **tallest** (a path, n−1).</small>
+<small>Drag **n**: the **shortest** tree (height $\lfloor \log\_2 n \rfloor$) beside the **tallest** (a path, height $n - 1$).</small>
 

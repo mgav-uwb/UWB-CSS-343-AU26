@@ -247,17 +247,69 @@
         stored in a list, and its algorithms recurse over that list, exactly
         the recursive definition made concrete:
       </p>
-      <pre>struct TreeNode {
+      <div class="code-tabs" data-snippet="trees/bst-general-tree">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// A general tree: any number of children, kept in a list. Its algorithms
+// recurse over that list, the recursive definition made concrete.
+struct TreeNode {
     Object            item;
-    vector&lt;TreeNode*&gt; children;   <span class="cm">// 0, 1, 2, ... many</span>
+    vector&lt;TreeNode*&gt; children;         // 0, 1, 2, ... many
 };
 
 int countNodes(TreeNode* t) {
     if (!t) return 0;
     int n = 1;
-    for (TreeNode* c : t-&gt;children) n += countNodes(c);   <span class="cm">// recurse on each subtree</span>
+    for (TreeNode* c : t-&gt;children) n += countNodes(c);   // recurse on each subtree
     return n;
 }</pre>
+<pre class="ct-pane" data-lang="java" hidden>// A general tree: any number of children, kept in a list. Its algorithms
+// recurse over that list, the recursive definition made concrete.
+class TreeNode {
+    Object         item;
+    List&lt;TreeNode&gt; children = new ArrayList&lt;&gt;();   // 0, 1, 2, ... many
+}
+
+static int countNodes(TreeNode t) {
+    if (t == null) return 0;
+    int n = 1;
+    for (TreeNode c : t.children) n += countNodes(c);  // recurse on each subtree
+    return n;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># A general tree: any number of children, kept in a list. Its algorithms
+# recurse over that list, the recursive definition made concrete.
+class TreeNode:
+    def __init__(self, item):
+        self.item = item
+        self.children = []              # 0, 1, 2, ... many
+
+def count_nodes(t):
+    if t is None:
+        return 0
+    n = 1
+    for c in t.children:
+        n += count_nodes(c)             # recurse on each subtree
+    return n</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// A general tree: any number of children, kept in a list. Its algorithms
+// recurse over that list, the recursive definition made concrete.
+struct TreeNode&lt;T&gt; {
+    item: T,
+    children: Vec&lt;TreeNode&lt;T&gt;&gt;,         // 0, 1, 2, ... many
+}
+
+fn count_nodes&lt;T&gt;(t: &amp;TreeNode&lt;T&gt;) -&gt; usize {
+    let mut n = 1;
+    for c in &amp;t.children {
+        n += count_nodes(c);            // recurse on each subtree
+    }
+    n
+}</pre>
+<p class="ct-src">source: <code>code/trees/bst-general-tree.cpp &middot; code/trees/bst-general-tree.java &middot; code/trees/bst-general-tree.py &middot; code/trees/bst-general-tree.rs</code></p>
+<!--/ct--></div>
       <p>
         Variable-length child lists are flexible but awkward. A standard trick
         re-encodes any general tree with just <em>two</em> links per node:
@@ -277,11 +329,42 @@ int countNodes(TreeNode* t) {
         <strong>right</strong> child (the distinction matters even when a node has
         only one child). Its node is the workhorse of the handout:
       </p>
-      <pre>struct Node {
+      <div class="code-tabs" data-snippet="trees/bst-binary-node">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// The binary tree node: an item and at most two children, left and right.
+struct Node {
     Object item;
     Node*  left;
     Node*  right;
 };</pre>
+<pre class="ct-pane" data-lang="java" hidden>// The binary tree node: an item and at most two children, left and right.
+class Node&lt;T&gt; {
+    T       item;
+    Node&lt;T&gt; left, right;                // null: no child on that side
+    Node(T item, Node&lt;T&gt; left, Node&lt;T&gt; right) {
+        this.item = item; this.left = left; this.right = right;
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># The binary tree node: an item and at most two children, left and right.
+class Node:
+    def __init__(self, item, left=None, right=None):
+        self.item = item
+        self.left = left                # None: no child on that side
+        self.right = right</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// The binary tree node: an item and at most two children, left and right.
+// Each link owns its subtree; None means no child on that side.
+struct Node&lt;T&gt; {
+    item: T,
+    left: Option&lt;Box&lt;Node&lt;T&gt;&gt;&gt;,
+    right: Option&lt;Box&lt;Node&lt;T&gt;&gt;&gt;,
+}</pre>
+<p class="ct-src">source: <code>code/trees/bst-binary-node.cpp &middot; code/trees/bst-binary-node.java &middot; code/trees/bst-binary-node.py &middot; code/trees/bst-binary-node.rs</code></p>
+<!--/ct--></div>
       <p>
         The same three-field node underlies expression trees (&sect;3), binary
         search trees (&sect;4 on), heaps (<a href="../heaps/ds-heaps-pq.html"><em>Heaps
@@ -515,12 +598,87 @@ fn inorder(t: &amp;Option&lt;Box&lt;Node&gt;&gt;) {
         own value, and an operator combines the already-evaluated values of its two
         subtrees.
       </p>
-      <pre>double eval(Node* t) {
-    if (isLeaf(t)) return t-&gt;value;     <span class="cm">// operand</span>
-    double a = eval(t-&gt;left);           <span class="cm">// evaluate the subtrees first</span>
+      <div class="code-tabs" data-snippet="trees/bst-eval">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// An expression tree in the binary node, with a token as its item: an
+// operator at an internal node, a number at a leaf. Evaluation is post-order.
+bool isLeaf(Node* t) { return !t-&gt;left &amp;&amp; !t-&gt;right; }
+
+double apply(const string&amp; op, double a, double b) {
+    if (op == &quot;+&quot;) return a + b;
+    if (op == &quot;-&quot;) return a - b;
+    if (op == &quot;*&quot;) return a * b;
+    return a / b;                           // &quot;/&quot;
+}
+
+double eval(Node* t) {
+    if (isLeaf(t)) return stod(t-&gt;item);    // operand
+    double a = eval(t-&gt;left);               // evaluate the subtrees first
     double b = eval(t-&gt;right);
-    return apply(t-&gt;op, a, b);          <span class="cm">// then combine: a (op) b</span>
+    return apply(t-&gt;item, a, b);            // then combine: a (op) b
 }</pre>
+<pre class="ct-pane" data-lang="java" hidden>// An expression tree in the binary node, with a token as its item: an
+// operator at an internal node, a number at a leaf. Evaluation is post-order.
+static boolean isLeaf(Node&lt;String&gt; t) { return t.left == null &amp;&amp; t.right == null; }
+
+static double apply(String op, double a, double b) {
+    if (op.equals(&quot;+&quot;)) return a + b;
+    if (op.equals(&quot;-&quot;)) return a - b;
+    if (op.equals(&quot;*&quot;)) return a * b;
+    return a / b;                           // &quot;/&quot;
+}
+
+static double eval(Node&lt;String&gt; t) {
+    if (isLeaf(t)) return Double.parseDouble(t.item);   // operand
+    double a = eval(t.left);                // evaluate the subtrees first
+    double b = eval(t.right);
+    return apply(t.item, a, b);             // then combine: a (op) b
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># An expression tree in the binary node, with a token as its item: an
+# operator at an internal node, a number at a leaf. Evaluation is post-order.
+def is_leaf(t):
+    return t.left is None and t.right is None
+
+def apply(op, a, b):
+    if op == &quot;+&quot;: return a + b
+    if op == &quot;-&quot;: return a - b
+    if op == &quot;*&quot;: return a * b
+    return a / b                            # &quot;/&quot;
+
+def evaluate(t):
+    if is_leaf(t):
+        return float(t.item)                # operand
+    a = evaluate(t.left)                    # evaluate the subtrees first
+    b = evaluate(t.right)
+    return apply(t.item, a, b)              # then combine: a (op) b</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// An expression tree in the binary node, with a token as its item: an
+// operator at an internal node, a number at a leaf. Evaluation is post-order.
+fn apply(op: &amp;str, a: f64, b: f64) -&gt; f64 {
+    match op {
+        &quot;+&quot; =&gt; a + b,
+        &quot;-&quot; =&gt; a - b,
+        &quot;*&quot; =&gt; a * b,
+        _ =&gt; a / b,                         // &quot;/&quot;
+    }
+}
+
+fn eval(t: &amp;Node&lt;String&gt;) -&gt; f64 {
+    match (&amp;t.left, &amp;t.right) {
+        (Some(l), Some(r)) =&gt; {
+            let a = eval(l);                // evaluate the subtrees first
+            let b = eval(r);
+            apply(&amp;t.item, a, b)            // then combine: a (op) b
+        }
+        _ =&gt; t.item.parse().unwrap(),       // a leaf: the operand
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/bst-eval.cpp &middot; code/trees/bst-eval.java &middot; code/trees/bst-eval.py &middot; code/trees/bst-eval.rs</code></p>
+<!--/ct--></div>
       <p>
         No precedence rules appear in the code: the structure already
         encoded them. On the right tree above, <code>eval</code> computes
@@ -808,13 +966,52 @@ fn put(t: Option&lt;Box&lt;Node&gt;&gt;, key: i64, val: String) -&gt; Option&lt;
         key \(\le k\) might sit in the right subtree, so we look there and keep the
         node only if the right subtree offers nothing.
       </p>
-      <pre>Node* floor(Node* t, const Key&amp; k) {   <span class="cm">// largest key &lt;= k</span>
+      <div class="code-tabs" data-snippet="trees/bst-floor">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// floor(k): the node with the largest key &lt;= k, or null if every key is larger.
+Node* floor(Node* t, const Key&amp; k) {
     if (!t) return nullptr;
     if (k == t-&gt;key) return t;
-    if (k &lt; t-&gt;key)  return floor(t-&gt;left, k);   <span class="cm">// answer is strictly left</span>
-    Node* r = floor(t-&gt;right, k);               <span class="cm">// a closer key on the right?</span>
-    return r ? r : t;                           <span class="cm">// else this node is the floor</span>
+    if (k &lt; t-&gt;key)  return floor(t-&gt;left, k);   // answer is strictly left
+    Node* r = floor(t-&gt;right, k);               // a closer key on the right?
+    return r ? r : t;                           // else this node is the floor
 }</pre>
+<pre class="ct-pane" data-lang="java" hidden>// floor(k): the node with the largest key &lt;= k, or null if every key is larger.
+Node floor(Node t, Key k) {
+    if (t == null) return null;
+    int c = k.compareTo(t.key);
+    if (c == 0) return t;
+    if (c &lt; 0)  return floor(t.left, k);        // answer is strictly left
+    Node r = floor(t.right, k);                 // a closer key on the right?
+    return r != null ? r : t;                   // else this node is the floor
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># floor(k): the node with the largest key &lt;= k, or None if every key is larger.
+def floor(t, k):
+    if t is None:
+        return None
+    if k == t.key:
+        return t
+    if k &lt; t.key:
+        return floor(t.left, k)                 # answer is strictly left
+    r = floor(t.right, k)                       # a closer key on the right?
+    return r if r is not None else t            # else this node is the floor</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// floor(k): the node with the largest key &lt;= k, or None if every key is larger.
+fn floor(t: &amp;Option&lt;Box&lt;Node&gt;&gt;, k: i64) -&gt; Option&lt;&amp;Node&gt; {
+    let n: &amp;Node = t.as_ref()?;                 // a null link: no floor here
+    if k == n.key { return Some(n); }
+    if k &lt; n.key { return floor(&amp;n.left, k); }  // answer is strictly left
+    match floor(&amp;n.right, k) {                  // a closer key on the right?
+        Some(r) =&gt; Some(r),
+        None =&gt; Some(n),                        // else this node is the floor
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/bst-floor.cpp &middot; code/trees/bst-floor.java &middot; code/trees/bst-floor.py &middot; code/trees/bst-floor.rs</code></p>
+<!--/ct--></div>
       <p>
         <strong>select</strong> and <strong>rank</strong> are inverses, and both
         steer by subtree sizes. Let \(s\) be the size of the node&rsquo;s left
@@ -1452,7 +1649,7 @@ fn erase(t: Option&lt;Box&lt;Node&gt;&gt;, key: i64) -&gt; Option&lt;Box&lt;Node
 
       <footer>
         Data Structures &amp; Algorithms &middot; Trees &amp; Binary Search Trees
-        v1.1 &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
+        v1.2 &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
     </div>

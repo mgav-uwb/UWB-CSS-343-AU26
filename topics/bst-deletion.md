@@ -58,7 +58,7 @@ The **predecessor** works just as well: the **largest key in the left subtree** 
 
 **Which to use?**
 
-- picking the **same side every time** skews the shape (a long mix of random inserts + one-sided Hibbard deletes → ~**√n** *average path length*)
+- picking the **same side every time** skews the shape (a long mix of random inserts + one-sided Hibbard deletes → about $\sqrt{n}$ *average path length*)
 - **alternate** them, or take the one from the **taller** subtree, to stay balanced
 - balanced trees make the choice moot
 
@@ -108,5 +108,5 @@ Every removed node is freed exactly once: **no leaks**.
 </pre>
 </div>
 
-<small>Press **▶** to build, then **Delete** a leaf, a one-child node, and a two-child node (e.g. `E`). **via** switches **successor ↔ predecessor**; scrub with **⏮ ◁ ▶ ▷ ⏩ 1024×** (◁ steps *backward*, resurrecting the key).</small>
+<small>Press **▶** to build, then **Delete** a leaf, a one-child node, and a two-child node (e.g. `E`). **via** switches **successor ↔ predecessor**; **◁** steps backward, resurrecting the key.</small>
 
