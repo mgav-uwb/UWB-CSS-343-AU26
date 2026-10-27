@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -122,7 +123,7 @@
 
       <h1>The Sorting Lower Bound</h1>
       <blockquote class="epigraph fact">
-        Sorting five keys needs at least ⌈log₂ 120⌉ = 7 comparisons, and seven are enough. For twelve keys the bound is 29, but the true minimum is 30.
+        Sorting five keys needs at least \(\lceil \log_2 120 \rceil = 7\) comparisons, and seven are enough. For twelve keys the bound is 29, but the true minimum is 30.
         <cite>D. E. Knuth, The Art of Computer Programming, Volume 3, §5.3.1</cite>
       </blockquote>
 
@@ -177,60 +178,53 @@
         \(a_i \le a_j \le a_k\). There are \(3! = 6\) orderings, so the tree
         needs \(6\) leaves, and all \(6\) appear:
       </p>
-      <figure>
-        <svg viewBox="0 0 540 250" role="img" aria-label="The decision tree for sorting three keys a1, a2, a3. The root compares a1 to a2. Its left branch (a1 at most a2) compares a2 to a3, reaching the leaf a1 a2 a3 on one side and a further comparison of a1 to a3 on the other, whose two leaves are a1 a3 a2 and a3 a1 a2. The root's right branch (a1 greater than a2) compares a1 to a3, reaching the leaf a2 a1 a3 on one side and a comparison of a2 to a3 on the other, whose leaves are a2 a3 a1 and a3 a2 a1. Six leaves in total, one per permutation; the tree has height 3.">
-          <g stroke="#b9c0d0" stroke-width="1.5" fill="none">
-            <line x1="270" y1="42" x2="145" y2="98"/>
-            <line x1="270" y1="42" x2="395" y2="98"/>
-            <line x1="145" y1="98" x2="62" y2="158"/>
-            <line x1="145" y1="98" x2="208" y2="158"/>
-            <line x1="395" y1="98" x2="330" y2="158"/>
-            <line x1="395" y1="98" x2="452" y2="158"/>
-            <line x1="208" y1="158" x2="158" y2="216"/>
-            <line x1="208" y1="158" x2="258" y2="216"/>
-            <line x1="452" y1="158" x2="402" y2="216"/>
-            <line x1="452" y1="158" x2="498" y2="216"/>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="11.5" fill="#5c6270" text-anchor="middle">
-            <text x="196" y="66">&le;</text>  <text x="344" y="66">&gt;</text>
-            <text x="92" y="126">&le;</text>  <text x="188" y="126">&gt;</text>
-            <text x="352" y="126">&le;</text> <text x="435" y="126">&gt;</text>
-            <text x="172" y="186">&le;</text> <text x="244" y="186">&gt;</text>
-            <text x="416" y="186">&le;</text> <text x="486" y="186">&gt;</text>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="12.5" font-weight="600" text-anchor="middle">
-            <g fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4">
-              <rect x="240" y="26" width="60" height="24" rx="6"/>
-              <rect x="115" y="84" width="60" height="24" rx="6"/>
-              <rect x="365" y="84" width="60" height="24" rx="6"/>
-              <rect x="178" y="144" width="60" height="24" rx="6"/>
-              <rect x="422" y="144" width="60" height="24" rx="6"/>
-            </g>
-            <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4">
-              <rect x="26" y="144" width="72" height="24" rx="6"/>
-              <rect x="294" y="144" width="72" height="24" rx="6"/>
-              <rect x="122" y="202" width="72" height="24" rx="6"/>
-              <rect x="222" y="202" width="72" height="24" rx="6"/>
-              <rect x="366" y="202" width="72" height="24" rx="6"/>
-              <rect x="462" y="202" width="72" height="24" rx="6"/>
-            </g>
-            <g fill="#1a1c22" stroke="none">
-              <text x="270" y="43">a&#8321; : a&#8322;</text>
-              <text x="145" y="101">a&#8322; : a&#8323;</text>
-              <text x="395" y="101">a&#8321; : a&#8323;</text>
-              <text x="208" y="161">a&#8321; : a&#8323;</text>
-              <text x="452" y="161">a&#8322; : a&#8323;</text>
-            </g>
-            <g fill="#0a7d4d" stroke="none" font-size="12">
-              <text x="62" y="161">&#9001;1,2,3&#9002;</text>
-              <text x="330" y="161">&#9001;2,1,3&#9002;</text>
-              <text x="158" y="219">&#9001;1,3,2&#9002;</text>
-              <text x="258" y="219">&#9001;3,1,2&#9002;</text>
-              <text x="402" y="219">&#9001;2,3,1&#9002;</text>
-              <text x="498" y="219">&#9001;3,2,1&#9002;</text>
-            </g>
-          </g>
-        </svg>
+      <figure class="wide">
+<!-- gen:so decision-tree -->
+<svg viewBox="0 0 482 220" role="img" style="max-width:578px" font-family="system-ui, sans-serif" aria-label="The decision tree for sorting three keys a1, a2, a3 (the comparisons insertion sort makes): each internal node compares two keys, each leaf states the sorted order of the original positions. Six leaves, one per ordering; height 3. the test a1 : a2 goes to the test a2 : a3 when at most, to the test a1 : a3 when greater. the test a2 : a3 goes to the leaf 1,2,3 when at most, to the test a1 : a3 when greater. the test a1 : a3 goes to the leaf 1,3,2 when at most, to the leaf 3,1,2 when greater. the test a1 : a3 goes to the leaf 2,1,3 when at most, to the test a2 : a3 when greater. the test a2 : a3 goes to the leaf 2,3,1 when at most, to the leaf 3,2,1 when greater.">
+<line x1="221.5" y1="35" x2="104.5" y2="69" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="153" y="54" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">≤</text>
+<line x1="221.5" y1="35" x2="338.5" y2="69" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="290" y="54" font-size="12" font-weight="600" fill="#5c6270" text-anchor="start">&gt;</text>
+<line x1="104.5" y1="93" x2="46" y2="127" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="65.3" y="112" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">≤</text>
+<line x1="104.5" y1="93" x2="163" y2="127" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="143.8" y="112" font-size="12" font-weight="600" fill="#5c6270" text-anchor="start">&gt;</text>
+<line x1="163" y1="151" x2="124" y2="185" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="133.5" y="170" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">≤</text>
+<line x1="163" y1="151" x2="202" y2="185" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="192.5" y="170" font-size="12" font-weight="600" fill="#5c6270" text-anchor="start">&gt;</text>
+<line x1="338.5" y1="93" x2="280" y2="127" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="299.3" y="112" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">≤</text>
+<line x1="338.5" y1="93" x2="397" y2="127" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="377.8" y="112" font-size="12" font-weight="600" fill="#5c6270" text-anchor="start">&gt;</text>
+<line x1="397" y1="151" x2="358" y2="185" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="367.5" y="170" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">≤</text>
+<line x1="397" y1="151" x2="436" y2="185" stroke="#9aa3b2" stroke-width="1.5"/>
+<text x="426.5" y="170" font-size="12" font-weight="600" fill="#5c6270" text-anchor="start">&gt;</text>
+<rect x="189.5" y="11" width="64" height="24" rx="6" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="221.5" y="27.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a<tspan dy="4" font-size="9">1</tspan><tspan dy="-4"> : a</tspan><tspan dy="4" font-size="9">2</tspan></text>
+<rect x="72.5" y="69" width="64" height="24" rx="6" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="104.5" y="85.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a<tspan dy="4" font-size="9">2</tspan><tspan dy="-4"> : a</tspan><tspan dy="4" font-size="9">3</tspan></text>
+<rect x="14" y="127" width="64" height="24" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="46" y="143.5" font-size="12.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">⟨1,2,3⟩</text>
+<rect x="131" y="127" width="64" height="24" rx="6" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="163" y="143.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a<tspan dy="4" font-size="9">1</tspan><tspan dy="-4"> : a</tspan><tspan dy="4" font-size="9">3</tspan></text>
+<rect x="92" y="185" width="64" height="24" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="124" y="201.5" font-size="12.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">⟨1,3,2⟩</text>
+<rect x="170" y="185" width="64" height="24" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="202" y="201.5" font-size="12.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">⟨3,1,2⟩</text>
+<rect x="306.5" y="69" width="64" height="24" rx="6" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="338.5" y="85.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a<tspan dy="4" font-size="9">1</tspan><tspan dy="-4"> : a</tspan><tspan dy="4" font-size="9">3</tspan></text>
+<rect x="248" y="127" width="64" height="24" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="280" y="143.5" font-size="12.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">⟨2,1,3⟩</text>
+<rect x="365" y="127" width="64" height="24" rx="6" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="397" y="143.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a<tspan dy="4" font-size="9">2</tspan><tspan dy="-4"> : a</tspan><tspan dy="4" font-size="9">3</tspan></text>
+<rect x="326" y="185" width="64" height="24" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="358" y="201.5" font-size="12.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">⟨2,3,1⟩</text>
+<rect x="404" y="185" width="64" height="24" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="436" y="201.5" font-size="12.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">⟨3,2,1⟩</text>
+</svg>
+<!-- /gen:so decision-tree -->
         <figcaption>
           The decision tree for \(n = 3\). Six permutations, six leaves; each
           input ordering follows exactly one root-to-leaf path. The height is
@@ -247,12 +241,12 @@
       <table class="trace">
         <tr><th class="lab">\((a_1, a_2, a_3)\)</th><th>\(a_1 : a_2\)</th>
           <th>second test</th><th>third test</th><th>leaf reached</th><th>depth</th></tr>
-        <tr><td class="lab">(1, 2, 3)</td><td>1 &le; 2, left</td><td>\(a_2{:}a_3\) 2 &le; 3, left</td><td>&ndash;</td><td class="cell">&#9001;1,2,3&#9002;</td><td>2</td></tr>
-        <tr><td class="lab">(1, 3, 2)</td><td>1 &le; 3, left</td><td>\(a_2{:}a_3\) 3 &gt; 2, right</td><td>\(a_1{:}a_3\) 1 &le; 2, left</td><td class="cell">&#9001;1,3,2&#9002;</td><td>3</td></tr>
-        <tr><td class="lab">(2, 3, 1)</td><td>2 &le; 3, left</td><td>\(a_2{:}a_3\) 3 &gt; 1, right</td><td>\(a_1{:}a_3\) 2 &gt; 1, right</td><td class="cell">&#9001;3,1,2&#9002;</td><td>3</td></tr>
-        <tr><td class="lab">(2, 1, 3)</td><td>2 &gt; 1, right</td><td>\(a_1{:}a_3\) 2 &le; 3, left</td><td>&ndash;</td><td class="cell">&#9001;2,1,3&#9002;</td><td>2</td></tr>
-        <tr><td class="lab">(3, 1, 2)</td><td>3 &gt; 1, right</td><td>\(a_1{:}a_3\) 3 &gt; 2, right</td><td>\(a_2{:}a_3\) 1 &le; 2, left</td><td class="cell">&#9001;2,3,1&#9002;</td><td>3</td></tr>
-        <tr><td class="lab">(3, 2, 1)</td><td>3 &gt; 2, right</td><td>\(a_1{:}a_3\) 3 &gt; 1, right</td><td>\(a_2{:}a_3\) 2 &gt; 1, right</td><td class="cell">&#9001;3,2,1&#9002;</td><td>3</td></tr>
+        <tr><td class="lab">(1, 2, 3)</td><td>\(1 \le 2\), left</td><td>\(a_2{:}a_3\): \(2 \le 3\), left</td><td>&ndash;</td><td class="cell">&#9001;1,2,3&#9002;</td><td>2</td></tr>
+        <tr><td class="lab">(1, 3, 2)</td><td>\(1 \le 3\), left</td><td>\(a_2{:}a_3\): \(3 &gt; 2\), right</td><td>\(a_1{:}a_3\): \(1 \le 2\), left</td><td class="cell">&#9001;1,3,2&#9002;</td><td>3</td></tr>
+        <tr><td class="lab">(2, 3, 1)</td><td>\(2 \le 3\), left</td><td>\(a_2{:}a_3\): \(3 &gt; 1\), right</td><td>\(a_1{:}a_3\): \(2 &gt; 1\), right</td><td class="cell">&#9001;3,1,2&#9002;</td><td>3</td></tr>
+        <tr><td class="lab">(2, 1, 3)</td><td>\(2 &gt; 1\), right</td><td>\(a_1{:}a_3\): \(2 \le 3\), left</td><td>&ndash;</td><td class="cell">&#9001;2,1,3&#9002;</td><td>2</td></tr>
+        <tr><td class="lab">(3, 1, 2)</td><td>\(3 &gt; 1\), right</td><td>\(a_1{:}a_3\): \(3 &gt; 2\), right</td><td>\(a_2{:}a_3\): \(1 \le 2\), left</td><td class="cell">&#9001;2,3,1&#9002;</td><td>3</td></tr>
+        <tr><td class="lab">(3, 2, 1)</td><td>\(3 &gt; 2\), right</td><td>\(a_1{:}a_3\): \(3 &gt; 1\), right</td><td>\(a_2{:}a_3\): \(2 &gt; 1\), right</td><td class="cell">&#9001;3,2,1&#9002;</td><td>3</td></tr>
       </table>
       <p>
         Six inputs, six <em>different</em> leaves, which is the property the proof
@@ -372,7 +366,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; The Sorting Lower Bound v1.0
+        Data Structures &amp; Algorithms &middot; The Sorting Lower Bound v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

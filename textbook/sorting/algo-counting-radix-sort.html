@@ -81,6 +81,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -280,7 +281,47 @@ fn counting_sort(a: &amp;mut [usize], r_radix: usize) {
         purpose: three records share key 2, and keys 0 and 1 each appear
         twice. Input order:
       </p>
-      <pre>Ava:2  Ben:0  Cal:3  Dia:2  Eve:0  Fox:1  Gia:2  Hal:1</pre>
+      <figure class="wide">
+<!-- gen:so records -->
+<svg viewBox="0 0 531 72" role="img" style="max-width:637px" font-family="system-ui, sans-serif" aria-label="Eight records, each a name with a key in 0 to 3, in input order. Ava:2, Ben:0, Cal:3, Dia:2, Eve:0, Fox:1, Gia:2, Hal:1.">
+<text x="46.2" y="35" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">input</text>
+<rect x="58.2" y="13" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="78.2" y="28" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ava</text>
+<text x="78.2" y="43" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="78.2" y="60" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="98.2" y="13" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="118.2" y="28" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ben</text>
+<text x="118.2" y="43" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="118.2" y="60" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="138.2" y="13" width="40" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="158.2" y="28" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Cal</text>
+<text x="158.2" y="43" font-size="11" font-weight="700" fill="#1e8e3e" text-anchor="middle">3</text>
+<text x="158.2" y="60" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="178.2" y="13" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="198.2" y="28" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Dia</text>
+<text x="198.2" y="43" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="198.2" y="60" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="218.2" y="13" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="238.2" y="28" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Eve</text>
+<text x="238.2" y="43" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="238.2" y="60" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="258.2" y="13" width="40" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="278.2" y="28" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Fox</text>
+<text x="278.2" y="43" font-size="11" font-weight="700" fill="#ea4335" text-anchor="middle">1</text>
+<text x="278.2" y="60" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="298.2" y="13" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="318.2" y="28" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Gia</text>
+<text x="318.2" y="43" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="318.2" y="60" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="338.2" y="13" width="40" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="358.2" y="28" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Hal</text>
+<text x="358.2" y="43" font-size="11" font-weight="700" fill="#ea4335" text-anchor="middle">1</text>
+<text x="358.2" y="60" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="392.2" y="28" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">keys in 0..3 (R = 4),</text>
+<text x="392.2" y="42" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">under each name</text>
+</svg>
+<!-- /gen:so records -->
+      </figure>
       <p>
         <strong>Pass 1, histogram.</strong> One increment per record;
         <code>count</code> after each read:
@@ -316,35 +357,376 @@ fn counting_sort(a: &amp;mut [usize], r_radix: usize) {
         same key lands one slot to the right. Every state of
         <code>aux</code> and of the moving <code>start</code> array:
       </p>
-      <table class="trace">
-        <tr><th>place</th><th>&rarr; slot</th>
-          <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th>
-          <th>start after</th></tr>
-        <tr><td class="lab">Ava:2</td><td class="cell">aux[4]</td>
-          <td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="new">Ava</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td>
-          <td class="cell">[0 2 5 7]</td></tr>
-        <tr><td class="lab">Ben:0</td><td class="cell">aux[0]</td>
-          <td class="new">Ben</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td>
-          <td class="cell">[1 2 5 7]</td></tr>
-        <tr><td class="lab">Cal:3</td><td class="cell">aux[7]</td>
-          <td class="cell">Ben</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="new">Cal</td>
-          <td class="cell">[1 2 5 8]</td></tr>
-        <tr><td class="lab">Dia:2</td><td class="cell">aux[5]</td>
-          <td class="cell">Ben</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="new">Dia</td><td class="cell">&middot;</td><td class="cell">Cal</td>
-          <td class="cell">[1 2 6 8]</td></tr>
-        <tr><td class="lab">Eve:0</td><td class="cell">aux[1]</td>
-          <td class="cell">Ben</td><td class="new">Eve</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">Dia</td><td class="cell">&middot;</td><td class="cell">Cal</td>
-          <td class="cell">[2 2 6 8]</td></tr>
-        <tr><td class="lab">Fox:1</td><td class="cell">aux[2]</td>
-          <td class="cell">Ben</td><td class="cell">Eve</td><td class="new">Fox</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">Dia</td><td class="cell">&middot;</td><td class="cell">Cal</td>
-          <td class="cell">[2 3 6 8]</td></tr>
-        <tr><td class="lab">Gia:2</td><td class="cell">aux[6]</td>
-          <td class="cell">Ben</td><td class="cell">Eve</td><td class="cell">Fox</td><td class="cell">&middot;</td><td class="cell">Ava</td><td class="cell">Dia</td><td class="new">Gia</td><td class="cell">Cal</td>
-          <td class="cell">[2 3 7 8]</td></tr>
-        <tr><td class="lab">Hal:1</td><td class="cell">aux[3]</td>
-          <td class="cell">Ben</td><td class="cell">Eve</td><td class="cell">Fox</td><td class="new">Hal</td><td class="cell">Ava</td><td class="cell">Dia</td><td class="cell">Gia</td><td class="cell">Cal</td>
-          <td class="cell">[2 4 7 8]</td></tr>
-      </table>
+      <figure class="wide">
+<!-- gen:so placement -->
+<svg viewBox="0 0 558 551" role="img" style="max-width:670px" font-family="system-ui, sans-serif" aria-label="Stable placement: scan the input left to right; each record goes to slot start[key] of aux, and start[key] moves one to the right. Colours are keys. Ava (key 2) goes to aux[4]; start becomes 0 2 5 7. Ben (key 0) goes to aux[0]; start becomes 1 2 5 7. Cal (key 3) goes to aux[7]; start becomes 1 2 5 8. Dia (key 2) goes to aux[5]; start becomes 1 2 6 8. Eve (key 0) goes to aux[1]; start becomes 2 2 6 8. Fox (key 1) goes to aux[2]; start becomes 2 3 6 8. Gia (key 2) goes to aux[6]; start becomes 2 3 7 8. Hal (key 1) goes to aux[3]; start becomes 2 4 7 8.">
+<text x="65.5" y="50" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">before</text>
+<text x="77.5" y="21" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">aux</text>
+<rect x="77.5" y="28" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="97.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="117.5" y="28" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="157.5" y="28" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="177.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="197.5" y="28" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="217.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="237.5" y="28" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="257.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="277.5" y="28" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="297.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="317.5" y="28" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="337.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="357.5" y="28" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="377.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="427.5" y="21" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">start</text>
+<rect x="427.5" y="28" width="30" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="442.5" y="51" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<text x="442.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="457.5" y="28" width="30" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="472.5" y="51" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="472.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="487.5" y="28" width="30" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="502.5" y="51" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="502.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="517.5" y="28" width="30" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="532.5" y="51" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="532.5" y="75" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="65.5" y="101" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">Ava:2</text>
+<text x="65.5" y="115" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">→ aux[4]</text>
+<rect x="77.5" y="86" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="97.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="117.5" y="86" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="157.5" y="86" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="177.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="197.5" y="86" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="217.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="237.5" y="86" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="257.5" y="101" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ava</text>
+<text x="257.5" y="116" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="257.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="277.5" y="86" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="297.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="317.5" y="86" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="337.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="357.5" y="86" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="377.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="238.8" y="87.3" width="37.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="427.5" y="86" width="30" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="442.5" y="109" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<text x="442.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="457.5" y="86" width="30" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="472.5" y="109" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="472.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="487.5" y="86" width="30" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="502.5" y="109" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="502.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="517.5" y="86" width="30" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="532.5" y="109" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="532.5" y="133" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="488.8" y="87.3" width="27.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="65.5" y="159" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">Ben:0</text>
+<text x="65.5" y="173" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">→ aux[0]</text>
+<rect x="77.5" y="144" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="97.5" y="159" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ben</text>
+<text x="97.5" y="174" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="97.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="117.5" y="144" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="157.5" y="144" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="177.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="197.5" y="144" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="217.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="237.5" y="144" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="257.5" y="159" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ava</text>
+<text x="257.5" y="174" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="257.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="277.5" y="144" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="297.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="317.5" y="144" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="337.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="357.5" y="144" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="377.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="78.8" y="145.3" width="37.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="427.5" y="144" width="30" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="442.5" y="167" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="442.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="457.5" y="144" width="30" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="472.5" y="167" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="472.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="487.5" y="144" width="30" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="502.5" y="167" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="502.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="517.5" y="144" width="30" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="532.5" y="167" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="532.5" y="191" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="428.8" y="145.3" width="27.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="65.5" y="217" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">Cal:3</text>
+<text x="65.5" y="231" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">→ aux[7]</text>
+<rect x="77.5" y="202" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="97.5" y="217" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ben</text>
+<text x="97.5" y="232" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="97.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="117.5" y="202" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="157.5" y="202" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="177.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="197.5" y="202" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="217.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="237.5" y="202" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="257.5" y="217" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ava</text>
+<text x="257.5" y="232" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="257.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="277.5" y="202" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="297.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="317.5" y="202" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="337.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="357.5" y="202" width="40" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="377.5" y="217" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Cal</text>
+<text x="377.5" y="232" font-size="11" font-weight="700" fill="#1e8e3e" text-anchor="middle">3</text>
+<text x="377.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="358.8" y="203.3" width="37.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="427.5" y="202" width="30" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="442.5" y="225" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="442.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="457.5" y="202" width="30" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="472.5" y="225" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="472.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="487.5" y="202" width="30" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="502.5" y="225" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="502.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="517.5" y="202" width="30" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="532.5" y="225" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="532.5" y="249" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="518.8" y="203.3" width="27.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="65.5" y="275" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">Dia:2</text>
+<text x="65.5" y="289" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">→ aux[5]</text>
+<rect x="77.5" y="260" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="97.5" y="275" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ben</text>
+<text x="97.5" y="290" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="97.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="117.5" y="260" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="157.5" y="260" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="177.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="197.5" y="260" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="217.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="237.5" y="260" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="257.5" y="275" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ava</text>
+<text x="257.5" y="290" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="257.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="277.5" y="260" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="297.5" y="275" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Dia</text>
+<text x="297.5" y="290" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="297.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="317.5" y="260" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="337.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="357.5" y="260" width="40" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="377.5" y="275" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Cal</text>
+<text x="377.5" y="290" font-size="11" font-weight="700" fill="#1e8e3e" text-anchor="middle">3</text>
+<text x="377.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="278.8" y="261.3" width="37.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="427.5" y="260" width="30" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="442.5" y="283" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="442.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="457.5" y="260" width="30" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="472.5" y="283" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="472.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="487.5" y="260" width="30" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="502.5" y="283" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="502.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="517.5" y="260" width="30" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="532.5" y="283" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="532.5" y="307" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="488.8" y="261.3" width="27.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="65.5" y="333" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">Eve:0</text>
+<text x="65.5" y="347" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">→ aux[1]</text>
+<rect x="77.5" y="318" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="97.5" y="333" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ben</text>
+<text x="97.5" y="348" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="97.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="117.5" y="318" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="137.5" y="333" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Eve</text>
+<text x="137.5" y="348" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="137.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="157.5" y="318" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="177.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="197.5" y="318" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="217.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="237.5" y="318" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="257.5" y="333" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ava</text>
+<text x="257.5" y="348" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="257.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="277.5" y="318" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="297.5" y="333" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Dia</text>
+<text x="297.5" y="348" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="297.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="317.5" y="318" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="337.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="357.5" y="318" width="40" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="377.5" y="333" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Cal</text>
+<text x="377.5" y="348" font-size="11" font-weight="700" fill="#1e8e3e" text-anchor="middle">3</text>
+<text x="377.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="118.8" y="319.3" width="37.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="427.5" y="318" width="30" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="442.5" y="341" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="442.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="457.5" y="318" width="30" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="472.5" y="341" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="472.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="487.5" y="318" width="30" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="502.5" y="341" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="502.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="517.5" y="318" width="30" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="532.5" y="341" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="532.5" y="365" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="428.8" y="319.3" width="27.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="65.5" y="391" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">Fox:1</text>
+<text x="65.5" y="405" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">→ aux[2]</text>
+<rect x="77.5" y="376" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="97.5" y="391" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ben</text>
+<text x="97.5" y="406" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="97.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="117.5" y="376" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="137.5" y="391" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Eve</text>
+<text x="137.5" y="406" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="137.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="157.5" y="376" width="40" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="177.5" y="391" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Fox</text>
+<text x="177.5" y="406" font-size="11" font-weight="700" fill="#ea4335" text-anchor="middle">1</text>
+<text x="177.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="197.5" y="376" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="217.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="237.5" y="376" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="257.5" y="391" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ava</text>
+<text x="257.5" y="406" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="257.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="277.5" y="376" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="297.5" y="391" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Dia</text>
+<text x="297.5" y="406" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="297.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="317.5" y="376" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="337.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="357.5" y="376" width="40" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="377.5" y="391" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Cal</text>
+<text x="377.5" y="406" font-size="11" font-weight="700" fill="#1e8e3e" text-anchor="middle">3</text>
+<text x="377.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="158.8" y="377.3" width="37.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="427.5" y="376" width="30" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="442.5" y="399" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="442.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="457.5" y="376" width="30" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="472.5" y="399" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="472.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="487.5" y="376" width="30" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="502.5" y="399" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="502.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="517.5" y="376" width="30" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="532.5" y="399" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="532.5" y="423" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="458.8" y="377.3" width="27.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="65.5" y="449" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">Gia:2</text>
+<text x="65.5" y="463" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">→ aux[6]</text>
+<rect x="77.5" y="434" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="97.5" y="449" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ben</text>
+<text x="97.5" y="464" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="97.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="117.5" y="434" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="137.5" y="449" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Eve</text>
+<text x="137.5" y="464" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="137.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="157.5" y="434" width="40" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="177.5" y="449" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Fox</text>
+<text x="177.5" y="464" font-size="11" font-weight="700" fill="#ea4335" text-anchor="middle">1</text>
+<text x="177.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="197.5" y="434" width="40" height="36" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="217.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="237.5" y="434" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="257.5" y="449" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ava</text>
+<text x="257.5" y="464" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="257.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="277.5" y="434" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="297.5" y="449" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Dia</text>
+<text x="297.5" y="464" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="297.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="317.5" y="434" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="337.5" y="449" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Gia</text>
+<text x="337.5" y="464" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="337.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="357.5" y="434" width="40" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="377.5" y="449" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Cal</text>
+<text x="377.5" y="464" font-size="11" font-weight="700" fill="#1e8e3e" text-anchor="middle">3</text>
+<text x="377.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="318.8" y="435.3" width="37.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="427.5" y="434" width="30" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="442.5" y="457" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="442.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="457.5" y="434" width="30" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="472.5" y="457" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="472.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="487.5" y="434" width="30" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="502.5" y="457" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="502.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="517.5" y="434" width="30" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="532.5" y="457" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="532.5" y="481" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="488.8" y="435.3" width="27.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="65.5" y="507" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">Hal:1</text>
+<text x="65.5" y="521" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">→ aux[3]</text>
+<rect x="77.5" y="492" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="97.5" y="507" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ben</text>
+<text x="97.5" y="522" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="97.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="117.5" y="492" width="40" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="137.5" y="507" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Eve</text>
+<text x="137.5" y="522" font-size="11" font-weight="700" fill="#4285f4" text-anchor="middle">0</text>
+<text x="137.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="157.5" y="492" width="40" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="177.5" y="507" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Fox</text>
+<text x="177.5" y="522" font-size="11" font-weight="700" fill="#ea4335" text-anchor="middle">1</text>
+<text x="177.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="197.5" y="492" width="40" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="217.5" y="507" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Hal</text>
+<text x="217.5" y="522" font-size="11" font-weight="700" fill="#ea4335" text-anchor="middle">1</text>
+<text x="217.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="237.5" y="492" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="257.5" y="507" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Ava</text>
+<text x="257.5" y="522" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="257.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="277.5" y="492" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="297.5" y="507" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Dia</text>
+<text x="297.5" y="522" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="297.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="317.5" y="492" width="40" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="337.5" y="507" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Gia</text>
+<text x="337.5" y="522" font-size="11" font-weight="700" fill="#f9ab00" text-anchor="middle">2</text>
+<text x="337.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="357.5" y="492" width="40" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="377.5" y="507" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">Cal</text>
+<text x="377.5" y="522" font-size="11" font-weight="700" fill="#1e8e3e" text-anchor="middle">3</text>
+<text x="377.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="198.8" y="493.3" width="37.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="427.5" y="492" width="30" height="36" fill="#4285f41f" stroke="#4285f4" stroke-width="1.2"/>
+<text x="442.5" y="515" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="442.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="457.5" y="492" width="30" height="36" fill="#ea43351f" stroke="#ea4335" stroke-width="1.2"/>
+<text x="472.5" y="515" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="472.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="487.5" y="492" width="30" height="36" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.2"/>
+<text x="502.5" y="515" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="502.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="517.5" y="492" width="30" height="36" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.2"/>
+<text x="532.5" y="515" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="532.5" y="539" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="458.8" y="493.3" width="27.4" height="33.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+</svg>
+<!-- /gen:so placement -->
+        <figcaption>
+          Each row places one record (ringed) at slot <code>start[key]</code>
+          and moves that counter one to the right (ringed). Colours are keys:
+          each key&rsquo;s block fills left to right in input order.
+        </figcaption>
+      </figure>
       <p>
         Output: <code>Ben:0 Eve:0 Fox:1 Hal:1 Ava:2 Dia:2 Gia:2 Cal:3</code>.
         Sorted by key, and look inside each block of duplicates:
@@ -491,17 +873,118 @@ fn lsd_sort(a: &amp;mut [u64], d: u32, r_radix: u64) {
         Sort seven 3-digit numbers (\(d=3\), \(R=10\)). Each row is the whole
         array after one stable counting pass on the highlighted digit:
       </p>
-      <table class="trace">
-        <tr><th></th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
-        <tr><td class="lab">input</td>
-          <td class="cell">329</td><td class="cell">457</td><td class="cell">657</td><td class="cell">839</td><td class="cell">436</td><td class="cell">720</td><td class="cell">355</td></tr>
-        <tr><td class="lab">after ones</td>
-          <td class="cell">72<span class="dg">0</span></td><td class="cell">35<span class="dg">5</span></td><td class="cell">43<span class="dg">6</span></td><td class="cell">45<span class="dg">7</span></td><td class="cell">65<span class="dg">7</span></td><td class="cell">32<span class="dg">9</span></td><td class="cell">83<span class="dg">9</span></td></tr>
-        <tr><td class="lab">after tens</td>
-          <td class="cell">7<span class="dg">2</span>0</td><td class="cell">3<span class="dg">2</span>9</td><td class="cell">4<span class="dg">3</span>6</td><td class="cell">8<span class="dg">3</span>9</td><td class="cell">3<span class="dg">5</span>5</td><td class="cell">4<span class="dg">5</span>7</td><td class="cell">6<span class="dg">5</span>7</td></tr>
-        <tr><td class="lab">after hundreds</td>
-          <td class="cell"><span class="dg">3</span>29</td><td class="cell"><span class="dg">3</span>55</td><td class="cell"><span class="dg">4</span>36</td><td class="cell"><span class="dg">4</span>57</td><td class="cell"><span class="dg">6</span>57</td><td class="cell"><span class="dg">7</span>20</td><td class="cell"><span class="dg">8</span>39</td></tr>
-      </table>
+      <figure class="wide">
+<!-- gen:so lsd -->
+<svg viewBox="0 0 407 287" role="img" style="max-width:488px" font-family="system-ui, sans-serif" aria-label="LSD radix sort of seven 3-digit keys: one stable counting pass per digit, least significant first. The digit each pass sorts on is blue; brackets mark the keys that tie on it, which keep their order. input: [329 457 657 839 436 720 355]. after ones: [720 355 436 457 657 329 839]. after tens: [720 329 436 839 355 457 657]. after hundreds: [329 355 436 457 657 720 839].">
+<text x="104.2" y="30" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">input</text>
+<rect x="116.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="136.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">329</text>
+<text x="136.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="156.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="176.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">457</text>
+<text x="176.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="196.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="216.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">657</text>
+<text x="216.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="236.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="256.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">839</text>
+<text x="256.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="276.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="296.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">436</text>
+<text x="296.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="316.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">720</text>
+<text x="336.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="356.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="376.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">355</text>
+<text x="376.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="104.2" y="80" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">after ones</text>
+<rect x="116.2" y="63" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="136.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>72</tspan><tspan fill="#1f5fb0" font-weight="800">0</tspan></text>
+<text x="136.2" y="100" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="156.2" y="63" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="176.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>35</tspan><tspan fill="#1f5fb0" font-weight="800">5</tspan></text>
+<text x="176.2" y="100" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="196.2" y="63" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="216.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>43</tspan><tspan fill="#1f5fb0" font-weight="800">6</tspan></text>
+<text x="216.2" y="100" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="236.2" y="63" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="256.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>45</tspan><tspan fill="#1f5fb0" font-weight="800">7</tspan></text>
+<text x="256.2" y="100" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="276.2" y="63" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="296.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>65</tspan><tspan fill="#1f5fb0" font-weight="800">7</tspan></text>
+<text x="296.2" y="100" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="316.2" y="63" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>32</tspan><tspan fill="#1f5fb0" font-weight="800">9</tspan></text>
+<text x="336.2" y="100" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="356.2" y="63" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="376.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>83</tspan><tspan fill="#1f5fb0" font-weight="800">9</tspan></text>
+<text x="376.2" y="100" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<path d="M239.2,107 L239.2,111 L313.2,111 L313.2,107" fill="none" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="276.2" y="123" font-size="11" font-weight="600" fill="#1f5fb0" text-anchor="middle">tie on 7</text>
+<path d="M319.2,107 L319.2,111 L393.2,111 L393.2,107" fill="none" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="356.2" y="123" font-size="11" font-weight="600" fill="#1f5fb0" text-anchor="middle">tie on 9</text>
+<text x="104.2" y="155" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">after tens</text>
+<rect x="116.2" y="138" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="136.2" y="156" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>7</tspan><tspan fill="#1f5fb0" font-weight="800">2</tspan><tspan>0</tspan></text>
+<text x="136.2" y="175" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="156.2" y="138" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="176.2" y="156" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>3</tspan><tspan fill="#1f5fb0" font-weight="800">2</tspan><tspan>9</tspan></text>
+<text x="176.2" y="175" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="196.2" y="138" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="216.2" y="156" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>4</tspan><tspan fill="#1f5fb0" font-weight="800">3</tspan><tspan>6</tspan></text>
+<text x="216.2" y="175" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="236.2" y="138" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="256.2" y="156" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>8</tspan><tspan fill="#1f5fb0" font-weight="800">3</tspan><tspan>9</tspan></text>
+<text x="256.2" y="175" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="276.2" y="138" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="296.2" y="156" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>3</tspan><tspan fill="#1f5fb0" font-weight="800">5</tspan><tspan>5</tspan></text>
+<text x="296.2" y="175" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="316.2" y="138" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.2" y="156" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>4</tspan><tspan fill="#1f5fb0" font-weight="800">5</tspan><tspan>7</tspan></text>
+<text x="336.2" y="175" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="356.2" y="138" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="376.2" y="156" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>6</tspan><tspan fill="#1f5fb0" font-weight="800">5</tspan><tspan>7</tspan></text>
+<text x="376.2" y="175" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<path d="M119.2,182 L119.2,186 L193.2,186 L193.2,182" fill="none" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="156.2" y="198" font-size="11" font-weight="600" fill="#1f5fb0" text-anchor="middle">tie on 2</text>
+<path d="M199.2,182 L199.2,186 L273.2,186 L273.2,182" fill="none" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="236.2" y="198" font-size="11" font-weight="600" fill="#1f5fb0" text-anchor="middle">tie on 3</text>
+<path d="M279.2,182 L279.2,186 L393.2,186 L393.2,182" fill="none" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="336.2" y="198" font-size="11" font-weight="600" fill="#1f5fb0" text-anchor="middle">tie on 5</text>
+<text x="104.2" y="230" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">after hundreds</text>
+<rect x="116.2" y="213" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="136.2" y="231" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">3</tspan><tspan>29</tspan></text>
+<text x="136.2" y="250" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="156.2" y="213" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="176.2" y="231" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">3</tspan><tspan>55</tspan></text>
+<text x="176.2" y="250" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="196.2" y="213" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="216.2" y="231" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">4</tspan><tspan>36</tspan></text>
+<text x="216.2" y="250" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="236.2" y="213" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="256.2" y="231" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">4</tspan><tspan>57</tspan></text>
+<text x="256.2" y="250" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="276.2" y="213" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="296.2" y="231" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">6</tspan><tspan>57</tspan></text>
+<text x="296.2" y="250" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="316.2" y="213" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="336.2" y="231" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">7</tspan><tspan>20</tspan></text>
+<text x="336.2" y="250" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="356.2" y="213" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="376.2" y="231" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">8</tspan><tspan>39</tspan></text>
+<text x="376.2" y="250" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<path d="M119.2,257 L119.2,261 L193.2,261 L193.2,257" fill="none" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="156.2" y="273" font-size="11" font-weight="600" fill="#1f5fb0" text-anchor="middle">tie on 3</text>
+<path d="M199.2,257 L199.2,261 L273.2,261 L273.2,257" fill="none" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="236.2" y="273" font-size="11" font-weight="600" fill="#1f5fb0" text-anchor="middle">tie on 4</text>
+</svg>
+<!-- /gen:so lsd -->
+        <figcaption>
+          The digit each pass sorts on is blue; brackets mark the keys that tie
+          on it.
+        </figcaption>
+      </figure>
       <p>
         Watch the ties do the work. The ones pass has two tie pairs
         (457, 657 on digit 7; 329, 839 on digit 9); each pair keeps its input
@@ -543,18 +1026,73 @@ fn lsd_sort(a: &amp;mut [u64], d: u32, r_radix: u64) {
         bucket from its right end while scanning the input left to right)
         and radix sort silently breaks:
       </p>
-      <table class="trace">
-        <tr><th></th><th colspan="3">stable passes</th><th colspan="3">unstable passes (ties reversed)</th></tr>
-        <tr><td class="lab">input</td>
-          <td class="cell">21</td><td class="cell">25</td><td class="cell">23</td>
-          <td class="cell">21</td><td class="cell">25</td><td class="cell">23</td></tr>
-        <tr><td class="lab">after ones</td>
-          <td class="cell">2<span class="dg">1</span></td><td class="cell">2<span class="dg">3</span></td><td class="cell">2<span class="dg">5</span></td>
-          <td class="cell">2<span class="dg">1</span></td><td class="cell">2<span class="dg">3</span></td><td class="cell">2<span class="dg">5</span></td></tr>
-        <tr><td class="lab">after tens</td>
-          <td class="cell"><span class="dg">2</span>1</td><td class="cell"><span class="dg">2</span>3</td><td class="cell"><span class="dg">2</span>5</td>
-          <td class="cell"><span class="dg">2</span>5</td><td class="cell"><span class="dg">2</span>3</td><td class="cell"><span class="dg">2</span>1</td></tr>
-      </table>
+      <figure class="wide">
+<!-- gen:so unstable -->
+<svg viewBox="0 0 473 177" role="img" style="max-width:568px" font-family="system-ui, sans-serif" aria-label="LSD radix sort of 21 25 23 with stable passes and with passes that reverse ties: the tens pass ties all three keys, and only the stable pass leaves them in order. input: stable passes [21 25 23], unstable passes (ties reversed) [21 25 23]. after ones: [21 23 25], [21 23 25] (no ties: identical). after tens: [21 23 25], [25 23 21] (all three tie on 2).">
+<text x="78.4" y="45" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">input</text>
+<text x="90.4" y="21" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">stable passes</text>
+<rect x="90.4" y="28" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="107.4" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">21</text>
+<text x="107.4" y="65" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="124.4" y="28" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="141.4" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">25</text>
+<text x="141.4" y="65" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="158.4" y="28" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="175.4" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">23</text>
+<text x="175.4" y="65" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="236.4" y="21" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">unstable passes (ties reversed)</text>
+<rect x="236.4" y="28" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="253.4" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">21</text>
+<text x="253.4" y="65" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="270.4" y="28" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="287.4" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">25</text>
+<text x="287.4" y="65" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="304.4" y="28" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="321.4" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">23</text>
+<text x="321.4" y="65" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="78.4" y="95" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">after ones</text>
+<rect x="90.4" y="78" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="107.4" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>2</tspan><tspan fill="#1f5fb0" font-weight="800">1</tspan></text>
+<text x="107.4" y="115" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="124.4" y="78" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="141.4" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>2</tspan><tspan fill="#1f5fb0" font-weight="800">3</tspan></text>
+<text x="141.4" y="115" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="158.4" y="78" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="175.4" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>2</tspan><tspan fill="#1f5fb0" font-weight="800">5</tspan></text>
+<text x="175.4" y="115" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="236.4" y="78" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="253.4" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>2</tspan><tspan fill="#1f5fb0" font-weight="800">1</tspan></text>
+<text x="253.4" y="115" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="270.4" y="78" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="287.4" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>2</tspan><tspan fill="#1f5fb0" font-weight="800">3</tspan></text>
+<text x="287.4" y="115" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="304.4" y="78" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="321.4" y="96" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan>2</tspan><tspan fill="#1f5fb0" font-weight="800">5</tspan></text>
+<text x="321.4" y="115" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="352.4" y="95" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">no ties: identical</text>
+<text x="78.4" y="145" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">after tens</text>
+<rect x="90.4" y="128" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="107.4" y="146" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">2</tspan><tspan>1</tspan></text>
+<text x="107.4" y="165" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="124.4" y="128" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="141.4" y="146" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">2</tspan><tspan>3</tspan></text>
+<text x="141.4" y="165" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="158.4" y="128" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="175.4" y="146" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">2</tspan><tspan>5</tspan></text>
+<text x="175.4" y="165" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="236.4" y="128" width="34" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2"/>
+<text x="253.4" y="146" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">2</tspan><tspan>5</tspan></text>
+<text x="253.4" y="165" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="270.4" y="128" width="34" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2"/>
+<text x="287.4" y="146" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">2</tspan><tspan>3</tspan></text>
+<text x="287.4" y="165" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="304.4" y="128" width="34" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2"/>
+<text x="321.4" y="146" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">2</tspan><tspan>1</tspan></text>
+<text x="321.4" y="165" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="352.4" y="145" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">all three tie on 2</text>
+</svg>
+<!-- /gen:so unstable -->
+      </figure>
       <p>
         The ones pass is identical in both columns (its digits 1, 3, 5 are
         all distinct, so there are no ties to mishandle). The tens pass is
@@ -586,10 +1124,57 @@ fn lsd_sort(a: &amp;mut [u64], d: u32, r_radix: u64) {
         the next digit. On the seven numbers of the trace, the first pass
         splits by hundreds digit:
       </p>
-      <pre>bucket 3: [329, 355]   bucket 4: [457, 436]   bucket 6: [657]
-bucket 7: [720]        bucket 8: [839]
-<span class="cm">recurse on the tens digit inside bucket 3, inside bucket 4, ... ;
-buckets 6, 7, 8 have one element each: already done.</span></pre>
+      <figure class="wide">
+<!-- gen:so msd -->
+<svg viewBox="0 0 682 120" role="img" style="max-width:818px" font-family="system-ui, sans-serif" aria-label="MSD radix sort's first pass splits the keys by their leading digit; each bucket of two or more keys is then sorted on its own, by the next digit. input: [329 457 657 839 436 720 355]. first pass: hundreds digit: bucket 3 [329 355], bucket 4 [457 436], bucket 6 [657], bucket 7 [720], bucket 8 [839] (3, 4: recurse on the tens digit; 6, 7, 8: one key each, done).">
+<text x="104.2" y="30" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">input</text>
+<rect x="116.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="136.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">3</tspan><tspan>29</tspan></text>
+<text x="136.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="156.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="176.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">4</tspan><tspan>57</tspan></text>
+<text x="176.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="196.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="216.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">6</tspan><tspan>57</tspan></text>
+<text x="216.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="236.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="256.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">8</tspan><tspan>39</tspan></text>
+<text x="256.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="276.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="296.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">4</tspan><tspan>36</tspan></text>
+<text x="296.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="316.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">7</tspan><tspan>20</tspan></text>
+<text x="336.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="356.2" y="13" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="376.2" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">3</tspan><tspan>55</tspan></text>
+<text x="376.2" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="104.2" y="94" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">first pass:</text>
+<text x="104.2" y="108" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">hundreds digit</text>
+<text x="116.2" y="77" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">bucket 3</text>
+<rect x="116.2" y="84" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="136.2" y="102" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">3</tspan><tspan>29</tspan></text>
+<rect x="156.2" y="84" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="176.2" y="102" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">3</tspan><tspan>55</tspan></text>
+<text x="214.2" y="77" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">bucket 4</text>
+<rect x="214.2" y="84" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="234.2" y="102" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">4</tspan><tspan>57</tspan></text>
+<rect x="254.2" y="84" width="40" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="274.2" y="102" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">4</tspan><tspan>36</tspan></text>
+<text x="312.2" y="77" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">bucket 6</text>
+<rect x="312.2" y="84" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="332.2" y="102" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">6</tspan><tspan>57</tspan></text>
+<text x="370.2" y="77" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">bucket 7</text>
+<rect x="370.2" y="84" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="390.2" y="102" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">7</tspan><tspan>20</tspan></text>
+<text x="428.2" y="77" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">bucket 8</text>
+<rect x="428.2" y="84" width="40" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="448.2" y="102" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle"><tspan fill="#1f5fb0" font-weight="800">8</tspan><tspan>39</tspan></text>
+<text x="482.2" y="94" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">3, 4: recurse on the tens digit</text>
+<text x="482.2" y="108" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">6, 7, 8: one key each, done</text>
+</svg>
+<!-- /gen:so msd -->
+      </figure>
       <p>
         The recursion must stay <em>inside</em> each block: a later full-array
         pass on a lower digit would destroy the leading-digit order (this is
@@ -648,8 +1233,8 @@ buckets 6, 7, 8 have one element each: already done.</span></pre>
       </p>
       <table>
         <tr><th>radix \(R\)</th><th>passes \(d\)</th><th>cost \(d(n+R)\)</th><th>at \(n = 1000\)</th><th>at \(n = 10^6\)</th></tr>
-        <tr><td>\(2^8 = 256\)</td><td>4</td><td>\(4(n + 256)\)</td><td>5&thinsp;024</td><td>&asymp;&nbsp;4.0&times;10<sup>6</sup></td></tr>
-        <tr><td>\(2^{16} = 65\,536\)</td><td>2</td><td>\(2(n + 65\,536)\)</td><td>133&thinsp;072</td><td>&asymp;&nbsp;2.1&times;10<sup>6</sup></td></tr>
+        <tr><td>\(2^8 = 256\)</td><td>4</td><td>\(4(n + 256)\)</td><td>5&thinsp;024</td><td>\(\approx 4.0 \times 10^6\)</td></tr>
+        <tr><td>\(2^{16} = 65\,536\)</td><td>2</td><td>\(2(n + 65\,536)\)</td><td>133&thinsp;072</td><td>\(\approx 2.1 \times 10^6\)</td></tr>
       </table>
       <p>
         At \(n = 1000\) the big radix is a disaster: the \(R\) term swamps
@@ -830,8 +1415,7 @@ buckets 6, 7, 8 have one element each: already done.</span></pre>
             <summary>solution</summary>
             Positions are processed right to left: position 2 (last letter),
             then 1, then 0. Output: <code>ace add bad bed bee cab dab dad
-            ebb fad fed fee</code> (verified by running the three stable
-            passes). Full MSD recursion builds, level by level, the R-way
+            ebb fad fed fee</code>. Full MSD recursion builds, level by level, the R-way
             trie of the strings: first-letter buckets are the root&rsquo;s
             children, second-letter sub-buckets their children, and reading
             the leaves left to right gives the same sorted order; see the
@@ -841,7 +1425,7 @@ buckets 6, 7, 8 have one element each: already done.</span></pre>
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Counting Sort &amp; Radix Sort v1.0
+        Data Structures &amp; Algorithms &middot; Counting Sort &amp; Radix Sort v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

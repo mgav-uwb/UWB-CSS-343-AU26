@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -162,72 +163,361 @@
         Partition \([3, 7, 1, 9, 4, 8, 6, 2, 5]\) with pivot \(5\). The index \(i\) marks the
         boundary of the &ldquo;\(&lt; 5\)&rdquo; region; whenever an element beats the
         pivot, grow the region and swap the element in:
-        <pre>  [ 3 7 1 9 4 8 6 2 | 5 ]   pivot = a[hi] = 5   (the LAST element)
-  i = lo &minus; 1 = &minus;1           j scans lo &hellip; hi&minus;1
-
-  j=0   3 &lt; 5  &rarr; swap(a[++i], a[j])   i:0   &rarr; 3 7 1 9 4 8 6 2
-  j=1   7 &lt; 5 ? no
-  j=2   1 &lt; 5  &rarr; swap(a[++i], a[j])   i:1   &rarr; 3 1 7 9 4 8 6 2
-  j=3   9 &lt; 5 ? no
-  j=4   4 &lt; 5  &rarr; swap(a[++i], a[j])   i:2   &rarr; 3 1 4 9 7 8 6 2
-  j=5   8 &lt; 5 ? no
-  j=6   6 &lt; 5 ? no
-  j=7   2 &lt; 5  &rarr; swap(a[++i], a[j])   i:3   &rarr; 3 1 4 2 7 8 6 9
-  end           swap(a[i+1], a[hi])           &rarr; 3 1 4 2 [5] 8 6 9 7</pre>
-        Every line of that trace is the loop body <code>if (a[j] &lt; pivot)
-        swap(a[++i], a[j]);</code> with a different <code>j</code>, written
-        symbolically on purpose, so the mechanism is visible rather than five
-        different-looking moves. <code>j</code> is the scan and visits every slot
+        <figure class="wide">
+<!-- gen:so lomuto -->
+<svg viewBox="0 0 632 692" role="img" style="max-width:758px" font-family="system-ui, sans-serif" aria-label="Lomuto partition of 3 7 1 9 4 8 6 2 5 around the last element, 5. Green: the region of keys smaller than the pivot, a[lo..i]; blue: keys scanned and not smaller; amber: the pivot; the ringed cell is a[j]. pivot = a[8] = 5: [3 7 1 9 4 8 6 2 5] (i = lo − 1 = −1:; the &quot;&lt; pivot&quot; region is empty). j = 0 3 &lt; 5: take: [3 7 1 9 4 8 6 2 5] (i at 0, j at 0) (i = 0: a no-op swap). j = 1 7 &lt; 5? no: [3 7 1 9 4 8 6 2 5] (i at 0, j at 1) (skip). j = 2 1 &lt; 5: take: [3 1 7 9 4 8 6 2 5] (i at 1, j at 2) (i = 1: swap a[1] and a[2]). j = 3 9 &lt; 5? no: [3 1 7 9 4 8 6 2 5] (i at 1, j at 3) (skip). j = 4 4 &lt; 5: take: [3 1 4 9 7 8 6 2 5] (i at 2, j at 4) (i = 2: swap a[2] and a[4]). j = 5 8 &lt; 5? no: [3 1 4 9 7 8 6 2 5] (i at 2, j at 5) (skip). j = 6 6 &lt; 5? no: [3 1 4 9 7 8 6 2 5] (i at 2, j at 6) (skip). j = 7 2 &lt; 5: take: [3 1 4 2 7 8 6 9 5] (i at 3, j at 7) (i = 3: swap a[3] and a[7]). place swap(a[i+1], a[hi]): [3 1 4 2 5 8 6 9 7] (p at 4) (p = 4: the pivot is home;; left of it &lt; 5, right of it &gt; 5).">
+<text x="136.4" y="30" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">pivot = a[8] = 5</text>
+<rect x="148.4" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="163.4" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="163.4" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="193.4" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="193.4" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="223.4" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="223.4" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="253.4" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="253.4" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="283.4" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="283.4" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="313.4" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="343.4" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="373.4" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="373.4" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="13" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="403.4" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="403.4" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="432.4" y="23" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i = lo − 1 = −1:</text>
+<text x="432.4" y="37" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">the &quot;&lt; pivot&quot; region is empty</text>
+<text x="136.4" y="71" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">j = 0</text>
+<text x="136.4" y="85" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">3 &lt; 5: take</text>
+<rect x="148.4" y="61" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="163.4" y="79" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="163.4" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="193.4" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="193.4" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="223.4" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="223.4" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="253.4" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="253.4" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="283.4" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="283.4" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="313.4" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="343.4" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="373.4" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="373.4" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="61" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="403.4" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="403.4" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="149.7" y="62.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="163.4" y="111" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i, j</text>
+<text x="432.4" y="78" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i = 0: a no-op swap</text>
+<text x="136.4" y="132" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">j = 1</text>
+<text x="136.4" y="146" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">7 &lt; 5? no</text>
+<rect x="148.4" y="122" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="163.4" y="140" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="163.4" y="159" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="122" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="193.4" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="193.4" y="159" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="122" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="223.4" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="223.4" y="159" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="122" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="253.4" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="253.4" y="159" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="122" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="283.4" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="283.4" y="159" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="122" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="313.4" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="159" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="122" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="343.4" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="159" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="122" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="373.4" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="373.4" y="159" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="122" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="403.4" y="140" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="403.4" y="159" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="179.7" y="123.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="163.4" y="172" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="193.4" y="172" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="432.4" y="139" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">skip</text>
+<text x="136.4" y="208.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">j = 2</text>
+<text x="136.4" y="222.6" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">1 &lt; 5: take</text>
+<rect x="148.4" y="198.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="163.4" y="216.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="163.4" y="235.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="198.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="193.4" y="216.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="193.4" y="235.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="198.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="223.4" y="216.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="223.4" y="235.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="198.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="253.4" y="216.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="253.4" y="235.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="198.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="283.4" y="216.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="283.4" y="235.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="198.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="313.4" y="216.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="235.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="198.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="343.4" y="216.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="235.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="198.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="373.4" y="216.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="373.4" y="235.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="198.6" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="403.4" y="216.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="403.4" y="235.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="209.7" y="199.9" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<path d="M196.4,197.6 Q208.4,178.4 220.4,197.6" fill="none" stroke="#4a5163" stroke-width="1.5"/><path d="M220.4,197.6 L214.6,194.1 L219.7,190.9 Z" fill="#4a5163"/><path d="M196.4,197.6 L197,190.9 L202.1,194.1 Z" fill="#4a5163"/>
+<text x="193.4" y="248.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="223.4" y="248.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="432.4" y="215.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i = 1: swap a[1] and a[2]</text>
+<text x="136.4" y="269.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">j = 3</text>
+<text x="136.4" y="283.6" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">9 &lt; 5? no</text>
+<rect x="148.4" y="259.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="163.4" y="277.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="163.4" y="296.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="259.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="193.4" y="277.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="193.4" y="296.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="259.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="223.4" y="277.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="223.4" y="296.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="259.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="253.4" y="277.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="253.4" y="296.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="259.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="283.4" y="277.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="283.4" y="296.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="259.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="313.4" y="277.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="296.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="259.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="343.4" y="277.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="296.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="259.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="373.4" y="277.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="373.4" y="296.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="259.6" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="403.4" y="277.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="403.4" y="296.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="239.7" y="260.9" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="193.4" y="309.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="253.4" y="309.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="432.4" y="276.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">skip</text>
+<text x="136.4" y="348.8" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">j = 4</text>
+<text x="136.4" y="362.8" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">4 &lt; 5: take</text>
+<rect x="148.4" y="338.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="163.4" y="356.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="163.4" y="375.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="338.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="193.4" y="356.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="193.4" y="375.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="338.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="223.4" y="356.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<text x="223.4" y="375.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="338.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="253.4" y="356.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="253.4" y="375.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="338.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="283.4" y="356.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="283.4" y="375.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="338.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="313.4" y="356.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="375.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="338.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="343.4" y="356.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="375.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="338.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="373.4" y="356.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="373.4" y="375.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="338.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="403.4" y="356.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="403.4" y="375.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="269.7" y="340.1" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<path d="M226.4,337.8 Q253.4,313.4 280.4,337.8" fill="none" stroke="#4a5163" stroke-width="1.5"/><path d="M280.4,337.8 L273.9,336 L277.9,331.6 Z" fill="#4a5163"/><path d="M226.4,337.8 L228.8,331.6 L232.8,336 Z" fill="#4a5163"/>
+<text x="223.4" y="388.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="283.4" y="388.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="432.4" y="355.8" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i = 2: swap a[2] and a[4]</text>
+<text x="136.4" y="409.8" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">j = 5</text>
+<text x="136.4" y="423.8" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">8 &lt; 5? no</text>
+<rect x="148.4" y="399.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="163.4" y="417.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="163.4" y="436.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="399.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="193.4" y="417.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="193.4" y="436.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="399.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="223.4" y="417.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<text x="223.4" y="436.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="399.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="253.4" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="253.4" y="436.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="399.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="283.4" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="283.4" y="436.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="399.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="313.4" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="436.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="399.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="343.4" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="436.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="399.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="373.4" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="373.4" y="436.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="399.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="403.4" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="403.4" y="436.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="299.7" y="401.1" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="223.4" y="449.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="313.4" y="449.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="432.4" y="416.8" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">skip</text>
+<text x="136.4" y="470.8" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">j = 6</text>
+<text x="136.4" y="484.8" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">6 &lt; 5? no</text>
+<rect x="148.4" y="460.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="163.4" y="478.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="163.4" y="497.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="460.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="193.4" y="478.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="193.4" y="497.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="460.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="223.4" y="478.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<text x="223.4" y="497.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="460.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="253.4" y="478.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="253.4" y="497.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="460.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="283.4" y="478.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="283.4" y="497.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="460.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="313.4" y="478.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="497.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="460.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="343.4" y="478.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="497.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="460.8" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="373.4" y="478.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="373.4" y="497.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="460.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="403.4" y="478.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="403.4" y="497.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="329.7" y="462.1" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="223.4" y="510.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="343.4" y="510.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="432.4" y="477.8" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">skip</text>
+<text x="136.4" y="555.2" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">j = 7</text>
+<text x="136.4" y="569.2" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">2 &lt; 5: take</text>
+<rect x="148.4" y="545.2" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="163.4" y="563.2" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="163.4" y="582.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="545.2" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="193.4" y="563.2" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="193.4" y="582.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="545.2" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="223.4" y="563.2" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<text x="223.4" y="582.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="545.2" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="253.4" y="563.2" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<text x="253.4" y="582.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="545.2" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="283.4" y="563.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="283.4" y="582.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="545.2" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="313.4" y="563.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="582.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="545.2" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="343.4" y="563.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="582.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="545.2" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="373.4" y="563.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="373.4" y="582.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="545.2" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="403.4" y="563.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="403.4" y="582.2" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="359.7" y="546.5" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<path d="M256.4,544.2 Q313.4,509.4 370.4,544.2" fill="none" stroke="#4a5163" stroke-width="1.5"/><path d="M370.4,544.2 L363.7,543.6 L366.8,538.5 Z" fill="#4a5163"/><path d="M256.4,544.2 L259.9,538.5 L263,543.6 Z" fill="#4a5163"/>
+<text x="253.4" y="595.2" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="373.4" y="595.2" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="432.4" y="562.2" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i = 3: swap a[3] and a[7]</text>
+<text x="136.4" y="639.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">place</text>
+<text x="136.4" y="653.6" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">swap(a[i+1], a[hi])</text>
+<rect x="148.4" y="629.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="163.4" y="647.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="163.4" y="666.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="178.4" y="629.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="193.4" y="647.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="193.4" y="666.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208.4" y="629.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="223.4" y="647.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<text x="223.4" y="666.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.4" y="629.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="253.4" y="647.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<text x="253.4" y="666.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="268.4" y="629.6" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="283.4" y="647.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="283.4" y="666.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="298.4" y="629.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="313.4" y="647.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="313.4" y="666.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="328.4" y="629.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="343.4" y="647.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="343.4" y="666.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="358.4" y="629.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="373.4" y="647.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="373.4" y="666.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="388.4" y="629.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="403.4" y="647.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="403.4" y="666.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<path d="M286.4,628.6 Q343.4,593.8 400.4,628.6" fill="none" stroke="#4a5163" stroke-width="1.5"/><path d="M400.4,628.6 L393.7,628 L396.8,622.9 Z" fill="#4a5163"/><path d="M286.4,628.6 L289.9,622.9 L293,628 Z" fill="#4a5163"/>
+<text x="283.4" y="679.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">p</text>
+<text x="432.4" y="639.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">p = 4: the pivot is home;</text>
+<text x="432.4" y="653.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">left of it &lt; 5, right of it &gt; 5</text>
+</svg>
+<!-- /gen:so lomuto -->
+          <figcaption>
+            Lomuto partition of \([3,7,1,9,4,8,6,2,5]\), one row per \(j\). Green: the
+            &ldquo;\(&lt; \text{pivot}\)&rdquo; region \(a[lo..i]\); blue: keys scanned and
+            not smaller than the pivot; amber: the pivot; the ringed cell is \(a[j]\);
+            an arc is a swap.
+          </figcaption>
+        </figure>
+        Every row of that trace is the loop body <code>if (a[j] &lt; pivot)
+        swap(a[++i], a[j]);</code> with a different <code>j</code>: a take is the
+        test succeeding, a skip is the test failing, and nothing else ever happens
+        inside the loop. <code>j</code> is the scan and visits every slot
         once; <code>i</code> is the boundary of the &ldquo;&lt; pivot&rdquo; region
         and advances only when something belongs in it. When <code>i</code> and
         <code>j</code> are the same slot the swap is a no-op (as at
         <code>j=0</code>): harmless, and not worth a branch to avoid.
         The pivot \(5\) lands at index \(4\), its final sorted position; everything
         left is \(&lt; 5\), everything right is \(&gt; 5\), though neither side is yet
-        sorted; note how the scan jumped over \(9, 8, 6\) and left them in
-        the order it found them. That single linear pass is what quicksort recurses around.
+        sorted; the keys the scan skipped, \(7, 9, 8, 6\), end up on the right as
+        \(8, 6, 9, 7\), because a partition promises nothing about the order within
+        a side. That single linear pass is what quicksort recurses around.
       </div>
-      <p>
-        The same partition as an array, cell by cell. The
-        <span style="color:#0a7d4d;font-weight:700">green</span> prefix is the
-        &ldquo;\(&lt; \text{pivot}\)&rdquo; region (indices \(0\ldots i\)); the
-        <span style="color:#6b40d8;font-weight:700">outlined</span> cell is the one the
-        scan index \(j\) is examining; the
-        <span style="color:#9a5b00;font-weight:700">shaded</span> cell is the pivot.
-        Each element that beats the pivot grows the green region and swaps in.
-      </p>
-      <figure>
-        <table class="trace">
-          <tr><th class="lab">step</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>i</th><th>j</th></tr>
-          <tr><td class="lab">pivot = a[8] = 5</td>
-            <td class="cell">3</td><td class="cell">7</td><td class="cell">1</td><td class="cell">9</td><td class="cell">4</td><td class="cell">8</td><td class="cell">6</td><td class="cell">2</td><td class="cell piv">5</td><td>&minus;1</td><td>&ndash;</td></tr>
-          <tr><td class="lab">j=0: 3&lt;5 &rarr; i=0, swap</td>
-            <td class="cell lt scan">3</td><td class="cell">7</td><td class="cell">1</td><td class="cell">9</td><td class="cell">4</td><td class="cell">8</td><td class="cell">6</td><td class="cell">2</td><td class="cell piv">5</td><td>0</td><td>0</td></tr>
-          <tr><td class="lab">j=1: 7&ge;5, skip</td>
-            <td class="cell lt">3</td><td class="cell scan">7</td><td class="cell">1</td><td class="cell">9</td><td class="cell">4</td><td class="cell">8</td><td class="cell">6</td><td class="cell">2</td><td class="cell piv">5</td><td>0</td><td>1</td></tr>
-          <tr><td class="lab">j=2: 1&lt;5 &rarr; i=1, swap</td>
-            <td class="cell lt">3</td><td class="cell lt">1</td><td class="cell scan">7</td><td class="cell">9</td><td class="cell">4</td><td class="cell">8</td><td class="cell">6</td><td class="cell">2</td><td class="cell piv">5</td><td>1</td><td>2</td></tr>
-          <tr><td class="lab">j=3: 9&ge;5, skip</td>
-            <td class="cell lt">3</td><td class="cell lt">1</td><td class="cell">7</td><td class="cell scan">9</td><td class="cell">4</td><td class="cell">8</td><td class="cell">6</td><td class="cell">2</td><td class="cell piv">5</td><td>1</td><td>3</td></tr>
-          <tr><td class="lab">j=4: 4&lt;5 &rarr; i=2, swap</td>
-            <td class="cell lt">3</td><td class="cell lt">1</td><td class="cell lt">4</td><td class="cell">9</td><td class="cell scan">7</td><td class="cell">8</td><td class="cell">6</td><td class="cell">2</td><td class="cell piv">5</td><td>2</td><td>4</td></tr>
-          <tr><td class="lab">j=5: 8&ge;5, skip</td>
-            <td class="cell lt">3</td><td class="cell lt">1</td><td class="cell lt">4</td><td class="cell">9</td><td class="cell">7</td><td class="cell scan">8</td><td class="cell">6</td><td class="cell">2</td><td class="cell piv">5</td><td>2</td><td>5</td></tr>
-          <tr><td class="lab">j=6: 6&ge;5, skip</td>
-            <td class="cell lt">3</td><td class="cell lt">1</td><td class="cell lt">4</td><td class="cell">9</td><td class="cell">7</td><td class="cell">8</td><td class="cell scan">6</td><td class="cell">2</td><td class="cell piv">5</td><td>2</td><td>6</td></tr>
-          <tr><td class="lab">j=7: 2&lt;5 &rarr; i=3, swap</td>
-            <td class="cell lt">3</td><td class="cell lt">1</td><td class="cell lt">4</td><td class="cell lt">2</td><td class="cell">7</td><td class="cell">8</td><td class="cell">6</td><td class="cell scan">9</td><td class="cell piv">5</td><td>3</td><td>7</td></tr>
-          <tr><td class="lab">place: swap a[4],a[8]</td>
-            <td class="cell lt">3</td><td class="cell lt">1</td><td class="cell lt">4</td><td class="cell lt">2</td><td class="cell piv">5</td><td class="cell">8</td><td class="cell">6</td><td class="cell">9</td><td class="cell">7</td><td>&ndash;</td><td>&ndash;</td></tr>
-        </table>
-        <figcaption>
-          Lomuto partition of \([3,7,1,9,4,8,6,2,5]\). The green &ldquo;less-than&rdquo;
-          region grows only when an element beats the pivot; skipped elements
-          (\(7, 9, 8, 6\)) are simply passed over. The final swap drops the pivot at
-          index \(4\), the boundary of the region: its permanent home. Neither side is
-          sorted; quicksort recurses on each.
-        </figcaption>
-      </figure>
       <div class="code-tabs" data-snippet="sorting/quicksort">
 <div class="ct-tabs" role="tablist">
   <button class="ct-tab" data-lang="cpp">C++</button>
@@ -327,7 +617,7 @@ fn quicksort(a: &amp;mut [i32], lo: usize, hi: usize) {
           <tr><th class="lab">depth</th><th class="lab">call</th><th class="lab">subarray</th><th class="lab">pivot = last</th><th class="lab">p</th><th class="lab">whole array after</th></tr>
           <tr><td class="lab">0</td><td class="lab">sort(0,8)</td><td class="cell">3 7 1 9 4 8 6 2 5</td><td class="cell piv">5</td><td>4</td><td class="cell">3 1 4 2 <strong>5</strong> 8 6 9 7</td></tr>
           <tr><td class="lab">1</td><td class="lab">sort(0,3)</td><td class="cell">3 1 4 2</td><td class="cell piv">2</td><td>1</td><td class="cell">1 <strong>2</strong> 4 3 5 8 6 9 7</td></tr>
-          <tr><td class="lab">2</td><td class="lab">sort(0,0)</td><td class="cell">1</td><td class="cell">&ndash;</td><td>&ndash;</td><td class="cell">base case: hi &le; lo, return</td></tr>
+          <tr><td class="lab">2</td><td class="lab">sort(0,0)</td><td class="cell">1</td><td class="cell">&ndash;</td><td>&ndash;</td><td class="cell">base case: <code>hi &lt;= lo</code>, return</td></tr>
           <tr><td class="lab">2</td><td class="lab">sort(2,3)</td><td class="cell">4 3</td><td class="cell piv">3</td><td>2</td><td class="cell">1 2 <strong>3</strong> 4 5 8 6 9 7</td></tr>
           <tr><td class="lab">3</td><td class="lab">sort(2,1)</td><td class="cell">&ndash;</td><td class="cell">&ndash;</td><td>&ndash;</td><td class="cell">base case: EMPTY (hi &lt; lo)</td></tr>
           <tr><td class="lab">3</td><td class="lab">sort(3,3)</td><td class="cell">4</td><td class="cell">&ndash;</td><td>&ndash;</td><td class="cell">base case</td></tr>
@@ -360,24 +650,92 @@ fn quicksort(a: &amp;mut [i32], lo: usize, hi: usize) {
         The pivot ends at index \(p\), splitting the range into \(p - lo\) elements
         on the left and \(hi - p\) on the right. The extremes are where quicksort
         goes quadratic, and both are worth running by hand.
-        <pre>  PIVOT IS THE SMALLEST:  [ 7 3 9 5 | 1 ]   pivot = 1
-    j=0  7 &lt; 1 ? no          i stays at lo&minus;1 = &minus;1
-    j=1  3 &lt; 1 ? no
-    j=2  9 &lt; 1 ? no
-    j=3  5 &lt; 1 ? no
-    end  swap(a[i+1], a[hi]) = swap(a[0], a[4])   &rarr; 1 3 9 5 7   p = 0
-    The &ldquo;&lt; pivot&rdquo; region is EMPTY. Left side: 0 elements. Right side: 4.
-    Zero swaps inside the loop, n&minus;1 comparisons, and nothing gained but one
-    placed element.
-
-  PIVOT IS THE LARGEST:   [ 7 3 9 5 | 11 ]   pivot = 11
-    j=0  7 &lt; 11  &rarr; i=0, swap(a[0], a[0])    a no-op: i and j are the same slot
-    j=1  3 &lt; 11  &rarr; i=1, swap(a[1], a[1])    no-op
-    j=2  9 &lt; 11  &rarr; i=2, swap(a[2], a[2])    no-op
-    j=3  5 &lt; 11  &rarr; i=3, swap(a[3], a[3])    no-op
-    end  swap(a[4], a[4])                     no-op   &rarr; 7 3 9 5 11   p = 4
-    The &ldquo;&lt; pivot&rdquo; region is EVERYTHING. Left side: 4 elements. Right: 0.
-    The array is not touched at all, and again one element is placed.</pre>
+        <figure class="wide">
+<!-- gen:so degenerate -->
+<svg viewBox="0 0 514 234" role="img" style="max-width:617px" font-family="system-ui, sans-serif" aria-label="Lomuto's two degenerate partitions, before and after. the pivot is the smallest: [7 3 9 5 1] becomes [1 3 9 5 7], p = 0, nothing on the left, 4 keys on the right. the pivot is the largest: [7 3 9 5 11] stays [7 3 9 5 11], p = 4, 4 keys on the left, nothing on the right.">
+<text x="256.6" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">the pivot is the smallest</text>
+<rect x="10" y="41" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="25" y="59" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="25" y="78" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="40" y="41" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="55" y="59" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="55" y="78" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="70" y="41" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="85" y="59" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="85" y="78" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="100" y="41" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="115" y="59" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="115" y="78" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="130" y="41" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="145" y="59" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="145" y="78" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="85" y="101" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">pivot = 1</text>
+<text x="244.3" y="53" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="244.3" y="69" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">4 compares, none true;</text>
+<text x="244.3" y="82" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">i stays at −1</text>
+<rect x="341" y="34.5" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="356" y="52.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="356" y="71.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="371" y="34.5" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="386" y="52.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="386" y="71.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="401" y="34.5" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="416" y="52.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="416" y="71.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="431" y="34.5" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="446" y="52.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="446" y="71.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="461" y="34.5" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="476" y="52.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="476" y="71.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="356" y="84.5" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">p</text>
+<text x="416" y="101" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">p = 0: left 0 keys, right 4</text>
+<text x="256.6" y="141" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">the pivot is the largest</text>
+<rect x="13.2" y="159" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="28.2" y="177" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="28.2" y="196" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="43.2" y="159" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="58.2" y="177" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="58.2" y="196" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="73.2" y="159" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="88.2" y="177" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="88.2" y="196" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="103.2" y="159" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="118.2" y="177" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="118.2" y="196" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="133.2" y="159" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="148.2" y="177" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="148.2" y="196" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="88.2" y="219" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">pivot = 11</text>
+<text x="244.3" y="171" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="244.3" y="187" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">4 compares, all true;</text>
+<text x="244.3" y="200" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">4 swaps, all no-ops</text>
+<rect x="337.8" y="152.5" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="352.8" y="170.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">7</text>
+<text x="352.8" y="189.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="367.8" y="152.5" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="382.8" y="170.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="382.8" y="189.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="397.8" y="152.5" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="412.8" y="170.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">9</text>
+<text x="412.8" y="189.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="427.8" y="152.5" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="442.8" y="170.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">5</text>
+<text x="442.8" y="189.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="457.8" y="152.5" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="472.8" y="170.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">11</text>
+<text x="472.8" y="189.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="472.8" y="202.5" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">p</text>
+<text x="412.8" y="219" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">p = 4: left 4 keys, right 0</text>
+</svg>
+<!-- /gen:so degenerate -->
+          <figcaption>
+            Smallest pivot: no key is smaller, the region stays empty, and the
+            placement swap moves the pivot to the front. Largest pivot: every key is
+            smaller, every swap exchanges a key with itself, and the array is not
+            touched. Either way, one key is placed.
+          </figcaption>
+        </figure>
         Both peel exactly one element off a range of size \(m\) after \(m-1\)
         comparisons, so a run of them obeys \(T(n) = T(n-1) + \Theta(n)\), which
         sums to \(\Theta(n^2)\). Already-sorted input with a last-element pivot
@@ -404,17 +762,181 @@ fn quicksort(a: &amp;mut [i32], lo: usize, hi: usize) {
         and pays one swap per inverted pair. A random array straddling a pivot has far fewer
         inverted pairs than it has small elements, so Hoare moves much less data.
       </div>
-      <pre>  [ 3 | 7 1 9 4 8 6 2 5 ]   pivot = a[lo] = 3
-
-  i&rarr; stops at a[1]=7 (&ge;3)
-  j&larr; 5, 7 are &gt;3; stops at a[7]=2 (&le;3)
-  i &lt; j &rarr; swap(a[i], a[j])   &rarr; 3 2 1 9 4 8 6 7 5
-
-  i&rarr; 1 is &lt;3, keep going; stops at a[3]=9
-  j&larr; 7, 6, 8, 4, 9 are &gt;3;  stops at a[2]=1
-  i=3 &ge; j=2 &rarr; CROSSED, no swap, the scan ends
-
-  swap(a[lo], a[j])            &rarr; 1 2 [3] 9 4 8 6 7 5</pre>
+      <figure class="wide">
+<!-- gen:so hoare -->
+<svg viewBox="0 0 688 353" role="img" style="max-width:826px" font-family="system-ui, sans-serif" aria-label="Hoare partition of 3 7 1 9 4 8 6 2 5 around the first element, 3. i walks right past keys smaller than the pivot (green), j walks left past keys larger (blue); when both stop on keys that are on the wrong sides, one swap fixes both. start: [3 7 1 9 4 8 6 2 5] (pivot = a[lo] = 3). scan i = 1 &lt; j = 7: [3 7 1 9 4 8 6 2 5] (i at 1, j at 7) (i stops at 7 (≥ 3); j passes 5, stops at 2 (≤ 3)). swap a[1] and a[7]: [3 2 1 9 4 8 6 7 5] (i at 1, j at 7) (each moves to the side it belongs on). scan i = 3 ≥ j = 2: crossed: [3 2 1 9 4 8 6 7 5] (i at 3, j at 2) (i passes 1, stops at 9 (≥ 3); j passes 6, 8, 4, 9, stops at 1 (≤ 3)). place swap(a[lo], a[j]): [1 2 3 9 4 8 6 7 5] (p at 2) (the pivot is home at index 2).">
+<text x="155.7" y="30" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">start</text>
+<rect x="167.7" y="13" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="182.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="182.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="197.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="212.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="212.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="227.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="242.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="242.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="257.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="272.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="272.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="287.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="302.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="302.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="317.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="332.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="332.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="347.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="362.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="362.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="377.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="392.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="392.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="407.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="422.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="422.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="451.7" y="30" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">pivot = a[lo] = 3</text>
+<text x="155.7" y="71" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">scan</text>
+<text x="155.7" y="85" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">i = 1 &lt; j = 7</text>
+<rect x="167.7" y="61" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="182.7" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="182.7" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="197.7" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="212.7" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="212.7" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="227.7" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="242.7" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="242.7" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="257.7" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="272.7" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="272.7" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="287.7" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="302.7" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="302.7" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="317.7" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="332.7" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="332.7" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="347.7" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="362.7" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="362.7" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="377.7" y="61" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="392.7" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="392.7" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="407.7" y="61" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="422.7" y="79" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="422.7" y="98" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="199" y="62.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="379" y="62.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="212.7" y="111" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="392.7" y="111" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="451.7" y="71" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i stops at 7 (≥ 3)</text>
+<text x="451.7" y="85" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">j passes 5, stops at 2 (≤ 3)</text>
+<text x="155.7" y="160.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">swap</text>
+<text x="155.7" y="174.6" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">a[1] and a[7]</text>
+<rect x="167.7" y="150.6" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="182.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="182.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="197.7" y="150.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="212.7" y="168.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<text x="212.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="227.7" y="150.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="242.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="242.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="257.7" y="150.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="272.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="272.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="287.7" y="150.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="302.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="302.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="317.7" y="150.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="332.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="332.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="347.7" y="150.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="362.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="362.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="377.7" y="150.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="392.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="392.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="407.7" y="150.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="422.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="422.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<path d="M215.7,149.6 Q302.7,104.4 389.7,149.6" fill="none" stroke="#4a5163" stroke-width="1.5"/><path d="M389.7,149.6 L383,149.5 L385.7,144.2 Z" fill="#4a5163"/><path d="M215.7,149.6 L219.6,144.2 L222.4,149.5 Z" fill="#4a5163"/>
+<text x="212.7" y="200.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="392.7" y="200.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="451.7" y="167.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">each moves to the side it belongs on</text>
+<text x="155.7" y="221.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">scan</text>
+<text x="155.7" y="235.6" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">i = 3 ≥ j = 2: crossed</text>
+<rect x="167.7" y="211.6" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="182.7" y="229.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="182.7" y="248.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="197.7" y="211.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="212.7" y="229.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<text x="212.7" y="248.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="227.7" y="211.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="242.7" y="229.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="242.7" y="248.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="257.7" y="211.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="272.7" y="229.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="272.7" y="248.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="287.7" y="211.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="302.7" y="229.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="302.7" y="248.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="317.7" y="211.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="332.7" y="229.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="332.7" y="248.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="347.7" y="211.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="362.7" y="229.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="362.7" y="248.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="377.7" y="211.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="392.7" y="229.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="392.7" y="248.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="407.7" y="211.6" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="422.7" y="229.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="422.7" y="248.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="259" y="212.9" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="229" y="212.9" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="242.7" y="261.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">j</text>
+<text x="272.7" y="261.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="451.7" y="221.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i passes 1, stops at 9 (≥ 3)</text>
+<text x="451.7" y="235.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">j passes 6, 8, 4, 9, stops at 1 (≤ 3)</text>
+<text x="155.7" y="300.8" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">place</text>
+<text x="155.7" y="314.8" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">swap(a[lo], a[j])</text>
+<rect x="167.7" y="290.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="182.7" y="308.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="182.7" y="327.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="197.7" y="290.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="212.7" y="308.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<text x="212.7" y="327.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="227.7" y="290.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="242.7" y="308.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="242.7" y="327.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="257.7" y="290.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="272.7" y="308.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="272.7" y="327.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="287.7" y="290.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="302.7" y="308.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="302.7" y="327.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="317.7" y="290.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="332.7" y="308.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="332.7" y="327.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="347.7" y="290.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="362.7" y="308.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="362.7" y="327.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="377.7" y="290.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="392.7" y="308.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="392.7" y="327.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="407.7" y="290.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="422.7" y="308.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="422.7" y="327.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<path d="M185.7,289.8 Q212.7,265.4 239.7,289.8" fill="none" stroke="#4a5163" stroke-width="1.5"/><path d="M239.7,289.8 L233.2,288 L237.2,283.6 Z" fill="#4a5163"/><path d="M185.7,289.8 L188.1,283.6 L192.1,288 Z" fill="#4a5163"/>
+<text x="242.7" y="340.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">p</text>
+<text x="451.7" y="307.8" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">the pivot is home at index 2</text>
+</svg>
+<!-- /gen:so hoare -->
+        <figcaption>
+          Hoare partition of the same array around \(a[lo] = 3\). Green: keys \(i\)
+          has passed (smaller than the pivot); blue: keys \(j\) has passed (larger);
+          the ringed cells are where the two scans stopped.
+        </figcaption>
+      </figure>
       <p>
         One swap inside the scan against Lomuto&rsquo;s four on the same array, and the keys
         between the pointers were never touched. Two details are where implementations go wrong.
@@ -694,36 +1216,288 @@ fn sort3way(a: &amp;mut [i32], lo: usize, hi: usize) {
         the pivot value, which is exactly the case Lomuto handles worst. The scan
         starts at \(i = lo+1\) because \(a[lo]\) is the pivot itself and is already
         in the &ldquo;\(=v\)&rdquo; region.
-        <table class="trace">
-          <tr><th class="lab">branch</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>lt</th><th>i</th><th>gt</th></tr>
-          <tr><td class="lab">start, v = 5</td>
-            <td class="cell piv">5</td><td class="cell scan">3</td><td class="cell">5</td><td class="cell">9</td><td class="cell">5</td><td class="cell">1</td><td class="cell">5</td><td>0</td><td>1</td><td>6</td></tr>
-          <tr><td class="lab">3 &lt; 5: swap lt,i; lt++, i++</td>
-            <td class="cell lt">3</td><td class="cell piv">5</td><td class="cell scan">5</td><td class="cell">9</td><td class="cell">5</td><td class="cell">1</td><td class="cell">5</td><td>1</td><td>2</td><td>6</td></tr>
-          <tr><td class="lab">5 = 5: i++</td>
-            <td class="cell lt">3</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell scan">9</td><td class="cell">5</td><td class="cell">1</td><td class="cell">5</td><td>1</td><td>3</td><td>6</td></tr>
-          <tr><td class="lab">9 &gt; 5: swap i,gt; gt&minus;&minus; (i stays)</td>
-            <td class="cell lt">3</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell scan">5</td><td class="cell">5</td><td class="cell">1</td><td class="cell">9</td><td>1</td><td>3</td><td>5</td></tr>
-          <tr><td class="lab">5 = 5: i++</td>
-            <td class="cell lt">3</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell scan">5</td><td class="cell">1</td><td class="cell">9</td><td>1</td><td>4</td><td>5</td></tr>
-          <tr><td class="lab">5 = 5: i++</td>
-            <td class="cell lt">3</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell scan">1</td><td class="cell">9</td><td>1</td><td>5</td><td>5</td></tr>
-          <tr><td class="lab">1 &lt; 5: swap lt,i; lt++, i++</td>
-            <td class="cell lt">3</td><td class="cell lt">1</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell piv">5</td><td class="cell">9</td><td>2</td><td>6</td><td>5</td></tr>
-        </table>
+        <figure class="wide">
+<!-- gen:so threeway -->
+<svg viewBox="0 0 558 526" role="img" style="max-width:670px" font-family="system-ui, sans-serif" aria-label="Dijkstra's three-way partition of 5 3 5 9 5 1 5 around v = 5. Green: keys less than v, a[lo..lt-1]; amber: keys equal to v, a[lt..i-1]; white: unexamined, a[i..gt]; blue: keys greater than v, a[gt+1..hi]. The ringed cell is a[i]. start v = a[lo] = 5: [5 3 5 9 5 1 5] (lt at 0, i at 1, gt at 6) (a[0] is the pivot: the &quot;= v&quot; region). a[1] = 3 3 &lt; 5: [3 5 5 9 5 1 5] (lt at 1, i at 2, gt at 6) (swap a[lt], a[i]; lt++, i++). a[2] = 5 5 = 5: [3 5 5 9 5 1 5] (lt at 1, i at 3, gt at 6) (i++). a[3] = 9 9 &gt; 5: [3 5 5 5 5 1 9] (lt at 1, i at 3, gt at 5) (swap a[i], a[gt]; gt−−; i stays). a[3] = 5 5 = 5: [3 5 5 5 5 1 9] (lt at 1, i at 4, gt at 5) (i++). a[4] = 5 5 = 5: [3 5 5 5 5 1 9] (lt at 1, i at 5, gt at 5) (i++). a[5] = 1 1 &lt; 5: [3 1 5 5 5 5 9] (lt at 2, i at 6, gt at 5) (swap a[lt], a[i]; lt++, i++; i &gt; gt: the pass is over).">
+<text x="97.7" y="23" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">start</text>
+<text x="97.7" y="37" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">v = a[lo] = 5</text>
+<rect x="109.7" y="13" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="124.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="124.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="139.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="154.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="154.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="169.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="184.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="184.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="199.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="214.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="214.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="229.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="244.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="244.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="259.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="274.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="274.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="289.7" y="13" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="304.7" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="304.7" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="124.7" y="63" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">lt</text>
+<text x="154.7" y="63" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="304.7" y="63" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">gt</text>
+<text x="333.7" y="30" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">a[0] is the pivot: the &quot;= v&quot; region</text>
+<text x="97.7" y="99.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">a[1] = 3</text>
+<text x="97.7" y="113.6" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">3 &lt; 5</text>
+<rect x="109.7" y="89.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="124.7" y="107.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="124.7" y="126.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="139.7" y="89.6" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="154.7" y="107.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="154.7" y="126.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="169.7" y="89.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="184.7" y="107.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="184.7" y="126.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="199.7" y="89.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="214.7" y="107.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="214.7" y="126.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="229.7" y="89.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="244.7" y="107.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="244.7" y="126.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="259.7" y="89.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="274.7" y="107.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="274.7" y="126.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="289.7" y="89.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="304.7" y="107.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="304.7" y="126.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="171" y="90.9" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<path d="M127.7,88.6 Q139.7,69.4 151.7,88.6" fill="none" stroke="#4a5163" stroke-width="1.5"/><path d="M151.7,88.6 L146,85.1 L151.1,81.9 Z" fill="#4a5163"/><path d="M127.7,88.6 L128.4,81.9 L133.4,85.1 Z" fill="#4a5163"/>
+<text x="154.7" y="139.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">lt</text>
+<text x="184.7" y="139.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="304.7" y="139.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">gt</text>
+<text x="333.7" y="106.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">swap a[lt], a[i]; lt++, i++</text>
+<text x="97.7" y="160.6" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">a[2] = 5</text>
+<text x="97.7" y="174.6" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">5 = 5</text>
+<rect x="109.7" y="150.6" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="124.7" y="168.6" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="124.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="139.7" y="150.6" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="154.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="154.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="169.7" y="150.6" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="184.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="184.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="199.7" y="150.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="214.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="214.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="229.7" y="150.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="244.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="244.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="259.7" y="150.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="274.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="274.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="289.7" y="150.6" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="304.7" y="168.6" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="304.7" y="187.6" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="201" y="151.9" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="154.7" y="200.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">lt</text>
+<text x="214.7" y="200.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="304.7" y="200.6" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">gt</text>
+<text x="333.7" y="167.6" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i++</text>
+<text x="97.7" y="242.4" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">a[3] = 9</text>
+<text x="97.7" y="256.4" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">9 &gt; 5</text>
+<rect x="109.7" y="232.4" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="124.7" y="250.4" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="124.7" y="269.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="139.7" y="232.4" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="154.7" y="250.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="154.7" y="269.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="169.7" y="232.4" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="184.7" y="250.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="184.7" y="269.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="199.7" y="232.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="214.7" y="250.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="214.7" y="269.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="229.7" y="232.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="244.7" y="250.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="244.7" y="269.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="259.7" y="232.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="274.7" y="250.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="274.7" y="269.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="289.7" y="232.4" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="304.7" y="250.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="304.7" y="269.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="201" y="233.7" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<path d="M217.7,231.4 Q259.7,201.8 301.7,231.4" fill="none" stroke="#4a5163" stroke-width="1.5"/><path d="M301.7,231.4 L295.1,230.4 L298.5,225.5 Z" fill="#4a5163"/><path d="M217.7,231.4 L220.9,225.5 L224.4,230.4 Z" fill="#4a5163"/>
+<text x="154.7" y="282.4" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">lt</text>
+<text x="214.7" y="282.4" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="274.7" y="282.4" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">gt</text>
+<text x="333.7" y="249.4" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">swap a[i], a[gt]; gt−−; i stays</text>
+<text x="97.7" y="303.4" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">a[3] = 5</text>
+<text x="97.7" y="317.4" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">5 = 5</text>
+<rect x="109.7" y="293.4" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="124.7" y="311.4" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="124.7" y="330.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="139.7" y="293.4" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="154.7" y="311.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="154.7" y="330.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="169.7" y="293.4" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="184.7" y="311.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="184.7" y="330.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="199.7" y="293.4" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="214.7" y="311.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="214.7" y="330.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="229.7" y="293.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="244.7" y="311.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="244.7" y="330.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="259.7" y="293.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="274.7" y="311.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="274.7" y="330.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="289.7" y="293.4" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="304.7" y="311.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="304.7" y="330.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="231" y="294.7" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="154.7" y="343.4" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">lt</text>
+<text x="244.7" y="343.4" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="274.7" y="343.4" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">gt</text>
+<text x="333.7" y="310.4" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i++</text>
+<text x="97.7" y="364.4" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">a[4] = 5</text>
+<text x="97.7" y="378.4" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">5 = 5</text>
+<rect x="109.7" y="354.4" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="124.7" y="372.4" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="124.7" y="391.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="139.7" y="354.4" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="154.7" y="372.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="154.7" y="391.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="169.7" y="354.4" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="184.7" y="372.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="184.7" y="391.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="199.7" y="354.4" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="214.7" y="372.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="214.7" y="391.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="229.7" y="354.4" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="244.7" y="372.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="244.7" y="391.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="259.7" y="354.4" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="274.7" y="372.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="274.7" y="391.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="289.7" y="354.4" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="304.7" y="372.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="304.7" y="391.4" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="261" y="355.7" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="154.7" y="404.4" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">lt</text>
+<text x="274.7" y="404.4" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i, gt</text>
+<text x="333.7" y="371.4" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i++</text>
+<text x="97.7" y="448.8" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">a[5] = 1</text>
+<text x="97.7" y="462.8" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">1 &lt; 5</text>
+<rect x="109.7" y="438.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="124.7" y="456.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="124.7" y="475.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="139.7" y="438.8" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="154.7" y="456.8" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="154.7" y="475.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="169.7" y="438.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="184.7" y="456.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="184.7" y="475.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="199.7" y="438.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="214.7" y="456.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="214.7" y="475.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="229.7" y="438.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="244.7" y="456.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="244.7" y="475.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="259.7" y="438.8" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="274.7" y="456.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="274.7" y="475.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="289.7" y="438.8" width="30" height="26" fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.6"/>
+<text x="304.7" y="456.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="304.7" y="475.8" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<path d="M157.7,437.8 Q214.7,403 271.7,437.8" fill="none" stroke="#4a5163" stroke-width="1.5"/><path d="M271.7,437.8 L265,437.2 L268.2,432.1 Z" fill="#4a5163"/><path d="M157.7,437.8 L161.3,432.1 L164.4,437.2 Z" fill="#4a5163"/>
+<text x="184.7" y="488.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">lt</text>
+<text x="274.7" y="488.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">gt</text>
+<text x="304.7" y="488.8" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<path d="M112.7,495.8 L112.7,499.8 L166.7,499.8 L166.7,495.8" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="139.7" y="511.8" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="middle">&lt; 5</text>
+<path d="M172.7,495.8 L172.7,499.8 L286.7,499.8 L286.7,495.8" fill="none" stroke="#c98a1a" stroke-width="1.4"/>
+<text x="229.7" y="511.8" font-size="11" font-weight="600" fill="#c98a1a" text-anchor="middle">= 5</text>
+<path d="M292.7,495.8 L292.7,499.8 L316.7,499.8 L316.7,495.8" fill="none" stroke="#1f5fb0" stroke-width="1.4"/>
+<text x="304.7" y="511.8" font-size="11" font-weight="600" fill="#1f5fb0" text-anchor="middle">&gt; 5</text>
+<text x="333.7" y="448.8" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">swap a[lt], a[i]; lt++, i++</text>
+<text x="333.7" y="462.8" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i &gt; gt: the pass is over</text>
+</svg>
+<!-- /gen:so threeway -->
+          <figcaption>
+            Green: \(a[lo..lt-1] &lt; v\); amber: \(a[lt..i-1] = v\); white: not yet
+            examined, \(a[i..gt]\); blue: \(a[gt+1..hi] &gt; v\). The ringed cell is
+            \(a[i]\).
+          </figcaption>
+        </figure>
         Now \(i &gt; gt\) and the pass is over after six steps on seven elements. The
         result is \([\,3\ 1\ \mid\ 5\ 5\ 5\ 5\ \mid\ 9\,]\): the four \(5\)s are in
         their final slots \(2..5\) and are never looked at again, so the recursion
         runs on \([3, 1]\) and on \([9]\) only. The one detail worth flagging is
         that the \(a[i] &gt; v\) branch does <em>not</em> advance \(i\): the value
         swapped in from position \(gt\) has never been examined, so it must be
-        rescanned, and step 4 above does exactly that on the \(5\) that arrived
-        from index \(6\).
-        <pre>  ALL KEYS EQUAL, n = 6:  [7 7 7 7 7 7]   v = 7
-    every step takes the &ldquo;a[i] == v&rdquo; branch: i runs lo+1 &hellip; hi, no swaps
-    ends with lt = lo = 0, gt = hi = 5
-    recursive calls: sort3way(0, &minus;1) and sort3way(6, 5), both EMPTY
-    &rarr; the whole array is sorted by ONE linear pass, &Theta;(n)</pre>
+        rescanned, and the row after the swap does exactly that on the \(5\)
+        that arrived from index \(6\). With every key equal, the pass is all
+        middle branch:
+        <figure class="wide">
+<!-- gen:so threeway-equal -->
+<svg viewBox="0 0 678 118" role="img" style="max-width:814px" font-family="system-ui, sans-serif" aria-label="Three-way partition of six equal keys. six keys equal to 7: one pass moves i from 1 to 6 with no swaps, ending with lt = 0 and gt = 5, and both recursive calls get empty ranges.">
+<rect x="10" y="25.5" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="25" y="43.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="25" y="62.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="40" y="25.5" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="55" y="43.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="55" y="62.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="70" y="25.5" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="85" y="43.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="85" y="62.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="100" y="25.5" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="115" y="43.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="115" y="62.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="130" y="25.5" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="145" y="43.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="145" y="62.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="160" y="25.5" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="175" y="43.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="175" y="62.5" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="25" y="75.5" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">lt</text>
+<text x="55" y="75.5" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">i</text>
+<text x="175" y="75.5" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">gt</text>
+<text x="100" y="103" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">v = 7</text>
+<text x="268" y="44" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="268" y="60" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">5 steps, every one</text>
+<text x="268" y="73" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">takes the = v branch</text>
+<rect x="416.5" y="13" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="431.5" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="431.5" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="446.5" y="13" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="461.5" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="461.5" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="476.5" y="13" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="491.5" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="491.5" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="506.5" y="13" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="521.5" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="521.5" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="536.5" y="13" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="551.5" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="551.5" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="566.5" y="13" width="30" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="581.5" y="31" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="581.5" y="50" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="431.5" y="63" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">lt</text>
+<text x="581.5" y="63" font-size="11" font-weight="700" fill="#2a2d36" text-anchor="middle" font-style="italic">gt</text>
+<path d="M419.5,70 L419.5,74 L593.5,74 L593.5,70" fill="none" stroke="#c98a1a" stroke-width="1.4"/>
+<text x="506.5" y="86" font-size="11" font-weight="600" fill="#c98a1a" text-anchor="middle">= 7: done</text>
+<text x="506.5" y="103" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">then sort3way(0, −1) and sort3way(6, 5): both empty</text>
+</svg>
+<!-- /gen:so threeway-equal -->
+          <figcaption>
+            Six equal keys: \(i\) runs from \(lo + 1\) to \(hi\) with no swaps,
+            \(lt = lo = 0\) and \(gt = hi = 5\), so one linear pass,
+            \(\Theta(n)\), sorts the array.
+          </figcaption>
+        </figure>
         Compare that with Lomuto&rsquo;s \(\Theta(n^2)\) and Hoare&rsquo;s
         \(\Theta(n\log n)\) on the same input, and with the general bound: three-way
         quicksort runs in time proportional to \(n H\), where \(H\) is the entropy of
@@ -888,7 +1662,7 @@ fn sort3way(a: &amp;mut [i32], lo: usize, hi: usize) {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Quicksort v1.0
+        Data Structures &amp; Algorithms &middot; Quicksort v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

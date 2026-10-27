@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -155,12 +156,203 @@
       <div class="ex">
         <span class="tag">Example (the merge)</span>
         Merge two sorted runs by repeatedly taking the smaller front element:
-        <pre>  L: 2 5 8    R: 1 3 9    out: [ ]
-  1 &lt; 2 &rarr; out 1        L: 2 5 8   R: 3 9
-  2 &lt; 3 &rarr; out 2        L: 5 8     R: 3 9
-  3 &lt; 5 &rarr; out 3        L: 5 8     R: 9
-  5 &lt; 9 &rarr; out 5;  8 &lt; 9 &rarr; out 8;  R tail 9 &rarr; out 9
-  &rarr; 1 2 3 5 8 9</pre>
+        <figure class="wide">
+<!-- gen:so merge -->
+<svg viewBox="0 0 679 274" role="img" style="max-width:815px" font-family="system-ui, sans-serif" aria-label="Merging the sorted runs L = 2 5 8 and R = 1 3 9 through the auxiliary copy: each step compares the two fronts and emits the smaller. start: L | R [2 5 8 1 3 9], out [_ _ _ _ _ _]. k = 0 right smaller: [2 5 8 1 3 9], [1 _ _ _ _ _] (1 &lt; 2: emit 1). k = 1 left wins: [2 5 8 1 3 9], [1 2 _ _ _ _] (3 &lt; 2 is false: emit 2). k = 2 right smaller: [2 5 8 1 3 9], [1 2 3 _ _ _] (3 &lt; 5: emit 3). k = 3 left wins: [2 5 8 1 3 9], [1 2 3 5 _ _] (9 &lt; 5 is false: emit 5). k = 4 left wins: [2 5 8 1 3 9], [1 2 3 5 8 _] (9 &lt; 8 is false: emit 8). k = 5 left exhausted: [2 5 8 1 3 9], [1 2 3 5 8 9] (i &gt; mid: emit 9).">
+<text x="104.2" y="45" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">start</text>
+<text x="116.2" y="21" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">L | R</text>
+<rect x="116.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.2" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="146.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.2" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="176.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.2" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<rect x="220.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="235.2" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="250.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="265.2" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="280.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="295.2" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="325.2" y="47" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="340.2" y="21" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">out</text>
+<rect x="340.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="370.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="400.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="430.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="460.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="490.2" y="28" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="104.2" y="73" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 0</text>
+<text x="104.2" y="87" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">right smaller</text>
+<rect x="116.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="146.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="176.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<rect x="220.2" y="63" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="235.2" y="81" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<rect x="250.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="265.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="280.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="295.2" y="81" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="117.5" y="64.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="221.5" y="64.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="325.2" y="82" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="340.2" y="63" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="355.2" y="81" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<rect x="370.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="400.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="430.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="460.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="490.2" y="63" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="534.2" y="80" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">1 &lt; 2: emit 1</text>
+<text x="104.2" y="108" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 1</text>
+<text x="104.2" y="122" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">left wins</text>
+<rect x="116.2" y="98" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="131.2" y="116" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<rect x="146.2" y="98" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.2" y="116" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="176.2" y="98" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.2" y="116" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<rect x="220.2" y="98" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="235.2" y="116" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="250.2" y="98" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="265.2" y="116" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="280.2" y="98" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="295.2" y="116" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="117.5" y="99.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="251.5" y="99.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="325.2" y="117" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="340.2" y="98" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="355.2" y="116" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="370.2" y="98" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="385.2" y="116" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<rect x="400.2" y="98" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="430.2" y="98" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="460.2" y="98" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="490.2" y="98" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="534.2" y="115" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">3 &lt; 2 is false: emit 2</text>
+<text x="104.2" y="143" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 2</text>
+<text x="104.2" y="157" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">right smaller</text>
+<rect x="116.2" y="133" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.2" y="151" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="146.2" y="133" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.2" y="151" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="176.2" y="133" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.2" y="151" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<rect x="220.2" y="133" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="235.2" y="151" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="250.2" y="133" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="265.2" y="151" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<rect x="280.2" y="133" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="295.2" y="151" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="147.5" y="134.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="251.5" y="134.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="325.2" y="152" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="340.2" y="133" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="355.2" y="151" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="370.2" y="133" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="385.2" y="151" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="400.2" y="133" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="415.2" y="151" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<rect x="430.2" y="133" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="460.2" y="133" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="490.2" y="133" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="534.2" y="150" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">3 &lt; 5: emit 3</text>
+<text x="104.2" y="178" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 3</text>
+<text x="104.2" y="192" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">left wins</text>
+<rect x="116.2" y="168" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.2" y="186" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="146.2" y="168" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="161.2" y="186" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">5</text>
+<rect x="176.2" y="168" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.2" y="186" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<rect x="220.2" y="168" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="235.2" y="186" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="250.2" y="168" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="265.2" y="186" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="280.2" y="168" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="295.2" y="186" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="147.5" y="169.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="281.5" y="169.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="325.2" y="187" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="340.2" y="168" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="355.2" y="186" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="370.2" y="168" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="385.2" y="186" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="400.2" y="168" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="415.2" y="186" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="430.2" y="168" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="445.2" y="186" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">5</text>
+<rect x="460.2" y="168" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="490.2" y="168" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="534.2" y="185" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">9 &lt; 5 is false: emit 5</text>
+<text x="104.2" y="213" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 4</text>
+<text x="104.2" y="227" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">left wins</text>
+<rect x="116.2" y="203" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.2" y="221" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="146.2" y="203" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.2" y="221" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="176.2" y="203" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="191.2" y="221" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">8</text>
+<rect x="220.2" y="203" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="235.2" y="221" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="250.2" y="203" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="265.2" y="221" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="280.2" y="203" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="295.2" y="221" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="177.5" y="204.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="281.5" y="204.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="325.2" y="222" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="340.2" y="203" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="355.2" y="221" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="370.2" y="203" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="385.2" y="221" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="400.2" y="203" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="415.2" y="221" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="430.2" y="203" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="445.2" y="221" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="460.2" y="203" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="475.2" y="221" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">8</text>
+<rect x="490.2" y="203" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="534.2" y="220" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">9 &lt; 8 is false: emit 8</text>
+<text x="104.2" y="248" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 5</text>
+<text x="104.2" y="262" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">left exhausted</text>
+<rect x="116.2" y="238" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="131.2" y="256" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="146.2" y="238" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="161.2" y="256" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="176.2" y="238" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="191.2" y="256" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="220.2" y="238" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="235.2" y="256" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="250.2" y="238" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="265.2" y="256" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="280.2" y="238" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="295.2" y="256" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="281.5" y="239.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="325.2" y="257" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="340.2" y="238" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="355.2" y="256" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="370.2" y="238" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="385.2" y="256" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="400.2" y="238" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="415.2" y="256" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="430.2" y="238" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="445.2" y="256" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="460.2" y="238" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="475.2" y="256" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<rect x="490.2" y="238" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="505.2" y="256" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">9</text>
+<text x="534.2" y="255" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i &gt; mid: emit 9</text>
+</svg>
+<!-- /gen:so merge -->
+          <figcaption>
+            Merging \(L = 2\ 5\ 8\) with \(R = 1\ 3\ 9\), one row per output
+            position \(k\). The ringed cells are the two fronts compared; the key
+            taken (green) moves to the output, and the input it leaves behind turns grey.
+          </figcaption>
+        </figure>
         Each element is copied exactly once, so the merge is \(\Theta(n)\). The
         subtlety is the <em>tail</em>: when one run empties, append the rest of the
         other. Note that the merge cannot be done in place cheaply (it writes
@@ -184,14 +376,178 @@
         <code>5</code> and <code>8</code> are &ldquo;left wins&rdquo;; and the
         final \(9\) is &ldquo;left exhausted&rdquo;, since \(L\) emptied first.
         The other two branches need their own runs:
-        <pre>  right exhausted     L: 9 82   R: 10      out 9 (left wins), 10 (right smaller),
-                                              then j &gt; hi &rarr; out 82 from the left tail
-                                              &rarr; 9 10 82
-
-  a tie goes LEFT     L: 2&#8321; 4   R: 2&#8322; 5     2&#8322; &lt; 2&#8321; is FALSE &rarr; take the left 2&#8321;
-                                              then 2&#8322; &lt; 4 &rarr; out 2&#8322;;  5 &lt; 4 false &rarr; out 4;
-                                              i &gt; mid &rarr; out 5
-                                              &rarr; 2&#8321; 2&#8322; 4 5    (the two 2s keep their order)</pre>
+        <figure class="wide">
+<!-- gen:so merge-branches -->
+<svg viewBox="0 0 584 415" role="img" style="max-width:701px" font-family="system-ui, sans-serif" aria-label="The merge's other two branches. right exhausted: L = 9 82, R = 10:. start: L | R [9 82 10], out [_ _ _]. k = 0 left wins: [9 82 10], [9 _ _] (10 &lt; 9 is false: emit 9). k = 1 right smaller: [9 82 10], [9 10 _] (10 &lt; 82: emit 10). k = 2 right exhausted: [9 82 10], [9 10 82] (j &gt; hi: emit 82). a tie goes left: L = 2₁ 4, R = 2₂ 5:. start: L | R [2₁ 4 2₂ 5], out [_ _ _ _]. k = 0 left wins: [2₁ 4 2₂ 5], [2₁ _ _ _] (2₂ &lt; 2₁ is false: emit 2₁). k = 1 right smaller: [2₁ 4 2₂ 5], [2₁ 2₂ _ _] (2₂ &lt; 4: emit 2₂). k = 2 left wins: [2₁ 4 2₂ 5], [2₁ 2₂ 4 _] (5 &lt; 4 is false: emit 4). k = 3 left exhausted: [2₁ 4 2₂ 5], [2₁ 2₂ 4 5] (i &gt; mid: emit 5).">
+<text x="10" y="22.5" font-size="12.5" font-weight="700" fill="#1a1c22" text-anchor="start">right exhausted: L = 9 82, R = 10</text>
+<text x="110.6" y="68" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">start</text>
+<text x="122.6" y="44" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">L | R</text>
+<rect x="122.6" y="51" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="69" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="152.6" y="51" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="69" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">82</text>
+<rect x="196.6" y="51" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="211.6" y="69" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="241.6" y="70" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="256.6" y="44" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">out</text>
+<rect x="256.6" y="51" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="286.6" y="51" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="316.6" y="51" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="110.6" y="96" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 0</text>
+<text x="110.6" y="110" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">left wins</text>
+<rect x="122.6" y="86" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="137.6" y="104" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="152.6" y="86" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="104" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">82</text>
+<rect x="196.6" y="86" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="211.6" y="104" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<rect x="123.9" y="87.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="197.9" y="87.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="241.6" y="105" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="256.6" y="86" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="271.6" y="104" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="286.6" y="86" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="316.6" y="86" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="420.6" y="103" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">10 &lt; 9 is false: emit 9</text>
+<text x="110.6" y="131" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 1</text>
+<text x="110.6" y="145" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">right smaller</text>
+<rect x="122.6" y="121" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="139" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="152.6" y="121" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="139" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">82</text>
+<rect x="196.6" y="121" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="211.6" y="139" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">10</text>
+<rect x="153.9" y="122.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="197.9" y="122.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="241.6" y="140" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="256.6" y="121" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="271.6" y="139" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="286.6" y="121" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="301.6" y="139" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">10</text>
+<rect x="316.6" y="121" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="420.6" y="138" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">10 &lt; 82: emit 10</text>
+<text x="110.6" y="166" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 2</text>
+<text x="110.6" y="180" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">right exhausted</text>
+<rect x="122.6" y="156" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="174" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="152.6" y="156" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="167.6" y="174" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">82</text>
+<rect x="196.6" y="156" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="211.6" y="174" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">10</text>
+<rect x="153.9" y="157.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="241.6" y="175" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="256.6" y="156" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="271.6" y="174" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="286.6" y="156" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="301.6" y="174" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<rect x="316.6" y="156" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="331.6" y="174" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">82</text>
+<text x="420.6" y="173" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">j &gt; hi: emit 82</text>
+<text x="10" y="210.5" font-size="12.5" font-weight="700" fill="#1a1c22" text-anchor="start">a tie goes left: L = 2₁ 4, R = 2₂ 5</text>
+<text x="110.6" y="256" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">start</text>
+<text x="122.6" y="232" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">L | R</text>
+<rect x="122.6" y="239" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="257" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2<tspan dy="4" font-size="9.7">1</tspan></text>
+<rect x="152.6" y="239" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="257" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="196.6" y="239" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="211.6" y="257" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2<tspan dy="4" font-size="9.7">2</tspan></text>
+<rect x="226.6" y="239" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="241.6" y="257" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="271.6" y="258" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="286.6" y="232" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">out</text>
+<rect x="286.6" y="239" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="316.6" y="239" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="346.6" y="239" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="376.6" y="239" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="110.6" y="284" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 0</text>
+<text x="110.6" y="298" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">left wins</text>
+<rect x="122.6" y="274" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="137.6" y="292" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2<tspan dy="4" font-size="9.7">1</tspan></text>
+<rect x="152.6" y="274" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="292" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="196.6" y="274" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="211.6" y="292" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2<tspan dy="4" font-size="9.7">2</tspan></text>
+<rect x="226.6" y="274" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="241.6" y="292" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="123.9" y="275.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="197.9" y="275.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="271.6" y="293" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="286.6" y="274" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="301.6" y="292" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2<tspan dy="4" font-size="9.7">1</tspan></text>
+<rect x="316.6" y="274" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="346.6" y="274" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="376.6" y="274" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="420.6" y="291" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">2₂ &lt; 2₁ is false: emit 2₁</text>
+<text x="110.6" y="319" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 1</text>
+<text x="110.6" y="333" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">right smaller</text>
+<rect x="122.6" y="309" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="327" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">2<tspan dy="4" font-size="9.7">1</tspan></text>
+<rect x="152.6" y="309" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="327" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="196.6" y="309" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="211.6" y="327" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2<tspan dy="4" font-size="9.7">2</tspan></text>
+<rect x="226.6" y="309" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="241.6" y="327" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="153.9" y="310.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="197.9" y="310.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="271.6" y="328" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="286.6" y="309" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="301.6" y="327" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2<tspan dy="4" font-size="9.7">1</tspan></text>
+<rect x="316.6" y="309" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="331.6" y="327" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">2<tspan dy="4" font-size="9.7">2</tspan></text>
+<rect x="346.6" y="309" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="376.6" y="309" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="420.6" y="326" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">2₂ &lt; 4: emit 2₂</text>
+<text x="110.6" y="354" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 2</text>
+<text x="110.6" y="368" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">left wins</text>
+<rect x="122.6" y="344" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="362" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">2<tspan dy="4" font-size="9.7">1</tspan></text>
+<rect x="152.6" y="344" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="167.6" y="362" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<rect x="196.6" y="344" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="211.6" y="362" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">2<tspan dy="4" font-size="9.7">2</tspan></text>
+<rect x="226.6" y="344" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="241.6" y="362" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="153.9" y="345.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<rect x="227.9" y="345.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="271.6" y="363" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="286.6" y="344" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="301.6" y="362" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2<tspan dy="4" font-size="9.7">1</tspan></text>
+<rect x="316.6" y="344" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="331.6" y="362" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2<tspan dy="4" font-size="9.7">2</tspan></text>
+<rect x="346.6" y="344" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="361.6" y="362" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<rect x="376.6" y="344" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="420.6" y="361" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">5 &lt; 4 is false: emit 4</text>
+<text x="110.6" y="389" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 3</text>
+<text x="110.6" y="403" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">left exhausted</text>
+<rect x="122.6" y="379" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="137.6" y="397" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">2<tspan dy="4" font-size="9.7">1</tspan></text>
+<rect x="152.6" y="379" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="167.6" y="397" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="196.6" y="379" width="30" height="26" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="211.6" y="397" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">2<tspan dy="4" font-size="9.7">2</tspan></text>
+<rect x="226.6" y="379" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="241.6" y="397" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">5</text>
+<rect x="227.9" y="380.3" width="27.4" height="23.4" fill="none" stroke="#1a1c22" stroke-width="2.6"/>
+<text x="271.6" y="398" font-size="17" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<rect x="286.6" y="379" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="301.6" y="397" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2<tspan dy="4" font-size="9.7">1</tspan></text>
+<rect x="316.6" y="379" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="331.6" y="397" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2<tspan dy="4" font-size="9.7">2</tspan></text>
+<rect x="346.6" y="379" width="30" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="361.6" y="397" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="376.6" y="379" width="30" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="391.6" y="397" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">5</text>
+<text x="420.6" y="396" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">i &gt; mid: emit 5</text>
+</svg>
+<!-- /gen:so merge-branches -->
+          <figcaption>
+            The subscripts on the two \(2\)s only tell them apart: they are equal
+            keys, and they come out in their input order.
+          </figcaption>
+        </figure>
         Writing the tie test as <code>aux[j] &lt;= aux[i]</code> instead would take
         the right run&rsquo;s copy first and lose stability, for no other gain: one
         character is the whole difference.
@@ -303,28 +659,110 @@ fn mergesort(a: &amp;mut [i32], lo: usize, hi: usize, aux: &amp;mut [i32]) {
         <span class="tag">Example (a whole run, unrolled)</span>
         Sort \([38, 27, 43, 3, 9, 82, 10]\). Seven elements is deliberately
         <em>odd</em>, so no split is ever even: <code>mid = lo + (hi&nbsp;&minus;&nbsp;lo)/2</code>
-        rounds down, which gives the left half the extra element. Every line below
-        is one call; the base cases are the singletons, and each
-        <code>merge</code> is the return trip.
-        <pre>  mergesort(0,6)  [38 27 43 3 9 82 10]   n=7, mid=3  &rarr; 4 + 3   (ODD split)
-    mergesort(0,3)  [38 27 43 3]        n=4, mid=1  &rarr; 2 + 2
-      mergesort(0,1)  [38 27]           n=2, mid=0  &rarr; 1 + 1
-        mergesort(0,0)  [38]            BASE: hi &le; lo, return
-        mergesort(1,1)  [27]            BASE
-        merge  [38] + [27]              &rarr; 27 38
-      mergesort(2,3)  [43 3]            n=2, mid=2  &rarr; 1 + 1
-        mergesort(2,2)  [43]            BASE
-        mergesort(3,3)  [3]             BASE
-        merge  [43] + [3]               &rarr; 3 43
-      merge  [27 38] + [3 43]           &rarr; 3 27 38 43
-    mergesort(4,6)  [9 82 10]           n=3, mid=5  &rarr; 2 + 1   (ODD split)
-      mergesort(4,5)  [9 82]            n=2, mid=4  &rarr; 1 + 1
-        mergesort(4,4)  [9]             BASE
-        mergesort(5,5)  [82]            BASE
-        merge  [9] + [82]               &rarr; 9 82
-      mergesort(6,6)  [10]              BASE
-      merge  [9 82] + [10]              &rarr; 9 10 82        (right run empties first)
-    merge  [3 27 38 43] + [9 10 82]     &rarr; 3 9 10 27 38 43 82</pre>
+        rounds down, which gives the left half the extra element. Each call is
+        drawn as the range it sorts, labelled \((lo, hi)\); the base cases are the
+        singletons, and each <code>merge</code> (green) is the return trip.
+        <figure class="wide">
+<!-- gen:so mergesort-run -->
+<svg viewBox="0 0 408 383" role="img" style="max-width:490px" font-family="system-ui, sans-serif" aria-label="Top-down mergesort on 38 27 43 3 9 82 10: the calls split down to single keys, then the merges run on the way back up. mergesort(0, 6) on 38 27 43 3 9 82 10 splits at mid = 3 into 38 27 43 3 and 9 82 10, then merges them into 3 9 10 27 38 43 82. mergesort(0, 3) on 38 27 43 3 splits at mid = 1 into 38 27 and 43 3, then merges them into 3 27 38 43. mergesort(0, 1) on 38 27 splits at mid = 0 into 38 and 27, then merges them into 27 38. mergesort(2, 3) on 43 3 splits at mid = 2 into 43 and 3, then merges them into 3 43. mergesort(4, 6) on 9 82 10 splits at mid = 5 into 9 82 and 10, then merges them into 9 10 82. mergesort(4, 5) on 9 82 splits at mid = 4 into 9 and 82, then merges them into 9 82. the base cases are 38, 27, 43, 3, 9, 82, 10.">
+<line x1="263.3" y1="49" x2="177" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="263.3" y1="49" x2="349.5" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="177" y1="319" x2="263.3" y2="347" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="349.5" y1="319" x2="263.3" y2="347" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="177" y1="103" x2="131" y2="131" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="177" y1="103" x2="223" y2="131" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="131" y1="265" x2="177" y2="293" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="223" y1="265" x2="177" y2="293" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="131" y1="157" x2="108" y2="185" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="131" y1="157" x2="154" y2="185" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="108" y1="211" x2="131" y2="239" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="154" y1="211" x2="131" y2="239" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="223" y1="157" x2="200" y2="185" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="223" y1="157" x2="246" y2="185" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="200" y1="211" x2="223" y2="239" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="246" y1="211" x2="223" y2="239" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="349.5" y1="103" x2="315" y2="131" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="349.5" y1="103" x2="384" y2="131" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="315" y1="265" x2="349.5" y2="293" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="384" y1="265" x2="349.5" y2="293" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="315" y1="157" x2="292" y2="185" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="315" y1="157" x2="338" y2="185" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="292" y1="211" x2="315" y2="239" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="338" y1="211" x2="315" y2="239" stroke="#0a7d4d" stroke-width="1.6"/>
+<line x1="384" y1="157" x2="384" y2="239" stroke="#5c6270" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="263.3" y="19" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(0, 6)</text>
+<rect x="165.3" y="23" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="179.3" y="41" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<rect x="193.3" y="23" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="207.3" y="41" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<rect x="221.3" y="23" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="235.3" y="41" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">43</text>
+<rect x="249.3" y="23" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="263.3" y="41" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="277.3" y="23" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="291.3" y="41" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="305.3" y="23" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="319.3" y="41" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">82</text>
+<rect x="333.3" y="23" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="347.3" y="41" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<rect x="165.3" y="347" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="179.3" y="365" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<rect x="193.3" y="347" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="207.3" y="365" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="221.3" y="347" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="235.3" y="365" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">10</text>
+<rect x="249.3" y="347" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="263.3" y="365" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">27</text>
+<rect x="277.3" y="347" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="291.3" y="365" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">38</text>
+<rect x="305.3" y="347" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="319.3" y="365" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">43</text>
+<rect x="333.3" y="347" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="347.3" y="365" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">82</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="177" y="73" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(0, 3)</text>
+<rect x="121" y="77" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="135" y="95" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<rect x="149" y="77" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="163" y="95" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<rect x="177" y="77" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="191" y="95" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">43</text>
+<rect x="205" y="77" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="219" y="95" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="121" y="293" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="135" y="311" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<rect x="149" y="293" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="163" y="311" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">27</text>
+<rect x="177" y="293" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="191" y="311" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">38</text>
+<rect x="205" y="293" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="219" y="311" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">43</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="131" y="127" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(0, 1)</text>
+<rect x="103" y="131" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="117" y="149" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<rect x="131" y="131" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="145" y="149" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<rect x="103" y="239" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="117" y="257" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">27</text>
+<rect x="131" y="239" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="145" y="257" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">38</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="108" y="181" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(0, 0)</text>
+<rect x="94" y="185" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="108" y="203" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">38</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="154" y="181" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(1, 1)</text>
+<rect x="140" y="185" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="154" y="203" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">27</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="223" y="127" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(2, 3)</text>
+<rect x="195" y="131" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="209" y="149" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">43</text>
+<rect x="223" y="131" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="237" y="149" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="195" y="239" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="209" y="257" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<rect x="223" y="239" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="237" y="257" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">43</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="200" y="181" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(2, 2)</text>
+<rect x="186" y="185" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="200" y="203" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">43</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="246" y="181" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(3, 3)</text>
+<rect x="232" y="185" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="246" y="203" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="349.5" y="73" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(4, 6)</text>
+<rect x="307.5" y="77" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="321.5" y="95" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="335.5" y="77" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="349.5" y="95" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">82</text>
+<rect x="363.5" y="77" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="377.5" y="95" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<rect x="307.5" y="293" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="321.5" y="311" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="335.5" y="293" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="349.5" y="311" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">10</text>
+<rect x="363.5" y="293" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="377.5" y="311" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">82</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="315" y="127" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(4, 5)</text>
+<rect x="287" y="131" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="301" y="149" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="315" y="131" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="329" y="149" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">82</text>
+<rect x="287" y="239" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="301" y="257" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="315" y="239" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/><text x="329" y="257" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">82</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="292" y="181" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(4, 4)</text>
+<rect x="278" y="185" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="292" y="203" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="338" y="181" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(5, 5)</text>
+<rect x="324" y="185" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="338" y="203" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">82</text>
+<text stroke="#fff" stroke-width="3" paint-order="stroke" x="384" y="127" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">(6, 6)</text>
+<rect x="370" y="131" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="384" y="149" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<rect x="370" y="239" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="384" y="257" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="10" y="40" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">split</text>
+<text x="10" y="202" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">base cases</text>
+<text x="10" y="364" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">merge</text>
+</svg>
+<!-- /gen:so mergesort-run -->
+          <figcaption>
+            Top-down mergesort on \([38, 27, 43, 3, 9, 82, 10]\). Both odd ranges,
+            \((0, 6)\) and \((4, 6)\), split with the extra key on the left; the
+            base case \((6, 6)\) waits one level (dashed) for its sibling, and the
+            merge \([9\ 82] + [10]\) empties its right run first.
+          </figcaption>
+        </figure>
         Seven elements, seven base cases, six merges (one per internal node of the
         call tree), and the array is sorted. Notice that a size-\(1\) subarray is
         never merged with anything on its own: it is returned as already sorted,
@@ -479,7 +917,7 @@ fn mergesort(a: &amp;mut [i32], lo: usize, hi: usize, aux: &amp;mut [i32]) {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Mergesort v1.0
+        Data Structures &amp; Algorithms &middot; Mergesort v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

@@ -122,14 +122,13 @@
 
       <h1>Divide-and-Conquer</h1>
       <blockquote class="epigraph fact">
-        In 1960 Andrey Kolmogorov conjectured that multiplying two n-digit numbers takes on the order of n² operations. Within a week, Anatoly Karatsuba, a student in his seminar, found a divide-and-conquer method using about n<sup>1.585</sup>.
+        In 1960 Andrey Kolmogorov conjectured that multiplying two \(n\)-digit numbers takes on the order of \(n^2\) operations. Within a week, Anatoly Karatsuba, a student in his seminar, found a divide-and-conquer method using about \(n^{1.585}\).
         <cite>A. A. Karatsuba, “The Complexity of Computations,” Proc. Steklov Institute of Mathematics 211, 1995</cite>
       </blockquote>
 
       <p class="lead">
-        You sorted in CSS 342; the frame here is
-        <strong>divide-and-conquer</strong>: split a problem into smaller
-        subproblems, solve them recursively, and combine the answers. The
+        <strong>Divide-and-conquer</strong> splits a problem into smaller
+        subproblems, solves them recursively, and combines the answers. The
         <strong>master theorem</strong> reads the cost of such an algorithm
         straight off its recurrence, no unrolling required.
         <a href="algo-mergesort.html">Mergesort</a> and
@@ -204,11 +203,14 @@
       </p>
       <div class="ex">
         <span class="tag">Example (reading recurrences)</span>
-        <pre>  mergesort:      2T(n/2) + &Theta;(n)   n^(log&#8322;2) = n = f  &rarr; case 2  &rArr; &Theta;(n log n)
-  binary search:   T(n/2) + &Theta;(1)   n^(log&#8322;1) = 1 = f  &rarr; case 2  &rArr; &Theta;(log n)
-  case 1 example: 4T(n/2) + &Theta;(n)   n^(log&#8322;4) = n&sup2; &gt; n  &rarr; case 1  &rArr; &Theta;(n&sup2;)
-  Karatsuba mult: 3T(n/2) + &Theta;(n)   n^(log&#8322;3) &asymp; n^1.58 &gt; n  &rarr; &Theta;(n^1.58)
-  case 3 example: 2T(n/2) + &Theta;(n&sup2;)  n^(log&#8322;2) = n &lt; n&sup2;  &rarr; case 3  &rArr; &Theta;(n&sup2;)</pre>
+        <table>
+          <tr><th>recurrence</th><th>\(n^{\log_b a}\) against \(f(n)\)</th><th>case</th><th>\(T(n)\)</th></tr>
+          <tr><td>mergesort: \(2T(n/2) + \Theta(n)\)</td><td>\(n^{\log_2 2} = n = f(n)\)</td><td>2</td><td>\(\Theta(n\log n)\)</td></tr>
+          <tr><td>binary search: \(T(n/2) + \Theta(1)\)</td><td>\(n^{\log_2 1} = 1 = f(n)\)</td><td>2</td><td>\(\Theta(\log n)\)</td></tr>
+          <tr><td>\(4T(n/2) + \Theta(n)\)</td><td>\(n^{\log_2 4} = n^2 &gt; n\)</td><td>1</td><td>\(\Theta(n^2)\)</td></tr>
+          <tr><td>Karatsuba: \(3T(n/2) + \Theta(n)\)</td><td>\(n^{\log_2 3} \approx n^{1.58} &gt; n\)</td><td>1</td><td>\(\Theta(n^{1.58})\)</td></tr>
+          <tr><td>\(2T(n/2) + \Theta(n^2)\)</td><td>\(n^{\log_2 2} = n &lt; n^2\)</td><td>3</td><td>\(\Theta(n^2)\)</td></tr>
+        </table>
         Karatsuba multiplication does three half-size multiplies instead of four, and
         its \(n^{1.58}\) beats grade-school \(n^2\): a divide-and-conquer win
         read straight off the recurrence.
@@ -421,7 +423,7 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Divide-and-Conquer v1.0
+        Data Structures &amp; Algorithms &middot; Divide-and-Conquer v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
