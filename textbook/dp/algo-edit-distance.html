@@ -180,7 +180,7 @@
         \[
           D[i][j] =
           \begin{cases}
-            D[i-1][j-1] &amp; \text{if } A[i{-}1] = B[j{-}1] \text{ (match, free)}\\[4pt]
+            D[i-1][j-1] &amp; \text{if } A[i{-}1] = B[j{-}1] \text{, free}\\[4pt]
             1 + \min\bigl(D[i-1][j],\; D[i][j-1],\; D[i-1][j-1]\bigr) &amp; \text{otherwise,}
           \end{cases}
         \]
@@ -199,10 +199,15 @@
       <div class="ex">
         <span class="tag">Example (two worked cells)</span>
         \(D[1][1]\), turning <code>"k"</code> into <code>"s"</code>:
-        <pre>  'k' != 's'  &rarr;  1 + min( D[0][1] = 1,     <span class="cm">// delete 'k', then insert 's'</span>
-                           D[1][0] = 1,     <span class="cm">// insert 's', then delete 'k'</span>
-                           D[0][0] = 0 )    <span class="cm">// replace k &rarr; s</span>
-              =  1 + 0  =  1                (one replace)</pre>
+        \[
+          \begin{aligned}
+            \mathtt{k} \ne \mathtt{s}:\quad D[1][1] = 1 + \min\bigl(\,
+              &amp; D[0][1] = 1, &amp;&amp;\text{delete k, then insert s}\\
+              &amp; D[1][0] = 1, &amp;&amp;\text{insert s, then delete k}\\
+              &amp; D[0][0] = 0 \,\bigr) &amp;&amp;\text{replace k} \to \text{s}\\
+            = 1 + 0 = 1 \quad &amp; &amp;&amp;\text{(one replace)}
+          \end{aligned}
+        \]
         The delete and insert routes each cost \(2\) in total (the neighbor already
         holds one edit); the single replace wins. Next, \(D[2][1]\), turning
         <code>"ki"</code> into <code>"s"</code>: <code>'i'</code> \(\ne\)
@@ -211,29 +216,162 @@
         then delete <code>i</code>. Both values appear in the full table below.
       </div>
       <figure>
-        <table class="trace">
-          <tr><th class="lab"></th><th>&ldquo;&rdquo;</th><th>s</th><th>i</th><th>t</th><th>t</th><th>i</th><th>n</th><th>g</th></tr>
-          <tr><td class="lab">&ldquo;&rdquo;</td>
-            <td class="cell lt">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell">6</td><td class="cell">7</td></tr>
-          <tr><td class="lab">k</td>
-            <td class="cell">1</td><td class="cell lt">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell">6</td><td class="cell">7</td></tr>
-          <tr><td class="lab">i</td>
-            <td class="cell">2</td><td class="cell">2</td><td class="cell lt">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell">6</td></tr>
-          <tr><td class="lab">t</td>
-            <td class="cell">3</td><td class="cell">3</td><td class="cell">2</td><td class="cell lt">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td></tr>
-          <tr><td class="lab">t</td>
-            <td class="cell">4</td><td class="cell">4</td><td class="cell">3</td><td class="cell">2</td><td class="cell lt">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td></tr>
-          <tr><td class="lab">e</td>
-            <td class="cell">5</td><td class="cell">5</td><td class="cell">4</td><td class="cell">3</td><td class="cell">2</td><td class="cell lt">2</td><td class="cell">3</td><td class="cell">4</td></tr>
-          <tr><td class="lab">n</td>
-            <td class="cell">6</td><td class="cell">6</td><td class="cell">5</td><td class="cell">4</td><td class="cell">3</td><td class="cell">3</td><td class="cell lt">2</td><td class="cell lt piv">3</td></tr>
-        </table>
+        <!-- gen:dp ed-table -->
+<svg viewBox="0 0 329 276" role="img" style="max-width:395px" font-family="system-ui, sans-serif" aria-label="The edit-distance table for kitten (rows) and sitting (columns), with the traceback. columns “”, s, i, t, t, i, n, g; rows “”: 0 1 2 3 4 5 6 7; k: 1 1 2 3 4 5 6 7; i: 2 2 1 2 3 4 5 6; t: 3 3 2 1 2 3 4 5; t: 4 4 3 2 1 2 3 4; e: 5 5 4 3 2 2 3 4; n: 6 6 5 4 3 3 2 3; the traceback visits (6,7), (6,6), (5,5), (4,4), (3,3), (2,2), (1,1), (0,0). an edit paid on the traceback, a free match.">
+<text x="58" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">“”</text>
+<text x="92" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">s</text>
+<text x="126" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">i</text>
+<text x="160" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">t</text>
+<text x="194" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">t</text>
+<text x="228" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">i</text>
+<text x="262" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">n</text>
+<text x="296" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">g</text>
+<text x="33" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="33" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">k</text>
+<text x="33" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i</text>
+<text x="33" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">t</text>
+<text x="33" y="169" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">t</text>
+<text x="33" y="199" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">e</text>
+<text x="33" y="229" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">n</text>
+<rect x="41" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="60" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="180" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="210" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="30" width="272" height="210" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="43" y="32" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="77" y="62" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="111" y="92" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="145" y="122" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="179" y="152" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="213" y="182" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="247" y="212" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="281" y="212" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="287.4" y1="225" x2="275.6" y2="225" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M270.6,225 L277.1,221.8 L277.1,228.3 Z" fill="#0a7d4d"/>
+<line x1="253.6" y1="217.6" x2="240.1" y2="205.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M236.4,202.4 L243.4,204.3 L239.1,209.1 Z" fill="#0a7d4d"/>
+<line x1="219.6" y1="187.6" x2="206.1" y2="175.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M202.4,172.4 L209.4,174.3 L205.1,179.1 Z" fill="#0a7d4d"/>
+<line x1="185.6" y1="157.6" x2="172.1" y2="145.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M168.4,142.4 L175.4,144.3 L171.1,149.1 Z" fill="#0a7d4d"/>
+<line x1="151.6" y1="127.6" x2="138.1" y2="115.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M134.4,112.4 L141.4,114.3 L137.1,119.1 Z" fill="#0a7d4d"/>
+<line x1="117.6" y1="97.6" x2="104.1" y2="85.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M100.4,82.4 L107.4,84.3 L103.1,89.1 Z" fill="#0a7d4d"/>
+<line x1="83.6" y1="67.6" x2="70.1" y2="55.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M66.4,52.4 L73.4,54.3 L69.1,59.1 Z" fill="#0a7d4d"/>
+<text x="58" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="92" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="126" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="160" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="194" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="228" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="262" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="296" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="58" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="92" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="126" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="160" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="194" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="228" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="262" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="296" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="58" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="92" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="126" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="160" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="194" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="228" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="262" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="296" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="58" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="92" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="126" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="160" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="194" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="228" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="262" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="296" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="58" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="92" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="126" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="160" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="194" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="228" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="262" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="296" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="58" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="92" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="126" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="160" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="194" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="228" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="262" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="296" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="58" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="92" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="126" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="160" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="194" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="228" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="262" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="296" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<rect x="10" y="251" width="14" height="12" rx="2" fill="#fde7bf" stroke="#0a7d4d" stroke-width="2"/><text x="30" y="261" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">an edit paid on the traceback</text>
+<rect x="224.6" y="251" width="14" height="12" rx="2" fill="#fff" stroke="#0a7d4d" stroke-width="2"/><text x="244.6" y="261" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">a free match</text>
+</svg>
+<!-- /gen:dp ed-table -->
         <figcaption>
           The edit-distance table for <code>kitten</code> \(\to\)
           <code>sitting</code>. Row and column \(0\) count the edits to and from the
           empty string; every interior cell reads its up, left, and diagonal
-          neighbors. The answer is \(D[6][7] = 3\), bottom-right. The highlighted
-          cells are the optimal traceback path: diagonal (replace
+          neighbors. The answer is \(D[6][7] = 3\), bottom-right. The green line
+          is the optimal traceback path, and the amber cells are the three where
+          it pays an edit: diagonal (replace
           <code>k</code>\(\to\)<code>s</code>, cost \(0{\to}1\)), three free diagonal
           matches <code>i t t</code>, diagonal (replace
           <code>e</code>\(\to\)<code>i</code>, \(1{\to}2\)), a free match
@@ -260,50 +398,130 @@
           </tr>
           <tr><td class="lab">D[5][1]</td><td class="cell">e / s</td><td>differ</td>
             <td class="cell lt">4</td><td class="cell">5</td><td class="cell lt">4</td>
-            <td class="cell new">5</td><td class="lab">tie: delete e or replace e&rarr;s</td></tr>
+            <td class="cell new">5</td><td>tie: delete e or replace e&rarr;s</td></tr>
           <tr><td class="lab">D[5][2]</td><td class="cell">e / i</td><td>differ</td>
             <td class="cell lt">3</td><td class="cell">5</td><td class="cell">4</td>
-            <td class="cell new">4</td><td class="lab">delete e (up)</td></tr>
+            <td class="cell new">4</td><td>delete e (up)</td></tr>
           <tr><td class="lab">D[5][3]</td><td class="cell">e / t</td><td>differ</td>
             <td class="cell lt">2</td><td class="cell">4</td><td class="cell">3</td>
-            <td class="cell new">3</td><td class="lab">delete e (up)</td></tr>
+            <td class="cell new">3</td><td>delete e (up)</td></tr>
           <tr><td class="lab">D[5][4]</td><td class="cell">e / t</td><td>differ</td>
             <td class="cell lt">1</td><td class="cell">3</td><td class="cell">2</td>
-            <td class="cell new">2</td><td class="lab">delete e (up)</td></tr>
+            <td class="cell new">2</td><td>delete e (up)</td></tr>
           <tr><td class="lab">D[5][5]</td><td class="cell">e / i</td><td>differ</td>
             <td class="cell">2</td><td class="cell">2</td><td class="cell lt">1</td>
-            <td class="cell new">2</td><td class="lab">replace e&rarr;i (diag)</td></tr>
+            <td class="cell new">2</td><td>replace e&rarr;i (diag)</td></tr>
           <tr><td class="lab">D[5][6]</td><td class="cell">e / n</td><td>differ</td>
             <td class="cell">3</td><td class="cell lt">2</td><td class="cell lt">2</td>
-            <td class="cell new">3</td><td class="lab">tie: insert n or replace e&rarr;n</td></tr>
+            <td class="cell new">3</td><td>tie: insert n or replace e&rarr;n</td></tr>
           <tr><td class="lab">D[5][7]</td><td class="cell">e / g</td><td>differ</td>
             <td class="cell">4</td><td class="cell lt">3</td><td class="cell lt">3</td>
-            <td class="cell new">4</td><td class="lab">tie: insert g or replace e&rarr;g</td></tr>
+            <td class="cell new">4</td><td>tie: insert g or replace e&rarr;g</td></tr>
           <tr><td class="lab">D[6][1]</td><td class="cell">n / s</td><td>differ</td>
             <td class="cell lt">5</td><td class="cell">6</td><td class="cell lt">5</td>
-            <td class="cell new">6</td><td class="lab">tie: delete n or replace n&rarr;s</td></tr>
+            <td class="cell new">6</td><td>tie: delete n or replace n&rarr;s</td></tr>
           <tr><td class="lab">D[6][2]</td><td class="cell">n / i</td><td>differ</td>
             <td class="cell lt">4</td><td class="cell">6</td><td class="cell">5</td>
-            <td class="cell new">5</td><td class="lab">delete n (up)</td></tr>
+            <td class="cell new">5</td><td>delete n (up)</td></tr>
           <tr><td class="lab">D[6][3]</td><td class="cell">n / t</td><td>differ</td>
             <td class="cell lt">3</td><td class="cell">5</td><td class="cell">4</td>
-            <td class="cell new">4</td><td class="lab">delete n (up)</td></tr>
+            <td class="cell new">4</td><td>delete n (up)</td></tr>
           <tr><td class="lab">D[6][4]</td><td class="cell">n / t</td><td>differ</td>
             <td class="cell lt">2</td><td class="cell">4</td><td class="cell">3</td>
-            <td class="cell new">3</td><td class="lab">delete n (up)</td></tr>
+            <td class="cell new">3</td><td>delete n (up)</td></tr>
           <tr><td class="lab">D[6][5]</td><td class="cell">n / i</td><td>differ</td>
             <td class="cell lt">2</td><td class="cell">3</td><td class="cell lt">2</td>
-            <td class="cell new">3</td><td class="lab">tie: delete n or replace n&rarr;i</td></tr>
+            <td class="cell new">3</td><td>tie: delete n or replace n&rarr;i</td></tr>
           <tr><td class="lab">D[6][6]</td><td class="cell">n / n</td><td>match</td>
             <td class="cell">3</td><td class="cell">3</td><td class="cell lt">2</td>
-            <td class="cell new">2</td><td class="lab">match n, free (diag, no \(+1\))</td></tr>
+            <td class="cell new">2</td><td>free match n (diag)</td></tr>
           <tr><td class="lab">D[6][7]</td><td class="cell">n / g</td><td>differ</td>
             <td class="cell">4</td><td class="cell lt">2</td><td class="cell">3</td>
-            <td class="cell new">3</td><td class="lab">insert g (left)</td></tr>
+            <td class="cell new">3</td><td>insert g (left)</td></tr>
         </table>
         <p>
           All four behaviours are visible in these fourteen cells:
         </p>
+        <figure>
+<!-- gen:dp ed-cases -->
+<svg viewBox="0 0 416 304" role="img" style="max-width:499px" font-family="system-ui, sans-serif" aria-label="Four ways a cell of the kitten / sitting table is filled, each shown as the cell (amber) with the neighbours it reads, the taken one green: delete wins, e ≠ i: 1 + min(3, 5, 4) = 4; replace wins, e ≠ i: 1 + min(2, 2, 1) = 2; insert wins, n ≠ g: 1 + min(4, 2, 3) = 3; a free match, n = n: the diagonal, 2.">
+<text x="98.9" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">delete wins</text>
+<text x="86.3" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">s</text>
+<text x="130.3" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">i</text>
+<text x="56.3" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">t</text>
+<text x="56.3" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">e</text>
+<rect x="64.3" y="50" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="108.3" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="64.3" y="88" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="108.3" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="64.3" y="50" width="88" height="76" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="110.3" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="94.7" y1="76.3" x2="118.1" y2="96.5" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M121.9,99.7 L114.9,98 L119.1,93 Z" fill="#9aa3b5"/>
+<line x1="130.3" y1="79" x2="130.3" y2="92" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M130.3,97 L127.1,90.5 L133.6,90.5 Z" fill="#0a7d4d"/>
+<line x1="94.9" y1="107" x2="116.7" y2="107" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M121.7,107 L115.2,110.3 L115.2,103.8 Z" fill="#9aa3b5"/>
+<text x="86.3" y="73.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="130.3" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="86.3" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="130.3" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="98.9" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">e ≠ i: 1 + min(3, 5, 4) = 4</text>
+<text x="316.8" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">replace wins</text>
+<text x="304.2" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">t</text>
+<text x="348.2" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">i</text>
+<text x="274.2" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">t</text>
+<text x="274.2" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">e</text>
+<rect x="282.2" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="326.2" y="50" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="282.2" y="88" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="326.2" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="282.2" y="50" width="88" height="76" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="328.2" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="312.6" y1="76.3" x2="336" y2="96.5" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M339.8,99.7 L332.7,98 L337,93 Z" fill="#0a7d4d"/>
+<line x1="348.2" y1="79" x2="348.2" y2="92" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M348.2,97 L344.9,90.5 L351.4,90.5 Z" fill="#9aa3b5"/>
+<line x1="312.8" y1="107" x2="334.5" y2="107" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M339.5,107 L333,110.3 L333,103.8 Z" fill="#9aa3b5"/>
+<text x="304.2" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="348.2" y="73.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="304.2" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="348.2" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="316.8" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">e ≠ i: 1 + min(2, 2, 1) = 2</text>
+<text x="115" y="173" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">insert wins</text>
+<text x="102.4" y="193" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">n</text>
+<text x="146.4" y="193" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">g</text>
+<text x="72.4" y="223" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">e</text>
+<text x="72.4" y="261" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">n</text>
+<rect x="80.4" y="200" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="124.4" y="200" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="80.4" y="238" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="124.4" y="238" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="80.4" y="200" width="88" height="76" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="126.4" y="240" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="110.8" y1="226.3" x2="134.2" y2="246.5" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M138,249.7 L131,248 L135.2,243 Z" fill="#9aa3b5"/>
+<line x1="146.4" y1="229" x2="146.4" y2="242" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M146.4,247 L143.2,240.5 L149.7,240.5 Z" fill="#9aa3b5"/>
+<line x1="111" y1="257" x2="132.8" y2="257" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M137.8,257 L131.3,260.3 L131.3,253.8 Z" fill="#0a7d4d"/>
+<text x="102.4" y="223.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="146.4" y="223.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="102.4" y="261.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="146.4" y="261.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="115" y="290" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">n ≠ g: 1 + min(4, 2, 3) = 3</text>
+<text x="316.8" y="173" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">a free match</text>
+<text x="304.2" y="193" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">i</text>
+<text x="348.2" y="193" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">n</text>
+<text x="274.2" y="223" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">e</text>
+<text x="274.2" y="261" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">n</text>
+<rect x="282.2" y="200" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="326.2" y="200" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="282.2" y="238" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="326.2" y="238" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="282.2" y="200" width="88" height="76" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="328.2" y="240" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="312.6" y1="226.3" x2="336" y2="246.5" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M339.8,249.7 L332.7,248 L337,243 Z" fill="#0a7d4d"/>
+<text x="304.2" y="223.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="348.2" y="223.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="304.2" y="261.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="348.2" y="261.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="316.8" y="290" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">n = n: the diagonal, 2</text>
+</svg>
+<!-- /gen:dp ed-cases -->
+        </figure>
         <ul>
           <li><strong>Delete wins alone</strong> at \(D[5][2]\), \(D[5][3]\),
             \(D[5][4]\), \(D[6][2]\), \(D[6][3]\), \(D[6][4]\). These are cells deep
@@ -538,12 +756,50 @@ fn edit_script(a: &amp;[u8], b: &amp;[u8], d: &amp;[Vec&lt;usize&gt;]) -&gt; Vec
         For <code>kitten</code> \(\to\) <code>sitting</code> the optimal script is
         unique:
       </p>
-      <pre>  k &rarr; s   replace
-  i &rarr; i   match        t &rarr; t   match        t &rarr; t   match
-  e &rarr; i   replace
-  n &rarr; n   match
-  &epsilon; &rarr; g   insert
-  &rarr;  2 replaces + 1 insert  =  3 edits  =  D[6][7]  &check;</pre>
+      <figure>
+<!-- gen:dp ed-script -->
+<svg viewBox="0 0 306 118" role="img" style="max-width:367px" font-family="system-ui, sans-serif" aria-label="The edit script for kitten to sitting, read off the traceback, one column per step: k to s, replace; i to i, match; t to t, match; t to t, match; e to i, replace; n to n, match; ε to g, insert. 2 replaces and 1 insert: 3 edits, the value of D[6][7].">
+<text x="26" y="27" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end" font-style="italic">A</text>
+<text x="26" y="59" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end" font-style="italic">B</text>
+<rect x="34" y="10" width="34" height="26" rx="4" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="51" y="28" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">k</text>
+<rect x="34" y="42" width="34" height="26" rx="4" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="51" y="60" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">s</text>
+<text x="51" y="80" font-size="10.5" font-weight="700" fill="#c98a1a" text-anchor="middle">replace</text>
+<rect x="72" y="10" width="34" height="26" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="89" y="28" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">i</text>
+<rect x="72" y="42" width="34" height="26" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="89" y="60" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">i</text>
+<text x="89" y="80" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">match</text>
+<rect x="110" y="10" width="34" height="26" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="127" y="28" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">t</text>
+<rect x="110" y="42" width="34" height="26" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="127" y="60" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">t</text>
+<text x="127" y="80" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">match</text>
+<rect x="148" y="10" width="34" height="26" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="165" y="28" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">t</text>
+<rect x="148" y="42" width="34" height="26" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="165" y="60" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">t</text>
+<text x="165" y="80" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">match</text>
+<rect x="186" y="10" width="34" height="26" rx="4" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="203" y="28" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">e</text>
+<rect x="186" y="42" width="34" height="26" rx="4" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="203" y="60" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">i</text>
+<text x="203" y="80" font-size="10.5" font-weight="700" fill="#c98a1a" text-anchor="middle">replace</text>
+<rect x="224" y="10" width="34" height="26" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="241" y="28" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">n</text>
+<rect x="224" y="42" width="34" height="26" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="241" y="60" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">n</text>
+<text x="241" y="80" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">match</text>
+<rect x="262" y="10" width="34" height="26" rx="4" fill="#fff" stroke="#c98a1a" stroke-width="1.8" stroke-dasharray="4 3"/>
+<text x="279" y="28" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">ε</text>
+<rect x="262" y="42" width="34" height="26" rx="4" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="279" y="60" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace">g</text>
+<text x="279" y="80" font-size="10.5" font-weight="700" fill="#c98a1a" text-anchor="middle">insert</text>
+<text x="10" y="104" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="start">2 replaces + 1 insert = 3 edits = D[6][7]</text>
+</svg>
+<!-- /gen:dp ed-script -->
+      </figure>
       <p>
         This script, not the count, is what a spell-checker&rsquo;s
         suggestion ranking, a <code>diff</code> hunk, or a genome aligner outputs.
@@ -624,14 +880,138 @@ fn edit_script(a: &amp;[u8], b: &amp;[u8], d: &amp;[Vec&lt;usize&gt;]) -&gt; Vec
           script.
           <details>
             <summary>solution</summary>
-            <pre>       ""  S  U  N  D  A  Y
-   ""   0  1  2  3  4  5  6
-   M    1  1  2  3  4  5  6
-   O    2  2  2  3  4  5  6
-   N    3  3  3  2  3  4  5
-   D    4  4  4  3  2  3  4
-   A    5  5  5  4  3  2  3
-   Y    6  6  6  5  4  3  2</pre>
+            <figure>
+<!-- gen:dp ed-monday -->
+<svg viewBox="0 0 284 250" role="img" style="max-width:341px" font-family="system-ui, sans-serif" aria-label="The edit-distance table for MONDAY (rows) and SUNDAY (columns), with the traceback. columns “”, S, U, N, D, A, Y; rows “”: 0 1 2 3 4 5 6; M: 1 1 2 3 4 5 6; O: 2 2 2 3 4 5 6; N: 3 3 3 2 3 4 5; D: 4 4 4 3 2 3 4; A: 5 5 5 4 3 2 3; Y: 6 6 6 5 4 3 2; the traceback visits (6,6), (5,5), (4,4), (3,3), (2,2), (1,1), (0,0).">
+<text x="52.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">“”</text>
+<text x="86.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">S</text>
+<text x="120.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">U</text>
+<text x="154.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">N</text>
+<text x="188.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">D</text>
+<text x="222.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">A</text>
+<text x="256.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">Y</text>
+<text x="27.4" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="27.4" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">M</text>
+<text x="27.4" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">O</text>
+<text x="27.4" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">N</text>
+<text x="27.4" y="169" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">D</text>
+<text x="27.4" y="199" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">A</text>
+<text x="27.4" y="229" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">Y</text>
+<rect x="35.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="60" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="90" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="30" width="238" height="210" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="37.4" y="32" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="71.4" y="62" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="105.4" y="92" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="139.4" y="122" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="173.4" y="152" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="207.4" y="182" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="241.4" y="212" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="248.1" y1="217.6" x2="234.6" y2="205.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M230.8,202.4 L237.9,204.3 L233.6,209.1 Z" fill="#0a7d4d"/>
+<line x1="214.1" y1="187.6" x2="200.6" y2="175.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M196.8,172.4 L203.9,174.3 L199.6,179.1 Z" fill="#0a7d4d"/>
+<line x1="180.1" y1="157.6" x2="166.6" y2="145.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M162.8,142.4 L169.9,144.3 L165.6,149.1 Z" fill="#0a7d4d"/>
+<line x1="146.1" y1="127.6" x2="132.6" y2="115.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M128.8,112.4 L135.9,114.3 L131.6,119.1 Z" fill="#0a7d4d"/>
+<line x1="112.1" y1="97.6" x2="98.6" y2="85.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M94.8,82.4 L101.9,84.3 L97.6,89.1 Z" fill="#0a7d4d"/>
+<line x1="78.1" y1="67.6" x2="64.6" y2="55.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M60.8,52.4 L67.9,54.3 L63.6,59.1 Z" fill="#0a7d4d"/>
+<text x="52.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="154.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="188.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="222.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="256.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="52.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="86.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="154.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="188.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="222.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="256.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="52.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="86.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="120.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="154.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="188.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="222.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="256.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="52.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="86.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="120.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="154.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="188.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="222.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="256.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="52.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="86.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="120.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="154.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="188.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="222.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="256.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="52.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="86.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="120.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="154.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="188.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="222.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="256.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="52.4" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="86.4" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="120.4" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="154.4" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="188.4" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="222.4" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="256.4" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+</svg>
+<!-- /gen:dp ed-monday -->
+            </figure>
             \(D[6][6] = 2\). The traceback runs down the main diagonal: replace
             <code>M</code>\(\to\)<code>S</code>, replace
             <code>O</code>\(\to\)<code>U</code>, then four free matches
@@ -646,13 +1026,82 @@ fn edit_script(a: &amp;[u8], b: &amp;[u8], d: &amp;[Vec&lt;usize&gt;]) -&gt; Vec
           Which of the three neighbours does every non-trivial step use?
           <details>
             <summary>solution</summary>
-            <pre>       ""  a  c  e
-   ""   0  1  2  3
-   a    1  0  1  2
-   b    2  1  1  2
-   c    3  2  1  2
-   d    4  3  2  2
-   e    5  4  3  2</pre>
+            <figure>
+<!-- gen:dp ed-abcde -->
+<svg viewBox="0 0 182 220" role="img" style="max-width:218px" font-family="system-ui, sans-serif" aria-label="The edit-distance table for abcde (rows) and ace (columns), with the traceback. columns “”, a, c, e; rows “”: 0 1 2 3; a: 1 0 1 2; b: 2 1 1 2; c: 3 2 1 2; d: 4 3 2 2; e: 5 4 3 2; the traceback visits (5,3), (4,2), (3,2), (2,1), (1,1), (0,0).">
+<text x="52.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">“”</text>
+<text x="86.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">a</text>
+<text x="120.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">c</text>
+<text x="154.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">e</text>
+<text x="27.4" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="27.4" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">a</text>
+<text x="27.4" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">b</text>
+<text x="27.4" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">c</text>
+<text x="27.4" y="169" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">d</text>
+<text x="27.4" y="199" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">e</text>
+<rect x="35.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="90" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="150" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="30" width="136" height="180" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="37.4" y="32" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="71.4" y="62" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="71.4" y="92" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="105.4" y="122" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="105.4" y="152" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="139.4" y="182" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="146.1" y1="187.6" x2="132.6" y2="175.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M128.8,172.4 L135.9,174.3 L131.6,179.1 Z" fill="#0a7d4d"/>
+<line x1="120.4" y1="155" x2="120.4" y2="150" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M120.4,145 L123.7,151.5 L117.2,151.5 Z" fill="#0a7d4d"/>
+<line x1="112.1" y1="127.6" x2="98.6" y2="115.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M94.8,112.4 L101.9,114.3 L97.6,119.1 Z" fill="#0a7d4d"/>
+<line x1="86.4" y1="95" x2="86.4" y2="90" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M86.4,85 L89.7,91.5 L83.2,91.5 Z" fill="#0a7d4d"/>
+<line x1="78.1" y1="67.6" x2="64.6" y2="55.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M60.8,52.4 L67.9,54.3 L63.6,59.1 Z" fill="#0a7d4d"/>
+<text x="52.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="154.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="52.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="86.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="52.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="86.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="52.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="86.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="120.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="52.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="86.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="120.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="154.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="52.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="86.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="120.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="154.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+</svg>
+<!-- /gen:dp ed-abcde -->
+            </figure>
             \(D[5][3] = 2\). The script is match <code>a</code>, delete
             <code>b</code>, match <code>c</code>, delete <code>d</code>, match
             <code>e</code>: two deletes, no inserts and no replaces. Every paying
@@ -668,10 +1117,55 @@ fn edit_script(a: &amp;[u8], b: &amp;[u8], d: &amp;[Vec&lt;usize&gt;]) -&gt; Vec
           optimal scripts.
           <details>
             <summary>solution</summary>
-            <pre>       ""  b  a
-   ""   0  1  2
-   a    1  1  1
-   b    2  1  2</pre>
+            <figure>
+<!-- gen:dp ed-ab -->
+<svg viewBox="0 0 476 130" role="img" style="max-width:571px" font-family="system-ui, sans-serif" aria-label="The edit-distance table for ab (rows) and ba (columns), with all three optimal walks from the corner. columns “”, b, a; rows “”: 0 1 2; a: 1 1 1; b: 2 1 2. the three optimal scripts: replace a → b, replace b → a; insert b, match a, delete b; delete a, match b, insert a.">
+<text x="55.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">“”</text>
+<text x="95.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">b</text>
+<text x="135.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">a</text>
+<text x="27.4" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="27.4" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">a</text>
+<text x="27.4" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">b</text>
+<rect x="35.4" y="30" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75.4" y="30" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="115.4" y="30" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="60" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75.4" y="60" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="115.4" y="60" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="90" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75.4" y="90" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="115.4" y="90" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="30" width="120" height="90" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="37.4" y="32" width="36" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="77.4" y="32" width="36" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="37.4" y="62" width="36" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="77.4" y="62" width="36" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="117.4" y="62" width="36" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="77.4" y="92" width="36" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="117.4" y="92" width="36" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="127" y1="98.7" x2="107.9" y2="84.3" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M103.9,81.3 L111,82.6 L107.1,87.8 Z" fill="#0a7d4d"/>
+<line x1="87" y1="68.7" x2="67.9" y2="54.3" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M63.9,51.3 L71,52.6 L67.1,57.8 Z" fill="#0a7d4d"/>
+<line x1="135.4" y1="95" x2="135.4" y2="90" stroke="#c98a1a" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/><path d="M135.4,85 L138.7,91.5 L132.2,91.5 Z" fill="#c98a1a"/>
+<line x1="127" y1="68.7" x2="107.9" y2="54.3" stroke="#c98a1a" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/><path d="M103.9,51.3 L111,52.6 L107.1,57.8 Z" fill="#c98a1a"/>
+<line x1="86.8" y1="45" x2="69.1" y2="45" stroke="#c98a1a" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/><path d="M64.1,45 L70.6,41.8 L70.6,48.3 Z" fill="#c98a1a"/>
+<line x1="126.8" y1="105" x2="109.1" y2="105" stroke="#6b40d8" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 3"/><path d="M104.1,105 L110.6,101.8 L110.6,108.3 Z" fill="#6b40d8"/>
+<line x1="87" y1="98.7" x2="67.9" y2="84.3" stroke="#6b40d8" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 3"/><path d="M63.9,81.3 L71,82.6 L67.1,87.8 Z" fill="#6b40d8"/>
+<line x1="55.4" y1="65" x2="55.4" y2="60" stroke="#6b40d8" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 3"/><path d="M55.4,55 L58.7,61.5 L52.2,61.5 Z" fill="#6b40d8"/>
+<text x="55.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="95.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="135.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="55.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="95.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="135.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="55.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="95.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="135.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<line x1="185.4" y1="55" x2="211.4" y2="55" stroke="#0a7d4d" stroke-width="2"/><text x="219.4" y="59" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">replace a → b, replace b → a</text>
+<line x1="185.4" y1="73" x2="211.4" y2="73" stroke="#c98a1a" stroke-width="2" stroke-dasharray="5 3"/><text x="219.4" y="77" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">insert b, match a, delete b</text>
+<line x1="185.4" y1="91" x2="211.4" y2="91" stroke="#6b40d8" stroke-width="2" stroke-dasharray="2 3"/><text x="219.4" y="95" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">delete a, match b, insert a</text>
+</svg>
+<!-- /gen:dp ed-ab -->
+            </figure>
             \(D[2][2] = 2\). Cell \(D[2][2]\) has <code>b</code> \(\ne\)
             <code>a</code> and up \(= D[1][2] = 1\), left \(= D[2][1] = 1\),
             diagonal \(= D[1][1] = 1\): a three-way tie, so all three branches are
@@ -696,16 +1190,164 @@ fn edit_script(a: &amp;[u8], b: &amp;[u8], d: &amp;[Vec&lt;usize&gt;]) -&gt; Vec
           distance, and why does the script change?
           <details>
             <summary>solution</summary>
-            <pre>       ""  s  i  t  t  i  n  g
-   ""   0  1  2  3  4  5  6  7
-   k    1  2  3  4  5  6  7  8
-   i    2  3  2  3  4  5  6  7
-   t    3  4  3  2  3  4  5  6
-   t    4  5  4  3  2  3  4  5
-   e    5  6  5  4  3  4  5  6
-   n    6  7  6  5  4  5  4  5</pre>
+            <figure>
+<!-- gen:dp ed-weighted -->
+<svg viewBox="0 0 329 276" role="img" style="max-width:395px" font-family="system-ui, sans-serif" aria-label="The edit-distance table for kitten (rows) and sitting (columns) with a replace costing 2 and an insert or delete 1, with the traceback of the script delete k, insert s, keep i, t, t, delete e, insert i, keep n, insert g. columns “”, s, i, t, t, i, n, g; rows “”: 0 1 2 3 4 5 6 7; k: 1 2 3 4 5 6 7 8; i: 2 3 2 3 4 5 6 7; t: 3 4 3 2 3 4 5 6; t: 4 5 4 3 2 3 4 5; e: 5 6 5 4 3 4 5 6; n: 6 7 6 5 4 5 4 5; the traceback visits (6,7), (6,6), (5,5), (5,4), (4,4), (3,3), (2,2), (1,1), (1,0), (0,0). an edit paid on the traceback, a free match.">
+<text x="58" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">“”</text>
+<text x="92" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">s</text>
+<text x="126" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">i</text>
+<text x="160" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">t</text>
+<text x="194" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">t</text>
+<text x="228" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">i</text>
+<text x="262" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">n</text>
+<text x="296" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">g</text>
+<text x="33" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="33" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">k</text>
+<text x="33" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i</text>
+<text x="33" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">t</text>
+<text x="33" y="169" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">t</text>
+<text x="33" y="199" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">e</text>
+<text x="33" y="229" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">n</text>
+<rect x="41" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="60" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="60" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="180" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="180" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="143" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="177" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="245" y="210" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="279" y="210" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="41" y="30" width="272" height="210" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="43" y="32" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="43" y="62" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="77" y="62" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="111" y="92" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="145" y="122" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="179" y="152" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="179" y="182" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="213" y="182" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="247" y="212" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="281" y="212" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="287.4" y1="225" x2="275.6" y2="225" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M270.6,225 L277.1,221.8 L277.1,228.3 Z" fill="#0a7d4d"/>
+<line x1="253.6" y1="217.6" x2="240.1" y2="205.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M236.4,202.4 L243.4,204.3 L239.1,209.1 Z" fill="#0a7d4d"/>
+<line x1="219.4" y1="195" x2="207.6" y2="195" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M202.6,195 L209.1,191.8 L209.1,198.3 Z" fill="#0a7d4d"/>
+<line x1="194" y1="185" x2="194" y2="180" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M194,175 L197.3,181.5 L190.8,181.5 Z" fill="#0a7d4d"/>
+<line x1="185.6" y1="157.6" x2="172.1" y2="145.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M168.4,142.4 L175.4,144.3 L171.1,149.1 Z" fill="#0a7d4d"/>
+<line x1="151.6" y1="127.6" x2="138.1" y2="115.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M134.4,112.4 L141.4,114.3 L137.1,119.1 Z" fill="#0a7d4d"/>
+<line x1="117.6" y1="97.6" x2="104.1" y2="85.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M100.4,82.4 L107.4,84.3 L103.1,89.1 Z" fill="#0a7d4d"/>
+<line x1="83.4" y1="75" x2="71.6" y2="75" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M66.6,75 L73.1,71.8 L73.1,78.3 Z" fill="#0a7d4d"/>
+<line x1="58" y1="65" x2="58" y2="60" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M58,55 L61.3,61.5 L54.8,61.5 Z" fill="#0a7d4d"/>
+<text x="58" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="92" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="126" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="160" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="194" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="228" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="262" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="296" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="58" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="92" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="126" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="160" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="194" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="228" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="262" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="296" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">8</text>
+<text x="58" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="92" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="126" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="160" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="194" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="228" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="262" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="296" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="58" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="92" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="126" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="160" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="194" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="228" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="262" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="296" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="58" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="92" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="126" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="160" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="194" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="228" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="262" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="296" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="58" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="92" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="126" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="160" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="194" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="228" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="262" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="296" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="58" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="92" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="126" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="160" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="194" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="228" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="262" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="296" y="229.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<rect x="10" y="251" width="14" height="12" rx="2" fill="#fde7bf" stroke="#0a7d4d" stroke-width="2"/><text x="30" y="261" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">an edit paid on the traceback</text>
+<rect x="224.6" y="251" width="14" height="12" rx="2" fill="#fff" stroke="#0a7d4d" stroke-width="2"/><text x="244.6" y="261" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">a free match</text>
+</svg>
+<!-- /gen:dp ed-weighted -->
+            </figure>
             \(D[6][7] = 5\). At cost \(2\) a replace is no cheaper than a delete
-            followed by an insert, so the optimum stops replacing: the script
+            followed by an insert, so replacing no longer helps (it only ties), and
+            an optimal script needs none: the one in the figure
             deletes <code>k</code> and inserts <code>s</code>, keeps
             <code>itt</code>, deletes <code>e</code> and inserts <code>i</code>,
             keeps <code>n</code>, inserts <code>g</code>. That is \(5\) unit-cost
@@ -717,7 +1359,7 @@ fn edit_script(a: &amp;[u8], b: &amp;[u8], d: &amp;[Vec&lt;usize&gt;]) -&gt; Vec
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Edit Distance v1.0
+        Data Structures &amp; Algorithms &middot; Edit Distance v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
         interactive demos in the course library.
       </footer>

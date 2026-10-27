@@ -173,16 +173,75 @@
       </div>
       <div class="ex">
         <span class="tag">Example (a 3&times;3 grid)</span>
-        <table class="trace">
-          <tr><th class="lab">cost</th><th></th><th></th><th></th>
-              <th class="lab" style="border-left:3px double var(--line)">dp</th><th></th><th></th><th></th></tr>
-          <tr><td class="lab"></td><td class="cell">1</td><td class="cell">3</td><td class="cell">1</td>
-              <td class="lab" style="border-left:3px double var(--line)"></td><td class="cell lt">1</td><td class="cell lt">4</td><td class="cell lt">5</td></tr>
-          <tr><td class="lab"></td><td class="cell">1</td><td class="cell">5</td><td class="cell">1</td>
-              <td class="lab" style="border-left:3px double var(--line)"></td><td class="cell">2</td><td class="cell">7</td><td class="cell lt">6</td></tr>
-          <tr><td class="lab"></td><td class="cell">4</td><td class="cell">2</td><td class="cell">1</td>
-              <td class="lab" style="border-left:3px double var(--line)"></td><td class="cell">6</td><td class="cell">8</td><td class="cell lt piv">7</td></tr>
-        </table>
+        <figure>
+<!-- gen:dp grid-min -->
+<svg viewBox="0 0 350 168" role="img" style="max-width:420px" font-family="system-ui, sans-serif" aria-label="A 3 by 3 cost grid and its minimum-path table. cost: 1 3 1; 1 5 1; 4 2 1. dp: 1 4 5; 2 7 6; 6 8 7. The cheapest path, right, right, down, down, is shaded in both: cells (0,0), (0,1), (0,2), (1,2), (2,2), total 7.">
+<text x="70.4" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">cost[i][j]</text>
+<text x="45.7" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">0</text>
+<text x="79.7" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="113.7" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<text x="20.7" y="69" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">0</text>
+<text x="20.7" y="99" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">1</text>
+<text x="20.7" y="129" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">2</text>
+<rect x="28.7" y="50" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="62.7" y="50" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="96.7" y="50" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="28.7" y="80" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="62.7" y="80" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="96.7" y="80" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="28.7" y="110" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="62.7" y="110" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="96.7" y="110" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="28.7" y="50" width="102" height="90" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="45.7" y="69.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="79.7" y="69.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="113.7" y="69.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="45.7" y="99.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="79.7" y="99.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="113.7" y="99.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="45.7" y="129.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="79.7" y="129.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="113.7" y="129.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+
+<text x="257.2" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">dp[i][j]</text>
+<text x="232.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">0</text>
+<text x="266.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="300.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<text x="207.6" y="69" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">0</text>
+<text x="207.6" y="99" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">1</text>
+<text x="207.6" y="129" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">2</text>
+<rect x="215.6" y="50" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="249.6" y="50" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="283.6" y="50" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="215.6" y="80" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="249.6" y="80" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="283.6" y="80" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="215.6" y="110" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="249.6" y="110" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="283.6" y="110" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="215.6" y="50" width="102" height="90" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="217.6" y="52" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="251.6" y="52" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="285.6" y="52" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="285.6" y="82" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="285.6" y="112" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="300.6" y1="115" x2="300.6" y2="110" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M300.6,105 L303.8,111.5 L297.3,111.5 Z" fill="#0a7d4d"/>
+<line x1="300.6" y1="85" x2="300.6" y2="80" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M300.6,75 L303.8,81.5 L297.3,81.5 Z" fill="#0a7d4d"/>
+<line x1="291.9" y1="65" x2="280.2" y2="65" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M275.2,65 L281.7,61.8 L281.7,68.3 Z" fill="#0a7d4d"/>
+<line x1="257.9" y1="65" x2="246.2" y2="65" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M241.2,65 L247.7,61.8 L247.7,68.3 Z" fill="#0a7d4d"/>
+<text x="232.6" y="69.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="266.6" y="69.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="300.6" y="69.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="232.6" y="99.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="266.6" y="99.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="300.6" y="99.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="232.6" y="129.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">6</text>
+<text x="266.6" y="129.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">8</text>
+<text x="300.6" y="129.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="257.2" y="154" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">the cheapest path costs 7</text>
+</svg>
+<!-- /gen:dp grid-min -->
+        </figure>
         Each \(dp\) cell adds its own cost to the cheaper of the cell above and the
         cell to the left: \(dp[1][2] = 1 + \min(5, 7) = 6\), and the corner
         \(dp[2][2] = 1 + \min(6, 8) = 7\) is the minimum path cost. The highlighted
@@ -425,8 +484,12 @@ fn count_paths(blocked: &amp;[Vec&lt;bool&gt;]) -&gt; u64 {
         wildly. For \(A\ (10{\times}30)\), \(B\ (30{\times}5)\),
         \(C\ (5{\times}60)\):
       </p>
-      <pre>  (AB)C :  10&middot;30&middot;5  +  10&middot;5&middot;60  =  1500 +  3000  =   4,500
-  A(BC) :  30&middot;5&middot;60  + 10&middot;30&middot;60  =  9000 + 18000  =  27,000     6&times; worse</pre>
+      \[
+        \begin{aligned}
+          (AB)C &amp;:\quad 10\cdot 30\cdot 5 + 10\cdot 5\cdot 60 = 1500 + 3000 = 4500\\
+          A(BC) &amp;:\quad 30\cdot 5\cdot 60 + 10\cdot 30\cdot 60 = 9000 + 18000 = 27000 &amp;&amp;\text{(6 times worse)}
+        \end{aligned}
+      \]
       <p>
         The last-decision question is <em>which multiplication happens last</em>,
         the outermost split \(k\):
@@ -560,11 +623,41 @@ fn count_paths(blocked: &amp;[Vec&lt;bool&gt;]) -&gt; u64 {
       </p>
       <div class="ex">
         <span class="tag">Example (coins {1, 3, 4}, amounts 0&ndash;6)</span>
-        <table class="trace">
-          <tr><th class="lab">a</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
-          <tr><td class="lab">dp[a]</td>
-            <td class="cell">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell">1</td><td class="cell">1</td><td class="cell">2</td><td class="cell lt">2</td></tr>
-        </table>
+        <figure>
+<!-- gen:dp coin-134 -->
+<svg viewBox="0 0 304 108" role="img" style="max-width:365px" font-family="system-ui, sans-serif" aria-label="Coin change with coins 1, 3 and 4. dp[a] for a = 0 to 6: 0, 1, 2, 1, 1, 2, 2. The candidates for dp[6]: coin 1 from dp[5] = 2, giving 3; coin 3 from dp[3] = 1, giving 2; coin 4 from dp[2] = 2, giving 3; the smallest, 2, is kept.">
+<text x="47.6" y="57" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">dp[a]</text>
+<rect x="55.6" y="40" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="72.6" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<rect x="89.6" y="40" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="106.6" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="123.6" y="40" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="140.6" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="157.6" y="40" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="174.6" y="57.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<rect x="191.6" y="40" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="208.6" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="225.6" y="40" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="242.6" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="259.6" y="40" width="34" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="276.6" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="47.6" y="78" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end">a</text>
+<text x="72.6" y="78" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="106.6" y="78" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="140.6" y="78" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="174.6" y="78" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="208.6" y="78" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="242.6" y="78" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="276.6" y="78" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="140.6" y="94" font-size="10.5" font-weight="600" fill="#5c6270" text-anchor="middle">c = 4</text>
+<text x="174.6" y="94" font-size="10.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">c = 3</text>
+<text x="242.6" y="94" font-size="10.5" font-weight="600" fill="#5c6270" text-anchor="middle">c = 1</text>
+<path d="M245.6,39 Q259.6,11 273.6,39" fill="none" stroke="#9aa3b5" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M273.6,39 L267.8,34.6 L273.6,31.7 Z" fill="#9aa3b5"/>
+<path d="M177.6,39 Q225.6,-5 273.6,39" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M273.6,39 L266.6,37 L271,32.2 Z" fill="#0a7d4d"/>
+<path d="M143.6,39 Q208.6,-13 273.6,39" fill="none" stroke="#9aa3b5" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M273.6,39 L266.5,37.5 L270.6,32.4 Z" fill="#9aa3b5"/>
+</svg>
+<!-- /gen:dp coin-134 -->
+        </figure>
         \(dp[6]\) tries a last coin of \(1\) (\(1 + dp[5] = 3\)), of \(3\)
         (\(1 + dp[3] = 2\)), and of \(4\) (\(1 + dp[2] = 3\)), and keeps \(2\):
         the \(3 + 3\) that greedy missed. Cost \(\Theta(a \cdot k)\) for
@@ -588,13 +681,45 @@ fn count_paths(blocked: &amp;[Vec&lt;bool&gt;]) -&gt; u64 {
           the cell stays \(\infty\), meaning &ldquo;no set of coins sums to
           \(a\).&rdquo;
         </p>
-        <table class="trace">
-          <tr><th class="lab">a</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
-          <tr><td class="lab">dp[a]</td>
-            <td class="cell">0</td><td class="cell piv">&infin;</td><td class="cell piv">&infin;</td>
-            <td class="cell">1</td><td class="cell piv">&infin;</td><td class="cell">1</td>
-            <td class="cell">2</td><td class="cell piv">&infin;</td><td class="cell lt">2</td></tr>
-        </table>
+        <figure>
+<!-- gen:dp coin-35 -->
+<svg viewBox="0 0 372 112" role="img" style="max-width:446px" font-family="system-ui, sans-serif" aria-label="Coin change with coins 3 and 5; infinity marks an amount no coins sum to. dp[a] for a = 0 to 8: 0, infinity, infinity, 1, infinity, 1, 2, infinity, 2. The candidates for dp[8]: coin 3 from dp[5] = 1, giving 2; coin 5 from dp[3] = 1, giving 2; the smallest, 2, is kept.">
+<text x="47.6" y="61" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">dp[a]</text>
+<rect x="55.6" y="44" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="72.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<rect x="89.6" y="44" width="34" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="1.8"/>
+<text x="106.6" y="61.5" font-size="13" font-weight="600" fill="#c0392b" text-anchor="middle">∞</text>
+<rect x="123.6" y="44" width="34" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="1.8"/>
+<text x="140.6" y="61.5" font-size="13" font-weight="600" fill="#c0392b" text-anchor="middle">∞</text>
+<rect x="157.6" y="44" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="174.6" y="61.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<rect x="191.6" y="44" width="34" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="1.8"/>
+<text x="208.6" y="61.5" font-size="13" font-weight="600" fill="#c0392b" text-anchor="middle">∞</text>
+<rect x="225.6" y="44" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="242.6" y="61.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<rect x="259.6" y="44" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="276.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="293.6" y="44" width="34" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="1.8"/>
+<text x="310.6" y="61.5" font-size="13" font-weight="600" fill="#c0392b" text-anchor="middle">∞</text>
+<rect x="327.6" y="44" width="34" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="344.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="47.6" y="82" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end">a</text>
+<text x="72.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="106.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="140.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="174.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="208.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="242.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="276.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="310.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="344.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="174.6" y="98" font-size="10.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">c = 5</text>
+<text x="242.6" y="98" font-size="10.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">c = 3</text>
+<path d="M245.6,43 Q293.6,-1 341.6,43" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M341.6,43 L334.6,41 L339,36.2 Z" fill="#0a7d4d"/>
+<path d="M177.6,43 Q259.6,-17 341.6,43" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M341.6,43 L334.4,41.8 L338.3,36.5 Z" fill="#0a7d4d"/>
+</svg>
+<!-- /gen:dp coin-35 -->
+        </figure>
         <p>Cell by cell:</p>
         <ul>
           <li>\(a = 1, 2\): both coins exceed the amount, no candidate at all, so
@@ -720,12 +845,60 @@ fn coin_change(coins: &amp;[usize], amount: usize) -&gt; Option&lt;usize&gt; {
       </div>
       <div class="ex">
         <span class="tag">Example</span>
-        <table class="trace">
-          <tr><td class="lab">a[i]</td>
-            <td class="cell">3</td><td class="cell">1</td><td class="cell">4</td><td class="cell">1</td><td class="cell">5</td><td class="cell">9</td><td class="cell">2</td><td class="cell">6</td></tr>
-          <tr><td class="lab">dp[i]</td>
-            <td class="cell">1</td><td class="cell">1</td><td class="cell">2</td><td class="cell">1</td><td class="cell">3</td><td class="cell lt">4</td><td class="cell">2</td><td class="cell lt">4</td></tr>
-        </table>
+        <figure>
+<!-- gen:dp lis -->
+<svg viewBox="0 0 338 114" role="img" style="max-width:406px" font-family="system-ui, sans-serif" aria-label="The longest increasing subsequence of 3 1 4 1 5 9 2 6. a: 3, 1, 4, 1, 5, 9, 2, 6; dp, the length of the longest increasing subsequence ending at i: 1, 1, 2, 1, 3, 4, 2, 4. The longest have length 4, ending at index 5 and 7; the arcs link each element of a longest chain to the element before it: 4 to 5, 2 to 4, 0 to 2, 1 to 2, 4 to 7.">
+<text x="47.6" y="53" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">a[i]</text>
+<rect x="55.6" y="36" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="72.6" y="53.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<rect x="89.6" y="36" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="106.6" y="53.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<rect x="123.6" y="36" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="140.6" y="53.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<rect x="157.6" y="36" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="174.6" y="53.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="191.6" y="36" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="208.6" y="53.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">5</text>
+<rect x="225.6" y="36" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="242.6" y="53.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="259.6" y="36" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="276.6" y="53.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="293.6" y="36" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="310.6" y="53.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">6</text>
+<text x="47.6" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">dp[i]</text>
+<rect x="55.6" y="62" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="72.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="89.6" y="62" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="106.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="123.6" y="62" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="140.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="157.6" y="62" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="174.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="191.6" y="62" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="208.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="225.6" y="62" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="242.6" y="79.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<rect x="259.6" y="62" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="276.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="293.6" y="62" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="310.6" y="79.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<text x="47.6" y="100" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end">i</text>
+<text x="72.6" y="100" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="106.6" y="100" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="140.6" y="100" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="174.6" y="100" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="208.6" y="100" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="242.6" y="100" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="276.6" y="100" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="310.6" y="100" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<path d="M211.6,35 Q225.6,7 239.6,35" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M239.6,35 L233.8,30.6 L239.6,27.7 Z" fill="#0a7d4d"/>
+<path d="M143.6,35 Q174.6,-1 205.6,35" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M205.6,35 L198.9,32.2 L203.8,28 Z" fill="#0a7d4d"/>
+<path d="M75.6,35 Q106.6,-1 137.6,35" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M137.6,35 L130.9,32.2 L135.8,28 Z" fill="#0a7d4d"/>
+<path d="M109.6,35 Q123.6,7 137.6,35" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M137.6,35 L131.8,30.6 L137.6,27.7 Z" fill="#0a7d4d"/>
+<path d="M211.6,35 Q259.6,-9 307.6,35" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M307.6,35 L300.6,33 L305,28.2 Z" fill="#0a7d4d"/>
+</svg>
+<!-- /gen:dp lis -->
+        </figure>
         Each \(dp[i]\) extends the best earlier subsequence ending in a smaller
         value: \(dp[4] = 3\) via \(1, 4, 5\) (or \(3,4,5\)), \(dp[5] = 4\) via
         \(1, 4, 5, 9\), and \(dp[7] = 4\) via \(1, 4, 5, 6\). The LIS length is
@@ -753,22 +926,22 @@ fn coin_change(coins: &amp;[usize], amount: usize) -&gt; Option&lt;usize&gt; {
               <td class="lab">none (\(3 \not&lt; 1\))</td>
               <td>start new</td><td class="cell new">1</td></tr>
           <tr><td class="lab">2</td><td class="cell">4</td>
-              <td class="lab">3:1, 1:1 &rarr; best 1</td>
+              <td class="lab">\(3{:}1,\ 1{:}1\) &rarr; best \(1\)</td>
               <td>extend</td><td class="cell new">2</td></tr>
           <tr><td class="lab">3</td><td class="cell">1</td>
               <td class="lab">none (3, 4 too large; \(1 \not&lt; 1\), strict)</td>
               <td>start new</td><td class="cell new">1</td></tr>
           <tr><td class="lab">4</td><td class="cell">5</td>
-              <td class="lab">3:1, 1:1, 4:2, 1:1 &rarr; best 2</td>
+              <td class="lab">\(3{:}1,\ 1{:}1,\ 4{:}2,\ 1{:}1\) &rarr; best \(2\)</td>
               <td>extend</td><td class="cell new">3</td></tr>
           <tr><td class="lab">5</td><td class="cell">9</td>
-              <td class="lab">3:1, 1:1, 4:2, 1:1, 5:3 &rarr; best 3</td>
+              <td class="lab">\(3{:}1,\ 1{:}1,\ 4{:}2,\ 1{:}1,\ 5{:}3\) &rarr; best \(3\)</td>
               <td>extend</td><td class="cell new lt">4</td></tr>
           <tr><td class="lab">6</td><td class="cell">2</td>
-              <td class="lab">1:1, 1:1 &rarr; best 1</td>
+              <td class="lab">\(1{:}1,\ 1{:}1\) &rarr; best \(1\)</td>
               <td>extend</td><td class="cell new">2</td></tr>
           <tr><td class="lab">7</td><td class="cell">6</td>
-              <td class="lab">3:1, 1:1, 4:2, 1:1, 5:3, 2:2 &rarr; best 3</td>
+              <td class="lab">\(3{:}1,\ 1{:}1,\ 4{:}2,\ 1{:}1,\ 5{:}3,\ 2{:}2\) &rarr; best \(3\)</td>
               <td>extend</td><td class="cell new lt">4</td></tr>
         </table>
         <p style="margin-bottom:0">
@@ -888,9 +1061,40 @@ fn lis(a: &amp;[i64]) -&gt; usize {
           <details>
             <summary>solution</summary>
             Sum-of-neighbors with the blocked cell forced to \(0\):
-            <pre>   1  1  1
-   1  0  1
-   1  1  2</pre>
+            <figure>
+<!-- gen:dp grid-wall -->
+<svg viewBox="0 0 198 168" role="img" style="max-width:238px" font-family="system-ui, sans-serif" aria-label="The path-count table of a 3 by 3 grid with the centre cell blocked: 1 1 1; 1 0 1; 1 1 2. The blocked centre holds 0 and the corner counts 2 paths.">
+<text x="98.9" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">paths[i][j]</text>
+<text x="74.3" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">0</text>
+<text x="108.3" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="142.3" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<text x="49.3" y="69" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">0</text>
+<text x="49.3" y="99" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">1</text>
+<text x="49.3" y="129" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">2</text>
+<rect x="57.3" y="50" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="91.3" y="50" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="125.3" y="50" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="57.3" y="80" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="91.3" y="80" width="34" height="30" fill="#fbeaea" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="125.3" y="80" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="57.3" y="110" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="91.3" y="110" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="125.3" y="110" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="57.3" y="50" width="102" height="90" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="93.3" y="82" width="30" height="26" rx="3" fill="none" stroke="#c0392b" stroke-width="1.8"/>
+<text x="74.3" y="69.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="108.3" y="69.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="142.3" y="69.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="74.3" y="99.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="108.3" y="99.5" font-size="13" font-weight="600" fill="#c0392b" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="142.3" y="99.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="74.3" y="129.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="108.3" y="129.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="142.3" y="129.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="98.9" y="154" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">the blocked centre counts 0</text>
+</svg>
+<!-- /gen:dp grid-wall -->
+            </figure>
             The corner counts \(2\) paths (down the left edge then across, or
             across the top then down the right edge), versus \(6\) unblocked
             (&sect;1). Every path through the center (\(6 - 2 = 4\) of them)
@@ -946,8 +1150,47 @@ fn lis(a: &amp;[i64]) -&gt; usize {
           <details>
             <summary>solution</summary>
             Greedy: \(5\), then three \(1\)s: four coins. The DP table:
-            <pre>  a:      0  1  2  3  4  5  6  7  8
-  dp[a]:  0  1  2  3  1  1  2  3  2</pre>
+            <figure>
+<!-- gen:dp coin-145 -->
+<svg viewBox="0 0 372 112" role="img" style="max-width:446px" font-family="system-ui, sans-serif" aria-label="Coin change with coins 1, 4 and 5. dp[a] for a = 0 to 8: 0, 1, 2, 3, 1, 1, 2, 3, 2. The candidates for dp[8]: coin 1 from dp[7] = 3, giving 4; coin 4 from dp[4] = 1, giving 2; coin 5 from dp[3] = 3, giving 4; the smallest, 2, is kept.">
+<text x="47.6" y="61" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">dp[a]</text>
+<rect x="55.6" y="44" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="72.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<rect x="89.6" y="44" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="106.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="123.6" y="44" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="140.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="157.6" y="44" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="174.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="191.6" y="44" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="208.6" y="61.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">1</text>
+<rect x="225.6" y="44" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="242.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="259.6" y="44" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="276.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="293.6" y="44" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="310.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="327.6" y="44" width="34" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="344.6" y="61.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="47.6" y="82" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end">a</text>
+<text x="72.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="106.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="140.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="174.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="208.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="242.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="276.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="310.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="344.6" y="82" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="174.6" y="98" font-size="10.5" font-weight="600" fill="#5c6270" text-anchor="middle">c = 5</text>
+<text x="208.6" y="98" font-size="10.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">c = 4</text>
+<text x="310.6" y="98" font-size="10.5" font-weight="600" fill="#5c6270" text-anchor="middle">c = 1</text>
+<path d="M313.6,43 Q327.6,15 341.6,43" fill="none" stroke="#9aa3b5" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M341.6,43 L335.8,38.6 L341.6,35.7 Z" fill="#9aa3b5"/>
+<path d="M211.6,43 Q276.6,-9 341.6,43" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M341.6,43 L334.5,41.5 L338.6,36.4 Z" fill="#0a7d4d"/>
+<path d="M177.6,43 Q259.6,-17 341.6,43" fill="none" stroke="#9aa3b5" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M341.6,43 L334.4,41.8 L338.3,36.5 Z" fill="#9aa3b5"/>
+</svg>
+<!-- /gen:dp coin-145 -->
+            </figure>
             \(\mathit{dp}[8]\) tries last coins \(1\) (\(1 + dp[7] = 4\)), \(4\)
             (\(1 + dp[4] = 2\)), and \(5\) (\(1 + dp[3] = 4\)): the optimum is
             \(2\), namely \(4 + 4\). Greedy&rsquo;s first grab of the \(5\) leaves
@@ -963,8 +1206,61 @@ fn lis(a: &amp;[i64]) -&gt; usize {
           instead of &ldquo;ending at \(i\).&rdquo;
           <details>
             <summary>solution</summary>
-            <pre>  a[i]:   10   9   2   5   3   7  101  18
-  dp[i]:   1   1   1   2   2   3    4   4</pre>
+            <figure>
+<!-- gen:dp lis-ex -->
+<svg viewBox="0 0 338 110" role="img" style="max-width:406px" font-family="system-ui, sans-serif" aria-label="The longest increasing subsequence of 10 9 2 5 3 7 101 18. a: 10, 9, 2, 5, 3, 7, 101, 18; dp, the length of the longest increasing subsequence ending at i: 1, 1, 1, 2, 2, 3, 4, 4. The longest have length 4, ending at index 6 and 7; the arcs link each element of a longest chain to the element before it: 5 to 6, 3 to 5, 2 to 3, 4 to 5, 2 to 4, 5 to 7.">
+<text x="47.6" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">a[i]</text>
+<rect x="55.6" y="32" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="72.6" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<rect x="89.6" y="32" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="106.6" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="123.6" y="32" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="140.6" y="49.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<rect x="157.6" y="32" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="174.6" y="49.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">5</text>
+<rect x="191.6" y="32" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="208.6" y="49.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<rect x="225.6" y="32" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="242.6" y="49.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">7</text>
+<rect x="259.6" y="32" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="276.6" y="49.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">101</text>
+<rect x="293.6" y="32" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="310.6" y="49.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">18</text>
+<text x="47.6" y="75" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">dp[i]</text>
+<rect x="55.6" y="58" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="72.6" y="75.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="89.6" y="58" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="106.6" y="75.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="123.6" y="58" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="140.6" y="75.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="157.6" y="58" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="174.6" y="75.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="191.6" y="58" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="208.6" y="75.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="225.6" y="58" width="34" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="242.6" y="75.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="259.6" y="58" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="276.6" y="75.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<rect x="293.6" y="58" width="34" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="310.6" y="75.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">4</text>
+<text x="47.6" y="96" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end">i</text>
+<text x="72.6" y="96" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="106.6" y="96" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="140.6" y="96" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="174.6" y="96" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="208.6" y="96" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="242.6" y="96" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="276.6" y="96" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="310.6" y="96" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<path d="M245.6,31 Q259.6,3 273.6,31" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M273.6,31 L267.8,26.6 L273.6,23.7 Z" fill="#0a7d4d"/>
+<path d="M177.6,31 Q208.6,-5 239.6,31" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M239.6,31 L232.9,28.2 L237.8,24 Z" fill="#0a7d4d"/>
+<path d="M143.6,31 Q157.6,3 171.6,31" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M171.6,31 L165.8,26.6 L171.6,23.7 Z" fill="#0a7d4d"/>
+<path d="M211.6,31 Q225.6,3 239.6,31" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M239.6,31 L233.8,26.6 L239.6,23.7 Z" fill="#0a7d4d"/>
+<path d="M143.6,31 Q174.6,-5 205.6,31" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M205.6,31 L198.9,28.2 L203.8,24 Z" fill="#0a7d4d"/>
+<path d="M245.6,31 Q276.6,-5 307.6,31" fill="none" stroke="#0a7d4d" stroke-width="2.2"/><path d="M307.6,31 L300.9,28.2 L305.8,24 Z" fill="#0a7d4d"/>
+</svg>
+<!-- /gen:dp lis-ex -->
+            </figure>
             The maximum is \(4\), achieved by \(2, 5, 7, 101\) (or \(2, 3, 7,
             18\), or \(2, 5, 7, 18\)). With the prefix state, consider extending by
             the next element: knowing only &ldquo;the first \(6\) elements contain
@@ -982,7 +1278,7 @@ fn lis(a: &amp;[i64]) -&gt; usize {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; DP Patterns: Grid, Interval, Coin Change &amp; LIS v1.0
+        Data Structures &amp; Algorithms &middot; DP Patterns: Grid, Interval, Coin Change &amp; LIS v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
         interactive demos in the course library.
       </footer>

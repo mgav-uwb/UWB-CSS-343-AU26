@@ -162,9 +162,11 @@
       <p>
         The running example, four items and capacity \(W = 5\):
       </p>
-      <pre>  item    A   B   C   D
-  value   3   4   5   6
-  weight  2   3   4   5        W = 5</pre>
+      <table class="trace">
+        <tr><th class="lab">item</th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+        <tr><td class="lab">value \(v_i\)</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell">6</td></tr>
+        <tr><td class="lab">weight \(w_i\)</td><td class="cell">2</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td></tr>
+      </table>
       <p>
         Which subset fits and is worth the most? Contrast this with the
         <em>fractional</em> knapsack of the
@@ -222,73 +224,70 @@
         be taken.
       </p>
       <figure>
-        <svg viewBox="0 0 460 190" role="img" aria-label="Two small grids showing which neighbor cells a DP cell reads. Left, the knapsack table: cell K[i][w] in the bottom row has one arrow arriving from the cell directly above it, labeled skip, and a second arrow arriving from the cell one row up and several columns to the left (at column w minus the item's weight), labeled take plus v-sub-i. Right, the edit-distance table: cell D[i][j] has three arrows arriving from the cell above (delete), the cell to the left (insert), and the diagonal upper-left cell (replace, or free on a match).">
-          <defs>
-            <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0,0 L8,4 L0,8 z" fill="#6b40d8"/>
-            </marker>
-          </defs>
-          <g font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#2a2d36" text-anchor="middle">
-            <text x="105" y="20">knapsack: K[i][w]</text>
-            <text x="348" y="20">edit distance: D[i][j]</text>
-          </g>
-          <!-- knapsack grid: 5 cols x 3 rows -->
-          <g fill="#fff" stroke="#cdd3de" stroke-width="1.2">
-            <rect x="20"  y="46" width="34" height="26"/><rect x="54" y="46" width="34" height="26"/>
-            <rect x="88"  y="46" width="34" height="26"/><rect x="122" y="46" width="34" height="26"/>
-            <rect x="156" y="46" width="34" height="26"/>
-            <rect x="20"  y="72" width="34" height="26"/><rect x="54" y="72" width="34" height="26"/>
-            <rect x="88"  y="72" width="34" height="26"/><rect x="122" y="72" width="34" height="26"/>
-            <rect x="156" y="72" width="34" height="26"/>
-            <rect x="20"  y="98" width="34" height="26"/><rect x="54" y="98" width="34" height="26"/>
-            <rect x="88"  y="98" width="34" height="26"/><rect x="122" y="98" width="34" height="26"/>
-            <rect x="156" y="98" width="34" height="26"/>
-          </g>
-          <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.5">
-            <rect x="20"  y="72" width="34" height="26"/>
-            <rect x="122" y="72" width="34" height="26"/>
-          </g>
-          <rect x="122" y="98" width="34" height="26" fill="#f3efff" stroke="#6b40d8" stroke-width="1.7"/>
-          <g stroke="#6b40d8" stroke-width="1.8" fill="none" marker-end="url(#arr)">
-            <line x1="139" y1="92" x2="139" y2="108"/>
-            <line x1="46"  y1="94" x2="130" y2="109"/>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="12" fill="#5c6270" text-anchor="middle">
-            <text x="37"  y="42">w&minus;w&#7522;</text>
-            <text x="139" y="42">w</text>
-            <text x="163" y="103" text-anchor="start">skip</text>
-            <text x="78"  y="118">take +v&#7522;</text>
-          </g>
-          <!-- edit-distance grid: 3 cols x 3 rows -->
-          <g fill="#fff" stroke="#cdd3de" stroke-width="1.2">
-            <rect x="280" y="46" width="34" height="26"/><rect x="314" y="46" width="34" height="26"/>
-            <rect x="348" y="46" width="34" height="26"/>
-            <rect x="280" y="72" width="34" height="26"/><rect x="314" y="72" width="34" height="26"/>
-            <rect x="348" y="72" width="34" height="26"/>
-            <rect x="280" y="98" width="34" height="26"/><rect x="314" y="98" width="34" height="26"/>
-            <rect x="348" y="98" width="34" height="26"/>
-          </g>
-          <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.5">
-            <rect x="314" y="72" width="34" height="26"/>
-            <rect x="348" y="72" width="34" height="26"/>
-            <rect x="314" y="98" width="34" height="26"/>
-          </g>
-          <rect x="348" y="98" width="34" height="26" fill="#f3efff" stroke="#6b40d8" stroke-width="1.7"/>
-          <g stroke="#6b40d8" stroke-width="1.8" fill="none" marker-end="url(#arr)">
-            <line x1="365" y1="92"  x2="365" y2="108"/>
-            <line x1="338" y1="115" x2="357" y2="115"/>
-            <line x1="336" y1="94"  x2="357" y2="109"/>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="12" fill="#5c6270" text-anchor="middle">
-            <text x="389" y="103" text-anchor="start">delete</text>
-            <text x="331" y="140">insert</text>
-            <text x="305" y="88" text-anchor="end">replace</text>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="12" fill="#5c6270" text-anchor="middle">
-            <text x="105" y="168">two candidate sources, take the max</text>
-            <text x="348" y="168">three candidate sources, take the min</text>
-          </g>
-        </svg>
+        <!-- gen:dp knap-reads -->
+<svg viewBox="0 0 562 168" role="img" style="max-width:674px" font-family="system-ui, sans-serif" aria-label="Two small grids showing which cells a DP cell reads. Left, the knapsack table: cell K[i][w] reads the cell directly above it (skip) and the cell one row up at column w minus the item's weight (take, plus the item's value v_i). Right, the edit-distance table: cell D[i][j] reads the cell above (delete), the cell to the left (insert) and the diagonal cell up and left (replace, or free on a match).">
+<text x="132.8" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">knapsack: K[i][w]</text>
+<text x="75.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">w − w<tspan dy="4" font-size="8.6">i</tspan></text>
+<text x="115.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle"></text>
+<text x="155.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle"></text>
+<text x="195.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">w</text>
+<text x="235.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle"></text>
+<text x="47.6" y="69" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end"></text>
+<text x="47.6" y="99" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i − 1</text>
+<text x="47.6" y="129" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i</text>
+<rect x="55.6" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.6" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="135.6" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="175.6" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="215.6" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="55.6" y="80" width="40" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.6" y="80" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="135.6" y="80" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="175.6" y="80" width="40" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="215.6" y="80" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="55.6" y="110" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.6" y="110" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="135.6" y="110" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="175.6" y="110" width="40" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="215.6" y="110" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="55.6" y="50" width="200" height="90" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="177.6" y="112" width="36" height="26" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="195.6" y1="98" x2="195.6" y2="117" stroke="#4a5163" stroke-width="1.8" stroke-linecap="round"/><path d="M195.6,122 L192.3,115.5 L198.8,115.5 Z" fill="#4a5163"/>
+<text stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke" x="202.6" y="114" font-size="11" font-weight="600" fill="#5c6270" text-anchor="start">skip</text>
+<line x1="78.6" y1="95.7" x2="187.8" y2="123" stroke="#4a5163" stroke-width="1.8" stroke-linecap="round"/><path d="M192.6,124.3 L185.5,125.8 L187.1,119.5 Z" fill="#4a5163"/>
+<text stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke" x="111.6" y="130" font-size="11" font-weight="600" fill="#5c6270" text-anchor="middle">take, + v<tspan dy="4" font-size="7.9">i</tspan></text>
+<text x="132.8" y="154" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">two candidate sources, take the max</text>
+<text x="430.7" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">edit distance: D[i][j]</text>
+<text x="393.5" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle"></text>
+<text x="433.5" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle"></text>
+<text x="473.5" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">j − 1</text>
+<text x="513.5" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">j</text>
+<text x="365.5" y="69" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end"></text>
+<text x="365.5" y="99" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i − 1</text>
+<text x="365.5" y="129" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i</text>
+<rect x="373.5" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="413.5" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="453.5" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="493.5" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="373.5" y="80" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="413.5" y="80" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="453.5" y="80" width="40" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="493.5" y="80" width="40" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="373.5" y="110" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="413.5" y="110" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="453.5" y="110" width="40" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="493.5" y="110" width="40" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="373.5" y="50" width="160" height="90" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="495.5" y="112" width="36" height="26" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="513.5" y1="98" x2="513.5" y2="117" stroke="#4a5163" stroke-width="1.8" stroke-linecap="round"/><path d="M513.5,122 L510.3,115.5 L516.8,115.5 Z" fill="#4a5163"/>
+<text stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke" x="520.5" y="114" font-size="11" font-weight="600" fill="#5c6270" text-anchor="start">delete</text>
+<line x1="476.5" y1="125" x2="505.5" y2="125" stroke="#4a5163" stroke-width="1.8" stroke-linecap="round"/><path d="M510.5,125 L504,128.3 L504,121.8 Z" fill="#4a5163"/>
+<text stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke" x="465.5" y="129" font-size="11" font-weight="600" fill="#5c6270" text-anchor="end">insert</text>
+<line x1="476.3" y1="97.1" x2="506.7" y2="119.9" stroke="#4a5163" stroke-width="1.8" stroke-linecap="round"/><path d="M510.7,122.9 L503.6,121.6 L507.5,116.4 Z" fill="#4a5163"/>
+<text stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke" x="465.5" y="99" font-size="11" font-weight="600" fill="#5c6270" text-anchor="end">replace</text>
+<text x="430.7" y="154" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">three candidate sources, take the min</text>
+</svg>
+<!-- /gen:dp knap-reads -->
         <figcaption>
           The two marquee 2-D transitions as neighbor reads (edit distance is
           the <a href="algo-edit-distance.html">Edit Distance</a> handout). Knapsack:
@@ -314,9 +313,13 @@
         <span class="tag">Example (one cell, both branches)</span>
         Compute \(K[2][5]\) (items A and B available, capacity \(5\); B has
         value \(4\), weight \(3\)):
-        <pre>  skip B:  K[1][5] = 3                       (just A)
-  take B:  4 + K[1][5-3] = 4 + K[1][2] = 4 + 3 = 7
-  K[2][5] = max(3, 7) = 7                    &larr; take both A and B</pre>
+        \[
+          \begin{aligned}
+            \text{skip B:}\quad K[1][5] &amp;= 3 &amp;&amp;\text{(just A)}\\
+            \text{take B:}\quad 4 + K[1][5-3] &amp;= 4 + K[1][2] = 4 + 3 = 7\\
+            K[2][5] &amp;= \max(3, 7) = 7 &amp;&amp;\text{take both A and B}
+          \end{aligned}
+        \]
         Taking B adds its value to the best use of the two units of capacity that
         remain <em>for the earlier items</em>: \(K[1][2] = 3\), item A alone
         (weights \(2 + 3 = 5\) exactly fill the sack). Every cell of the table is
@@ -355,9 +358,82 @@
         Widen the same instance to \(W = 7\) and look at
         \(K[4][7]\), with row \(+\)C now reading
         \(K[3][0..7] = 0, 0, 3, 4, 5, 7, 8, 9\):
-        <pre>  skip D:  K[3][7] = 9                       (B + C, weight 7)
-  take D:  6 + K[3][7-5] = 6 + K[3][2] = 6 + 3 = 9   (A + D, weight 7)
-  K[4][7] = max(9, 9) = 9                    &larr; both choices optimal</pre>
+        \[
+          \begin{aligned}
+            \text{skip D:}\quad K[3][7] &amp;= 9 &amp;&amp;\text{(B + C, weight 7)}\\
+            \text{take D:}\quad 6 + K[3][7-5] &amp;= 6 + K[3][2] = 6 + 3 = 9 &amp;&amp;\text{(A + D, weight 7)}\\
+            K[4][7] &amp;= \max(9, 9) = 9 &amp;&amp;\text{both choices optimal}
+          \end{aligned}
+        \]
+        All four outcomes, cell by cell:
+        <figure>
+<!-- gen:dp knap-cases -->
+<svg viewBox="0 0 633 154" role="img" style="max-width:760px" font-family="system-ui, sans-serif" aria-label="The four outcomes of a knapsack cell, each shown as the cell (amber), the cell above it (skip) and, when the item fits, the cell one row up and w_i columns left (take, plus the item's value); the source taken is green. Does not fit: K[3][3] copies 4 from above, since item C weighs 4. Fits and take wins: K[3][4] = max(4, 5 + K[2][0] = 5) = 5. Fits and skip wins: K[3][5] = max(7, 5 + K[2][1] = 5) = 7. A tie: K[4][7] = max(9, 6 + K[3][2] = 9) = 9, both sources green.">
+<text x="82.8" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">does not fit</text>
+<text x="95.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">3</text>
+<text x="65.6" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+B</text>
+<text x="65.6" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+C</text>
+<rect x="73.6" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="73.6" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="75.6" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="95.6" y1="79" x2="95.6" y2="92" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M95.6,97 L92.3,90.5 L98.8,90.5 Z" fill="#0a7d4d"/>
+<text x="95.6" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="95.6" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="82.8" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">C weighs 4 &gt; 3: copy 4</text>
+
+<text x="254.4" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">fits, take wins</text>
+<text x="245.1" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">0</text>
+<text x="289.1" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">4</text>
+<text x="215.1" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+B</text>
+<text x="215.1" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+C</text>
+<rect x="223.1" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="267.1" y="50" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="267.1" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="269.1" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="289.1" y1="79" x2="289.1" y2="92" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M289.1,97 L285.9,90.5 L292.4,90.5 Z" fill="#9aa3b5"/>
+<line x1="253.5" y1="76.3" x2="277" y2="96.5" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M280.7,99.7 L273.7,98 L277.9,93 Z" fill="#0a7d4d"/>
+<text stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke" x="245.1" y="111" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="middle">+ 5</text>
+<text x="245.1" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="289.1" y="73.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="289.1" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="254.4" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">max(4, 5 + 0) = 5</text>
+
+<text x="409.9" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">fits, skip wins</text>
+<text x="400.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="444.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">5</text>
+<text x="370.6" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+B</text>
+<text x="370.6" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+C</text>
+<rect x="378.6" y="50" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="422.6" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="422.6" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="424.6" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="444.6" y1="79" x2="444.6" y2="92" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M444.6,97 L441.4,90.5 L447.9,90.5 Z" fill="#0a7d4d"/>
+<line x1="409" y1="76.3" x2="432.4" y2="96.5" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M436.2,99.7 L429.2,98 L433.4,93 Z" fill="#9aa3b5"/>
+<text stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke" x="400.6" y="111" font-size="11" font-weight="600" fill="#9aa3b5" text-anchor="middle">+ 5</text>
+<text x="400.6" y="73.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="444.6" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="444.6" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="409.9" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">max(7, 5 + 0) = 7</text>
+
+<text x="565.4" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">fits, a tie</text>
+<text x="556.1" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<text x="600.1" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">7</text>
+<text x="526.1" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+C</text>
+<text x="526.1" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+D</text>
+<rect x="534.1" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="578.1" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="578.1" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="580.1" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="600.1" y1="79" x2="600.1" y2="92" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M600.1,97 L596.9,90.5 L603.4,90.5 Z" fill="#0a7d4d"/>
+<line x1="564.5" y1="76.3" x2="587.9" y2="96.5" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M591.7,99.7 L584.7,98 L588.9,93 Z" fill="#0a7d4d"/>
+<text stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke" x="556.1" y="111" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="middle">+ 6</text>
+<text x="556.1" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="600.1" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">9</text>
+<text x="600.1" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">9</text>
+<text x="565.4" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">max(9, 6 + 3) = 9</text>
+</svg>
+<!-- /gen:dp knap-cases -->
+        </figure>
         Because <code>max</code> keeps the skip value on a tie, the cell equals
         the one above it, and the traceback below reports D as skipped and
         returns \(\{\text{B}, \text{C}\}\). The equally optimal
@@ -366,27 +442,104 @@
       </div>
       <h3>The full table</h3>
       <figure>
-        <table class="trace">
-          <tr><th class="lab">row</th><th>w=0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
-          <tr><td class="lab">{} (no items)</td>
-            <td class="cell lt">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td></tr>
-          <tr><td class="lab">+A (v3, w2)</td>
-            <td class="cell">0</td><td class="cell">0</td><td class="cell lt">3</td><td class="cell">3</td><td class="cell">3</td><td class="cell">3</td></tr>
-          <tr><td class="lab">+B (v4, w3)</td>
-            <td class="cell">0</td><td class="cell">0</td><td class="cell">3</td><td class="cell">4</td><td class="cell">4</td><td class="cell lt">7</td></tr>
-          <tr><td class="lab">+C (v5, w4)</td>
-            <td class="cell">0</td><td class="cell">0</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell lt">7</td></tr>
-          <tr><td class="lab">+D (v6, w5)</td>
-            <td class="cell">0</td><td class="cell">0</td><td class="cell">3</td><td class="cell">4</td><td class="cell">5</td><td class="cell lt piv">7</td></tr>
-        </table>
+        <!-- gen:dp knap-table -->
+<svg viewBox="0 0 552 190" role="img" style="max-width:662px" font-family="system-ui, sans-serif" aria-label="The knapsack table for items A to D at W = 5, with the traceback. columns 0, 1, 2, 3, 4, 5; rows {}: 0 0 0 0 0 0; +A (v3, w2): 0 0 3 3 3 3; +B (v4, w3): 0 0 3 4 4 7; +C (v5, w4): 0 0 3 4 5 7; +D (v6, w5): 0 0 3 4 5 7; the traceback visits (4,5), (3,5), (2,5), (1,2), (0,0).">
+<text x="87.9" y="23" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">w</text>
+<text x="112.9" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">0</text>
+<text x="146.9" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="180.9" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<text x="214.9" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">3</text>
+<text x="248.9" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">4</text>
+<text x="282.9" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">5</text>
+<text x="87.9" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">{}</text>
+<text x="87.9" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+A (v3, w2)</text>
+<text x="87.9" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+B (v4, w3)</text>
+<text x="87.9" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+C (v5, w4)</text>
+<text x="87.9" y="169" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+D (v6, w5)</text>
+<rect x="95.9" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="129.9" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="163.9" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="197.9" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="231.9" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="265.9" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.9" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="129.9" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="163.9" y="60" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="197.9" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="231.9" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="265.9" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.9" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="129.9" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="163.9" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="197.9" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="231.9" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="265.9" y="90" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.9" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="129.9" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="163.9" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="197.9" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="231.9" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="265.9" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.9" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="129.9" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="163.9" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="197.9" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="231.9" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="265.9" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.9" y="30" width="204" height="150" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="97.9" y="32" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="165.9" y="62" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="267.9" y="92" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="267.9" y="122" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="267.9" y="152" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="282.9" y1="155" x2="282.9" y2="150" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M282.9,145 L286.2,151.5 L279.7,151.5 Z" fill="#0a7d4d"/>
+<line x1="282.9" y1="125" x2="282.9" y2="120" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M282.9,115 L286.2,121.5 L279.7,121.5 Z" fill="#0a7d4d"/>
+<line x1="274.3" y1="102.5" x2="194.3" y2="78.9" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M189.5,77.5 L196.7,76.2 L194.8,82.5 Z" fill="#0a7d4d"/>
+<line x1="172.4" y1="71.2" x2="126" y2="50.8" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M121.5,48.8 L128.7,48.4 L126.1,54.4 Z" fill="#0a7d4d"/>
+<text x="112.9" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="146.9" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="180.9" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="214.9" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="248.9" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="282.9" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="112.9" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="146.9" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="180.9" y="79.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="214.9" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="248.9" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="282.9" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="112.9" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="146.9" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="180.9" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="214.9" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="248.9" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="282.9" y="109.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="112.9" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="146.9" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="180.9" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="214.9" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="248.9" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="282.9" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="112.9" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="146.9" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="180.9" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="214.9" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="248.9" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="282.9" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="313.9" y="79" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">A taken: w = 2 − 2 = 0</text>
+<text x="313.9" y="109" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">B taken: w = 5 − 3 = 2</text>
+<text x="313.9" y="139" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">C skipped (equal to the cell above)</text>
+<text x="313.9" y="169" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">D skipped (equal to the cell above)</text>
+</svg>
+<!-- /gen:dp knap-table -->
         <figcaption>
           The knapsack table for items A&ndash;D at \(W = 5\), filled row by row;
           each row adds one item. The answer is the bottom-right cell,
-          \(K[4][5] = 7\). The highlighted cells are the ones the
-          traceback below visits on its way back: \(7 \to 7 \to 7\)
-          down column \(5\) (D and C skipped; the value never changes), then
-          the jump to \(K[1][2] = 3\) when B is found taken, then \(K[0][0]\) after
-          A. Watch where the \(7\) first appears: in the +B row at \(w = 5\), the
+          \(K[4][5] = 7\). The green line is the traceback below, walking back
+          from the answer: \(7 \to 7 \to 7\) down column \(5\) (D and C
+          skipped; the value never changes), then the jump to \(K[1][2] = 3\)
+          when B is found taken, then \(K[0][0]\) after A. The filled cells are
+          the two where an item is found taken. Watch where the \(7\) first appears: in the +B row at \(w = 5\), the
           moment A\(+\)B (weight \(5\), value \(7\)) becomes available.
         </figcaption>
       </figure>
@@ -521,11 +674,17 @@ fn knapsack_items(n: usize, cap: usize, weight: &amp;[usize], k: &amp;[Vec&lt;i6
         was taken: record it and reduce the remaining capacity by its weight. On the
         table above:
       </p>
-      <pre>  K[4][5]=7 == K[3][5]=7  &rarr;  D skipped     (w stays 5)
-  K[3][5]=7 == K[2][5]=7  &rarr;  C skipped     (w stays 5)
-  K[2][5]=7 != K[1][5]=3  &rarr;  B TAKEN       (w = 5 &minus; 3 = 2)
-  K[1][2]=3 != K[0][2]=0  &rarr;  A TAKEN       (w = 2 &minus; 2 = 0)
-  &rarr;  items {A, B}, value 7</pre>
+      <table class="trace">
+        <tr><th class="lab">step</th><th>compare with the cell above</th><th>verdict</th><th>capacity left</th></tr>
+        <tr><td class="lab">1</td><td class="cell">\(K[4][5] = 7 = K[3][5]\)</td><td>D skipped</td><td class="cell">\(w = 5\)</td></tr>
+        <tr><td class="lab">2</td><td class="cell">\(K[3][5] = 7 = K[2][5]\)</td><td>C skipped</td><td class="cell">\(w = 5\)</td></tr>
+        <tr><td class="lab">3</td><td class="cell">\(K[2][5] = 7 \ne K[1][5] = 3\)</td><td class="lt">B taken</td><td class="cell">\(w = 5 - 3 = 2\)</td></tr>
+        <tr><td class="lab">4</td><td class="cell">\(K[1][2] = 3 \ne K[0][2] = 0\)</td><td class="lt">A taken</td><td class="cell">\(w = 2 - 2 = 0\)</td></tr>
+      </table>
+      <p>
+        The walk ends in row \(0\) with items \(\{\text{A}, \text{B}\}\),
+        value \(7\).
+      </p>
       <div class="thm">
         <span class="tag">Proposition (knapsack cost)</span>
         The table has \((n+1)(W+1)\) cells, each filled in \(O(1)\), so the DP runs
@@ -657,11 +816,100 @@ fn knapsack_items(n: usize, cap: usize, weight: &amp;[usize], k: &amp;[Vec&lt;i6
           taken, and show that greedy-by-ratio fails on this instance.
           <details>
             <summary>solution</summary>
-            <pre>  w:      0  1  2  3  4  5  6  7
-  {}      0  0  0  0  0  0  0  0
-  +X      0  0  0  4  4  4  4  4
-  +Y      0  0  0  4  5  5  5  9
-  +Z      0  0  0  4  5  7  7  9</pre>
+            <figure>
+<!-- gen:dp knap-xyz -->
+<svg viewBox="0 0 559 160" role="img" style="max-width:671px" font-family="system-ui, sans-serif" aria-label="The knapsack table for X (value 4, weight 3), Y (5, 4), Z (7, 5) at W = 7, with the traceback. columns 0, 1, 2, 3, 4, 5, 6, 7; rows {}: 0 0 0 0 0 0 0 0; +X: 0 0 0 4 4 4 4 4; +Y: 0 0 0 4 5 5 5 9; +Z: 0 0 0 4 5 7 7 9; the traceback visits (3,7), (2,7), (1,3), (0,0).">
+<text x="27.4" y="23" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">w</text>
+<text x="52.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">0</text>
+<text x="86.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="120.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<text x="154.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">3</text>
+<text x="188.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">4</text>
+<text x="222.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">5</text>
+<text x="256.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">6</text>
+<text x="290.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">7</text>
+<text x="27.4" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">{}</text>
+<text x="27.4" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+X</text>
+<text x="27.4" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+Y</text>
+<text x="27.4" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">+Z</text>
+<rect x="35.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="273.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="60" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="273.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="273.4" y="90" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="205.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="239.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="273.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="30" width="272" height="120" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="37.4" y="32" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="139.4" y="62" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="275.4" y="92" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="275.4" y="122" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="290.4" y1="125" x2="290.4" y2="120" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M290.4,115 L293.7,121.5 L287.2,121.5 Z" fill="#0a7d4d"/>
+<line x1="281.8" y1="103.1" x2="167.9" y2="78" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M163.1,76.9 L170.1,75.1 L168.7,81.5 Z" fill="#0a7d4d"/>
+<line x1="145.8" y1="72.5" x2="65.8" y2="48.9" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M61,47.5 L68.2,46.2 L66.4,52.5 Z" fill="#0a7d4d"/>
+<text x="52.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="188.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="222.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="256.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="290.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="52.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.4" y="79.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="188.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="222.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="256.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="290.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="52.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="188.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="222.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="256.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="290.4" y="109.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">9</text>
+<text x="52.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">4</text>
+<text x="188.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">5</text>
+<text x="222.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="256.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">7</text>
+<text x="290.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">9</text>
+<text x="321.4" y="79" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">X taken: w = 3 − 3 = 0</text>
+<text x="321.4" y="109" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">Y taken: w = 7 − 4 = 3</text>
+<text x="321.4" y="139" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">Z skipped (equal to the cell above)</text>
+</svg>
+<!-- /gen:dp knap-xyz -->
+            </figure>
             \(K[3][7] = 9\). Traceback: \(K[3][7] = 9 = K[2][7]\) &rarr; Z skipped;
             \(K[2][7] = 9 \ne K[1][7] = 4\) &rarr; Y taken (\(w = 7-4 = 3\));
             \(K[1][3] = 4 \ne K[0][3] = 0\) &rarr; X taken (\(w = 0\)). Items
@@ -696,7 +944,7 @@ fn knapsack_items(n: usize, cap: usize, weight: &amp;[usize], k: &amp;[Vec&lt;i6
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; 0/1 Knapsack v1.0
+        Data Structures &amp; Algorithms &middot; 0/1 Knapsack v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
         interactive demos in the course library.
       </footer>

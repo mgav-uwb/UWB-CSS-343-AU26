@@ -126,7 +126,7 @@
       </p>
       <h1>Matrix-Chain Multiplication</h1>
       <blockquote class="epigraph fact">
-        The standard dynamic program takes Θ(n³) time. T. C. Hu and M. T. Shing found an O(n log n) algorithm in the early 1980s by recasting the problem as cutting a polygon into triangles.
+        The standard dynamic program takes \(\Theta(n^3)\) time. T. C. Hu and M. T. Shing found an \(O(n \log n)\) algorithm in the early 1980s by recasting the problem as cutting a polygon into triangles.
         <cite>T. C. Hu and M. T. Shing, “Computation of Matrix Chain Products,” SIAM J. Computing 11 (1982) and 13 (1984)</cite>
       </blockquote>
 
@@ -182,11 +182,14 @@
       <div class="ex">
         <span class="tag">Example (three matrices, two orders)</span>
         \(A\ (10{\times}30)\), \(B\ (30{\times}5)\), \(C\ (5{\times}60)\).
-        <pre>  (AB)C :  AB costs 10&middot;30&middot;5 = 1500, giving 10&times;5;  (AB)C costs 10&middot;5&middot;60  =  3000
-           total  1500 +  3000 =   4,500
-
-  A(BC) :  BC costs 30&middot;5&middot;60 = 9000, giving 30&times;60; A(BC) costs 10&middot;30&middot;60 = 18000
-           total  9000 + 18000 =  27,000      6&times; worse</pre>
+        \[
+          \begin{aligned}
+            (AB)C &amp;:\quad AB \text{ costs } 10\cdot 30\cdot 5 = 1500, \text{ giving } 10\times 5;\\
+            &amp;\phantom{:}\quad (AB)C \text{ costs } 10\cdot 5\cdot 60 = 3000; \text{ total } 1500 + 3000 = 4500\\[6pt]
+            A(BC) &amp;:\quad BC \text{ costs } 30\cdot 5\cdot 60 = 9000, \text{ giving } 30\times 60;\\
+            &amp;\phantom{:}\quad A(BC) \text{ costs } 10\cdot 30\cdot 60 = 18000; \text{ total } 9000 + 18000 = 27000, \text{ six times as many}
+          \end{aligned}
+        \]
         Both compute the same \(10 \times 60\) matrix. The difference is that
         \((AB)C\) squeezes the chain down to \(10 \times 5\) before touching the
         wide \(C\), while \(A(BC)\) first inflates the middle to \(30 \times 60\)
@@ -204,11 +207,11 @@
       </div>
       <table class="trace">
         <tr><th>parenthesization</th><th>arithmetic</th><th>total</th></tr>
-        <tr><td class="cell">((A1(A2A3))A4)</td><td class="cell">4&middot;6&middot;2 + 5&middot;4&middot;2 + 5&middot;2&middot;7 = 48 + 40 + 70</td><td class="cell lt">158</td></tr>
-        <tr><td class="cell">(A1((A2A3)A4))</td><td class="cell">4&middot;6&middot;2 + 4&middot;2&middot;7 + 5&middot;4&middot;7 = 48 + 56 + 140</td><td class="cell">244</td></tr>
-        <tr><td class="cell">(((A1A2)A3)A4)</td><td class="cell">5&middot;4&middot;6 + 5&middot;6&middot;2 + 5&middot;2&middot;7 = 120 + 60 + 70</td><td class="cell">250</td></tr>
-        <tr><td class="cell">(A1(A2(A3A4)))</td><td class="cell">6&middot;2&middot;7 + 4&middot;6&middot;7 + 5&middot;4&middot;7 = 84 + 168 + 140</td><td class="cell">392</td></tr>
-        <tr><td class="cell">((A1A2)(A3A4))</td><td class="cell">5&middot;4&middot;6 + 6&middot;2&middot;7 + 5&middot;6&middot;7 = 120 + 84 + 210</td><td class="cell piv">414</td></tr>
+        <tr><td class="cell">\(((A_1(A_2A_3))A_4)\)</td><td class="cell">\(4\cdot 6\cdot 2 + 5\cdot 4\cdot 2 + 5\cdot 2\cdot 7 = 48 + 40 + 70\)</td><td class="cell lt">158</td></tr>
+        <tr><td class="cell">\((A_1((A_2A_3)A_4))\)</td><td class="cell">\(4\cdot 6\cdot 2 + 4\cdot 2\cdot 7 + 5\cdot 4\cdot 7 = 48 + 56 + 140\)</td><td class="cell">244</td></tr>
+        <tr><td class="cell">\((((A_1A_2)A_3)A_4)\)</td><td class="cell">\(5\cdot 4\cdot 6 + 5\cdot 6\cdot 2 + 5\cdot 2\cdot 7 = 120 + 60 + 70\)</td><td class="cell">250</td></tr>
+        <tr><td class="cell">\((A_1(A_2(A_3A_4)))\)</td><td class="cell">\(6\cdot 2\cdot 7 + 4\cdot 6\cdot 7 + 5\cdot 4\cdot 7 = 84 + 168 + 140\)</td><td class="cell">392</td></tr>
+        <tr><td class="cell">\(((A_1A_2)(A_3A_4))\)</td><td class="cell">\(5\cdot 4\cdot 6 + 6\cdot 2\cdot 7 + 5\cdot 6\cdot 7 = 120 + 84 + 210\)</td><td class="cell piv">414</td></tr>
       </table>
       <p>
         The best order costs \(158\) and the worst \(414\), a factor of
@@ -493,9 +496,9 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
       </p>
       <table class="trace">
         <tr><th class="lab">cell</th><th>only candidate \(k\)</th><th>\(m\)</th><th>\(s\)</th></tr>
-        <tr><td class="lab">m[1][2]</td><td class="cell">k=1: \(0 + 0 + p_0p_1p_2 = 5{\cdot}4{\cdot}6 = 120\)</td><td class="cell lt">120</td><td class="cell">1</td></tr>
-        <tr><td class="lab">m[2][3]</td><td class="cell">k=2: \(0 + 0 + p_1p_2p_3 = 4{\cdot}6{\cdot}2 = 48\)</td><td class="cell lt">48</td><td class="cell">2</td></tr>
-        <tr><td class="lab">m[3][4]</td><td class="cell">k=3: \(0 + 0 + p_2p_3p_4 = 6{\cdot}2{\cdot}7 = 84\)</td><td class="cell lt">84</td><td class="cell">3</td></tr>
+        <tr><td class="lab">m[1][2]</td><td class="cell">\(k=1\): \(0 + 0 + p_0p_1p_2 = 5{\cdot}4{\cdot}6 = 120\)</td><td class="cell lt">120</td><td class="cell">1</td></tr>
+        <tr><td class="lab">m[2][3]</td><td class="cell">\(k=2\): \(0 + 0 + p_1p_2p_3 = 4{\cdot}6{\cdot}2 = 48\)</td><td class="cell lt">48</td><td class="cell">2</td></tr>
+        <tr><td class="lab">m[3][4]</td><td class="cell">\(k=3\): \(0 + 0 + p_2p_3p_4 = 6{\cdot}2{\cdot}7 = 84\)</td><td class="cell lt">84</td><td class="cell">3</td></tr>
       </table>
       <h3>Diagonal \(L = 3\): the first real competitions</h3>
       <div class="ex">
@@ -554,13 +557,45 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
         the lower triangle is unused. Read it outward from the diagonal, the
         order it was filled.
       </p>
-      <table class="trace">
-        <tr><th class="lab">\(m[i][j]\)</th><th>j=1</th><th>j=2</th><th>j=3</th><th>j=4</th></tr>
-        <tr><td class="lab">i=1</td><td class="cell">0</td><td class="cell">120</td><td class="cell">88</td><td class="cell lt">158</td></tr>
-        <tr><td class="lab">i=2</td><td class="cell">&middot;</td><td class="cell">0</td><td class="cell">48</td><td class="cell">104</td></tr>
-        <tr><td class="lab">i=3</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">0</td><td class="cell">84</td></tr>
-        <tr><td class="lab">i=4</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">0</td></tr>
-      </table>
+      <figure>
+<!-- gen:dp mc-m -->
+<svg viewBox="0 0 272 188" role="img" style="max-width:326px" font-family="system-ui, sans-serif" aria-label="The matrix-chain cost table for p = (5, 4, 6, 2, 7), upper triangle only, rows i, columns j: 0 120 88 158; 0 48 104; 0 84; 0. The diagonals are shaded by range length L = j - i + 1, the order they are filled: L = 1 (the zeros), L = 2, 3, then the answer m[1][4] = 158.">
+<text x="65.1" y="23" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">m[i][j]</text>
+<text x="96.1" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">j = 1</text>
+<text x="142.1" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">j = 2</text>
+<text x="188.1" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">j = 3</text>
+<text x="234.1" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">j = 4</text>
+<text x="65.1" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i = 1</text>
+<text x="65.1" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i = 2</text>
+<text x="65.1" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i = 3</text>
+<text x="65.1" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i = 4</text>
+<rect x="73.1" y="30" width="46" height="30" fill="#f1f3f7" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="119.1" y="30" width="46" height="30" fill="#e4eefa" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="165.1" y="30" width="46" height="30" fill="#d2e3f6" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211.1" y="30" width="46" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="119.1" y="60" width="46" height="30" fill="#f1f3f7" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="165.1" y="60" width="46" height="30" fill="#e4eefa" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211.1" y="60" width="46" height="30" fill="#d2e3f6" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="165.1" y="90" width="46" height="30" fill="#f1f3f7" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211.1" y="90" width="46" height="30" fill="#e4eefa" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="211.1" y="120" width="46" height="30" fill="#f1f3f7" stroke="#c8ccd6" stroke-width="1"/>
+<text x="96.1" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="142.1" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">120</text>
+<text x="188.1" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">88</text>
+<text x="234.1" y="49.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">158</text>
+<text x="142.1" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="188.1" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">48</text>
+<text x="234.1" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">104</text>
+<text x="188.1" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="234.1" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">84</text>
+<text x="234.1" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<rect x="10" y="163" width="14" height="12" rx="2" fill="#f1f3f7" stroke="#c8ccd6" stroke-width="1"/><text x="30" y="173" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">L = 1</text>
+<rect x="76.8" y="163" width="14" height="12" rx="2" fill="#e4eefa" stroke="#c8ccd6" stroke-width="1"/><text x="96.8" y="173" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">L = 2</text>
+<rect x="143.6" y="163" width="14" height="12" rx="2" fill="#d2e3f6" stroke="#c8ccd6" stroke-width="1"/><text x="163.6" y="173" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">L = 3</text>
+<rect x="210.4" y="163" width="14" height="12" rx="2" fill="#bfd6f1" stroke="#c8ccd6" stroke-width="1"/><text x="230.4" y="173" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">L = 4</text>
+</svg>
+<!-- /gen:dp mc-m -->
+      </figure>
       <p>
         Six cells were computed (the four base cases were written), from ten
         candidate evaluations in all: \(1 + 1 + 1\) on the \(L = 2\) diagonal,
@@ -577,12 +612,62 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
         assignment inside the <code>if</code>: \(s[i][j]\) is the \(k\) that won
         the minimum for \([i, j]\).
       </p>
-      <table class="trace">
-        <tr><th class="lab">\(s[i][j]\)</th><th>j=2</th><th>j=3</th><th>j=4</th></tr>
-        <tr><td class="lab">i=1</td><td class="cell">1</td><td class="cell">1</td><td class="cell lt">3</td></tr>
-        <tr><td class="lab">i=2</td><td class="cell">&middot;</td><td class="cell">2</td><td class="cell">3</td></tr>
-        <tr><td class="lab">i=3</td><td class="cell">&middot;</td><td class="cell">&middot;</td><td class="cell">3</td></tr>
-      </table>
+      <figure>
+<!-- gen:dp mc-s -->
+<svg viewBox="0 0 462 246" role="img" style="max-width:554px" font-family="system-ui, sans-serif" aria-label="The split table s for p = (5, 4, 6, 2, 7): 1 1 3; 2 3; 3; shaded, the cells the traceback reads: s[1][4] = 3, s[1][3] = 1, s[2][3] = 2. The bracketing tree: [1, 4]  k = 3 m = 158 at the root; [1, 4]  k = 3 m = 158 calls [1, 3]  k = 1 m = 88 and A4 2×7; [1, 3]  k = 1 m = 88 calls A1 5×4 and [2, 3]  k = 2 m = 48; [2, 3]  k = 2 m = 48 calls A2 4×6 and A3 6×2. The bracketing ((A1(A2A3))A4) costs 48 + 40 + 70 = 158.">
+<text x="99.5" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">the split table</text>
+<text x="61" y="43" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">s[i][j]</text>
+<text x="89" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">j = 2</text>
+<text x="129" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">j = 3</text>
+<text x="169" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">j = 4</text>
+<text x="61" y="69" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i = 1</text>
+<text x="61" y="99" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i = 2</text>
+<text x="61" y="129" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">i = 3</text>
+<rect x="69" y="50" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="50" width="40" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="149" y="50" width="40" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="109" y="80" width="40" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="149" y="80" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="149" y="110" width="40" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<text x="89" y="69.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="129" y="69.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="169" y="69.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="129" y="99.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="169" y="99.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+<text x="169" y="129.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+
+<text x="340.5" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">the bracketing it encodes</text>
+<line x1="340.5" y1="168" x2="317.5" y2="180" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="340.5" y1="168" x2="363.5" y2="180" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="300.3" y1="118" x2="260" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="300.3" y1="118" x2="340.5" y2="130" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="360.6" y1="68" x2="300.3" y2="80" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="360.6" y1="68" x2="421" y2="80" stroke="#4a5163" stroke-width="1.4"/>
+<rect x="242" y="130" width="36" height="38" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="260" y="145.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">A<tspan dy="4" font-size="9">1</tspan></text>
+<text x="260" y="160.5" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">5×4</text>
+<rect x="299.5" y="180" width="36" height="38" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="317.5" y="195.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">A<tspan dy="4" font-size="9">2</tspan></text>
+<text x="317.5" y="210.5" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">4×6</text>
+<rect x="345.5" y="180" width="36" height="38" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="363.5" y="195.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">A<tspan dy="4" font-size="9">3</tspan></text>
+<text x="363.5" y="210.5" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">6×2</text>
+<rect x="288" y="130" width="105" height="38" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/>
+<text x="340.5" y="145.5" font-size="12.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">[2, 3]  k = 2</text>
+<text x="340.5" y="160.5" font-size="11.5" font-weight="400" fill="#0a7d4d" text-anchor="middle">m = 48</text>
+<rect x="247.8" y="80" width="105" height="38" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/>
+<text x="300.3" y="95.5" font-size="12.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">[1, 3]  k = 1</text>
+<text x="300.3" y="110.5" font-size="11.5" font-weight="400" fill="#0a7d4d" text-anchor="middle">m = 88</text>
+<rect x="403" y="80" width="36" height="38" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="421" y="95.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">A<tspan dy="4" font-size="9">4</tspan></text>
+<text x="421" y="110.5" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">2×7</text>
+<rect x="308.1" y="30" width="105" height="38" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/>
+<text x="360.6" y="45.5" font-size="12.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">[1, 4]  k = 3</text>
+<text x="360.6" y="60.5" font-size="11.5" font-weight="400" fill="#0a7d4d" text-anchor="middle">m = 158</text>
+<text x="340.5" y="232" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">((A1(A2A3))A4), 48 + 40 + 70 = 158</text>
+</svg>
+<!-- /gen:dp mc-s -->
+      </figure>
       <p>
         The traceback is the recursion <code>parens</code>: at a range
         \([i, j]\) with \(i &lt; j\), read \(k = s[i][j]\), print an open
@@ -605,10 +690,14 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
       <div class="ex">
         <span class="tag">Example (checking the reconstruction against the price)</span>
         Execute \(((A_1(A_2A_3))A_4)\) and add up the bill:
-        <pre>  A2A3           :  4&middot;6&middot;2 =  48    giving 4&times;2
-  A1(A2A3)       :  5&middot;4&middot;2 =  40    giving 5&times;2
-  (A1(A2A3))A4   :  5&middot;2&middot;7 =  70    giving 5&times;7
-                    total  = 158</pre>
+        \[
+          \begin{aligned}
+            A_2A_3 &amp;:\quad 4\cdot 6\cdot 2 = 48, &amp;&amp;\text{giving } 4\times 2\\
+            A_1(A_2A_3) &amp;:\quad 5\cdot 4\cdot 2 = 40, &amp;&amp;\text{giving } 5\times 2\\
+            (A_1(A_2A_3))A_4 &amp;:\quad 5\cdot 2\cdot 7 = 70, &amp;&amp;\text{giving } 5\times 7\\
+            &amp;\phantom{:}\quad \text{total } 48 + 40 + 70 = 158
+          \end{aligned}
+        \]
         Which matches \(m[1][4] = 158\) and matches the first row of the
         enumeration in &sect;1, confirming the DP found the true minimum over all
         five bracketings and not merely a good one.
@@ -648,10 +737,12 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
         splits, and there are \(n - L + 1\) ranges of length \(L\), so the total
         is
         \[
-          T(n) \;=\; \sum_{L=2}^{n} (n - L + 1)(L - 1)
-          \;=\; \sum_{d=1}^{n-1} (n - d)\,d
-          \;=\; n\!\cdot\!\frac{(n-1)n}{2} - \frac{(n-1)n(2n-1)}{6}
-          \;=\; \frac{n^3 - n}{6},
+          \begin{aligned}
+            T(n) &amp;= \sum_{L=2}^{n} (n - L + 1)(L - 1)
+              = \sum_{d=1}^{n-1} (n - d)\,d\\
+            &amp;= n\cdot\frac{(n-1)n}{2} - \frac{(n-1)n(2n-1)}{6}
+              = \frac{n^3 - n}{6},
+          \end{aligned}
         \]
         substituting \(d = L - 1\). Equivalently
         \(T(n) = \binom{n+1}{3}\), the number of ways to choose the triple.
@@ -767,9 +858,14 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
             \(m[2][4] = \min(k{=}2: 0 + 120 + 3{\cdot}6{\cdot}5 = 210,\;
             k{=}3: 72 + 0 + 3{\cdot}4{\cdot}5 = 132) = 132\), \(s[2][4] = 3\).
             <br />\(L = 4\):
-            \(m[1][4] = \min(k{=}1: 0 + 132 + 2{\cdot}3{\cdot}5 = 162,\;
-            k{=}2: 36 + 120 + 2{\cdot}6{\cdot}5 = 216,\;
-            k{=}3: 84 + 0 + 2{\cdot}4{\cdot}5 = 124) = 124\), \(s[1][4] = 3\).
+            \[
+              \begin{aligned}
+                m[1][4] = \min\bigl(&amp;k{=}1{:}\ 0 + 132 + 2{\cdot}3{\cdot}5 = 162,\\
+                &amp;k{=}2{:}\ 36 + 120 + 2{\cdot}6{\cdot}5 = 216,\\
+                &amp;k{=}3{:}\ 84 + 0 + 2{\cdot}4{\cdot}5 = 124\bigr) = 124
+              \end{aligned}
+            \]
+            so \(s[1][4] = 3\).
             <br />Traceback: \(s[1][4] = 3\) gives \(([1,3])(A_4)\);
             \(s[1][3] = 2\) gives \(([1,2])(A_3)\); \(s[1][2] = 1\) gives
             \(A_1A_2\). Result \((((A_1A_2)A_3)A_4)\), the fully
@@ -802,9 +898,14 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
             48 + 0 + 6{\cdot}8{\cdot}7 = 384) = 98\) at \(k = 1\);
             \(m[2][4] = \min(0 + 280 + 1{\cdot}8{\cdot}5 = 320,\;
             56 + 0 + 1{\cdot}7{\cdot}5 = 91) = 91\) at \(k = 3\).
-            \(L = 4\): \(m[1][4] = \min(k{=}1: 0 + 91 + 6{\cdot}1{\cdot}5 = 121,\;
-            k{=}2: 48 + 280 + 6{\cdot}8{\cdot}5 = 568,\;
-            k{=}3: 98 + 0 + 6{\cdot}7{\cdot}5 = 308) = 121\) at \(k = 1\),
+            \(L = 4\): \[
+              \begin{aligned}
+                m[1][4] = \min\bigl(&amp;k{=}1{:}\ 0 + 91 + 6{\cdot}1{\cdot}5 = 121,\\
+                &amp;k{=}2{:}\ 48 + 280 + 6{\cdot}8{\cdot}5 = 568,\\
+                &amp;k{=}3{:}\ 98 + 0 + 6{\cdot}7{\cdot}5 = 308\bigr) = 121
+              \end{aligned}
+            \]
+             at \(k = 1\),
             giving \((A_1((A_2A_3)A_4))\), cost
             \(1{\cdot}8{\cdot}7 + 1{\cdot}7{\cdot}5 + 6{\cdot}1{\cdot}5 = 56 +
             35 + 30 = 121\).
@@ -837,13 +938,23 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
             <br />\(L = 2\): \(m[4][5] = 2{\cdot}7{\cdot}3 = 42\), \(s = 4\).
             <br />\(L = 3\): \(m[3][5] = \min(k{=}3: 0 + 42 + 6{\cdot}2{\cdot}3
             = 78,\; k{=}4: 84 + 0 + 6{\cdot}7{\cdot}3 = 210) = 78\), \(s = 3\).
-            <br />\(L = 4\): \(m[2][5] = \min(k{=}2: 0 + 78 + 4{\cdot}6{\cdot}3
-            = 150,\; k{=}3: 48 + 42 + 4{\cdot}2{\cdot}3 = 114,\;
-            k{=}4: 104 + 0 + 4{\cdot}7{\cdot}3 = 188) = 114\), \(s = 3\).
-            <br />\(L = 5\): \(m[1][5] = \min(k{=}1: 0 + 114 + 5{\cdot}4{\cdot}3
-            = 174,\; k{=}2: 120 + 78 + 5{\cdot}6{\cdot}3 = 288,\;
-            k{=}3: 88 + 42 + 5{\cdot}2{\cdot}3 = 160,\;
-            k{=}4: 158 + 0 + 5{\cdot}7{\cdot}3 = 263) = 160\), \(s[1][5] = 3\).
+            <br />\(L = 4\): \[
+              \begin{aligned}
+                m[2][5] = \min\bigl(&amp;k{=}2{:}\ 0 + 78 + 4{\cdot}6{\cdot}3 = 150,\\
+                &amp;k{=}3{:}\ 48 + 42 + 4{\cdot}2{\cdot}3 = 114,\\
+                &amp;k{=}4{:}\ 104 + 0 + 4{\cdot}7{\cdot}3 = 188\bigr) = 114
+              \end{aligned}
+            \]
+            so \(s = 3\).
+            <br />\(L = 5\): \[
+              \begin{aligned}
+                m[1][5] = \min\bigl(&amp;k{=}1{:}\ 0 + 114 + 5{\cdot}4{\cdot}3 = 174,\\
+                &amp;k{=}2{:}\ 120 + 78 + 5{\cdot}6{\cdot}3 = 288,\\
+                &amp;k{=}3{:}\ 88 + 42 + 5{\cdot}2{\cdot}3 = 160,\\
+                &amp;k{=}4{:}\ 158 + 0 + 5{\cdot}7{\cdot}3 = 263\bigr) = 160
+              \end{aligned}
+            \]
+            so \(s[1][5] = 3\).
             <br />Traceback: \(s[1][5] = 3\) splits into \([1,3]\) and
             \([4,5]\); \(s[1][3] = 1\) gives \((A_1(A_2A_3))\);
             \(s[4][5] = 4\) gives \((A_4A_5)\). Result
@@ -878,9 +989,14 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
             \(L = 2\) is unchanged (single candidates): \(120, 48, 84\).
             \(L = 3\): \(M[1][3] = \max(88, 180) = 180\) at \(k = 2\);
             \(M[2][4] = \max(252, 104) = 252\) at \(k = 2\).
-            \(L = 4\): \(M[1][4] = \max(k{=}1: 0 + 252 + 140 = 392,\;
-            k{=}2: 120 + 84 + 210 = 414,\;
-            k{=}3: 180 + 0 + 70 = 250) = 414\) at \(k = 2\), giving
+            \(L = 4\): \[
+              \begin{aligned}
+                M[1][4] = \max\bigl(&amp;k{=}1{:}\ 0 + 252 + 140 = 392,\\
+                &amp;k{=}2{:}\ 120 + 84 + 210 = 414,\\
+                &amp;k{=}3{:}\ 180 + 0 + 70 = 250\bigr) = 414
+              \end{aligned}
+            \]
+             at \(k = 2\), giving
             \(((A_1A_2)(A_3A_4))\).
             That is exactly the worst row of the &sect;1 enumeration, and the
             three candidate totals \(392, 414, 250\) are the three worst
@@ -925,7 +1041,7 @@ fn parens(s: &amp;[Vec&lt;usize&gt;], i: usize, j: usize) -&gt; String {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Matrix-Chain Multiplication v1.0
+        Data Structures &amp; Algorithms &middot; Matrix-Chain Multiplication v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
         interactive demos in the course library.
       </footer>

@@ -292,11 +292,56 @@
         <strong>Memoization</strong> keeps the natural recursion and adds a
         <strong>cache</strong>: before computing, check whether the answer is
         already stored; after computing, store it.
-        <pre>  solve(x):
-      if x in memo: return memo[x]      <span class="cm">// remember</span>
-      result = ... solve(smaller) ...   <span class="cm">// the natural recursion</span>
-      memo[x] = result
-      return result</pre>
+        <div class="code-tabs" data-snippet="dp/memo-shape">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Memoization: the natural recursion plus a cache, checked first and written
+// last. isBase, baseValue and combine are the problem&#x27;s own; combine calls
+// solve on smaller subproblems.
+long solve(int x, map&lt;int, long&gt;&amp; memo) {
+    if (isBase(x)) return baseValue(x);
+    if (memo.count(x)) return memo[x];    // remember: a cache hit
+    long result = combine(x, memo);       // the natural recursion
+    memo[x] = result;                     // stored for every later caller
+    return result;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Memoization: the natural recursion plus a cache, checked first and written
+// last. isBase, baseValue and combine are the problem&#x27;s own; combine calls
+// solve on smaller subproblems.
+static long solve(int x, Map&lt;Integer, Long&gt; memo) {
+    if (isBase(x)) return baseValue(x);
+    if (memo.containsKey(x)) return memo.get(x);   // remember: a cache hit
+    long result = combine(x, memo);                // the natural recursion
+    memo.put(x, result);                           // stored for every later caller
+    return result;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Memoization: the natural recursion plus a cache, checked first and written
+# last. is_base, base_value and combine are the problem&#x27;s own; combine calls
+# solve on smaller subproblems.
+def solve(x, memo):
+    if is_base(x):
+        return base_value(x)
+    if x in memo:                         # remember: a cache hit
+        return memo[x]
+    result = combine(x, memo)             # the natural recursion
+    memo[x] = result                      # stored for every later caller
+    return result</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Memoization: the natural recursion plus a cache, checked first and written
+// last. is_base, base_value and combine are the problem&#x27;s own; combine calls
+// solve on smaller subproblems.
+fn solve(x: usize, memo: &amp;mut HashMap&lt;usize, i64&gt;) -&gt; i64 {
+    if is_base(x) { return base_value(x); }
+    if memo.contains_key(&amp;x) { return memo[&amp;x]; }  // remember: a cache hit
+    let result = combine(x, memo);                 // the natural recursion
+    memo.insert(x, result);                        // stored for every later caller
+    result
+}</pre>
+<p class="ct-src">source: <code>code/dp/memo-shape.cpp &middot; code/dp/memo-shape.java &middot; code/dp/memo-shape.py &middot; code/dp/memo-shape.rs</code></p>
+<!--/ct--></div>
         The recursion tree is unchanged, but each distinct node is computed once;
         every repeat is an \(O(1)\) cache hit that cuts off a whole subtree.
       </div>
@@ -305,9 +350,58 @@
         <strong>Tabulation</strong> replaces the recursion with a loop that fills a
         <strong>table</strong> of subproblem answers in <strong>dependency
         order</strong>, smallest subproblems first:
-        <pre>  for subproblems from SMALLEST to largest:
-      table[x] = ... table[smaller] ...   <span class="cm">// already computed</span>
-  return table[goal]</pre>
+        <div class="code-tabs" data-snippet="dp/tab-shape">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Tabulation: fill the table smallest subproblem first, so every cell the
+// recurrence reads is already written. combineFrom reads only smaller x.
+long solveTable(int goal) {
+    vector&lt;long&gt; table(goal + 1);
+    for (int x = 0; x &lt;= goal; x++) {
+        if (isBase(x)) table[x] = baseValue(x);
+        else table[x] = combineFrom(table, x);   // its inputs are filled
+    }
+    return table[goal];
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Tabulation: fill the table smallest subproblem first, so every cell the
+// recurrence reads is already written. combineFrom reads only smaller x.
+static long solveTable(int goal) {
+    long[] table = new long[goal + 1];
+    for (int x = 0; x &lt;= goal; x++) {
+        if (isBase(x)) table[x] = baseValue(x);
+        else table[x] = combineFrom(table, x);   // its inputs are filled
+    }
+    return table[goal];
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Tabulation: fill the table smallest subproblem first, so every cell the
+# recurrence reads is already written. combine_from reads only smaller x.
+def solve_table(goal):
+    table = [0] * (goal + 1)
+    for x in range(goal + 1):
+        if is_base(x):
+            table[x] = base_value(x)
+        else:
+            table[x] = combine_from(table, x)   # its inputs are filled
+    return table[goal]</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Tabulation: fill the table smallest subproblem first, so every cell the
+// recurrence reads is already written. combine_from reads only smaller x.
+fn solve_table(goal: usize) -&gt; i64 {
+    let mut table = vec![0i64; goal + 1];
+    for x in 0..=goal {
+        if is_base(x) {
+            table[x] = base_value(x);
+        } else {
+            table[x] = combine_from(&amp;table, x);    // its inputs are filled
+        }
+    }
+    table[goal]
+}</pre>
+<p class="ct-src">source: <code>code/dp/tab-shape.cpp &middot; code/dp/tab-shape.java &middot; code/dp/tab-shape.py &middot; code/dp/tab-shape.rs</code></p>
+<!--/ct--></div>
         No recursion and no call stack, but <em>you</em> must work out an
         evaluation order in which every cell&rsquo;s dependencies are filled before
         the cell itself, whereas memoization discovers that order automatically.
@@ -500,77 +594,101 @@
         idea, because the naive recursion is obviously correct and spectacularly
         wasteful. Straight from the definition:
       </p>
-      <pre>  long fib(int n) {
-      if (n &lt; 2) return n;              <span class="cm">// fib(0) = 0, fib(1) = 1</span>
-      return fib(n - 1) + fib(n - 2);
-  }</pre>
+      <div class="code-tabs" data-snippet="dp/fib_naive">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Naive Fibonacci, straight from the definition: correct, but every call
+// solves its subproblems from scratch. 2 fib(n+1) - 1 calls, Theta(phi^n).
+long fib(int n) {
+    if (n &lt; 2) return n;                  // base cases: fib(0)=0, fib(1)=1
+    return fib(n - 1) + fib(n - 2);       // both solved again, every time
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Naive Fibonacci, straight from the definition: correct, but every call
+// solves its subproblems from scratch. 2 fib(n+1) - 1 calls, Theta(phi^n).
+static long fib(int n) {
+    if (n &lt; 2) return n;                  // base cases: fib(0)=0, fib(1)=1
+    return fib(n - 1) + fib(n - 2);       // both solved again, every time
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Naive Fibonacci, straight from the definition: correct, but every call
+# solves its subproblems from scratch. 2 fib(n+1) - 1 calls, Theta(phi^n).
+def fib(n):
+    if n &lt; 2:                             # base cases: fib(0)=0, fib(1)=1
+        return n
+    return fib(n - 1) + fib(n - 2)        # both solved again, every time</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Naive Fibonacci, straight from the definition: correct, but every call
+// solves its subproblems from scratch. 2 fib(n+1) - 1 calls, Theta(phi^n).
+fn fib(n: u64) -&gt; u64 {
+    if n &lt; 2 { return n; }                // base cases: fib(0)=0, fib(1)=1
+    fib(n - 1) + fib(n - 2)               // both solved again, every time
+}</pre>
+<p class="ct-src">source: <code>code/dp/fib_naive.cpp &middot; code/dp/fib_naive.java &middot; code/dp/fib_naive.py &middot; code/dp/fib_naive.rs</code></p>
+<!--/ct--></div>
       <p>
         Correct, but trace the calls for \(n = 5\) and the overlap is
         everywhere:
       </p>
       <figure>
-        <svg viewBox="0 0 470 268" role="img" aria-label="The call tree of naive fib(5): fifteen nodes in five levels. The root f(5) calls f(4) and f(3); f(4) calls f(3) and f(2); each f(3) calls f(2) and f(1); each f(2) calls f(1) and f(0). The two f(3) nodes are shaded blue and the three f(2) nodes are shaded orange to show the repeats: fib(3) is computed twice and fib(2) three times, though only six distinct subproblems f(0) through f(5) exist among the fifteen calls.">
-          <g stroke="#b9c0d0" stroke-width="1.4" fill="none">
-            <line x1="230" y1="42" x2="130" y2="76"/>
-            <line x1="230" y1="42" x2="330" y2="76"/>
-            <line x1="130" y1="96" x2="70"  y2="130"/>
-            <line x1="130" y1="96" x2="185" y2="130"/>
-            <line x1="330" y1="96" x2="290" y2="130"/>
-            <line x1="330" y1="96" x2="382" y2="130"/>
-            <line x1="70"  y1="150" x2="44"  y2="184"/>
-            <line x1="70"  y1="150" x2="104" y2="184"/>
-            <line x1="185" y1="150" x2="156" y2="184"/>
-            <line x1="185" y1="150" x2="214" y2="184"/>
-            <line x1="290" y1="150" x2="262" y2="184"/>
-            <line x1="290" y1="150" x2="318" y2="184"/>
-            <line x1="44"  y1="204" x2="22"  y2="238"/>
-            <line x1="44"  y1="204" x2="74"  y2="238"/>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="12.5" font-weight="600" text-anchor="middle">
-            <g fill="#f0f2f6" stroke="#8a9099" stroke-width="1.2">
-              <rect x="211" y="22"  width="38" height="20" rx="5"/>
-              <rect x="111" y="76"  width="38" height="20" rx="5"/>
-              <rect x="85"  y="184" width="38" height="20" rx="5"/>
-              <rect x="137" y="184" width="38" height="20" rx="5"/>
-              <rect x="195" y="184" width="38" height="20" rx="5"/>
-              <rect x="243" y="184" width="38" height="20" rx="5"/>
-              <rect x="299" y="184" width="38" height="20" rx="5"/>
-              <rect x="363" y="130" width="38" height="20" rx="5"/>
-              <rect x="3"   y="238" width="38" height="20" rx="5"/>
-              <rect x="55"  y="238" width="38" height="20" rx="5"/>
-            </g>
-            <g fill="#eef4fc" stroke="#1f5fb0" stroke-width="1.4">
-              <rect x="311" y="76"  width="38" height="20" rx="5"/>
-              <rect x="51"  y="130" width="38" height="20" rx="5"/>
-            </g>
-            <g fill="#fff5e6" stroke="#9a5b00" stroke-width="1.4">
-              <rect x="166" y="130" width="38" height="20" rx="5"/>
-              <rect x="271" y="130" width="38" height="20" rx="5"/>
-              <rect x="25"  y="184" width="38" height="20" rx="5"/>
-            </g>
-            <g fill="#1a1c22" stroke="none">
-              <text x="230" y="37">f(5)</text>
-              <text x="130" y="91">f(4)</text> <text x="330" y="91">f(3)</text>
-              <text x="70"  y="145">f(3)</text> <text x="185" y="145">f(2)</text>
-              <text x="290" y="145">f(2)</text> <text x="382" y="145">f(1)</text>
-              <text x="44"  y="199">f(2)</text> <text x="104" y="199">f(1)</text>
-              <text x="156" y="199">f(1)</text> <text x="214" y="199">f(0)</text>
-              <text x="262" y="199">f(1)</text> <text x="318" y="199">f(0)</text>
-              <text x="22"  y="253">f(1)</text> <text x="74"  y="253">f(0)</text>
-            </g>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="13" text-anchor="start">
-            <text x="358" y="200" fill="#1f5fb0">f(3) &times; 2</text>
-            <text x="358" y="220" fill="#9a5b00">f(2) &times; 3</text>
-            <text x="358" y="240" fill="#8a9099">15 calls,</text>
-            <text x="358" y="257" fill="#8a9099">6 distinct</text>
-          </g>
-        </svg>
+        <!-- gen:dp fib-tree -->
+<svg viewBox="0 0 556 227" role="img" style="max-width:667px" font-family="system-ui, sans-serif" aria-label="The call tree of naive fib(5). f(5) at the root; f(5) calls f(4) and f(3); f(4) calls f(3) and f(2); f(3) calls f(2) and f(1); f(2) calls f(1) and f(0); f(2) calls f(1) and f(0); f(3) calls f(2) and f(1); f(2) calls f(1) and f(0). f(3) is called 2 times and f(2) 3 times: 15 calls, 6 distinct subproblems.">
+<line x1="56" y1="171" x2="31" y2="194" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="56" y1="171" x2="81" y2="194" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="93.5" y1="125" x2="56" y2="148" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="93.5" y1="125" x2="131" y2="148" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="206" y1="125" x2="181" y2="148" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="206" y1="125" x2="231" y2="148" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="149.8" y1="79" x2="93.5" y2="102" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="149.8" y1="79" x2="206" y2="102" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="306" y1="125" x2="281" y2="148" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="306" y1="125" x2="331" y2="148" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="343.5" y1="79" x2="306" y2="102" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="343.5" y1="79" x2="381" y2="102" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="246.6" y1="33" x2="149.8" y2="56" stroke="#4a5163" stroke-width="1.4"/>
+<line x1="246.6" y1="33" x2="343.5" y2="56" stroke="#4a5163" stroke-width="1.4"/>
+<rect x="10" y="194" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="31" y="209.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(1)</text>
+<rect x="60" y="194" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="81" y="209.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(0)</text>
+<rect x="35" y="148" width="42" height="23" rx="6" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="56" y="163.5" font-size="12.5" font-weight="600" fill="#c98a1a" text-anchor="middle">f(2)</text>
+<rect x="110" y="148" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="131" y="163.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(1)</text>
+<rect x="72.5" y="102" width="42" height="23" rx="6" fill="#eef4fc" stroke="#1f5fb0" stroke-width="2"/>
+<text x="93.5" y="117.5" font-size="12.5" font-weight="600" fill="#1f5fb0" text-anchor="middle">f(3)</text>
+<rect x="160" y="148" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="181" y="163.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(1)</text>
+<rect x="210" y="148" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="231" y="163.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(0)</text>
+<rect x="185" y="102" width="42" height="23" rx="6" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="206" y="117.5" font-size="12.5" font-weight="600" fill="#c98a1a" text-anchor="middle">f(2)</text>
+<rect x="128.8" y="56" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="149.8" y="71.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(4)</text>
+<rect x="260" y="148" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="281" y="163.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(1)</text>
+<rect x="310" y="148" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="331" y="163.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(0)</text>
+<rect x="285" y="102" width="42" height="23" rx="6" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="306" y="117.5" font-size="12.5" font-weight="600" fill="#c98a1a" text-anchor="middle">f(2)</text>
+<rect x="360" y="102" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="381" y="117.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(1)</text>
+<rect x="322.5" y="56" width="42" height="23" rx="6" fill="#eef4fc" stroke="#1f5fb0" stroke-width="2"/>
+<text x="343.5" y="71.5" font-size="12.5" font-weight="600" fill="#1f5fb0" text-anchor="middle">f(3)</text>
+<rect x="225.6" y="10" width="42" height="23" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="246.6" y="25.5" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="middle">f(5)</text>
+<text x="426" y="158" font-size="12.5" font-weight="600" fill="#1f5fb0" text-anchor="start">f(3) × 2</text>
+<text x="426" y="176" font-size="12.5" font-weight="600" fill="#c98a1a" text-anchor="start">f(2) × 3</text>
+<text x="426" y="194" font-size="12" font-weight="400" fill="#5c6270" text-anchor="start">15 calls,</text>
+<text x="426" y="210" font-size="12" font-weight="400" fill="#5c6270" text-anchor="start">6 distinct</text>
+</svg>
+<!-- /gen:dp fib-tree -->
         <figcaption>
           The call tree of naive \(\mathrm{fib}(5)\): \(15\) calls to compute a
           number with only \(6\) distinct subproblems
           \(\mathrm{fib}(0), \dots, \mathrm{fib}(5)\). The blue \(\mathrm{fib}(3)\)
-          is computed twice, the orange \(\mathrm{fib}(2)\) three times, and
+          is computed twice, the amber \(\mathrm{fib}(2)\) three times, and
           the duplication compounds with depth. Everything outside one copy of each
           subproblem is pure recomputation.
         </figcaption>
@@ -611,9 +729,9 @@
       </p>
       <figure>
         <table class="trace">
-          <tr><th class="lab">k</th>
+          <tr><th class="lab">\(k\)</th>
             <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
-          <tr><td class="lab">times fib(k) computed</td>
+          <tr><td class="lab">times \(\mathrm{fib}(k)\) computed</td>
             <td class="cell">34</td><td class="cell piv">55</td><td class="cell piv">34</td><td class="cell">21</td><td class="cell">13</td><td class="cell">8</td><td class="cell">5</td><td class="cell">3</td><td class="cell">2</td><td class="cell">1</td><td class="cell">1</td></tr>
         </table>
         <figcaption>
@@ -832,15 +950,15 @@ fn fib_two_var(n: usize) -&gt; u64 {
           <tr><th>step</th><th class="lab">write</th><th>reads</th><th>value</th></tr>
           <tr><td class="num">1</td><td class="lab">t[0]</td><td>base case</td><td class="cell">0</td></tr>
           <tr><td class="num">2</td><td class="lab">t[1]</td><td>base case</td><td class="cell">1</td></tr>
-          <tr><td class="num">3</td><td class="lab">t[2]</td><td>t[1] + t[0] = 1 + 0</td><td class="cell">1</td></tr>
-          <tr><td class="num">4</td><td class="lab">t[3]</td><td>t[2] + t[1] = 1 + 1</td><td class="cell">2</td></tr>
-          <tr><td class="num">5</td><td class="lab">t[4]</td><td>t[3] + t[2] = 2 + 1</td><td class="cell">3</td></tr>
-          <tr><td class="num">6</td><td class="lab">t[5]</td><td>t[4] + t[3] = 3 + 2</td><td class="cell">5</td></tr>
-          <tr><td class="num">7</td><td class="lab">t[6]</td><td>t[5] + t[4] = 5 + 3</td><td class="cell">8</td></tr>
-          <tr><td class="num">8</td><td class="lab">t[7]</td><td>t[6] + t[5] = 8 + 5</td><td class="cell">13</td></tr>
-          <tr><td class="num">9</td><td class="lab">t[8]</td><td>t[7] + t[6] = 13 + 8</td><td class="cell">21</td></tr>
-          <tr><td class="num">10</td><td class="lab">t[9]</td><td>t[8] + t[7] = 21 + 13</td><td class="cell">34</td></tr>
-          <tr><td class="num">11</td><td class="lab">t[10]</td><td>t[9] + t[8] = 34 + 21</td><td class="cell lt">55</td></tr>
+          <tr><td class="num">3</td><td class="lab">t[2]</td><td>\(t[1] + t[0] = 1 + 0\)</td><td class="cell">1</td></tr>
+          <tr><td class="num">4</td><td class="lab">t[3]</td><td>\(t[2] + t[1] = 1 + 1\)</td><td class="cell">2</td></tr>
+          <tr><td class="num">5</td><td class="lab">t[4]</td><td>\(t[3] + t[2] = 2 + 1\)</td><td class="cell">3</td></tr>
+          <tr><td class="num">6</td><td class="lab">t[5]</td><td>\(t[4] + t[3] = 3 + 2\)</td><td class="cell">5</td></tr>
+          <tr><td class="num">7</td><td class="lab">t[6]</td><td>\(t[5] + t[4] = 5 + 3\)</td><td class="cell">8</td></tr>
+          <tr><td class="num">8</td><td class="lab">t[7]</td><td>\(t[6] + t[5] = 8 + 5\)</td><td class="cell">13</td></tr>
+          <tr><td class="num">9</td><td class="lab">t[8]</td><td>\(t[7] + t[6] = 13 + 8\)</td><td class="cell">21</td></tr>
+          <tr><td class="num">10</td><td class="lab">t[9]</td><td>\(t[8] + t[7] = 21 + 13\)</td><td class="cell">34</td></tr>
+          <tr><td class="num">11</td><td class="lab">t[10]</td><td>\(t[9] + t[8] = 34 + 21\)</td><td class="cell lt">55</td></tr>
         </table>
         Eleven cells written, nine additions, and the answer is the last cell:
         \(\mathrm{fib}(10) = 55\). Memoization reached the same \(11\) values
@@ -852,9 +970,9 @@ fn fib_two_var(n: usize) -&gt; u64 {
         <table class="trace">
           <tr><th class="lab">after step \(i\)</th>
             <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
-          <tr><td class="lab">a = fib(i)</td>
+          <tr><td class="lab">\(a = \mathrm{fib}(i)\)</td>
             <td class="cell">0</td><td class="cell">1</td><td class="cell">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">5</td><td class="cell">8</td><td class="cell">13</td><td class="cell">21</td><td class="cell">34</td><td class="cell lt">55</td></tr>
-          <tr><td class="lab">b = fib(i+1)</td>
+          <tr><td class="lab">\(b = \mathrm{fib}(i{+}1)\)</td>
             <td class="cell">1</td><td class="cell">1</td><td class="cell">2</td><td class="cell">3</td><td class="cell">5</td><td class="cell">8</td><td class="cell">13</td><td class="cell">21</td><td class="cell">34</td><td class="cell">55</td><td class="cell">89</td></tr>
         </table>
         Ten iterations, one addition each, two live values at all times. The
@@ -1007,7 +1125,7 @@ fn fib_two_var(n: usize) -&gt; u64 {
       </div>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; The Dynamic Programming Method v1.0
+        Data Structures &amp; Algorithms &middot; The Dynamic Programming Method v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
         interactive demos in the course library.
       </footer>

@@ -215,19 +215,86 @@
         <span class="tag">Example (the full table)</span>
         \(A = \texttt{AGCAT}\) (rows), \(B = \texttt{GAC}\) (columns). Fill row by
         row, left to right; each cell reads its up, left, and diagonal neighbors,
-        which are already filled. The outlined cells are the traceback path from
-        \(L[5][3]\) back toward \(L[0][0]\); the green cells are the matches it
+        which are already filled. The green line is the traceback path from
+        \(L[5][3]\) back to row \(0\); the filled cells are the matches it
         steps through: <code>C</code> then <code>A</code>, spelling the LCS
         <code>AC</code> reversed.
-        <table class="trace">
-          <tr><th class="lab"></th><th>&ldquo;&rdquo;</th><th>G</th><th>A</th><th>C</th></tr>
-          <tr><td class="lab">&ldquo;&rdquo;</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td><td class="cell">0</td></tr>
-          <tr><td class="lab">A</td><td class="cell">0</td><td class="cell">0</td><td class="cell lt">1</td><td class="cell">1</td></tr>
-          <tr><td class="lab">G</td><td class="cell">0</td><td class="cell">1</td><td class="cell scan">1</td><td class="cell">1</td></tr>
-          <tr><td class="lab">C</td><td class="cell">0</td><td class="cell">1</td><td class="cell">1</td><td class="cell lt">2</td></tr>
-          <tr><td class="lab">A</td><td class="cell">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell scan">2</td></tr>
-          <tr><td class="lab">T</td><td class="cell">0</td><td class="cell">1</td><td class="cell">2</td><td class="cell scan">2</td></tr>
-        </table>
+        <figure>
+<!-- gen:dp lcs-table -->
+<svg viewBox="0 0 182 220" role="img" style="max-width:218px" font-family="system-ui, sans-serif" aria-label="The LCS table for AGCAT (rows) and GAC (columns), with the traceback. columns “”, G, A, C; rows “”: 0 0 0 0; A: 0 0 1 1; G: 0 1 1 1; C: 0 1 1 2; A: 0 1 2 2; T: 0 1 2 2; the traceback visits (5,3), (4,3), (3,3), (2,2), (1,2), (0,1).">
+<text x="52.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">“”</text>
+<text x="86.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">G</text>
+<text x="120.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">A</text>
+<text x="154.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">C</text>
+<text x="27.4" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="27.4" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">A</text>
+<text x="27.4" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">G</text>
+<text x="27.4" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">C</text>
+<text x="27.4" y="169" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">A</text>
+<text x="27.4" y="199" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">T</text>
+<rect x="35.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="60" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="120" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="180" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="30" width="136" height="180" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="71.4" y="32" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="105.4" y="62" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="105.4" y="92" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="139.4" y="122" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="139.4" y="152" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="139.4" y="182" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="154.4" y1="185" x2="154.4" y2="180" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M154.4,175 L157.7,181.5 L151.2,181.5 Z" fill="#0a7d4d"/>
+<line x1="154.4" y1="155" x2="154.4" y2="150" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M154.4,145 L157.7,151.5 L151.2,151.5 Z" fill="#0a7d4d"/>
+<line x1="146.1" y1="127.6" x2="132.6" y2="115.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M128.8,112.4 L135.9,114.3 L131.6,119.1 Z" fill="#0a7d4d"/>
+<line x1="120.4" y1="95" x2="120.4" y2="90" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M120.4,85 L123.7,91.5 L117.2,91.5 Z" fill="#0a7d4d"/>
+<line x1="112.1" y1="67.6" x2="98.6" y2="55.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M94.8,52.4 L101.9,54.3 L97.6,59.1 Z" fill="#0a7d4d"/>
+<text x="52.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="52.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="79.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="52.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="52.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="139.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="52.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="154.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="52.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="154.4" y="199.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+</svg>
+<!-- /gen:dp lcs-table -->
+        </figure>
         The bottom-right cell is the answer: \(L[5][3] = 2\). Check a few cells
         against the recurrence: row <code>C</code>, column <code>C</code> is a
         match, so it is diagonal \(+\,1 = 1 + 1 = 2\); row <code>A</code> (fourth),
@@ -245,27 +312,107 @@
         <table class="trace">
           <tr><th class="lab"></th><th>G</th><th>A</th><th>C</th></tr>
           <tr><td class="lab">A</td>
-            <td class="cell">A&ne;G: max(&uarr;0, &larr;0) = 0</td>
-            <td class="cell lt">A=A: &#8598;0 + 1 = 1</td>
-            <td class="cell">A&ne;C: max(&uarr;0, &larr;1) = 1</td></tr>
+            <td class="cell">\(\mathtt{A} \ne \mathtt{G}{:}\ \max(\uparrow 0, \leftarrow 0) = 0\)</td>
+            <td class="cell lt">\(\mathtt{A} = \mathtt{A}{:}\ \nwarrow 0 + 1 = 1\)</td>
+            <td class="cell">\(\mathtt{A} \ne \mathtt{C}{:}\ \max(\uparrow 0, \leftarrow 1) = 1\)</td></tr>
           <tr><td class="lab">G</td>
-            <td class="cell lt">G=G: &#8598;0 + 1 = 1</td>
-            <td class="cell">G&ne;A: max(&uarr;1, &larr;1) = 1</td>
-            <td class="cell">G&ne;C: max(&uarr;1, &larr;1) = 1</td></tr>
+            <td class="cell lt">\(\mathtt{G} = \mathtt{G}{:}\ \nwarrow 0 + 1 = 1\)</td>
+            <td class="cell">\(\mathtt{G} \ne \mathtt{A}{:}\ \max(\uparrow 1, \leftarrow 1) = 1\)</td>
+            <td class="cell">\(\mathtt{G} \ne \mathtt{C}{:}\ \max(\uparrow 1, \leftarrow 1) = 1\)</td></tr>
           <tr><td class="lab">C</td>
-            <td class="cell">C&ne;G: max(&uarr;1, &larr;0) = 1</td>
-            <td class="cell">C&ne;A: max(&uarr;1, &larr;1) = 1</td>
-            <td class="cell lt">C=C: &#8598;1 + 1 = 2</td></tr>
+            <td class="cell">\(\mathtt{C} \ne \mathtt{G}{:}\ \max(\uparrow 1, \leftarrow 0) = 1\)</td>
+            <td class="cell">\(\mathtt{C} \ne \mathtt{A}{:}\ \max(\uparrow 1, \leftarrow 1) = 1\)</td>
+            <td class="cell lt">\(\mathtt{C} = \mathtt{C}{:}\ \nwarrow 1 + 1 = 2\)</td></tr>
           <tr><td class="lab">A</td>
-            <td class="cell">A&ne;G: max(&uarr;1, &larr;0) = 1</td>
-            <td class="cell lt">A=A: &#8598;1 + 1 = 2</td>
-            <td class="cell">A&ne;C: max(&uarr;2, &larr;2) = 2</td></tr>
+            <td class="cell">\(\mathtt{A} \ne \mathtt{G}{:}\ \max(\uparrow 1, \leftarrow 0) = 1\)</td>
+            <td class="cell lt">\(\mathtt{A} = \mathtt{A}{:}\ \nwarrow 1 + 1 = 2\)</td>
+            <td class="cell">\(\mathtt{A} \ne \mathtt{C}{:}\ \max(\uparrow 2, \leftarrow 2) = 2\)</td></tr>
           <tr><td class="lab">T</td>
-            <td class="cell">T&ne;G: max(&uarr;1, &larr;0) = 1</td>
-            <td class="cell">T&ne;A: max(&uarr;2, &larr;1) = 2</td>
-            <td class="cell">T&ne;C: max(&uarr;2, &larr;2) = 2</td></tr>
+            <td class="cell">\(\mathtt{T} \ne \mathtt{G}{:}\ \max(\uparrow 1, \leftarrow 0) = 1\)</td>
+            <td class="cell">\(\mathtt{T} \ne \mathtt{A}{:}\ \max(\uparrow 2, \leftarrow 1) = 2\)</td>
+            <td class="cell">\(\mathtt{T} \ne \mathtt{C}{:}\ \max(\uparrow 2, \leftarrow 2) = 2\)</td></tr>
         </table>
         The four outcomes, one instance each:
+        <figure>
+<!-- gen:dp lcs-cases -->
+<svg viewBox="0 0 674 154" role="img" style="max-width:809px" font-family="system-ui, sans-serif" aria-label="The four ways a cell of the AGCAT / GAC table is filled, each shown as the cell (amber) with the neighbours it reads, the taken one green: match: diagonal + 1, C = C: 1 + 1 = 2; mismatch, up wins, T ≠ A: max(2, 1) = 2; mismatch, left wins, A ≠ C: max(0, 1) = 1; mismatch, a tie, G ≠ A: max(1, 1) = 1.">
+<text x="78.5" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">match: diagonal + 1</text>
+<text x="65.9" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">A</text>
+<text x="109.9" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">C</text>
+<text x="35.9" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">G</text>
+<text x="35.9" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">C</text>
+<rect x="43.9" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="87.9" y="50" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="43.9" y="88" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="87.9" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="43.9" y="50" width="88" height="76" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="89.9" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="74.3" y1="76.3" x2="97.7" y2="96.5" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M101.5,99.7 L94.4,98 L98.7,93 Z" fill="#0a7d4d"/>
+<text x="65.9" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="109.9" y="73.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="65.9" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="109.9" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="78.5" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">C = C: 1 + 1 = 2</text>
+
+<text x="251.4" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">mismatch, up wins</text>
+<text x="238.8" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">G</text>
+<text x="282.8" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">A</text>
+<text x="208.8" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">A</text>
+<text x="208.8" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">T</text>
+<rect x="216.8" y="50" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="260.8" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="216.8" y="88" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="260.8" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="216.8" y="50" width="88" height="76" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="262.8" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="282.8" y1="79" x2="282.8" y2="92" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M282.8,97 L279.5,90.5 L286,90.5 Z" fill="#0a7d4d"/>
+<line x1="247.4" y1="107" x2="269.1" y2="107" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M274.1,107 L267.6,110.3 L267.6,103.8 Z" fill="#9aa3b5"/>
+<text x="238.8" y="73.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="282.8" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="238.8" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="282.8" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="251.4" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">T ≠ A: max(2, 1) = 2</text>
+
+<text x="424.3" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">mismatch, left wins</text>
+<text x="415" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">A</text>
+<text x="459" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">C</text>
+<text x="385" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="385" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">A</text>
+<rect x="393" y="50" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="437" y="50" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="393" y="88" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="437" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="393" y="50" width="88" height="76" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="439" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="459" y1="79" x2="459" y2="92" stroke="#9aa3b5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/><path d="M459,97 L455.8,90.5 L462.3,90.5 Z" fill="#9aa3b5"/>
+<line x1="423.7" y1="107" x2="445.4" y2="107" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M450.4,107 L443.9,110.3 L443.9,103.8 Z" fill="#0a7d4d"/>
+<text x="415" y="73.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="459" y="73.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="415" y="111.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="459" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="424.3" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">A ≠ C: max(0, 1) = 1</text>
+
+<text x="597.2" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="middle">mismatch, a tie</text>
+<text x="584.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">G</text>
+<text x="628.6" y="43" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">A</text>
+<text x="554.6" y="73" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">A</text>
+<text x="554.6" y="111" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">G</text>
+<rect x="562.6" y="50" width="44" height="38" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="606.6" y="50" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="562.6" y="88" width="44" height="38" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="606.6" y="88" width="44" height="38" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="562.6" y="50" width="88" height="76" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="608.6" y="90" width="40" height="34" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="628.6" y1="79" x2="628.6" y2="92" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M628.6,97 L625.3,90.5 L631.8,90.5 Z" fill="#0a7d4d"/>
+<line x1="593.2" y1="107" x2="614.9" y2="107" stroke="#0a7d4d" stroke-width="2.2" stroke-linecap="round"/><path d="M619.9,107 L613.4,110.3 L613.4,103.8 Z" fill="#0a7d4d"/>
+<text x="584.6" y="73.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="628.6" y="73.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="584.6" y="111.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="628.6" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="597.2" y="140" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">G ≠ A: max(1, 1) = 1</text>
+</svg>
+<!-- /gen:dp lcs-cases -->
+        </figure>
         <ul>
           <li><strong>match, diagonal \(+\,1\)</strong>: row <code>C</code>,
             column <code>C</code> takes \(1 + 1 = 2\), the only cell in the table
@@ -510,12 +657,82 @@ fn lcs_string(a: &amp;[u8], b: &amp;[u8], l: &amp;[Vec&lt;usize&gt;]) -&gt; Stri
           LCS by traceback.
           <details>
             <summary>solution</summary>
-            <pre>        ""  B  D  C  B
-    ""   0  0  0  0  0
-    A    0  0  0  0  0
-    B    0  1  1  1  1
-    C    0  1  1  2  2
-    B    0  1  1  2  3</pre>
+            <figure>
+<!-- gen:dp lcs-abcb -->
+<svg viewBox="0 0 216 190" role="img" style="max-width:259px" font-family="system-ui, sans-serif" aria-label="The LCS table for ABCB (rows) and BDCB (columns), with the traceback. columns “”, B, D, C, B; rows “”: 0 0 0 0 0; A: 0 0 0 0 0; B: 0 1 1 1 1; C: 0 1 1 2 2; B: 0 1 1 2 3; the traceback visits (4,4), (3,3), (2,2), (2,1), (1,0).">
+<text x="52.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">“”</text>
+<text x="86.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">B</text>
+<text x="120.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">D</text>
+<text x="154.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">C</text>
+<text x="188.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">B</text>
+<text x="27.4" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="27.4" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">A</text>
+<text x="27.4" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">B</text>
+<text x="27.4" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">C</text>
+<text x="27.4" y="169" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">B</text>
+<rect x="35.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="90" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="120" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="150" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="171.4" y="150" width="34" height="30" fill="#eaf6ef" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="30" width="170" height="150" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="37.4" y="62" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="71.4" y="92" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="105.4" y="92" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="139.4" y="122" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<rect x="173.4" y="152" width="30" height="26" rx="3" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<line x1="180.1" y1="157.6" x2="166.6" y2="145.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M162.8,142.4 L169.9,144.3 L165.6,149.1 Z" fill="#0a7d4d"/>
+<line x1="146.1" y1="127.6" x2="132.6" y2="115.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M128.8,112.4 L135.9,114.3 L131.6,119.1 Z" fill="#0a7d4d"/>
+<line x1="111.8" y1="105" x2="100.1" y2="105" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M95.1,105 L101.6,101.8 L101.6,108.3 Z" fill="#0a7d4d"/>
+<line x1="78.1" y1="97.6" x2="64.6" y2="85.7" stroke="#0a7d4d" stroke-width="2" stroke-linecap="round"/><path d="M60.8,82.4 L67.9,84.3 L63.6,89.1 Z" fill="#0a7d4d"/>
+<text x="52.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="188.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="52.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="188.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="52.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="109.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="188.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="52.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="139.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="188.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="52.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="169.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<text x="188.4" y="169.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+</svg>
+<!-- /gen:dp lcs-abcb -->
+            </figure>
             Length \(L[4][4] = 3\). Traceback from the corner:
             <code>B</code>/<code>B</code> match: emit <code>B</code>, go
             diagonal to \((3,3)\); <code>C</code>/<code>C</code> match:
@@ -534,11 +751,53 @@ fn lcs_string(a: &amp;[u8], b: &amp;[u8], l: &amp;[Vec&lt;usize&gt;]) -&gt; Stri
           \(B = \texttt{ACB}\) and gets the table below. Using only the sanity
           invariants of <a href="#lcs">&sect;1</a> (no re-derivation), point out
           two cells that <em>cannot</em> be right, then give the correct table.
-          <pre>        ""  A  C  B
-    ""   0  0  0  0
-    C    0  0  1  1
-    A    0  1  0  1
-    B    0  1  1  3</pre>
+          <figure>
+<!-- gen:dp lcs-wrong -->
+<svg viewBox="0 0 182 160" role="img" style="max-width:218px" font-family="system-ui, sans-serif" aria-label="A student's LCS table for CAB (rows) and ACB (columns), as handed in. columns “”, A, C, B; rows “”: 0 0 0 0; C: 0 0 1 1; A: 0 1 0 1; B: 0 1 1 3.">
+<text x="52.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">“”</text>
+<text x="86.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">A</text>
+<text x="120.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">C</text>
+<text x="154.4" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">B</text>
+<text x="27.4" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="27.4" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">C</text>
+<text x="27.4" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">A</text>
+<text x="27.4" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">B</text>
+<rect x="35.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.4" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.4" y="30" width="136" height="120" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="52.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.4" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="52.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="52.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.4" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="52.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.4" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">3</text>
+</svg>
+<!-- /gen:dp lcs-wrong -->
+          </figure>
           <details>
             <summary>solution</summary>
             Row <code>A</code>, column <code>C</code> holds \(0\) but the cell
@@ -546,11 +805,56 @@ fn lcs_string(a: &amp;[u8], b: &amp;[u8], l: &amp;[Vec&lt;usize&gt;]) -&gt; Stri
             down. And the corner holds \(3\) while its up and left neighbors hold
             \(1\): adjacent cells may differ by at most \(1\). Correct
             table:
-            <pre>        ""  A  C  B
-    ""   0  0  0  0
-    C    0  0  1  1
-    A    0  1  1  1
-    B    0  1  1  2</pre>
+            <figure>
+<!-- gen:dp lcs-cab -->
+<svg viewBox="0 0 182 186" role="img" style="max-width:218px" font-family="system-ui, sans-serif" aria-label="The correct LCS table for CAB (rows) and ACB (columns); the two corrected cells are (2,2) and (3,3). columns “”, A, C, B; rows “”: 0 0 0 0; C: 0 0 1 1; A: 0 1 1 1; B: 0 1 1 2. the two cells corrected.">
+<text x="52.6" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">“”</text>
+<text x="86.6" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">A</text>
+<text x="120.6" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">C</text>
+<text x="154.6" y="23" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">B</text>
+<text x="27.6" y="49" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">“”</text>
+<text x="27.6" y="79" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">C</text>
+<text x="27.6" y="109" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">A</text>
+<text x="27.6" y="139" font-size="12" font-weight="600" fill="#5c6270" text-anchor="end">B</text>
+<rect x="35.6" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.6" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.6" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.6" y="30" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.6" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.6" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.6" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.6" y="60" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.6" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.6" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.6" y="90" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.6" y="90" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.6" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="69.6" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="103.6" y="120" width="34" height="30" fill="#fff" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="137.6" y="120" width="34" height="30" fill="#fde7bf" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="35.6" y="30" width="136" height="120" fill="none" stroke="#2a2d36" stroke-width="1.2"/>
+<rect x="105.6" y="92" width="30" height="26" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<rect x="139.6" y="122" width="30" height="26" rx="3" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<text x="52.6" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.6" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.6" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="154.6" y="49.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="52.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="120.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.6" y="79.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="52.6" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.6" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.6" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.6" y="109.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="52.6" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">0</text>
+<text x="86.6" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="120.6" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">1</text>
+<text x="154.6" y="139.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2</text>
+<rect x="10" y="161" width="14" height="12" rx="2" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.6"/><text x="30" y="171" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">the two cells corrected</text>
+</svg>
+<!-- /gen:dp lcs-cab -->
+            </figure>
             LCS length \(2\); the traceback yields <code>CB</code> (or
             <code>AB</code>; both are common subsequences of length
             \(2\)).
@@ -559,7 +863,7 @@ fn lcs_string(a: &amp;[u8], b: &amp;[u8], l: &amp;[Vec&lt;usize&gt;]) -&gt; Stri
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Longest Common Subsequence v1.0
+        Data Structures &amp; Algorithms &middot; Longest Common Subsequence v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
         interactive demos in the course library.
       </footer>
