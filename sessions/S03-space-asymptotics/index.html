@@ -35,6 +35,9 @@
     .reveal h1 .katex, .reveal h2 .katex, .reveal h3 .katex { text-transform: none; }
     /* a formula in a table cell stays on one line */
     .reveal td .katex, .reveal th .katex { white-space: nowrap; }
+    /* the theme tops every element in a <small>; KaTeX needs its own alignment back, or subscripts drift */
+    .reveal small .katex * { vertical-align: baseline; }
+    .reveal small .katex .vlist, .reveal small .katex .vlist-s { vertical-align: bottom; }
     /* a slide that hosts a demo: the demo gets the full slide width */
     .reveal .algo-viz { text-align: left; font-size: 16px; }
     .reveal .algo-viz .viz-fallback { font-size: 15px; }
