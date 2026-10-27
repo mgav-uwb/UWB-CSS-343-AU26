@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -205,11 +206,15 @@
         \texttt{*}, \texttt{(}, \texttt{)}\}\); one nonterminal
         \(V = \{E\}\); start symbol \(E\):
       </p>
-      <pre>  G1 (ambiguous):
-      E &rarr; E + E
-      E &rarr; E * E
-      E &rarr; ( E )
-      E &rarr; a</pre>
+      \[
+        \text{G1 (ambiguous):}\qquad
+        \begin{aligned}
+          E &\to E + E\\
+          E &\to E * E\\
+          E &\to (\,E\,)\\
+          E &\to \texttt{a}
+        \end{aligned}
+      \]
       <p>
         Alternatives for the same nonterminal are usually stacked with
         <code>|</code>: \(E \to E + E \mid E * E \mid (\,E\,) \mid \texttt{a}\).
@@ -259,10 +264,14 @@
         &sect;<a href="#ambig">3</a> (repeated here so the derivations can be
         followed now):
       </p>
-      <pre>  G2 (stratified by precedence):
-      E &rarr; E + T | T          <span class="cm">an expression is a sum of terms</span>
-      T &rarr; T * F | F          <span class="cm">a term is a product of factors</span>
-      F &rarr; ( E ) | a          <span class="cm">a factor is atomic</span></pre>
+      \[
+        \text{G2:}\qquad
+        \begin{array}{ll}
+          E \to E + T \mid T & \qquad\text{an expression is a sum of terms}\\
+          T \to T * F \mid F & \qquad\text{a term is a product of factors}\\
+          F \to (\,E\,) \mid \texttt{a} & \qquad\text{a factor is atomic}
+        \end{array}
+      \]
       <div class="ex">
         <span class="tag">Example (leftmost and rightmost derivations of <code>a + a * a</code>)</span>
         The leftmost derivation always rewrites the underlined symbol, which is
@@ -460,10 +469,14 @@
         nonterminal, and let a level refer <em>only</em> to itself and to the
         level below. Loosest-binding operator at the top, atoms at the bottom:
       </p>
-      <pre>  G2:
-      E &rarr; E + T | T          <span class="cm">level 1: +   (loosest)</span>
-      T &rarr; T * F | F          <span class="cm">level 2: *   (tighter)</span>
-      F &rarr; ( E ) | a          <span class="cm">level 3: atoms, and the escape hatch ( E )</span></pre>
+      \[
+        \text{G2:}\qquad
+        \begin{array}{ll}
+          E \to E + T \mid T & \qquad\text{level 1: } +\ \text{(loosest)}\\
+          T \to T * F \mid F & \qquad\text{level 2: } *\ \text{(tighter)}\\
+          F \to (\,E\,) \mid \texttt{a} & \qquad\text{level 3: atoms, and the escape hatch } (\,E\,)
+        \end{array}
+      \]
       <div class="thm">
         <span class="tag">Proposition (G2 forces precedence and left associativity)</span>
         In every parse tree of G2, no \(*\) node is an ancestor of a \(+\) node
@@ -569,8 +582,12 @@
         accepting), \(q_1\) (odd), with \(\delta(q_0,\texttt{A}) = q_1\),
         \(\delta(q_1,\texttt{A}) = q_0\), and \(\texttt{B}\) a self-loop on
         both. The construction gives, mechanically:
-        <pre>  A&#8320; &rarr; A A&#8321; | B A&#8320; | &epsilon;      <span class="cm">state q0: even, accepting</span>
-  A&#8321; &rarr; A A&#8320; | B A&#8321;          <span class="cm">state q1: odd, not accepting</span></pre>
+        \[
+          \begin{array}{ll}
+            A_0 \to \texttt{A}\,A_1 \mid \texttt{B}\,A_0 \mid \varepsilon & \qquad\text{state } q_0\text{: even, accepting}\\
+            A_1 \to \texttt{A}\,A_0 \mid \texttt{B}\,A_1 & \qquad\text{state } q_1\text{: odd, not accepting}
+          \end{array}
+        \]
         A derivation of <code>ABAB</code>:
         \(A_0 \Rightarrow \texttt{A}A_1 \Rightarrow \texttt{AB}A_1 \Rightarrow
         \texttt{ABA}A_0 \Rightarrow \texttt{ABAB}A_0 \Rightarrow \texttt{ABAB}\),
@@ -680,10 +697,12 @@
         thereafter replace a nonterminal on top by the right-hand side of one of
         its productions, or match a terminal on top against the next input
         character.
-        <pre>  PDA for a&#8319;b&#8319;, in three rules:
-      read 'a'  &rarr;  push X            <span class="cm">count up, one X per a</span>
-      read 'b'  &rarr;  pop  X            <span class="cm">count down; fail if the stack is empty</span>
-      end       &rarr;  accept iff the stack is empty</pre>
+        <table>
+          <tr><th colspan="3">a PDA for \(\texttt{a}^n\texttt{b}^n\), in three rules</th></tr>
+          <tr><td>read <code>a</code></td><td>push \(X\)</td><td>count up, one \(X\) per <code>a</code></td></tr>
+          <tr><td>read <code>b</code></td><td>pop \(X\)</td><td>count down; fail if the stack is empty</td></tr>
+          <tr><td>end of input</td><td>accept iff the stack is empty</td><td></td></tr>
+        </table>
         On <code>aaabbb</code> the stack climbs to <code>XXX</code> and drains
         to empty: accept. On <code>aabbb</code> the third <code>b</code> finds
         an empty stack: reject. On <code>aaabb</code> the stack still holds one
@@ -750,12 +769,18 @@
         The standard repair rewrites each left-recursive level as a
         <em>loop</em>. \(E \to E + T \mid T\) generates exactly a \(T\) followed
         by zero or more <code>+ T</code> groups, so write it in extended
-        notation with braces meaning &ldquo;zero or more&rdquo;:
+        notation with braces meaning &ldquo;zero or more&rdquo;. The result,
+        G3, is G2 with the left recursion turned into iteration: the same
+        language, and the same trees:
       </p>
-      <pre>  G3 (G2 with the left recursion turned into iteration; same language, same trees):
-      E &rarr; T { + T }
-      T &rarr; F { * F }
-      F &rarr; ( E ) | a</pre>
+      \[
+        \text{G3:}\qquad
+        \begin{aligned}
+          E &\to T\ \{\, +\ T \,\}\\
+          T &\to F\ \{\, *\ F \,\}\\
+          F &\to (\,E\,) \mid \texttt{a}
+        \end{aligned}
+      \]
       <p>
         The loop must build its tree by folding <em>left</em>
         (<code>node = combine(node, next)</code> inside the loop body), which
@@ -1126,12 +1151,20 @@ fn parse(text: &amp;str) -&gt; Result&lt;String, String&gt; {
             There are no \(\varepsilon\)-productions to remove.
           </li>
         </ol>
-        <pre>  G2 in Chomsky Normal Form (10 nonterminals, 15 productions):
-      E  &rarr; E&#8321; T | T&#8321; F | L F&#8321; | a
-      T  &rarr; T&#8321; F | L F&#8321; | a
-      F  &rarr; L F&#8321; | a
-      E&#8321; &rarr; E P          T&#8321; &rarr; T M          F&#8321; &rarr; E R
-      P  &rarr; +            M  &rarr; *            L  &rarr; (            R &rarr; )</pre>
+        <p style="margin-bottom:0">G2 in Chomsky Normal Form (10 nonterminals, 16 productions):</p>
+                \[
+                  \begin{aligned}
+                    E &\to E_1\,T \mid T_1\,F \mid L\,F_1 \mid \texttt{a}\\
+                    T &\to T_1\,F \mid L\,F_1 \mid \texttt{a}\\
+                    F &\to L\,F_1 \mid \texttt{a}
+                  \end{aligned}
+                  \qquad
+                  \begin{aligned}
+                    E_1 &\to E\,P & T_1 &\to T\,M & F_1 &\to E\,R\\
+                    P &\to \texttt{+} & M &\to \texttt{*} & L &\to \texttt{(}\\
+                    R &\to \texttt{)}
+                  \end{aligned}
+                \]
         Checked by exhaustive enumeration over all 19 530 strings of length at
         most 6 in these five terminals: this CNF grammar accepts exactly the
         same set as G2, with zero mismatches.
@@ -1537,18 +1570,21 @@ fn cyk(w: &amp;[char],
           <details>
             <summary>solution</summary>
             Leftmost:
-            \(E \Rightarrow T \Rightarrow T * F \Rightarrow F * F \Rightarrow
-            (E) * F \Rightarrow (E + T) * F \Rightarrow (T + T) * F \Rightarrow
-            (F + T) * F \Rightarrow (\texttt{a} + T) * F \Rightarrow
-            (\texttt{a} + F) * F \Rightarrow (\texttt{a} + \texttt{a}) * F
-            \Rightarrow (\texttt{a} + \texttt{a}) * \texttt{a}\).
+            \[
+              \begin{aligned}
+                E &\Rightarrow T \Rightarrow T * F \Rightarrow F * F \Rightarrow (E) * F \Rightarrow (E + T) * F\\
+                  &\Rightarrow (T + T) * F \Rightarrow (F + T) * F \Rightarrow (\texttt{a} + T) * F\\
+                  &\Rightarrow (\texttt{a} + F) * F \Rightarrow (\texttt{a} + \texttt{a}) * F \Rightarrow (\texttt{a} + \texttt{a}) * \texttt{a}
+              \end{aligned}
+            \]
             Rightmost: same eleven productions, applied in the mirror order:
-            \(E \Rightarrow T \Rightarrow T * F \Rightarrow T * \texttt{a}
-            \Rightarrow F * \texttt{a} \Rightarrow (E) * \texttt{a} \Rightarrow
-            (E + T) * \texttt{a} \Rightarrow (E + F) * \texttt{a} \Rightarrow
-            (E + \texttt{a}) * \texttt{a} \Rightarrow (T + \texttt{a}) *
-            \texttt{a} \Rightarrow (F + \texttt{a}) * \texttt{a} \Rightarrow
-            (\texttt{a} + \texttt{a}) * \texttt{a}\).
+            \[
+              \begin{aligned}
+                E &\Rightarrow T \Rightarrow T * F \Rightarrow T * \texttt{a} \Rightarrow F * \texttt{a} \Rightarrow (E) * \texttt{a} \Rightarrow (E + T) * \texttt{a}\\
+                  &\Rightarrow (E + F) * \texttt{a} \Rightarrow (E + \texttt{a}) * \texttt{a} \Rightarrow (T + \texttt{a}) * \texttt{a}\\
+                  &\Rightarrow (F + \texttt{a}) * \texttt{a} \Rightarrow (\texttt{a} + \texttt{a}) * \texttt{a}
+              \end{aligned}
+            \]
             One parse tree under G2 (it is unambiguous), and also exactly one
             under G1: the parentheses force the grouping, so G1&rsquo;s
             ambiguity has nothing to exploit here. Ambiguity is a property of
@@ -1583,11 +1619,15 @@ fn cyk(w: &amp;[char],
           <details>
             <summary>solution</summary>
             Add a level per operator, tightest at the bottom:
-            <pre>  E &rarr; E + T | T
-  T &rarr; T * U | U
-  U &rarr; - U | B          <span class="cm">unary minus: recursive, so --a parses</span>
-  B &rarr; F ^ B | F          <span class="cm">RIGHT-recursive: right-associative</span>
-  F &rarr; ( E ) | a</pre>
+            \[
+              \begin{array}{ll}
+                E \to E + T \mid T & \\
+                T \to T * U \mid U & \\
+                U \to -\,U \mid B & \qquad\text{unary minus: recursive, so } {-}{-}\texttt{a} \text{ parses}\\
+                B \to F \mathbin{\verb|^|} B \mid F & \qquad\text{right-recursive: right-associative}\\
+                F \to (\,E\,) \mid \texttt{a} &
+              \end{array}
+            \]
             In the parser: \(E\) and \(T\) are left-recursive, so each becomes
             a loop with a left fold (<code>while la()=='+'</code>,
             <code>while la()=='*'</code>). \(U\) is left-<em>most</em> recursive
@@ -1767,7 +1807,7 @@ fn cyk(w: &amp;[char],
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Context-Free Grammars &amp; Parsing v1.0
+        Data Structures &amp; Algorithms &middot; Context-Free Grammars &amp; Parsing v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

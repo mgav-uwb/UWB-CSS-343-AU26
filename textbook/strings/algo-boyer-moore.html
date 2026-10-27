@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -446,12 +447,75 @@ fn bm_search(t: &amp;str, p: &amp;str) -&gt; i32 {
         \(\mathit{right}[\texttt{A}] = 4\), \(\mathit{right}[\texttt{B}] = 0\))
         in <code>AAAAAAAAAA</code> (\(n = 10\)). Every alignment plays out
         identically:
-        <pre>  text:     A A A A A A A A A A
-  align 0:  B A A A A            scan right to left: A,A,A,A match,
-                                 then P[0] = B vs t[0] = A mismatches
-  rule:     j = 0, c = A, right[A] = 4  &rarr;  shift 0 - 4 = -4  &rarr; CLAMPED to 1
-  align 1:  . B A A A A          the same five comparisons, the same clamp
-  &hellip;         (6 alignments of 5 comparisons each: 30 comparisons, no match)</pre>
+        <figure class="wide">
+<!-- gen:str bm-clamp -->
+<svg viewBox="0 0 642 242" role="img" style="max-width:770px" font-family="system-ui, sans-serif" aria-label="Boyer-Moore, bad-character rule, searching for BAAAA in AAAAAAAAAA: every alignment compares right to left, matches four As, then fails on P[0] = B against an A; right[A] = 4 lies to the right of the mismatch, so the shift 0 − 4 is clamped to 1. text: AAAAAAAAAA. align 0: BAAAA (j = 0, right[A] = 4: shift 0 − 4 = −4, clamped to 1). align 1: BAAAA starting under column 1 (the same five comparisons, the same clamp). align 2: BAAAA starting under column 2 (the same five comparisons, the same clamp). align 3: BAAAA starting under column 3 (the same five comparisons, the same clamp). align 4: BAAAA starting under column 4 (the same five comparisons, the same clamp). align 5: BAAAA starting under column 5 (6 alignments × 5 comparisons = 30, no match).">
+<text x="75.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="123.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="147.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="171.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="195.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="219.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="243.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="267.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="291.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<text x="53.4" y="40" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">text</text>
+<rect x="63.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="75.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="87.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="99.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="111.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="123.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="135.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="147.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="171.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="195.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="207.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="219.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="231.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="243.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="255.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="267.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="279.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="291.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="53.4" y="74" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 0</text>
+<rect x="63.4" y="58" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="75.4" y="75" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="87.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="99.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="111.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="123.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="135.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="147.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="171.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="315.4" y="74" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">j = 0, right[A] = 4: shift 0 − 4 = −4, clamped to 1</text>
+<text x="53.4" y="104" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 1</text>
+<rect x="87.4" y="88" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="99.4" y="105" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="111.4" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="123.4" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="135.4" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="147.4" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="171.4" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="195.4" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="315.4" y="104" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">the same five comparisons, the same clamp</text>
+<text x="53.4" y="134" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 2</text>
+<rect x="111.4" y="118" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="123.4" y="135" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="135.4" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="147.4" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="171.4" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="195.4" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="207.4" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="219.4" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="315.4" y="134" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">the same five comparisons, the same clamp</text>
+<text x="53.4" y="164" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 3</text>
+<rect x="135.4" y="148" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="147.4" y="165" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="159.4" y="148" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="171.4" y="165" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="148" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="195.4" y="165" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="207.4" y="148" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="219.4" y="165" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="231.4" y="148" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="243.4" y="165" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="315.4" y="164" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">the same five comparisons, the same clamp</text>
+<text x="53.4" y="194" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 4</text>
+<rect x="159.4" y="178" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="171.4" y="195" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="183.4" y="178" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="195.4" y="195" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="207.4" y="178" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="219.4" y="195" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="231.4" y="178" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="243.4" y="195" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="255.4" y="178" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="267.4" y="195" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="315.4" y="194" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">the same five comparisons, the same clamp</text>
+<text x="53.4" y="224" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 5</text>
+<rect x="183.4" y="208" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="195.4" y="225" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="207.4" y="208" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="219.4" y="225" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="231.4" y="208" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="243.4" y="225" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="255.4" y="208" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="267.4" y="225" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="279.4" y="208" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="291.4" y="225" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="315.4" y="224" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">6 alignments × 5 comparisons = 30, no match</text>
+</svg>
+<!-- /gen:str bm-clamp -->
+        </figure>
         The mismatched <code>A</code> occurs in the pattern to the
         <em>right</em> of the mismatch position, so &ldquo;line up the
         rightmost <code>A</code>&rdquo; would slide the pattern backward, and
@@ -582,7 +646,7 @@ fn bm_search(t: &amp;str, p: &amp;str) -&gt; i32 {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Boyer&ndash;Moore v1.0
+        Data Structures &amp; Algorithms &middot; Boyer&ndash;Moore v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

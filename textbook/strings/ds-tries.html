@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -167,8 +168,11 @@
         blind to prefixes. Neither tool can answer &ldquo;list every key
         starting with <code>sh</code>&rdquo; without scanning everything.
       </p>
-      <pre>  BST:   O(log n) COMPARES, each up to L chars  &rarr;  O(L log n)
-  hash:  O(1) probes, but hashes the WHOLE key  &rarr;  &Theta;(L), no order, no prefixes</pre>
+      <table>
+        <tr><th>structure</th><th>work per search</th><th>total</th></tr>
+        <tr><td>balanced BST</td><td>\(O(\log n)\) compares, each up to \(L\) characters</td><td>\(O(L \log n)\)</td></tr>
+        <tr><td>hash table</td><td>\(O(1)\) probes, but the hash reads the whole key</td><td>\(\Theta(L)\); no order, no prefixes</td></tr>
+      </table>
       <p>
         Both treat a string as one atomic value. The trie&rsquo;s idea is to
         stop doing that: use the <em>characters themselves</em> as the search
@@ -206,46 +210,42 @@
         \(\{\)<code>she</code>, <code>sea</code>, <code>sells</code>\(\}\):
       </p>
       <figure>
-        <svg viewBox="0 0 380 322" role="img" aria-label="A trie holding the keys she, sea, and sells. The root has a single child s. The s node has two children: e on the left and h on the right. Under e are two children: a, which is word-marked and completes the key sea, and l, which continues down through a second l to a word-marked s, completing sells. Under h is a word-marked e completing she. Word-marked nodes are drawn with a doubled green ring.">
-          <g stroke="#b9c0d0" stroke-width="1.5" fill="none">
-            <line x1="190" y1="30" x2="190" y2="82"/>
-            <line x1="190" y1="82" x2="120" y2="134"/>
-            <line x1="190" y1="82" x2="260" y2="134"/>
-            <line x1="120" y1="134" x2="70" y2="186"/>
-            <line x1="120" y1="134" x2="160" y2="186"/>
-            <line x1="260" y1="134" x2="260" y2="186"/>
-            <line x1="160" y1="186" x2="160" y2="238"/>
-            <line x1="160" y1="238" x2="160" y2="290"/>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
-            <circle cx="190" cy="30" r="13" fill="#f0f2f6" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="190" y="35" fill="#8a9099" font-size="12">&#8709;</text>
-            <circle cx="190" cy="82" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="190" y="87" fill="#1a1c22">s</text>
-            <circle cx="120" cy="134" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="120" y="139" fill="#1a1c22">e</text>
-            <circle cx="260" cy="134" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="260" y="139" fill="#1a1c22">h</text>
-            <circle cx="70" cy="186" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
-            <circle cx="70" cy="186" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-            <text x="70" y="191" fill="#0a7d4d">a</text>
-            <circle cx="160" cy="186" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="160" y="191" fill="#1a1c22">l</text>
-            <circle cx="260" cy="186" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
-            <circle cx="260" cy="186" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-            <text x="260" y="191" fill="#0a7d4d">e</text>
-            <circle cx="160" cy="238" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="160" y="243" fill="#1a1c22">l</text>
-            <circle cx="160" cy="290" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
-            <circle cx="160" cy="290" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-            <text x="160" y="295" fill="#0a7d4d">s</text>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="12.5" font-style="italic" fill="#8a9099">
-            <text x="46" y="190" text-anchor="end">sea</text>
-            <text x="284" y="190" text-anchor="start">she</text>
-            <text x="184" y="294" text-anchor="start">sells</text>
-          </g>
-        </svg>
+<!-- gen:str trie-sss -->
+<svg viewBox="0 0 235 306" role="img" style="max-width:282px" font-family="system-ui, sans-serif" aria-label="A trie holding the keys she, sea, sells; a doubled green ring marks a node a key ends on. the root has s. s has e, h. e has a (a key ends here), l. l has l. l has s (a key ends here). h has e (a key ends here).">
+<line x1="123.5" y1="41" x2="123.5" y2="65" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="113.5" y1="86.3" x2="73.7" y2="119.7" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="133.5" y1="86.3" x2="173.3" y2="119.7" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="56.2" y1="138.6" x2="35.6" y2="167.4" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="71.3" y1="138.6" x2="91.9" y2="167.4" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="99.5" y1="191" x2="99.5" y2="215" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="99.5" y1="241" x2="99.5" y2="265" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="183.3" y1="141" x2="183.3" y2="165" stroke="#4a5163" stroke-width="1.5"/>
+<circle cx="123.5" cy="28" r="13" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="123.5" y="32.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="123.5" cy="78" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="123.5" y="82.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<circle cx="63.7" cy="128" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="63.7" y="132.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<circle cx="28" cy="178" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="28" cy="178" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="28" y="182.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a</text>
+<text x="51" y="182" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">sea</text>
+<circle cx="99.5" cy="178" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="99.5" y="182.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="99.5" cy="228" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="99.5" y="232.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="99.5" cy="278" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="99.5" cy="278" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="99.5" y="282.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<text x="122.5" y="282" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">sells</text>
+<circle cx="183.3" cy="128" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="183.3" y="132.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">h</text>
+<circle cx="183.3" cy="178" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="183.3" cy="178" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="183.3" y="182.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<text x="206.3" y="182" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">she</text>
+</svg>
+<!-- /gen:str trie-sss -->
         <figcaption>
           The trie holding \(\{\)<code>she</code>, <code>sea</code>,
           <code>sells</code>\(\}\). Each node stores one character of a path;
@@ -501,10 +501,62 @@ fn keys_with_prefix(mut t: &amp;Node, prefix: &amp;str) -&gt; Vec&lt;String&gt; 
         <span class="tag">Example (a worked search, and the is-word subtlety)</span>
         Take the trie holding \(\{\)<code>she</code>, <code>shell</code>,
         <code>shells</code>\(\}\) and search for <code>shell</code>:
-        <pre>  search "shell":  s &rarr; h &rarr; e &rarr; l &rarr; l     (follow 5 characters)
-                   the node it ends on is word-marked &rarr; FOUND
-  search "shel":   s &rarr; h &rarr; e &rarr; l           (the path exists&hellip;)
-                   &hellip;but its node is NOT word-marked &rarr; not a key</pre>
+        <figure class="wide">
+<!-- gen:str trie-search-chain -->
+<svg viewBox="0 0 494 154" role="img" style="max-width:593px" font-family="system-ui, sans-serif" aria-label="The trie holding she, shell, shells is one path s, h, e, l, l, s, with she, shell and shells word-marked. Searching &quot;shell&quot; follows five characters to a word-marked node: found. Searching &quot;shel&quot; follows four characters to a node that is not word-marked: not a key. .">
+<text x="10" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">search &quot;shell&quot;: 5 characters</text>
+<line x1="41" y1="54" x2="57" y2="54" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="83" y1="54" x2="99" y2="54" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="125" y1="54" x2="137" y2="54" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="167" y1="54" x2="183" y2="54" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="209" y1="54" x2="221" y2="54" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="251" y1="54" x2="263" y2="54" stroke="#4a5163" stroke-width="1.5"/>
+<circle cx="28" cy="54" r="13" fill="#eef1f6" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="28" y="58.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="70" cy="54" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="70" y="58.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<circle cx="112" cy="54" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="112" y="58.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">h</text>
+<circle cx="154" cy="54" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="154" cy="54" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="154" y="58.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">e</text>
+<circle cx="196" cy="54" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="196" y="58.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">l</text>
+<circle cx="238" cy="54" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="238" cy="54" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="238" y="58.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">l</text>
+<circle cx="280" cy="54" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="280" cy="54" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="280" y="58.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<text x="302" y="58" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">word-marked: FOUND</text>
+<text x="10" y="96" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">search &quot;shel&quot;: 4 characters</text>
+<line x1="41" y1="127" x2="57" y2="127" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="83" y1="127" x2="99" y2="127" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="125" y1="127" x2="137" y2="127" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="167" y1="127" x2="183" y2="127" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="209" y1="127" x2="221" y2="127" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="251" y1="127" x2="263" y2="127" stroke="#4a5163" stroke-width="1.5"/>
+<circle cx="28" cy="127" r="13" fill="#eef1f6" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="28" y="131.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="70" cy="127" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="70" y="131.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<circle cx="112" cy="127" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="112" y="131.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">h</text>
+<circle cx="154" cy="127" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="154" cy="127" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="154" y="131.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">e</text>
+<circle cx="196" cy="127" r="13" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="196" y="131.5" font-size="13.5" font-weight="600" fill="#c0392b" text-anchor="middle">l</text>
+<circle cx="238" cy="127" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="238" cy="127" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="238" y="131.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="280" cy="127" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="280" cy="127" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="280" y="131.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<text x="302" y="131" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">not word-marked: not a key</text>
+</svg>
+<!-- /gen:str trie-search-chain -->
+        </figure>
         <code>shel</code> is a perfectly good <em>path</em> (it lies on
         the way to <code>shell</code> and <code>shells</code>), but no
         stored key ends there, so the flag correctly rejects it. Returning
@@ -540,11 +592,64 @@ fn keys_with_prefix(mut t: &amp;Node, prefix: &amp;str) -&gt; Vec&lt;String&gt; 
         <span class="tag">Example (a worked insert)</span>
         Insert <code>sea</code> into a trie holding \(\{\)<code>she</code>,
         <code>shell</code>\(\}\):
-        <pre>  s:  exists (shared with she/shell)  &rarr; follow it
-  e:  's' has no 'e' child            &rarr; CREATE a node
-  a:  create a node, mark it a word
-
-  "sea" and "she" now share exactly one node: 's'</pre>
+        <figure class="wide">
+<!-- gen:str trie-insert -->
+<svg viewBox="0 0 403 326" role="img" style="max-width:484px" font-family="system-ui, sans-serif" aria-label="Inserting sea into the trie holding she and shell: s exists and is followed; s has no e child, so e is created, then a, which is word-marked; sea and she share one node, s. before and after.">
+<text x="48.4" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">{she, shell}</text>
+<line x1="48.4" y1="61" x2="48.4" y2="85" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="48.4" y1="111" x2="48.4" y2="135" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="48.4" y1="161" x2="48.4" y2="185" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="48.4" y1="211" x2="48.4" y2="235" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="48.4" y1="261" x2="48.4" y2="285" stroke="#4a5163" stroke-width="1.5"/>
+<circle cx="48.4" cy="48" r="13" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="48.4" y="52.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="48.4" cy="98" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="48.4" y="102.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<circle cx="48.4" cy="148" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="48.4" y="152.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">h</text>
+<circle cx="48.4" cy="198" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="48.4" cy="198" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="48.4" y="202.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<circle cx="48.4" cy="248" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="48.4" y="252.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="48.4" cy="298" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="48.4" cy="298" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="48.4" y="302.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<text x="133.3" y="157" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="133.3" y="173" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">insert sea</text>
+<text x="286" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">after</text>
+<line x1="285.9" y1="61" x2="285.9" y2="85" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="274.6" y1="104.4" x2="209.1" y2="141.6" stroke="#c98a1a" stroke-width="2.2"/>
+<line x1="297.2" y1="104.4" x2="362.7" y2="141.6" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="197.8" y1="161" x2="197.8" y2="185" stroke="#c98a1a" stroke-width="2.2"/>
+<line x1="374" y1="161" x2="374" y2="185" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="374" y1="211" x2="374" y2="235" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="374" y1="261" x2="374" y2="285" stroke="#4a5163" stroke-width="1.5"/>
+<circle cx="285.9" cy="48" r="13" fill="#eef1f6" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="285.9" y="52.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="285.9" cy="98" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="285.9" y="102.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<text x="305.9" y="102" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">exists: follow</text>
+<circle cx="197.8" cy="148" r="13" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="197.8" y="152.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<text x="217.8" y="152" font-size="11" font-weight="600" fill="#c98a1a" text-anchor="start">created</text>
+<circle cx="197.8" cy="198" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="197.8" cy="198" r="13" fill="#fde7bf" stroke="#c98a1a" stroke-width="2"/>
+<text x="197.8" y="202.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a</text>
+<text x="220.8" y="202" font-size="11" font-weight="600" fill="#c98a1a" text-anchor="start">created, word-marked</text>
+<circle cx="374" cy="148" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="374" y="152.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">h</text>
+<circle cx="374" cy="198" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="374" cy="198" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="374" y="202.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<circle cx="374" cy="248" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="374" y="252.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="374" cy="298" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="374" cy="298" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="374" y="302.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+</svg>
+<!-- /gen:str trie-insert -->
+        </figure>
         Insert allocates only the <em>missing suffix</em> of its key (here two nodes) and reuses every shared-prefix node already
         present. That reuse is what keeps a trie compact on dictionary-like key
         sets full of common prefixes, and it is why insert, like search,
@@ -643,20 +748,147 @@ fn keys_with_prefix(mut t: &amp;Node, prefix: &amp;str) -&gt; Vec&lt;String&gt; 
         path of six nodes (s, h, e, l, l, s) with the 3rd, 5th and 6th
         word-marked. Delete all three keys, in this order, letting each
         deletion see the previous one&rsquo;s result:
-        <pre>  delete "she"     unmark node e (depth 3)
-                   e has a child (l)          &rarr; STOP.  freed: 0
-
-  delete "shells"  unmark node s (depth 6)
-                   s childless, unmarked      &rarr; free it
-                   parent l (depth 5) IS a word ("shell") &rarr; STOP.  freed: 1
-
-  delete "shell"   unmark node l (depth 5)
-                   l childless, unmarked      &rarr; free it
-                   l (depth 4) childless, unmarked  &rarr; free it
-                   e (depth 3) childless, unmarked now ("she" was deleted) &rarr; free
-                   h (depth 2) childless, unmarked  &rarr; free it
-                   s (depth 1) childless, unmarked  &rarr; free it
-                   the root                   &rarr; STOP.  freed: 5</pre>
+        <figure class="wide">
+<!-- gen:str trie-delete -->
+<svg viewBox="0 0 708 222" role="img" style="max-width:850px" font-family="system-ui, sans-serif" aria-label="Three deletions from the trie holding she, shell, shells (one path s, h, e, l, l, s), each from the result of the one before. Delete she: its node is unmarked, and it has a child, so pruning stops; nothing is freed. Delete shells: its node is unmarked and childless, so it is freed; its parent l is the word shell, so pruning stops; one node freed. Delete shell: its node is unmarked; it and every node above it are now childless and unmarked, so all five are freed, up to the root. .">
+<line x1="41" y1="41.5" x2="57" y2="41.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="83" y1="41.5" x2="99" y2="41.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="125" y1="41.5" x2="137" y2="41.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="167" y1="41.5" x2="183" y2="41.5" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="209" y1="41.5" x2="221" y2="41.5" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="251" y1="41.5" x2="263" y2="41.5" stroke="#4a5163" stroke-width="1.5"/>
+<circle cx="28" cy="41.5" r="13" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="28" y="46" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="70" cy="41.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="70" y="46" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<circle cx="112" cy="41.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="112" y="46" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">h</text>
+<circle cx="154" cy="41.5" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="154" cy="41.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="154" y="46" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">e</text>
+<circle cx="196" cy="41.5" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="196" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="238" cy="41.5" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="238" cy="41.5" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="238" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="280" cy="41.5" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="280" cy="41.5" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="280" y="46" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<text x="353.9" y="33" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="353.9" y="49" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">delete she</text>
+<text x="353.9" y="62" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">freed: 0</text>
+<line x1="440.9" y1="34" x2="456.9" y2="34" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="482.9" y1="34" x2="498.9" y2="34" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="524.9" y1="34" x2="540.9" y2="34" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="566.9" y1="34" x2="582.9" y2="34" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="608.9" y1="34" x2="620.9" y2="34" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="650.9" y1="34" x2="662.9" y2="34" stroke="#4a5163" stroke-width="1.5"/>
+<circle cx="427.9" cy="34" r="13" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="427.9" y="38.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="469.9" cy="34" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="469.9" y="38.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<circle cx="511.9" cy="34" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="511.9" y="38.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">h</text>
+<circle cx="553.9" cy="34" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="553.9" y="38.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<text x="553.9" y="62" font-size="10.5" font-weight="600" fill="#2a2d36" text-anchor="middle">stop: it has a child</text>
+<circle cx="595.9" cy="34" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="595.9" y="38.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="637.9" cy="34" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="637.9" cy="34" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="637.9" y="38.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="679.9" cy="34" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="679.9" cy="34" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="679.9" y="38.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<line x1="41" y1="113.5" x2="57" y2="113.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="83" y1="113.5" x2="99" y2="113.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="125" y1="113.5" x2="141" y2="113.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="167" y1="113.5" x2="183" y2="113.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="209" y1="113.5" x2="221" y2="113.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="251" y1="113.5" x2="263" y2="113.5" stroke="#6b40d8" stroke-width="2.8"/>
+<circle cx="28" cy="113.5" r="13" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="28" y="118" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="70" cy="113.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="70" y="118" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<circle cx="112" cy="113.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="112" y="118" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">h</text>
+<circle cx="154" cy="113.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="154" y="118" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">e</text>
+<circle cx="196" cy="113.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="196" y="118" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">l</text>
+<circle cx="238" cy="113.5" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="238" cy="113.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="238" y="118" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">l</text>
+<circle cx="280" cy="113.5" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="280" cy="113.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="280" y="118" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<text x="353.9" y="105" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="353.9" y="121" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">delete shells</text>
+<text x="353.9" y="134" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">freed: 1</text>
+<line x1="440.9" y1="106" x2="456.9" y2="106" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="482.9" y1="106" x2="498.9" y2="106" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="524.9" y1="106" x2="540.9" y2="106" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="566.9" y1="106" x2="582.9" y2="106" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="608.9" y1="106" x2="620.9" y2="106" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="650.9" y1="106" x2="666.9" y2="106" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="427.9" cy="106" r="13" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="427.9" y="110.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="469.9" cy="106" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="469.9" y="110.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<circle cx="511.9" cy="106" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="511.9" y="110.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">h</text>
+<circle cx="553.9" cy="106" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="553.9" y="110.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<circle cx="595.9" cy="106" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="595.9" y="110.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="637.9" cy="106" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="637.9" cy="106" r="13" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="637.9" y="110.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<text x="637.9" y="134" font-size="10.5" font-weight="600" fill="#2a2d36" text-anchor="middle">stop: it is a word</text>
+<circle cx="679.9" cy="106" r="13" fill="#fff" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="679.9" y="110.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">s</text>
+<line x1="41" y1="185.5" x2="57" y2="185.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="83" y1="185.5" x2="99" y2="185.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="125" y1="185.5" x2="141" y2="185.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="167" y1="185.5" x2="183" y2="185.5" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="209" y1="185.5" x2="221" y2="185.5" stroke="#6b40d8" stroke-width="2.8"/>
+<circle cx="28" cy="185.5" r="13" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="28" y="190" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="70" cy="185.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="70" y="190" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<circle cx="112" cy="185.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="112" y="190" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">h</text>
+<circle cx="154" cy="185.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="154" y="190" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">e</text>
+<circle cx="196" cy="185.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="196" y="190" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">l</text>
+<circle cx="238" cy="185.5" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="238" cy="185.5" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="238" y="190" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">l</text>
+<text x="353.9" y="177" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="353.9" y="193" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">delete shell</text>
+<text x="353.9" y="206" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">freed: 5</text>
+<line x1="440.9" y1="178" x2="456.9" y2="178" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<line x1="482.9" y1="178" x2="498.9" y2="178" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<line x1="524.9" y1="178" x2="540.9" y2="178" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<line x1="566.9" y1="178" x2="582.9" y2="178" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<line x1="608.9" y1="178" x2="624.9" y2="178" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="427.9" cy="178" r="13" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="427.9" y="182.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<text x="427.9" y="206" font-size="10.5" font-weight="600" fill="#2a2d36" text-anchor="middle">stop: the root</text>
+<circle cx="469.9" cy="178" r="13" fill="#fff" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="469.9" y="182.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">s</text>
+<circle cx="511.9" cy="178" r="13" fill="#fff" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="511.9" y="182.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">h</text>
+<circle cx="553.9" cy="178" r="13" fill="#fff" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="553.9" y="182.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">e</text>
+<circle cx="595.9" cy="178" r="13" fill="#fff" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="595.9" y="182.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">l</text>
+<circle cx="637.9" cy="178" r="13" fill="#fff" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="637.9" y="182.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">l</text>
+</svg>
+<!-- /gen:str trie-delete -->
+        </figure>
         <p>
           Each deletion stops for a different reason, and those are the only
           three reasons there are: the node still has <strong>children</strong>
@@ -726,14 +958,52 @@ fn keys_with_prefix(mut t: &amp;Node, prefix: &amp;str) -&gt; Vec&lt;String&gt; 
         <strong>compressed trie</strong> (also <em>radix tree</em>) collapses
         every such chain into one edge labeled with the whole substring:
       </p>
-      <pre>  {she, shells}          root &#9472;&#9472;"she"&#9472;&#9472;&#9654; &#9679; &#9472;&#9472;"lls"&#9472;&#9472;&#9654; &#9679;
-                         3 nodes counting the root, not 6 characters' worth
-
-  add "shore" and the "she" edge must SPLIT, because keys now diverge there:
-
-                         root &#9472;&#9472;"sh"&#9472;&#9472;&#9654; &#9898; &#9472;&#9472;"e"&#9472;&#9472;&#9654;   &#9679; &#9472;&#9472;"lls"&#9472;&#9472;&#9654; &#9679;
-                                             &#9492;&#9472;"ore"&#9472;&#9472;&#9654; &#9679;
-                         5 nodes      (&#9679; = a key ends here, &#9898; = a branch)</pre>
+      <figure class="wide">
+<!-- gen:str radix -->
+<svg viewBox="0 0 526 206" role="img" style="max-width:631px" font-family="system-ui, sans-serif" aria-label="A compressed trie (radix tree). Holding she and shells, it has 3 nodes counting the root: an edge &quot;she&quot; to a node where she ends, then an edge &quot;lls&quot; to a node where shells ends. Adding shore splits the &quot;she&quot; edge, because the keys now diverge after sh: an edge &quot;sh&quot; to a branch node, then &quot;e&quot; to the node for she (and &quot;lls&quot; below it to shells), and &quot;ore&quot; to the node for shore: 5 nodes. .">
+<text x="80.4" y="46" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">{she, shells}: 3 nodes</text>
+<line x1="59.4" y1="76" x2="59.4" y2="104" stroke="#4a5163" stroke-width="1.5"/>
+<text x="66.4" y="92" font-size="11.5" font-weight="700" fill="#2a2d36" text-anchor="start">&quot;she&quot;</text>
+<line x1="59.4" y1="122" x2="59.4" y2="150" stroke="#4a5163" stroke-width="1.5"/>
+<text x="66.4" y="138" font-size="11.5" font-weight="700" fill="#2a2d36" text-anchor="start">&quot;lls&quot;</text>
+<circle cx="59.4" cy="67" r="9" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="59.4" y="71.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="59.4" cy="113" r="13" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="59.4" cy="113" r="9" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="78.4" y="117" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">she</text>
+<circle cx="59.4" cy="159" r="13" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="59.4" cy="159" r="9" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="78.4" y="163" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">shells</text>
+<text x="225.7" y="97" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="225.7" y="113" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">add shore:</text>
+<text x="225.7" y="126" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">the she edge splits</text>
+<text x="408.1" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">5 nodes</text>
+<line x1="404.4" y1="53" x2="404.4" y2="81" stroke="#4a5163" stroke-width="1.5"/>
+<text x="411.4" y="69" font-size="11.5" font-weight="700" fill="#2a2d36" text-anchor="start">&quot;sh&quot;</text>
+<line x1="397.2" y1="95.4" x2="350" y2="130.6" stroke="#4a5163" stroke-width="1.5"/>
+<text x="366.6" y="115" font-size="11.5" font-weight="700" fill="#2a2d36" text-anchor="end">&quot;e&quot;</text>
+<line x1="411.6" y1="95.4" x2="458.8" y2="130.6" stroke="#4a5163" stroke-width="1.5"/>
+<text x="442.2" y="115" font-size="11.5" font-weight="700" fill="#2a2d36" text-anchor="start">&quot;ore&quot;</text>
+<line x1="342.8" y1="145" x2="342.8" y2="173" stroke="#4a5163" stroke-width="1.5"/>
+<text x="349.8" y="161" font-size="11.5" font-weight="700" fill="#2a2d36" text-anchor="start">&quot;lls&quot;</text>
+<circle cx="404.4" cy="44" r="9" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="404.4" y="48.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="404.4" cy="90" r="9" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<circle cx="342.8" cy="136" r="13" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="342.8" cy="136" r="9" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="361.8" y="140" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">she</text>
+<circle cx="342.8" cy="182" r="13" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="342.8" cy="182" r="9" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="361.8" y="186" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">shells</text>
+<circle cx="466" cy="136" r="13" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="466" cy="136" r="9" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="485" y="140" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">shore</text>
+</svg>
+<!-- /gen:str radix -->
+        <figcaption>
+          A doubled green ring marks a node where a key ends; a plain node is a branch. Edges carry whole substrings.
+        </figcaption>
+      </figure>
       <p>
         Nodes now exist only where keys <em>branch</em> or <em>end</em>. That is
         not a rule imposed from outside, it is forced: a node with one child and
@@ -1039,10 +1309,82 @@ fn insert(t: &amp;mut RadNode, key: &amp;str, i: usize) {
           prefix and then one <code>mid</code> link lands on exactly the
           characters that may come next:
         </p>
-        <pre>  position 0 (the root's own BST)   {b, s, t}   every first character
-  after "s"    -> one mid link  ->  {e, h}
-  after "sh"   -> one mid link  ->  {e, o}      she/shells vs shore
-  after "she"  -> one mid link  ->  {l}</pre>
+        <figure class="wide">
+<!-- gen:str tst-positions -->
+<svg viewBox="0 0 379 324" role="img" style="max-width:455px" font-family="system-ui, sans-serif" aria-label="The ternary search trie for she, sells, sea, shells, by, the, shore (19 nodes); mid links solid, left and right links dashed, a doubled green ring where a key ends. The four coloured groups are the little BSTs a prefix and one mid link land on: position 0 {b, s, t}; after s {e, h}; after sh {e, o}; after she {l}. .">
+<line x1="94.2" y1="84" x2="94.2" y2="100" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="178.4" y1="33" x2="105.1" y2="67" stroke="#5c6270" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="197.1" y1="37.1" x2="219.4" y2="62.9" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="200.1" y1="33" x2="273.4" y2="67" stroke="#5c6270" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="156" y1="127" x2="165.5" y2="149" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="162.4" y1="169.1" x2="142.7" y2="191.9" stroke="#5c6270" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="170.2" y1="172" x2="170.2" y2="192" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="170.2" y1="216" x2="170.2" y2="232" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="216.9" y1="78" x2="161.6" y2="110" stroke="#5c6270" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="222.5" y1="83" x2="214.6" y2="101.3" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="208.2" y1="128" x2="208.2" y2="148" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="216.1" y1="125.1" x2="238.4" y2="150.9" stroke="#5c6270" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="208.2" y1="172" x2="208.2" y2="192" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="208.2" y1="216" x2="208.2" y2="232" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="246.2" y1="172" x2="246.2" y2="192" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="246.2" y1="216" x2="246.2" y2="232" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="284.2" y1="84" x2="284.2" y2="104" stroke="#4a5163" stroke-width="1.8"/>
+<line x1="284.2" y1="128" x2="284.2" y2="144" stroke="#4a5163" stroke-width="1.8"/>
+<circle cx="94.2" cy="72" r="12" fill="#4285f426" stroke="#4285f4" stroke-width="2.2"/>
+<text x="94.2" y="76.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">b</text>
+<circle cx="94.2" cy="116" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="94.2" cy="116" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="94.2" y="120.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">y</text>
+<circle cx="189.2" cy="28" r="12" fill="#4285f426" stroke="#4285f4" stroke-width="2.2"/>
+<text x="189.2" y="32.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<circle cx="151.2" cy="116" r="12" fill="#a142f426" stroke="#a142f4" stroke-width="2.2"/>
+<text x="151.2" y="120.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<circle cx="132.2" cy="204" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="132.2" cy="204" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="132.2" y="208.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a</text>
+<circle cx="170.2" cy="160" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="170.2" y="164.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="170.2" cy="204" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="170.2" y="208.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="170.2" cy="248" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="170.2" cy="248" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="170.2" y="252.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<circle cx="227.2" cy="72" r="12" fill="#a142f426" stroke="#a142f4" stroke-width="2.2"/>
+<text x="227.2" y="76.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">h</text>
+<circle cx="208.2" cy="116" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="208.2" cy="116" r="12" fill="#fa7b1726" stroke="#fa7b17" stroke-width="2.2"/>
+<text x="208.2" y="120.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<circle cx="208.2" cy="160" r="12" fill="#12b5cb26" stroke="#12b5cb" stroke-width="2.2"/>
+<text x="208.2" y="164.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="208.2" cy="204" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="208.2" y="208.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">l</text>
+<circle cx="208.2" cy="248" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="208.2" cy="248" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="208.2" y="252.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">s</text>
+<circle cx="246.2" cy="160" r="12" fill="#fa7b1726" stroke="#fa7b17" stroke-width="2.2"/>
+<text x="246.2" y="164.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">o</text>
+<circle cx="246.2" cy="204" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="246.2" y="208.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">r</text>
+<circle cx="246.2" cy="248" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="246.2" cy="248" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="246.2" y="252.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<circle cx="284.2" cy="72" r="12" fill="#4285f426" stroke="#4285f4" stroke-width="2.2"/>
+<text x="284.2" y="76.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">t</text>
+<circle cx="284.2" cy="116" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="284.2" y="120.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">h</text>
+<circle cx="284.2" cy="160" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="284.2" cy="160" r="12" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
+<text x="284.2" y="164.5" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">e</text>
+<circle cx="16" cy="288" r="6" fill="#4285f426" stroke="#4285f4" stroke-width="2"/><text x="28" y="292" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">position 0: {b, s, t}</text>
+<circle cx="195.2" cy="288" r="6" fill="#a142f426" stroke="#a142f4" stroke-width="2"/><text x="207.2" y="292" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">after s: {e, h}</text>
+<circle cx="16" cy="305" r="6" fill="#fa7b1726" stroke="#fa7b17" stroke-width="2"/><text x="28" y="309" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">after sh: {e, o}</text>
+<circle cx="195.2" cy="305" r="6" fill="#12b5cb26" stroke="#12b5cb" stroke-width="2"/><text x="207.2" y="309" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">after she: {l}</text>
+</svg>
+<!-- /gen:str tst-positions -->
+        <figcaption>
+          Mid links solid, left and right links dashed; a doubled green ring marks a node a key ends on. Each colour is the little BST that a prefix and one <code>mid</code> link land on.
+        </figcaption>
+        </figure>
       </div>
       <div class="demo">
         <span class="tag">Interactive</span>
@@ -1059,11 +1401,6 @@ fn insert(t: &amp;mut RadNode, key: &amp;str, i: usize) {
         thing with <a href="../../lib/demo.html?ds=trie">the R-way trie</a> on the
         same keys.
       </div>
-      <pre>  struct Node {
-      char c;
-      Node *left, *mid, *right;   <span class="cm">// &lt; c,   == c (next char),   &gt; c</span>
-      bool isWord;
-  };</pre>
       <div class="code-tabs" data-snippet="strings/tst">
 <div class="ct-tabs" role="tablist">
   <button class="ct-tab" data-lang="cpp">C++</button>
@@ -1315,73 +1652,103 @@ fn get(root: &amp;Option&lt;Box&lt;TstNode&gt;&gt;, key: &amp;[u8]) -&gt; bool {
         Trie holding \(\{\)<code>she</code>, <code>shell</code>,
         <code>shells</code>, <code>sea</code>\(\}\); query prefix
         <code>she</code>:
-        <pre>  1. walk s &rarr; h &rarr; e            (reach the "she" node)
-  2. DFS the subtree below it, emitting word-marked nodes:
-     she (marked itself), shell, shells
-  &rarr; { she, shell, shells }     ("sea" branched off at 's', never visited)</pre>
+        <figure class="wide">
+<!-- gen:str trie-kwp-she -->
+<svg viewBox="0 0 284 348" role="img" style="max-width:341px" font-family="system-ui, sans-serif" aria-label="keysWithPrefix(&quot;she&quot;) on the trie holding she, shell, shells, sea: the walk s, h, e reaches the node for she (purple path); a depth-first search of the subtree below it collects the word-marked nodes she, shell, shells (green); sea branched off at s and is never visited (grey). .">
+<line x1="121" y1="41" x2="121" y2="61" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="113" y1="84.3" x2="93.3" y2="109.7" stroke="#9aa3b5" stroke-width="1.2"/>
+<line x1="129" y1="84.3" x2="148.8" y2="109.7" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="85.3" y1="133" x2="85.3" y2="153" stroke="#9aa3b5" stroke-width="1.2"/>
+<line x1="156.8" y1="133" x2="156.8" y2="153" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="156.8" y1="179" x2="156.8" y2="199" stroke="#0a7d4d" stroke-width="2.2"/>
+<line x1="156.8" y1="225" x2="156.8" y2="245" stroke="#0a7d4d" stroke-width="2.2"/>
+<line x1="156.8" y1="271" x2="156.8" y2="291" stroke="#0a7d4d" stroke-width="2.2"/>
+<circle cx="121" cy="28" r="13" fill="#eef1f6" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="121" y="32.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="121" cy="74" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="121" y="78.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<circle cx="85.3" cy="120" r="13" fill="#fff" stroke="#9aa3b5" stroke-width="1.2"/>
+<text x="85.3" y="124.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">e</text>
+<circle cx="85.3" cy="166" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="85.3" cy="166" r="13" fill="#fff" stroke="#9aa3b5" stroke-width="1.2"/>
+<text x="85.3" y="170.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">a</text>
+<text x="108.3" y="170" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">sea</text>
+<circle cx="156.8" cy="120" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="156.8" y="124.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">h</text>
+<circle cx="156.8" cy="166" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="156.8" cy="166" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="156.8" y="170.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">e</text>
+<text x="179.8" y="170" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="start">she</text>
+<circle cx="156.8" cy="212" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="156.8" y="216.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">l</text>
+<circle cx="156.8" cy="258" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="156.8" cy="258" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="156.8" y="262.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">l</text>
+<text x="179.8" y="262" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="start">shell</text>
+<circle cx="156.8" cy="304" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="156.8" cy="304" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="156.8" y="308.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">s</text>
+<text x="179.8" y="308" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="start">shells</text>
+<text x="142" y="335" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">keysWithPrefix(&quot;she&quot;) = {she, shell, shells}</text>
+</svg>
+<!-- /gen:str trie-kwp-she -->
+        </figure>
         The cost is \(\Theta(\text{prefix length} + \text{output size})\):
         the walk touches three nodes, and the collection touches only the keys
         that actually share the prefix. That output-sensitivity is why
         autocomplete feels instant even over huge dictionaries.
       </div>
       <figure>
-        <svg viewBox="0 0 470 372" role="img" aria-label="The trie holding she, sells, sea, shells, and shells' five keys, with the query keysWithPrefix of s h highlighted. The walk from the root through s to h is outlined in purple; the subtree below the h node, containing e (word she), l, l (word shell), and s (word shells), is filled green. The keys sea and sells hang under the e child of s, outside the highlighted subtree.">
-          <g stroke="#b9c0d0" stroke-width="1.5" fill="none">
-            <line x1="235" y1="28" x2="235" y2="78"/>
-            <line x1="235" y1="78" x2="140" y2="130"/>
-            <line x1="140" y1="130" x2="85" y2="182"/>
-            <line x1="140" y1="130" x2="195" y2="182"/>
-            <line x1="195" y1="182" x2="195" y2="234"/>
-            <line x1="195" y1="234" x2="195" y2="286"/>
-          </g>
-          <g stroke="#6b40d8" stroke-width="2.2" fill="none">
-            <line x1="235" y1="78" x2="330" y2="130"/>
-          </g>
-          <g stroke="#0a7d4d" stroke-width="1.8" fill="none">
-            <line x1="330" y1="130" x2="330" y2="182"/>
-            <line x1="330" y1="182" x2="330" y2="234"/>
-            <line x1="330" y1="234" x2="330" y2="286"/>
-            <line x1="330" y1="286" x2="330" y2="338"/>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle">
-            <circle cx="235" cy="28" r="13" fill="#f0f2f6" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="235" y="33" fill="#8a9099" font-size="12">&#8709;</text>
-            <circle cx="235" cy="78" r="14" fill="#fff" stroke="#6b40d8" stroke-width="2.2"/>
-            <text x="235" y="83" fill="#6b40d8">s</text>
-            <circle cx="140" cy="130" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="140" y="135" fill="#1a1c22">e</text>
-            <circle cx="330" cy="130" r="14" fill="#fff" stroke="#6b40d8" stroke-width="2.2"/>
-            <text x="330" y="135" fill="#6b40d8">h</text>
-            <circle cx="85" cy="182" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
-            <circle cx="85" cy="182" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-            <text x="85" y="187" fill="#0a7d4d">a</text>
-            <circle cx="195" cy="182" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="195" y="187" fill="#1a1c22">l</text>
-            <circle cx="330" cy="182" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
-            <circle cx="330" cy="182" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-            <text x="330" y="187" fill="#0a7d4d">e</text>
-            <circle cx="195" cy="234" r="14" fill="#f6f8fb" stroke="#b9c0d0" stroke-width="1.4"/>
-            <text x="195" y="239" fill="#1a1c22">l</text>
-            <circle cx="330" cy="234" r="14" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-            <text x="330" y="239" fill="#1a1c22">l</text>
-            <circle cx="195" cy="286" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
-            <circle cx="195" cy="286" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-            <text x="195" y="291" fill="#0a7d4d">s</text>
-            <circle cx="330" cy="286" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
-            <circle cx="330" cy="286" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-            <text x="330" y="291" fill="#0a7d4d">l</text>
-            <circle cx="330" cy="338" r="16" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
-            <circle cx="330" cy="338" r="12" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
-            <text x="330" y="343" fill="#0a7d4d">s</text>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="12.5" font-style="italic" fill="#8a9099">
-            <text x="61" y="186" text-anchor="end">sea</text>
-            <text x="219" y="290" text-anchor="start">sells</text>
-            <text x="354" y="186" text-anchor="start">she</text>
-            <text x="354" y="290" text-anchor="start">shell</text>
-            <text x="354" y="342" text-anchor="start">shells</text>
-          </g>
-        </svg>
+<!-- gen:str trie-kwp-sh -->
+<svg viewBox="0 0 278 348" role="img" style="max-width:334px" font-family="system-ui, sans-serif" aria-label="keysWithPrefix(&quot;sh&quot;) on the trie holding she, sells, sea, shells, shell: the walk s, h (purple path) reaches the h node; the subtree below it holds exactly the answer she, shell, shells (green); the sea and sells branch under e is never visited (grey). .">
+<line x1="135.9" y1="41" x2="135.9" y2="61" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="125.6" y1="81.9" x2="86.4" y2="112.1" stroke="#9aa3b5" stroke-width="1.2"/>
+<line x1="146.2" y1="81.9" x2="185.4" y2="112.1" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="68.1" y1="130.3" x2="48.4" y2="155.7" stroke="#9aa3b5" stroke-width="1.2"/>
+<line x1="84.1" y1="130.3" x2="103.9" y2="155.7" stroke="#9aa3b5" stroke-width="1.2"/>
+<line x1="111.9" y1="179" x2="111.9" y2="199" stroke="#9aa3b5" stroke-width="1.2"/>
+<line x1="111.9" y1="225" x2="111.9" y2="245" stroke="#9aa3b5" stroke-width="1.2"/>
+<line x1="195.7" y1="133" x2="195.7" y2="153" stroke="#0a7d4d" stroke-width="2.2"/>
+<line x1="195.7" y1="179" x2="195.7" y2="199" stroke="#0a7d4d" stroke-width="2.2"/>
+<line x1="195.7" y1="225" x2="195.7" y2="245" stroke="#0a7d4d" stroke-width="2.2"/>
+<line x1="195.7" y1="271" x2="195.7" y2="291" stroke="#0a7d4d" stroke-width="2.2"/>
+<circle cx="135.9" cy="28" r="13" fill="#eef1f6" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="135.9" y="32.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="135.9" cy="74" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="135.9" y="78.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<circle cx="76.1" cy="120" r="13" fill="#fff" stroke="#9aa3b5" stroke-width="1.2"/>
+<text x="76.1" y="124.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">e</text>
+<circle cx="40.4" cy="166" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="40.4" cy="166" r="13" fill="#fff" stroke="#9aa3b5" stroke-width="1.2"/>
+<text x="40.4" y="170.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">a</text>
+<text x="63.4" y="170" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">sea</text>
+<circle cx="111.9" cy="166" r="13" fill="#fff" stroke="#9aa3b5" stroke-width="1.2"/>
+<text x="111.9" y="170.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">l</text>
+<circle cx="111.9" cy="212" r="13" fill="#fff" stroke="#9aa3b5" stroke-width="1.2"/>
+<text x="111.9" y="216.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">l</text>
+<circle cx="111.9" cy="258" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="111.9" cy="258" r="13" fill="#fff" stroke="#9aa3b5" stroke-width="1.2"/>
+<text x="111.9" y="262.5" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">s</text>
+<text x="134.9" y="262" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">sells</text>
+<circle cx="195.7" cy="120" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="195.7" y="124.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">h</text>
+<circle cx="195.7" cy="166" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="195.7" cy="166" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="195.7" y="170.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">e</text>
+<text x="218.7" y="170" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="start">she</text>
+<circle cx="195.7" cy="212" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="195.7" y="216.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">l</text>
+<circle cx="195.7" cy="258" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="195.7" cy="258" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="195.7" y="262.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">l</text>
+<text x="218.7" y="262" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="start">shell</text>
+<circle cx="195.7" cy="304" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="195.7" cy="304" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="195.7" y="308.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">s</text>
+<text x="218.7" y="308" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="start">shells</text>
+<text x="139" y="335" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">keysWithPrefix(&quot;sh&quot;) = {she, shell, shells}</text>
+</svg>
+<!-- /gen:str trie-kwp-sh -->
         <figcaption>
           <code>keysWithPrefix("sh")</code> on the demo trie (keys
           <code>she, sells, sea, shells, shell</code>). The purple outline is
@@ -1402,10 +1769,40 @@ fn get(root: &amp;Option&lt;Box&lt;TstNode&gt;&gt;, key: &amp;[u8]) -&gt; bool {
         <span class="tag">Example (longestPrefixOf, worked)</span>
         Keys \(\{\)<code>she</code>, <code>shells</code>\(\}\); query
         <code>shellsort</code>:
-        <pre>  s h e     &rarr; passed "she", a word     (remember "she")
-  l l s     &rarr; passed "shells", a word  (remember it; longer)
-  o         &rarr; no child &rarr; stop
-  &rarr; longestPrefixOf("shellsort") = "shells"</pre>
+        <figure class="wide">
+<!-- gen:str trie-lpo -->
+<svg viewBox="0 0 622 74" role="img" style="max-width:746px" font-family="system-ui, sans-serif" aria-label="longestPrefixOf(&quot;shellsort&quot;) on the trie holding she and shells: the walk passes she (a word: remember it), then shells (a longer word: remember it), then finds no o child and stops; the answer is the last word passed, shells. .">
+<line x1="41" y1="32" x2="57" y2="32" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="83" y1="32" x2="99" y2="32" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="125" y1="32" x2="137" y2="32" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="167" y1="32" x2="183" y2="32" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="209" y1="32" x2="225" y2="32" stroke="#6b40d8" stroke-width="2.8"/>
+<line x1="251" y1="32" x2="263" y2="32" stroke="#6b40d8" stroke-width="2.8"/>
+<circle cx="28" cy="32" r="13" fill="#eef1f6" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="28" y="36.5" font-size="12" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<circle cx="70" cy="32" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="70" y="36.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">s</text>
+<circle cx="112" cy="32" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="112" y="36.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">h</text>
+<circle cx="154" cy="32" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="154" cy="32" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="154" y="36.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">e</text>
+<text x="154" y="60" font-size="10.5" font-weight="600" fill="#6b40d8" text-anchor="middle">remember she</text>
+<circle cx="196" cy="32" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="196" y="36.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">l</text>
+<circle cx="238" cy="32" r="13" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="238" y="36.5" font-size="13.5" font-weight="600" fill="#6b40d8" text-anchor="middle">l</text>
+<circle cx="280" cy="32" r="17" fill="none" stroke="#0a7d4d" stroke-width="1.4"/>
+<circle cx="280" cy="32" r="13" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="280" y="36.5" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">s</text>
+<text x="280" y="60" font-size="10.5" font-weight="600" fill="#6b40d8" text-anchor="middle">remember shells</text>
+<line x1="293" y1="32" x2="315" y2="32" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="3 3"/>
+<text x="323" y="37" font-size="13" font-weight="700" fill="#c0392b" text-anchor="middle">✗</text>
+<text x="309" y="24" font-size="11" font-weight="700" fill="#c0392b" text-anchor="middle">o</text>
+<text x="346" y="36" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">longestPrefixOf(&quot;shellsort&quot;) = &quot;shells&quot;</text>
+</svg>
+<!-- /gen:str trie-lpo -->
+        </figure>
         This is exactly IP <em>longest-prefix match</em>: a router stores
         network prefixes in a (Patricia) trie, walks a destination address bit
         by bit, and forwards along the most specific (longest) matching prefix it passed. It is also how word segmenters and lexers
@@ -1510,7 +1907,7 @@ fn get(root: &amp;Option&lt;Box&lt;TstNode&gt;&gt;, key: &amp;[u8]) -&gt; bool {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Tries &amp; Ternary Search Trees v1.0
+        Data Structures &amp; Algorithms &middot; Tries &amp; Ternary Search Trees v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

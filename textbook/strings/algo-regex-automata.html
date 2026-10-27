@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -171,19 +172,26 @@
         You use regexes daily (<code>grep</code>, editor find, input
         validation), and the four operations generate everything:
       </p>
-      <pre>  AB       matches exactly &quot;AB&quot;
-  A|B      matches &quot;A&quot; or &quot;B&quot;
-  A*       matches &quot;&quot;, &quot;A&quot;, &quot;AA&quot;, &quot;AAA&quot;, &hellip;
-  (AB)*    matches &quot;&quot;, &quot;AB&quot;, &quot;ABAB&quot;, &hellip;</pre>
+      <table>
+        <tr><th>regex</th><th>matches</th></tr>
+        <tr><td><code>AB</code></td><td>exactly <code>"AB"</code></td></tr>
+        <tr><td><code>A|B</code></td><td><code>"A"</code> or <code>"B"</code></td></tr>
+        <tr><td><code>A*</code></td><td><code>""</code>, <code>"A"</code>, <code>"AA"</code>, <code>"AAA"</code>, &hellip;</td></tr>
+        <tr><td><code>(AB)*</code></td><td><code>""</code>, <code>"AB"</code>, <code>"ABAB"</code>, &hellip;</td></tr>
+      </table>
       <p>
         Thinking in terms of the set of accepted strings (not the
         character-by-character syntax) is what connects regexes to automata,
         which are membership testers for these sets:
       </p>
-      <pre>  L(A*B)     = { B, AB, AAB, AAAB, &hellip; }    (any run of A&#x27;s, then a B)
-  L((A|B)C)  = { AC, BC }
-  L((0|1)*)  = every binary string (any length, including &quot;&quot;)
-  L(A(B|C)*D) = A, then any mix of B&#x27;s and C&#x27;s, then D</pre>
+      \[
+        \begin{aligned}
+          L(\texttt{A*B}) &= \{\texttt{B}, \texttt{AB}, \texttt{AAB}, \texttt{AAAB}, \dots\} \quad \text{(any run of A's, then a B)}\\
+          L(\texttt{(A|B)C}) &= \{\texttt{AC}, \texttt{BC}\}\\
+          L(\texttt{(0|1)*}) &= \text{every binary string, of any length, including the empty one}\\
+          L(\texttt{A(B|C)*D}) &= \text{an A, then any mix of B's and C's, then a D}
+        \end{aligned}
+      \]
       <p>
         The reading skill is to decompose at the outermost operator first: break the regex at its top-level <code>|</code> and <code>*</code>, then
         recurse into the groups. That recursive structure is exactly what the
@@ -231,14 +239,19 @@
         string</em></strong>: zero characters, the theory-book name for
         <code>&quot;&quot;</code>, and the same \(\varepsilon\) that labels
         the free moves of &sect;2&rsquo;s automata:
-        <pre>  A+     =  AA*             one or more
-  A?     =  (A|&epsilon;)           optional: an A, or nothing at all
-  A{3}   =  AAA             exactly 3 copies
-  A{1,2} =  (A|AA)          between 1 and 2 copies
-  [abc]  =  (a|b|c)         any ONE of a, b, c
-  [a-z]  =  any one of a..z &middot; [^ab] = any one char EXCEPT a, b
-  \d     =  [0123456789]    one digit   &middot;   .  = any one character
-  \(     =  a literal (     \ turns an operator into a plain character</pre>
+        <table>
+          <tr><th>sugar</th><th>means</th><th></th></tr>
+          <tr><td><code>A+</code></td><td><code>AA*</code></td><td>one or more</td></tr>
+          <tr><td><code>A?</code></td><td><code>(A|</code>&epsilon;<code>)</code></td><td>optional: an <code>A</code>, or nothing at all</td></tr>
+          <tr><td><code>A{3}</code></td><td><code>AAA</code></td><td>exactly 3 copies</td></tr>
+          <tr><td><code>A{1,2}</code></td><td><code>(A|AA)</code></td><td>between 1 and 2 copies</td></tr>
+          <tr><td><code>[abc]</code></td><td><code>(a|b|c)</code></td><td>any one of <code>a</code>, <code>b</code>, <code>c</code></td></tr>
+          <tr><td><code>[a-z]</code></td><td></td><td>any one of <code>a</code> to <code>z</code></td></tr>
+          <tr><td><code>[^ab]</code></td><td></td><td>any one character except <code>a</code> and <code>b</code></td></tr>
+          <tr><td><code>\d</code></td><td><code>[0123456789]</code></td><td>one digit</td></tr>
+          <tr><td><code>.</code></td><td></td><td>any one character</td></tr>
+          <tr><td><code>\(</code></td><td>a literal <code>(</code></td><td><code>\</code> turns an operator into a plain character</td></tr>
+        </table>
         (Inside brackets <code>^</code> negates; outside them, as the end of
         this aside explains, it anchors.)
         Because it is all sugar, machinery for the four core operations
@@ -260,13 +273,16 @@
         <code>\(?\d{3}\)?[- ]?\d{3}-?\d{4}</code> matches
         <code>(206)&nbsp;555-1234</code>, <code>206-555-1234</code>, and
         <code>2065551234</code>. Piece by piece:
-        <pre>  \(?     an optional literal (      \( is ONE token; ? applies to it
-  \d{3}   exactly three digits
-  \)?     an optional literal )
-  [- ]?   an optional dash OR space
-  \d{3}   three digits
-  -?      an optional dash (no space allowed here)
-  \d{4}   four digits</pre>
+        <table>
+          <tr><th>piece</th><th>matches</th></tr>
+          <tr><td><code>\(?</code></td><td>an optional literal <code>(</code>: <code>\(</code> is one token, and <code>?</code> applies to it</td></tr>
+          <tr><td><code>\d{3}</code></td><td>exactly three digits</td></tr>
+          <tr><td><code>\)?</code></td><td>an optional literal <code>)</code></td></tr>
+          <tr><td><code>[- ]?</code></td><td>an optional dash or space</td></tr>
+          <tr><td><code>\d{3}</code></td><td>three digits</td></tr>
+          <tr><td><code>-?</code></td><td>an optional dash (no space allowed here)</td></tr>
+          <tr><td><code>\d{4}</code></td><td>four digits</td></tr>
+        </table>
         The piece that trips readers is <code>\(?</code>: the backslash binds
         first, making <code>\(</code> a single ordinary-character token, and
         <em>then</em> <code>?</code> makes that token optional. It desugars
@@ -361,39 +377,30 @@
         alphabet over:
       </div>
       <figure>
-        <svg viewBox="0 0 480 190" role="img" aria-label="A two-state deterministic finite automaton. State A, marked start, has a self-loop labeled 1 and an arrow labeled 0 to state B. State B, drawn with a double circle to mark it accepting, has a self-loop labeled 0 and an arrow labeled 1 back to A.">
-          <defs>
-            <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
-            </marker>
-          </defs>
-          <g stroke="#5c6270" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
-            <line x1="70" y1="95" x2="124" y2="95"/>
-            <path d="M 141,75 C 128,38 172,38 159,75"/>
-            <path d="M 321,75 C 308,38 352,38 339,75"/>
-            <path d="M 171,86 C 220,64 260,64 309,86"/>
-            <path d="M 309,104 C 260,126 220,126 171,104"/>
-          </g>
-          <g fill="#fff" stroke="#1a1c22" stroke-width="1.6">
-            <circle cx="150" cy="95" r="22"/>
-            <circle cx="330" cy="95" r="22"/>
-            <circle cx="330" cy="95" r="16.5"/>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1c22">
-            <text x="150" y="100">A</text>
-            <text x="330" y="100">B</text>
-          </g>
-          <g font-family="SF Mono, Menlo, monospace" font-size="13.5" font-weight="700" text-anchor="middle" fill="#0a7d4d">
-            <text x="150" y="32">1</text>
-            <text x="330" y="32">0</text>
-            <text x="240" y="60">0</text>
-            <text x="240" y="141">1</text>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="11.5" text-anchor="middle" fill="#5c6270">
-            <text x="150" y="137">start</text>
-            <text x="330" y="137">accept</text>
-          </g>
-        </svg>
+<!-- gen:str re-dfa-ends0 -->
+<svg viewBox="0 0 302 104" role="img" style="max-width:362px" font-family="system-ui, sans-serif" aria-label="A DFA recognizing binary strings ending in 0: two states, A (start) and B (accepting, a double circle). state A (start). state B (accepting). A on 0 to B. A on 1 to A. B on 0 to B. B on 1 to A.">
+<path d="M102,57 Q174,28 246,57" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M246,57 L238.2,57.6 L240.8,51.1 Z" fill="#5c6270"/>
+<text x="174" y="33" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">0</text>
+<path d="M75,48 C60,14 108,14 93,48" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M93,48 L92.6,40.2 L99,43 Z" fill="#5c6270"/>
+<text x="84" y="16" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<path d="M255,48 C240,14 288,14 273,48" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M273,48 L272.6,40.2 L279,43 Z" fill="#5c6270"/>
+<text x="264" y="16" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">0</text>
+<path d="M246,71 Q174,100 102,71" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M102,71 L109.8,70.4 L107.2,76.9 Z" fill="#5c6270"/>
+<text x="174" y="103" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<line x1="24" y1="64" x2="58" y2="64" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M64,64 L57,67.5 L57,60.5 Z" fill="#5c6270"/>
+<text x="38" y="57" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">start</text>
+<circle cx="84" cy="64" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<text x="84" y="69" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">A</text>
+<circle cx="264" cy="64" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<circle cx="264" cy="64" r="15.5" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="264" y="69" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">B</text>
+</svg>
+<!-- /gen:str re-dfa-ends0 -->
         <figcaption>
           A DFA recognizing \(L(\texttt{(0|1)*0})\), binary strings ending in
           \(\texttt{0}\). State \(A\) means &ldquo;the input so far does not end in
@@ -410,8 +417,8 @@
         does not end in <code>0</code>). Each step follows exactly one arrow, so a
         DFA processes an \(n\)-character string in \(O(n)\), and the invariant
         &ldquo;state \(B\) \(\iff\) the input so far ends in <code>0</code>&rdquo;
-        is the correctness argument, a loop invariant like every other one this
-        course. It is also the finite-memory point of &sect;1 made concrete: two
+        is the correctness argument, a loop invariant like every other one in these
+        handouts. It is also the finite-memory point of &sect;1 made concrete: two
         states can remember &ldquo;ends in 0 or not,&rdquo; but no fixed number of
         states can remember an unbounded count.
       </p>
@@ -456,8 +463,12 @@
         weighed in &sect;6. Either way, one bridge makes everything cohere:
         the automaton is a <em>membership tester</em> for the regex&rsquo;s
         language:</p>
-      <pre>  the NFA ACCEPTS a string   &hArr;   the string is IN the regex&#x27;s language
-  &quot;does it match?&quot;  =  &quot;does the NFA accept?&quot;</pre>
+      \[
+        \begin{aligned}
+          \text{the NFA accepts a string} &\iff \text{the string is in the regex's language}\\
+          \text{&ldquo;does it match?&rdquo;} &= \text{&ldquo;does the NFA accept?&rdquo;}
+        \end{aligned}
+      \]
 
       <!-- ============================================================ -->
       <h2 id="build">3. Thompson&rsquo;s construction: from regex to NFA</h2>
@@ -639,16 +650,17 @@
       </div>
       <div class="ex">
         <span class="tag">Example (warm-up: build <code>A*B</code>)</span>
-        <pre>  re:  A   *   B         states 0 1 2 3   (3 = accept)
-
-  i=0 &#x27;A&#x27;, next is &#x27;*&#x27; &rarr;  &epsilon; 0&rarr;1  (skip the A)
-                          match edge 0 &#x2500;A&rarr; 1
-  i=1 &#x27;*&#x27;              &rarr;  &epsilon; 1&rarr;2  (fall through the &#x27;*&#x27;)
-                          &epsilon; 1&rarr;0  (repeat the A)
-  i=2 &#x27;B&#x27;              &rarr;  match edge 2 &#x2500;B&rarr; 3
-
-  &epsilon;-edges: 0&rarr;1, 1&rarr;0, 1&rarr;2      match edges: 0&#x2500;A&rarr;1, 2&#x2500;B&rarr;3</pre>
-        Each state&rsquo;s <em>out</em>-edges are listed beside it: this is
+        <!-- gen:str re-astarb-table -->
+<table class="trace">
+<tr><th class="lab">state</th><th>re[i]</th><th>out-edges</th></tr>
+<tr><td class="lab">0</td><td class="cell">A</td><td style="text-align:left">&epsilon; 0&rarr;1 (skip the A)<br>match 0&nbsp;&ndash;A&rarr;&nbsp;1</td></tr>
+<tr><td class="lab">1</td><td class="cell">*</td><td style="text-align:left">&epsilon; 1&rarr;0 (repeat the A)<br>&epsilon; 1&rarr;2 (fall through the '*')</td></tr>
+<tr><td class="lab">2</td><td class="cell">B</td><td style="text-align:left">match 2&nbsp;&ndash;B&rarr;&nbsp;3</td></tr>
+<tr><td class="lab">3</td><td>accept</td><td style="text-align:left">&ndash;</td></tr>
+<tr><td colspan="3" style="text-align:left">&epsilon;-edges (3): 0&rarr;1, 1&rarr;0, 1&rarr;2; match edges (2): 0&nbsp;&ndash;A&rarr;&nbsp;1, 2&nbsp;&ndash;B&rarr;&nbsp;3</td></tr>
+</table>
+<!-- /gen:str re-astarb-table -->
+        Each state&rsquo;s <em>out</em>-edges are listed in its row: this is
         the adjacency list that &sect;4&rsquo;s \(\varepsilon\)-closure
         will graph-search. The star
         wires two \(\varepsilon\)-edges around its operand: \(0 \to 1\)
@@ -656,56 +668,40 @@
         is listed there) and \(1 \to 0\) loops back for more copies (listed
         under state \(1\)), whose other edge falls through to the
         <code>B</code>. Three \(\varepsilon\)-edges, two match edges, four
-        states: Thompson&rsquo;s gadgets, compressed onto the string. This exact machine
-        (same state numbers, same edges) is the one the in-class activity
-        (ICA&nbsp;17) hands you.
+        states: Thompson&rsquo;s gadgets, compressed onto the string.
       </div>
       <figure>
-        <svg viewBox="0 0 660 230" role="img" aria-label="The four-state NFA for the regex A star B. States 0 through 3 sit on a line; state 0 is the character A, state 1 the star, state 2 the character B, state 3 the accept state drawn as a double circle. Solid arrows: 0 to 1 labeled A, and 2 to 3 labeled B. Dashed epsilon arcs above: 0 to 1 (skip) and 1 to 2 (fall through); a dashed epsilon arc below from 1 back to 0 (repeat).">
-          <defs>
-            <marker id="arrF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
-            </marker>
-          </defs>
-          <g stroke="#5c6270" stroke-width="1.6" fill="none" marker-end="url(#arrF)">
-            <line x1="40" y1="130" x2="86" y2="130"/>
-            <line x1="132" y1="130" x2="234" y2="130"/>
-            <line x1="432" y1="130" x2="534" y2="130"/>
-            <g stroke-dasharray="5 4">
-              <path d="M 118,112 C 155,52 215,52 252,112"/>
-              <path d="M 268,112 C 305,52 365,52 402,112"/>
-              <path d="M 244,144 C 210,200 160,200 128,146"/>
-            </g>
-          </g>
-          <g fill="#fff" stroke="#1a1c22" stroke-width="1.6">
-            <circle cx="110" cy="130" r="20"/>
-            <circle cx="260" cy="130" r="20"/>
-            <circle cx="410" cy="130" r="20"/>
-            <circle cx="560" cy="130" r="20"/>
-            <circle cx="560" cy="130" r="15"/>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1c22">
-            <text x="110" y="135">0</text>
-            <text x="260" y="135">1</text>
-            <text x="410" y="135">2</text>
-            <text x="560" y="135">3</text>
-          </g>
-          <g font-family="SF Mono, Menlo, monospace" font-size="14.5" font-weight="700" text-anchor="middle" fill="#1a1c22">
-            <text x="110" y="178">A</text>
-            <text x="260" y="178">*</text>
-            <text x="410" y="178">B</text>
-          </g>
-          <text x="560" y="176" font-family="system-ui, sans-serif" font-size="11.5" text-anchor="middle" fill="#5c6270">accept</text>
-          <g font-family="SF Mono, Menlo, monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#0a7d4d">
-            <text x="184" y="119">A</text>
-            <text x="484" y="119">B</text>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="13.5" font-style="italic" text-anchor="middle" fill="#9a5b00">
-            <text x="185" y="58">&epsilon;</text>
-            <text x="335" y="58">&epsilon;</text>
-            <text x="186" y="196">&epsilon;</text>
-          </g>
-        </svg>
+<!-- gen:str re-nfa-astarb -->
+<svg viewBox="0 0 350 149" role="img" style="max-width:420px" font-family="system-ui, sans-serif" aria-label="The four-state NFA for the regex A*B under Sedgewick's encoding (unwrapped). states 0 to 3 (state 3 accepts), the characters A * B. match edges 0 to 1 on A, 2 to 3 on B. epsilon-edges 0 to 1, 1 to 0, 1 to 2.">
+<path d="M41.8,61.7 C49.8,30.5 108.2,30.5 116.2,61.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M116.2,61.7 L111.4,56.2 L117.7,54.6 Z" fill="#5c6270"/>
+<text x="79" y="38" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M116.2,83.3 C108.2,114.5 49.8,114.5 41.8,83.3" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M41.8,83.3 L46.6,88.8 L40.3,90.4 Z" fill="#5c6270"/>
+<text x="79" y="116" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M137.8,61.7 C145.8,30.5 204.2,30.5 212.2,61.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M212.2,61.7 L207.4,56.2 L213.7,54.6 Z" fill="#5c6270"/>
+<text x="175" y="38" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<line x1="46" y1="72.5" x2="106" y2="72.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M112,72.5 L105.5,75.8 L105.5,69.3 Z" fill="#5c6270"/>
+<text x="79" y="66.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="238" y1="72.5" x2="298" y2="72.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M304,72.5 L297.5,75.8 L297.5,69.3 Z" fill="#5c6270"/>
+<text x="271" y="66.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<circle cx="31" cy="72.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="31" y="77" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">0</text>
+<text x="31" y="102.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<circle cx="127" cy="72.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="127" y="77" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="127" y="102.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">*</text>
+<circle cx="223" cy="72.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="223" y="77" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="223" y="102.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<circle cx="319" cy="72.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<circle cx="319" cy="72.5" r="11" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="319" y="77" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">3</text>
+</svg>
+<!-- /gen:str re-nfa-astarb -->
         <figcaption>
           The <code>A*B</code> machine under Sedgewick&rsquo;s encoding. Each state
           is one character of the regex (shown beneath it); solid edges consume
@@ -720,21 +716,17 @@
         Each operator needs to know its <em>operands</em>, which requires parsing, and Sedgewick does it in one left-to-right scan with a
         <strong>stack</strong>, exactly like evaluating an arithmetic expression:
       </p>
-      <pre>  &#x27;(&#x27; or &#x27;|&#x27;  &rarr;  push its index
-  &#x27;)&#x27;         &rarr;  pop; if a &#x27;|&#x27; comes off, wire the alternation:
-                   &epsilon; from the &#x27;(&#x27; to just after the &#x27;|&#x27;   (enter branch 2)
-                   &epsilon; from the &#x27;|&#x27; to the &#x27;)&#x27;             (skip to the join)
-                       addEdge(lp, or+1);   addEdge(or, i);
-  &#x27;*&#x27; after an atom or group starting at lp:
-                   &epsilon; lp&rarr;star  (skip)   and   &epsilon; star&rarr;lp  (repeat)
-                       addEdge(lp, i+1);   addEdge(i+1, lp);
-  &#x27;(&#x27;, &#x27;*&#x27;, &#x27;)&#x27;  &rarr;  &epsilon; i&rarr;i+1  (fall through the metacharacter)
-                       addEdge(i, i+1);
-  first of all:    wrap the regex in implicit parens: &quot;A|B&quot; &rarr; &quot;(A|B)&quot;</pre>
+      <table>
+        <tr><th>at</th><th>do</th><th>code</th></tr>
+        <tr><td><code>(</code> or <code>|</code></td><td>push its index</td><td></td></tr>
+        <tr><td><code>)</code></td><td>pop; if a <code>|</code> comes off, wire the alternation: &epsilon; from the <code>(</code> to just after the <code>|</code> (enter branch 2), and &epsilon; from the <code>|</code> to the <code>)</code> (skip to the join)</td><td style="white-space:nowrap"><code>addEdge(lp, or+1);</code><br><code>addEdge(or, i);</code></td></tr>
+        <tr><td><code>*</code> after an atom or group starting at <code>lp</code></td><td>&epsilon; lp&rarr;star (skip) and &epsilon; star&rarr;lp (repeat)</td><td style="white-space:nowrap"><code>addEdge(lp, i+1);</code><br><code>addEdge(i+1, lp);</code></td></tr>
+        <tr><td><code>(</code>, <code>*</code>, <code>)</code></td><td>&epsilon; i&rarr;i+1 (fall through the metacharacter)</td><td style="white-space:nowrap"><code>addEdge(i, i+1);</code></td></tr>
+        <tr><td>first of all</td><td>wrap the regex in implicit parens: <code>A|B</code> &rarr; <code>(A|B)</code></td><td></td></tr>
+      </table>
       <p>
         Those five <code>addEdge</code> calls are the <em>entire</em>
-        construction, and they are what ICA&nbsp;17&rsquo;s
-        <code>buildNFA</code> extra credit asks you to write.
+        construction.
       </p>
       <p>
         The <strong>outer wrap</strong> is a real implementation detail worth
@@ -753,28 +745,120 @@
         Three regexes, each isolating a single gadget, built to the last
         edge. Read them as the encoding&rsquo;s version of the three figures
         above.
-        <pre>  CONCATENATION  re = ( A B C )      states 0..5   (5 = accept)
-      i=0 &#x27;(&#x27;  &rarr; &epsilon; 0&rarr;1        i=1 &#x27;A&#x27; &rarr; 1 &#x2500;A&rarr; 2
-      i=2 &#x27;B&#x27;  &rarr; 2 &#x2500;B&rarr; 3         i=3 &#x27;C&#x27; &rarr; 3 &#x2500;C&rarr; 4
-      i=4 &#x27;)&#x27;  &rarr; &epsilon; 4&rarr;5
-      &epsilon;-edges: 0&rarr;1, 4&rarr;5   match: 1&#x2500;A&rarr;2, 2&#x2500;B&rarr;3, 3&#x2500;C&rarr;4
-      start closure {0,1}: only state 1 is armed, and only an A moves it.
-
-  UNION          re = ( A | B )      states 0..5   (5 = accept)
-      i=0 &#x27;(&#x27;  &rarr; &epsilon; 0&rarr;1        i=1 &#x27;A&#x27; &rarr; 1 &#x2500;A&rarr; 2
-      i=2 &#x27;|&#x27;  &rarr; push 2 (silent)    i=3 &#x27;B&#x27; &rarr; 3 &#x2500;B&rarr; 4
-      i=4 &#x27;)&#x27;  &rarr; pop &#x27;|&#x27;(2), pop &#x27;(&#x27;(0):  &epsilon; 0&rarr;3 (fork), &epsilon; 2&rarr;4 (join)
-                 then &epsilon; 4&rarr;5
-      &epsilon;-edges: 0&rarr;1, 0&rarr;3, 2&rarr;4, 4&rarr;5   match: 1&#x2500;A&rarr;2, 3&#x2500;B&rarr;4
-      start closure {0,1,3}: BOTH letters armed at once.
-
-  CLOSURE        re = ( A * )        states 0..4   (4 = accept)
-      i=0 &#x27;(&#x27;  &rarr; &epsilon; 0&rarr;1
-      i=1 &#x27;A&#x27;, next is &#x27;*&#x27; &rarr; &epsilon; 1&rarr;2 (skip), &epsilon; 2&rarr;1 (repeat), 1 &#x2500;A&rarr; 2
-      i=2 &#x27;*&#x27;  &rarr; &epsilon; 2&rarr;3        i=3 &#x27;)&#x27; &rarr; &epsilon; 3&rarr;4
-      &epsilon;-edges: 0&rarr;1, 1&rarr;2, 2&rarr;1, 2&rarr;3, 3&rarr;4   match: 1&#x2500;A&rarr;2
-      start closure {0,1,2,3,4}: contains the accept state 4 before
-      any input, which is exactly &quot;A* matches the empty string&quot;.</pre>
+        <figure class="wide">
+<!-- gen:str re-gadgets -->
+<svg viewBox="0 0 470 510" role="img" style="max-width:564px" font-family="system-ui, sans-serif" aria-label="Three wrapped regexes, each isolating one gadget, with the start closure drawn purple. Concatenation (ABC): epsilon-edges 0 to 1 and 4 to 5, match edges 1 to 2 on A, 2 to 3 on B, 3 to 4 on C; start closure {0, 1}. Union (A|B): epsilon-edges 0 to 1, 0 to 3 (the fork), 2 to 4 (the join), 4 to 5; match edges 1 to 2 on A and 3 to 4 on B; start closure {0, 1, 3}. Closure (A*): epsilon-edges 0 to 1, 1 to 2 (skip), 2 to 1 (repeat), 2 to 3, 3 to 4; match edge 1 to 2 on A; start closure {0, 1, 2, 3, 4}, which holds the accept state. .">
+<text x="235" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">concatenation: re = (ABC)</text>
+<path d="M95.8,81.7 C103.8,50.5 126.2,50.5 134.2,81.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M134.2,81.7 L129.4,76.2 L135.7,74.6 Z" fill="#5c6270"/>
+<text x="115" y="58" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M335.8,81.7 C343.8,50.5 366.2,50.5 374.2,81.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M374.2,81.7 L369.4,76.2 L375.7,74.6 Z" fill="#5c6270"/>
+<text x="355" y="58" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<line x1="160" y1="92.5" x2="184" y2="92.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M190,92.5 L183.5,95.8 L183.5,89.3 Z" fill="#5c6270"/>
+<text x="175" y="86.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="220" y1="92.5" x2="244" y2="92.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M250,92.5 L243.5,95.8 L243.5,89.3 Z" fill="#5c6270"/>
+<text x="235" y="86.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<line x1="280" y1="92.5" x2="304" y2="92.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M310,92.5 L303.5,95.8 L303.5,89.3 Z" fill="#5c6270"/>
+<text x="295" y="86.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<circle cx="85" cy="92.5" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="85" y="97" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">0</text>
+<text x="85" y="122.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">(</text>
+<circle cx="145" cy="92.5" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="145" y="97" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">1</text>
+<text x="145" y="122.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<circle cx="205" cy="92.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="205" y="97" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="205" y="122.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<circle cx="265" cy="92.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="265" y="97" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="265" y="122.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<circle cx="325" cy="92.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="325" y="97" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="325" y="122.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">)</text>
+<circle cx="385" cy="92.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<circle cx="385" cy="92.5" r="11" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="385" y="97" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="235" y="144.5" font-size="11.5" font-weight="600" fill="#6b40d8" text-anchor="middle">start closure {0, 1}: only state 1 is armed, and only an A moves it</text>
+<text x="235" y="176.5" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">union: re = (A|B)</text>
+<path d="M95.8,253.2 C103.8,222 126.2,222 134.2,253.2" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M134.2,253.2 L129.4,247.7 L135.7,246.1 Z" fill="#5c6270"/>
+<text x="115" y="229.5" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M95.8,253.2 C103.8,198 246.2,198 254.2,253.2" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M254.2,253.2 L250.1,247.2 L256.5,246.3 Z" fill="#5c6270"/>
+<text x="175" y="211.5" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M215.8,253.2 C223.8,210 306.2,210 314.2,253.2" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M314.2,253.2 L309.8,247.4 L316.2,246.2 Z" fill="#5c6270"/>
+<text x="265" y="220.5" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M335.8,253.2 C343.8,222 366.2,222 374.2,253.2" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M374.2,253.2 L369.4,247.7 L375.7,246.1 Z" fill="#5c6270"/>
+<text x="355" y="229.5" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<line x1="160" y1="264" x2="184" y2="264" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M190,264 L183.5,267.3 L183.5,260.8 Z" fill="#5c6270"/>
+<text x="175" y="258" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="280" y1="264" x2="304" y2="264" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M310,264 L303.5,267.3 L303.5,260.8 Z" fill="#5c6270"/>
+<text x="295" y="258" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<circle cx="85" cy="264" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="85" y="268.5" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">0</text>
+<text x="85" y="294" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">(</text>
+<circle cx="145" cy="264" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="145" y="268.5" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">1</text>
+<text x="145" y="294" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<circle cx="205" cy="264" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="205" y="268.5" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="205" y="294" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">|</text>
+<circle cx="265" cy="264" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="265" y="268.5" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">3</text>
+<text x="265" y="294" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<circle cx="325" cy="264" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="325" y="268.5" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="325" y="294" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">)</text>
+<circle cx="385" cy="264" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<circle cx="385" cy="264" r="11" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="385" y="268.5" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="235" y="316" font-size="11.5" font-weight="600" fill="#6b40d8" text-anchor="middle">start closure {0, 1, 3}: both letters armed at once</text>
+<text x="235" y="348" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">closure: re = (A*)</text>
+<path d="M125.8,406.7 C133.8,375.5 156.2,375.5 164.2,406.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M164.2,406.7 L159.4,401.2 L165.7,399.6 Z" fill="#5c6270"/>
+<text x="145" y="383" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M185.8,406.7 C193.8,375.5 216.2,375.5 224.2,406.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M224.2,406.7 L219.4,401.2 L225.7,399.6 Z" fill="#5c6270"/>
+<text x="205" y="383" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M224.2,428.3 C216.2,459.5 193.8,459.5 185.8,428.3" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M185.8,428.3 L190.6,433.8 L184.3,435.4 Z" fill="#5c6270"/>
+<text x="205" y="461" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M245.8,406.7 C253.8,375.5 276.2,375.5 284.2,406.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M284.2,406.7 L279.4,401.2 L285.7,399.6 Z" fill="#5c6270"/>
+<text x="265" y="383" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M305.8,406.7 C313.8,375.5 336.2,375.5 344.2,406.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M344.2,406.7 L339.4,401.2 L345.7,399.6 Z" fill="#5c6270"/>
+<text x="325" y="383" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<line x1="190" y1="417.5" x2="214" y2="417.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M220,417.5 L213.5,420.8 L213.5,414.3 Z" fill="#5c6270"/>
+<text x="205" y="411.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<circle cx="115" cy="417.5" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="115" y="422" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">0</text>
+<text x="115" y="447.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">(</text>
+<circle cx="175" cy="417.5" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="175" y="422" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">1</text>
+<text x="175" y="447.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<circle cx="235" cy="417.5" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="235" y="422" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">2</text>
+<text x="235" y="447.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">*</text>
+<circle cx="295" cy="417.5" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<text x="295" y="422" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">3</text>
+<text x="295" y="447.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">)</text>
+<circle cx="355" cy="417.5" r="15" fill="#f3efff" stroke="#6b40d8" stroke-width="2.2"/>
+<circle cx="355" cy="417.5" r="11" fill="none" stroke="#6b40d8" stroke-width="1.3"/>
+<text x="355" y="422" font-size="13" font-weight="700" fill="#6b40d8" text-anchor="middle">4</text>
+<text x="235" y="497" font-size="11.5" font-weight="600" fill="#6b40d8" text-anchor="middle">start closure {0, 1, 2, 3, 4}: it holds the accept state 4 before any input</text>
+</svg>
+<!-- /gen:str re-gadgets -->
+        </figure>
         <p style="margin-bottom:0">
           Concatenation is the operator that costs <em>nothing</em>: the two
           letters are adjacent in the string, so state \(2\) is already both
@@ -796,18 +880,22 @@
         row; here it is as a table, for the wrapped
         <code>((A*B|AC)D)</code>. The stack holds the positions of
         <code>(</code> and <code>|</code>:
-        <pre>   i  re[i]   stack     edges added at this step
-   0   (      [0]       &epsilon; 0&rarr;1  (fall through)
-   1   (      [0,1]     &epsilon; 1&rarr;2  (fall through)
-   2   A      [0,1]     &epsilon; 2&rarr;3, &epsilon; 3&rarr;2  (lookahead sees the &#x27;*&#x27;)  &middot;  2 &#x2500;A&rarr; 3
-   3   *      [0,1]     &epsilon; 3&rarr;4  (fall through)
-   4   B      [0,1]     4 &#x2500;B&rarr; 5
-   5   |      [0,1,5]   nothing yet: pushed, wired at the &#x27;)&#x27;
-   6   A      [0,1,5]   6 &#x2500;A&rarr; 7
-   7   C      [0,1,5]   7 &#x2500;C&rarr; 8
-   8   )      [0]       pop &#x27;|&#x27;(5) and &#x27;(&#x27;(1): &epsilon; 1&rarr;6, &epsilon; 5&rarr;8;  then &epsilon; 8&rarr;9
-   9   D      [0]       9 &#x2500;D&rarr; 10
-  10   )      []        &epsilon; 10&rarr;11  (fall through)</pre>
+        <!-- gen:str re-scan-table -->
+<table class="trace">
+<tr><th class="lab">i</th><th>re[i]</th><th>stack</th><th>edges added at this step</th></tr>
+<tr><td class="lab">0</td><td class="cell">(</td><td class="cell">[0]</td><td style="text-align:left">&epsilon; 0&rarr;1 (fall through)</td></tr>
+<tr><td class="lab">1</td><td class="cell">(</td><td class="cell">[0,1]</td><td style="text-align:left">&epsilon; 1&rarr;2 (fall through)</td></tr>
+<tr><td class="lab">2</td><td class="cell">A</td><td class="cell">[0,1]</td><td style="text-align:left">&epsilon; 2&rarr;3, &epsilon; 3&rarr;2, 2&nbsp;&ndash;A&rarr;&nbsp;3 (lookahead sees the '*')</td></tr>
+<tr><td class="lab">3</td><td class="cell">*</td><td class="cell">[0,1]</td><td style="text-align:left">&epsilon; 3&rarr;4 (fall through)</td></tr>
+<tr><td class="lab">4</td><td class="cell">B</td><td class="cell">[0,1]</td><td style="text-align:left">4&nbsp;&ndash;B&rarr;&nbsp;5</td></tr>
+<tr><td class="lab">5</td><td class="cell">|</td><td class="cell">[0,1,5]</td><td style="text-align:left">nothing yet: pushed, wired at the ')'</td></tr>
+<tr><td class="lab">6</td><td class="cell">A</td><td class="cell">[0,1,5]</td><td style="text-align:left">6&nbsp;&ndash;A&rarr;&nbsp;7</td></tr>
+<tr><td class="lab">7</td><td class="cell">C</td><td class="cell">[0,1,5]</td><td style="text-align:left">7&nbsp;&ndash;C&rarr;&nbsp;8</td></tr>
+<tr><td class="lab">8</td><td class="cell">)</td><td class="cell">[0]</td><td style="text-align:left">pop '|'(5) and '('(1): &epsilon; 1&rarr;6, &epsilon; 5&rarr;8, &epsilon; 8&rarr;9</td></tr>
+<tr><td class="lab">9</td><td class="cell">D</td><td class="cell">[0]</td><td style="text-align:left">9&nbsp;&ndash;D&rarr;&nbsp;10</td></tr>
+<tr><td class="lab">10</td><td class="cell">)</td><td class="cell">[]</td><td style="text-align:left">&epsilon; 10&rarr;11 (fall through)</td></tr>
+</table>
+<!-- /gen:str re-scan-table -->
         Two timings are worth noticing. The star pair arrives <em>early</em>,
         at \(i=2\), by lookahead: the scan sees the coming <code>*</code>
         and wires skip and repeat around the atom that just ended. The
@@ -824,26 +912,24 @@
         builds by default. Wrapped, the regex is <code>((A*B|AC)D)</code>:
         states \(0..11\), state \(11\) the accept. Every state with its
         out-edges:
-        <pre>  re:  ( ( A * B | A C ) D )      states 0..11   (11 = accept)
-
-  i=0  &#x27;(&#x27;   &rarr;  &epsilon; 0&rarr;1    (fall through)
-  i=1  &#x27;(&#x27;   &rarr;  &epsilon; 1&rarr;2    (fall through)
-                &epsilon; 1&rarr;6    (enter the right branch; wired at the &#x27;)&#x27;)
-  i=2  &#x27;A&#x27;, next is &#x27;*&#x27;
-             &rarr;  &epsilon; 2&rarr;3    (skip the A)
-                match edge 2 &#x2500;A&rarr; 3
-  i=3  &#x27;*&#x27;   &rarr;  &epsilon; 3&rarr;4    (fall through the &#x27;*&#x27;)
-                &epsilon; 3&rarr;2    (repeat the A)
-  i=4  &#x27;B&#x27;   &rarr;  match edge 4 &#x2500;B&rarr; 5
-  i=5  &#x27;|&#x27;   &rarr;  &epsilon; 5&rarr;8    (left branch done: skip to the &#x27;)&#x27;)
-  i=6  &#x27;A&#x27;   &rarr;  match edge 6 &#x2500;A&rarr; 7
-  i=7  &#x27;C&#x27;   &rarr;  match edge 7 &#x2500;C&rarr; 8
-  i=8  &#x27;)&#x27;   &rarr;  &epsilon; 8&rarr;9    (fall through)
-  i=9  &#x27;D&#x27;   &rarr;  match edge 9 &#x2500;D&rarr; 10
-  i=10 &#x27;)&#x27;   &rarr;  &epsilon; 10&rarr;11  (fall through: accept)
-
-  &epsilon;-edges (9): 0&rarr;1, 1&rarr;2, 1&rarr;6, 2&rarr;3, 3&rarr;2, 3&rarr;4, 5&rarr;8, 8&rarr;9, 10&rarr;11
-  match  (5):  2&#x2500;A&rarr;3, 4&#x2500;B&rarr;5, 6&#x2500;A&rarr;7, 7&#x2500;C&rarr;8, 9&#x2500;D&rarr;10</pre>
+        <!-- gen:str re-big-table -->
+<table class="trace">
+<tr><th class="lab">state</th><th>re[i]</th><th>out-edges</th></tr>
+<tr><td class="lab">0</td><td class="cell">(</td><td style="text-align:left">&epsilon; 0&rarr;1 (fall through the '(')</td></tr>
+<tr><td class="lab">1</td><td class="cell">(</td><td style="text-align:left">&epsilon; 1&rarr;2 (fall through the '(')<br>&epsilon; 1&rarr;6 (enter the right branch)</td></tr>
+<tr><td class="lab">2</td><td class="cell">A</td><td style="text-align:left">&epsilon; 2&rarr;3 (skip the A)<br>match 2&nbsp;&ndash;A&rarr;&nbsp;3</td></tr>
+<tr><td class="lab">3</td><td class="cell">*</td><td style="text-align:left">&epsilon; 3&rarr;2 (repeat the A)<br>&epsilon; 3&rarr;4 (fall through the '*')</td></tr>
+<tr><td class="lab">4</td><td class="cell">B</td><td style="text-align:left">match 4&nbsp;&ndash;B&rarr;&nbsp;5</td></tr>
+<tr><td class="lab">5</td><td class="cell">|</td><td style="text-align:left">&epsilon; 5&rarr;8 (skip to the ')')</td></tr>
+<tr><td class="lab">6</td><td class="cell">A</td><td style="text-align:left">match 6&nbsp;&ndash;A&rarr;&nbsp;7</td></tr>
+<tr><td class="lab">7</td><td class="cell">C</td><td style="text-align:left">match 7&nbsp;&ndash;C&rarr;&nbsp;8</td></tr>
+<tr><td class="lab">8</td><td class="cell">)</td><td style="text-align:left">&epsilon; 8&rarr;9 (fall through the ')')</td></tr>
+<tr><td class="lab">9</td><td class="cell">D</td><td style="text-align:left">match 9&nbsp;&ndash;D&rarr;&nbsp;10</td></tr>
+<tr><td class="lab">10</td><td class="cell">)</td><td style="text-align:left">&epsilon; 10&rarr;11 (fall through the ')')</td></tr>
+<tr><td class="lab">11</td><td>accept</td><td style="text-align:left">&ndash;</td></tr>
+<tr><td colspan="3" style="text-align:left">&epsilon;-edges (9): 0&rarr;1, 1&rarr;2, 1&rarr;6, 2&rarr;3, 3&rarr;2, 3&rarr;4, 5&rarr;8, 8&rarr;9, 10&rarr;11; match edges (5): 2&nbsp;&ndash;A&rarr;&nbsp;3, 4&nbsp;&ndash;B&rarr;&nbsp;5, 6&nbsp;&ndash;A&rarr;&nbsp;7, 7&nbsp;&ndash;C&rarr;&nbsp;8, 9&nbsp;&ndash;D&rarr;&nbsp;10</td></tr>
+</table>
+<!-- /gen:str re-big-table -->
         The states with <em>two</em> out-edges are exactly where
         nondeterminism lives: state \(1\) forks into the two alternatives
         (its jump to \(6\) is wired when the scan reaches the
@@ -854,76 +940,88 @@
         draws the same machine.
       </div>
       <figure>
-        <svg viewBox="0 0 920 270" role="img" aria-label="The twelve-state NFA for the wrapped regex ((A*B|AC)D). Twelve states 0 to 11 sit on a line; each shows its regex character beneath: two open parens, A, star, B, bar, A, C, close paren, D, close paren, and the accept state 11. Solid arrows on the line consume characters: 2 to 3 on A, 4 to 5 on B, 6 to 7 on A, 7 to 8 on C, 9 to 10 on D. Dashed epsilon arcs above connect 0-1, 1-2, 2-3, 3-4, 8-9, 10-11 (short), 1 to 6 (the alternation branch, long) and 5 to 8 (the bar skipping to the close paren). One dashed arc below runs from 3 back to 2, the star's repeat.">
-          <defs>
-            <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0,0L10,5L0,10z" fill="#5c6270"/>
-            </marker>
-          </defs>
-          <g stroke="#5c6270" stroke-width="1.5" fill="none" marker-end="url(#arrG)">
-            <line x1="14" y1="160" x2="49" y2="160"/>
-            <line x1="228" y1="160" x2="260" y2="160"/>
-            <line x1="368" y1="160" x2="400" y2="160"/>
-            <line x1="508" y1="160" x2="540" y2="160"/>
-            <line x1="578" y1="160" x2="610" y2="160"/>
-            <line x1="718" y1="160" x2="750" y2="160"/>
-            <g stroke-dasharray="5 4">
-              <path d="M 78,146 C 98,110 112,110 132,146"/>
-              <path d="M 152,148 C 168,112 182,112 202,146"/>
-              <path d="M 218,146 C 238,110 252,110 272,146"/>
-              <path d="M 288,146 C 308,110 322,110 342,146"/>
-              <path d="M 638,148 C 658,112 672,112 692,146"/>
-              <path d="M 778,146 C 798,110 812,110 832,146"/>
-              <path d="M 136,142 C 220,38 400,38 486,141"/>
-              <path d="M 425,144 C 480,74 570,74 625,144"/>
-              <path d="M 273,174 C 265,250 225,250 217,176"/>
-            </g>
-          </g>
-          <g fill="#fff" stroke="#1a1c22" stroke-width="1.5">
-            <circle cx="70" cy="160" r="17"/>
-            <circle cx="140" cy="160" r="17"/>
-            <circle cx="210" cy="160" r="17"/>
-            <circle cx="280" cy="160" r="17"/>
-            <circle cx="350" cy="160" r="17"/>
-            <circle cx="420" cy="160" r="17"/>
-            <circle cx="490" cy="160" r="17"/>
-            <circle cx="560" cy="160" r="17"/>
-            <circle cx="630" cy="160" r="17"/>
-            <circle cx="700" cy="160" r="17"/>
-            <circle cx="770" cy="160" r="17"/>
-            <circle cx="840" cy="160" r="17"/>
-            <circle cx="840" cy="160" r="12.5"/>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="700" text-anchor="middle" fill="#1a1c22">
-            <text x="70" y="165">0</text><text x="140" y="165">1</text>
-            <text x="210" y="165">2</text><text x="280" y="165">3</text>
-            <text x="350" y="165">4</text><text x="420" y="165">5</text>
-            <text x="490" y="165">6</text><text x="560" y="165">7</text>
-            <text x="630" y="165">8</text><text x="700" y="165">9</text>
-            <text x="770" y="165">10</text><text x="840" y="165">11</text>
-          </g>
-          <g font-family="SF Mono, Menlo, monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1c22">
-            <text x="70" y="207">(</text><text x="140" y="207">(</text>
-            <text x="210" y="207">A</text><text x="280" y="207">*</text>
-            <text x="350" y="207">B</text><text x="420" y="207">|</text>
-            <text x="490" y="207">A</text><text x="560" y="207">C</text>
-            <text x="630" y="207">)</text><text x="700" y="207">D</text>
-            <text x="770" y="207">)</text>
-          </g>
-          <text x="840" y="205" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle" fill="#5c6270">accept</text>
-          <g font-family="SF Mono, Menlo, monospace" font-size="13" font-weight="700" text-anchor="middle" fill="#0a7d4d">
-            <text x="245" y="150">A</text>
-            <text x="385" y="150">B</text>
-            <text x="525" y="150">A</text>
-            <text x="595" y="150">C</text>
-            <text x="735" y="150">D</text>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="13.5" font-style="italic" text-anchor="middle" fill="#9a5b00">
-            <text x="315" y="48">&epsilon;</text>
-            <text x="525" y="82">&epsilon;</text>
-            <text x="245" y="242">&epsilon;</text>
-          </g>
-        </svg>
+<!-- gen:str re-nfa-big -->
+<svg viewBox="0 0 722 185" role="img" style="max-width:866px" font-family="system-ui, sans-serif" aria-label="The twelve-state NFA for the wrapped regex ((A*B|AC)D). states 0 to 11 (state 11 accepts), the characters ( ( A * B | A C ) D ). match edges 2 to 3 on A, 4 to 5 on B, 6 to 7 on A, 7 to 8 on C, 9 to 10 on D. epsilon-edges 0 to 1, 1 to 2, 2 to 3, 3 to 2, 3 to 4, 1 to 6, 5 to 8, 8 to 9, 10 to 11.">
+<path d="M41.8,97.7 C49.8,66.5 72.2,66.5 80.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M80.2,97.7 L75.4,92.2 L81.7,90.6 Z" fill="#5c6270"/>
+<text x="61" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M101.8,97.7 C109.8,66.5 132.2,66.5 140.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M140.2,97.7 L135.4,92.2 L141.7,90.6 Z" fill="#5c6270"/>
+<text x="121" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M161.8,97.7 C169.8,66.5 192.2,66.5 200.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M200.2,97.7 L195.4,92.2 L201.7,90.6 Z" fill="#5c6270"/>
+<text x="181" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M200.2,119.3 C192.2,150.5 169.8,150.5 161.8,119.3" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M161.8,119.3 L166.6,124.8 L160.3,126.4 Z" fill="#5c6270"/>
+<text x="181" y="152" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M221.8,97.7 C229.8,66.5 252.2,66.5 260.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M260.2,97.7 L255.4,92.2 L261.7,90.6 Z" fill="#5c6270"/>
+<text x="241" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M101.8,97.7 C109.8,18.5 372.2,18.5 380.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M380.2,97.7 L376.3,91.6 L382.8,90.9 Z" fill="#5c6270"/>
+<text x="241" y="38" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M341.8,97.7 C349.8,42.5 492.2,42.5 500.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M500.2,97.7 L496.1,91.7 L502.5,90.8 Z" fill="#5c6270"/>
+<text x="421" y="56" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M521.8,97.7 C529.8,66.5 552.2,66.5 560.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M560.2,97.7 L555.4,92.2 L561.7,90.6 Z" fill="#5c6270"/>
+<text x="541" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M641.8,97.7 C649.8,66.5 672.2,66.5 680.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M680.2,97.7 L675.4,92.2 L681.7,90.6 Z" fill="#5c6270"/>
+<text x="661" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<line x1="166" y1="108.5" x2="190" y2="108.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M196,108.5 L189.5,111.8 L189.5,105.3 Z" fill="#5c6270"/>
+<text x="181" y="102.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="286" y1="108.5" x2="310" y2="108.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M316,108.5 L309.5,111.8 L309.5,105.3 Z" fill="#5c6270"/>
+<text x="301" y="102.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<line x1="406" y1="108.5" x2="430" y2="108.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M436,108.5 L429.5,111.8 L429.5,105.3 Z" fill="#5c6270"/>
+<text x="421" y="102.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="466" y1="108.5" x2="490" y2="108.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M496,108.5 L489.5,111.8 L489.5,105.3 Z" fill="#5c6270"/>
+<text x="481" y="102.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<line x1="586" y1="108.5" x2="610" y2="108.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M616,108.5 L609.5,111.8 L609.5,105.3 Z" fill="#5c6270"/>
+<text x="601" y="102.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">D</text>
+<circle cx="31" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="31" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">0</text>
+<text x="31" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">(</text>
+<circle cx="91" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="91" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="91" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">(</text>
+<circle cx="151" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="151" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="151" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<circle cx="211" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="211" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="211" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">*</text>
+<circle cx="271" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="271" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="271" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<circle cx="331" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="331" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="331" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">|</text>
+<circle cx="391" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="391" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="391" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<circle cx="451" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="451" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="451" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<circle cx="511" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="511" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="511" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">)</text>
+<circle cx="571" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="571" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="571" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">D</text>
+<circle cx="631" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="631" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="631" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">)</text>
+<circle cx="691" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<circle cx="691" cy="108.5" r="11" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="691" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">11</text>
+</svg>
+<!-- /gen:str re-nfa-big -->
         <figcaption>
           The full machine for <code>(A*B|AC)D</code> as the demo builds it: the
           wrapped regex <code>((A*B|AC)D)</code>, \(12\) states, \(9\)
@@ -931,7 +1029,7 @@
           long arc \(1\to6\) is the <code>(</code> branching into the second
           alternative; \(5\to8\) is the <code>|</code> skipping to the
           <code>)</code>; \(2\leftrightarrow3\) is the star&rsquo;s skip/repeat
-          pair; the six short arcs are structural fall-throughs.
+          pair; the other five short arcs are structural fall-throughs.
         </figcaption>
       </figure>
       <div class="thm">
@@ -981,11 +1079,16 @@
         <span class="tag">Example (why not just guess?)</span>
         Sedgewick calls these <em>stalling sequences</em>. Commit to single
         choices on <code>((A*B|AC)D)</code> and watch them die:
-        <pre>  input AAABD, guess the RIGHT branch:
-      0 &rarr;&epsilon; 1 &rarr;&epsilon; 6 &#x2500;A&rarr; 7        stuck: state 7 wants C, the input has A
-
-  input AAAAC (the star loop is forced; nothing to guess):
-      &hellip; 2 &#x2500;A&rarr; 3 &rarr;&epsilon; 2 &#x2500;A&rarr; 3 &hellip; &rarr;&epsilon; 4    stuck: state 4 wants B</pre>
+        <!-- gen:str re-stall -->
+\[
+\begin{array}{l}
+\text{input AAABD, guess the right branch:}\\
+\qquad 0 \xrightarrow{\varepsilon} 1 \xrightarrow{\varepsilon} 6 \xrightarrow{\texttt{A}} 7 \qquad \text{stuck: state 7 wants C, the input has A}\\[8pt]
+\text{input AAAAC (the star loop is forced; nothing to guess):}\\
+\qquad \cdots\ 2 \xrightarrow{\texttt{A}} 3 \xrightarrow{\varepsilon} 2 \xrightarrow{\texttt{A}} 3\ \cdots \xrightarrow{\varepsilon} 4 \qquad \text{stuck: state 4 wants B}
+\end{array}
+\]
+<!-- /gen:str re-stall -->
         A wrong guess strands the machine in a state with no usable edge, and
         nothing tells you <em>at guessing time</em> which choice is wrong: the
         input decides, later. Backtracking (undo and try the other branch)
@@ -994,11 +1097,15 @@
         every viable state alive at once and lets the input kill the wrong
         ones.
       </div>
-      <pre>  states = &epsilon;-closure({ start })
-  for each character c of the text:
-      next   = { i+1 : i &isin; states and re[i] == c }     <span class="cm">// advance</span>
-      states = &epsilon;-closure(next)                          <span class="cm">// close</span>
-  accept  iff  the accept state &isin; states</pre>
+      \[
+        \begin{array}{l}
+          \mathit{states} \leftarrow \varepsilon\text{-closure}(\{\text{start}\})\\
+          \textbf{for each } \text{character } c \text{ of the text:}\\
+          \qquad \mathit{next} \leftarrow \{\, i+1 : i \in \mathit{states} \text{ and } \texttt{re}[i] = c \,\} \qquad \text{advance}\\
+          \qquad \mathit{states} \leftarrow \varepsilon\text{-closure}(\mathit{next}) \qquad \text{close}\\
+          \text{accept iff the accept state} \in \mathit{states}
+        \end{array}
+      \]
       <p>
         Two phases per character: <strong>advance</strong> every letter state
         whose character matches (its one \(i \to i+1\) edge; the encoding invariant
@@ -1019,16 +1126,20 @@
         <span class="tag">Example (\(\varepsilon\)-closure, worked)</span>
         On the <code>A*B</code> machine (\(\varepsilon\)-edges \(0\to1\),
         \(1\to0\), \(1\to2\)), compute \(\varepsilon\)-closure(\(\{0\}\)):
-        <pre>  expand 0:  0&rarr;1                 add 1
-  expand 1:  1&rarr;0 (already seen),  1&rarr;2   add 2
-  expand 2:  no &epsilon;-edges
-  &rarr; {0, 1, 2}</pre>
+        <!-- gen:str re-closure-astarb -->
+<table class="trace">
+<tr><th class="lab">step</th><th>&epsilon;-edges</th><th>result</th></tr>
+<tr><td class="lab">expand 0</td><td style="text-align:left">0&rarr;1</td><td class="lt">add 1</td></tr>
+<tr><td class="lab">expand 1</td><td style="text-align:left">1&rarr;0 (seen), 1&rarr;2</td><td class="lt">add 2</td></tr>
+<tr><td class="lab">expand 2</td><td style="text-align:left">no &epsilon;-edges out</td><td class="lt"></td></tr>
+<tr><td colspan="3" style="text-align:left">&epsilon;-closure({0}) = {0, 1, 2}</td></tr>
+</table>
+<!-- /gen:str re-closure-astarb -->
         Read the result: before consuming <em>anything</em>, the machine is
         simultaneously ready to match an <code>A</code> (state 0) <em>and</em> to
         match the <code>B</code> directly (state 2): the skip edge has
         already opened both the zero-<code>A</code>&rsquo;s and the
-        some-<code>A</code>&rsquo;s futures. This exact set is ICA&nbsp;17&rsquo;s
-        first test.
+        some-<code>A</code>&rsquo;s futures.
       </div>
       <p>
         Here is the entire engine: construction, closure, and the
@@ -1353,21 +1464,23 @@ impl Nfa {
         (\(0\to1\), \(1\to2\), \(1\to6\), \(2\to3\), \(3\to2\), \(3\to4\),
         \(5\to8\), \(8\to9\), \(10\to11\)), with the closure run as the
         graph search it is:
-        <pre>  THE START SET  &epsilon;-closure({0})
-      expand 0:  0&rarr;1                      add 1
-      expand 1:  1&rarr;2, 1&rarr;6                add 2, 6
-      expand 2:  2&rarr;3                      add 3
-      expand 3:  3&rarr;2 (seen), 3&rarr;4         add 4
-      expand 4, 6:  no &epsilon;-edges out
-      &rarr; {0,1,2,3,4,6}   armed: 2 (left branch A), 4 (its B), 6 (right branch A)
-
-  READING THE &#x27;B&#x27; OF &quot;AAABD&quot;, from {2,3,4}
-      advance:  state 2 is &#x27;A&#x27;  &rarr; no      state 3 is &#x27;*&#x27; &rarr; never matches
-                state 4 is &#x27;B&#x27;  &rarr; yes: 4&rarr;5      next = {5}
-      close:    expand 5:  5&rarr;8              add 8
-                expand 8:  8&rarr;9              add 9
-                expand 9:  no &epsilon;-edges out
-      &rarr; {5,8,9}   armed: 9, the &#x27;D&#x27;</pre>
+        <!-- gen:str re-closure-big -->
+<table class="trace">
+<tr><th colspan="3" style="text-align:left">the start set, &epsilon;-closure({0})</th></tr>
+<tr><td class="lab">expand 0</td><td style="text-align:left">0&rarr;1</td><td class="lt">add 1</td></tr>
+<tr><td class="lab">expand 1</td><td style="text-align:left">1&rarr;2, 1&rarr;6</td><td class="lt">add 2, 6</td></tr>
+<tr><td class="lab">expand 2</td><td style="text-align:left">2&rarr;3</td><td class="lt">add 3</td></tr>
+<tr><td class="lab">expand 3</td><td style="text-align:left">3&rarr;2 (seen), 3&rarr;4</td><td class="lt">add 4</td></tr>
+<tr><td class="lab">expand 4, 6</td><td style="text-align:left">no &epsilon;-edges out</td><td></td></tr>
+<tr><td colspan="3" style="text-align:left">&rarr; {0,1,2,3,4,6}: armed 2 (left branch A), 4 (its B), 6 (right branch A)</td></tr>
+<tr><th colspan="3" style="text-align:left">reading the 'B' of AAABD, from {2,3,4}</th></tr>
+<tr><td class="lab">advance</td><td style="text-align:left">2 is 'A' &rarr; no<br>3 is '*' &rarr; never matches<br>4 is 'B' &rarr; yes: 4&rarr;5</td><td class="lt">next = {5}</td></tr>
+<tr><td class="lab">close: expand 5</td><td style="text-align:left">5&rarr;8</td><td class="lt">add 8</td></tr>
+<tr><td class="lab">close: expand 8</td><td style="text-align:left">8&rarr;9</td><td class="lt">add 9</td></tr>
+<tr><td class="lab">close: expand 9</td><td style="text-align:left">no &epsilon;-edges out</td><td class="lt"></td></tr>
+<tr><td colspan="3" style="text-align:left">&rarr; {5,8,9}: armed 9, the 'D'</td></tr>
+</table>
+<!-- /gen:str re-closure-big -->
         <p style="margin-bottom:0">
           Both phases are visible in the second block. <strong>Advance</strong>
           only ever uses \(i \to i+1\) edges out of <em>letter</em> states, and
@@ -1387,8 +1500,14 @@ impl Nfa {
         Acceptance means at least one path through the machine consumes the
         whole string and lands on the accept state. The simulation never
         names that path, but it exists; unrolled:
-        <pre>  0 &rarr;&epsilon; 1 &rarr;&epsilon; 2 &#x2500;A&rarr; 3 &rarr;&epsilon; 2 &#x2500;A&rarr; 3 &rarr;&epsilon; 2 &#x2500;A&rarr; 3 &rarr;&epsilon; 4
-    &#x2500;B&rarr; 5 &rarr;&epsilon; 8 &rarr;&epsilon; 9 &#x2500;D&rarr; 10 &rarr;&epsilon; 11   accept</pre>
+        <!-- gen:str re-witness -->
+\[
+\begin{aligned}
+&0 \xrightarrow{\varepsilon} 1 \xrightarrow{\varepsilon} 2 \xrightarrow{\texttt{A}} 3 \xrightarrow{\varepsilon} 2 \xrightarrow{\texttt{A}} 3 \xrightarrow{\varepsilon} 2 \xrightarrow{\texttt{A}} 3 \xrightarrow{\varepsilon} 4\\
+&\quad \xrightarrow{\texttt{B}} 5 \xrightarrow{\varepsilon} 8 \xrightarrow{\varepsilon} 9 \xrightarrow{\texttt{D}} 10 \xrightarrow{\varepsilon} 11 \quad \text{accept}
+\end{aligned}
+\]
+<!-- /gen:str re-witness -->
         Three trips through the star&rsquo;s loop consume the
         <code>A</code>&rsquo;s, the fall-through takes the <code>B</code>, the
         <code>|</code> skips to the join, and the <code>D</code> drives home.
@@ -1419,7 +1538,7 @@ impl Nfa {
       </div>
       <div class="proof">
         <strong>Proof (induction on \(i\): a loop invariant, like every
-        other one this course).</strong> Base: before any input the reachable
+        other one in these handouts).</strong> Base: before any input the reachable
         states are those \(\varepsilon\)-reachable from the start: exactly
         the initial closure. Step: a path consuming one more character
         \(t[i]\) must take some matching edge out of a state reachable on the
@@ -1587,9 +1706,78 @@ impl Nfa {
         Determinize <code>(A|B)*B</code>. Wrapped it is
         <code>((A|B)*B)</code>: states \(0..9\), accept \(9\), built by the
         rules of &sect;3:
-        <pre>  re:  ( ( A | B ) * B )      states 0..9   (9 = accept)
-  &epsilon;-edges: 0&rarr;1, 1&rarr;2, 1&rarr;4, 1&rarr;6, 3&rarr;5, 5&rarr;6, 6&rarr;1, 6&rarr;7, 8&rarr;9
-  match:    2&#x2500;A&rarr;3, 4&#x2500;B&rarr;5, 7&#x2500;B&rarr;8</pre>
+        <figure class="wide">
+<!-- gen:str re-nfa-abstarb -->
+<svg viewBox="0 0 602 221" role="img" style="max-width:722px" font-family="system-ui, sans-serif" aria-label="The NFA for the wrapped regex ((A|B)*B), states 0 to 9, 9 accepting. states 0 to 9 (state 9 accepts), the characters ( ( A | B ) * B ). match edges 2 to 3 on A, 4 to 5 on B, 7 to 8 on B. epsilon-edges 0 to 1, 1 to 2, 1 to 4, 3 to 5, 1 to 6, 6 to 1, 5 to 6, 6 to 7, 8 to 9.">
+<path d="M41.8,97.7 C49.8,66.5 72.2,66.5 80.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M80.2,97.7 L75.4,92.2 L81.7,90.6 Z" fill="#5c6270"/>
+<text x="61" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M101.8,97.7 C109.8,66.5 132.2,66.5 140.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M140.2,97.7 L135.4,92.2 L141.7,90.6 Z" fill="#5c6270"/>
+<text x="121" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M101.8,97.7 C109.8,42.5 252.2,42.5 260.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M260.2,97.7 L256.1,91.7 L262.5,90.8 Z" fill="#5c6270"/>
+<text x="181" y="56" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M221.8,97.7 C229.8,54.5 312.2,54.5 320.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M320.2,97.7 L315.8,91.9 L322.2,90.7 Z" fill="#5c6270"/>
+<text x="271" y="65" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M101.8,97.7 C109.8,18.5 372.2,18.5 380.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M380.2,97.7 L376.3,91.6 L382.8,90.9 Z" fill="#5c6270"/>
+<text x="241" y="38" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M380.2,119.3 C372.2,198.5 109.8,198.5 101.8,119.3" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M101.8,119.3 L105.7,125.4 L99.2,126.1 Z" fill="#5c6270"/>
+<text x="241" y="188" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M341.8,97.7 C349.8,66.5 372.2,66.5 380.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M380.2,97.7 L375.4,92.2 L381.7,90.6 Z" fill="#5c6270"/>
+<text x="361" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M401.8,97.7 C409.8,66.5 432.2,66.5 440.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M440.2,97.7 L435.4,92.2 L441.7,90.6 Z" fill="#5c6270"/>
+<text x="421" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<path d="M521.8,97.7 C529.8,66.5 552.2,66.5 560.2,97.7" fill="none" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M560.2,97.7 L555.4,92.2 L561.7,90.6 Z" fill="#5c6270"/>
+<text x="541" y="74" font-size="13" font-weight="600" fill="#9a5b00" text-anchor="middle" font-style="italic">ε</text>
+<line x1="166" y1="108.5" x2="190" y2="108.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M196,108.5 L189.5,111.8 L189.5,105.3 Z" fill="#5c6270"/>
+<text x="181" y="102.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="286" y1="108.5" x2="310" y2="108.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M316,108.5 L309.5,111.8 L309.5,105.3 Z" fill="#5c6270"/>
+<text x="301" y="102.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<line x1="466" y1="108.5" x2="490" y2="108.5" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M496,108.5 L489.5,111.8 L489.5,105.3 Z" fill="#5c6270"/>
+<text x="481" y="102.5" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<circle cx="31" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="31" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">0</text>
+<text x="31" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">(</text>
+<circle cx="91" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="91" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="91" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">(</text>
+<circle cx="151" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="151" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="151" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<circle cx="211" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="211" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="211" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">|</text>
+<circle cx="271" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="271" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="271" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<circle cx="331" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="331" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">5</text>
+<text x="331" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">)</text>
+<circle cx="391" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="391" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="391" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">*</text>
+<circle cx="451" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="451" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="451" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<circle cx="511" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<text x="511" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">8</text>
+<text x="511" y="138.5" font-size="13" font-weight="700" fill="#2a2d36" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">)</text>
+<circle cx="571" cy="108.5" r="15" fill="#fff" stroke="#1a1c22" stroke-width="1.5"/>
+<circle cx="571" cy="108.5" r="11" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="571" y="113" font-size="13" font-weight="700" fill="#1a1c22" text-anchor="middle">9</text>
+</svg>
+<!-- /gen:str re-nfa-abstarb -->
+        </figure>
         The algorithm is &sect;4&rsquo;s two phases, run on <em>every</em>
         character of the alphabet instead of on the next input character, with
         each new subset pushed on a worklist until nothing new appears. Start
@@ -1646,17 +1834,77 @@ impl Nfa {
         <span class="tag">Example (minimization, worked on <code>(A|B)*B</code>)</span>
         Take &sect;1&rsquo;s ends-in-<code>B</code> pattern again. The worklist
         above finished with three states, each a set of NFA states:
-        <pre>  D0 = {0,1,2,4,6,7}       start     A &rarr; D1    B &rarr; D2
-  D1 = {1,2,3,4,5,6,7}               A &rarr; D1    B &rarr; D2
-  D2 = {1,2,4,5,6,7,8,9}   accept    A &rarr; D1    B &rarr; D2</pre>
+        <figure class="wide">
+<!-- gen:str re-dfa-abstarb -->
+<svg viewBox="0 0 450 294" role="img" style="max-width:540px" font-family="system-ui, sans-serif" aria-label="The subset construction of (A|B)*B: three DFA states, each a set of NFA states. state D0 (start) = {0,1,2,4,6,7}. state D1 = {1,2,3,4,5,6,7}. state D2 (accepting) = {1,2,4,5,6,7,8,9}. D0 on A to D1. D0 on B to D2. D1 on A to D1. D1 on B to D2. D2 on A to D1. D2 on B to D2.">
+<line x1="102.9" y1="132.5" x2="279.4" y2="72.4" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M285.1,70.5 L279.6,76 L277.3,69.4 Z" fill="#5c6270"/>
+<text x="190.8" y="96" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="102.9" y1="145.5" x2="279.4" y2="205.6" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M285.1,207.5 L277.3,208.6 L279.6,202 Z" fill="#5c6270"/>
+<text x="197.2" y="171" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<path d="M295,48 C280,14 328,14 313,48" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M313,48 L312.6,40.2 L319,43 Z" fill="#5c6270"/>
+<text x="304" y="16" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<path d="M311,82 Q340,139 311,196" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M311,196 L311.1,188.2 L317.3,191.3 Z" fill="#5c6270"/>
+<text x="339" y="143" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<path d="M297,196 Q268,139 297,82" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M297,82 L296.9,89.8 L290.7,86.7 Z" fill="#5c6270"/>
+<text x="269" y="143" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<path d="M295,230 C280,264 328,264 313,230" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M313,230 L319,235 L312.6,237.8 Z" fill="#5c6270"/>
+<text x="304" y="272" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<line x1="24" y1="139" x2="58" y2="139" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M64,139 L57,142.5 L57,135.5 Z" fill="#5c6270"/>
+<text x="38" y="132" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">start</text>
+<circle cx="84" cy="139" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<text x="84" y="144" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">D<tspan dy="4" font-size="10.5">0</tspan></text>
+<text x="84" y="174" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">{0,1,2,4,6,7}</text>
+<circle cx="304" cy="64" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<text x="304" y="69" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">D<tspan dy="4" font-size="10.5">1</tspan></text>
+<text x="332" y="68" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="start">{1,2,3,4,5,6,7}</text>
+<circle cx="304" cy="214" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<circle cx="304" cy="214" r="15.5" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="304" y="219" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">D<tspan dy="4" font-size="10.5">2</tspan></text>
+<text x="332" y="218" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="start">{1,2,4,5,6,7,8,9}</text>
+</svg>
+<!-- /gen:str re-dfa-abstarb -->
+        </figure>
         <code>D0</code> (before any character) and <code>D1</code> (after an
         <code>A</code>) are different sets of NFA states, but read the rows: the
         behavior is identical, and the continuations of both are &ldquo;every
         string ending in <code>B</code>&rdquo;. They differ only in history, so
         they merge, and what comes out is the two-state machine of
         &sect;2 with the alphabet renamed:
-        <pre>  q0           "the input so far does NOT end in B"   A &rarr; q0   B &rarr; q1
-  q1  accept   "the input so far ends in B"           A &rarr; q0   B &rarr; q1</pre>
+        <figure class="wide">
+<!-- gen:str re-dfa-min -->
+<svg viewBox="0 0 329 126" role="img" style="max-width:395px" font-family="system-ui, sans-serif" aria-label="Minimizing (A|B)*B: D0 and D1 merge into q0, the input so far does not end in B; D2 becomes q1, accepting: the input so far ends in B. state q0 (start) = does not end in B. state q1 (accepting) = ends in B. q0 on A to q0. q0 on B to q1. q1 on A to q0. q1 on B to q1.">
+<path d="M75,48 C60,14 108,14 93,48" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M93,48 L92.6,40.2 L99,43 Z" fill="#5c6270"/>
+<text x="84" y="16" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<path d="M102,57 Q184,28 266,57" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M266,57 L258.2,58 L260.6,51.4 Z" fill="#5c6270"/>
+<text x="184" y="33" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<path d="M266,71 Q184,100 102,71" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M102,71 L109.8,70 L107.4,76.6 Z" fill="#5c6270"/>
+<text x="184" y="103" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<path d="M275,48 C260,14 308,14 293,48" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M293,48 L292.6,40.2 L299,43 Z" fill="#5c6270"/>
+<text x="284" y="16" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<line x1="24" y1="64" x2="58" y2="64" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M64,64 L57,67.5 L57,60.5 Z" fill="#5c6270"/>
+<text x="38" y="57" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">start</text>
+<circle cx="84" cy="64" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<text x="84" y="69" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">q<tspan dy="4" font-size="10.5">0</tspan></text>
+<text x="84" y="99" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">does not end in B</text>
+<circle cx="284" cy="64" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<circle cx="284" cy="64" r="15.5" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="284" y="69" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">q<tspan dy="4" font-size="10.5">1</tspan></text>
+<text x="284" y="99" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">ends in B</text>
+</svg>
+<!-- /gen:str re-dfa-min -->
+        </figure>
         Three states down to two on a seven-character pattern; the same merging
         is what keeps the table of a real lexer, built from dozens of token
         patterns at once, small enough to ship.
@@ -1684,9 +1932,37 @@ impl Nfa {
         language exactly when their minimal DFAs coincide. Take
         <code>A(BA)*</code> and <code>(AB)*A</code>. They determinize to five
         and four states respectively, and both minimize to the same three:
-        <pre>  q0             start    A &rarr; q1     B &rarr; dead
-  q1  accept              A &rarr; dead   B &rarr; q0
-  dead                    A &rarr; dead   B &rarr; dead</pre>
+        <figure class="wide">
+<!-- gen:str re-dfa-canon -->
+<svg viewBox="0 0 312 264" role="img" style="max-width:374px" font-family="system-ui, sans-serif" aria-label="The minimal DFA shared by A(BA)* and (AB)*A: three states, q0 (start), q1 (accepting) and a dead state. state q0 (start). state q1 (accepting). state dead. q0 on A to q1. q0 on B to dead. q1 on A to dead. q1 on B to q0. dead on A, B to dead.">
+<path d="M102,57 Q179,28 256,57" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M256,57 L248.2,57.8 L250.7,51.3 Z" fill="#5c6270"/>
+<text x="179" y="33" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="96.4" y1="79.7" x2="162.9" y2="163.6" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M166.6,168.3 L159.5,165 L165,160.7 Z" fill="#5c6270"/>
+<text x="139.3" y="121.8" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<line x1="261.6" y1="79.7" x2="195.1" y2="163.6" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M191.4,168.3 L193,160.7 L198.5,165 Z" fill="#5c6270"/>
+<text x="234.3" y="134.2" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<path d="M256,71 Q179,100 102,71" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M102,71 L109.8,70.2 L107.3,76.7 Z" fill="#5c6270"/>
+<text x="179" y="103" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<path d="M170,200 C155,234 203,234 188,200" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M188,200 L194,205 L187.6,207.8 Z" fill="#5c6270"/>
+<text x="179" y="242" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A, B</text>
+<line x1="24" y1="64" x2="58" y2="64" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M64,64 L57,67.5 L57,60.5 Z" fill="#5c6270"/>
+<text x="38" y="57" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">start</text>
+<circle cx="84" cy="64" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<text x="84" y="69" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">q<tspan dy="4" font-size="10.5">0</tspan></text>
+<circle cx="274" cy="64" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<circle cx="274" cy="64" r="15.5" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="274" y="69" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">q<tspan dy="4" font-size="10.5">1</tspan></text>
+<circle cx="179" cy="184" r="20" fill="#f4f5f8" stroke="#9aa3b5" stroke-width="1.6"/>
+<text x="179" y="189" font-size="14" font-weight="700" fill="#5c6270" text-anchor="middle">dead</text>
+</svg>
+<!-- /gen:str re-dfa-canon -->
+        </figure>
         So the two patterns describe one language, the alternating strings that
         start and end with <code>A</code>:
         \(\{\texttt{A}, \texttt{ABA}, \texttt{ABABA}, \dots\}\). This is how
@@ -1880,10 +2156,46 @@ impl Nfa {
           <details>
             <summary>solution</summary>
             Four, one of them the empty set:
-            <pre>  D0 = {0,1,2,3}   start     A &rarr; D1    B &rarr; D2
-  D1 = {1,2,3}               A &rarr; D1    B &rarr; D2
-  D2 = {4,5}       accept    A &rarr; D3    B &rarr; D3
-  D3 = { }         dead      A &rarr; D3    B &rarr; D3</pre>
+            <figure class="wide">
+<!-- gen:str re-dfa-ex -->
+<svg viewBox="0 0 546 316" role="img" style="max-width:655px" font-family="system-ui, sans-serif" aria-label="The subset construction of the wrapped (A*B): four DFA states, one of them the empty (dead) set. state D0 (start) = {0,1,2,3}. state D1 = {1,2,3}. state D2 (accepting) = {4,5}. state D3 = { } dead. D0 on A to D1. D0 on B to D2. D1 on A to D1. D1 on B to D2. D2 on A, B to D3. D3 on A, B to D3.">
+<line x1="102.9" y1="132.5" x2="279.4" y2="72.4" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M285.1,70.5 L279.6,76 L277.3,69.4 Z" fill="#5c6270"/>
+<text x="190.8" y="96" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="102.9" y1="145.5" x2="279.4" y2="205.6" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M285.1,207.5 L277.3,208.6 L279.6,202 Z" fill="#5c6270"/>
+<text x="197.2" y="171" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<path d="M295,48 C280,14 328,14 313,48" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M313,48 L312.6,40.2 L319,43 Z" fill="#5c6270"/>
+<text x="304" y="16" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<line x1="304" y1="84" x2="304" y2="188" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M304,194 L300.5,187 L307.5,187 Z" fill="#5c6270"/>
+<text x="314" y="143" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<line x1="324" y1="214" x2="478" y2="214" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M484,214 L477,217.5 L477,210.5 Z" fill="#5c6270"/>
+<text x="404" y="208" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A, B</text>
+<path d="M495,230 C480,264 528,264 513,230" fill="none" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M513,230 L519,235 L512.6,237.8 Z" fill="#5c6270"/>
+<text x="504" y="272" font-size="13" font-weight="700" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A, B</text>
+<line x1="24" y1="139" x2="58" y2="139" stroke="#5c6270" stroke-width="1.6"/>
+<path d="M64,139 L57,142.5 L57,135.5 Z" fill="#5c6270"/>
+<text x="38" y="132" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">start</text>
+<circle cx="84" cy="139" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<text x="84" y="144" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">D<tspan dy="4" font-size="10.5">0</tspan></text>
+<text x="84" y="174" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">{0,1,2,3}</text>
+<circle cx="304" cy="64" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<text x="304" y="69" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">D<tspan dy="4" font-size="10.5">1</tspan></text>
+<text x="332" y="68" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="start">{1,2,3}</text>
+<circle cx="304" cy="214" r="20" fill="#fff" stroke="#1a1c22" stroke-width="1.6"/>
+<circle cx="304" cy="214" r="15.5" fill="none" stroke="#1a1c22" stroke-width="1.3"/>
+<text x="304" y="219" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">D<tspan dy="4" font-size="10.5">2</tspan></text>
+<text x="304" y="249" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">{4,5}</text>
+<circle cx="504" cy="214" r="20" fill="#f4f5f8" stroke="#9aa3b5" stroke-width="1.6"/>
+<text x="504" y="219" font-size="14" font-weight="700" fill="#5c6270" text-anchor="middle">D<tspan dy="4" font-size="10.5">3</tspan></text>
+<text x="504" y="289" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">{ } dead</text>
+</svg>
+<!-- /gen:str re-dfa-ex -->
+            </figure>
             The start closure is \(\{0,1,2,3\}\) (the wrap&rsquo;s
             \(0\to1\), the star&rsquo;s skip \(1\to2\), the fall-through
             \(2\to3\)), so the <code>B</code> is armed with zero
@@ -1946,7 +2258,7 @@ impl Nfa {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Regular Expressions &amp; Automata v1.0
+        Data Structures &amp; Algorithms &middot; Regular Expressions &amp; Automata v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

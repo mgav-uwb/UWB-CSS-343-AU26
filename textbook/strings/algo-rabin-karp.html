@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -234,13 +235,19 @@
         Take the digit alphabet, so \(R = 10\), and the deliberately tiny prime
         \(Q = 13\) (small enough that collisions show up in a short trace). The
         pattern is <code>26535</code>, so \(m = 5\):
-        <pre>  h = 0
-  read 2:   h = (10&middot;0 + 2) mod 13 =   2 mod 13 =  2
-  read 6:   h = (10&middot;2 + 6) mod 13 =  26 mod 13 =  0
-  read 5:   h = (10&middot;0 + 5) mod 13 =   5 mod 13 =  5
-  read 3:   h = (10&middot;5 + 3) mod 13 =  53 mod 13 =  1
-  read 5:   h = (10&middot;1 + 5) mod 13 =  15 mod 13 =  2
-  fingerprint of the pattern:  h(P) = 2</pre>
+        <!-- gen:str rk-horner -->
+\[
+\begin{array}{rl}
+& h = 0 \\
+\text{read } 2\text{:} & h = (10 \cdot 0 + 2) \bmod 13 = 2 \bmod 13 = 2 \\
+\text{read } 6\text{:} & h = (10 \cdot 2 + 6) \bmod 13 = 26 \bmod 13 = 0 \\
+\text{read } 5\text{:} & h = (10 \cdot 0 + 5) \bmod 13 = 5 \bmod 13 = 5 \\
+\text{read } 3\text{:} & h = (10 \cdot 5 + 3) \bmod 13 = 53 \bmod 13 = 1 \\
+\text{read } 5\text{:} & h = (10 \cdot 1 + 5) \bmod 13 = 15 \bmod 13 = 2 \\
+\text{fingerprint of the pattern:} & h(P) = 2
+\end{array}
+\]
+<!-- /gen:str rk-horner -->
         The check on the arithmetic: \(26535 = 13 \cdot 2041 + 2\), so
         \(26535 \bmod 13 = 2\), which is what the running reduction produced.
         Horner&rsquo;s method never held \(26535\); it never held anything
@@ -306,8 +313,45 @@
         idiom used below reduces the product first, so that
         \(T[i] \cdot \mathit{RM} \bmod Q\) lies in \([0, Q)\), and then adds a
         single \(Q\):
-        <pre>  h = (h + Q - (T[i] * RM) % Q) % Q;   // in [0, Q): one +Q suffices
-  h = (h * R + T[i+m]) % Q;</pre>
+        <div class="code-tabs" data-snippet="strings/rk-roll">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// One roll of the window: drop the leaving character, shift, admit the
+// entering one. h lies in [0, Q), and so does (drop * RM) % Q, so adding one
+// Q makes the difference non-negative before the reduction.
+long roll(long h, long drop, long add, long RM, long R, long Q) {
+    h = (h + Q - (drop * RM) % Q) % Q;   // drop T[i]: back in [0, Q)
+    h = (h * R + add) % Q;               // shift, then admit T[i + m]
+    return h;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// One roll of the window: drop the leaving character, shift, admit the
+// entering one. h lies in [0, Q), and so does (drop * RM) % Q, so adding one
+// Q makes the difference non-negative before the reduction.
+static long roll(long h, long drop, long add, long RM, long R, long Q) {
+    h = (h + Q - (drop * RM) % Q) % Q;   // drop T[i]: back in [0, Q)
+    h = (h * R + add) % Q;               // shift, then admit T[i + m]
+    return h;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># One roll of the window: drop the leaving character, shift, admit the
+# entering one. Python&#x27;s % is never negative, so the + Q is not needed here;
+# it keeps the line the same as in C++, Java and Rust.
+def roll(h, drop, add, RM, R, Q):
+    h = (h + Q - (drop * RM) % Q) % Q    # drop T[i]: back in [0, Q)
+    h = (h * R + add) % Q                # shift, then admit T[i + m]
+    return h</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// One roll of the window: drop the leaving character, shift, admit the
+// entering one. h lies in [0, Q), and so does (drop * rm) % q, so adding one
+// q keeps the unsigned difference from wrapping below zero.
+fn roll(h: u64, drop: u64, add: u64, rm: u64, r: u64, q: u64) -&gt; u64 {
+    let h = (h + q - (drop * rm) % q) % q;   // drop T[i]: back in [0, Q)
+    (h * r + add) % q                        // shift, then admit T[i + m]
+}</pre>
+<p class="ct-src">source: <code>code/strings/rk-roll.cpp &middot; code/strings/rk-roll.java &middot; code/strings/rk-roll.py &middot; code/strings/rk-roll.rs</code></p>
+<!--/ct--></div>
         Writing <code>h = (h - T[i]*RM) % Q</code> and hoping is the single most
         common bug in a hand-written Rabin&ndash;Karp.
       </div>
@@ -319,9 +363,15 @@
         \(h = 31415 \bmod 13 = 7\) (Horner: \(3, 5, 2, 8, 7\)). Slide it right
         by one, dropping <code>3</code> and admitting <code>9</code>, to reach
         the window <code>14159</code>:
-        <pre>  drop:   7 &minus; 3&middot;3 = &minus;2      &rarr;  &minus;2 + 13 = 11
-  shift and admit:  11&middot;10 + 9 = 119   &rarr;  119 mod 13 = 2   (13&middot;9 = 117)
-  check:  14159 mod 13 = 2      (13&middot;1089 = 14157)   &#10003;</pre>
+        <!-- gen:str rk-roll-one -->
+\[
+\begin{array}{rl}
+\text{drop:} & 7 - 3 \cdot 3 = -2 \;\to\; -2 + 13 = 11 \\
+\text{shift and admit:} & 11 \cdot 10 + 9 = 119 \;\to\; 119 \bmod 13 = 2 \quad (13 \cdot 9 = 117) \\
+\text{check:} & 14159 \bmod 13 = 2 \quad (13 \cdot 1089 = 14157)\ \checkmark
+\end{array}
+\]
+<!-- /gen:str rk-roll-one -->
         Constant work, and the answer agrees with hashing <code>14159</code>
         from scratch, which is the whole point.
       </div>
@@ -523,12 +573,18 @@ fn rk_search(t: &amp;str, p: &amp;str) -&gt; i32 {
         the code&rsquo;s reduce-the-product-first idiom is what keeps a single
         \(+Q\) sufficient):
       </p>
-      <pre>  i=0 &rarr; 1:  drop 3:  7 &minus; 3&middot;3 = &minus;2   &rarr; 11;   11&middot;10 + 9 = 119  &rarr; 119 mod 13 =  2
-  i=1 &rarr; 2:  drop 1:  2 &minus; 1&middot;3 = &minus;1   &rarr; 12;   12&middot;10 + 2 = 122  &rarr; 122 mod 13 =  5
-  i=2 &rarr; 3:  drop 4:  5 &minus; 4&middot;3 = &minus;7   &rarr;  6;    6&middot;10 + 6 =  66  &rarr;  66 mod 13 =  1
-  i=3 &rarr; 4:  drop 1:  1 &minus; 1&middot;3 = &minus;2   &rarr; 11;   11&middot;10 + 5 = 115  &rarr; 115 mod 13 = 11
-  i=4 &rarr; 5:  drop 5: 11 &minus; 5&middot;3 = &minus;4   &rarr;  9;    9&middot;10 + 3 =  93  &rarr;  93 mod 13 =  2
-  i=5 &rarr; 6:  drop 9:  2 &minus; 9&middot;3 = &minus;25  &rarr;  1;    1&middot;10 + 5 =  15  &rarr;  15 mod 13 =  2</pre>
+      <!-- gen:str rk-rolls -->
+\[
+\begin{array}{llll}
+i = 0 \to 1\text{:} & \text{drop } 3\text{:}\ 7 - 3 \cdot 3 = -2 \to 11 & 11 \cdot 10 + 9 = 119 & \to 119 \bmod 13 = 2 \\
+i = 1 \to 2\text{:} & \text{drop } 1\text{:}\ 2 - 1 \cdot 3 = -1 \to 12 & 12 \cdot 10 + 2 = 122 & \to 122 \bmod 13 = 5 \\
+i = 2 \to 3\text{:} & \text{drop } 4\text{:}\ 5 - 4 \cdot 3 = -7 \to 6 & 6 \cdot 10 + 6 = 66 & \to 66 \bmod 13 = 1 \\
+i = 3 \to 4\text{:} & \text{drop } 1\text{:}\ 1 - 1 \cdot 3 = -2 \to 11 & 11 \cdot 10 + 5 = 115 & \to 115 \bmod 13 = 11 \\
+i = 4 \to 5\text{:} & \text{drop } 5\text{:}\ 11 - 5 \cdot 3 = -4 \to 9 & 9 \cdot 10 + 3 = 93 & \to 93 \bmod 13 = 2 \\
+i = 5 \to 6\text{:} & \text{drop } 9\text{:}\ 2 - 9 \cdot 3 = -25 \to 1 & 1 \cdot 10 + 5 = 15 & \to 15 \bmod 13 = 2
+\end{array}
+\]
+<!-- /gen:str rk-rolls -->
       <p>
         Each line can be checked against the window it produces:
         \(14159 \bmod 13 = 2\), \(41592 \bmod 13 = 5\),
@@ -682,10 +738,67 @@ fn rk_search(t: &amp;str, p: &amp;str) -&gt; i32 {
         \(R = 10\), \(Q = 997\). Preprocessing builds the fingerprint set
         \(\{201, 613, 63\}\) (the three values computed in &sect;5). The scan
         rolls one hash across the text and looks it up:
-        <pre>  window  1:  14159   h = 201  &isin; set  &rarr;  verify against 14159  &rarr;  match at 1
-  window  6:  26535   h = 613  &isin; set  &rarr;  verify against 26535  &rarr;  match at 6
-  window 11:  89793   h =  63  &isin; set  &rarr;  verify against 89793  &rarr;  match at 11
-  (the other nine windows: h &notin; set, rejected with no character comparisons)</pre>
+        <figure class="wide">
+<!-- gen:str rk-multi -->
+<svg viewBox="0 0 699 152" role="img" style="max-width:839px" font-family="system-ui, sans-serif" aria-label="Rabin-Karp with three patterns of length 5 and Q = 997: the fingerprint set is {201, 613, 63}; one rolling pass over 3141592653589793 finds fingerprints in the set at windows 1, 6 and 11, verifies each, and reports three matches; the other nine windows are rejected with no character comparisons. text: 3141592653589793 (9 other windows: h ∉ set). window 1: 14159 starting under column 1 (h = 201 ∈ set: verified, match at 1). window 6: 26535 starting under column 6 (h = 613 ∈ set: verified, match at 6). window 11: 89793 starting under column 11 (h = 63 ∈ set: verified, match at 11).">
+<text x="87.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="111.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="135.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="183.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="207.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="231.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="255.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="279.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="303.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<text x="327.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="351.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<text x="375.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<text x="399.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<text x="423.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<text x="447.8" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<text x="65.8" y="40" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">text</text>
+<rect x="75.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="87.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">3</text>
+<rect x="99.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="111.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="123.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="135.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">4</text>
+<rect x="147.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="159.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="171.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="183.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">5</text>
+<rect x="195.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="207.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">9</text>
+<rect x="219.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="231.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">2</text>
+<rect x="243.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="255.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">6</text>
+<rect x="267.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="279.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">5</text>
+<rect x="291.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="303.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">3</text>
+<rect x="315.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="327.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">5</text>
+<rect x="339.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="351.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">8</text>
+<rect x="363.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="375.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">9</text>
+<rect x="387.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="399.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">7</text>
+<rect x="411.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="423.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">9</text>
+<rect x="435.8" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="447.8" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">3</text>
+<text x="471.8" y="40" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">9 other windows: h ∉ set</text>
+<text x="65.8" y="74" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">window 1</text>
+<rect x="99.8" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="111.8" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="123.8" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="135.8" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">4</text>
+<rect x="147.8" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="159.8" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="171.8" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="183.8" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">5</text>
+<rect x="195.8" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="207.8" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">9</text>
+<text x="471.8" y="74" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">h = 201 ∈ set: verified, match at 1</text>
+<text x="65.8" y="104" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">window 6</text>
+<rect x="219.8" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="231.8" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">2</text>
+<rect x="243.8" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="255.8" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">6</text>
+<rect x="267.8" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="279.8" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">5</text>
+<rect x="291.8" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="303.8" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">3</text>
+<rect x="315.8" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="327.8" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">5</text>
+<text x="471.8" y="104" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">h = 613 ∈ set: verified, match at 6</text>
+<text x="65.8" y="134" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">window 11</text>
+<rect x="339.8" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="351.8" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">8</text>
+<rect x="363.8" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="375.8" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">9</text>
+<rect x="387.8" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="399.8" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">7</text>
+<rect x="411.8" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="423.8" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">9</text>
+<rect x="435.8" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="447.8" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">3</text>
+<text x="471.8" y="134" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">h = 63 ∈ set: verified, match at 11</text>
+</svg>
+<!-- /gen:str rk-multi -->
+        </figure>
         Three patterns, one pass, twelve hash lookups, fifteen character
         comparisons. Adding a thousand more patterns of length \(5\) would not
         change the scan at all, only the size of the set.
@@ -1002,7 +1115,7 @@ fn rk_search(t: &amp;str, p: &amp;str) -&gt; i32 {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Rabin&ndash;Karp v1.0
+        Data Structures &amp; Algorithms &middot; Rabin&ndash;Karp v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

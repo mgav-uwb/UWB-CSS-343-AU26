@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -156,9 +157,42 @@
       <h2 id="insight">1. The insight, and the failure function</h2>
       <div class="ex">
         <span class="tag">Example (the key insight)</span>
-        <pre>  text:     A B A B A B C &hellip;
-  pattern:  A B A B C
-                    &uarr; mismatch at pattern[4]</pre>
+        <figure class="wide">
+<!-- gen:str kmp-insight -->
+<svg viewBox="0 0 613 122" role="img" style="max-width:736px" font-family="system-ui, sans-serif" aria-label="The KMP insight: ABABC matches ABAB against ABABABC… and fails at pattern[4]; AB is both a prefix of the pattern and a suffix of the matched ABAB, so the pattern slides by two and comparison resumes at pattern[2] without moving the text pointer. text: ABABABC. align 0: ABABC (matched ABAB, then mismatch at P[4]). align 2: ABABC starting under column 2 (AB re-aligned under the text's last AB; resume at P[2]).">
+<text x="75.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="123.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="147.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="171.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="195.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="219.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="53.4" y="40" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">text</text>
+<rect x="63.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="75.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="87.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="99.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="111.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="123.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="135.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="147.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="159.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="171.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="195.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="207.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="219.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<text x="243.4" y="41" font-size="14" font-weight="600" fill="#5c6270" text-anchor="middle">…</text>
+<text x="53.4" y="74" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 0</text>
+<rect x="63.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="75.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="87.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="99.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="111.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="123.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="135.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="147.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="159.4" y="58" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="171.4" y="75" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<text x="267.4" y="74" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">matched ABAB, then mismatch at P[4]</text>
+<text x="53.4" y="104" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 2</text>
+<rect x="111.4" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="123.4" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="135.4" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="147.4" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="159.4" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="171.4" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="195.4" y="105" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="207.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="219.4" y="105" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<text x="267.4" y="104" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">AB re-aligned under the text's last AB; resume at P[2]</text>
+</svg>
+<!-- /gen:str kmp-insight -->
+        </figure>
         We matched <code>ABAB</code> and failed at <code>pattern[4]</code>.
         Brute force would slide by one and re-read from <code>text[1]</code>.
         But look at what was matched: <code>AB</code> is a <em>prefix</em> of
@@ -484,8 +518,33 @@ fn kmp_search(t: &amp;str, p: &amp;str) -&gt; i32 {
         the exam-classic pattern <code>ABABAC</code>, whose table row reads
         \(\mathit{fail} = [0, 0, 1, 2, 3, 0]\). The chain starts at its
         longest border, \(\mathit{fail}[4] = 3\):
-        <pre>  chain:  3  &rarr;  fail[2] = 1  &rarr;  fail[0] = 0
-  ABABA&rsquo;s borders:   ABA (3)    A (1)    &epsilon; (0)</pre>
+        <figure class="wide">
+<!-- gen:str kmp-borders -->
+<svg viewBox="0 0 522 152" role="img" style="max-width:626px" font-family="system-ui, sans-serif" aria-label="The fall-back chain for S = ABABA: k = fail[4] = 3, then fail[2] = 1, then fail[0] = 0; each border is drawn as the prefix of that length slid under the end of S: ABA, A, and the empty string. S: ABABA. k = fail[4] = 3: ABA starting under column 2 (border ABA: the prefix ABA is also a suffix). k = fail[2] = 1: A starting under column 4 (border A: the prefix A is also a suffix). k = fail[0] = 0:  starting under column 5 (the empty border ε).">
+<text x="125" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="149" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="173" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="197" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="221" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="103" y="40" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">S</text>
+<rect x="113" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="125" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="137" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="149" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="161" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="173" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="185" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="197" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="209" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="221" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="103" y="74" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = fail[4] = 3</text>
+<rect x="161" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="173" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="185" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="197" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="209" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="221" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="245" y="74" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">border ABA: the prefix ABA is also a suffix</text>
+<text x="103" y="104" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = fail[2] = 1</text>
+<rect x="209" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="221" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="245" y="104" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">border A: the prefix A is also a suffix</text>
+<text x="103" y="134" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = fail[0] = 0</text>
+<text x="245" y="134" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">the empty border ε</text>
+</svg>
+<!-- /gen:str kmp-borders -->
+        </figure>
         Exactly the three borders, longest first. And the lemma says why
         length \(2\) is <em>legitimately</em> absent from the chain: a border
         of length \(2\) would have to be a border of <code>ABA</code> (every
@@ -522,9 +581,15 @@ fn kmp_search(t: &amp;str, p: &amp;str) -&gt; i32 {
         <span class="tag">Example (one build step, both outcomes)</span>
         <em>All candidates die.</em> Pattern <code>ABABAC</code>, last step
         \(j = 5\), where \(k\) enters holding \(\mathit{fail}[4] = 3\):
-        <pre>  k = 3:  P[3] = B &ne; C   &rarr; fall back, k = fail[2] = 1
-  k = 1:  P[1] = B &ne; C   &rarr; fall back, k = fail[0] = 0
-  k = 0:  P[0] = A &ne; C   &rarr; no border extends: fail[5] = 0</pre>
+        <!-- gen:str kmp-step-ababac -->
+\[
+\begin{array}{lll}
+k = 3\text{:} & P[3] = \texttt{B} \ne \texttt{C} & \to\ \text{fall back, } k = \mathit{fail}[2] = 1 \\
+k = 1\text{:} & P[1] = \texttt{B} \ne \texttt{C} & \to\ \text{fall back, } k = \mathit{fail}[0] = 0 \\
+k = 0\text{:} & P[0] = \texttt{A} \ne \texttt{C} & \to\ \text{no border extends: } \mathit{fail}[5] = 0
+\end{array}
+\]
+<!-- /gen:str kmp-step-ababac -->
         Three tests, one per border of <code>ABABA</code>: the loop
         proved no border extends by <code>C</code>, so \(0\) is not a guess
         but an exhaustive check.
@@ -536,23 +601,122 @@ fn kmp_search(t: &amp;str, p: &amp;str) -&gt; i32 {
         characters <code>AABAAABAAA</code> are <code>AABAAA</code> (6),
         <code>AA</code> (2), <code>A</code> (1), \(\epsilon\); lengths
         \(3, 4, 5\) are not borders, and the chain never touches them:
-        <pre>  k = 6:  P[6] = B &ne; A   &rarr; fall back, k = fail[5] = 2
-  k = 2:  P[2] = B &ne; A   &rarr; fall back, k = fail[1] = 1
-  k = 1:  P[1] = A = A    &rarr; extends: fail[10] = k + 1 = 2
-
-  (j = 11, k enters as fail[10] = 2)
-  k = 2:  P[2] = B = B    &rarr; extends: fail[11] = k + 1 = 3</pre>
+        <!-- gen:str kmp-step-long -->
+\[
+\begin{array}{lll}
+k = 6\text{:} & P[6] = \texttt{B} \ne \texttt{A} & \to\ \text{fall back, } k = \mathit{fail}[5] = 2 \\
+k = 2\text{:} & P[2] = \texttt{B} \ne \texttt{A} & \to\ \text{fall back, } k = \mathit{fail}[1] = 1 \\
+k = 1\text{:} & P[1] = \texttt{A} = \texttt{A} & \to\ \text{extends: } \mathit{fail}[10] = k + 1 = 2 \\
+j = 11\text{:} & k = \mathit{fail}[10] = 2 &  \\
+k = 2\text{:} & P[2] = \texttt{B} = \texttt{B} & \to\ \text{extends: } \mathit{fail}[11] = k + 1 = 3
+\end{array}
+\]
+<!-- /gen:str kmp-step-long -->
         Drawn as alignments: each candidate \(k\) slides a fresh copy
         of the pattern so that its first \(k\) characters sit under the last
         \(k\) already matched, and the cell compared is \(P[k]\) under
         \(P[j]\):
-        <pre>  P:        A A B A A A B A A A A B A A A B
-                                &uarr; j = 10
-  k = 6:            A A B A A A B      AABAAA re-aligned; P[6] = B &ne; A  &#10007;
-  k = 2:                    A A B      AA re-aligned; P[2] = B &ne; A  &#10007;
-  k = 1:                      A A      A  re-aligned; P[1] = A = A  &#10003;
-                                  &uarr; j = 11
-  k = 2:                      A A B    AA (= fail[10]); P[2] = B = B  &#10003;</pre>
+        <figure class="wide">
+<!-- gen:str kmp-build-align -->
+<svg viewBox="0 0 712 292" role="img" style="max-width:854px" font-family="system-ui, sans-serif" aria-label="Building fail for AABAAABAAAABAAAB, drawn as alignments: at j = 10 each candidate border k slides a copy of the pattern so its first k characters sit under the last k matched, and P[k] is compared with P[10]: k = 6 and k = 2 fail, k = 1 extends, so fail[10] = 2; at j = 11, k enters as 2 and P[2] = B matches, so fail[11] = 3. P: AABAAABAAAABAAAB. k = 6: AABAAAB starting under column 4 (AABAAA re-aligned; P[6] = B ≠ A). k = 2: AAB starting under column 8 (AA re-aligned; P[2] = B ≠ A). k = 1: AA starting under column 9 (A re-aligned; P[1] = A = A: fail[10] = 2). P: AABAAABAAAABAAAB. k = 2: AAB starting under column 9 (AA re-aligned; P[2] = B = B: fail[11] = 3).">
+<text x="63" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="87" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="111" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="135" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="159" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="183" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="207" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="231" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="255" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="279" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<text x="303" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="327" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<text x="351" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<text x="375" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<text x="399" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<text x="423" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<text x="41" y="40" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">P</text>
+<rect x="51" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="63" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="75" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="87" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="99" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="111" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="123" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="135" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="147" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="159" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="171" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="183" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="195" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="207" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="219" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="231" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="243" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="255" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="267" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="279" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="291" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="303" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="315" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="327" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="339" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="351" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="363" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="375" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="387" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="399" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="411" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="423" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<path d="M303,51 L298.5,58 L307.5,58 Z" fill="#6b40d8"/>
+<line x1="303" y1="57" x2="303" y2="65" stroke="#6b40d8" stroke-width="1.6"/>
+<text x="310" y="67" font-size="11" font-weight="700" fill="#6b40d8" text-anchor="start">j = 10</text>
+<text x="41" y="100" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 6</text>
+<rect x="147" y="84" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="159" y="101" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="171" y="84" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="183" y="101" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="195" y="84" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="207" y="101" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="219" y="84" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="231" y="101" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="243" y="84" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="255" y="101" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="267" y="84" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="279" y="101" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="291" y="84" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="303" y="101" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<text x="447" y="100" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">AABAAA re-aligned; P[6] = B ≠ A</text>
+<text x="41" y="130" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 2</text>
+<rect x="243" y="114" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="255" y="131" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="267" y="114" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="279" y="131" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="291" y="114" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="303" y="131" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<text x="447" y="130" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">AA re-aligned; P[2] = B ≠ A</text>
+<text x="41" y="160" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 1</text>
+<rect x="267" y="144" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="279" y="161" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="291" y="144" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="303" y="161" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<text x="447" y="160" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">A re-aligned; P[1] = A = A: fail[10] = 2</text>
+<text x="63" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="87" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="111" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="135" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="159" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="183" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="207" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="231" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="255" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="279" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<text x="303" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<text x="327" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<text x="351" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<text x="375" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<text x="399" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<text x="423" y="194" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<text x="41" y="214" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">P</text>
+<rect x="51" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="63" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="75" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="87" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="99" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="111" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="123" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="135" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="147" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="159" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="171" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="183" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="195" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="207" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="219" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="231" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="243" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="255" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="267" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="279" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="291" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="303" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="315" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="327" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="339" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="351" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="363" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="375" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="387" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="399" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="411" y="198" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="423" y="215" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<path d="M327,225 L322.5,232 L331.5,232 Z" fill="#6b40d8"/>
+<line x1="327" y1="231" x2="327" y2="239" stroke="#6b40d8" stroke-width="1.6"/>
+<text x="334" y="241" font-size="11" font-weight="700" fill="#6b40d8" text-anchor="start">j = 11</text>
+<text x="41" y="274" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 2</text>
+<rect x="267" y="258" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="279" y="275" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="291" y="258" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="303" y="275" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="315" y="258" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="327" y="275" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<text x="447" y="274" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">AA re-aligned; P[2] = B = B: fail[11] = 3</text>
+</svg>
+<!-- /gen:str kmp-build-align -->
+        </figure>
         TWO fall-backs, and neither runs to \(k = 0\): the border
         <code>AABAAA</code> refuses to extend, so does <code>AA</code>, and
         <code>A</code> accepts: \(\mathit{fail}[10] = 2\), reached by
@@ -606,11 +770,63 @@ fn kmp_search(t: &amp;str, p: &amp;str) -&gt; i32 {
         same pair as the full run below. The scan matches
         <code>AABAA</code> at alignment \(0\), then hits
         \(t[5] = \)<code>B</code> \(\ne\) <code>C</code>\( = P[5]\):
-        <pre>  text:      A A B A A B A A C
-  align 0:   A A B A A C           &#10007; matched AABAA, then C &ne; B at text[5]
-  align 1:     A A B A A C         is AABA a border of AABAA? no, skipped
-  align 2:       A A B A A C       is AAB a border? no, skipped
-  align 3:         A A B A A C     is AA a border? YES: the loop&rsquo;s first stop</pre>
+        <figure class="wide">
+<!-- gen:str kmp-skipped -->
+<svg viewBox="0 0 562 182" role="img" style="max-width:674px" font-family="system-ui, sans-serif" aria-label="KMP searching for AABAAC in AABAABAAC: alignment 0 matches AABAA, then fails at text[5]; alignments 1 and 2 are skipped without a comparison, because AABA and AAB are not borders of AABAA; alignment 3 keeps the border AA and compares P[2] with text[5]. text: AABAABAAC. align 0: AABAAC (matched AABAA, then C ≠ B at text[5]). align 1: AABAAC starting under column 1 (is AABA a border? no, skipped). align 2: AABAAC starting under column 2 (is AAB a border? no, skipped). align 3: AABAAC starting under column 3 (is AA a border? yes: the loop's first stop).">
+<text x="75.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="123.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="147.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="171.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="195.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="219.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="243.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="267.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="53.4" y="40" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">text</text>
+<rect x="63.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="75.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="87.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="99.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="111.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="123.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="135.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="147.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="171.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="195.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="207.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="219.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="231.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="243.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="255.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="267.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<text x="53.4" y="74" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 0</text>
+<rect x="63.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="75.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="87.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="99.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="111.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="123.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="135.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="147.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="171.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="58" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="195.4" y="75" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<text x="291.4" y="74" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">matched AABAA, then C ≠ B at text[5]</text>
+<text x="53.4" y="104" font-size="11.5" font-weight="600" fill="#5c6270" text-anchor="end">align 1</text>
+<rect x="87.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="99.4" y="105" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="111.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="123.4" y="105" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="135.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="147.4" y="105" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="159.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="171.4" y="105" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="195.4" y="105" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="207.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="219.4" y="105" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<text x="291.4" y="104" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">is AABA a border? no, skipped</text>
+<text x="53.4" y="134" font-size="11.5" font-weight="600" fill="#5c6270" text-anchor="end">align 2</text>
+<rect x="111.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="123.4" y="135" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="135.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="147.4" y="135" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="171.4" y="135" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="183.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="195.4" y="135" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="207.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="219.4" y="135" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="231.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b5" stroke-width="1.1" stroke-dasharray="4 3"/><text x="243.4" y="135" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<text x="291.4" y="134" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">is AAB a border? no, skipped</text>
+<text x="53.4" y="164" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 3</text>
+<rect x="135.4" y="148" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="147.4" y="165" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="148" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="171.4" y="165" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="148" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="195.4" y="165" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="207.4" y="148" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="219.4" y="165" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="231.4" y="148" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="243.4" y="165" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="255.4" y="148" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="267.4" y="165" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">C</text>
+<text x="291.4" y="164" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">is AA a border? yes: the loop's first stop</text>
+</svg>
+<!-- /gen:str kmp-skipped -->
+        </figure>
         The borders of <code>AABAA</code> are \(2, 1, 0\), so the only
         alignments worth trying are \(5-2=3\), \(5-1=4\), \(5-0=5\). The loop
         takes one step, \(j = \mathit{fail}[4] = 2\) (alignment \(3\)),
@@ -632,10 +848,57 @@ fn kmp_search(t: &amp;str, p: &amp;str) -&gt; i32 {
         alignment \(0\), then hits \(t[5] = \)<code>A</code> \(\ne\)
         <code>B</code>\( = P[5]\), and the matched prefix is again
         <code>AABAA</code>, borders \(2, 1, 0\):
-        <pre>  text:      A A B A A A B A A B
-  align 0:   A A B A A B           &#10007; matched AABAA, then B &ne; A at text[5]
-  align 3:         A A B A A B     border AA: P[2] = B vs A  &#10007;; fall again
-  align 4:           A A B A A B   border A:  P[1] = A vs A  &#10003;; j = 2, scan on</pre>
+        <figure class="wide">
+<!-- gen:str kmp-rescue -->
+<svg viewBox="0 0 617 152" role="img" style="max-width:740px" font-family="system-ui, sans-serif" aria-label="KMP searching for AABAAB in AABAAABAAB: alignment 0 matches AABAA and fails at text[5]; the longest border AA (alignment 3) fails on the same character; the next border A (alignment 4) matches it, and the scan goes on to find the occurrence at index 4. text: AABAAABAAB. align 0: AABAAB (matched AABAA, then B ≠ A at text[5]). align 3: AABAAB starting under column 3 (border AA: P[2] = B vs A fails; fall again). align 4: AABAAB starting under column 4 (border A: P[1] = A vs A matches; j = 2, scan on).">
+<text x="75.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="123.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="147.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="171.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="195.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="219.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="243.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="267.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<text x="291.4" y="20" font-size="9.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<text x="53.4" y="40" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">text</text>
+<rect x="63.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="75.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="87.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="99.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="111.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="123.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="135.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="147.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="171.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="195.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="207.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="219.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="231.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="243.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="255.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="267.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="279.4" y="24" width="24" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/><text x="291.4" y="41" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<text x="53.4" y="74" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 0</text>
+<rect x="63.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="75.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="87.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="99.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="111.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="123.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="135.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="147.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="58" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="171.4" y="75" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="58" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="195.4" y="75" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<text x="315.4" y="74" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">matched AABAA, then B ≠ A at text[5]</text>
+<text x="53.4" y="104" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 3</text>
+<rect x="135.4" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="147.4" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="159.4" y="88" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="171.4" y="105" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="88" width="24" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.8"/><text x="195.4" y="105" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="207.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="219.4" y="105" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="231.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="243.4" y="105" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="255.4" y="88" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="267.4" y="105" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<text x="315.4" y="104" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">border AA: P[2] = B vs A fails; fall again</text>
+<text x="53.4" y="134" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">align 4</text>
+<rect x="159.4" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3" stroke-dasharray="4 3"/><text x="171.4" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="183.4" y="118" width="24" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/><text x="195.4" y="135" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="207.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="219.4" y="135" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<rect x="231.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="243.4" y="135" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="255.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="267.4" y="135" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">A</text>
+<rect x="279.4" y="118" width="24" height="24" fill="#fff" stroke="#9aa3b2" stroke-width="1.1"/><text x="291.4" y="135" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">B</text>
+<text x="315.4" y="134" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">border A: P[1] = A vs A matches; j = 2, scan on</text>
+</svg>
+<!-- /gen:str kmp-rescue -->
+        </figure>
         Two stops this time: the longest border&rsquo;s candidate
         (alignment \(3\)) fails on the very next character, the loop falls
         once more to \(j = \mathit{fail}[1] = 1\), and the shorter
@@ -925,7 +1188,7 @@ fn kmp_search(t: &amp;str, p: &amp;str) -&gt; i32 {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Knuth&ndash;Morris&ndash;Pratt v1.0
+        Data Structures &amp; Algorithms &middot; Knuth&ndash;Morris&ndash;Pratt v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
