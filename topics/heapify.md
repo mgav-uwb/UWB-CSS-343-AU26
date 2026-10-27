@@ -16,9 +16,9 @@
 
 --
 
-## Build from n given keys
+## Build from $n$ given keys
 
-Given `n` keys already in an array, make it a heap. The obvious way: **insert each one**:
+Given $n$ keys already in an array, make it a heap. The obvious way: **insert each one**:
 
 ```cpp
 for (int i = 1; i <= n; i++)       // a[1..i-1] is a heap; add a[i]
@@ -26,7 +26,7 @@ for (int i = 1; i <= n; i++)       // a[1..i-1] is a heap; add a[i]
 ```
 
 - worst case: keys arrive **ascending**, and every key swims **all the way to the root**
-- cost: the sum of the depths ≈ `n log n`, so **Θ(n log n)**
+- cost: the sum of the depths, $\approx n \log\_2 n$, so $\boldsymbol{\Theta(n \log n)}$
 
 Can we do better with all the data **up front**?
 
@@ -34,7 +34,7 @@ Can we do better with all the data **up front**?
 
 ## Heapify: sink bottom-up
 
-Put all `n` keys in the array as they are (a complete tree, wrong values everywhere), then **sink every internal node, last to first**:
+Put all $n$ keys in the array as they are (a complete tree, wrong values everywhere), then **sink every internal node, last to first**:
 
 ```cpp
 // Make a[1..n] a heap: sink every internal node, last to first.
@@ -44,16 +44,16 @@ void heapify(int a[], int n) {
 }
 ```
 
-- `a[n/2+1 .. n]` are **leaves**: already heaps, skipped
-- when `sink(a, k, n)` runs, everything **below k is already a heap**
+- slots $\lfloor n/2 \rfloor + 1$ to $n$ are **leaves**: already heaps, skipped
+- when `sink(a, k, n)` runs, everything **below** $\boldsymbol{k}$ **is already a heap**
 
 --
 
 ## Heapify: a worked pass (1)
 
-`[ 30 60 50 90 85 40 70 45 20 ]`, `n = 9`, so the loop starts at `k = 4`:
+`[ 30 60 50 90 85 40 70 45 20 ]`, $n = 9$, so the loop starts at $k = 4$:
 
-<div><img src="../../topics/figures/heaps/hp-heapify-1.svg" style="height:278px" alt="
+<div><img src="../../topics/figures/heaps/hp-heapify-1.svg" style="height:258px" alt="
   i:      1  2  3  4  5  6  7  8  9
   a:    [ 30 60 50 90 85 40 70 45 20 ]     raw, n = 9
   sink 4: 90 ≥ 45, 20                  no swap
@@ -66,7 +66,7 @@ The outlined subtree is the one `sink(a, k, n)` just made a heap; shaded keys mo
 
 ## Heapify: a worked pass (2)
 
-<div><img src="../../topics/figures/heaps/hp-heapify-2.svg" style="height:340px" alt="
+<div><img src="../../topics/figures/heaps/hp-heapify-2.svg" style="height:326px" alt="
   sink 2: 60 &lt; max(90, 85) → swap 90 ; 60 ≥ 45, 20
         [ 30 90 70 60 85 40 50 45 20 ]
   sink 1: 30↔90, 30↔85, 30 is a leaf
@@ -94,7 +94,7 @@ The root sinks **last**, when both its subtrees are heaps. Nodes 4, 3, 2 made at
 
 ## What one sink guarantees
 
-**Lemma.** If both subtrees under `k` are heaps, `sink(a, k, n)` makes the whole subtree at `k` a heap.
+**Lemma.** If both subtrees under $k$ are heaps, `sink(a, k, n)` makes the whole subtree at `k` a heap.
 
 <div><img src="../../topics/figures/heaps/hp-one-sink.svg" style="height:188px" alt="
     before sink(k):                after:
@@ -102,17 +102,17 @@ The root sinks **last**, when both its subtrees are heaps. Nodes 4, 3, 2 made at
         /     \    be misplaced        rooted at k
     (heap)   (heap)"></div>
 
-**Why:** the larger child `c` moves up and beats `x`, its sibling and its old subtree; below it, `x` sits over two heaps: the same picture, one level down.
+**Why:** the larger child $c$ moves up and beats $x$, its sibling and its old subtree; below it, $x$ sits over two heaps: the same picture, one level down.
 
 --
 
 ## Heapify is correct
 
-**Invariant:** when the loop reaches `k`, every node **after** `k` roots a heap.
+**Invariant:** when the loop reaches $k$, every node **after** $k$ roots a heap.
 
-- **start** `k = n/2`: all nodes after are **leaves**, one-node heaps ✓
-- **step:** children `2k, 2k+1` come after `k`, so they are heaps; the **lemma** makes `k` a heap root too
-- **end:** after `k = 1`, node 1 roots a heap: **the whole array** ∎
+- **start** $k = \lfloor n/2 \rfloor$: all nodes after are **leaves**, one-node heaps ✓
+- **step:** children $2k$ and $2k + 1$ come after $k$, so they are heaps; the **lemma** makes $k$ a heap root too
+- **end:** after $k = 1$, node 1 roots a heap: **the whole array** ∎
 
 --
 
@@ -120,27 +120,27 @@ The root sinks **last**, when both its subtrees are heaps. Nodes 4, 3, 2 made at
 
 | depth | nodes | swim = depth | sink = height |
 | ----- | ----- | ------------ | ------------- |
-| 0     | 1     | 0            | **h**         |
-| 1     | 2     | 1            | h − 1         |
+| 0     | 1     | 0            | $\boldsymbol{h}$ |
+| 1     | 2     | 1            | $h - 1$       |
 | …     | …     | …            | …             |
-| h     | ~n/2  | **h**        | **0**         |
+| $h$   | $\approx n/2$ | $\boldsymbol{h}$ | **0** |
 
-- n inserts pay the **swim** column: half the nodes pay ≈ h, so **Θ(n log n)**
+- $n$ inserts pay the **swim** column: half the nodes pay $\approx h$, so $\boldsymbol{\Theta(n \log n)}$
 - heapify pays the **sink** column: half the nodes pay **0**; the next slides add it up
 
 --
 
 ## Counting every swap
 
-**Full** tree, `n = 2^(h+1) − 1`. A sink from height `j` costs ≤ `j` swaps; level by level:
+**Full** tree, $n = 2^{h+1} - 1$. A sink from height $j$ costs $\le j$ swaps; level by level:
 
-| depth d | nodes   | sink ≤ h − d | contributes  |
+| depth $d$ | nodes   | sink $\le h - d$ | contributes  |
 | ------- | ------- | ------------ | ------------ |
-| 0       | 1       | h            | h · 1        |
-| 1       | 2       | h − 1        | (h − 1) · 2  |
+| 0       | 1       | $h$          | $h \cdot 1$  |
+| 1       | 2       | $h - 1$      | $(h - 1) \cdot 2$ |
 | ⋮       | ⋮       | ⋮            | ⋮            |
-| h − 1   | 2^(h−1) | 1            | 1 · 2^(h−1)  |
-| h       | 2^h     | 0            | 0            |
+| $h - 1$ | $2^{h-1}$ | 1          | $1 \cdot 2^{h-1}$ |
+| $h$     | $2^h$   | 0            | 0            |
 
 <div style="font-size:0.8em">
 
@@ -152,39 +152,48 @@ $$S = h \cdot 1 + (h-1) \cdot 2 + (h-2) \cdot 4 + \dots + 1 \cdot 2^{h-1}$$
 
 ## The trick: double it and align
 
-Doubling shifts every term **one column right** (each `2^d` becomes `2^(d+1)`):
+Doubling shifts every term **one column right** (each $2^d$ becomes $2^{d+1}$):
 
-```text
-   S  =  h·1 + (h−1)·2 + (h−2)·4 + ⋯ + 1·2^(h−1)
-   2S =        h·2     + (h−1)·4 + ⋯ + 2·2^(h−1) + 1·2^h
-```
+<div style="font-size:0.75em">
 
-Equal powers of two now share a **column**, and in every column the `2S` coefficient is **one more** than the `S` coefficient: subtract.
+$$
+\begin{array}{rcccccccccc}
+S &=& h \cdot 1 &+& (h-1) \cdot 2 &+& (h-2) \cdot 4 &+ \cdots +& 1 \cdot 2^{h-1} & & \\\\
+2S &=& & & h \cdot 2 &+& (h-1) \cdot 4 &+ \cdots +& 2 \cdot 2^{h-1} &+& 1 \cdot 2^h
+\end{array}
+$$
+
+</div>
+
+Equal powers of two now share a **column**, and in every column the $2S$ coefficient is **one more** than the $S$ coefficient: subtract.
 
 --
 
 ## Subtract: the sum telescopes
 
-Column by column, `2S − S` leaves **one copy of each power of two**, plus the unmatched ends:
+Column by column, $2S - S$ leaves **one copy of each power of two**, plus the unmatched ends:
 
-```text
-   2S − S  =  −h·1  +  1·2 + 1·4 + ⋯ + 1·2^(h−1) + 1·2^h
-
-   S  =  ( 2 + 4 + ⋯ + 2^h )  −  h        [2S − S = S]
-      =  ( 2^(h+1) − 2 )  −  h            [geometric sum]
-```
+$$
+\begin{aligned}
+2S - S &= -h \cdot 1 + 1 \cdot 2 + 1 \cdot 4 + \cdots + 1 \cdot 2^{h-1} + 1 \cdot 2^h \\\\
+S &= (2 + 4 + \cdots + 2^h) - h \qquad \text{as } 2S - S = S \\\\
+&= (2^{h+1} - 2) - h \qquad \text{a geometric sum}
+\end{aligned}
+$$
 
 $$S = 2^{h+1} - h - 2$$
 
 --
 
-## Fewer than n swaps
+## Fewer than $n$ swaps
 
-The **full** tree has `n = 2^(h+1) − 1` nodes, so `2^(h+1) = n + 1`:
+In the **full** tree $n = 2^{h+1} - 1$, so $2^{h+1} = n + 1$:
 
 $$S = n - h - 1 < n$$
 
-**Building a heap costs fewer swaps than there are nodes.** For **any** complete tree, `2^h ≤ n` gives `S ≤ 2n`: **heapify ∈ Θ(n).**
+**Building a heap costs fewer swaps than there are nodes.**
+
+Any complete tree: $2^h \le n$, so $S < 2^{h+1} \le 2n$; **heapify is** $\boldsymbol{\Theta(n)}$.
 
 --
 
@@ -192,19 +201,19 @@ $$S = n - h - 1 < n$$
 
 | method              | pays per node         | cost           |
 | ------------------- | --------------------- | -------------- |
-| repeated **insert** | its **depth** (swim)  | **Θ(n log n)** |
-| **heapify**         | its **height** (sink) | **Θ(n)**       |
+| repeated **insert** | its **depth** (swim)  | $\boldsymbol{\Theta(n \log n)}$ |
+| **heapify**         | its **height** (sink) | $\boldsymbol{\Theta(n)}$ |
 
 Same result. Heapify wins whenever the data is **all there up front**; a live PQ (keys arriving over time) still inserts one by one.
 
 --
 
-## Θ(n) build vs the sorting bound
+## A linear build vs the sorting bound
 
-Comparison sorting needs **Ω(n log n)** comparisons (the sorting lower bound). Does a Θ(n) build beat it? **No**: a heap is **not sorted**.
+Comparison sorting needs $\boldsymbol{\Omega(n \log n)}$ comparisons. Does a $\Theta(n)$ build beat that bound? **No**: a heap is **not sorted**.
 
-- heap order holds only **along paths**: far less information than sorted order
-- extracting the sorted order still costs `n ×` Θ(log n): that is **heapsort**
+- heap order holds only **along paths**: far less than sorted order
+- extracting the sorted order still costs $\Theta(n \log n)$: that is **heapsort**
 
-**Θ(n) buys partial order; full order still costs n log n.**
+**Partial order costs** $\boldsymbol{\Theta(n)}$; **full order,** $\boldsymbol{\Theta(n \log n)}$.
 

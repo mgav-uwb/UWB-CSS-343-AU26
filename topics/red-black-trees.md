@@ -511,24 +511,24 @@ The middle borrows from the **left** sibling if it can, otherwise from the right
 
 --
 
-## Proof, part 1: bounding b
+## Proof, part 1: bounding $b$
 
-**Claim: height ≤ 2 log₂ n.** Let **b** = black links on a root-to-null path: the *same* on every path, by invariant 3.
+**Claim:** height $\boldsymbol{\le 2 \log\_2 n}$. Let $b$ = black links from the root down to a null link, not counting it: the *same* on every path (rule 4).
 
-**Collapse every red link into its parent**: this recovers the **2-3 tree**.
+- **collapse every red link into its parent**: the 2-3 tree again, its **edges** the black links, so $b$ = **its height**
+- a 2-3 tree's height is at most $\log\_2(n+1) - 1$ (all 2-nodes)
 
-- the tree's **black** links = the 2-3 tree's **edges**, so `b` = **that 2-3 tree's height**
-- a 2-3 tree's height is at most log₂ n (all 2-nodes)
-
-So: **b ≤ log₂ n**.
+So $\boldsymbol{b \le \log\_2(n+1) - 1}$.
 
 --
 
 ## Proof, part 2: no double-reds
 
-Between any two **black** links, invariant 2 allows **at most one red** (two in a row is the violation `flipColors` removes): so **height ≤ 2b**.
+A path meets $b + 1$ nodes of the 2-3 tree, and each adds **at most one red** link (rule 3: no two reds in a row):
 
-Combine with part 1 (`b ≤ log₂ n`): **height ≤ 2 log₂ n = Θ(log n)**, guaranteed for any insert order. ∎
+$$\text{height} \le b + (b + 1) = 2b + 1$$
+
+With part 1: $\text{height} \le 2 \log\_2(n+1) - 1 \le \boldsymbol{2 \log\_2 n}$ for $n \ge 3$ (1 or 2 keys: height 0 or 1). $\Theta(\log n)$ for any insert order. ∎
 
 --
 
@@ -540,7 +540,7 @@ The classic red-black BST (Cormen et al.) is the balanced tree real libraries sh
 - Java `TreeMap` / `TreeSet`
 - the Linux kernel scheduler, and more
 
-Guaranteed **Θ(log n)**, height **≤ 2 log₂ n**, at most **2 rotations per insert** and **3 per delete**.
+Guaranteed $\boldsymbol{\Theta(\log n)}$, height $\boldsymbol{\le 2 \log\_2 n}$, at most **2 rotations per insert** and **3 per delete**.
 
 --
 
@@ -548,11 +548,11 @@ Guaranteed **Θ(log n)**, height **≤ 2 log₂ n**, at most **2 rotations per i
 
 | | AVL | red-black |
 |---|---|---|
-| height | ≤ 1.44 log₂n | ≤ 2 log₂n |
+| height | $\le 1.44 \log\_2 n$ | $\le 2 \log\_2 n$ |
 | balance | **tighter** | looser |
-| rotations / insert | ≤ 1 (single or double) | **≤ 2** + recolors |
-| rotations / delete | up to **log n** | **O(1)** |
+| rotations / insert | $\le 1$ (single or double) | $\boldsymbol{\le 2}$ + recolors |
+| rotations / delete | up to $\boldsymbol{\log\_2 n}$ | $\boldsymbol{O(1)}$ |
 | best for | **read**-heavy | **write**-heavy |
 
-Both guaranteed Θ(log n): AVL searches a bit faster, red-black updates a bit faster.
+Both guaranteed $\Theta(\log n)$: AVL searches a bit faster, red-black updates a bit faster.
 

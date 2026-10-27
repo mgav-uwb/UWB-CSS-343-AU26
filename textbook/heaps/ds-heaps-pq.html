@@ -184,11 +184,108 @@
         The defining workload is that <code>insert</code> and <code>delMax</code>
         <em>interleave</em>. A discrete-event simulator is the canonical case:
       </p>
-      <pre>  PQ = min-PQ keyed by event time
-  insert the first few events
-  while PQ not empty:
-      e = delMin()          <span class="cm">// the earliest remaining event</span>
-      process e             <span class="cm">// may schedule NEW future events -&gt; insert</span></pre>
+      <div class="code-tabs" data-snippet="heaps/event-loop">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// A discrete-event simulation: a min-priority-queue of events keyed by time.
+// Processing an event may schedule a new one, later, so inserts and
+// delete-mins interleave.
+struct Event {
+    int time;
+    int id;
+};
+
+// the queue&#x27;s order: the earliest time on top
+struct Later {
+    bool operator()(const Event&amp; x, const Event&amp; y) const {
+        return x.time &gt; y.time;
+    }
+};
+
+void simulate(int horizon) {
+    std::priority_queue&lt;Event, std::vector&lt;Event&gt;, Later&gt; pq;
+    pq.push({0, 1});                   // the first few events
+    pq.push({1, 2});
+    int nextId = 3;
+    while (!pq.empty()) {
+        Event e = pq.top();            // delMin: the earliest remaining event
+        pq.pop();
+        std::cout &lt;&lt; &quot;t=&quot; &lt;&lt; e.time &lt;&lt; &quot;: event &quot; &lt;&lt; e.id &lt;&lt; &quot;\n&quot;;
+        if (e.time + 3 &lt;= horizon)     // processing schedules a new future event
+            pq.push({e.time + 3, nextId++});
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// A discrete-event simulation: a min-priority-queue of events keyed by time.
+// Processing an event may schedule a new one, later, so inserts and
+// delete-mins interleave.
+static class Event implements Comparable&lt;Event&gt; {
+    final int time;
+    final int id;
+    Event(int time, int id) { this.time = time; this.id = id; }
+    public int compareTo(Event other) {   // earliest first
+        return Integer.compare(time, other.time);
+    }
+}
+
+static void simulate(int horizon) {
+    PriorityQueue&lt;Event&gt; pq = new PriorityQueue&lt;&gt;();   // a min-heap
+    pq.add(new Event(0, 1));           // the first few events
+    pq.add(new Event(1, 2));
+    int nextId = 3;
+    while (!pq.isEmpty()) {
+        Event e = pq.poll();           // delMin: the earliest remaining event
+        System.out.println(&quot;t=&quot; + e.time + &quot;: event &quot; + e.id);
+        if (e.time + 3 &lt;= horizon)     // processing schedules a new future event
+            pq.add(new Event(e.time + 3, nextId++));
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># A discrete-event simulation: a min-priority-queue of events keyed by time.
+# Processing an event may schedule a new one, later, so inserts and
+# delete-mins interleave.
+import heapq
+
+def simulate(horizon):
+    pq = []                            # a min-heap of (time, id) pairs
+    heapq.heappush(pq, (0, 1))         # the first few events
+    heapq.heappush(pq, (1, 2))
+    next_id = 3
+    while pq:
+        time, eid = heapq.heappop(pq)  # delMin: the earliest remaining event
+        print(f&quot;t={time}: event {eid}&quot;)
+        if time + 3 &lt;= horizon:        # processing schedules a new future event
+            heapq.heappush(pq, (time + 3, next_id))
+            next_id += 1</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// A discrete-event simulation: a min-priority-queue of events keyed by time.
+// Processing an event may schedule a new one, later, so inserts and
+// delete-mins interleave.
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
+
+pub fn simulate(horizon: u32) {
+    let mut pq = BinaryHeap::new();    // a max-heap; Reverse makes it a min-heap
+    pq.push(Reverse((0, 1)));          // the first few events: (time, id)
+    pq.push(Reverse((1, 2)));
+    let mut next_id = 3;
+    // delMin: the earliest event
+    while let Some(Reverse((time, id))) = pq.pop() {
+        println!(&quot;t={}: event {}&quot;, time, id);
+        if time + 3 &lt;= horizon {       // processing schedules a new future event
+            pq.push(Reverse((time + 3, next_id)));
+            next_id += 1;
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/heaps/event-loop.cpp &middot; code/heaps/event-loop.java &middot; code/heaps/event-loop.py &middot; code/heaps/event-loop.rs</code></p>
+<!--/ct--></div>
+      <p>
+        With a horizon of \(10\), the events run at times
+        \(0, 1, 3, 4, 6, 7, 9, 10\): each <code>delMin</code> returns the earliest
+        event still pending, including the ones scheduled after the run began.
+      </p>
       <p>
         New events appear <em>in the middle</em> of processing, out of time order,
         yet <code>delMin</code> must always return the chronologically next one. A
@@ -319,16 +416,18 @@
         <strong>1-based</strong> convention leaves <code>a[0]</code> unused so the
         root sits at index \(1\) and the index formulas stay short:
       </p>
-      <pre>  parent(k) = k / 2       <span class="cm">// integer division, floor</span>
-  left(k)   = 2k
-  right(k)  = 2k + 1</pre>
+      \[
+        \texttt{parent}(k) = \lfloor k/2 \rfloor, \qquad
+        \texttt{left}(k) = 2k, \qquad
+        \texttt{right}(k) = 2k + 1
+      \]
       <p>
         Going to a child is a multiply by two; going to a parent is a divide by two.
         There is no dereferencing, no pointer to follow, nothing to allocate per
         node. (A 0-based array works too, with
         \(\texttt{parent}(k)=\lfloor(k-1)/2\rfloor\), \(\texttt{left}(k)=2k+1\),
-        \(\texttt{right}(k)=2k+2\); the course, its assignments, and every snippet
-        here use the 1-based form.)
+        \(\texttt{right}(k)=2k+2\); every snippet
+        here uses the 1-based form.)
       </p>
       <figure>
         <!-- gen:hp tree-array -->
@@ -1018,17 +1117,154 @@ impl MaxHeap {
         Result: \([\,95\;80\;90\;30\;60\;50\;70\,]\).
       </div>
       <div class="ex">
-        <span class="tag">Example (insert 85: a partial swim)</span>
+        <span class="tag">Example (insert 85, then 40: a partial swim, and none)</span>
         Not every inserted key reaches the root. From the same start
-        \(a = [\,90\;80\;70\;30\;60\;50\,]\), insert \(85\) instead:
-        <pre>  append:  90 80 70 30 60 50 85        <span class="cm">// 85 at a[7], child of a[3]=70</span>
-  swap@3:  90 80 85 30 60 50 70        <span class="cm">// 85 &gt; parent 70, one level up</span>
-  stop:    parent a[1]=90 &ge; 85        <span class="cm">// loop condition fails</span></pre>
+        \(a = [\,90\;80\;70\;30\;60\;50\,]\), insert \(85\) instead, and,
+        separately, \(40\):
+        <figure>
+<!-- gen:hp swim-partial -->
+<svg viewBox="0 0 524 480" role="img" style="max-width:629px" font-family="system-ui, sans-serif" aria-label="Two inserts into 90, 80, 70, 30, 60, 50. Insert 85: append 85 at a[7]: the array a[1..7] = 90, 80, 70, 30, 60, 50, 85; as a tree, 90 at the root; 90 has children 80 and 70; 80 has children 30 and 60; 70 has children 50 and 85. swapped up to a[3]; a[1] = 90 ≥ 85: stop: the array a[1..7] = 90, 80, 85, 30, 60, 50, 70; as a tree, 90 at the root; 90 has children 80 and 85; 80 has children 30 and 60; 85 has children 50 and 70. Insert 40: append 40 at a[7]; a[3] = 70 ≥ 40: stop: the array a[1..7] = 90, 80, 70, 30, 60, 50, 40; as a tree, 90 at the root; 90 has children 80 and 70; 80 has children 30 and 60; 70 has children 50 and 40.">
+<text x="10" y="23" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">insert 85: one level up, then stop</text>
+<line x1="97.5" y1="47" x2="57.5" y2="93" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="97.5" y1="47" x2="137.5" y2="93" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="57.5" y1="93" x2="37.5" y2="139" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="57.5" y1="93" x2="77.5" y2="139" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="137.5" y1="93" x2="117.5" y2="139" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="137.5" y1="93" x2="157.5" y2="139" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="97.5" cy="47" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="97.5" y="52" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<circle cx="57.5" cy="93" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="57.5" y="98" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<circle cx="137.5" cy="93" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="137.5" y="98" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<circle cx="37.5" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="37.5" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<circle cx="77.5" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="77.5" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="117.5" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="117.5" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<circle cx="157.5" cy="139" r="21" fill="#fde7bf"/>
+<circle cx="157.5" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="157.5" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">85</text>
+<rect x="10" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="22.5" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="22.5" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="35" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="47.5" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="47.5" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="60" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="72.5" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="72.5" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="85" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="97.5" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="97.5" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="110" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="122.5" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="122.5" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="135" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="147.5" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="147.5" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="160" y="172" width="25" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="172.5" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">85</text>
+<text x="172.5" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="97.5" y="223" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">append 85 at a[7]</text>
+<text x="222.1" y="115" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="222.1" y="131" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">85 &gt; 70</text>
+<text x="222.1" y="144" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">swap</text>
+<line x1="386.1" y1="47" x2="346.1" y2="93" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="386.1" y1="47" x2="426.1" y2="93" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="346.1" y1="93" x2="326.1" y2="139" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="346.1" y1="93" x2="366.1" y2="139" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="426.1" y1="93" x2="406.1" y2="139" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="426.1" y1="93" x2="446.1" y2="139" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="386.1" cy="47" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="386.1" y="52" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<circle cx="346.1" cy="93" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="346.1" y="98" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<circle cx="426.1" cy="93" r="21" fill="#fde7bf"/>
+<circle cx="426.1" cy="93" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="426.1" y="98" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">85</text>
+<circle cx="326.1" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="326.1" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<circle cx="366.1" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="366.1" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="406.1" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="406.1" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<circle cx="446.1" cy="139" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="446.1" y="144" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<rect x="298.6" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="311.1" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="311.1" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="323.6" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.1" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="336.1" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="348.6" y="172" width="25" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="361.1" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">85</text>
+<text x="361.1" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="373.6" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="386.1" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="386.1" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="398.6" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="411.1" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="411.1" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="423.6" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="436.1" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="436.1" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="448.6" y="172" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="461.1" y="188.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="461.1" y="207" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="386.1" y="223" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">swapped up to a[3]; a[1] = 90 ≥ 85: stop</text>
+<text x="10" y="265" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="start">insert 40: no swap at all</text>
+<line x1="133.9" y1="289" x2="93.9" y2="335" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="133.9" y1="289" x2="173.9" y2="335" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="93.9" y1="335" x2="73.9" y2="381" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="93.9" y1="335" x2="113.9" y2="381" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="173.9" y1="335" x2="153.9" y2="381" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="173.9" y1="335" x2="193.9" y2="381" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="133.9" cy="289" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="133.9" y="294" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<circle cx="93.9" cy="335" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="93.9" y="340" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<circle cx="173.9" cy="335" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="173.9" y="340" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<circle cx="73.9" cy="381" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="73.9" y="386" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<circle cx="113.9" cy="381" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="113.9" y="386" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<circle cx="153.9" cy="381" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="153.9" y="386" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<circle cx="193.9" cy="381" r="21" fill="#fde7bf"/>
+<circle cx="193.9" cy="381" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="193.9" y="386" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<rect x="46.4" y="414" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="58.9" y="430.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="58.9" y="449" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="71.4" y="414" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="83.9" y="430.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="83.9" y="449" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="96.4" y="414" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="108.9" y="430.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="108.9" y="449" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="121.4" y="414" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="133.9" y="430.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="133.9" y="449" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="146.4" y="414" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="158.9" y="430.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="158.9" y="449" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="171.4" y="414" width="25" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="183.9" y="430.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="183.9" y="449" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="196.4" y="414" width="25" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="208.9" y="430.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="208.9" y="449" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="133.9" y="465" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">append 40 at a[7]; a[3] = 70 ≥ 40: stop</text>
+</svg>
+<!-- /gen:hp swim-partial -->
+        </figure>
         \(85\) climbs one level and settles at index \(3\):
-        \([\,90\;80\;85\;30\;60\;50\;70\,]\). The third outcome is no motion at
-        all. Insert \(40\) into the same starting heap instead:
-        <pre>  append:  90 80 70 30 60 50 40        <span class="cm">// 40 at a[7], child of a[3]=70</span>
-  stop:    parent a[3]=70 &ge; 40        <span class="cm">// loop body never runs: zero swaps</span></pre>
+        \([\,90\;80\;85\;30\;60\;50\;70\,]\), because its new parent
+        \(a[1] = 90 \ge 85\) ends the loop. \(40\) does not move at all: its parent
+        \(a[3] = 70 \ge 40\), so the loop body never runs.
         Swim therefore has exactly three outcomes: climb all the way to the root
         (the \(95\) above), climb partway and stop under a larger ancestor (this
         \(85\)), or stop before the first swap (this \(40\), which stays at index
@@ -1041,10 +1277,7 @@ impl MaxHeap {
         Continue from \(a = [\,95\;80\;90\;30\;60\;50\;70\,]\) (\(n=7\)) and call
         <code>delMax</code>. The answer is \(a[1]=95\). Swap it with the last key
         \(70\) and shrink to \(n=6\); the new root \(70\) then sinks, comparing
-        against both children and following the larger each time:
-        <pre>  swap 95&harr;70, shrink:  70 80 90 30 60 50        <span class="cm">// 95 parked past the end</span>
-  70 vs max(80,90)=90:  90 80 70 30 60 50        <span class="cm">// swap with the larger child</span>
-  70 vs child 50:       90 80 70 30 60 50        <span class="cm">// 70 &ge; 50, stop</span></pre>
+        against both children and following the larger each time.
         <code>delMax</code> returns \(95\) and leaves \([\,90\;80\;70\;30\;60\;50\,]\),
         the heap from before the insert of \(95\): here the delMax undoes the
         insert. Note the two choice points: at the root, \(70\) is
@@ -1201,11 +1434,116 @@ impl MaxHeap {
         \([\,90\;85\;70\;60\;30\;40\;50\;45\;20\,]\) (\(n=9\); Section&nbsp;5 builds
         exactly this one) and call <code>delMax</code>: swap the root with
         \(a[9]=20\), shrink to \(n=8\), and sink the promoted \(20\).
-        <pre>  swap 90&harr;20, shrink:  20 85 70 60 30 40 50 45   <span class="cm">// 90 parked at a[9]</span>
-  k=1, max(85,70)=85:   85 20 70 60 30 40 50 45   <span class="cm">// two children, right one loses</span>
-  k=2, max(60,30)=60:   85 60 70 20 30 40 50 45   <span class="cm">// two children, left one wins</span>
-  k=4, lone child 45:   85 60 70 45 30 40 50 20   <span class="cm">// 2k=8=n, so no right sibling</span>
-  k=8: 2k=16 &gt; n:       85 60 70 45 30 40 50 20   <span class="cm">// a leaf: loop ends</span></pre>
+        <figure>
+<!-- gen:hp sink-long -->
+<svg viewBox="0 0 636 182" role="img" style="max-width:763px" font-family="system-ui, sans-serif" aria-label="delMax on 90, 85, 70, 60, 30, 40, 50, 45, 20, one row per step; the two keys each step swaps are shaded, 90 parked past the end. a heap, n = 9: the array a[1..9] = 90, 85, 70, 60, 30, 40, 50, 45, 20. swap 90 ↔ 20, shrink to n = 8: the array a[1..9] = 20, 85, 70, 60, 30, 40, 50, 45, 90; the heap is a[1..8]; the rest is parked past the end. k = 1: 85 beats 70, swap with a[2]: the array a[1..9] = 85, 20, 70, 60, 30, 40, 50, 45, 90; the heap is a[1..8]; the rest is parked past the end. k = 2: 60 beats 30, swap with a[4]: the array a[1..9] = 85, 60, 70, 20, 30, 40, 50, 45, 90; the heap is a[1..8]; the rest is parked past the end. k = 4: lone child a[8] = 45, swap; a[8] is a leaf: the array a[1..9] = 85, 60, 70, 45, 30, 40, 50, 20, 90; the heap is a[1..8]; the rest is parked past the end.">
+<text x="321.8" y="26" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="end">a heap, n = 9</text>
+<rect x="337.8" y="10" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="353.8" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<rect x="369.8" y="10" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="385.8" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">85</text>
+<rect x="401.8" y="10" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="417.8" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<rect x="433.8" y="10" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="449.8" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="465.8" y="10" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="481.8" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="497.8" y="10" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="513.8" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<rect x="529.8" y="10" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="545.8" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="561.8" y="10" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="577.8" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">45</text>
+<rect x="593.8" y="10" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="609.8" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<text x="321.8" y="57" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">swap 90 ↔ 20, shrink to n = 8</text>
+<rect x="337.8" y="41" width="32" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="353.8" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="369.8" y="41" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="385.8" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">85</text>
+<rect x="401.8" y="41" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="417.8" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<rect x="433.8" y="41" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="449.8" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="465.8" y="41" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="481.8" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="497.8" y="41" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="513.8" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<rect x="529.8" y="41" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="545.8" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="561.8" y="41" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="577.8" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">45</text>
+<rect x="593.8" y="41" width="32" height="24" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="609.8" y="57.5" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">90</text>
+<text x="321.8" y="88" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 1: 85 beats 70, swap with a[2]</text>
+<rect x="337.8" y="72" width="32" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="353.8" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">85</text>
+<rect x="369.8" y="72" width="32" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="385.8" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="401.8" y="72" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="417.8" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<rect x="433.8" y="72" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="449.8" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="465.8" y="72" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="481.8" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="497.8" y="72" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="513.8" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<rect x="529.8" y="72" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="545.8" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="561.8" y="72" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="577.8" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">45</text>
+<rect x="593.8" y="72" width="32" height="24" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="609.8" y="88.5" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">90</text>
+<text x="321.8" y="119" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 2: 60 beats 30, swap with a[4]</text>
+<rect x="337.8" y="103" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="353.8" y="119.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">85</text>
+<rect x="369.8" y="103" width="32" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="385.8" y="119.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="401.8" y="103" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="417.8" y="119.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<rect x="433.8" y="103" width="32" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="449.8" y="119.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="465.8" y="103" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="481.8" y="119.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="497.8" y="103" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="513.8" y="119.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<rect x="529.8" y="103" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="545.8" y="119.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="561.8" y="103" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="577.8" y="119.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">45</text>
+<rect x="593.8" y="103" width="32" height="24" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="609.8" y="119.5" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">90</text>
+<text x="321.8" y="157" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">k = 4: lone child a[8] = 45, swap; a[8] is a leaf</text>
+<rect x="337.8" y="134" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="353.8" y="150.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">85</text>
+<text x="353.8" y="169" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="369.8" y="134" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="385.8" y="150.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="385.8" y="169" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="401.8" y="134" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="417.8" y="150.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="417.8" y="169" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="433.8" y="134" width="32" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="449.8" y="150.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">45</text>
+<text x="449.8" y="169" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="465.8" y="134" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="481.8" y="150.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="481.8" y="169" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="497.8" y="134" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="513.8" y="150.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="513.8" y="169" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="529.8" y="134" width="32" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="545.8" y="150.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="545.8" y="169" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="561.8" y="134" width="32" height="24" fill="#fde7bf" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="577.8" y="150.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<text x="577.8" y="169" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="593.8" y="134" width="32" height="24" fill="#f1f2f5" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="609.8" y="150.5" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">90</text>
+<text x="609.8" y="169" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+</svg>
+<!-- /gen:hp sink-long -->
+        </figure>
         The result \([\,85\;60\;70\;45\;30\;40\;50\;20\,]\) is a heap
         (\(85\ge60,70\); \(60\ge45,30\); \(70\ge40,50\); \(45\ge20\)), and
         \(90\) sits parked at \(a[9]\). Between this run and the one above, every
@@ -1251,7 +1589,35 @@ impl MaxHeap {
         array a heap. The obvious way treats it as \(n\) insertions, swimming each
         element in turn:
       </p>
-      <pre>  for i = 1 .. n:  swim(a, i)       <span class="cm">// n successive inserts</span></pre>
+      <div class="code-tabs" data-snippet="heaps/build-by-insert">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Build a heap by n successive inserts: a[1..i-1] is a heap; swim a[i] into it.
+void buildByInsert(int a[], int n) {
+    for (int i = 1; i &lt;= n; i++)
+        swim(a, i);
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Build a heap by n successive inserts: a[1..i-1] is a heap; swim a[i] into it.
+static void buildByInsert(int[] a, int n) {
+    for (int i = 1; i &lt;= n; i++)
+        swim(a, i);
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Build a heap by n successive inserts: a[1..i-1] is a heap; swim a[i] into it.
+def build_by_insert(a, n):
+    for i in range(1, n + 1):
+        swim(a, i)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Build a heap by n successive inserts: a[1..i-1] is a heap; swim a[i] into it.
+pub fn build_by_insert(a: &amp;mut [i32], n: usize) {
+    for i in 1..=n {
+        swim(a, i);
+    }
+}</pre>
+<p class="ct-src">source: <code>code/heaps/build-by-insert.cpp &middot; code/heaps/build-by-insert.java &middot; code/heaps/build-by-insert.py &middot; code/heaps/build-by-insert.rs</code></p>
+<!--/ct--></div>
       <p>
         Its worst case is ascending input: each new key is the largest so far and
         swims its full depth. The total is the sum of the nodes&rsquo; depths, and in
@@ -1266,8 +1632,35 @@ impl MaxHeap {
         (its code appears with heapsort&rsquo;s, in
         <a href="algo-heapsort.html"><em>Heapsort</em></a>):
       </p>
-      <pre>  heapify(a, n):
-      for k = n/2 down to 1:  sink(a, k, n)</pre>
+      <div class="code-tabs" data-snippet="heaps/heapify">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Make a[1..n] a heap: sink every internal node, last to first.
+void heapify(int a[], int n) {
+    for (int k = n/2; k &gt;= 1; k--)
+        sink(a, k, n);
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Make a[1..n] a heap: sink every internal node, last to first.
+static void heapify(int[] a, int n) {
+    for (int k = n/2; k &gt;= 1; k--)
+        sink(a, k, n);
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Make a[1..n] a heap: sink every internal node, last to first.
+def heapify(a, n):
+    for k in range(n//2, 0, -1):
+        sink(a, k, n)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Make a[1..=n] a heap: sink every internal node, last to first.
+pub fn heapify(a: &amp;mut [i32], n: usize) {
+    for k in (1..=n/2).rev() {
+        sink(a, k, n);
+    }
+}</pre>
+<p class="ct-src">source: <code>code/heaps/heapify.cpp &middot; code/heaps/heapify.java &middot; code/heaps/heapify.py &middot; code/heaps/heapify.rs</code></p>
+<!--/ct--></div>
       <p>
         Two facts make this work. The nodes past \(\lfloor n/2\rfloor\) are leaves
         (Section&nbsp;3), already one-node heaps, so we skip them. And processing
@@ -1680,8 +2073,12 @@ impl MaxHeap {
         \]
         Double it, which shifts every term one power of two to the right, and line
         the two rows up by matching powers:
-        <pre>  S  =  h&middot;1 + (h&minus;1)&middot;2 + (h&minus;2)&middot;4 + &middot;&middot;&middot; + 1&middot;2^(h&minus;1)
-  2S =         h&middot;2   + (h&minus;1)&middot;4 + &middot;&middot;&middot; + 2&middot;2^(h&minus;1) + 1&middot;2^h</pre>
+        \[
+          \begin{array}{rcccccccccc}
+          S &=& h\cdot 1 &+& (h-1)\cdot 2 &+& (h-2)\cdot 4 &+\cdots+& 1\cdot 2^{h-1} && \\
+          2S &=& && h\cdot 2 &+& (h-1)\cdot 4 &+\cdots+& 2\cdot 2^{h-1} &+& 1\cdot 2^{h}
+          \end{array}
+        \]
         In each shared power-of-two column the \(2S\) coefficient exceeds the \(S\)
         coefficient by exactly one, so subtracting collapses the sum:
         \[
@@ -1945,7 +2342,7 @@ impl MaxHeap {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Heaps &amp; Priority Queues v1.0
+        Data Structures &amp; Algorithms &middot; Heaps &amp; Priority Queues v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

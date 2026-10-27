@@ -25,7 +25,7 @@
 
 ## Reading for today
 
-- <a href="../../textbook/heaps/ds-heaps-pq.html">Heaps & Priority Queues</a>: the invariants, swim and sink, building in Θ(n)
+- <a href="../../textbook/heaps/ds-heaps-pq.html">Heaps & Priority Queues</a>: the invariants, swim and sink, building in $\Theta(n)$
 - <a href="../../textbook/heaps/algo-heapsort.html">Heapsort</a>
 
 The heap demos are also on the <a href="../../lib/demo.html?ds=heap">course hub</a>.

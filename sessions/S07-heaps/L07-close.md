@@ -12,10 +12,10 @@
 ## Recap
 
 - a **priority queue** promises the maximum, nothing more
-- a **binary heap** is a complete tree in an array: children of i at 2i and 2i + 1 (1-based)
-- **insert** swims up, **delete-max** sinks down: both Θ(log n)
-- **heapify** sinks bottom-up in **Θ(n)**
-- **heapsort**: heapify, then n delete-maxes in place: Θ(n log n), no extra array
+- a **binary heap** is a complete tree in an array: children of $i$ at $2i$ and $2i + 1$ (1-based)
+- **insert** swims up, **delete-max** sinks down: both $\Theta(\log n)$
+- **heapify** sinks bottom-up in $\boldsymbol{\Theta(n)}$
+- **heapsort**: heapify, then $n$ delete-maxes in place: $\Theta(n \log n)$, no extra array
 
 --
 

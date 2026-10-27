@@ -51,9 +51,9 @@ A **min**-PQ is the mirror image: `min()`, `delMin()`. We build the **max** vers
 
 | implementation       | insert       | delMax       |
 | -------------------- | ------------ | ------------ |
-| unordered array/list | Θ(1)         | **Θ(n)**     |
-| ordered array/list   | **Θ(n)**     | Θ(1)         |
-| **binary heap**      | **Θ(log n)** | **Θ(log n)** |
+| unordered array/list | $\Theta(1)$ | $\boldsymbol{\Theta(n)}$ |
+| ordered array/list   | $\boldsymbol{\Theta(n)}$ | $\Theta(1)$ |
+| **binary heap**      | $\boldsymbol{\Theta(\log n)}$ | $\boldsymbol{\Theta(\log n)}$ |
 
 Each simple option makes **one** operation cheap by making the other **linear**. We want **both** fast.
 
@@ -61,15 +61,15 @@ Each simple option makes **one** operation cheap by making the other **linear**.
 
 ## Why not an AVL tree?
 
-An AVL tree is already a PQ: insert and delete-max both cost Θ(log n), and the max is the rightmost node. Why a new structure?
+An AVL tree already works as a PQ: insert and delete-max in $\Theta(\log n)$, the max at the rightmost node. Why a new structure?
 
 |                   | AVL tree                  | binary heap     |
 | ----------------- | ------------------------- | --------------- |
 | memory            | node + 2 pointers per key | **plain array** |
-| build from n keys | Θ(n log n)                | **Θ(n)**        |
+| build from $n$ keys | $\Theta(n \log n)$ | $\boldsymbol{\Theta(n)}$ |
 | code              | rotations, balancing      | **~20 lines**   |
 
-The heap keeps **less** order than a search tree, so it costs less: no pointers, no rotations, and a linear-time build.
+A heap keeps **less** order than a search tree, so it costs less: no pointers, no rotations, a linear-time build.
 
 --
 
@@ -77,7 +77,7 @@ The heap keeps **less** order than a search tree, so it costs less: no pointers,
 
 A sorted list has **too much** order (expensive to maintain). An unsorted list has **none** (expensive to search).
 
-A heap keeps a **partial** order, **each parent ≥ its children**, which is:
+A heap keeps a **partial** order, **each parent** $\boldsymbol{\ge}$ **its children**, which is:
 
 - **strong enough**: the maximum is always at the top
 - **loose enough**: after a change, only **one root-to-leaf path** needs repair
@@ -89,7 +89,7 @@ A heap keeps a **partial** order, **each parent ≥ its children**, which is:
 A **binary (max-)heap** is a binary tree that is both:
 
 1. **complete**: every level full except possibly the last, which is filled **left to right**
-2. **heap-ordered**: every node's key is **≥ both its children**
+2. **heap-ordered**: every node's key is $\boldsymbol{\ge}$ **both its children**
 
 <div><img src="../../topics/figures/heaps/hp-conditions.svg" style="height:228px" alt="
        90                  90                  90
@@ -104,9 +104,9 @@ A **binary (max-)heap** is a binary tree that is both:
 
 ## No pointers: use an array
 
-A **complete** tree has no gaps, so number the nodes **level by level, 1..n** and store them in `a[1..n]`:
+A **complete** tree has no gaps, so number the nodes **level by level**, $1$ to $n$, and store them in `a[1..n]`:
 
-<div><img src="../../topics/figures/heaps/hp-tree-array.svg" style="height:300px" alt="
+<div><img src="../../topics/figures/heaps/hp-tree-array.svg" style="height:282px" alt="
             90 (1)
            /      \
        80 (2)     70 (3)
@@ -125,13 +125,13 @@ int right(int k)  { return 2 * k + 1; }
 
 ## Reading the array as a tree
 
-<div><img src="../../topics/figures/heaps/hp-array-links.svg" style="height:340px" alt="
+<div><img src="../../topics/figures/heaps/hp-array-links.svg" style="height:320px" alt="
    a: [ _ | 90 | 80 | 70 | 30 | 60 | 50 ]
         0    1    2    3    4    5    6
    k = 2 (80):  children a[4] = 30, a[5] = 60;  parent a[1] = 90
    a[1] = 90: children a[2], a[3];  a[3] = 70: child a[6]"></div>
 
-Node `k = 2` (key 80): children at `2k = 4` and `2k + 1 = 5` (30, 60), parent at `k / 2 = 1` (90). Every move to a child or a parent is a **multiply or divide by 2**.
+Node $k = 2$ (key 80): children $2k = 4$ and $2k + 1 = 5$ (30, 60), parent $\lfloor k/2 \rfloor = 1$ (90). Every move to a child or a parent is a **multiply or divide by 2**.
 
 --
 
@@ -141,11 +141,11 @@ For a heap in `a[1..15]` (1-indexed):
 
 - the children of `a[6]` are at indices **?**
 - the parent of `a[11]` is at index **?**
-- is `a[8]` a leaf? (n = 15)
+- is `a[8]` a leaf? ($n = 15$)
 
 <details class="answer"><summary>Answer:</summary>
 
-children of 6: **12, 13** · parent of 11: **5** · a[8] leaf? its children would be 16, 17 > 15 → **yes, a leaf**.
+children of 6: **12, 13** · parent of 11: **5** · a[8] leaf? its children would be $16, 17 > 15$ → **yes, a leaf**.
 
 </details>
 
@@ -167,7 +167,7 @@ private:
 };
 ```
 
-<small>`a[0]` is unused, so the root sits at index 1 and `k/2`, `2k`, `2k + 1` need no correction. A classic variant stores the size `n` in `a[0]`.</small>
+<small>`a[0]` is unused, so the root sits at index 1 and `k / 2`, `2 * k`, `2 * k + 1` need no correction. A classic variant stores the size `n` in `a[0]`.</small>
 
 --
 
@@ -177,7 +177,7 @@ Same picture (a binary tree), **different invariant**:
 
 |       | BST                 | heap                |
 | ----- | ------------------- | ------------------- |
-| order | left < node < right | parent ≥ children   |
+| order | $\text{left} < \text{node} < \text{right}$ | $\text{parent} \ge \text{children}$ |
 | finds | any key, in order   | **only the max**    |
 | shape | can be unbalanced   | always **complete** |
 
@@ -187,11 +187,11 @@ A heap gives up "find any key" to make "find the max" and "stay balanced" trivia
 
 ## Height of a heap
 
-A complete binary tree on `n` nodes has height
+A complete binary tree on $n$ nodes has height
 
 $$h = \lfloor \log_2 n \rfloor$$
 
-Every level except the last is full, so the levels hold `1, 2, 4, …` nodes. Any operation that walks one root-to-leaf path costs **O(log n)**, guaranteed.
+Every level except the last is full, so the levels hold $1, 2, 4, \dots$ nodes. Any operation that walks one root-to-leaf path costs $\boldsymbol{O(\log n)}$, guaranteed.
 
 --
 
@@ -199,7 +199,7 @@ Every level except the last is full, so the levels hold `1, 2, 4, …` nodes. An
 
 Both conditions are **local** (parent against child, level by level), so both hold in every subtree:
 
-<div><img src="../../topics/figures/heaps/hp-subtrees.svg" style="height:270px" alt="
+<div><img src="../../topics/figures/heaps/hp-subtrees.svg" style="height:255px" alt="
             90
            /  \
         (80)  (70)      each outlined subtree
@@ -213,16 +213,16 @@ Both conditions are **local** (parent against child, level by level), so both ho
 ## So where's the min?
 
 - down every path keys only **shrink**, so the **root is the global max** (transitivity)
-- a node with a child is ≥ that child, so a non-leaf **cannot** be the min
-- so the **min is at a leaf**, but no rule says **which** leaf: finding it is a **Θ(n)** scan
+- a node with a child is $\ge$ that child, so a non-leaf **cannot** be the min
+- so the **min is at a leaf**, but no rule says **which** leaf: finding it is a $\boldsymbol{\Theta(n)}$ scan
 
 --
 
 ## Leaves are the back half of the array
 
-Node `k` has a child exactly when `2k ≤ n`:
+Node $k$ has a child exactly when $2k \le n$:
 
-<div><img src="../../topics/figures/heaps/hp-leaves.svg" style="height:295px" alt="
+<div><img src="../../topics/figures/heaps/hp-leaves.svg" style="height:280px" alt="
    internal nodes:  k = 1 .. n/2
    leaves:          k = n/2 + 1 .. n
    a: [ _ | 90  80  70 | 30  60  50 ]     n = 6
@@ -242,5 +242,5 @@ Node `k` has a child exactly when `2k ≤ n`:
     10   20 75         90 ≥ 80 ≥ 75 (a path)"></div>
 
 - every root-to-leaf **path** is non-increasing
-- but **75 > 30**, a level up: nothing holds **across** subtrees; only **ancestor–descendant** pairs are ordered
+- but $\boldsymbol{75 > 30}$, a level up: nothing holds **across** subtrees; only **ancestor–descendant** pairs are ordered
 

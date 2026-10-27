@@ -10,7 +10,7 @@
 
 ### Heapsort and priority queues in practice
 
-> Heapsort guarantees n log n in place, yet on modern machines it usually loses to quicksort: sink jumps across the array and misses the cache.
+> Heapsort guarantees $n \log n$ time in place, yet on modern machines it usually loses to quicksort: sink jumps across the array and misses the cache.
 
 <small>A. LaMarca and R. E. Ladner, “The Influence of Caches on the Performance of Sorting,” J. Algorithms 31, 1999</small>
 
@@ -18,12 +18,12 @@
 
 ## Selection sort with a heap
 
-Selection sort repeatedly finds the max of what is left, by a **Θ(n) scan**. A heap finds the max in **Θ(log n)**:
+Selection sort repeatedly finds the max of what is left, by a $\boldsymbol{\Theta(n)}$ **scan**. A heap finds the max in $\boldsymbol{\Theta(\log n)}$:
 
 | step                      | selection sort | heapsort       |
 | ------------------------- | -------------- | -------------- |
-| find the max of the rest  | scan, Θ(n)     | delMax, Θ(log n) |
-| n rounds                  | **Θ(n²)**      | **Θ(n log n)** |
+| find the max of the rest  | scan, $\Theta(n)$ | delMax, $\Theta(\log n)$ |
+| $n$ rounds                | $\boldsymbol{\Theta(n^2)}$ | $\boldsymbol{\Theta(n \log n)}$ |
 
 And `delMax` already **parks the max at the end** (`swap a[1], a[n]`), so the sorted part grows in the same array. That is **heapsort**.
 
@@ -80,15 +80,15 @@ Each round: swap the max to the boundary, sink the new root. The bar is the heap
 
 --
 
-## Which Θ(n log n) sort?
+## Which $\Theta(n \log n)$ sort?
 
 | sort          | worst          | space    | stable  | in practice           |
 | ------------- | -------------- | -------- | ------- | --------------------- |
-| mergesort     | Θ(n log n)     | **Θ(n)** | **yes** | needs a buffer        |
-| quicksort     | **Θ(n²)**      | Θ(log n) | no      | fastest constants     |
-| **heapsort**  | **Θ(n log n)** | **Θ(1)** | no      | the fallback          |
+| mergesort     | $\Theta(n \log n)$ | $\boldsymbol{\Theta(n)}$ | **yes** | needs a buffer |
+| quicksort     | $\boldsymbol{\Theta(n^2)}$ | $\Theta(\log n)$ | no | fastest constants |
+| **heapsort**  | $\boldsymbol{\Theta(n \log n)}$ | $\boldsymbol{\Theta(1)}$ | no | the fallback |
 
-Of the three, only heapsort is **guaranteed** `n log n` **and** in place; `std::sort` (**introsort**) falls back to it when quicksort recurses too deep.
+Of the three, only heapsort is **guaranteed** $n \log n$ **and** in place; `std::sort` (**introsort**) falls back to it when quicksort recurses too deep.
 
 --
 
@@ -100,7 +100,7 @@ You will rarely write one yourself:
 - **Java**: `java.util.PriorityQueue`: **min**-heap
 - **Python**: `heapq`: **min**-heap (negate keys for max)
 
-All are binary heaps: push and pop Θ(log n), build Θ(n), peek Θ(1).
+All are binary heaps: push and pop $\Theta(\log n)$, build $\Theta(n)$, peek $\Theta(1)$.
 
 --
 
@@ -109,5 +109,5 @@ All are binary heaps: push and pop Θ(log n), build Θ(n), peek Θ(1).
 - **wrong direction**: a min-heap where you meant max (or the reverse)
 - **sink not picking the larger child**: a bigger key stays below a smaller one
 - **off-by-one**: 1-indexed math (`k/2`) on a 0-indexed array
-- **n inserts** (Θ(n log n)) where **heapify** (Θ(n)) was intended
+- $\boldsymbol{n}$ **inserts** ($\Theta(n \log n)$) where **heapify** ($\Theta(n)$) was intended
 

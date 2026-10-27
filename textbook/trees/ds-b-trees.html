@@ -177,10 +177,39 @@
         whole <strong>block</strong> (page) at a time. So the cost that matters is the
         <em>number of node accesses = disk reads</em>, not the number of comparisons.
       </p>
-      <pre>   register  ~1 ns
-   RAM       ~100 ns
-   SSD       ~100 &micro;s      <span class="cm">// ~1000x RAM</span>
-   disk      ~10 ms       <span class="cm">// ~100000x RAM</span></pre>
+      <figure>
+<!-- gen:bt latency -->
+<svg viewBox="0 0 718 190" role="img" style="max-width:862px" font-family="system-ui, sans-serif" aria-label="Access times on a log scale, each grid line ten times the last: a register about 1 nanosecond, RAM about 100 nanoseconds, an SSD about 100 microseconds (about 1,000 times RAM), a spinning disk about 10 milliseconds (about 100,000 times RAM).">
+<line x1="86" y1="12" x2="86" y2="158" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="140" y1="12" x2="140" y2="158" stroke="#c8ccd6" stroke-width="1" stroke-dasharray="2 3"/>
+<line x1="194" y1="12" x2="194" y2="158" stroke="#c8ccd6" stroke-width="1" stroke-dasharray="2 3"/>
+<line x1="248" y1="12" x2="248" y2="158" stroke="#c8ccd6" stroke-width="1" stroke-dasharray="2 3"/>
+<line x1="302" y1="12" x2="302" y2="158" stroke="#c8ccd6" stroke-width="1" stroke-dasharray="2 3"/>
+<line x1="356" y1="12" x2="356" y2="158" stroke="#c8ccd6" stroke-width="1" stroke-dasharray="2 3"/>
+<line x1="410" y1="12" x2="410" y2="158" stroke="#c8ccd6" stroke-width="1" stroke-dasharray="2 3"/>
+<line x1="464" y1="12" x2="464" y2="158" stroke="#c8ccd6" stroke-width="1" stroke-dasharray="2 3"/>
+<line x1="518" y1="12" x2="518" y2="158" stroke="#c8ccd6" stroke-width="1" stroke-dasharray="2 3"/>
+<text x="140" y="173" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">1 ns</text>
+<text x="302" y="173" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">1 µs</text>
+<text x="464" y="173" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">1 ms</text>
+<text x="76" y="32" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="end">register</text>
+<rect x="86" y="16" width="54" height="22" rx="3" fill="#dfe3ea" stroke="#9aa3b2" stroke-width="1.2"/>
+<text x="148" y="32" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="start">~1 ns</text>
+<text x="76" y="67" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="end">RAM</text>
+<rect x="86" y="51" width="162" height="22" rx="3" fill="#dfe3ea" stroke="#9aa3b2" stroke-width="1.2"/>
+<text x="256" y="67" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="start">~100 ns</text>
+<text x="76" y="102" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="end">SSD</text>
+<rect x="86" y="86" width="324" height="22" rx="3" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.2"/>
+<text x="418" y="102" font-size="12.5" font-weight="600" fill="#c0392b" text-anchor="start">~100 µs (~1,000 × RAM)</text>
+<text x="76" y="137" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="end">disk</text>
+<rect x="86" y="121" width="432" height="22" rx="3" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.2"/>
+<text x="526" y="137" font-size="12.5" font-weight="600" fill="#c0392b" text-anchor="start">~10 ms (~100,000 × RAM)</text>
+</svg>
+<!-- /gen:bt latency -->
+        <figcaption>
+          Access times on a log scale, each grid line ten times the last: an SSD read costs about \(10^3\) RAM accesses, a disk read about \(10^5\).
+        </figcaption>
+      </figure>
       <p>
         Size a node to fill exactly one block, and each node holds hundreds of keys, so
         the tree is only a few levels deep. One block read brings a whole key array
@@ -188,30 +217,35 @@
         disk read per level, and the height is \(\log_M n\).
       </p>
       <figure>
-        <svg viewBox="0 0 520 190" role="img" aria-label="An order-5 B-tree of height 1. The root node, highlighted green, holds the two keys 30 and 60 and has three leaf children: the left leaf holds 10 and 20, the middle leaf holds 40 and 50, and the right leaf holds 70, 80, and 90. Keys less than 30 go left, keys between 30 and 60 go to the middle, and keys greater than 60 go right.">
-          <g font-family="system-ui, sans-serif" font-size="13.5" font-weight="600" text-anchor="middle">
-            <g stroke="#4a5163" stroke-width="1.5" fill="none">
-              <line x1="230" y1="54" x2="86"  y2="120"/>
-              <line x1="260" y1="56" x2="260" y2="120"/>
-              <line x1="290" y1="54" x2="446" y2="120"/>
-            </g>
-            <!-- root [30|60] -->
-            <rect x="222" y="26" width="76" height="30" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
-            <line x1="260" y1="26" x2="260" y2="56" stroke="#9fd3b8" stroke-width="1"/>
-            <text x="241" y="46" fill="#0a7d4d">30</text><text x="279" y="46" fill="#0a7d4d">60</text>
-            <!-- leaves -->
-            <rect x="44" y="120" width="76" height="30" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
-            <line x1="82" y1="120" x2="82" y2="150" stroke="#c8ccd6" stroke-width="1"/>
-            <text x="63" y="140">10</text><text x="101" y="140">20</text>
-            <rect x="222" y="120" width="76" height="30" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
-            <line x1="260" y1="120" x2="260" y2="150" stroke="#c8ccd6" stroke-width="1"/>
-            <text x="241" y="140">40</text><text x="279" y="140">50</text>
-            <rect x="392" y="120" width="110" height="30" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.5"/>
-            <line x1="429" y1="120" x2="429" y2="150" stroke="#c8ccd6" stroke-width="1"/>
-            <line x1="465" y1="120" x2="465" y2="150" stroke="#c8ccd6" stroke-width="1"/>
-            <text x="410" y="140">70</text><text x="447" y="140">80</text><text x="483" y="140">90</text>
-          </g>
-        </svg>
+        <!-- gen:bt tree -->
+<svg viewBox="0 0 273 108" role="img" style="max-width:328px" font-family="system-ui, sans-serif" aria-label="An order-5 B-tree of height 1: the node 30, 60 at the top; the node 30, 60 has children the node 10, 20, the node 40, 50, the node 70, 80, 90. Keys less than 30 go left, keys between 30 and 60 to the middle, keys greater than 60 right.">
+<line x1="102" y1="36" x2="37.6" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="129.6" y1="36" x2="122.7" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="157.1" y1="36" x2="221.6" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="102" y="10" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="129.6" y1="10" x2="129.6" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="102" y="10" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="115.8" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="143.3" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="10" y="72" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="37.6" y1="72" x2="37.6" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="10" y="72" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="23.8" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="51.3" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="95.1" y="72" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="122.7" y1="72" x2="122.7" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.1" y="72" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="108.9" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="136.5" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="180.2" y="72" width="82.7" height="26" rx="6" fill="#fff"/>
+<line x1="207.8" y1="72" x2="207.8" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="235.4" y1="72" x2="235.4" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="180.2" y="72" width="82.7" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="194" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="221.6" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="249.1" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+</svg>
+<!-- /gen:bt tree -->
         <figcaption>
           An order-5 B-tree: each node holds up to \(M-1 = 4\) keys and \(M = 5\)
           children. One node is sized to one disk block, so a lookup costs one block
@@ -228,17 +262,105 @@
         between \(k_i\) and \(k_{i+1}\). Three searches on the tree above, whose
         root is \([30\,|\,60]\) over the leaves \([10\,|\,20]\),
         \([40\,|\,50]\), and \([70\,|\,80\,|\,90]\).
-        <pre>  search 50:  read the root [30|60]. 50 &gt; 30 and 50 &lt; 60, so it belongs
-              between the two separators: follow the MIDDLE child.
-              read [40|50]. 50 is present: HIT, 2 node reads.
+        <figure class="wide">
+<!-- gen:bt search -->
+<svg viewBox="0 0 797 126" role="img" style="max-width:956px" font-family="system-ui, sans-serif" aria-label="Three searches in the order-5 B-tree with root 30, 60 over the leaves 10, 20; 40, 50; and 70, 80, 90, each path in green. search 50: found after reading 2 nodes; search 65: not found after reading 2 nodes; search 30: found after reading 1 node.">
+<line x1="93.4" y1="36" x2="44.9" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="121" y1="36" x2="114.1" y2="72" stroke="#0a7d4d" stroke-width="2.6"/>
+<line x1="148.5" y1="36" x2="197" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="93.4" y="10" width="55.1" height="26" rx="6" fill="#eaf6ef"/>
+<line x1="121" y1="10" x2="121" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="93.4" y="10" width="55.1" height="26" rx="6" fill="none" stroke="#0a7d4d" stroke-width="2.1"/>
+<text x="107.2" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">30</text>
+<text x="134.7" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">60</text>
+<rect x="17.4" y="72" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="44.9" y1="72" x2="44.9" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="17.4" y="72" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="31.2" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="58.7" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="86.5" y="72" width="55.1" height="26" rx="6" fill="#eaf6ef"/>
+<line x1="114.1" y1="72" x2="114.1" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="86.5" y="72" width="55.1" height="26" rx="6" fill="none" stroke="#0a7d4d" stroke-width="2.1"/>
+<text x="100.3" y="90" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">40</text>
+<text x="127.8" y="90" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">50</text>
+<rect x="155.6" y="72" width="82.7" height="26" rx="6" fill="#fff"/>
+<line x1="183.2" y1="72" x2="183.2" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="210.8" y1="72" x2="210.8" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="155.6" y="72" width="82.7" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="169.4" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="197" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="224.5" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="127.8" y="111" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">search 50: middle child; hit, 2 reads</text>
 
-  search 65:  read the root. 65 &gt; 60, past the last separator: follow the
-              RIGHT child. read [70|80|90]. 65 is smaller than every key
-              there and the node is a leaf: MISS, 2 node reads.
+<line x1="371.1" y1="36" x2="322.6" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="398.7" y1="36" x2="391.8" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="426.2" y1="36" x2="474.7" y2="72" stroke="#0a7d4d" stroke-width="2.6"/>
+<rect x="371.1" y="10" width="55.1" height="26" rx="6" fill="#eaf6ef"/>
+<line x1="398.7" y1="10" x2="398.7" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="371.1" y="10" width="55.1" height="26" rx="6" fill="none" stroke="#0a7d4d" stroke-width="2.1"/>
+<text x="384.9" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">30</text>
+<text x="412.4" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">60</text>
+<rect x="295.1" y="72" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="322.6" y1="72" x2="322.6" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="295.1" y="72" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="308.9" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="336.4" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="364.2" y="72" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="391.8" y1="72" x2="391.8" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="364.2" y="72" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="378" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="405.5" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="433.3" y="72" width="82.7" height="26" rx="6" fill="#eaf6ef"/>
+<line x1="460.9" y1="72" x2="460.9" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="488.4" y1="72" x2="488.4" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="433.3" y="72" width="82.7" height="26" rx="6" fill="none" stroke="#0a7d4d" stroke-width="2.1"/>
+<text x="447.1" y="90" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">70</text>
+<text x="474.7" y="90" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">80</text>
+<text x="502.2" y="90" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">90</text>
+<text x="405.5" y="111" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">search 65: right child; miss, 2 reads</text>
 
-  search 30:  read the root. 30 equals the first separator, so the search
-              stops at the ROOT: HIT, 1 node read. A key stored in an
-              internal node is found without ever reaching a leaf.</pre>
+<line x1="641.4" y1="36" x2="593" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="669" y1="36" x2="662.1" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="696.5" y1="36" x2="745" y2="72" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="641.4" y="10" width="55.1" height="26" rx="6" fill="#eaf6ef"/>
+<line x1="669" y1="10" x2="669" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="641.4" y="10" width="55.1" height="26" rx="6" fill="none" stroke="#0a7d4d" stroke-width="2.1"/>
+<text x="655.2" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">30</text>
+<text x="682.8" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">60</text>
+<rect x="565.4" y="72" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="593" y1="72" x2="593" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="565.4" y="72" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="579.2" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="606.7" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="634.5" y="72" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="662.1" y1="72" x2="662.1" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="634.5" y="72" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="648.3" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<text x="675.9" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="703.6" y="72" width="82.7" height="26" rx="6" fill="#fff"/>
+<line x1="731.2" y1="72" x2="731.2" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="758.8" y1="72" x2="758.8" y2="98" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="703.6" y="72" width="82.7" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="717.4" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="745" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="772.5" y="90" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="675.9" y="111" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">search 30: hit at the root, 1 read</text>
+</svg>
+<!-- /gen:bt search -->
+        </figure>
+        <ul>
+          <li><strong>Search 50.</strong> Read the root \([30\,|\,60]\):
+          \(30 \lt 50 \lt 60\), so \(50\) belongs between the two separators;
+          follow the <em>middle</em> child. Read \([40\,|\,50]\): \(50\) is
+          present. A hit, 2 node reads.</li>
+          <li><strong>Search 65.</strong> Read the root: \(65 \gt 60\), past the
+          last separator; follow the <em>right</em> child. Read
+          \([70\,|\,80\,|\,90]\): \(65\) is smaller than every key there and the
+          node is a leaf. A miss, 2 node reads.</li>
+          <li><strong>Search 30.</strong> Read the root: \(30\) equals the first
+          separator, so the search stops at the <em>root</em>. A hit, 1 node read: a
+          key stored in an internal node is found without reaching a leaf.</li>
+        </ul>
         Each search reads one node per level, one disk block per level, no
         matter how many keys that block holds. The hit at \(30\) is worth
         noticing: in a plain B-tree records sit in internal nodes too, so a
@@ -255,45 +377,222 @@
         split promotes. Search scans (or binary-searches) the keys
         of a node already in memory and follows one child: one block read per level.
       </p>
-      <pre>  struct BTreeNode {
-      int        n;              <span class="cm">// keys in use: &lceil;M/2&rceil; - 1 to M - 1 (the root: 1 to M - 1)</span>
-      int        key[M];         <span class="cm">// sorted; an M-th key only mid-insert</span>
-      BTreeNode* child[M + 1];   <span class="cm">// n + 1 children; none in a leaf</span>
-      bool       leaf;
-  };
+      <div class="code-tabs" data-snippet="trees/btree-node">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// the order (a disk-sized node: M in the hundreds)
+const int M = 5;
 
-  class BTree {
-  public:
-      bool contains(int key) const;  <span class="cm">// one node (one block read) per level</span>
-      void insert(int key);          <span class="cm">// add in a leaf, split full nodes upward</span>
-      void remove(int key);          <span class="cm">// remove, then borrow or merge upward</span>
-  private:
-      BTreeNode* root = nullptr;
-  };
+struct BTreeNode {
+    // keys in use: ceil(M/2) - 1 to M - 1 (the root: 1 to M - 1)
+    int        n;
+    int        key[M];         // sorted; an M-th key only mid-insert
+    BTreeNode* child[M + 1];   // n + 1 children; none in a leaf
+    bool       leaf;
+};
 
-  bool BTree::contains(int key) const {
-      BTreeNode* h = root;
-      while (h != nullptr) {
-          int i = 0;
-          while (i &lt; h-&gt;n &amp;&amp; key &gt; h-&gt;key[i]) i++;   <span class="cm">// first key &ge; the target</span>
-          if (i &lt; h-&gt;n &amp;&amp; key == h-&gt;key[i]) return true;
-          if (h-&gt;leaf) return false;
-          h = h-&gt;child[i];                              <span class="cm">// read the next block</span>
-      }
-      return false;
-  }</pre>
+class BTree {
+public:
+    bool contains(int key) const;  // one node (one block read) per level
+    void insert(int key);          // add in a leaf, split full nodes upward
+    void remove(int key);          // remove, then borrow or merge upward
+private:
+    BTreeNode* root = nullptr;
+};
+
+bool BTree::contains(int key) const {
+    BTreeNode* h = root;
+    while (h != nullptr) {
+        int i = 0;
+        while (i &lt; h-&gt;n &amp;&amp; key &gt; h-&gt;key[i]) i++;   // first key &gt;= the target
+        if (i &lt; h-&gt;n &amp;&amp; key == h-&gt;key[i]) return true;
+        if (h-&gt;leaf) return false;
+        h = h-&gt;child[i];                             // read the next block
+    }
+    return false;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// the order (a disk-sized node: M in the hundreds)
+static final int M = 5;
+
+static class BTreeNode {
+    // keys in use: ceil(M/2) - 1 to M - 1 (the root: 1 to M - 1)
+    int n;
+    int[] key = new int[M];           // sorted; an M-th key only mid-insert
+    BTreeNode[] child = new BTreeNode[M + 1];   // n + 1 children; none in a leaf
+    boolean leaf;
+}
+
+static class BTree {
+    private BTreeNode root;
+
+    boolean contains(int key) {       // one node (one block read) per level
+        BTreeNode h = root;
+        while (h != null) {
+            int i = 0;
+            while (i &lt; h.n &amp;&amp; key &gt; h.key[i]) i++;   // first key &gt;= the target
+            if (i &lt; h.n &amp;&amp; key == h.key[i]) return true;
+            if (h.leaf) return false;
+            h = h.child[i];                           // read the next block
+        }
+        return false;
+    }
+    // insert(key): add in a leaf, split full nodes upward
+    // remove(key): remove, then borrow or merge upward
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># the order (a disk-sized node: M in the hundreds)
+M = 5
+
+class BTreeNode:
+    def __init__(self):
+        # keys in use: ceil(M/2) - 1 to M - 1 (the root: 1 to M - 1)
+        self.n = 0
+        self.key = [0] * M            # sorted; an M-th key only mid-insert
+        self.child = [None] * (M + 1) # n + 1 children; none in a leaf
+        self.leaf = True
+
+class BTree:
+    def __init__(self):
+        self.root = None
+
+    def contains(self, key):          # one node (one block read) per level
+        h = self.root
+        while h is not None:
+            i = 0
+            while i &lt; h.n and key &gt; h.key[i]:
+                i += 1                # first key &gt;= the target
+            if i &lt; h.n and key == h.key[i]:
+                return True
+            if h.leaf:
+                return False
+            h = h.child[i]            # read the next block
+        return False
+    # insert(key): add in a leaf, split full nodes upward
+    # remove(key): remove, then borrow or merge upward</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// the order (a disk-sized node: M in the hundreds)
+const M: usize = 5;
+
+struct BTreeNode {
+    // keys in use: ceil(M/2) - 1 to M - 1 (the root: 1 to M - 1)
+    n: usize,
+    key: [i32; M],                      // sorted; an M-th key only mid-insert
+    child: [Option&lt;Box&lt;BTreeNode&gt;&gt;; M + 1],   // n + 1 children; none in a leaf
+    leaf: bool,
+}
+
+struct BTree {
+    root: Option&lt;Box&lt;BTreeNode&gt;&gt;,
+}
+
+impl BTree {
+    fn contains(&amp;self, key: i32) -&gt; bool {   // one node (one block read) per level
+        let mut h = &amp;self.root;
+        while let Some(node) = h {
+            let mut i = 0;
+            // first key &gt;= the target
+            while i &lt; node.n &amp;&amp; key &gt; node.key[i] { i += 1; }
+            if i &lt; node.n &amp;&amp; key == node.key[i] { return true; }
+            if node.leaf { return false; }
+            // read the next block
+            h = &amp;node.child[i];
+        }
+        false
+    }
+    // insert(key): add in a leaf, split full nodes upward
+    // remove(key): remove, then borrow or merge upward
+}</pre>
+<p class="ct-src">source: <code>code/trees/btree-node.cpp &middot; code/trees/btree-node.java &middot; code/trees/btree-node.py &middot; code/trees/btree-node.rs</code></p>
+<!--/ct--></div>
       <p>
         Insertion is the 2-3 rule at width \(M\), as the demo shows.
       </p>
       <div class="ex">
         <span class="tag">Example (a B-tree split, \(M=5\))</span>
-        Insert \(55\) into a full leaf \([60\,|\,70\,|\,80\,|\,90]\):
-        <pre>  temp [55|60|70|80|90]   <span class="cm">// 5 keys: overflow at M</span>
-              &darr;  split, promote the middle (70)
-        parent gains 70
-       [ ... | 70 | ... ]
-        /             \
-   [55|60]          [80|90]</pre>
+        Insert \(55\) into the full leaf \([60\,|\,70\,|\,80\,|\,90]\) under the
+        root \([30]\):
+        <figure>
+<!-- gen:bt split -->
+<svg viewBox="0 0 777 118" role="img" style="max-width:932px" font-family="system-ui, sans-serif" aria-label="Order 5. Inserting 55 into the node 30 at the top; the node 30 has children the node 10, 20, the node 60, 70, 80, 90: the leaf 60, 70, 80, 90 becomes 55, 60, 70, 80, 90, five keys, and splits; its middle key 70 moves up, giving the node 30, 70 at the top; the node 30, 70 has children the node 10, 20, the node 55, 60, the node 80, 90.">
+<line x1="72.1" y1="36" x2="37.6" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="99.7" y1="36" x2="134.2" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="72.1" y="10" width="27.6" height="26" rx="6" fill="#fff"/>
+<rect x="72.1" y="10" width="27.6" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="85.9" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="10" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="37.6" y1="64" x2="37.6" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="10" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="23.8" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="51.3" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="79.1" y="64" width="110.2" height="26" rx="6" fill="#fff"/>
+<line x1="106.7" y1="64" x2="106.7" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="134.2" y1="64" x2="134.2" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="161.8" y1="64" x2="161.8" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="79.1" y="64" width="110.2" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="92.9" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="120.5" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="148" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="175.6" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="99.7" y="103" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">a full leaf: 4 keys</text>
+<text x="232.7" y="44" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="232.7" y="60" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">insert 55</text>
+<line x1="345.1" y1="36" x2="303.6" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="372.6" y1="36" x2="414.1" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="345.1" y="10" width="27.6" height="26" rx="6" fill="#fff"/>
+<rect x="345.1" y="10" width="27.6" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="358.9" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="276.1" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="303.6" y1="64" x2="303.6" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="276.1" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="289.8" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="317.4" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="345.2" y="64" width="137.8" height="26" rx="6" fill="#fff"/>
+<rect x="345.2" y="64" width="27.6" height="26" fill="#fde7bf"/>
+<rect x="400.3" y="64" width="27.6" height="26" fill="#fbeaea"/>
+<line x1="372.7" y1="64" x2="372.7" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="400.3" y1="64" x2="400.3" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="427.9" y1="64" x2="427.9" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="455.4" y1="64" x2="455.4" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="345.2" y="64" width="137.8" height="26" rx="6" fill="none" stroke="#c0392b" stroke-width="2.1"/>
+<text x="359" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">55</text>
+<text x="386.5" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="414.1" y="82" font-size="13" font-weight="600" fill="#c0392b" text-anchor="middle">70</text>
+<text x="441.6" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="469.2" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="379.5" y="103" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">5 keys: overflow at M = 5</text>
+<text x="519" y="44" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="519" y="60" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">split</text>
+<line x1="633.1" y1="36" x2="591.5" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="660.6" y1="36" x2="660.6" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="688.2" y1="36" x2="729.8" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="633.1" y="10" width="55.1" height="26" rx="6" fill="#fff"/>
+<rect x="660.6" y="10" width="27.6" height="26" fill="#eaf6ef"/>
+<line x1="660.6" y1="10" x2="660.6" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="633.1" y="10" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="646.9" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="674.4" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">70</text>
+<rect x="564" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="591.5" y1="64" x2="591.5" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="564" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="577.7" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="605.3" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="633.1" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<rect x="633.1" y="64" width="27.6" height="26" fill="#fde7bf"/>
+<line x1="660.6" y1="64" x2="660.6" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="633.1" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="646.9" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">55</text>
+<text x="674.4" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="702.2" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="729.8" y1="64" x2="729.8" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="702.2" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="716" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="743.5" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="660.6" y="103" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">70 moves up: two half-full leaves</text>
+</svg>
+<!-- /gen:bt split -->
+        </figure>
         Split at \(M\) keys, promote the middle, and two half-full nodes remain: the same rule as a 2-3 split, only the threshold (5 keys instead of 3)
         and the halves (two keys each instead of one) differ. A root split still grows
         the height by one, at the top.
@@ -331,10 +630,12 @@
         \(\log_{\lceil M/2\rceil} n\), so a lookup costs \(O(\log_M n)\) disk reads.
       </div>
       <div class="proof">
-        <strong>Proof.</strong> Every non-root node has at least \(\lceil M/2\rceil\)
-        children, so a tree of height \(h\) has at least \(2\lceil M/2\rceil^{\,h-1}\)
-        leaves, hence at least that many keys. Solving \(n \ge 2\lceil M/2\rceil^{\,h-1}\)
-        for \(h\) gives \(h \le 1 + \log_{\lceil M/2\rceil}(n/2) = O(\log_M n)\). Each
+        <strong>Proof.</strong> Write \(t = \lceil M/2\rceil\). The root holds at
+        least one key and has at least two children; every other node has at least
+        \(t\) children and so at least \(t - 1\) keys. Depth \(d \ge 1\) therefore
+        holds at least \(2t^{d-1}\) nodes, and a tree of height \(h\) holds at least
+        \[ n \;\ge\; 1 + (t-1)\sum_{d=1}^{h} 2t^{d-1} \;=\; 1 + 2(t^h - 1) \;=\; 2t^h - 1 \]
+        keys. Solving for \(h\) gives \(h \le \log_t \frac{n+1}{2} \le \log_t n\). Each
         level costs exactly one node access (one block read); the in-node binary search
         is free once the block is in RAM. <span class="qed">&#8718;</span>
       </div>
@@ -367,28 +668,108 @@
         routes to more children), so the tree is even shorter, and the linked
         leaves make range scans a single descent followed by a walk along the chain.
       </p>
-      <pre>  index on age, order 3 (routers upstairs, records in the leaves):
-
-  internal:          [ 30 | 60 ]
-                    /      |      \
-  leaves:   [10|20] &rarr; [30|45] &rarr; [60|90] &rarr; &empty;
-             (each leaf key carries its own record; a key such
-              as 30 or 60 appears twice: once as a router,
-              once in a leaf)</pre>
+      <figure>
+<!-- gen:bt bplus -->
+<svg viewBox="0 0 337 117" role="img" style="max-width:404px" font-family="system-ui, sans-serif" aria-label="A B+ tree of order 3 indexing age. the router node 30, 60 at the top; the router node 30, 60 has children the node 10, 20, the node 30, 45, the node 60, 90; the leaves are linked left to right, the last to nothing. Router nodes (grey) hold keys only; each leaf key carries its record (a dot below it), and 30 and 60 appear twice, as routers and as leaf keys.">
+<text x="10" y="27" font-size="12" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">routers</text>
+<text x="10" y="81" font-size="12" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">leaves</text>
+<line x1="156.2" y1="36" x2="98.6" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="183.7" y1="36" x2="183.7" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="211.3" y1="36" x2="268.8" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="128.2" y1="77" x2="149.2" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M154.2,77 L147.2,73 L147.2,81 Z" fill="#4a5163"/>
+<line x1="213.3" y1="77" x2="234.3" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M239.3,77 L232.3,73 L232.3,81 Z" fill="#4a5163"/>
+<line x1="298.4" y1="77" x2="309.4" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M314.4,77 L307.4,73 L307.4,81 Z" fill="#4a5163"/>
+<text x="323.4" y="82" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="156.2" y="10" width="55.1" height="26" rx="6" fill="#e9ecf2"/>
+<line x1="183.7" y1="10" x2="183.7" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="156.2" y="10" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="169.9" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="197.5" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="71" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="98.6" y1="64" x2="98.6" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="71" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="84.8" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<line x1="84.8" y1="90" x2="84.8" y2="98" stroke="#9aa3b2" stroke-width="1.2"/>
+<circle cx="84.8" cy="102" r="4" fill="#5c6270"/>
+<text x="112.4" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<line x1="112.4" y1="90" x2="112.4" y2="98" stroke="#9aa3b2" stroke-width="1.2"/>
+<circle cx="112.4" cy="102" r="4" fill="#5c6270"/>
+<rect x="156.2" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="183.7" y1="64" x2="183.7" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="156.2" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="169.9" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<line x1="169.9" y1="90" x2="169.9" y2="98" stroke="#9aa3b2" stroke-width="1.2"/>
+<circle cx="169.9" cy="102" r="4" fill="#5c6270"/>
+<text x="197.5" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">45</text>
+<line x1="197.5" y1="90" x2="197.5" y2="98" stroke="#9aa3b2" stroke-width="1.2"/>
+<circle cx="197.5" cy="102" r="4" fill="#5c6270"/>
+<rect x="241.3" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="268.8" y1="64" x2="268.8" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="241.3" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="255.1" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<line x1="255.1" y1="90" x2="255.1" y2="98" stroke="#9aa3b2" stroke-width="1.2"/>
+<circle cx="255.1" cy="102" r="4" fill="#5c6270"/>
+<text x="282.6" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<line x1="282.6" y1="90" x2="282.6" y2="98" stroke="#9aa3b2" stroke-width="1.2"/>
+<circle cx="282.6" cy="102" r="4" fill="#5c6270"/>
+</svg>
+<!-- /gen:bt bplus -->
+        <figcaption>
+          An index on <code>age</code>, order 3: routers upstairs (grey) with no records, every key with its record (a dot) in a leaf, the leaves chained in key order. The keys \(30\) and \(60\) appear twice, once as a router and once in a leaf.
+        </figcaption>
+      </figure>
       <p>
         In code, a B+ node is a B-tree node whose fields depend on its kind: a router
         node holds keys and children only, and a leaf holds keys with their records
         and a pointer to the next leaf, the link that makes the leaves one sorted
         list.
       </p>
-      <pre>  struct BPlusNode {
-      bool       leaf;
-      int        n;              <span class="cm">// keys in use</span>
-      int        key[M];         <span class="cm">// routers, or a leaf's keys (one spare slot)</span>
-      BPlusNode* child[M + 1];   <span class="cm">// router only: n + 1 children</span>
-      Record*    rec[M];         <span class="cm">// leaf only: rec[i] is key[i]&rsquo;s record</span>
-      BPlusNode* next;           <span class="cm">// leaf only: the next leaf in key order, or null</span>
-  };</pre>
+      <div class="code-tabs" data-snippet="trees/bplus-node">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">struct BPlusNode {
+    bool       leaf;
+    int        n;              // keys in use
+    int        key[M];         // routers, or a leaf&#x27;s keys (one spare slot)
+    BPlusNode* child[M + 1];   // router only: n + 1 children
+    Record*    rec[M];         // leaf only: rec[i] is key[i]&#x27;s record
+    BPlusNode* next;           // leaf only: the next leaf in key order, or null
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>static class BPlusNode {
+    boolean leaf;
+    int n;                             // keys in use
+    int[] key = new int[M];            // routers or leaf keys (one spare slot)
+    BPlusNode[] child = new BPlusNode[M + 1];   // router only: n + 1 children
+    Record[] rec = new Record[M];      // leaf only: rec[i] is key[i]&#x27;s record
+    BPlusNode next;                    // leaf only: the next leaf, or null
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>class BPlusNode:
+    def __init__(self, leaf):
+        self.leaf = leaf
+        self.n = 0                    # keys in use
+        self.key = [0] * M            # routers, or a leaf&#x27;s keys (one spare slot)
+        self.child = [None] * (M + 1) # router only: n + 1 children
+        self.rec = [None] * M         # leaf only: rec[i] is key[i]&#x27;s record
+        self.next = None              # leaf only: the next leaf, or None</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// The nodes live in one Vec and a link is an index into it: a leaf is
+// reached both from its parent and from the leaf before it.
+struct BPlusNode {
+    leaf: bool,
+    n: usize,                    // keys in use
+    key: [i32; M],               // routers, or a leaf&#x27;s keys (one spare slot)
+    child: [usize; M + 1],       // router only: n + 1 children
+    rec: [Option&lt;Record&gt;; M],    // leaf only: rec[i] is key[i]&#x27;s record
+    next: Option&lt;usize&gt;,         // leaf only: the next leaf in key order, or None
+}</pre>
+<p class="ct-src">source: <code>code/trees/bplus-node.cpp &middot; code/trees/bplus-node.java &middot; code/trees/bplus-node.py &middot; code/trees/bplus-node.rs</code></p>
+<!--/ct--></div>
       <div class="def">
         <span class="tag">Definition (routing in a B+ tree)</span>
         At a router node with routers \(s_1 \lt s_2 \lt \cdots \lt s_m\), a key
@@ -424,19 +805,142 @@
       <div class="ex">
         <span class="tag">Example (one key copied up, then moved up)</span>
         Insert \(50\) into the order-3 index above (a node holds at most 2 keys).
-        <pre>  1. 50 descends: router [30|60], 30 &le; 50 &lt; 60, child 1: the leaf
-     [30|45] becomes [30|45|50], three keys: split.
-
-  2. leaf split: [30|45] and [50], linked into the chain; 50 is COPIED
-     up, and the router node becomes [30|50|60], three routers: split.
-
-  3. router split: [30] and [60]; 50 MOVES up into a new root.
-
-                [ 50 ]
-               /      \
-           [30]        [60]
-          /    \      /    \
-     [10|20] &rarr; [30|45] &rarr; [50] &rarr; [60|90] &rarr; &empty;</pre>
+        <figure>
+<!-- gen:bt bplus-insert -->
+<svg viewBox="0 0 682 288" role="img" style="max-width:818px" font-family="system-ui, sans-serif" aria-label="Inserting 50 into the order-3 B+ tree the router node 30, 60 at the top; the router node 30, 60 has children the node 10, 20, the node 30, 45, the node 60, 90; the leaves are linked left to right, the last to nothing. The leaf 30, 45 overflows to 30, 45, 50 and splits into 30, 45 and 50; 50 is copied up as a router, so the router node holds 30, 50, 60, three routers, and overflows. That node splits B-tree style: 50 moves up into a new root. the router node 50 at the top; the router node 50 has children the router node 30, the router node 60; the router node 30 has children the node 10, 20, the node 30, 45; the router node 60 has children the node 50, the node 60, 90; the leaves are linked left to right, the last to nothing. 50 is now a router and a leaf key.">
+<line x1="95.1" y1="36" x2="37.6" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="122.7" y1="36" x2="122.7" y2="64" stroke="#0a7d4d" stroke-width="2.6"/>
+<line x1="150.2" y1="36" x2="207.8" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="67.1" y1="77" x2="88.1" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M93.1,77 L86.1,73 L86.1,81 Z" fill="#4a5163"/>
+<line x1="152.2" y1="77" x2="173.2" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M178.2,77 L171.2,73 L171.2,81 Z" fill="#4a5163"/>
+<line x1="237.4" y1="77" x2="248.4" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M253.4,77 L246.4,73 L246.4,81 Z" fill="#4a5163"/>
+<text x="262.4" y="82" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="95.1" y="10" width="55.1" height="26" rx="6" fill="#e9ecf2"/>
+<line x1="122.7" y1="10" x2="122.7" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.1" y="10" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="108.9" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="136.5" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="10" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="37.6" y1="64" x2="37.6" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="10" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="23.8" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="51.3" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="95.1" y="64" width="55.1" height="26" rx="6" fill="#eaf6ef"/>
+<line x1="122.7" y1="64" x2="122.7" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="95.1" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#0a7d4d" stroke-width="2.1"/>
+<text x="108.9" y="82" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">30</text>
+<text x="136.5" y="82" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">45</text>
+<rect x="180.2" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="207.8" y1="64" x2="207.8" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="180.2" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="194" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="221.6" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="137.7" y="103" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">insert 50: its leaf [30|45] is full</text>
+<text x="311.9" y="44" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="311.9" y="60" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">leaf split</text>
+<line x1="458.5" y1="36" x2="385.9" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="486" y1="36" x2="471" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="513.6" y1="36" x2="542.4" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="541.2" y1="36" x2="613.7" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="415.5" y1="77" x2="436.5" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M441.5,77 L434.5,73 L434.5,81 Z" fill="#4a5163"/>
+<line x1="500.6" y1="77" x2="521.6" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M526.6,77 L519.6,73 L519.6,81 Z" fill="#4a5163"/>
+<line x1="558.2" y1="77" x2="579.2" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M584.2,77 L577.2,73 L577.2,81 Z" fill="#4a5163"/>
+<line x1="643.3" y1="77" x2="654.3" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M659.3,77 L652.3,73 L652.3,81 Z" fill="#4a5163"/>
+<text x="668.3" y="82" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="458.5" y="10" width="82.7" height="26" rx="6" fill="#e9ecf2"/>
+<rect x="486" y="10" width="27.6" height="26" fill="#fbeaea"/>
+<line x1="486" y1="10" x2="486" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="513.6" y1="10" x2="513.6" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="458.5" y="10" width="82.7" height="26" rx="6" fill="none" stroke="#c0392b" stroke-width="2.1"/>
+<text x="472.3" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="499.8" y="28" font-size="13" font-weight="600" fill="#c0392b" text-anchor="middle">50</text>
+<text x="527.4" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="358.4" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="385.9" y1="64" x2="385.9" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="358.4" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="372.1" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="399.7" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="443.5" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="471" y1="64" x2="471" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="443.5" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="457.3" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="484.8" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">45</text>
+<rect x="528.6" y="64" width="27.6" height="26" rx="6" fill="#fff"/>
+<rect x="528.6" y="64" width="27.6" height="26" fill="#fde7bf"/>
+<rect x="528.6" y="64" width="27.6" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="542.4" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="586.2" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="613.7" y1="64" x2="613.7" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="586.2" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="599.9" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="627.5" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="514.8" y="103" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">leaf split: 50 copied up; 3 routers</text>
+<text x="180.2" y="187" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="180.2" y="203" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">router split</text>
+<line x1="364.1" y1="152" x2="303.1" y2="180" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="391.7" y1="152" x2="452.7" y2="180" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="289.3" y1="206" x2="260.5" y2="234" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="316.9" y1="206" x2="345.7" y2="234" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="438.9" y1="206" x2="417" y2="234" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="466.4" y1="206" x2="488.3" y2="234" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="290.1" y1="247" x2="311.1" y2="247" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M316.1,247 L309.1,243 L309.1,251 Z" fill="#4a5163"/>
+<line x1="375.2" y1="247" x2="396.2" y2="247" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M401.2,247 L394.2,243 L394.2,251 Z" fill="#4a5163"/>
+<line x1="432.8" y1="247" x2="453.8" y2="247" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M458.8,247 L451.8,243 L451.8,251 Z" fill="#4a5163"/>
+<line x1="517.9" y1="247" x2="528.9" y2="247" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M533.9,247 L526.9,243 L526.9,251 Z" fill="#4a5163"/>
+<text x="542.9" y="252" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="364.1" y="126" width="27.6" height="26" rx="6" fill="#e9ecf2"/>
+<rect x="364.1" y="126" width="27.6" height="26" fill="#eaf6ef"/>
+<rect x="364.1" y="126" width="27.6" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="377.9" y="144" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">50</text>
+<rect x="289.3" y="180" width="27.6" height="26" rx="6" fill="#e9ecf2"/>
+<rect x="289.3" y="180" width="27.6" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="303.1" y="198" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<rect x="233" y="234" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="260.5" y1="234" x2="260.5" y2="260" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="233" y="234" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="246.8" y="252" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="274.3" y="252" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="318.1" y="234" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="345.7" y1="234" x2="345.7" y2="260" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="318.1" y="234" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="331.9" y="252" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="359.4" y="252" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">45</text>
+<rect x="438.9" y="180" width="27.6" height="26" rx="6" fill="#e9ecf2"/>
+<rect x="438.9" y="180" width="27.6" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="452.7" y="198" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="403.2" y="234" width="27.6" height="26" rx="6" fill="#fff"/>
+<rect x="403.2" y="234" width="27.6" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="417" y="252" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<rect x="460.8" y="234" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="488.3" y1="234" x2="488.3" y2="260" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="460.8" y="234" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="474.6" y="252" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="502.1" y="252" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="389.4" y="273" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">router split: 50 moves up</text>
+</svg>
+<!-- /gen:bt bplus-insert -->
+        </figure>
+        <ol>
+          <li>\(50\) descends: at the routers \([30\,|\,60]\),
+          \(30 \le 50 \lt 60\), so it takes child 1, the leaf \([30\,|\,45]\),
+          which becomes \([30\,|\,45\,|\,50]\): three keys, so it splits.</li>
+          <li>Leaf split: \([30\,|\,45]\) and \([50]\), linked into the chain;
+          \(50\) is <em>copied</em> up, and the router node becomes
+          \([30\,|\,50\,|\,60]\): three routers, so it splits.</li>
+          <li>Router split: \([30]\) and \([60]\); \(50\) <em>moves</em> up into a
+          new root.</li>
+        </ol>
         Now \(50\) is the root&rsquo;s router and a key in its leaf, and \(30\)
         and \(60\) are routers and leaf keys as well. Deleting \(30\) next turns
         its leaf into \([45]\) (still at least one key, so no repair) and leaves
@@ -455,19 +959,62 @@
         Run <code>BETWEEN 20 AND 40</code> against the index drawn above: the
         router \([30\,|\,60]\) over the linked leaves \([10\,|\,20] \to
         [30\,|\,45] \to [60\,|\,90]\).
-        <pre>  1. descend for the low end, 20: read the router [30|60]; 20 &lt; 30, so
-     follow the LEFT child. Read the leaf [10|20] and position on 20.
-     (Note the descent does NOT stop at a router: 30 appears upstairs as a
-     separator, but its record lives in a leaf, so every search reaches
-     a leaf. That is the B+ rule.)
-
-  2. scan this leaf from that position: 20 is in range, emit it. The leaf
-     ends, so follow its NEXT-leaf link.
-
-  3. read [30|45]: 30 is in range, emit it; 45 &gt; 40, out of range, stop.
-
-  result 20, 30 in one descent (2 node reads) plus one extra leaf read,
-  and no internal node was ever revisited.</pre>
+        <figure>
+<!-- gen:bt range -->
+<svg viewBox="0 0 451 118" role="img" style="max-width:541px" font-family="system-ui, sans-serif" aria-label="A range query for 20 to 40 on the router node 30, 60 at the top; the router node 30, 60 has children the node 10, 20, the node 30, 45, the node 60, 90; the leaves are linked left to right, the last to nothing. One descent: 20 &lt; 30, to the leaf 10, 20, which holds 20. Then along the chain to the leaf 30, 45: 30 is in range, 45 is past 40, so the scan stops. Three node reads.">
+<text x="67.2" y="27" font-size="12" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">routers</text>
+<text x="67.2" y="81" font-size="12" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">leaves</text>
+<line x1="213.4" y1="36" x2="155.8" y2="64" stroke="#0a7d4d" stroke-width="2.6"/>
+<text x="175.6" y="43" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="end">20 &lt; 30</text>
+<line x1="241" y1="36" x2="241" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="268.5" y1="36" x2="326.1" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="185.4" y1="77" x2="206.4" y2="77" stroke="#0a7d4d" stroke-width="2.4"/>
+<path d="M211.4,77 L204.4,73 L204.4,81 Z" fill="#0a7d4d"/>
+<line x1="270.5" y1="77" x2="291.5" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M296.5,77 L289.5,73 L289.5,81 Z" fill="#4a5163"/>
+<line x1="355.7" y1="77" x2="366.7" y2="77" stroke="#4a5163" stroke-width="1.4"/>
+<path d="M371.7,77 L364.7,73 L364.7,81 Z" fill="#4a5163"/>
+<text x="380.7" y="82" font-size="13" font-weight="600" fill="#5c6270" text-anchor="middle">∅</text>
+<rect x="213.4" y="10" width="55.1" height="26" rx="6" fill="#e9ecf2"/>
+<line x1="241" y1="10" x2="241" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="213.4" y="10" width="55.1" height="26" rx="6" fill="none" stroke="#0a7d4d" stroke-width="2.1"/>
+<text x="227.2" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">30</text>
+<text x="254.8" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">60</text>
+<rect x="128.3" y="64" width="55.1" height="26" rx="6" fill="#eaf6ef"/>
+<rect x="155.8" y="64" width="27.6" height="26" fill="#eaf6ef"/>
+<line x1="155.8" y1="64" x2="155.8" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="128.3" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#0a7d4d" stroke-width="2.1"/>
+<text x="142.1" y="82" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">10</text>
+<text x="169.6" y="82" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">20</text>
+<rect x="213.4" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<rect x="213.4" y="64" width="27.6" height="26" fill="#eaf6ef"/>
+<rect x="241" y="64" width="27.6" height="26" fill="#fbeaea"/>
+<line x1="241" y1="64" x2="241" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="213.4" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="227.2" y="82" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">30</text>
+<text x="254.8" y="82" font-size="13" font-weight="600" fill="#c0392b" text-anchor="middle">45</text>
+<rect x="298.5" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="326.1" y1="64" x2="326.1" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="298.5" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="312.3" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<text x="339.9" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+<text x="225.4" y="103" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">range 20..40: descend once for 20, walk the chain: 20, 30; stop at 45</text>
+</svg>
+<!-- /gen:bt range -->
+        </figure>
+        <ol>
+          <li>Descend for the low end, \(20\): read the routers \([30\,|\,60]\);
+          \(20 \lt 30\), so follow the <em>left</em> child. Read the leaf
+          \([10\,|\,20]\) and position on \(20\). The descent does not stop at a
+          router: \(30\) appears upstairs as a separator, but its record lives in a
+          leaf, so every search reaches a leaf. That is the B+ rule.</li>
+          <li>Scan this leaf from that position: \(20\) is in range, emit it. The
+          leaf ends, so follow its next-leaf link.</li>
+          <li>Read \([30\,|\,45]\): \(30\) is in range, emit it; \(45 \gt 40\),
+          out of range, stop.</li>
+        </ol>
+        The result \(20, 30\) costs one descent (2 node reads) plus one extra leaf
+        read, and no internal node is ever revisited.
         A plain B-tree answers the same query by walking the tree itself,
         returning to internal nodes between leaves; the linked leaves replace
         that wandering with a sequential read, which is also exactly what a disk
@@ -498,9 +1045,9 @@
         The order is dictated by hardware, not taste: pick \(M\) so a node fills one
         block. With a \(4096\)-byte block, \(8\)-byte keys, and \(8\)-byte pointers, an
         internal node needs about \(M\cdot 8 + (M-1)\cdot 8 \approx 4096\), giving
-        \(M \approx 256\). Then three levels hold roughly \(1 \times 256 \times 256^2
-        \times 255 \approx 16\) million keys in three reads; pushing to \(M = 1000\)
-        and one more level reaches billions in about four. Those figures assume full
+        \(M \approx 256\). Then three full levels hold \((1 + 256 + 256^2) \times 255 =
+        256^3 - 1 \approx 16.8\) million keys in three reads; at \(M = 1000\), three
+        full levels hold \(1000^3 - 1\), about a billion. Those figures assume full
         nodes, though. The order property only <em>guarantees</em> half-full, and the
         root is exempt even from that: right after any root split the new root
         holds a single key. Counting the guaranteed minimum (\(\lceil M/2\rceil\)
@@ -508,8 +1055,7 @@
         because capacity grows exponentially in the fan-out, one extra disk read makes
         it up. &ldquo;A few disk reads for the largest real datasets&rdquo; is the sound
         takeaway (Open Data Structures, Morin, Ch. 14); just do not quote the
-        best case as if it were the guarantee. This block-size arithmetic is the disk
-        exercise you will see on the homework.
+        best case as if it were the guarantee.
       </div>
       <div class="demo">
         <span class="tag">Interactive</span>
@@ -571,10 +1117,37 @@
         to fill a disk block. Balance is a <strong>goal</strong>, reached by whichever
         mechanism suits the machine, not a single algorithm. A blunt decision guide:
       </p>
-      <pre>   in RAM, read-heavy        &rarr;  AVL
-   in RAM, general/mutable   &rarr;  red-black   (std::map)
-   on disk / a database      &rarr;  B+ tree
-   learning / interviews     &rarr;  2-3         (it explains red-black)</pre>
+      <figure>
+<!-- gen:bt choose -->
+<svg viewBox="0 0 720 260" role="img" style="max-width:864px" font-family="system-ui, sans-serif" aria-label="Choosing a balanced search tree. Where does the data live? On disk or in a database: a B+ tree. In RAM: if mostly reads, AVL (the tightest balance); with many updates, red-black (std::map, TreeMap). 2-3 trees are for learning: a red-black tree is a 2-3 tree in binary.">
+<path d="M160,105 H220 V37 H274" fill="none" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M280,37 L272,32.5 L272,41.5 Z" fill="#4a5163"/>
+<text x="227" y="30" font-size="12" font-weight="600" fill="#5c6270" text-anchor="start">on disk</text>
+<path d="M160,105 H220 V147 H274" fill="none" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M280,147 L272,142.5 L272,151.5 Z" fill="#4a5163"/>
+<text x="227" y="140" font-size="12" font-weight="600" fill="#5c6270" text-anchor="start">in RAM</text>
+<path d="M430,147 H485 V97 H534" fill="none" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M540,97 L532,92.5 L532,101.5 Z" fill="#4a5163"/>
+<text x="492" y="90" font-size="12" font-weight="600" fill="#5c6270" text-anchor="start">yes</text>
+<path d="M430,147 H485 V205 H534" fill="none" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M540,205 L532,200.5 L532,209.5 Z" fill="#4a5163"/>
+<text x="492" y="198" font-size="12" font-weight="600" fill="#5c6270" text-anchor="start">no</text>
+<rect x="10" y="80" width="150" height="50" rx="8" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="85" y="102" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle">where does the</text>
+<text x="85" y="118" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle">data live?</text>
+<rect x="280" y="20" width="150" height="34" rx="8" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="355" y="42" font-size="14" font-weight="600" fill="#0a7d4d" text-anchor="middle">B+ tree</text>
+<rect x="280" y="130" width="150" height="34" rx="8" fill="#fff" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="355" y="152" font-size="14" font-weight="600" fill="#1a1c22" text-anchor="middle">mostly reads?</text>
+<rect x="540" y="80" width="170" height="34" rx="8" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="625" y="102" font-size="14" font-weight="600" fill="#0a7d4d" text-anchor="middle">AVL</text>
+<rect x="540" y="180" width="170" height="50" rx="8" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="625" y="202" font-size="14" font-weight="600" fill="#0a7d4d" text-anchor="middle">red-black</text>
+<text x="625" y="218" font-size="12" font-weight="400" fill="#0a7d4d" text-anchor="middle">(std::map, TreeMap)</text>
+<text x="10" y="242" font-size="12" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">2-3 trees: for learning; a red-black tree is a 2-3 tree in binary</text>
+</svg>
+<!-- /gen:bt choose -->
+      </figure>
       <p>
         You will rarely hand-roll any of these: you reach for <code>std::map</code>
         (red-black) in memory or trust your database&rsquo;s B+ tree on disk. But
@@ -599,9 +1172,46 @@
             node overflows only at \(M = 5\). \(35\) lands in that same leaf,
             making the five keys \([35\,|\,40\,|\,45\,|\,50\,|\,55]\), so the
             leaf splits and its middle key \(45\) is promoted:
-            <pre>          [ 30 | 45 | 60 ]
-         /      |     |      \
-   [10|20] [35|40] [50|55] [70|80|90]</pre>
+            <figure>
+<!-- gen:bt ex-1 -->
+<svg viewBox="0 0 311 100" role="img" style="max-width:373px" font-family="system-ui, sans-serif" aria-label="After inserting 45, 55 and 35: the node 30, 45, 60 at the top; the node 30, 45, 60 has children the node 10, 20, the node 35, 40, the node 50, 55, the node 70, 80, 90. The leaf 35, 40, 45, 50, 55 split and sent 45 up.">
+<line x1="106.8" y1="36" x2="37.6" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="134.3" y1="36" x2="106.7" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="161.9" y1="36" x2="175.8" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<line x1="189.5" y1="36" x2="258.7" y2="64" stroke="#4a5163" stroke-width="1.5"/>
+<rect x="106.8" y="10" width="82.7" height="26" rx="6" fill="#fff"/>
+<rect x="134.3" y="10" width="27.6" height="26" fill="#eaf6ef"/>
+<line x1="134.3" y1="10" x2="134.3" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="161.9" y1="10" x2="161.9" y2="36" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="106.8" y="10" width="82.7" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="120.6" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">30</text>
+<text x="148.1" y="28" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">45</text>
+<text x="175.7" y="28" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">60</text>
+<rect x="10" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="37.6" y1="64" x2="37.6" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="10" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="23.8" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="51.3" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">20</text>
+<rect x="79.1" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="106.7" y1="64" x2="106.7" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="79.1" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="92.9" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">35</text>
+<text x="120.5" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">40</text>
+<rect x="148.2" y="64" width="55.1" height="26" rx="6" fill="#fff"/>
+<line x1="175.8" y1="64" x2="175.8" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="148.2" y="64" width="55.1" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="162" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">50</text>
+<text x="189.6" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">55</text>
+<rect x="217.4" y="64" width="82.7" height="26" rx="6" fill="#fff"/>
+<line x1="244.9" y1="64" x2="244.9" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<line x1="272.5" y1="64" x2="272.5" y2="90" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="217.4" y="64" width="82.7" height="26" rx="6" fill="none" stroke="#2a2d36" stroke-width="1.6"/>
+<text x="231.1" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">70</text>
+<text x="258.7" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">80</text>
+<text x="286.3" y="82" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">90</text>
+</svg>
+<!-- /gen:bt ex-1 -->
+            </figure>
             The root now holds three keys, so it can accept one more promoted
             key (reaching the legal maximum of four) and splits on the next one,
             which would lift a new
@@ -664,7 +1274,7 @@
             True. Each maintains a height bound that is \(\Theta(\log n)\) under every
             insertion order: AVL keeps \(h \le 1.44\log_2 n\) via the balance-factor
             invariant; red-black keeps \(h \le 2\log_2 n\) via black balance and the
-            no-double-red rule; a 2-3 tree keeps \(\log_3 n \le h \le \log_2 n\) by perfect
+            no-double-red rule; a 2-3 tree keeps \(\log_3(n+1) - 1 \le h \le \log_2(n+1) - 1\) by perfect
             balance; and a B-tree of order \(M\) keeps \(h \le \log_{\lceil M/2\rceil} n\)
             by the half-full rule. Search visits one node per level, so it is
             \(\Theta(h) = \Theta(\log n)\) in every case. (A plain BST would make the claim
@@ -675,10 +1285,36 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.5
+        Data Structures &amp; Algorithms &middot; B-Trees &amp; B+ Trees v1.6
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
     </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
   </body>
 </html>

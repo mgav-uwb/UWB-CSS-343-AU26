@@ -51,7 +51,7 @@ void MaxHeap::insert(int key) {
 
 Insert **95** into `[90 80 70 30 60 50]`: it lands at `a[7]`, the right child of 70, beats 70, then beats 90:
 
-<div><img src="../../topics/figures/heaps/hp-swim.svg" style="height:265px" alt="
+<div><img src="../../topics/figures/heaps/hp-swim.svg" style="height:252px" alt="
   append at a[7]:        95 &gt; 70, swap:        95 &gt; 90, swap:
       90                     90                     95
      /  \                   /  \                   /  \
@@ -164,7 +164,7 @@ swap 95 ↔ 70 (last), shrink → [ 70 80 90 30 60 50 ] → sink: 70 loses to th
 | starts at        | the last leaf | the **root**                 |
 | moves            | **up**        | **down**                     |
 | compares against | **1 parent**  | **2 children** (pick larger) |
-| cost             | O(log n)      | O(log n)                     |
+| cost             | $O(\log n)$   | $O(\log n)$                  |
 
 Heapify, heapsort, Huffman coding and Dijkstra's algorithm all call these two.
 

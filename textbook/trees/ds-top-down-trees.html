@@ -785,24 +785,31 @@
         as in the <a href="ds-two-three-trees.html#multiway">2-3 node</a>, but at most
         three keys are ever in use: a node never overflows.
       </p>
-      <pre>struct Node234 {
-    int      n = 0;               <span class="cm">// keys in use: 1, 2 or 3</span>
-    int      key[3] = {};         <span class="cm">// sorted</span>
-    Node234* child[4] = {};       <span class="cm">// n + 1 children, all null in a leaf</span>
+      <div class="code-tabs" data-snippet="trees/topdown-234-insert">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">struct Node234 {
+    int      n = 0;               // keys in use: 1, 2 or 3
+    int      key[3] = {};         // sorted
+    Node234* child[4] = {};       // n + 1 children, all null in a leaf
 };
 
 bool isLeaf(const Node234* h) { return h-&gt;child[0] == nullptr; }
 
 class Tree234 {
 public:
-    void insert(int key);         <span class="cm">// split full nodes on the way down</span>
-    void remove(int key);         <span class="cm">// fix 2-nodes on the way down</span>
+    void insert(int key);         // split full nodes on the way down
+    void remove(int key);         // fix 2-nodes on the way down
 private:
     Node234* root = nullptr;
 };
 
-<span class="cm">// x-&gt;child[i] is full (3 keys). Its middle key moves up into x, which is not</span>
-<span class="cm">// full; the child keeps key[0], and a new node takes key[2].</span>
+// x-&gt;child[i] is full (3 keys). Its middle key moves up into x, which is not
+// full; the child keeps key[0], and a new node takes key[2].
 void splitChild(Node234* x, int i) {
     Node234* c = x-&gt;child[i];
     Node234* right = new Node234();
@@ -810,11 +817,11 @@ void splitChild(Node234* x, int i) {
     right-&gt;key[0] = c-&gt;key[2];
     right-&gt;child[0] = c-&gt;child[2];
     right-&gt;child[1] = c-&gt;child[3];
-    for (int j = x-&gt;n; j &gt; i; j--) {             <span class="cm">// open slot i in x</span>
+    for (int j = x-&gt;n; j &gt; i; j--) {             // open slot i in x
         x-&gt;key[j] = x-&gt;key[j - 1];
         x-&gt;child[j + 1] = x-&gt;child[j];
     }
-    x-&gt;key[i] = c-&gt;key[1];                       <span class="cm">// the middle key moves up</span>
+    x-&gt;key[i] = c-&gt;key[1];                       // the middle key moves up
     x-&gt;child[i + 1] = right;
     x-&gt;n++;
     c-&gt;n = 1;
@@ -829,31 +836,240 @@ void Tree234::insert(int key) {
         root-&gt;key[0] = key;
         return;
     }
-    if (root-&gt;n == 3) {                          <span class="cm">// a full root: split it first</span>
-        Node234* top = new Node234();            <span class="cm">// no keys yet, one child</span>
+    if (root-&gt;n == 3) {                          // a full root: split it first
+        Node234* top = new Node234();            // no keys yet, one child
         top-&gt;child[0] = root;
-        splitChild(top, 0);                      <span class="cm">// the tree grows one level</span>
+        splitChild(top, 0);                      // the tree grows one level
         root = top;
     }
     Node234* x = root;
     while (true) {
         int i = 0;
         while (i &lt; x-&gt;n &amp;&amp; key &gt; x-&gt;key[i]) i++;
-        if (i &lt; x-&gt;n &amp;&amp; key == x-&gt;key[i]) return;    <span class="cm">// already present</span>
-        if (isLeaf(x)) {                         <span class="cm">// not full: room for the key</span>
+        if (i &lt; x-&gt;n &amp;&amp; key == x-&gt;key[i]) return;    // already present
+        if (isLeaf(x)) {                         // not full: room for the key
             for (int j = x-&gt;n; j &gt; i; j--) x-&gt;key[j] = x-&gt;key[j - 1];
             x-&gt;key[i] = key;
             x-&gt;n++;
             return;
         }
-        if (x-&gt;child[i]-&gt;n == 3) {               <span class="cm">// full: split before entering</span>
+        if (x-&gt;child[i]-&gt;n == 3) {               // full: split before entering
             splitChild(x, i);
-            if (key == x-&gt;key[i]) return;        <span class="cm">// the key that moved up</span>
+            if (key == x-&gt;key[i]) return;        // the key that moved up
             if (key &gt; x-&gt;key[i]) i++;
         }
         x = x-&gt;child[i];
     }
 }</pre>
+<pre class="ct-pane" data-lang="java" hidden>class Node234 {
+    int n = 0;                          // keys in use: 1, 2 or 3
+    int[] key = new int[3];             // sorted
+    Node234[] child = new Node234[4];   // n + 1 children, all null in a leaf
+}
+
+class Tree234 {
+    private Node234 root;
+
+    static boolean isLeaf(Node234 h) { return h.child[0] == null; }
+
+    // x.child[i] is full (3 keys). Its middle key moves up into x, which is not
+    // full; the child keeps key[0], and a new node takes key[2].
+    static void splitChild(Node234 x, int i) {
+        Node234 c = x.child[i];
+        Node234 right = new Node234();
+        right.n = 1;
+        right.key[0] = c.key[2];
+        right.child[0] = c.child[2];
+        right.child[1] = c.child[3];
+        for (int j = x.n; j &gt; i; j--) {             // open slot i in x
+            x.key[j] = x.key[j - 1];
+            x.child[j + 1] = x.child[j];
+        }
+        x.key[i] = c.key[1];                        // the middle key moves up
+        x.child[i + 1] = right;
+        x.n++;
+        c.n = 1;
+        c.child[2] = null;
+        c.child[3] = null;
+    }
+
+    // split full nodes on the way down
+    void insert(int key) {
+        if (root == null) {
+            root = new Node234();
+            root.n = 1;
+            root.key[0] = key;
+            return;
+        }
+        if (root.n == 3) {                          // a full root: split it first
+            Node234 top = new Node234();            // no keys yet, one child
+            top.child[0] = root;
+            splitChild(top, 0);                     // the tree grows one level
+            root = top;
+        }
+        Node234 x = root;
+        while (true) {
+            int i = 0;
+            while (i &lt; x.n &amp;&amp; key &gt; x.key[i]) i++;
+            if (i &lt; x.n &amp;&amp; key == x.key[i]) return;    // already present
+            if (isLeaf(x)) {                        // not full: room for the key
+                for (int j = x.n; j &gt; i; j--) x.key[j] = x.key[j - 1];
+                x.key[i] = key;
+                x.n++;
+                return;
+            }
+            if (x.child[i].n == 3) {                // full: split before entering
+                splitChild(x, i);
+                if (key == x.key[i]) return;        // the key that moved up
+                if (key &gt; x.key[i]) i++;
+            }
+            x = x.child[i];
+        }
+    }
+    // remove(key): fix 2-nodes on the way down
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden>class Node234:
+    def __init__(self):
+        self.n = 0                     # keys in use: 1, 2 or 3
+        self.key = [0] * 3             # sorted
+        self.child = [None] * 4        # n + 1 children, all None in a leaf
+
+def is_leaf(h):
+    return h.child[0] is None
+
+# x.child[i] is full (3 keys). Its middle key moves up into x, which is not
+# full; the child keeps key[0], and a new node takes key[2].
+def split_child(x, i):
+    c = x.child[i]
+    right = Node234()
+    right.n = 1
+    right.key[0] = c.key[2]
+    right.child[0] = c.child[2]
+    right.child[1] = c.child[3]
+    for j in range(x.n, i, -1):        # open slot i in x
+        x.key[j] = x.key[j - 1]
+        x.child[j + 1] = x.child[j]
+    x.key[i] = c.key[1]                # the middle key moves up
+    x.child[i + 1] = right
+    x.n += 1
+    c.n = 1
+    c.child[2] = None
+    c.child[3] = None
+
+class Tree234:
+    def __init__(self):
+        self.root = None
+
+    def insert(self, key):             # split full nodes on the way down
+        if self.root is None:
+            self.root = Node234()
+            self.root.n = 1
+            self.root.key[0] = key
+            return
+        if self.root.n == 3:           # a full root: split it first
+            top = Node234()            # no keys yet, one child
+            top.child[0] = self.root
+            split_child(top, 0)        # the tree grows one level
+            self.root = top
+        x = self.root
+        while True:
+            i = 0
+            while i &lt; x.n and key &gt; x.key[i]:
+                i += 1
+            if i &lt; x.n and key == x.key[i]:
+                return                 # already present
+            if is_leaf(x):             # not full: room for the key
+                for j in range(x.n, i, -1):
+                    x.key[j] = x.key[j - 1]
+                x.key[i] = key
+                x.n += 1
+                return
+            if x.child[i].n == 3:      # full: split before entering
+                split_child(x, i)
+                if key == x.key[i]:
+                    return             # the key that moved up
+                if key &gt; x.key[i]:
+                    i += 1
+            x = x.child[i]
+    # remove(key): fix 2-nodes on the way down</pre>
+<pre class="ct-pane" data-lang="rs" hidden>struct Node234 {
+    n: usize,                           // keys in use: 1, 2 or 3
+    key: [i32; 3],                      // sorted
+    child: [Option&lt;Box&lt;Node234&gt;&gt;; 4],   // n + 1 children, all None in a leaf
+}
+
+impl Node234 {
+    fn new() -&gt; Box&lt;Node234&gt; {
+        Box::new(Node234 { n: 0, key: [0; 3], child: [None, None, None, None] })
+    }
+    fn is_leaf(&amp;self) -&gt; bool { self.child[0].is_none() }
+}
+
+struct Tree234 {
+    root: Option&lt;Box&lt;Node234&gt;&gt;,
+}
+
+// x.child[i] is full (3 keys). Its middle key moves up into x, which is not
+// full; the child keeps key[0], and a new node takes key[2].
+fn split_child(x: &amp;mut Node234, i: usize) {
+    let c = x.child[i].as_mut().unwrap();
+    let mut right = Node234::new();
+    right.n = 1;
+    right.key[0] = c.key[2];
+    right.child[0] = c.child[2].take();
+    right.child[1] = c.child[3].take();
+    let middle = c.key[1];
+    c.n = 1;
+    for j in (i + 1..=x.n).rev() {      // open slot i in x
+        x.key[j] = x.key[j - 1];
+        x.child[j + 1] = x.child[j].take();
+    }
+    x.key[i] = middle;                  // the middle key moves up
+    x.child[i + 1] = Some(right);
+    x.n += 1;
+}
+
+impl Tree234 {
+    fn insert(&amp;mut self, key: i32) {    // split full nodes on the way down
+        if self.root.is_none() {
+            let mut r = Node234::new();
+            r.n = 1;
+            r.key[0] = key;
+            self.root = Some(r);
+            return;
+        }
+        if self.root.as_ref().unwrap().n == 3 {     // a full root: split it first
+            let mut top = Node234::new();            // no keys yet, one child
+            top.child[0] = self.root.take();
+            split_child(&amp;mut top, 0);                // the tree grows one level
+            self.root = Some(top);
+        }
+        let mut x = self.root.as_mut().unwrap();
+        loop {
+            let mut i = 0;
+            while i &lt; x.n &amp;&amp; key &gt; x.key[i] { i += 1; }
+            if i &lt; x.n &amp;&amp; key == x.key[i] { return; }       // already present
+            // not full: room for the key
+            if x.is_leaf() {
+                for j in (i + 1..=x.n).rev() { x.key[j] = x.key[j - 1]; }
+                x.key[i] = key;
+                x.n += 1;
+                return;
+            }
+            // full: split before entering
+            if x.child[i].as_ref().unwrap().n == 3 {
+                split_child(x, i);
+                // the key that moved up
+                if key == x.key[i] { return; }
+                if key &gt; x.key[i] { i += 1; }
+            }
+            x = x.child[i].as_mut().unwrap();
+        }
+    }
+    // remove(key): fix 2-nodes on the way down
+}</pre>
+<p class="ct-src">source: <code>code/trees/topdown-234-insert.cpp &middot; code/trees/topdown-234-insert.java &middot; code/trees/topdown-234-insert.py &middot; code/trees/topdown-234-insert.rs</code></p>
+<!--/ct--></div>
       <p>
         A key that is already in the tree still pays for the splits above it; they
         leave a valid tree.
@@ -1327,15 +1543,22 @@ void Tree234::insert(int key) {
         <span class="qed">&#8718;</span>
       </div>
       <h3>In code</h3>
-      <pre><span class="cm">// x-&gt;child[i] + x-&gt;key[i] + x-&gt;child[i + 1] become one node, x-&gt;child[i].</span>
+      <div class="code-tabs" data-snippet="trees/topdown-234-delete">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// x-&gt;child[i] + x-&gt;key[i] + x-&gt;child[i + 1] become one node, x-&gt;child[i].
 void merge(Node234* x, int i) {
     Node234* a = x-&gt;child[i];
     Node234* b = x-&gt;child[i + 1];
-    a-&gt;key[a-&gt;n] = x-&gt;key[i];                    <span class="cm">// the separator comes down</span>
+    a-&gt;key[a-&gt;n] = x-&gt;key[i];                    // the separator comes down
     for (int j = 0; j &lt; b-&gt;n; j++) a-&gt;key[a-&gt;n + 1 + j] = b-&gt;key[j];
     for (int j = 0; j &lt;= b-&gt;n; j++) a-&gt;child[a-&gt;n + 1 + j] = b-&gt;child[j];
     a-&gt;n += 1 + b-&gt;n;
-    for (int j = i; j &lt; x-&gt;n - 1; j++) {         <span class="cm">// close the gap in x</span>
+    for (int j = i; j &lt; x-&gt;n - 1; j++) {         // close the gap in x
         x-&gt;key[j] = x-&gt;key[j + 1];
         x-&gt;child[j + 1] = x-&gt;child[j + 2];
     }
@@ -1344,8 +1567,8 @@ void merge(Node234* x, int i) {
     delete b;
 }
 
-<span class="cm">// The left sibling lends: x-&gt;key[i - 1] comes down into the front of</span>
-<span class="cm">// child i, and the sibling's largest key goes up in its place.</span>
+// The left sibling lends: x-&gt;key[i - 1] comes down into the front of
+// child i, and the sibling&#x27;s largest key goes up in its place.
 void borrowFromLeft(Node234* x, int i) {
     Node234* c = x-&gt;child[i];
     Node234* left = x-&gt;child[i - 1];
@@ -1359,8 +1582,8 @@ void borrowFromLeft(Node234* x, int i) {
     left-&gt;n--;
 }
 
-<span class="cm">// The right sibling lends: x-&gt;key[i] comes down onto the end of child i,</span>
-<span class="cm">// and the sibling's smallest key goes up in its place.</span>
+// The right sibling lends: x-&gt;key[i] comes down onto the end of child i,
+// and the sibling&#x27;s smallest key goes up in its place.
 void borrowFromRight(Node234* x, int i) {
     Node234* c = x-&gt;child[i];
     Node234* right = x-&gt;child[i + 1];
@@ -1374,8 +1597,8 @@ void borrowFromRight(Node234* x, int i) {
     right-&gt;n--;
 }
 
-<span class="cm">// x-&gt;child[i] is a 2-node. Give it a second key before the search enters:</span>
-<span class="cm">// borrow if a sibling can spare a key, else merge. Returns the child to enter.</span>
+// x-&gt;child[i] is a 2-node. Give it a second key before the search enters:
+// borrow if a sibling can spare a key, else merge. Returns the child to enter.
 int fixChild(Node234* x, int i) {
     Node234* left  = (i &gt; 0)    ? x-&gt;child[i - 1] : nullptr;
     Node234* right = (i &lt; x-&gt;n) ? x-&gt;child[i + 1] : nullptr;
@@ -1402,38 +1625,364 @@ void Tree234::remove(int key) {
         int i = 0;
         while (i &lt; x-&gt;n &amp;&amp; key &gt; x-&gt;key[i]) i++;
         bool here = (i &lt; x-&gt;n &amp;&amp; key == x-&gt;key[i]);
-        if (isLeaf(x)) {                         <span class="cm">// 2+ keys, or the root</span>
-            if (!here) return;                   <span class="cm">// not in the tree</span>
+        if (isLeaf(x)) {                         // 2+ keys, or the root
+            if (!here) return;                   // not in the tree
             for (int j = i; j &lt; x-&gt;n - 1; j++) x-&gt;key[j] = x-&gt;key[j + 1];
             x-&gt;n--;
-            if (x-&gt;n == 0) {                     <span class="cm">// the root held the last key</span>
+            if (x-&gt;n == 0) {                     // the root held the last key
                 delete x;
                 root = nullptr;
             }
             return;
         }
-        if (here) {                              <span class="cm">// a key in an internal node</span>
-            if (x-&gt;child[i]-&gt;n &gt;= 2) {           <span class="cm">// the left side can spare one</span>
-                key = maxKey(x-&gt;child[i]);       <span class="cm">// the predecessor replaces it,</span>
-                x-&gt;key[i] = key;                 <span class="cm">// then goes from the leaf</span>
+        if (here) {                              // a key in an internal node
+            if (x-&gt;child[i]-&gt;n &gt;= 2) {           // the left side can spare one
+                key = maxKey(x-&gt;child[i]);       // the predecessor replaces it,
+                x-&gt;key[i] = key;                 // then goes from the leaf
             } else if (x-&gt;child[i + 1]-&gt;n &gt;= 2) {
-                key = minKey(x-&gt;child[i + 1]);   <span class="cm">// the successor, mirrored</span>
+                key = minKey(x-&gt;child[i + 1]);   // the successor, mirrored
                 x-&gt;key[i] = key;
                 i++;
             } else {
-                merge(x, i);                     <span class="cm">// the key comes down</span>
+                merge(x, i);                     // the key comes down
             }
         } else if (x-&gt;child[i]-&gt;n == 1) {
             i = fixChild(x, i);
         }
         Node234* next = x-&gt;child[i];
-        if (x == root &amp;&amp; x-&gt;n == 0) {            <span class="cm">// a merge took the root's key</span>
+        if (x == root &amp;&amp; x-&gt;n == 0) {            // a merge took the root&#x27;s key
             delete x;
-            root = next;                         <span class="cm">// one level shorter</span>
+            root = next;                         // one level shorter
         }
         x = next;
     }
 }</pre>
+<pre class="ct-pane" data-lang="java" hidden>class Tree234 {   // continued: the delete
+    // x.child[i] + x.key[i] + x.child[i + 1] become one node, x.child[i].
+    static void merge(Node234 x, int i) {
+        Node234 a = x.child[i];
+        Node234 b = x.child[i + 1];
+        a.key[a.n] = x.key[i];                      // the separator comes down
+        for (int j = 0; j &lt; b.n; j++) a.key[a.n + 1 + j] = b.key[j];
+        for (int j = 0; j &lt;= b.n; j++) a.child[a.n + 1 + j] = b.child[j];
+        a.n += 1 + b.n;
+        for (int j = i; j &lt; x.n - 1; j++) {         // close the gap in x
+            x.key[j] = x.key[j + 1];
+            x.child[j + 1] = x.child[j + 2];
+        }
+        x.child[x.n] = null;
+        x.n--;
+    }
+
+    // The left sibling lends: x.key[i - 1] comes down into the front of
+    // child i, and the sibling&#x27;s largest key goes up in its place.
+    static void borrowFromLeft(Node234 x, int i) {
+        Node234 c = x.child[i];
+        Node234 left = x.child[i - 1];
+        for (int j = c.n; j &gt; 0; j--) c.key[j] = c.key[j - 1];
+        for (int j = c.n + 1; j &gt; 0; j--) c.child[j] = c.child[j - 1];
+        c.key[0] = x.key[i - 1];
+        c.child[0] = left.child[left.n];
+        c.n++;
+        x.key[i - 1] = left.key[left.n - 1];
+        left.child[left.n] = null;
+        left.n--;
+    }
+
+    // The right sibling lends: x.key[i] comes down onto the end of child i,
+    // and the sibling&#x27;s smallest key goes up in its place.
+    static void borrowFromRight(Node234 x, int i) {
+        Node234 c = x.child[i];
+        Node234 right = x.child[i + 1];
+        c.key[c.n] = x.key[i];
+        c.child[c.n + 1] = right.child[0];
+        c.n++;
+        x.key[i] = right.key[0];
+        for (int j = 0; j &lt; right.n - 1; j++) right.key[j] = right.key[j + 1];
+        for (int j = 0; j &lt; right.n; j++) right.child[j] = right.child[j + 1];
+        right.child[right.n] = null;
+        right.n--;
+    }
+
+    // x.child[i] is a 2-node. Give it a second key before the search enters:
+    // borrow if a sibling can spare a key, else merge. Returns the child to enter.
+    static int fixChild(Node234 x, int i) {
+        Node234 left  = (i &gt; 0)   ? x.child[i - 1] : null;
+        Node234 right = (i &lt; x.n) ? x.child[i + 1] : null;
+        if (left != null &amp;&amp; left.n &gt;= 2)   { borrowFromLeft(x, i);  return i; }
+        if (right != null &amp;&amp; right.n &gt;= 2) { borrowFromRight(x, i); return i; }
+        if (left != null) { merge(x, i - 1); return i - 1; }
+        merge(x, i);
+        return i;
+    }
+
+    static int maxKey(Node234 h) {
+        while (!isLeaf(h)) h = h.child[h.n];
+        return h.key[h.n - 1];
+    }
+
+    static int minKey(Node234 h) {
+        while (!isLeaf(h)) h = h.child[0];
+        return h.key[0];
+    }
+
+    void remove(int key) {                          // fix 2-nodes on the way down
+        Node234 x = root;
+        while (x != null) {
+            int i = 0;
+            while (i &lt; x.n &amp;&amp; key &gt; x.key[i]) i++;
+            boolean here = (i &lt; x.n &amp;&amp; key == x.key[i]);
+            if (isLeaf(x)) {                        // 2+ keys, or the root
+                if (!here) return;                  // not in the tree
+                for (int j = i; j &lt; x.n - 1; j++) x.key[j] = x.key[j + 1];
+                x.n--;
+                if (x.n == 0) root = null;          // the root held the last key
+                return;
+            }
+            if (here) {                             // a key in an internal node
+                if (x.child[i].n &gt;= 2) {            // the left side can spare one
+                    key = maxKey(x.child[i]);       // the predecessor replaces it,
+                    x.key[i] = key;                 // then goes from the leaf
+                } else if (x.child[i + 1].n &gt;= 2) {
+                    key = minKey(x.child[i + 1]);   // the successor, mirrored
+                    x.key[i] = key;
+                    i++;
+                } else {
+                    merge(x, i);                    // the key comes down
+                }
+            } else if (x.child[i].n == 1) {
+                i = fixChild(x, i);
+            }
+            Node234 next = x.child[i];
+            if (x == root &amp;&amp; x.n == 0)              // a merge took the root&#x27;s key:
+                root = next;                        // one level shorter
+            x = next;
+        }
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># x.child[i] + x.key[i] + x.child[i + 1] become one node, x.child[i].
+def merge(x, i):
+    a = x.child[i]
+    b = x.child[i + 1]
+    a.key[a.n] = x.key[i]              # the separator comes down
+    for j in range(b.n):
+        a.key[a.n + 1 + j] = b.key[j]
+    for j in range(b.n + 1):
+        a.child[a.n + 1 + j] = b.child[j]
+    a.n += 1 + b.n
+    for j in range(i, x.n - 1):        # close the gap in x
+        x.key[j] = x.key[j + 1]
+        x.child[j + 1] = x.child[j + 2]
+    x.child[x.n] = None
+    x.n -= 1
+
+# The left sibling lends: x.key[i - 1] comes down into the front of
+# child i, and the sibling&#x27;s largest key goes up in its place.
+def borrow_from_left(x, i):
+    c = x.child[i]
+    left = x.child[i - 1]
+    for j in range(c.n, 0, -1):
+        c.key[j] = c.key[j - 1]
+    for j in range(c.n + 1, 0, -1):
+        c.child[j] = c.child[j - 1]
+    c.key[0] = x.key[i - 1]
+    c.child[0] = left.child[left.n]
+    c.n += 1
+    x.key[i - 1] = left.key[left.n - 1]
+    left.child[left.n] = None
+    left.n -= 1
+
+# The right sibling lends: x.key[i] comes down onto the end of child i,
+# and the sibling&#x27;s smallest key goes up in its place.
+def borrow_from_right(x, i):
+    c = x.child[i]
+    right = x.child[i + 1]
+    c.key[c.n] = x.key[i]
+    c.child[c.n + 1] = right.child[0]
+    c.n += 1
+    x.key[i] = right.key[0]
+    for j in range(right.n - 1):
+        right.key[j] = right.key[j + 1]
+    for j in range(right.n):
+        right.child[j] = right.child[j + 1]
+    right.child[right.n] = None
+    right.n -= 1
+
+# x.child[i] is a 2-node. Give it a second key before the search enters:
+# borrow if a sibling can spare a key, else merge. Returns the child to enter.
+def fix_child(x, i):
+    left = x.child[i - 1] if i &gt; 0 else None
+    right = x.child[i + 1] if i &lt; x.n else None
+    if left is not None and left.n &gt;= 2:
+        borrow_from_left(x, i)
+        return i
+    if right is not None and right.n &gt;= 2:
+        borrow_from_right(x, i)
+        return i
+    if left is not None:
+        merge(x, i - 1)
+        return i - 1
+    merge(x, i)
+    return i
+
+def max_key(h):
+    while not is_leaf(h):
+        h = h.child[h.n]
+    return h.key[h.n - 1]
+
+def min_key(h):
+    while not is_leaf(h):
+        h = h.child[0]
+    return h.key[0]
+
+# a Tree234 method: fix 2-nodes on the way down
+def remove(self, key):
+    x = self.root
+    while x is not None:
+        i = 0
+        while i &lt; x.n and key &gt; x.key[i]:
+            i += 1
+        here = i &lt; x.n and key == x.key[i]
+        if is_leaf(x):                 # 2+ keys, or the root
+            if not here:
+                return                 # not in the tree
+            for j in range(i, x.n - 1):
+                x.key[j] = x.key[j + 1]
+            x.n -= 1
+            if x.n == 0:
+                self.root = None       # the root held the last key
+            return
+        if here:                       # a key in an internal node
+            if x.child[i].n &gt;= 2:      # the left side can spare one
+                key = max_key(x.child[i])      # the predecessor replaces it,
+                x.key[i] = key                 # then goes from the leaf
+            elif x.child[i + 1].n &gt;= 2:
+                key = min_key(x.child[i + 1])  # the successor, mirrored
+                x.key[i] = key
+                i += 1
+            else:
+                merge(x, i)            # the key comes down
+        elif x.child[i].n == 1:
+            i = fix_child(x, i)
+        nxt = x.child[i]
+        if x is self.root and x.n == 0:
+            # a merge took the root&#x27;s key: one level shorter
+            self.root = nxt
+        x = nxt</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// x.child[i] + x.key[i] + x.child[i + 1] become one node, x.child[i].
+fn merge(x: &amp;mut Node234, i: usize) {
+    let mut b = x.child[i + 1].take().unwrap();
+    let sep = x.key[i];
+    let a = x.child[i].as_mut().unwrap();
+    a.key[a.n] = sep;                            // the separator comes down
+    for j in 0..b.n { a.key[a.n + 1 + j] = b.key[j]; }
+    for j in 0..=b.n { a.child[a.n + 1 + j] = b.child[j].take(); }
+    a.n += 1 + b.n;
+    for j in i..x.n - 1 {                        // close the gap in x
+        x.key[j] = x.key[j + 1];
+        x.child[j + 1] = x.child[j + 2].take();
+    }
+    x.n -= 1;
+}
+
+// The left sibling lends: x.key[i - 1] comes down into the front of
+// child i, and the sibling&#x27;s largest key goes up in its place.
+fn borrow_from_left(x: &amp;mut Node234, i: usize) {
+    let (lo, hi) = x.child.split_at_mut(i);
+    let left = lo[i - 1].as_mut().unwrap();
+    let c = hi[0].as_mut().unwrap();
+    for j in (1..=c.n).rev() { c.key[j] = c.key[j - 1]; }
+    for j in (1..=c.n + 1).rev() { c.child[j] = c.child[j - 1].take(); }
+    c.key[0] = x.key[i - 1];
+    c.child[0] = left.child[left.n].take();
+    c.n += 1;
+    x.key[i - 1] = left.key[left.n - 1];
+    left.n -= 1;
+}
+
+// The right sibling lends: x.key[i] comes down onto the end of child i,
+// and the sibling&#x27;s smallest key goes up in its place.
+fn borrow_from_right(x: &amp;mut Node234, i: usize) {
+    let (lo, hi) = x.child.split_at_mut(i + 1);
+    let c = lo[i].as_mut().unwrap();
+    let right = hi[0].as_mut().unwrap();
+    c.key[c.n] = x.key[i];
+    c.child[c.n + 1] = right.child[0].take();
+    c.n += 1;
+    x.key[i] = right.key[0];
+    for j in 0..right.n - 1 { right.key[j] = right.key[j + 1]; }
+    for j in 0..right.n { right.child[j] = right.child[j + 1].take(); }
+    right.n -= 1;
+}
+
+// x.child[i] is a 2-node. Give it a second key before the search enters:
+// borrow if a sibling can spare a key, else merge. Returns the child to enter.
+fn fix_child(x: &amp;mut Node234, i: usize) -&gt; usize {
+    let left_n = if i &gt; 0 { x.child[i - 1].as_ref().unwrap().n } else { 0 };
+    let right_n = if i &lt; x.n { x.child[i + 1].as_ref().unwrap().n } else { 0 };
+    if left_n &gt;= 2 { borrow_from_left(x, i); return i; }
+    if right_n &gt;= 2 { borrow_from_right(x, i); return i; }
+    if i &gt; 0 { merge(x, i - 1); return i - 1; }
+    merge(x, i);
+    i
+}
+
+fn max_key(h: &amp;Node234) -&gt; i32 {
+    let mut h = h;
+    while !h.is_leaf() { h = h.child[h.n].as_ref().unwrap(); }
+    h.key[h.n - 1]
+}
+
+fn min_key(h: &amp;Node234) -&gt; i32 {
+    let mut h = h;
+    while !h.is_leaf() { h = h.child[0].as_ref().unwrap(); }
+    h.key[0]
+}
+
+// One step down from x, which holds two or more keys or is the root.
+fn remove_from(x: &amp;mut Node234, mut key: i32) {
+    let mut i = 0;
+    while i &lt; x.n &amp;&amp; key &gt; x.key[i] { i += 1; }
+    let here = i &lt; x.n &amp;&amp; key == x.key[i];
+    if x.is_leaf() {                                // 2+ keys, or the root
+        if !here { return; }                        // not in the tree
+        for j in i..x.n - 1 { x.key[j] = x.key[j + 1]; }
+        x.n -= 1;
+        return;
+    }
+    if here {                                       // a key in an internal node
+        if x.child[i].as_ref().unwrap().n &gt;= 2 {    // the left side can spare one
+            // the predecessor replaces it, then goes from the leaf
+            key = max_key(x.child[i].as_ref().unwrap());
+            x.key[i] = key;
+        } else if x.child[i + 1].as_ref().unwrap().n &gt;= 2 {
+            // the successor, mirrored
+            key = min_key(x.child[i + 1].as_ref().unwrap());
+            x.key[i] = key;
+            i += 1;
+        } else {
+            merge(x, i);                            // the key comes down
+        }
+    } else if x.child[i].as_ref().unwrap().n == 1 {
+        i = fix_child(x, i);
+    }
+    remove_from(x.child[i].as_mut().unwrap(), key);
+}
+
+impl Tree234 {
+    fn remove(&amp;mut self, key: i32) {                // fix 2-nodes on the way down
+        if let Some(root) = self.root.as_mut() {
+            remove_from(root, key);
+            // a merge took the root&#x27;s key, or the last key went:
+            // one level shorter
+            if root.n == 0 {
+                self.root = root.child[0].take();
+            }
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/topdown-234-delete.cpp &middot; code/trees/topdown-234-delete.java &middot; code/trees/topdown-234-delete.py &middot; code/trees/topdown-234-delete.rs</code></p>
+<!--/ct--></div>
       <p>
         A key that is not in the tree still pays for the repairs on its path: the search
         fails at a leaf after merging or borrowing on the way down, and the tree it
@@ -1677,16 +2226,67 @@ void Tree234::remove(int key) {
         Moving that one test to the start of the function, before the comparison, splits
         every 4-node on the search path on the way down, the top-down rule of &sect;3:
       </p>
-      <pre><span class="cm">// Top-down 2-3-4 insert: the color flip moves BEFORE the comparison.</span>
+      <div class="code-tabs" data-snippet="trees/topdown-llrb-insert">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Top-down 2-3-4 insert: the color flip moves BEFORE the comparison.
 RBNode* put234(RBNode* h, int key) {
     if (!h) return new RBNode{key};
-    if (isRed(h-&gt;left) &amp;&amp; isRed(h-&gt;right)) flipColors(h);   <span class="cm">// split a 4-node now</span>
+    if (isRed(h-&gt;left) &amp;&amp; isRed(h-&gt;right)) flipColors(h);   // split a 4-node now
     if      (key &lt; h-&gt;key) h-&gt;left  = put234(h-&gt;left,  key);
     else if (key &gt; h-&gt;key) h-&gt;right = put234(h-&gt;right, key);
     if (isRed(h-&gt;right) &amp;&amp; !isRed(h-&gt;left))     h = rotateLeft(h);
     if (isRed(h-&gt;left) &amp;&amp; isRed(h-&gt;left-&gt;left)) h = rotateRight(h);
     return h;
 }</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Top-down 2-3-4 insert: the color flip moves BEFORE the comparison.
+static RBNode put234(RBNode h, int key) {
+    if (h == null) return new RBNode(key);
+    if (isRed(h.left) &amp;&amp; isRed(h.right)) flipColors(h);     // split a 4-node now
+    if      (key &lt; h.key) h.left  = put234(h.left,  key);
+    else if (key &gt; h.key) h.right = put234(h.right, key);
+    if (isRed(h.right) &amp;&amp; !isRed(h.left))    h = rotateLeft(h);
+    if (isRed(h.left) &amp;&amp; isRed(h.left.left)) h = rotateRight(h);
+    return h;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Top-down 2-3-4 insert: the color flip moves BEFORE the comparison.
+def put234(h, key):
+    if h is None:
+        return RBNode(key)
+    if is_red(h.left) and is_red(h.right):
+        flip_colors(h)                 # split a 4-node now
+    if key &lt; h.key:
+        h.left = put234(h.left, key)
+    elif key &gt; h.key:
+        h.right = put234(h.right, key)
+    if is_red(h.right) and not is_red(h.left):
+        h = rotate_left(h)
+    if is_red(h.left) and is_red(h.left.left):
+        h = rotate_right(h)
+    return h</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Top-down 2-3-4 insert: the color flip moves BEFORE the comparison.
+fn put234(h: Link, key: i32) -&gt; Box&lt;RBNode&gt; {
+    let mut h = match h {
+        None =&gt; return Box::new(
+            RBNode { key, left: None, right: None, red: true }),
+        Some(n) =&gt; n,
+    };
+    // split a 4-node now
+    if is_red(&amp;h.left) &amp;&amp; is_red(&amp;h.right) { flip_colors(&amp;mut h); }
+    if      key &lt; h.key { h.left  = Some(put234(h.left.take(),  key)); }
+    else if key &gt; h.key { h.right = Some(put234(h.right.take(), key)); }
+    if is_red(&amp;h.right) &amp;&amp; !is_red(&amp;h.left) { h = rotate_left(h); }
+    if is_red(&amp;h.left) &amp;&amp; is_red(&amp;h.left.as_ref().unwrap().left) {
+        h = rotate_right(h);
+    }
+    h
+}</pre>
+<p class="ct-src">source: <code>code/trees/topdown-llrb-insert.cpp &middot; code/trees/topdown-llrb-insert.java &middot; code/trees/topdown-llrb-insert.py &middot; code/trees/topdown-llrb-insert.rs</code></p>
+<!--/ct--></div>
       <p>
         Sedgewick (2008) put it this way: &ldquo;the left-leaning versions of 2-3 trees
         and top-down 2-3-4 trees differ in the position of one line of code.&rdquo; With
@@ -1849,8 +2449,15 @@ RBNode* put234(RBNode* h, int key) {
         the insert&rsquo;s three tests, splits them on the way back up. The delete
         repairs in both directions: two passes.
       </p>
-      <pre><span class="cm">// h-&gt;left is a 2-node. Merge it with h's key and h-&gt;right into one temporary</span>
-<span class="cm">// 4-node; if h-&gt;right is a 3-node, turn the merge into a borrow.</span>
+      <div class="code-tabs" data-snippet="trees/topdown-llrb-delete">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// h-&gt;left is a 2-node. Merge it with h&#x27;s key and h-&gt;right into one temporary
+// 4-node; if h-&gt;right is a 3-node, turn the merge into a borrow.
 RBNode* moveRedLeft(RBNode* h) {
     flipColors(h);
     if (isRed(h-&gt;right-&gt;left)) {
@@ -1861,7 +2468,7 @@ RBNode* moveRedLeft(RBNode* h) {
     return h;
 }
 
-<span class="cm">// The mirror, for h-&gt;right. Red links lean left, so one rotation does.</span>
+// The mirror, for h-&gt;right. Red links lean left, so one rotation does.
 RBNode* moveRedRight(RBNode* h) {
     flipColors(h);
     if (isRed(h-&gt;left-&gt;left)) {
@@ -1883,32 +2490,225 @@ int minKey(RBNode* h) {
     return h-&gt;key;
 }
 
-<span class="cm">// key is in the tree. On the way down, h or h-&gt;left is red.</span>
+// key is in the tree. On the way down, h or h-&gt;left is red.
 RBNode* del(RBNode* h, int key) {
     if (key &lt; h-&gt;key) {
         if (!isRed(h-&gt;left) &amp;&amp; !isRed(h-&gt;left-&gt;left)) h = moveRedLeft(h);
         h-&gt;left = del(h-&gt;left, key);
     } else {
-        if (isRed(h-&gt;left)) h = rotateRight(h);              <span class="cm">// red onto the path</span>
+        if (isRed(h-&gt;left)) h = rotateRight(h);              // red onto the path
         if (key == h-&gt;key &amp;&amp; h-&gt;right == nullptr) { delete h; return nullptr; }
         if (!isRed(h-&gt;right) &amp;&amp; !isRed(h-&gt;right-&gt;left)) h = moveRedRight(h);
-        if (key == h-&gt;key) {                                 <span class="cm">// two children</span>
-            h-&gt;key = minKey(h-&gt;right);                       <span class="cm">// the successor</span>
+        if (key == h-&gt;key) {                                 // two children
+            h-&gt;key = minKey(h-&gt;right);                       // the successor
             h-&gt;right = deleteMin(h-&gt;right);
         } else {
             h-&gt;right = del(h-&gt;right, key);
         }
     }
-    return fixUp(h);                                         <span class="cm">// back up</span>
+    return fixUp(h);                                         // back up
 }
 
 void RedBlackTree::remove(int key) {
-    if (!contains(key)) return;                  <span class="cm">// del assumes the key is there</span>
+    if (!contains(key)) return;                  // del assumes the key is there
     if (!isRed(root-&gt;left) &amp;&amp; !isRed(root-&gt;right))
-        root-&gt;red = true;                        <span class="cm">// h or h-&gt;left red at the top</span>
+        root-&gt;red = true;                        // h or h-&gt;left red at the top
     root = del(root, key);
     if (root != nullptr) root-&gt;red = false;
 }</pre>
+<pre class="ct-pane" data-lang="java" hidden>// h.left is a 2-node. Merge it with h&#x27;s key and h.right into one temporary
+// 4-node; if h.right is a 3-node, turn the merge into a borrow.
+static RBNode moveRedLeft(RBNode h) {
+    flipColors(h);
+    if (isRed(h.right.left)) {
+        h.right = rotateRight(h.right);
+        h = rotateLeft(h);
+        flipColors(h);
+    }
+    return h;
+}
+
+// The mirror, for h.right. Red links lean left, so one rotation does.
+static RBNode moveRedRight(RBNode h) {
+    flipColors(h);
+    if (isRed(h.left.left)) {
+        h = rotateRight(h);
+        flipColors(h);
+    }
+    return h;
+}
+
+static RBNode deleteMin(RBNode h) {
+    if (h.left == null) return null;
+    if (!isRed(h.left) &amp;&amp; !isRed(h.left.left)) h = moveRedLeft(h);
+    h.left = deleteMin(h.left);
+    return fixUp(h);
+}
+
+static int minKey(RBNode h) {
+    while (h.left != null) h = h.left;
+    return h.key;
+}
+
+// key is in the tree. On the way down, h or h.left is red.
+static RBNode del(RBNode h, int key) {
+    if (key &lt; h.key) {
+        if (!isRed(h.left) &amp;&amp; !isRed(h.left.left)) h = moveRedLeft(h);
+        h.left = del(h.left, key);
+    } else {
+        if (isRed(h.left)) h = rotateRight(h);                // red onto the path
+        if (key == h.key &amp;&amp; h.right == null) return null;
+        if (!isRed(h.right) &amp;&amp; !isRed(h.right.left)) h = moveRedRight(h);
+        if (key == h.key) {                                   // two children
+            h.key = minKey(h.right);                          // the successor
+            h.right = deleteMin(h.right);
+        } else {
+            h.right = del(h.right, key);
+        }
+    }
+    return fixUp(h);                                          // back up
+}
+
+void remove(int key) {                         // a RedBlackTree method
+    if (!contains(key)) return;                // del assumes the key is there
+    if (!isRed(root.left) &amp;&amp; !isRed(root.right))
+        root.red = true;                       // h or h.left red at the top
+    root = del(root, key);
+    if (root != null) root.red = false;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># h.left is a 2-node. Merge it with h&#x27;s key and h.right into one temporary
+# 4-node; if h.right is a 3-node, turn the merge into a borrow.
+def move_red_left(h):
+    flip_colors(h)
+    if is_red(h.right.left):
+        h.right = rotate_right(h.right)
+        h = rotate_left(h)
+        flip_colors(h)
+    return h
+
+# The mirror, for h.right. Red links lean left, so one rotation does.
+def move_red_right(h):
+    flip_colors(h)
+    if is_red(h.left.left):
+        h = rotate_right(h)
+        flip_colors(h)
+    return h
+
+def delete_min(h):
+    if h.left is None:
+        return None
+    if not is_red(h.left) and not is_red(h.left.left):
+        h = move_red_left(h)
+    h.left = delete_min(h.left)
+    return fix_up(h)
+
+def min_key(h):
+    while h.left is not None:
+        h = h.left
+    return h.key
+
+# key is in the tree. On the way down, h or h.left is red.
+def delete(h, key):
+    if key &lt; h.key:
+        if not is_red(h.left) and not is_red(h.left.left):
+            h = move_red_left(h)
+        h.left = delete(h.left, key)
+    else:
+        if is_red(h.left):
+            h = rotate_right(h)        # red onto the path
+        if key == h.key and h.right is None:
+            return None
+        if not is_red(h.right) and not is_red(h.right.left):
+            h = move_red_right(h)
+        if key == h.key:               # two children
+            h.key = min_key(h.right)   # the successor
+            h.right = delete_min(h.right)
+        else:
+            h.right = delete(h.right, key)
+    return fix_up(h)                   # back up
+
+def remove(self, key):                 # a RedBlackTree method
+    if not self.contains(key):
+        return                         # delete assumes the key is there
+    if not is_red(self.root.left) and not is_red(self.root.right):
+        self.root.red = True           # h or h.left red at the top
+    self.root = delete(self.root, key)
+    if self.root is not None:
+        self.root.red = False</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// h.left is a 2-node. Merge it with h&#x27;s key and h.right into one temporary
+// 4-node; if h.right is a 3-node, turn the merge into a borrow.
+fn move_red_left(mut h: Box&lt;RBNode&gt;) -&gt; Box&lt;RBNode&gt; {
+    flip_colors(&amp;mut h);
+    if is_red(&amp;h.right.as_ref().unwrap().left) {
+        h.right = Some(rotate_right(h.right.take().unwrap()));
+        h = rotate_left(h);
+        flip_colors(&amp;mut h);
+    }
+    h
+}
+
+// The mirror, for h.right. Red links lean left, so one rotation does.
+fn move_red_right(mut h: Box&lt;RBNode&gt;) -&gt; Box&lt;RBNode&gt; {
+    flip_colors(&amp;mut h);
+    if is_red(&amp;h.left.as_ref().unwrap().left) {
+        h = rotate_right(h);
+        flip_colors(&amp;mut h);
+    }
+    h
+}
+
+fn delete_min(mut h: Box&lt;RBNode&gt;) -&gt; Link {
+    if h.left.is_none() { return None; }
+    if !is_red(&amp;h.left) &amp;&amp; !is_red(&amp;h.left.as_ref().unwrap().left) {
+        h = move_red_left(h);
+    }
+    h.left = delete_min(h.left.take().unwrap());
+    Some(fix_up(h))
+}
+
+fn min_key(h: &amp;RBNode) -&gt; i32 {
+    let mut h = h;
+    while let Some(l) = &amp;h.left { h = l; }
+    h.key
+}
+
+// key is in the tree. On the way down, h or h.left is red.
+fn del(mut h: Box&lt;RBNode&gt;, key: i32) -&gt; Link {
+    if key &lt; h.key {
+        if !is_red(&amp;h.left) &amp;&amp; !is_red(&amp;h.left.as_ref().unwrap().left) {
+            h = move_red_left(h);
+        }
+        h.left = del(h.left.take().unwrap(), key);
+    } else {
+        // red onto the path
+        if is_red(&amp;h.left) { h = rotate_right(h); }
+        if key == h.key &amp;&amp; h.right.is_none() { return None; }
+        if !is_red(&amp;h.right) &amp;&amp; !is_red(&amp;h.right.as_ref().unwrap().left) {
+            h = move_red_right(h);
+        }
+        if key == h.key {                                         // two children
+            h.key = min_key(h.right.as_ref().unwrap());           // the successor
+            h.right = delete_min(h.right.take().unwrap());
+        } else {
+            h.right = del(h.right.take().unwrap(), key);
+        }
+    }
+    Some(fix_up(h))                                               // back up
+}
+
+impl RedBlackTree {
+    fn remove(&amp;mut self, key: i32) {
+        if !self.contains(key) { return; }          // del assumes the key is there
+        let mut root = self.root.take().unwrap();
+        if !is_red(&amp;root.left) &amp;&amp; !is_red(&amp;root.right) {
+            root.red = true;                        // h or h.left red at the top
+        }
+        self.root = del(root, key);
+        if let Some(r) = self.root.as_mut() { r.red = false; }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/trees/topdown-llrb-delete.cpp &middot; code/trees/topdown-llrb-delete.java &middot; code/trees/topdown-llrb-delete.py &middot; code/trees/topdown-llrb-delete.rs</code></p>
+<!--/ct--></div>
       <figure>
 <!-- gen:td move-red -->
 <svg viewBox="0 0 765 572" role="img" style="max-width:918px" font-family="system-ui, sans-serif" aria-label="moveRedLeft and moveRedRight, each before and after, the red-black BST above the 2-3 tree it encodes; the shaded node is h, colored red by the descent (the red line above it). moveRedLeft: the sibling is a 2-node, deleting 20: 40 at the root; 40 has left child 20 by a black link and right child 60 by a black link, flipColors(40), gives 40 at the root; 40 has left child 20 by a red link and right child 60 by a red link; as 2-3 trees [40]([20], [60]) becomes [20|40|60]; merge: a temporary 4-node. moveRedLeft: the sibling is a 3-node, deleting 20: 40 at the root; 40 has left child 20 by a black link and right child 60 by a black link; 60 has left child 50 by a red link, flipColors(40), rotateRight(60), rotateLeft(40), flipColors(50), gives 50 at the root; 50 has left child 40 by a black link and right child 60 by a black link; 40 has left child 20 by a red link; as 2-3 trees [40]([20], [50|60]) becomes [50]([20|40], [60]); borrow: 40 down, 50 up. moveRedRight: the sibling is a 2-node, deleting 60: 40 at the root; 40 has left child 20 by a black link and right child 60 by a black link, flipColors(40), gives 40 at the root; 40 has left child 20 by a red link and right child 60 by a red link; as 2-3 trees [40]([20], [60]) becomes [20|40|60]; merge: a temporary 4-node. moveRedRight: the sibling is a 3-node, deleting 60: 40 at the root; 40 has left child 20 by a black link and right child 60 by a black link; 20 has left child 10 by a red link, flipColors(40), rotateRight(40), flipColors(20), gives 20 at the root; 20 has left child 10 by a black link and right child 40 by a black link; 40 has right child 60 by a red link; as 2-3 trees [40]([10|20], [60]) becomes [20]([10], [40|60]); borrow: 40 down, 20 up.">
@@ -2586,10 +3386,36 @@ void RedBlackTree::remove(int key) {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Top-Down Balanced Trees v1.0
+        Data Structures &amp; Algorithms &middot; Top-Down Balanced Trees v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
     </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
   </body>
 </html>

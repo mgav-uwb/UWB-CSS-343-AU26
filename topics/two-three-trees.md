@@ -20,9 +20,9 @@
 
 The AVL tree kept a **binary** tree balanced:
 
-- one invariant: balance factor **∈ {−1, 0, +1}**
+- one invariant: balance factor $\boldsymbol{\in \lbrace -1, 0, +1 \rbrace}$
 - restored after each op by **rotations**
-- result: height **≤ 1.44 log₂ n**: a **guarantee**
+- result: height $\boldsymbol{\le 1.44 \log\_2 n}$: a **guarantee**
 
 It works: but rotations are fiddly: LL/RR/LR/RL on insert, and delete can **cascade** rotations up the path.
 
@@ -82,9 +82,11 @@ One node type with a key count. Keys stay sorted, so `child[i]` holds the keys b
 
 > **A 2-3 tree keeps *every* leaf at the *same* depth: always.**
 
-No "±1 slack" like AVL. Perfect balance, maintained on every insert, with **no rotations**.
+No $\pm 1$ slack as in AVL, kept on every insert with **no rotations**. With $n$ keys, from all 3-nodes to all 2-nodes:
 
-Height is therefore between **log₃ n** (all 3-nodes) and **log₂ n** (all 2-nodes) → **Θ(log n)**, guaranteed.
+$$\log\_3(n+1) - 1 \le h \le \log\_2(n+1) - 1$$
+
+So the height is $\boldsymbol{\Theta(\log n)}$, guaranteed.
 
 --
 
@@ -100,13 +102,13 @@ Height is therefore between **log₃ n** (all 3-nodes) and **log₂ n** (all 2-n
    search 65: 65 &gt; 50 right, 65 &lt; 70 left, found in [60|65]">
 </div>
 
-Three levels, three "pick a door" decisions. Search cost = one comparison group per level = **Θ(height) = Θ(log n)**.
+Three levels, three "pick a door" decisions. Search cost = one comparison group per level = $\boldsymbol{\Theta(h) = \Theta(\log n)}$.
 
 --
 
 ## 2-3 vs. a plain BST
 
-Why a 2-3 tree, when a BST already searches in Θ(height)?
+Why a 2-3 tree, when a BST already searches in $\Theta(h)$?
 
 - a 2-3 node may hold **two** keys → **fewer levels**
 - but the win isn't raw comparisons (you may test 2 keys per node)
@@ -218,10 +220,9 @@ Insert **50, 30, 70, 10, 20** into an empty 2-3 tree:
 
 ## Practice: you try
 
-Insert **65** into:
-
-<div>
-<img src="../../topics/figures/trees/tt-practice.svg" style="height:160px" alt="
+<div style="display:flex; align-items:center; justify-content:center; gap:32px">
+<span>Insert <strong>65</strong> into:</span>
+<img src="../../topics/figures/trees/tt-practice.svg" style="height:150px" alt="
         [ 40 ]
        /      \
    [20|30]   [60|70]">
@@ -229,10 +230,10 @@ Insert **65** into:
 
 <details class="answer"><summary>Answer:</summary>
 
-65 > 40 → leaf `[60|70]` is full → temp `[60|65|70]` → **split**, promote **65** → root becomes `[40|65]`, leaves `[20|30] [60] [70]`. Every leaf still at depth 1. ✓
+$65 > 40$: the leaf `[60|70]` overflows, **65** moves up; every leaf is still at depth 1.
 
 <div>
-<img src="../../topics/figures/trees/tt-practice-answer.svg" style="height:167px" alt="
+<img src="../../topics/figures/trees/tt-practice-answer.svg" style="height:150px" alt="
    65 &gt; 40 → leaf [60|70] → temp [60|65|70] → split, promote 65
         [ 40 | 65 ]
        /     |     \
@@ -259,10 +260,10 @@ Insert **65** into:
 
 --
 
-## Cost: Θ(log n), no rotations
+## Cost: $\Theta(\log n)$, no rotations
 
-- **height**: between `log₃ n` and `log₂ n`
-- **search / insert**: `Θ(log n)`: a constant amount of work per level
+- **height**: $\Theta(\log n)$, between the all-3-node and the all-2-node tree
+- **search / insert**: $\Theta(\log n)$: a constant amount of work per level
 - **splits per insert**: at most one per level, usually far fewer
 
 A guaranteed-balanced search tree, and we never wrote a rotation.

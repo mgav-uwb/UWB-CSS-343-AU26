@@ -12,8 +12,8 @@
 ## Recap
 
 - **2-3 trees**: perfect balance by split and promote; insertion always in a leaf
-- **red-black trees**: a 2-3 tree in binary form; three moves restore it; height at most 2 log₂ n
-- **B-trees**: many keys per node, one node per disk block; height log base M of n
+- **red-black trees**: a 2-3 tree in binary form; three moves restore it; height at most $2 \log\_2 n$
+- **B-trees**: many keys per node, one node per disk block; height about $\log\_M n$
 - **B+ trees**: values in linked leaves, so range scans read consecutive blocks
 
 --

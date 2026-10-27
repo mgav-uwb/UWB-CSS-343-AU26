@@ -18,7 +18,7 @@
 
 ## Generalize: let nodes hold *many* keys
 
-A 2-3 node holds 1–2 keys. Why stop at 2? A **B-tree of order M** lets each node hold up to **M − 1 keys** (M children), and keeps every leaf at the same depth: same split-and-promote, splitting when a node reaches **M** keys.
+A 2-3 node holds 1–2 keys. Why stop at 2? A **B-tree of order** $\boldsymbol{M}$ lets each node hold up to $\boldsymbol{M - 1}$ **keys** ($M$ children), and keeps every leaf at the same depth: same split-and-promote, splitting when a node reaches $\boldsymbol{M}$ keys.
 
 2-3 trees are just **B-trees of order 3**.
 
@@ -26,7 +26,7 @@ A 2-3 node holds 1–2 keys. Why stop at 2? A **B-tree of order M** lets each no
 
 ## Why fat nodes? The disk.
 
-Reading from disk/SSD isn't ≈1× RAM: it's **≈10⁵× slower**, and it comes a whole **block** (page) at a time. So the cost that matters is **number of node accesses = disk reads**, not comparisons.
+Reading from disk/SSD isn't as fast as RAM: it's $\boldsymbol{\approx 10^5 \times}$ **slower**, and it comes a whole **block** (page) at a time. So the cost that matters is **number of node accesses = disk reads**, not comparisons.
 
 <div>
 <img src="../../topics/figures/trees/bt-latency.svg" style="height:241px" alt="
@@ -41,7 +41,7 @@ Reading from disk/SSD isn't ≈1× RAM: it's **≈10⁵× slower**, and it comes
 
 ## One node, one disk block
 
-A node fills **one block**: **hundreds** of keys, so only about **log<sub>M</sub> n** levels.
+A node fills **one block**: **hundreds** of keys, so only about $\boldsymbol{\log\_M n}$ levels.
 
 <div>
 <img src="../../topics/figures/trees/bt-levels.svg" style="height:234px" alt="
@@ -56,9 +56,9 @@ A **billion** keys, any lookup in **3 disk reads**: why databases and filesystem
 
 --
 
-## An M-ary search tree
+## An $M$-ary search tree
 
-Generalize the search rule: a node holds a **sorted array** of up to `M−1` keys and `M` child pointers.
+Generalize the search rule: a node holds a **sorted array** of up to $M - 1$ keys and $M$ child pointers.
 
 <div>
 <img src="../../topics/figures/trees/bt-mary-node.svg" style="height:192px" alt="
@@ -73,10 +73,10 @@ One block read brings the whole key array into memory; a single in-memory binary
 
 ## The order property
 
-A **B-tree of order M** requires:
+A **B-tree of order** $\boldsymbol{M}$ requires:
 
-- every node has at most **M** children (M−1 keys)
-- every **non-root** node has at least **⌈M/2⌉** children
+- every node has at most $\boldsymbol{M}$ children ($M - 1$ keys)
+- every **non-root** node has at least $\boldsymbol{\lceil M/2 \rceil}$ children
 - the **root** has at least 2 children (unless it's a leaf)
 - **all leaves at the same depth**
 
@@ -109,7 +109,7 @@ Search: binary-search `key[]` in RAM, follow `child[i]`. **One node = one block 
 
 ## Why not a plain BST on disk?
 
-A balanced **binary** tree over `10⁹` keys is ≈**30 levels** → up to **30 disk reads** per lookup (≈0.3 s on a spinning disk).
+A balanced **binary** tree over $10^9$ keys is about **30 levels** ($\log\_2 10^9 \approx 30$) → up to **30 disk reads** per lookup (≈0.3 s on a spinning disk).
 
 The same keys in an order-1000 B-tree: **3 reads** (≈30 ms). **10× fewer** block I/Os: the branching factor is doing all the work.
 
@@ -135,9 +135,9 @@ The same keys in an order-1000 B-tree: **3 reads** (≈30 ms). **10× fewer** bl
 
 --
 
-## B-tree insert: worked (M = 5)
+## B-tree insert, worked
 
-Insert **55** into a full leaf `[60|70|80|90]`:
+Order $M = 5$: insert **55** into a full leaf `[60|70|80|90]`:
 
 <div>
 <img src="../../topics/figures/trees/bt-insert.svg" style="height:134px" alt="
@@ -147,7 +147,7 @@ Insert **55** into a full leaf `[60|70|80|90]`:
                                       5 keys: overflow at M     70 moves up">
 </div>
 
-Split at **M keys**, promote the **middle**, two half-full nodes remain: same rule, wider node.
+Split at $\boldsymbol{M}$ **keys**, promote the **middle**, two half-full nodes remain: same rule, wider node.
 
 --
 
@@ -200,11 +200,11 @@ Routers carry **no records**; only leaves do, and `next` chains the leaves in ke
 
 ## Routers: less goes left, equal or more goes right
 
-At routers `[30 | 60]`, a key k goes to:
+At routers `[30 | 60]`, a key $k$ goes to:
 
-- **child 0** if k < 30
-- **child 1** if 30 ≤ k < 60
-- **child 2** if k ≥ 60
+- **child 0** if $k < 30$
+- **child 1** if $30 \le k < 60$
+- **child 2** if $k \ge 60$
 
 **Equal goes right.** A router is a copy of the first key of the subtree to its right, so a search for 30 passes router 30 and ends in the leaf `[30|45]`.
 
@@ -283,9 +283,9 @@ B+ packs more keys per internal block → higher fan-out, shorter tree, faster r
 
 --
 
-## Choosing the order M
+## Choosing the order $M$
 
-Pick M so a node **fills one disk block**:
+Pick $M$ so a node **fills one disk block**:
 
 <div>
 <img src="../../topics/figures/trees/bt-block.svg" style="height:198px" alt="
@@ -295,7 +295,7 @@ Pick M so a node **fills one disk block**:
    →  M = 256">
 </div>
 
-Bigger blocks or smaller keys → larger M → shallower tree.
+Bigger blocks or smaller keys → larger $M$ → shallower tree.
 
 --
 
@@ -303,11 +303,11 @@ Bigger blocks or smaller keys → larger M → shallower tree.
 
 | structure | balance kept by | height | best when |
 |---|---|---|---|
-| plain BST | nothing | up to n−1 | keys already random |
-| **AVL** | rotations, bf ∈ ±1 | ≤ 1.44 log₂n | **read-heavy** (tightest) |
-| **red-black** | rotations + colors | ≤ 2 log₂n | **write-heavy** (std lib) |
-| **2-3** | split & promote | log n | teaching / basis of RB |
-| **B / B+** | split & promote | log<sub>M</sub> n | **disk / databases** |
+| plain BST | nothing | up to $n - 1$ | keys already random |
+| **AVL** | rotations, $\lvert \text{bf} \rvert \le 1$ | $\le 1.44 \log\_2 n$ | **read-heavy** (tightest) |
+| **red-black** | rotations + colors | $\le 2 \log\_2 n$ | **write-heavy** (std lib) |
+| **2-3** | split & promote | $\le \log\_2 n$ | teaching / basis of RB |
+| **B / B+** | split & promote | $\approx \log\_M n$ | **disk / databases** |
 
 --
 
@@ -321,5 +321,5 @@ Bigger blocks or smaller keys → larger M → shallower tree.
    learning / interviews    →  2-3  (explains red-black)">
 </div>
 
-All Θ(log n); the machine and the workload pick the winner.
+All $\Theta(\log n)$; the machine and the workload pick the winner.
 

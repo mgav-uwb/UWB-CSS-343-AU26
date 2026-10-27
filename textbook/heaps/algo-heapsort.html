@@ -224,16 +224,68 @@ pub fn heapsort(a: &amp;mut [i32], n: usize) {
         Every step of the trace below is a step of it, and its two guards produce
         the cases the trace shows:
       </p>
-      <pre>  sink(a, k, n):                       <span class="cm">// push a[k] down inside a[1..n]</span>
-      while 2k &le; n:                   <span class="cm">// a[k] has a left child</span>
-          j = 2k                       <span class="cm">// the left child</span>
-          if j &lt; n and a[j] &lt; a[j+1]:   <span class="cm">// a RIGHT child exists and is bigger</span>
-              j = j + 1                <span class="cm">// compare against the LARGER child</span>
-          if a[k] &ge; a[j]:  break       <span class="cm">// a[k] already dominates: stop</span>
-          swap a[k], a[j]              <span class="cm">// demote under the larger child</span>
-          k = j                        <span class="cm">// move down one level</span></pre>
+      <div class="code-tabs" data-snippet="heaps/sink">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// a[1..n] is a heap, except that a[k] may be smaller than a child.
+// Push a[k] down, always under its larger child.
+void sink(int a[], int k, int n) {
+    while (2*k &lt;= n) {                 // a[k] has a left child
+        int j = 2*k;
+        if (j &lt; n &amp;&amp; a[j] &lt; a[j+1]) j++;   // j: the larger child
+        if (a[k] &gt;= a[j]) break;       // a[k] &gt;= both children
+        std::swap(a[k], a[j]);
+        k = j;
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// a[1..n] is a heap, except that a[k] may be smaller than a child.
+// Push a[k] down, always under its larger child.
+static void sink(int[] a, int k, int n) {
+    while (2*k &lt;= n) {                 // a[k] has a left child
+        int j = 2*k;
+        if (j &lt; n &amp;&amp; a[j] &lt; a[j+1]) j++;   // j: the larger child
+        if (a[k] &gt;= a[j]) break;       // a[k] &gt;= both children
+        swap(a, k, j);
+        k = j;
+    }
+}
+
+// Exchange a[i] and a[j].
+static void swap(int[] a, int i, int j) {
+    int t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># a[1..n] is a heap, except that a[k] may be smaller than a child.
+# Push a[k] down, always under its larger child.
+def sink(a, k, n):
+    while 2*k &lt;= n:                    # a[k] has a left child
+        j = 2*k
+        if j &lt; n and a[j] &lt; a[j+1]:
+            j += 1                     # j: the larger child
+        if a[k] &gt;= a[j]:
+            break                      # a[k] &gt;= both children
+        a[k], a[j] = a[j], a[k]
+        k = j</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// a[1..=n] is a heap, except that a[k] may be smaller than a child.
+// Push a[k] down, always under its larger child.
+pub fn sink(a: &amp;mut [i32], mut k: usize, n: usize) {
+    while 2*k &lt;= n {                   // a[k] has a left child
+        let mut j = 2*k;
+        if j &lt; n &amp;&amp; a[j] &lt; a[j+1] { j += 1; }   // j: the larger child
+        if a[k] &gt;= a[j] { break; }     // a[k] &gt;= both children
+        a.swap(k, j);
+        k = j;
+    }
+}</pre>
+<p class="ct-src">source: <code>code/heaps/sink.cpp &middot; code/heaps/sink.java &middot; code/heaps/sink.py &middot; code/heaps/sink.rs</code></p>
+<!--/ct--></div>
       <p>
-        The loop guard <code>2k &le; n</code> stops the descent at a leaf; the
+        The loop guard <code>2*k &lt;= n</code> stops the descent at a leaf; the
         guard <code>j &lt; n</code> is what distinguishes a node with two children
         from a node whose left child is the last live slot; and the
         <code>break</code> is the early stop. Note that <code>n</code> here is the
@@ -412,9 +464,37 @@ pub fn heapsort(a: &amp;mut [i32], n: usize) {
         Sort \([\,5_a\;5_b\;3\,]\), where \(5_a\) and \(5_b\) are equal keys
         carrying distinct payloads and \(5_a\) started first. A stable sort must
         return \(3, 5_a, 5_b\).
-        <pre>  build:      5a 5b 3      <span class="cm">// sink 1: 5a &ge; larger child 5b, no swap; already a heap</span>
-  park 5a:    5b 3 | 5a    <span class="cm">// swap a[1],a[3]; sink 3 in a[1..2]: lone child 5b, swap</span>
-  park 5b:    3 | 5b 5a    <span class="cm">// swap a[1],a[2]; sink in a[1..1]: nothing to do</span></pre>
+        <figure>
+<!-- gen:hp unstable -->
+<svg viewBox="0 0 369 120" role="img" style="max-width:443px" font-family="system-ui, sans-serif" aria-label="Heapsort of 5a, 5b, 3, where 5a and 5b are equal keys. The build changes nothing: 5a is at least both children. Round one parks 5a at a[3] and sinks 3 under 5b: 5b, 3, then 5a. Round two parks 5b at a[2]: 3, 5b, 5a. The equal keys come out in the opposite order.">
+<text x="235" y="26" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">build: 5<tspan dy="4" font-size="8.3">a</tspan><tspan dy="-4"> ≥ both children, no swap</tspan></text>
+<rect x="251" y="10" width="36" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="269" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">5<tspan dy="4" font-size="9.4">a</tspan></text>
+<rect x="287" y="10" width="36" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="305" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">5<tspan dy="4" font-size="9.4">b</tspan></text>
+<rect x="323" y="10" width="36" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="341" y="26.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="235" y="57" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">park 5<tspan dy="4" font-size="8.3">a</tspan><tspan dy="-4"> at a[3]; 3 sinks under 5</tspan><tspan dy="4" font-size="8.3">b</tspan></text>
+<rect x="251" y="41" width="36" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="269" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">5<tspan dy="4" font-size="9.4">b</tspan></text>
+<rect x="287" y="41" width="36" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="305" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="323" y="41" width="36" height="24" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="341" y="57.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">5<tspan dy="4" font-size="9.4">a</tspan></text>
+<line x1="323" y1="36" x2="323" y2="70" stroke="#1a1c22" stroke-width="3"/>
+<text x="235" y="95" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">park 5<tspan dy="4" font-size="8.3">b</tspan><tspan dy="-4"> at a[2]: 3, 5</tspan><tspan dy="4" font-size="8.3">b</tspan><tspan dy="-4">, 5</tspan><tspan dy="4" font-size="8.3">a</tspan></text>
+<rect x="251" y="72" width="36" height="24" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="269" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="269" y="107" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="287" y="72" width="36" height="24" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="305" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">5<tspan dy="4" font-size="9.4">b</tspan></text>
+<text x="305" y="107" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="323" y="72" width="36" height="24" fill="#eaf6ef" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="341" y="88.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">5<tspan dy="4" font-size="9.4">a</tspan></text>
+<text x="341" y="107" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+</svg>
+<!-- /gen:hp unstable -->
+        </figure>
         The result is \(3, 5_b, 5_a\): the tie is inverted. The cause is the
         first park, which moved \(5_a\) from index \(1\) to index \(3\), past
         the equal key \(5_b\). Any sort that moves keys across
@@ -537,7 +617,7 @@ pub fn heapsort(a: &amp;mut [i32], n: usize) {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Heapsort v1.0
+        Data Structures &amp; Algorithms &middot; Heapsort v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
