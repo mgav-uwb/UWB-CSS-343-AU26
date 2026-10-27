@@ -184,11 +184,73 @@
         two notions that the <a href="algo-bfs.html">BFS handout</a> held together. On this
         little digraph,
       </p>
-      <pre>  0 &mdash;2&rarr; 1
-  |      |
-  5      4        plus one direct edge   0 &mdash;9&rarr; 3
-  &darr;      &darr;
-  2 &mdash;8&rarr; 3</pre>
+      <figure>
+<!-- gen:wg fewest -->
+<svg viewBox="0 0 488 176" role="img" style="max-width:586px" font-family="system-ui, sans-serif" aria-label="With the direct edge 0 to 3 (weight 9) added: BFS takes 0 to 3, one edge, cost 9; the least-weight path is 0 to 1 to 3, two edges, cost 6.">
+<text x="125" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">fewest edges (BFS)</text>
+<line x1="54.1" y1="84" x2="103.9" y2="62.2" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M110.3,59.4 L103.9,67.1 L100.3,58.9 Z" fill="#8a93a6"/>
+<line x1="54.1" y1="96" x2="103.9" y2="117.8" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M110.3,120.6 L100.3,121.1 L103.9,112.9 Z" fill="#8a93a6"/>
+<line x1="55.4" y1="90" x2="186.6" y2="90" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M193.6,90 L182.4,95.6 L182.4,84.4 Z" fill="#e8590c"/>
+<line x1="138.7" y1="59" x2="188.6" y2="80.8" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M195,83.6 L184.9,84.1 L188.5,75.9 Z" fill="#8a93a6"/>
+<line x1="138.7" y1="121" x2="188.6" y2="99.2" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M195,96.4 L188.5,104.1 L184.9,95.9 Z" fill="#8a93a6"/>
+<circle cx="82.7" cy="71.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="82.7" y="75.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="82.7" cy="108.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="82.7" y="112.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="125" cy="90" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="125" y="94" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="167.3" cy="71.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="167.3" y="75.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="167.3" cy="108.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="167.3" y="112.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="40.4" cy="90" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="40.4" y="94.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="125" cy="53" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="125" y="57.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="125" cy="127" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="125" y="131.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="209.6" cy="90" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="209.6" y="94.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="125" y="163" font-size="11.5" font-weight="600" fill="#b3261e" text-anchor="middle">0 → 3: 1 edge, cost 9</text>
+<text x="363" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">least weight</text>
+<line x1="292.1" y1="84" x2="341.9" y2="62.2" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M348.3,59.4 L340.3,69.1 L335.8,58.8 Z" fill="#e8590c"/>
+<line x1="292.1" y1="96" x2="341.9" y2="117.8" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M348.3,120.6 L338.3,121.1 L341.9,112.9 Z" fill="#8a93a6"/>
+<line x1="293.4" y1="90" x2="424.6" y2="90" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M431.6,90 L422.6,94.5 L422.6,85.5 Z" fill="#8a93a6"/>
+<line x1="376.7" y1="59" x2="426.6" y2="80.8" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M433,83.6 L420.4,84.2 L424.9,73.9 Z" fill="#e8590c"/>
+<line x1="376.7" y1="121" x2="426.6" y2="99.2" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M433,96.4 L426.5,104.1 L422.9,95.9 Z" fill="#8a93a6"/>
+<circle cx="320.7" cy="71.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="320.7" y="75.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="320.7" cy="108.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="320.7" y="112.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="363" cy="90" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="363" y="94" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="405.3" cy="71.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="405.3" y="75.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="405.3" cy="108.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="405.3" y="112.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="278.4" cy="90" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="278.4" y="94.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="363" cy="53" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="363" y="57.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="363" cy="127" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="363" y="131.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="447.6" cy="90" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="447.6" y="94.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="363" y="163" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">0 → 1 → 3: 2 edges, cost 6</text>
+</svg>
+<!-- /gen:wg fewest -->
+        <figcaption>The digraph \(0 \to 1\,(2)\), \(0 \to 2\,(5)\), \(1 \to 3\,(4)\), \(2 \to 3\,(8)\), plus the direct edge \(0 \to 3\,(9)\).</figcaption>
+      </figure>
       <p>
         three routes lead from \(0\) to \(3\): the direct edge (one hop, cost
         \(9\)), the detour \(0 \to 1 \to 3\) (two hops, cost \(2 + 4 = 6\)), and
@@ -223,11 +285,62 @@
         above, drop its direct edge, and chain \(k\) copies of the diamond end to
         end, the exit vertex of each serving as the entrance of the next:
       </p>
-      <pre>        a1        a2        a3
-      &#8599;    &#8600;    &#8599;    &#8600;    &#8599;    &#8600;
-   v0        v1        v2        v3     k = 3 diamonds
-      &#8600;    &#8599;    &#8600;    &#8599;    &#8600;    &#8599;
-        b1        b2        b3</pre>
+      <figure>
+<!-- gen:wg diamonds -->
+<svg viewBox="0 0 420 146" role="img" style="max-width:504px" font-family="system-ui, sans-serif" aria-label="Three diamonds in a row: v0 to a1 and b1, both to v1; v1 to a2 and b2, both to v2; v2 to a3 and b3, both to v3. Each diamond doubles the routes: 1, 2, 4, 8 routes reach v0, v1, v2, v3. k diamonds use 1 + 3k vertices and give 2^k routes.">
+<line x1="47.3" y1="58" x2="72.3" y2="44.7" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M78.5,41.5 L72.7,49.7 L68.5,41.7 Z" fill="#8a93a6"/>
+<line x1="47.3" y1="72" x2="72.3" y2="85.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M78.5,88.5 L68.5,88.3 L72.7,80.3 Z" fill="#8a93a6"/>
+<line x1="105.9" y1="41" x2="131" y2="54.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M137.2,57.5 L127.1,57.3 L131.3,49.3 Z" fill="#8a93a6"/>
+<line x1="105.9" y1="89" x2="131" y2="75.7" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M137.2,72.5 L131.3,80.7 L127.1,72.7 Z" fill="#8a93a6"/>
+<line x1="164.6" y1="58" x2="189.7" y2="44.7" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M195.9,41.5 L190,49.7 L185.8,41.7 Z" fill="#8a93a6"/>
+<line x1="164.6" y1="72" x2="189.7" y2="85.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M195.9,88.5 L185.8,88.3 L190,80.3 Z" fill="#8a93a6"/>
+<line x1="223.3" y1="41" x2="248.3" y2="54.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M254.5,57.5 L244.5,57.3 L248.7,49.3 Z" fill="#8a93a6"/>
+<line x1="223.3" y1="89" x2="248.3" y2="75.7" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M254.5,72.5 L248.7,80.7 L244.5,72.7 Z" fill="#8a93a6"/>
+<line x1="281.9" y1="58" x2="307" y2="44.7" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M313.2,41.5 L307.3,49.7 L303.1,41.7 Z" fill="#8a93a6"/>
+<line x1="281.9" y1="72" x2="307" y2="85.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M313.2,88.5 L303.1,88.3 L307.3,80.3 Z" fill="#8a93a6"/>
+<line x1="340.6" y1="41" x2="365.7" y2="54.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M371.9,57.5 L361.8,57.3 L366,49.3 Z" fill="#8a93a6"/>
+<line x1="340.6" y1="89" x2="365.7" y2="75.7" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M371.9,72.5 L366,80.7 L361.8,72.7 Z" fill="#8a93a6"/>
+<circle cx="34" cy="65" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="34" y="69.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">v0</text>
+<text x="34" y="92" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1 route</text>
+<circle cx="92.7" cy="34" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="92.7" y="38.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a1</text>
+<circle cx="92.7" cy="96" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="92.7" y="100.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">b1</text>
+<circle cx="151.3" cy="65" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="151.3" y="69.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">v1</text>
+<text x="151.3" y="92" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2 routes</text>
+<circle cx="210" cy="34" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="210" y="38.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a2</text>
+<circle cx="210" cy="96" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="210" y="100.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">b2</text>
+<circle cx="268.7" cy="65" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="268.7" y="69.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">v2</text>
+<text x="268.7" y="92" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">4 routes</text>
+<circle cx="327.3" cy="34" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="327.3" y="38.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">a3</text>
+<circle cx="327.3" cy="96" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="327.3" y="100.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">b3</text>
+<circle cx="386" cy="65" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="386" y="69.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">v3</text>
+<text x="386" y="92" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">8 routes</text>
+<text x="210" y="133" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">3 diamonds: 1 + 3·3 = 10 vertices, 2³ = 8 routes from v0 to v3</text>
+</svg>
+<!-- /gen:wg diamonds -->
+        <figcaption>Three diamonds; under each \(v_i\), the number of routes from \(v_0\).</figcaption>
+      </figure>
       <div class="thm">
         <span class="tag">Proposition (exponentially many paths)</span>
         For every \(k \ge 1\), the chain of \(k\) diamonds is a digraph with
@@ -398,58 +511,73 @@ impl WGraph {
         carrying weights:
       </p>
       <figure>
-        <svg viewBox="0 0 420 300" role="img" aria-label="The running weighted directed acyclic graph, the same eight-vertex graph as the graph-representations handout with a green weight on each edge. Vertices 0 through 7 are circles spaced evenly around a ring in index order, 0 at the top, indices increasing clockwise. The eleven directed edges and their weights are: edge from 0 to 1 with weight 4, edge from 0 to 3 with weight 6, edge from 0 to 5 with weight 20, edge from 1 to 2 with weight 1, edge from 1 to 3 with weight 5, edge from 2 to 3 with weight 8, edge from 3 to 4 with weight 2, edge from 3 to 7 with weight 11, edge from 4 to 5 with weight 3, edge from 4 to 7 with weight 7, and edge from 5 to 6 with weight 9. Vertices 6 and 7 have no outgoing edges.">
-          <defs>
-            <marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L8,3 L0,6 Z" fill="#4a5163"/>
-            </marker>
-          </defs>
-          <g stroke="#4a5163" stroke-width="1.8" fill="none" marker-end="url(#ah)">
-            <line x1="230" y1="46" x2="269" y2="62"/>  <!-- 0->1 -->
-            <line x1="218" y1="58" x2="281" y2="209"/>  <!-- 0->3 -->
-            <line x1="202" y1="58" x2="139" y2="209"/>  <!-- 0->5 -->
-            <line x1="298" y1="91" x2="314" y2="130"/>  <!-- 1->2 -->
-            <line x1="289" y1="93" x2="289" y2="207"/>  <!-- 1->3 -->
-            <line x1="314" y1="170" x2="298" y2="209"/>  <!-- 2->3 -->
-            <line x1="269" y1="238" x2="230" y2="254"/>  <!-- 3->4 -->
-            <line x1="274" y1="214" x2="146" y2="86"/>  <!-- 3->7 -->
-            <line x1="190" y1="254" x2="151" y2="238"/>  <!-- 4->5 -->
-            <line x1="202" y1="242" x2="139" y2="91"/>  <!-- 4->7 -->
-            <line x1="122" y1="209" x2="106" y2="170"/>  <!-- 5->6 -->
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
-             fill="#0a7d4d" stroke="#fff" stroke-width="3" paint-order="stroke"
-             text-anchor="middle">
-            <text x="250" y="58">4</text>    <!-- 0->1 -->
-            <text x="250" y="138">6</text>   <!-- 0->3 -->
-            <text x="170" y="138">20</text>  <!-- 0->5 -->
-            <text x="306" y="115">1</text>   <!-- 1->2 -->
-            <text x="289" y="154">5</text>   <!-- 1->3 -->
-            <text x="306" y="194">8</text>   <!-- 2->3 -->
-            <text x="250" y="250">2</text>   <!-- 3->4 -->
-            <text x="210" y="154">11</text>  <!-- 3->7 -->
-            <text x="170" y="250">3</text>   <!-- 4->5 -->
-            <text x="170" y="171">7</text>   <!-- 4->7 -->
-            <text x="114" y="194">9</text>    <!-- 5->6 -->
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
-            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
-              <circle cx="210" cy="38" r="19"/>  <circle cx="289" cy="71" r="19"/>
-              <circle cx="322" cy="150" r="19"/>  <circle cx="289" cy="229" r="19"/>
-              <circle cx="210" cy="262" r="19"/>  <circle cx="131" cy="229" r="19"/>
-              <circle cx="98" cy="150" r="19"/>  <circle cx="131" cy="71" r="19"/>
-            </g>
-            <g fill="#1a1c22" stroke="none">
-              <text x="210" y="43">0</text>  <text x="289" y="76">1</text>
-              <text x="322" y="155">2</text>  <text x="289" y="234">3</text>
-              <text x="210" y="267">4</text>  <text x="131" y="234">5</text>
-              <text x="98" y="155">6</text>  <text x="131" y="76">7</text>
-            </g>
-          </g>
-        </svg>
+        <!-- gen:wg course -->
+<svg viewBox="0 0 360 260" role="img" style="max-width:432px" font-family="system-ui, sans-serif" aria-label="The course graph: 0 to 1 (4), 0 to 3 (6), 1 to 2 (1), 1 to 3 (5), 2 to 3 (8), 0 to 5 (20), 3 to 4 (2), 3 to 7 (11), 4 to 5 (3), 5 to 6 (9), 4 to 7 (7).">
+<line x1="193.9" y1="38.7" x2="227.3" y2="52.6" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M233.8,55.3 L223.8,56 L227.2,47.7 Z" fill="#8a93a6"/>
+<line x1="185.7" y1="46.9" x2="239.8" y2="177.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M242.5,183.8 L234.9,177.2 L243.2,173.8 Z" fill="#8a93a6"/>
+<line x1="254.3" y1="75.3" x2="268.2" y2="108.8" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M270.9,115.2 L263.3,108.6 L271.6,105.2 Z" fill="#8a93a6"/>
+<line x1="248.6" y1="76.4" x2="248.6" y2="175.6" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M248.6,182.6 L244.1,173.6 L253.1,173.6 Z" fill="#8a93a6"/>
+<line x1="271.3" y1="143.9" x2="257.4" y2="177.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M254.7,183.8 L254,173.8 L262.3,177.2 Z" fill="#8a93a6"/>
+<line x1="174.3" y1="46.9" x2="120.2" y2="177.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M117.5,183.8 L116.8,173.8 L125.1,177.2 Z" fill="#8a93a6"/>
+<line x1="234.7" y1="204.3" x2="201.2" y2="218.2" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M194.8,220.9 L201.4,213.3 L204.8,221.6 Z" fill="#8a93a6"/>
+<line x1="238" y1="188" x2="127.7" y2="77.7" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M122.7,72.7 L132.3,75.9 L125.9,82.3 Z" fill="#8a93a6"/>
+<line x1="166.1" y1="221.3" x2="132.7" y2="207.4" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M126.2,204.7 L136.2,204 L132.8,212.3 Z" fill="#8a93a6"/>
+<line x1="105.7" y1="184.7" x2="91.8" y2="151.2" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M89.1,144.8 L96.7,151.4 L88.4,154.8 Z" fill="#8a93a6"/>
+<line x1="174.3" y1="213.1" x2="120.2" y2="82.7" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M117.5,76.2 L125.1,82.8 L116.8,86.2 Z" fill="#8a93a6"/>
+<circle cx="214.3" cy="47.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="214.3" y="51.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="214.3" cy="115.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="214.3" y="119.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="262.8" cy="95.7" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="262.8" y="99.7" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="248.6" cy="130" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="248.6" y="134" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="262.8" cy="164.3" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="262.8" y="168.3" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="145.7" cy="115.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="145.7" y="119.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="214.3" cy="212.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="214.3" y="216.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="180" cy="130" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="180" y="134" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="145.7" cy="212.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="145.7" y="216.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="97.2" cy="164.3" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="97.2" y="168.3" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="145.7" cy="144.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="145.7" y="148.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="180" cy="33" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="180" y="37.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="248.6" cy="61.4" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="248.6" y="66.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="277" cy="130" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="277" y="134.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="248.6" cy="198.6" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="248.6" y="203.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="180" cy="227" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="180" y="231.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="111.4" cy="198.6" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="111.4" y="203.4" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="83" cy="130" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="83" y="134.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="111.4" cy="61.4" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="111.4" y="66.2" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+</svg>
+<!-- /gen:wg course -->
         <figcaption>
           The running graph: \(V = 8\), \(E = 11\), every edge pointing from a lower
-          to a higher index, with weights in green. Weighted adjacency list:
+          to a higher index, with each weight on its edge. Weighted adjacency list:
           \(0\to\{1{:}4,\,3{:}6,\,5{:}20\}\), \(1\to\{2{:}1,\,3{:}5\}\),
           \(2\to\{3{:}8\}\), \(3\to\{4{:}2,\,7{:}11\}\), \(4\to\{5{:}3,\,7{:}7\}\),
           \(5\to\{6{:}9\}\). Note the built-in trap: the direct edge \(0 \to 5\)
@@ -477,17 +605,57 @@ impl WGraph {
         vertex: an over-estimate of \(\delta(v)\) that we drive downward as we
         learn more.
       </p>
-      <pre>  dist[s] = 0        <span class="cm">// zero cost to reach the source from itself</span>
-  dist[v] = &infin;        <span class="cm">// every other vertex: no route known yet</span></pre>
+      \[
+        \texttt{dist}[s] = 0 \quad \text{(the source costs nothing to reach)}, \qquad
+        \texttt{dist}[v] = \infty \quad \text{(every other } v\text{: no route known yet)}.
+      \]
       <div class="def">
         <span class="tag">Definition (edge relaxation)</span>
         To <strong>relax</strong> an edge \(u \to v\) of weight \(w\) is to ask
         whether routing through \(u\) beats \(v\)&rsquo;s current best, and if so, to
         take it:
-        <pre>  if (dist[u] + w &lt; dist[v]) {
-      dist[v] = dist[u] + w;   <span class="cm">// found a cheaper route to v</span>
-      parent[v] = u;           <span class="cm">// remember the edge, for the path</span>
-  }</pre>
+        <div class="code-tabs" data-snippet="graphs/relax-edge">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Relax the edge u -&gt; v of weight w: if the route through u is cheaper,
+// take it. LONG_MAX plays infinity; an unreached u offers nothing.
+void relax(vector&lt;long&gt;&amp; dist, vector&lt;int&gt;&amp; parent, int u, int v, long w) {
+    if (dist[u] == LONG_MAX) return;     // no route to u yet
+    if (dist[u] + w &lt; dist[v]) {
+        dist[v] = dist[u] + w;           // found a cheaper route to v
+        parent[v] = u;                   // remember the edge, for the path
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Relax the edge u -&gt; v of weight w: if the route through u is cheaper,
+// take it. Long.MAX_VALUE plays infinity; an unreached u offers nothing.
+static void relax(long[] dist, int[] parent, int u, int v, long w) {
+    if (dist[u] == Long.MAX_VALUE) return;   // no route to u yet
+    if (dist[u] + w &lt; dist[v]) {
+        dist[v] = dist[u] + w;               // found a cheaper route to v
+        parent[v] = u;                       // remember the edge, for the path
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Relax the edge u -&gt; v of weight w: if the route through u is cheaper,
+# take it. (inf + w is inf, so an unreached u offers nothing.)
+def relax(dist, parent, u, v, w):
+    if dist[u] + w &lt; dist[v]:
+        dist[v] = dist[u] + w            # found a cheaper route to v
+        parent[v] = u                    # remember the edge, for the path</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Relax the edge u -&gt; v of weight w: if the route through u is cheaper,
+// take it. i64::MAX plays infinity; an unreached u offers nothing.
+fn relax(dist: &amp;mut [i64], parent: &amp;mut [Option&lt;usize&gt;], u: usize, v: usize, w: i64) {
+    if dist[u] == i64::MAX { return; }   // no route to u yet
+    if dist[u] + w &lt; dist[v] {
+        dist[v] = dist[u] + w;           // found a cheaper route to v
+        parent[v] = Some(u);             // remember the edge, for the path
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/relax-edge.cpp &middot; code/graphs/relax-edge.java &middot; code/graphs/relax-edge.py &middot; code/graphs/relax-edge.rs</code></p>
+<!--/ct--></div>
       </div>
       <div class="ex">
         <span class="tag">Example (one relaxation)</span>
@@ -497,6 +665,43 @@ impl WGraph {
         \(\texttt{parent}[v] \leftarrow u\). If later some other route offers
         \(\texttt{dist}[v] = 6\), it relaxes again to \(6\). The value only ever
         falls.
+        <figure>
+<!-- gen:wg relax-step -->
+<svg viewBox="0 0 496 126" role="img" style="max-width:595px" font-family="system-ui, sans-serif" aria-label="Relaxing the edge u to v, weight 4, with dist[u] = 3 and dist[v] = 10: 3 + 4 = 7 &lt; 10, so dist[v] becomes 7 and parent[v] = u.">
+<text x="95" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">before</text>
+<line x1="48" y1="65" x2="134" y2="65" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M141,65 L132,69.5 L132,60.5 Z" fill="#8a93a6"/>
+<circle cx="95" cy="65" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="95" y="69" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="33" cy="65" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="33" y="69.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">u</text>
+<circle cx="157" cy="65" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="157" y="69.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">v</text>
+<rect x="22" y="31" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="33" y="45" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">3</text>
+<rect x="143" y="31" width="28" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="157" y="45" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">10</text>
+<text x="95" y="113" font-size="11.5" font-weight="600" fill="#5c6270" text-anchor="middle">parent[v] unset</text>
+<text x="248" y="57" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="248" y="73" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">3 + 4 = 7 &lt; 10</text>
+<text x="248" y="86" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">relax</text>
+<text x="401" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">after</text>
+<line x1="354" y1="65" x2="440" y2="65" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M447,65 L435.8,70.6 L435.8,59.4 Z" fill="#7c5cff"/>
+<circle cx="401" cy="65" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="401" y="69" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="339" cy="65" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="339" y="69.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">u</text>
+<circle cx="463" cy="65" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="463" y="69.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">v</text>
+<rect x="328" y="31" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="339" y="45" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">3</text>
+<rect x="452" y="31" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="463" y="45" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">7</text>
+<text x="401" y="113" font-size="11.5" font-weight="600" fill="#7c5cff" text-anchor="middle">parent[v] = u</text>
+</svg>
+<!-- /gen:wg relax-step -->
+      </figure>
       </div>
       <p>
         Relaxation is monotone (it never raises a label), and it is
@@ -566,9 +771,97 @@ impl WGraph {
         shortest distances are final. Repeatedly take the <em>unsettled vertex with
         the smallest tentative distance</em>, settle it, and relax its out-edges.
       </p>
-      <pre>  settled : shortest distance is now KNOWN (final)
-  frontier: discovered, tentative, waiting in the priority queue
-  &infin;       : not yet discovered</pre>
+      <ul>
+        <li><strong>settled</strong>: the shortest distance is known (final);</li>
+        <li><strong>frontier</strong>: discovered, tentative, waiting in the priority queue;</li>
+        <li><strong>undiscovered</strong>: \(\texttt{dist} = \infty\), not reached yet.</li>
+      </ul>
+      <figure>
+<!-- gen:wg zones -->
+<svg viewBox="0 0 474 290" role="img" style="max-width:569px" font-family="system-ui, sans-serif" aria-label="Dijkstra on the course graph from 0, after settling 0 and 1: settled 0 (dist 0) and 1 (dist 4); frontier 2 (5), 3 (6), 5 (20), tentative, in the priority queue; undiscovered 4, 6, 7 (infinity).">
+<line x1="173.9" y1="38.7" x2="217.9" y2="57" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M224.4,59.7 L211.9,60.6 L216.2,50.2 Z" fill="#7c5cff"/>
+<line x1="165.7" y1="46.9" x2="230.4" y2="202.9" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M233.1,209.4 L223.6,201.2 L234,196.9 Z" fill="#7c5cff"/>
+<line x1="244.9" y1="79.7" x2="263.2" y2="123.8" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M265.9,130.2 L256.4,122 L266.8,117.7 Z" fill="#7c5cff"/>
+<line x1="239.2" y1="80.8" x2="239.2" y2="201.2" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M239.2,208.2 L234.7,199.2 L243.7,199.2 Z" fill="#8a93a6"/>
+<line x1="266.3" y1="158.9" x2="248" y2="202.9" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M245.3,209.4 L244.6,199.4 L252.9,202.8 Z" fill="#8a93a6"/>
+<line x1="154.3" y1="46.9" x2="89.6" y2="202.9" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M86.9,209.4 L86,196.9 L96.4,201.2 Z" fill="#7c5cff"/>
+<line x1="225.3" y1="229.9" x2="181.2" y2="248.2" stroke="#c3c8d3" stroke-width="1.6" stroke-dasharray="4 3"/>
+<path d="M174.8,250.9 L181.4,243.3 L184.8,251.6 Z" fill="#c3c8d3"/>
+<line x1="228.6" y1="213.6" x2="97.1" y2="82.1" stroke="#c3c8d3" stroke-width="1.6" stroke-dasharray="4 3"/>
+<path d="M92.1,77.1 L101.7,80.3 L95.3,86.7 Z" fill="#c3c8d3"/>
+<line x1="146.1" y1="251.3" x2="102.1" y2="233" stroke="#c3c8d3" stroke-width="1.6" stroke-dasharray="4 3"/>
+<path d="M95.6,230.3 L105.6,229.6 L102.2,237.9 Z" fill="#c3c8d3"/>
+<line x1="75.1" y1="210.3" x2="56.8" y2="166.2" stroke="#c3c8d3" stroke-width="1.6" stroke-dasharray="4 3"/>
+<path d="M54.1,159.8 L61.7,166.4 L53.4,169.8 Z" fill="#c3c8d3"/>
+<line x1="154.3" y1="243.1" x2="89.6" y2="87.1" stroke="#c3c8d3" stroke-width="1.6" stroke-dasharray="4 3"/>
+<path d="M86.9,80.6 L94.5,87.2 L86.2,90.6 Z" fill="#c3c8d3"/>
+<circle cx="199.6" cy="49.4" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="199.6" y="53.4" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="199.6" cy="128.6" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="199.6" y="132.6" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="255.6" cy="105.4" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="255.6" y="109.4" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="239.2" cy="145" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="239.2" y="149" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="255.6" cy="184.6" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="255.6" y="188.6" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="120.4" cy="128.6" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="120.4" y="132.6" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="199.6" cy="240.6" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="199.6" y="244.6" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="160" cy="145" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="160" y="149" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="120.4" cy="240.6" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="120.4" y="244.6" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="64.4" cy="184.6" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="64.4" y="188.6" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="120.4" cy="161.4" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="120.4" y="165.4" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="160" cy="33" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="160" y="37.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="239.2" cy="65.8" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="239.2" y="70.6" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="272" cy="145" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="272" y="149.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="239.2" cy="224.2" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="239.2" y="229" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="160" cy="257" r="15" fill="#fff" stroke="#d8dce3" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="160" y="261.8" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">4</text>
+<circle cx="80.8" cy="224.2" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="80.8" y="229" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="48" cy="145" r="15" fill="#fff" stroke="#d8dce3" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="48" y="149.8" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">6</text>
+<circle cx="80.8" cy="65.8" r="15" fill="#fff" stroke="#d8dce3" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="80.8" y="70.6" font-size="13.5" font-weight="600" fill="#9aa3b5" text-anchor="middle">7</text>
+<rect x="119" y="23.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="130" y="37.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="249.4" y="36.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="260.4" y="50.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">4</text>
+<rect x="282.2" y="115.7" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="293.2" y="129.7" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">5</text>
+<rect x="249.4" y="234.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="260.4" y="248.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">6</text>
+<rect x="170.2" y="260" width="22" height="19" rx="9.5" fill="#fff" stroke="#c6ccd8" stroke-width="1.3"/>
+<text x="181.2" y="274" font-size="15" font-weight="700" fill="#5c6270" text-anchor="middle">∞</text>
+<rect x="45.6" y="234.5" width="28" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="59.6" y="248.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">20</text>
+<rect x="58.2" y="115.7" width="22" height="19" rx="9.5" fill="#fff" stroke="#c6ccd8" stroke-width="1.3"/>
+<text x="69.2" y="129.7" font-size="15" font-weight="700" fill="#5c6270" text-anchor="middle">∞</text>
+<rect x="39.8" y="56.3" width="22" height="19" rx="9.5" fill="#fff" stroke="#c6ccd8" stroke-width="1.3"/>
+<text x="50.8" y="70.3" font-size="15" font-weight="700" fill="#5c6270" text-anchor="middle">∞</text>
+<circle cx="327" cy="113" r="9" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2"/><text x="343" y="117" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="start">settled: final</text>
+<circle cx="327" cy="145" r="9" fill="#fff" stroke="#5c6270" stroke-width="1.6"/><text x="343" y="149" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="start">frontier: tentative</text>
+<circle cx="327" cy="177" r="9" fill="#fff" stroke="#d8dce3" stroke-width="1.4" stroke-dasharray="4 3"/><text x="343" y="181" font-size="11" font-weight="600" fill="#5c6270" text-anchor="start">undiscovered: ∞</text>
+</svg>
+<!-- /gen:wg zones -->
+        <figcaption>The running graph (\(\S1\)) from \(0\), after settling \(0\) and \(1\): the tree edges so far, and every tentative distance.</figcaption>
+      </figure>
       <p>
         Each iteration promotes the nearest frontier vertex into <em>settled</em>
         and pushes its improved neighbors onto the frontier: exactly BFS
@@ -686,12 +979,104 @@ fn dijkstra(g: &amp;WGraph, s: usize) -&gt; Vec&lt;i64&gt; {
         <span class="tag">Example (a full trace)</span>
         On the small graph \(0\to1(2)\), \(0\to2(5)\), \(1\to2(1)\), \(1\to3(7)\),
         \(2\to3(3)\):
-        <pre>  settle 0 (dist 0):  relax 0&rarr;1 &rArr; dist[1]=2;  0&rarr;2 &rArr; dist[2]=5
-  settle 1 (dist 2):  relax 1&rarr;2: 2+1=3 &lt; 5 &rArr; dist[2]=3;
-                      relax 1&rarr;3: 2+7=9      &rArr; dist[3]=9
-  settle 2 (dist 3):  relax 2&rarr;3: 3+3=6 &lt; 9 &rArr; dist[3]=6
-  settle 3 (dist 6):  done
-  distances:  0  2  3  6</pre>
+        <figure>
+<!-- gen:wg worked -->
+<svg viewBox="0 0 576 406" role="img" style="max-width:691px" font-family="system-ui, sans-serif" aria-label="Dijkstra with a binary heap on 0 to 1 (2), 0 to 2 (5), 1 to 2 (1), 1 to 3 (7), 2 to 3 (3), from 0. Entries are (dist, vertex). pop (0,0): settle 0: queue empty; relax 0→1: dist[1] = 2: queue (2,1); relax 0→2: dist[2] = 5: queue (2,1) (5,2); pop (2,1): settle 1: queue (5,2); relax 1→2: 2 + 1 = 3 &lt; 5: queue (3,2) (5,2) stale; relax 1→3: dist[3] = 9: queue (3,2) (5,2) stale (9,3); pop (3,2): settle 2: queue (5,2) stale (9,3); relax 2→3: 3 + 3 = 6 &lt; 9: queue (5,2) stale (6,3) (9,3) stale; pop (5,2): 2 settled, skip: queue (6,3) (9,3) stale; pop (6,3): settle 3: queue (9,3) stale; pop (9,3): 3 settled, skip: queue empty. Final distances 0, 2, 3, 6; settle order 0, 1, 2, 3.">
+<text x="115" y="118" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">the graph, finished</text>
+<line x1="52.7" y1="182.7" x2="94.9" y2="159.2" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M101,155.8 L93.9,166.2 L88.5,156.3 Z" fill="#7c5cff"/>
+<line x1="52.7" y1="197.3" x2="94.9" y2="220.8" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M101,224.2 L91,223.8 L95.3,215.9 Z" fill="#8a93a6"/>
+<line x1="115" y1="163" x2="115" y2="209" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M115,216 L109.4,204.8 L120.6,204.8 Z" fill="#7c5cff"/>
+<line x1="128.1" y1="155.3" x2="170.3" y2="178.8" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M176.5,182.2 L166.4,181.8 L170.8,173.9 Z" fill="#8a93a6"/>
+<line x1="128.1" y1="224.7" x2="170.3" y2="201.2" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M176.5,197.8 L169.4,208.2 L163.9,198.3 Z" fill="#7c5cff"/>
+<circle cx="77.3" cy="169" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="77.3" y="173" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="77.3" cy="211" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="77.3" y="215" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="115" cy="190" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="115" y="194" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="152.7" cy="169" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="152.7" y="173" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="152.7" cy="211" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="152.7" y="215" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="39.6" cy="190" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="39.6" y="194.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="115" cy="148" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="115" y="152.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="115" cy="232" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="115" y="236.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">2</text>
+<circle cx="190.4" cy="190" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="190.4" y="194.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">3</text>
+<rect x="11" y="200.3" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="22" y="214.3" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="125.2" y="126" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="136.2" y="140" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">2</text>
+<rect x="125.2" y="235" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="136.2" y="249" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">3</text>
+<rect x="197" y="160.7" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="208" y="174.7" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">6</text>
+<text x="115" y="268" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">settle order: 0, 1, 2, 3</text>
+
+<text x="409.6" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">the priority queue after each step</text>
+<text x="415.2" y="47" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">pop (0,0): settle 0</text>
+<rect x="427.2" y="30" width="47.5" height="26" fill="#fff" stroke="#c8ccd6" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="451" y="47" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle" font-style="italic">empty</text>
+<text x="415.2" y="78" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">relax 0→1: dist[1] = 2</text>
+<rect x="427.2" y="61" width="46" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/>
+<text x="450.2" y="79" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">(2,1)</text>
+<text x="415.2" y="109" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">relax 0→2: dist[2] = 5</text>
+<rect x="427.2" y="92" width="46" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="450.2" y="110" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">(2,1)</text>
+<rect x="473.2" y="92" width="46" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/>
+<text x="496.2" y="110" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">(5,2)</text>
+<text x="415.2" y="140" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">pop (2,1): settle 1</text>
+<rect x="427.2" y="123" width="46" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="450.2" y="141" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">(5,2)</text>
+<text x="415.2" y="171" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">relax 1→2: 2 + 1 = 3 &lt; 5</text>
+<rect x="427.2" y="154" width="46" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/>
+<text x="450.2" y="172" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">(3,2)</text>
+<rect x="473.2" y="154" width="46" height="26" fill="#f4f5f8" stroke="#c6ccd8" stroke-width="2"/>
+<text x="496.2" y="172" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">(5,2)</text>
+<text x="415.2" y="202" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">relax 1→3: dist[3] = 9</text>
+<rect x="427.2" y="185" width="46" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="450.2" y="203" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">(3,2)</text>
+<rect x="473.2" y="185" width="46" height="26" fill="#f4f5f8" stroke="#c6ccd8" stroke-width="2"/>
+<text x="496.2" y="203" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">(5,2)</text>
+<rect x="519.2" y="185" width="46" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/>
+<text x="542.2" y="203" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">(9,3)</text>
+<text x="415.2" y="233" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">pop (3,2): settle 2</text>
+<rect x="427.2" y="216" width="46" height="26" fill="#f4f5f8" stroke="#c6ccd8" stroke-width="2"/>
+<text x="450.2" y="234" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">(5,2)</text>
+<rect x="473.2" y="216" width="46" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="496.2" y="234" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">(9,3)</text>
+<text x="415.2" y="264" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">relax 2→3: 3 + 3 = 6 &lt; 9</text>
+<rect x="427.2" y="247" width="46" height="26" fill="#f4f5f8" stroke="#c6ccd8" stroke-width="2"/>
+<text x="450.2" y="265" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">(5,2)</text>
+<rect x="473.2" y="247" width="46" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/>
+<text x="496.2" y="265" font-size="13.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">(6,3)</text>
+<rect x="519.2" y="247" width="46" height="26" fill="#f4f5f8" stroke="#c6ccd8" stroke-width="2"/>
+<text x="542.2" y="265" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">(9,3)</text>
+<text x="415.2" y="295" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">pop (5,2): 2 settled, skip</text>
+<rect x="427.2" y="278" width="46" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="450.2" y="296" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">(6,3)</text>
+<rect x="473.2" y="278" width="46" height="26" fill="#f4f5f8" stroke="#c6ccd8" stroke-width="2"/>
+<text x="496.2" y="296" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">(9,3)</text>
+<text x="415.2" y="326" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">pop (6,3): settle 3</text>
+<rect x="427.2" y="309" width="46" height="26" fill="#f4f5f8" stroke="#c6ccd8" stroke-width="2"/>
+<text x="450.2" y="327" font-size="13.5" font-weight="600" fill="#5c6270" text-anchor="middle">(9,3)</text>
+<text x="415.2" y="357" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">pop (9,3): 3 settled, skip</text>
+<rect x="427.2" y="340" width="47.5" height="26" fill="#fff" stroke="#c8ccd6" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="451" y="357" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle" font-style="italic">empty</text>
+<rect x="61.4" y="379" width="16" height="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/><text x="84.4" y="391" font-size="11" font-weight="400" fill="#2a2d36" text-anchor="start">just pushed</text>
+<rect x="173.6" y="379" width="16" height="16" fill="#f4f5f8" stroke="#c6ccd8" stroke-width="2"/><text x="196.6" y="391" font-size="11" font-weight="400" fill="#2a2d36" text-anchor="start">stale: its vertex has a smaller entry or is settled</text>
+</svg>
+<!-- /gen:wg worked -->
+        <figcaption>Every pop and push of the code above, with the priority queue after each step; entries are \((\texttt{dist}, \text{vertex})\).</figcaption>
+      </figure>
         Watch vertex \(2\): its label dropped from \(5\) to \(3\) via the
         \(1 \to 2\) edge <em>before</em> it settled: relaxation finding a
         better route just in time. Because \(2\) settles (at \(3\)) before \(3\)
@@ -825,56 +1210,89 @@ fn dijkstra(g: &amp;WGraph, s: usize) -&gt; Vec&lt;i64&gt; {
         assembled from whichever relaxation last lowered each label.
       </p>
       <figure>
-        <svg viewBox="0 0 420 300" role="img" aria-label="The shortest-paths tree Dijkstra computes from vertex 0, drawn on the same eight-vertex ring layout as the running graph. Seven tree edges are thick and green: edge from 0 to 1, edge from 0 to 3, edge from 1 to 2, edge from 3 to 4, edge from 4 to 5, edge from 4 to 7, and edge from 5 to 6. The four unused edges are thin and gray: edge from 0 to 5, edge from 1 to 3, edge from 2 to 3, and edge from 3 to 7. Beside each vertex is its final shortest distance from 0: vertex 0 has distance 0, vertex 1 has 4, vertex 2 has 5, vertex 3 has 6, vertex 4 has 8, vertex 5 has 11, vertex 6 has 20, and vertex 7 has 15.">
-          <defs>
-            <marker id="ahg" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L8,3 L0,6 Z" fill="#0a7d4d"/>
-            </marker>
-            <marker id="ahx" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L8,3 L0,6 Z" fill="#b8bec9"/>
-            </marker>
-          </defs>
-          <g stroke="#b8bec9" stroke-width="1.6" fill="none" marker-end="url(#ahx)">
-            <line x1="202" y1="58" x2="139" y2="209"/>  <!-- 0->5 (unused) -->
-            <line x1="289" y1="93" x2="289" y2="207"/>  <!-- 1->3 (unused) -->
-            <line x1="314" y1="170" x2="298" y2="209"/>  <!-- 2->3 (unused) -->
-            <line x1="274" y1="214" x2="146" y2="86"/>  <!-- 3->7 (unused) -->
-          </g>
-          <g stroke="#0a7d4d" stroke-width="2.6" fill="none" marker-end="url(#ahg)">
-            <line x1="230" y1="46" x2="269" y2="62"/>  <!-- 0->1 -->
-            <line x1="218" y1="58" x2="281" y2="209"/>  <!-- 0->3 -->
-            <line x1="298" y1="91" x2="314" y2="130"/>  <!-- 1->2 -->
-            <line x1="269" y1="238" x2="230" y2="254"/>  <!-- 3->4 -->
-            <line x1="190" y1="254" x2="151" y2="238"/>  <!-- 4->5 -->
-            <line x1="202" y1="242" x2="139" y2="91"/>  <!-- 4->7 -->
-            <line x1="122" y1="209" x2="106" y2="170"/>  <!-- 5->6 -->
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
-             fill="#0a7d4d" stroke="#fff" stroke-width="3" paint-order="stroke"
-             text-anchor="middle">
-            <text x="210" y="14">0</text>    <text x="318" y="66">4</text>
-            <text x="351" y="150">5</text>   <text x="318" y="234">6</text>
-            <text x="210" y="292">8</text>   <text x="101" y="234">11</text>
-            <text x="68" y="150">20</text>   <text x="101" y="66">15</text>
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
-            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
-              <circle cx="210" cy="38" r="19"/>  <circle cx="289" cy="71" r="19"/>
-              <circle cx="322" cy="150" r="19"/>  <circle cx="289" cy="229" r="19"/>
-              <circle cx="210" cy="262" r="19"/>  <circle cx="131" cy="229" r="19"/>
-              <circle cx="98" cy="150" r="19"/>  <circle cx="131" cy="71" r="19"/>
-            </g>
-            <g fill="#1a1c22" stroke="none">
-              <text x="210" y="43">0</text>  <text x="289" y="76">1</text>
-              <text x="322" y="155">2</text>  <text x="289" y="234">3</text>
-              <text x="210" y="267">4</text>  <text x="131" y="234">5</text>
-              <text x="98" y="155">6</text>  <text x="131" y="76">7</text>
-            </g>
-          </g>
-        </svg>
+        <!-- gen:wg spt-course -->
+<svg viewBox="0 0 360 270" role="img" style="max-width:432px" font-family="system-ui, sans-serif" aria-label="The shortest-paths tree from 0 on the course graph. Tree edges: 0 to 1, 0 to 3, 1 to 2, 3 to 4, 4 to 5, 4 to 7, 5 to 6. Unused edges: 0 to 5, 1 to 3, 2 to 3, 3 to 7. Final distances: 0, 4, 5, 6, 8, 11, 20, 15 for vertices 0 to 7.">
+<line x1="193.9" y1="38.7" x2="230.9" y2="54.1" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M237.3,56.8 L224.8,57.6 L229.1,47.3 Z" fill="#7c5cff"/>
+<line x1="185.7" y1="46.9" x2="243.3" y2="185.9" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M246,192.3 L236.5,184.1 L246.9,179.8 Z" fill="#7c5cff"/>
+<line x1="257.9" y1="76.7" x2="273.2" y2="113.8" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M275.9,120.2 L266.4,112 L276.8,107.7 Z" fill="#7c5cff"/>
+<line x1="252.1" y1="77.9" x2="252.1" y2="184.1" stroke="#c3c8d3" stroke-width="1.6" stroke-dasharray="5 4"/>
+<path d="M252.1,191.1 L247.6,182.1 L256.6,182.1 Z" fill="#c3c8d3"/>
+<line x1="276.3" y1="148.9" x2="260.9" y2="185.9" stroke="#c3c8d3" stroke-width="1.6" stroke-dasharray="5 4"/>
+<path d="M258.2,192.3 L257.5,182.3 L265.8,185.7 Z" fill="#c3c8d3"/>
+<line x1="174.3" y1="46.9" x2="116.7" y2="185.9" stroke="#c3c8d3" stroke-width="1.6" stroke-dasharray="5 4"/>
+<path d="M114,192.3 L113.3,182.3 L121.6,185.7 Z" fill="#c3c8d3"/>
+<line x1="238.3" y1="212.9" x2="201.2" y2="228.2" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M194.8,230.9 L203,221.4 L207.3,231.8 Z" fill="#7c5cff"/>
+<line x1="241.5" y1="196.5" x2="124.1" y2="79.1" stroke="#c3c8d3" stroke-width="1.6" stroke-dasharray="5 4"/>
+<path d="M119.2,74.2 L128.7,77.4 L122.4,83.7 Z" fill="#c3c8d3"/>
+<line x1="166.1" y1="231.3" x2="129.1" y2="215.9" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M122.7,213.2 L135.2,212.4 L130.9,222.7 Z" fill="#7c5cff"/>
+<line x1="102.1" y1="193.3" x2="86.8" y2="156.2" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M84.1,149.8 L93.6,158 L83.2,162.3 Z" fill="#7c5cff"/>
+<line x1="174.3" y1="223.1" x2="116.7" y2="84.1" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M114,77.7 L123.5,85.9 L113.1,90.2 Z" fill="#7c5cff"/>
+<circle cx="216.1" cy="47.9" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="216.1" y="51.9" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="216.1" cy="120.1" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="216.1" y="124.1" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="267.1" cy="98.9" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="267.1" y="102.9" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="252.1" cy="135" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="252.1" y="139" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="267.1" cy="171.1" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="267.1" y="175.1" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="143.9" cy="120.1" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="143.9" y="124.1" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="216.1" cy="222.1" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="216.1" y="226.1" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="180" cy="135" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="180" y="139" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="143.9" cy="222.1" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="143.9" y="226.1" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="92.9" cy="171.1" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="92.9" y="175.1" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="143.9" cy="149.9" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="143.9" y="153.9" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="180" cy="33" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="180" y="37.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="252.1" cy="62.9" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="252.1" y="67.7" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="282" cy="135" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="282" y="139.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">2</text>
+<circle cx="252.1" cy="207.1" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="252.1" y="211.9" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">3</text>
+<circle cx="180" cy="237" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="180" y="241.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">4</text>
+<circle cx="107.9" cy="207.1" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="107.9" y="211.9" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">5</text>
+<circle cx="78" cy="135" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="78" y="139.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">6</text>
+<circle cx="107.9" cy="62.9" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="107.9" y="67.7" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">7</text>
+<rect x="139" y="23.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="150" y="37.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="262.3" y="33.6" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="273.3" y="47.6" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">4</text>
+<rect x="301" y="125.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="312" y="139.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">5</text>
+<rect x="262.3" y="217.4" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="273.3" y="231.4" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">6</text>
+<rect x="190.2" y="240" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="201.2" y="254" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">8</text>
+<rect x="72.7" y="217.4" width="28" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="86.7" y="231.4" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">11</text>
+<rect x="34" y="125.5" width="28" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="48" y="139.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">20</text>
+<rect x="63.9" y="53.4" width="28" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="77.9" y="67.4" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">15</text>
+</svg>
+<!-- /gen:wg spt-course -->
         <figcaption>
-          The shortest-paths tree from \(0\) (green), with each vertex&rsquo;s final
-          distance beside it. The four gray edges (\(0\to5\), \(1\to3\),
+          The shortest-paths tree from \(0\) (purple), with each vertex&rsquo;s final
+          distance beside it. The four light dashed edges (\(0\to5\), \(1\to3\),
           \(2\to3\), \(3\to7\)) are never used, each beaten by a cheaper route
           through the tree.
         </figcaption>
@@ -939,6 +1357,48 @@ fn dijkstra(g: &amp;WGraph, s: usize) -&gt; Vec&lt;i64&gt; {
         from the invariant, \(\texttt{dist}[u] = \delta(u)\), and the induction
         extends to \(S \cup \{u\}\). <span class="qed">&#8718;</span>
       </div>
+      <figure>
+<!-- gen:wg cut -->
+<svg viewBox="0 0 410 186" role="img" style="max-width:492px" font-family="system-ui, sans-serif" aria-label="The proof's cut, on s to x (2), x to y (3), y to u (1), s to u (4). Settled S = {s, x} with dist 0 and 2; u is the nearest unsettled vertex (dist 4), y is unsettled (dist 5). The path P = s to x to y to u leaves S at its first edge x to y and costs 6, at least dist[y] = 5, at least dist[u] = 4.">
+<rect x="53" y="24" width="151.4" height="91" rx="18" fill="#f2faf5" stroke="#0a7d4d" stroke-width="1.4" stroke-dasharray="6 4"/><text x="63" y="38" font-size="11" font-weight="600" fill="#0a7d4d" text-anchor="start">S: settled</text>
+<line x1="96.8" y1="79" x2="147.3" y2="57.1" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M153.7,54.4 L145.6,64 L141.2,53.7 Z" fill="#e8590c"/>
+<line x1="183.4" y1="48" x2="255.2" y2="48" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M262.2,48 L251,53.6 L251,42.4 Z" fill="#e8590c"/>
+<line x1="278.2" y1="63" x2="278.2" y2="99" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M278.2,106 L272.6,94.8 L283.8,94.8 Z" fill="#e8590c"/>
+<line x1="97.7" y1="87.8" x2="255.6" y2="117.7" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M262.5,119 L250.4,122.5 L252.5,111.4 Z" fill="#7c5cff"/>
+<circle cx="125.7" cy="66.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="125.7" y="70.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="223.3" cy="48" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="223.3" y="52" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="278.2" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="278.2" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="180.6" cy="103.5" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="180.6" y="107.5" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="83" cy="85" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="83" y="89.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">s</text>
+<circle cx="168.4" cy="48" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="168.4" y="52.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">x</text>
+<circle cx="278.2" cy="48" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="278.2" y="52.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">y</text>
+<circle cx="278.2" cy="122" r="15" fill="#7c5cff" stroke="#7c5cff" stroke-width="2.4"/>
+<text x="278.2" y="126.8" font-size="13.5" font-weight="600" fill="#fff" text-anchor="middle">u</text>
+<rect x="46" y="75.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="57" y="89.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="157.4" y="11" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="168.4" y="25" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">2</text>
+<rect x="297.2" y="38.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="308.2" y="52.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">5</text>
+<rect x="297.2" y="112.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="308.2" y="126.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">4</text>
+
+<text x="205" y="173" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">P = s → x → y → u: cost 2 + 3 + 1 = 6 ≥ dist[y] = 5 ≥ dist[u] = 4</text>
+</svg>
+<!-- /gen:wg cut -->
+        <figcaption>The proof on a small graph, at the moment \(u\) is the nearest unsettled vertex: the path \(P\) leaves \(S\) at \(x \to y\), and its cost bounds \(\texttt{dist}[y]\), which bounds \(\texttt{dist}[u]\).</figcaption>
+      </figure>
       <p>
         The theorem also explains the speed. Because a settled distance is provably
         final, no vertex is ever settled twice and no out-edge is ever relaxed
@@ -978,11 +1438,68 @@ fn dijkstra(g: &amp;WGraph, s: usize) -&gt; Vec&lt;i64&gt; {
       </p>
       <div class="ex">
         <span class="tag">Example (Dijkstra settles too early)</span>
-        <pre>  s ──1──→ a        edges:  s→a (1),  s→b (2),  b→a (−4)
-  │        ↑
-  2       −4        greedy from s: settle s(0); nearest is a(1),
-  │        │        declared FINAL. Then settle b(2); relax b→a:
-  └──→ b ──┘        2 + (−4) = −2 &lt; 1, but a is already settled.</pre>
+        On \(s \to a\,(1)\), \(s \to b\,(2)\), \(b \to a\,(-4)\), from \(s\): Dijkstra
+        settles \(s\) at \(0\), then the nearest, \(a\) at \(1\), declared final; only
+        then does \(b\) settle at \(2\) and offer \(a\) the route \(2 + (-4) = -2\).
+        <figure>
+<!-- gen:wg neg -->
+<svg viewBox="0 0 526 166" role="img" style="max-width:631px" font-family="system-ui, sans-serif" aria-label="s to a (1), s to b (2), b to a (minus 4). Dijkstra settles a at distance 1 before b; when b settles at 2, the edge b to a offers 2 + (minus 4) = minus 2, but a is already settled, so Dijkstra reports 1. The true shortest path is s to b to a, cost minus 2.">
+<text x="133" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">Dijkstra</text>
+<line x1="61" y1="53" x2="197" y2="53" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M204,53 L192.8,58.6 L192.8,47.4 Z" fill="#7c5cff"/>
+<line x1="58.1" y1="61.9" x2="114.5" y2="103.4" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M120.1,107.5 L107.7,105.4 L114.4,96.3 Z" fill="#7c5cff"/>
+<line x1="145.1" y1="108.1" x2="201.5" y2="66.6" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M207.1,62.5 L201.4,73.7 L194.7,64.6 Z" fill="#e8590c"/>
+<circle cx="133" cy="53" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="133" y="57" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="89.5" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="89.5" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="176.5" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="176.5" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">−4</text>
+<circle cx="46" cy="53" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="46" y="57.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">s</text>
+<circle cx="220" cy="53" r="15" fill="#fdeaea" stroke="#b3261e" stroke-width="2.4"/>
+<text x="220" y="57.8" font-size="13.5" font-weight="600" fill="#b3261e" text-anchor="middle">a</text>
+<circle cx="133" cy="117" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="133" y="121.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">b</text>
+<rect x="35" y="71.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="46" y="85.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="220" y="63.3" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="231" y="77.3" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">1</text>
+<rect x="122" y="79.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="133" y="93.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">2</text>
+<text x="133" y="153" font-size="11.5" font-weight="600" fill="#b3261e" text-anchor="middle">settles a at 1 first; b → a still relaxes</text>
+
+<text x="406" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">the shortest paths</text>
+<line x1="334" y1="53" x2="470" y2="53" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M477,53 L468,57.5 L468,48.5 Z" fill="#8a93a6"/>
+<line x1="331.1" y1="61.9" x2="387.5" y2="103.4" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M393.1,107.5 L380.7,105.4 L387.4,96.3 Z" fill="#7c5cff"/>
+<line x1="418.1" y1="108.1" x2="474.5" y2="66.6" stroke="#7c5cff" stroke-width="3.4"/>
+<path d="M480.1,62.5 L474.4,73.7 L467.7,64.6 Z" fill="#7c5cff"/>
+<circle cx="406" cy="53" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="406" y="57" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="362.5" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="362.5" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="449.5" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="449.5" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">−4</text>
+<circle cx="319" cy="53" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="319" y="57.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">s</text>
+<circle cx="493" cy="53" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="493" y="57.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">a</text>
+<circle cx="406" cy="117" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="406" y="121.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">b</text>
+<rect x="308" y="71.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="319" y="85.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="479" y="71.5" width="28" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="493" y="85.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">−2</text>
+<rect x="395" y="79.5" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="406" y="93.5" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">2</text>
+<text x="406" y="153" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">s → b → a = 2 + (−4) = −2</text>
+</svg>
+<!-- /gen:wg neg -->
+      </figure>
         Vertex \(a\) settles at distance \(1\), but the true shortest route
         \(s \to b \to a\) costs \(2 + (-4) = -2\). The cheaper route arrives after
         \(a\) is frozen, so Dijkstra silently returns \(1\), not \(-2\). Nothing
@@ -1008,9 +1525,64 @@ fn dijkstra(g: &amp;WGraph, s: usize) -&gt; Vec&lt;i64&gt; {
         When weights may be negative, drop the greedy shortcut and relax blindly:
         pass over <em>all</em> \(E\) edges, \(V-1\) times.
       </p>
-      <pre>  for i in 1 .. V-1:
-      for each edge (u, v, w):
-          relax(u, v, w)</pre>
+      <div class="code-tabs" data-snippet="graphs/bellman-rounds">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Bellman-Ford&#x27;s core: relax every edge, V - 1 times (relax as above).
+// Negative weights are fine.
+void bellmanFordRounds(WGraph&amp; g, int s, vector&lt;long&gt;&amp; dist, vector&lt;int&gt;&amp; parent) {
+    dist.assign(g.V, LONG_MAX);              // LONG_MAX plays infinity
+    parent.assign(g.V, -1);
+    dist[s] = 0;
+    for (int round = 1; round &lt;= g.V - 1; round++)
+        for (int u = 0; u &lt; g.V; u++)        // every edge, u by u
+            for (Edge e : g.adj[u])
+                relax(dist, parent, u, e.to, e.w);
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Bellman-Ford&#x27;s core: relax every edge, V - 1 times (relax as above).
+// Negative weights are fine.
+static void bellmanFordRounds(WGraph g, int s, long[] dist, int[] parent) {
+    Arrays.fill(dist, Long.MAX_VALUE);       // MAX_VALUE plays infinity
+    Arrays.fill(parent, -1);
+    dist[s] = 0;
+    for (int round = 1; round &lt;= g.V - 1; round++)
+        for (int u = 0; u &lt; g.V; u++)        // every edge, u by u
+            for (Edge e : g.adj.get(u))
+                relax(dist, parent, u, e.to, e.w);
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Bellman-Ford&#x27;s core: relax every edge, V - 1 times (relax as above).
+# Negative weights are fine.
+def bellman_ford_rounds(g, s):
+    dist = [float(&quot;inf&quot;)] * g.V
+    parent = [None] * g.V
+    dist[s] = 0
+    for _round in range(g.V - 1):
+        for u in range(g.V):                 # every edge, u by u
+            for v, w in g.adj[u]:
+                relax(dist, parent, u, v, w)
+    return dist, parent</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Bellman-Ford&#x27;s core: relax every edge, V - 1 times (relax as above).
+// Negative weights are fine.
+fn bellman_ford_rounds(g: &amp;WGraph, s: usize) -&gt; (Vec&lt;i64&gt;, Vec&lt;Option&lt;usize&gt;&gt;) {
+    let n = g.adj.len();
+    let mut dist = vec![i64::MAX; n];        // i64::MAX plays infinity
+    let mut parent = vec![None; n];
+    dist[s] = 0;
+    for _round in 1..n {
+        for u in 0..n {                      // every edge, u by u
+            for &amp;(v, w) in &amp;g.adj[u] {
+                relax(&amp;mut dist, &amp;mut parent, u, v, w);
+            }
+        }
+    }
+    (dist, parent)
+}</pre>
+<p class="ct-src">source: <code>code/graphs/bellman-rounds.cpp &middot; code/graphs/bellman-rounds.java &middot; code/graphs/bellman-rounds.py &middot; code/graphs/bellman-rounds.rs</code></p>
+<!--/ct--></div>
       <p>
         A shortest path has at most \(V-1\) edges, and one can show that after round
         \(i\) every shortest path using at most \(i\) edges is final; so \(V-1\)
@@ -1084,7 +1656,9 @@ fn dijkstra(g: &amp;WGraph, s: usize) -&gt; Vec&lt;i64&gt; {
         <strong>heuristic</strong> \(h(u)\) estimating the cost still to go, so it
         expands toward the goal first:
       </p>
-      <pre>  priority = dist[u] + h(u)          <span class="cm">// h(u) &asymp; remaining cost to the target</span></pre>
+      \[
+        \text{priority}(u) = \texttt{dist}[u] + h(u), \qquad h(u) \approx \text{the cost still to go from } u \text{ to the target.}
+      \]
       <p>
         What is \(h\), and how is it computed? <em>Not from the graph</em>:
         knowing the true remaining cost is the very problem being solved. It comes
@@ -1272,7 +1846,7 @@ fn dijkstra(g: &amp;WGraph, s: usize) -&gt; Vec&lt;i64&gt; {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Dijkstra&rsquo;s Algorithm v1.0
+        Data Structures &amp; Algorithms &middot; Dijkstra&rsquo;s Algorithm v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

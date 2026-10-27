@@ -2,7 +2,7 @@
   TOPIC · Dijkstra: correctness and limits.
   Teaches: the correctness proof; where negative weights break it; Bellman-Ford for negative weights; negative cycles; Dijkstra against BFS; choosing a shortest-path algorithm; A* in one slide.
   Needs:   Dijkstra's algorithm.
-  Demos:   dijkstra-neg (slide spec); bellman-ford (registry demo, slide spec in demos.js)
+  Demos:   dijkstra-neg (slide spec); bellman-ford (registry demo, slide spec in demos.js); figures wg-cut, wg-neg, wg-negcycle (tools/gen-wgraph-figures.mjs)
   Program: none
   Budget:  ~20 min, 10 slides.
   Ported from Summer 2026 L09-graphs-dijkstra.md, parts 5.
@@ -18,44 +18,45 @@
 
 ## The proof: setup
 
-Let S = the settled set. **Induction hypothesis: `dist[x] = δ(x)` for every x ∈ S**: true at the start (S = {s}, dist[s] = 0). Dijkstra is about to settle **u**, the nearest unsettled vertex. **Claim: dist[u] = δ(u) too.**
+**Hypothesis:** $\mathit{dist}[x] = \delta(x)$ for every settled $x \in S$ (at the start, $S = \lbrace s \rbrace$). Dijkstra now settles $u$, the nearest unsettled vertex. **Claim:** $\mathit{dist}[u] = \delta(u)$.
 
-```text
+Any path $P$ to $u$ leaves $S$ by a **first** edge $x \to y$, with $x \in S$, $y \notin S$:
+
+<div><img src="../../topics/figures/wgraphs/wg-cut.svg" style="height:200px" alt="
    take ANY path P from s to u.
    P starts inside S (at s) and ends outside (at u)
    → P crosses the boundary somewhere:
-
-   let  x → y  be P's FIRST edge with  x ∈ S,  y ∉ S
-```
+   let  x → y  be P's FIRST edge with  x ∈ S,  y ∉ S"></div>
 
 --
 
 ## The proof: the chain
 
-```text
-   cost(P) =  cost(s ⇝ x)  +  w(x→y)  +  cost(y ⇝ u)
+$$\mathit{cost}(P) = \mathit{cost}(s \leadsto x) + w(x, y) + \mathit{cost}(y \leadsto u)$$
 
-           ≥     δ(x)      +  w(x→y)  +  0      ← weights ≥ 0
-           =   dist[x]     +  w(x→y)            ← IH: x ∈ S
-           ≥   dist[y]                 ← x→y relaxed when x settled
-           ≥   dist[u]                 ← u is the NEAREST unsettled
+$$
+\begin{alignedat}{2}
+\mathit{cost}(P) &\ge \delta(x) + w(x, y) + 0 &\qquad& \text{every weight} \ge 0 \\\\
+&= \mathit{dist}[x] + w(x, y) && \text{hypothesis: } x \in S \\\\
+&\ge \mathit{dist}[y] && x \to y \text{ relaxed when } x \text{ settled} \\\\
+&\ge \mathit{dist}[u] && u \text{ is the nearest unsettled}
+\end{alignedat}
+$$
 
-   every path to u costs ≥ dist[u]  ⇒  dist[u] = δ(u)  ∎
-```
+Every path to $u$ costs at least $\mathit{dist}[u]$, so $\mathit{dist}[u] = \delta(u). \enspace \blacksquare$
 
 --
 
 ## Where negative weights break it
 
-```text
+<div><img src="../../topics/figures/wgraphs/wg-neg.svg" style="height:215px" alt="
    s ──1──→ a        greedy settles a at dist 1: final!
    │        ↑
    2       −4        but s→b→a = 2 + (−4) = −2
    │        │        the cheaper route arrives too late
-   └──→ b ──┘
-```
+   └──→ b ──┘"></div>
 
-The proof's `cost(y ⇝ u) ≥ 0` line **fails**: a negative tail CAN undercut a settled label. **Dijkstra silently returns 1, not −2.**
+The proof's $\mathit{cost}(y \leadsto u) \ge 0$ line **fails**: a negative tail **can** undercut a settled label. **Dijkstra silently returns 1, not −2.**
 
 --
 
@@ -74,17 +75,25 @@ The proof's `cost(y ⇝ u) ≥ 0` line **fails**: a negative tail CAN undercut a
 
 --
 
-## Bellman-Ford (for negative weights)
+## Bellman-Ford
 
-Relax **every edge, V−1 times**:
+For negative weights: relax **every edge, $V - 1$ times**.
 
-```text
-   for i in 1..V-1:
-       for each edge (u,v,w):
-           relax(u, v, w)
+```cpp
+struct WEdge { int from, to, w; };
+vector<WEdge> edges;                          // every edge, in input order
+
+void bellmanFord(int s) {
+    dist.assign(V, INF);
+    dist[s] = 0;
+    for (int round = 1; round <= V - 1; round++)
+        for (WEdge e : edges)                 // relax every edge
+            if (dist[e.from] != INF && dist[e.from] + e.w < dist[e.to])
+                dist[e.to] = dist[e.from] + e.w;
+}
 ```
 
-Handles negative weights; detects **negative cycles**. Slower: **O(V·E)**. Round i finalizes every shortest path of **≤ i edges**.
+Handles negative weights; detects **negative cycles**. Slower: $O(VE)$. Round $i$ finalizes every shortest path of **at most $i$ edges**.
 
 --
 
@@ -102,27 +111,26 @@ round 2: nothing changes → stop early; dist = 0, −2, 2
 
 ## Negative cycles
 
-If a cycle's weights **sum to negative**, "shortest path" is **undefined**: loop it forever, cost → −∞:
+If a cycle's weights **sum to negative**, "shortest path" is **undefined**: loop it forever and the cost goes to $-\infty$:
 
-```text
+<div><img src="../../topics/figures/wgraphs/wg-negcycle.svg" style="height:220px" alt="
    a → b → c → a   with total weight −2
-   each lap subtracts 2 → no minimum exists
-```
+   each lap subtracts 2 → no minimum exists"></div>
 
-Bellman-Ford **detects** this: an edge still relaxing on a **V-th** pass → a negative cycle.
+Bellman-Ford **detects** this: an edge that still relaxes on a **$V$-th** pass proves a negative cycle.
 
 --
 
 ## Dijkstra vs BFS
 
-BFS is **Dijkstra with all weights = 1**:
+BFS is **Dijkstra with every weight 1**:
 
 | | BFS | Dijkstra |
 |---|---|---|
 | edge weights | all 1 | nonnegative |
 | frontier | **queue** | **priority queue** |
 | gives | fewest edges | least weight |
-| cost | Θ(V+E) | O(E log V) |
+| cost | $\Theta(V + E)$ | $O(E \log V)$ |
 
 Same algorithm; the PQ replaces the plain queue.
 
@@ -132,26 +140,21 @@ Same algorithm; the PQ replaces the plain queue.
 
 | situation | use | cost |
 |---|---|---|
-| unweighted | **BFS** | Θ(V+E) |
-| DAG (any weights) | **topo-order relax** | Θ(V+E) |
-| nonnegative, sparse | **Dijkstra + heap** | O(E log V) |
-| nonnegative, dense | **Dijkstra + array** | O(V²) |
-| negative weights | **Bellman-Ford** | O(V·E) |
+| unweighted | **BFS** | $\Theta(V + E)$ |
+| DAG (any weights) | **topo-order relax** | $\Theta(V + E)$ |
+| nonnegative, sparse | **Dijkstra + heap** | $O(E \log V)$ |
+| nonnegative, dense | **Dijkstra + array** | $O(V^2)$ |
+| negative weights | **Bellman-Ford** | $O(VE)$ |
 
 --
 
 ## A*: Dijkstra with a hint
 
-Point-to-point on a **road map**. Every vertex has **coordinates**: cheap knowledge from *outside* the graph:
+Point-to-point on a **road map**, where every vertex has **coordinates**. Let $h(u)$ = the straight-line distance from $u$ to the target $t$, an estimate of the cost still to go:
 
-```text
-   h(u) = straight-line distance u → target t
-        = √( (xᵤ−xₜ)² + (yᵤ−yₜ)² )
-          O(1), from coordinates: NOT from the edges
+$$h(u) = \sqrt{(x\_u - x\_t)^2 + (y\_u - y\_t)^2}$$
 
-   priority = dist[u] + h(u)      h(u) = cost still to go,
-                                  estimated
-```
+$O(1)$ from the coordinates, **not** from the edges. The priority becomes $\mathit{dist}[u] + h(u)$.
 
-**One changed line** of the Dijkstra code: `PQ.push({dist[v] + h(v), v})`: and the frontier leans **toward the goal**.
+**One changed line** of the Dijkstra code, `pq.push({dist[v] + h(v), v})`, and the frontier leans **toward the goal**.
 

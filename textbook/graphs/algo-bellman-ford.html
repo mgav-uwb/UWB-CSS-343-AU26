@@ -175,10 +175,48 @@
         Keep a tentative distance \(\texttt{dist}[v]\) for every vertex,
         initialized to \(\texttt{dist}[s] = 0\) and \(\infty\) elsewhere. To
         <strong>relax</strong> an edge \(u \to v\) of weight \(w\):
-        <pre>  if (dist[u] + w &lt; dist[v]) {
-      dist[v] = dist[u] + w;   <span class="cm">// found a cheaper route to v</span>
-      parent[v] = u;           <span class="cm">// remember the edge, for the path</span>
-  }</pre>
+        <div class="code-tabs" data-snippet="graphs/relax-edge">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Relax the edge u -&gt; v of weight w: if the route through u is cheaper,
+// take it. LONG_MAX plays infinity; an unreached u offers nothing.
+void relax(vector&lt;long&gt;&amp; dist, vector&lt;int&gt;&amp; parent, int u, int v, long w) {
+    if (dist[u] == LONG_MAX) return;     // no route to u yet
+    if (dist[u] + w &lt; dist[v]) {
+        dist[v] = dist[u] + w;           // found a cheaper route to v
+        parent[v] = u;                   // remember the edge, for the path
+    }
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Relax the edge u -&gt; v of weight w: if the route through u is cheaper,
+// take it. Long.MAX_VALUE plays infinity; an unreached u offers nothing.
+static void relax(long[] dist, int[] parent, int u, int v, long w) {
+    if (dist[u] == Long.MAX_VALUE) return;   // no route to u yet
+    if (dist[u] + w &lt; dist[v]) {
+        dist[v] = dist[u] + w;               // found a cheaper route to v
+        parent[v] = u;                       // remember the edge, for the path
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Relax the edge u -&gt; v of weight w: if the route through u is cheaper,
+# take it. (inf + w is inf, so an unreached u offers nothing.)
+def relax(dist, parent, u, v, w):
+    if dist[u] + w &lt; dist[v]:
+        dist[v] = dist[u] + w            # found a cheaper route to v
+        parent[v] = u                    # remember the edge, for the path</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Relax the edge u -&gt; v of weight w: if the route through u is cheaper,
+// take it. i64::MAX plays infinity; an unreached u offers nothing.
+fn relax(dist: &amp;mut [i64], parent: &amp;mut [Option&lt;usize&gt;], u: usize, v: usize, w: i64) {
+    if dist[u] == i64::MAX { return; }   // no route to u yet
+    if dist[u] + w &lt; dist[v] {
+        dist[v] = dist[u] + w;           // found a cheaper route to v
+        parent[v] = Some(u);             // remember the edge, for the path
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/relax-edge.cpp &middot; code/graphs/relax-edge.java &middot; code/graphs/relax-edge.py &middot; code/graphs/relax-edge.rs</code></p>
+<!--/ct--></div>
         Relaxation never raises a label, and a finite label is always the cost of
         some real route from \(s\) (append the relaxed edge to the route that set
         \(\texttt{dist}[u]\)). When <em>no</em> edge in the graph can be relaxed,
@@ -265,58 +303,56 @@
         source \(0\), with one negative edge \(4 \to 3\) of weight \(-5\).
       </p>
       <figure>
-        <svg viewBox="0 0 460 300" role="img" aria-label="The running weighted digraph on five vertices. Vertex 0 is at the left, vertices 1 and 3 along the top, vertices 2 and 4 along the bottom. The nine directed edges and weights are: 0 to 1 weight 4, 0 to 2 weight 2, 1 to 2 weight 3, 2 to 1 weight 1, 1 to 3 weight 2, 1 to 4 weight 3, 2 to 3 weight 4, 2 to 4 weight 5, and 4 to 3 weight minus 5, the negative edge, drawn in red.">
-          <defs>
-            <marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L8,3 L0,6 Z" fill="#4a5163"/>
-            </marker>
-            <marker id="ahr" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L8,3 L0,6 Z" fill="#b3261e"/>
-            </marker>
-          </defs>
-          <g stroke="#4a5163" stroke-width="1.8" fill="none" marker-end="url(#ah)">
-            <line x1="73" y1="138" x2="167" y2="73"/>    <!-- 0->1 -->
-            <line x1="73" y1="163" x2="167" y2="227"/>   <!-- 0->2 -->
-            <line x1="177" y1="82" x2="177" y2="218"/>   <!-- 1->2 -->
-            <line x1="193" y1="218" x2="193" y2="82"/>   <!-- 2->1 -->
-            <line x1="207" y1="60" x2="378" y2="60"/>    <!-- 1->3 -->
-            <line x1="202" y1="74" x2="383" y2="226"/>   <!-- 1->4 -->
-            <line x1="202" y1="226" x2="383" y2="74"/>   <!-- 2->3 -->
-            <line x1="207" y1="240" x2="378" y2="240"/>  <!-- 2->4 -->
-          </g>
-          <g stroke="#b3261e" stroke-width="2.2" fill="none" marker-end="url(#ahr)">
-            <line x1="400" y1="218" x2="400" y2="82"/>   <!-- 4->3, negative -->
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
-             fill="#0a7d4d" stroke="#fff" stroke-width="3" paint-order="stroke"
-             text-anchor="middle">
-            <text x="112" y="99">4</text>     <!-- 0->1 -->
-            <text x="112" y="211">2</text>    <!-- 0->2 -->
-            <text x="164" y="154">3</text>    <!-- 1->2 -->
-            <text x="207" y="154">1</text>    <!-- 2->1 -->
-            <text x="292" y="52">2</text>     <!-- 1->3 -->
-            <text x="238" y="106">3</text>    <!-- 1->4 -->
-            <text x="238" y="204">4</text>    <!-- 2->3 -->
-            <text x="292" y="257">5</text>    <!-- 2->4 -->
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="13" font-weight="700"
-             fill="#b3261e" stroke="#fff" stroke-width="3" paint-order="stroke"
-             text-anchor="middle">
-            <text x="421" y="154">&minus;5</text> <!-- 4->3 -->
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="15" font-weight="600" text-anchor="middle">
-            <g fill="#fff" stroke="#2a2d36" stroke-width="1.6">
-              <circle cx="55" cy="150" r="19"/>   <circle cx="185" cy="60" r="19"/>
-              <circle cx="185" cy="240" r="19"/>  <circle cx="400" cy="60" r="19"/>
-              <circle cx="400" cy="240" r="19"/>
-            </g>
-            <g fill="#1a1c22" stroke="none">
-              <text x="55" y="155">0</text>   <text x="185" y="65">1</text>
-              <text x="185" y="245">2</text>  <text x="400" y="65">3</text>
-              <text x="400" y="245">4</text>
-            </g>
-          </g>
-        </svg>
+        <!-- gen:wg bf-running -->
+<svg viewBox="0 0 350 170" role="img" style="max-width:420px" font-family="system-ui, sans-serif" aria-label="The running digraph on five vertices: 0 at the left, 1 and 3 along the top, 2 and 4 along the bottom. Edges: 0 to 1 (4), 0 to 2 (2), 1 to 2 (3), 1 to 3 (2), 1 to 4 (3), 2 to 1 (1), 2 to 3 (4), 2 to 4 (5), and the negative edge 4 to 3 (minus 5), in red.">
+<line x1="46.5" y1="78.5" x2="120.2" y2="43" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M126.5,39.9 L120.4,47.9 L116.4,39.8 Z" fill="#8a93a6"/>
+<line x1="46.5" y1="91.5" x2="120.2" y2="127" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M126.5,130.1 L116.4,130.2 L120.4,122.1 Z" fill="#8a93a6"/>
+<path d="M146.8,46.8 Q162.9,85 149.9,115.8" fill="none" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M147.2,122.3 L146.5,112.2 L154.8,115.7 Z" fill="#8a93a6"/>
+<line x1="155.9" y1="33" x2="294" y2="33" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M301,33 L292,37.5 L292,28.5 Z" fill="#8a93a6"/>
+<line x1="153.8" y1="40.6" x2="297.2" y2="125.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M303.2,128.9 L293.2,128.2 L297.8,120.4 Z" fill="#8a93a6"/>
+<path d="M135.1,123.2 Q118.9,85 132,54.2" fill="none" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M134.7,47.7 L135.3,57.8 L127,54.3 Z" fill="#8a93a6"/>
+<line x1="153.8" y1="129.4" x2="297.2" y2="44.7" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M303.2,41.1 L297.8,49.6 L293.2,41.8 Z" fill="#8a93a6"/>
+<line x1="155.9" y1="137" x2="294" y2="137" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M301,137 L292,141.5 L292,132.5 Z" fill="#8a93a6"/>
+<line x1="317" y1="122" x2="317" y2="56" stroke="#b3261e" stroke-width="2.975"/>
+<path d="M317,49 L322.6,60.3 L311.4,60.3 Z" fill="#b3261e"/>
+<circle cx="87" cy="59" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="87" y="63" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="87" cy="111" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="87" y="115" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="151.9" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="151.9" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="229" cy="33" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="229" y="37" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="214.9" cy="76.7" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="214.9" y="80.7" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="129.9" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="129.9" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="243" cy="76.7" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="243" y="80.7" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="229" cy="137" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="229" y="141" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="317" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="317" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">−5</text>
+<circle cx="33" cy="85" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="33" y="89.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="140.9" cy="33" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="140.9" y="37.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="140.9" cy="137" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="140.9" y="141.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="317" cy="33" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="317" y="37.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="317" cy="137" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="317" y="141.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+</svg>
+<!-- /gen:wg bf-running -->
         <figcaption>
           The running graph. Edge list, in the scan order used by every trace
           below: \(0\to1\,(4)\), \(0\to2\,(2)\), \(1\to2\,(3)\), \(1\to3\,(2)\),
@@ -639,10 +675,167 @@ fn bellman_ford(g: &amp;WGraph, s: usize) -&gt; Result&lt;Vec&lt;i64&gt;, ()&gt;
         Take the path \(0 \to 1 \to 2 \to 3\), each edge of weight \(1\), source
         \(0\). Scanned <em>against</em> the path direction, order
         \(2\to3,\ 1\to2,\ 0\to1\):
-        <pre>  round 1:  2&rarr;3: dist[2]=&infin;, skip     1&rarr;2: dist[1]=&infin;, skip     0&rarr;1: 0+1=1&lt;&infin; &rArr; dist[1]=1
-  round 2:  2&rarr;3: dist[2]=&infin;, skip     1&rarr;2: 1+1=2&lt;&infin; &rArr; dist[2]=2   0&rarr;1: 1 &ge; 1, no change
-  round 3:  2&rarr;3: 2+1=3&lt;&infin; &rArr; dist[3]=3   1&rarr;2: 2 &ge; 2   0&rarr;1: 1 &ge; 1
-  final:    dist = [0, 1, 2, 3]  after the full V-1 = 3 rounds</pre>
+        <figure>
+<!-- gen:wg bf-order -->
+<svg viewBox="0 0 564 460" role="img" style="max-width:677px" font-family="system-ui, sans-serif" aria-label="Bellman-Ford on the path 0 to 1 to 2 to 3, every weight 1, from 0. Edges scanned against the path (2 to 3, 1 to 2, 0 to 1): round 1 relaxes 0 to 1 (labels 0, 1, inf, inf), round 2 relaxes 1 to 2 (0, 1, 2, inf), round 3 relaxes 2 to 3 (0, 1, 2, 3): all V - 1 = 3 rounds. Scanned with the path (0 to 1, 1 to 2, 2 to 3): round 1 relaxes all three (0, 1, 2, 3), round 2 relaxes nothing and the run stops.">
+<text x="251.3" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">scanned against the path: 2→3, 1→2, 0→1</text>
+<text x="53.4" y="71" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">round 1</text>
+<line x1="295.1" y1="67" x2="346.4" y2="67" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M353.4,67 L344.4,71.5 L344.4,62.5 Z" fill="#8a93a6"/>
+<line x1="205.7" y1="67" x2="257.1" y2="67" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M264.1,67 L255.1,71.5 L255.1,62.5 Z" fill="#8a93a6"/>
+<line x1="116.4" y1="67" x2="167.7" y2="67" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M174.7,67 L163.5,72.6 L163.5,61.4 Z" fill="#e8590c"/>
+<circle cx="324.7" cy="67" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="324.7" y="71" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="235.4" cy="67" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="235.4" y="71" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="146.1" cy="67" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="146.1" y="71" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="101.4" cy="67" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="101.4" y="71.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="190.7" cy="67" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="190.7" y="71.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="280.1" cy="67" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="280.1" y="71.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="369.4" cy="67" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="369.4" y="71.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="90.4" y="31" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="101.4" y="45" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="179.7" y="31" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="190.7" y="45" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">1</text>
+<rect x="269.1" y="31" width="22" height="19" rx="9.5" fill="#fff" stroke="#c6ccd8" stroke-width="1.3"/>
+<text x="280.1" y="45" font-size="15" font-weight="700" fill="#5c6270" text-anchor="middle">∞</text>
+<rect x="358.4" y="31" width="22" height="19" rx="9.5" fill="#fff" stroke="#c6ccd8" stroke-width="1.3"/>
+<text x="369.4" y="45" font-size="15" font-weight="700" fill="#5c6270" text-anchor="middle">∞</text>
+<text x="419.4" y="71" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">relaxed: 0→1</text>
+<text x="53.4" y="149" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">round 2</text>
+<line x1="295.1" y1="145" x2="346.4" y2="145" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M353.4,145 L344.4,149.5 L344.4,140.5 Z" fill="#8a93a6"/>
+<line x1="205.7" y1="145" x2="257.1" y2="145" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M264.1,145 L252.8,150.6 L252.8,139.4 Z" fill="#e8590c"/>
+<line x1="116.4" y1="145" x2="167.7" y2="145" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M174.7,145 L165.7,149.5 L165.7,140.5 Z" fill="#8a93a6"/>
+<circle cx="324.7" cy="145" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="324.7" y="149" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="235.4" cy="145" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="235.4" y="149" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="146.1" cy="145" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="146.1" y="149" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="101.4" cy="145" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="101.4" y="149.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="190.7" cy="145" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="190.7" y="149.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="280.1" cy="145" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="280.1" y="149.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="369.4" cy="145" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="369.4" y="149.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="90.4" y="109" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="101.4" y="123" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="179.7" y="109" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="190.7" y="123" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">1</text>
+<rect x="269.1" y="109" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="280.1" y="123" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">2</text>
+<rect x="358.4" y="109" width="22" height="19" rx="9.5" fill="#fff" stroke="#c6ccd8" stroke-width="1.3"/>
+<text x="369.4" y="123" font-size="15" font-weight="700" fill="#5c6270" text-anchor="middle">∞</text>
+<text x="419.4" y="149" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">relaxed: 1→2</text>
+<text x="53.4" y="227" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">round 3</text>
+<line x1="295.1" y1="223" x2="346.4" y2="223" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M353.4,223 L342.1,228.6 L342.1,217.4 Z" fill="#e8590c"/>
+<line x1="205.7" y1="223" x2="257.1" y2="223" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M264.1,223 L255.1,227.5 L255.1,218.5 Z" fill="#8a93a6"/>
+<line x1="116.4" y1="223" x2="167.7" y2="223" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M174.7,223 L165.7,227.5 L165.7,218.5 Z" fill="#8a93a6"/>
+<circle cx="324.7" cy="223" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="324.7" y="227" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="235.4" cy="223" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="235.4" y="227" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="146.1" cy="223" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="146.1" y="227" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="101.4" cy="223" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="101.4" y="227.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="190.7" cy="223" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="190.7" y="227.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="280.1" cy="223" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="280.1" y="227.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="369.4" cy="223" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="369.4" y="227.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="90.4" y="187" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="101.4" y="201" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="179.7" y="187" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="190.7" y="201" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">1</text>
+<rect x="269.1" y="187" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="280.1" y="201" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">2</text>
+<rect x="358.4" y="187" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="369.4" y="201" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">3</text>
+<text x="419.4" y="227" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">relaxed: 2→3</text>
+<text x="281.8" y="291" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">scanned with the path: 0→1, 1→2, 2→3</text>
+<text x="53.4" y="339" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">round 1</text>
+<line x1="116.4" y1="335" x2="167.7" y2="335" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M174.7,335 L163.5,340.6 L163.5,329.4 Z" fill="#e8590c"/>
+<line x1="205.7" y1="335" x2="257.1" y2="335" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M264.1,335 L252.8,340.6 L252.8,329.4 Z" fill="#e8590c"/>
+<line x1="295.1" y1="335" x2="346.4" y2="335" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M353.4,335 L342.1,340.6 L342.1,329.4 Z" fill="#e8590c"/>
+<circle cx="146.1" cy="335" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="146.1" y="339" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="235.4" cy="335" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="235.4" y="339" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="324.7" cy="335" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="324.7" y="339" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="101.4" cy="335" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="101.4" y="339.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="190.7" cy="335" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="190.7" y="339.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="280.1" cy="335" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="280.1" y="339.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="369.4" cy="335" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="369.4" y="339.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="90.4" y="299" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="101.4" y="313" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="179.7" y="299" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="190.7" y="313" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">1</text>
+<rect x="269.1" y="299" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="280.1" y="313" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">2</text>
+<rect x="358.4" y="299" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="369.4" y="313" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">3</text>
+<text x="419.4" y="339" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">relaxed: 0→1, 1→2, 2→3</text>
+<text x="53.4" y="417" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">round 2</text>
+<line x1="116.4" y1="413" x2="167.7" y2="413" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M174.7,413 L165.7,417.5 L165.7,408.5 Z" fill="#8a93a6"/>
+<line x1="205.7" y1="413" x2="257.1" y2="413" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M264.1,413 L255.1,417.5 L255.1,408.5 Z" fill="#8a93a6"/>
+<line x1="295.1" y1="413" x2="346.4" y2="413" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M353.4,413 L344.4,417.5 L344.4,408.5 Z" fill="#8a93a6"/>
+<circle cx="146.1" cy="413" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="146.1" y="417" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="235.4" cy="413" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="235.4" y="417" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="324.7" cy="413" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="324.7" y="417" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="101.4" cy="413" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="101.4" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="190.7" cy="413" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="190.7" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="280.1" cy="413" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="280.1" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="369.4" cy="413" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="369.4" y="417.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="90.4" y="377" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="101.4" y="391" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="179.7" y="377" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="190.7" y="391" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">1</text>
+<rect x="269.1" y="377" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="280.1" y="391" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">2</text>
+<rect x="358.4" y="377" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="369.4" y="391" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">3</text>
+<text x="419.4" y="417" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">nothing relaxes: stop</text>
+</svg>
+<!-- /gen:wg bf-order -->
+          <figcaption>Each row: the labels after that round, and the edges that relaxed in it (orange).</figcaption>
+        </figure>
+        Against the path, round 1 tests \(2\to3\) and \(1\to2\) from labels still at
+        \(\infty\) and skips them; only \(0\to1\) relaxes, to \(\texttt{dist}[1] = 1\).
         Each round the news travels exactly one edge, so all \(V-1\) rounds are
         needed; the skipped tests (source label still \(\infty\), so
         \(\infty + 1\) offers nothing and the guard skips) are the remaining
@@ -1028,7 +1221,7 @@ fn bellman_ford(g: &amp;WGraph, s: usize) -&gt; Result&lt;Vec&lt;i64&gt;, ()&gt;
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Bellman-Ford v1.0
+        Data Structures &amp; Algorithms &middot; Bellman-Ford v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

@@ -304,13 +304,413 @@ fn prim(n: usize, adj: &amp;Vec&lt;Vec&lt;(usize, i64)&gt;&gt;, s: usize) -&gt; 
       </p>
       <div class="ex">
         <span class="tag">Example (Prim from 0)</span>
-        <pre>  tree {0}          cheapest leaving edge  0-1 (4)  &rarr; add 1   total  4
-  tree {0,1}        1-2 (1)                        &rarr; add 2   total  5
-  tree {0,1,2}      1-3 (5)                        &rarr; add 3   total 10
-  tree {0,1,2,3}    3-4 (2)                        &rarr; add 4   total 12
-  tree +4           4-5 (3)                        &rarr; add 5   total 15
-  tree +5           4-7 (7)                        &rarr; add 7   total 22
-  tree +7           5-6 (9)                        &rarr; add 6   total 31</pre>
+        <figure>
+<!-- gen:wg prim-steps -->
+<svg viewBox="0 0 806 786" role="img" style="max-width:967px" font-family="system-ui, sans-serif" aria-label="Prim from 0 on the running graph, one panel per edge added: the lightest edge leaving the tree each time. Add 0-1 (4), total 4; 1-2 (1), total 5; 1-3 (5), total 10; 3-4 (2), total 12; 4-5 (3), total 15; 4-7 (7), total 22; 5-6 (9), total 31.">
+<line x1="147" y1="36" x2="189.5" y2="53.6" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="140" y1="43" x2="196.5" y2="179.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="206.4" y1="70.5" x2="224" y2="113" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="201.5" y1="71.5" x2="201.5" y2="178.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="224" y1="137" x2="206.4" y2="179.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="130" y1="43" x2="73.5" y2="179.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="189.5" y1="196.4" x2="147" y2="214" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="192.3" y1="182.3" x2="77.7" y2="67.7" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="123" y1="214" x2="80.5" y2="196.4" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="63.6" y1="179.5" x2="46" y2="137" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="130" y1="207" x2="73.5" y2="70.5" stroke="#8a93a6" stroke-width="1.6"/>
+<circle cx="168.2" cy="44.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="168.2" y="48.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="168.2" cy="111.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="168.2" y="115.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="215.2" cy="91.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="215.2" y="95.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="201.5" cy="125" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="201.5" y="129" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="215.2" cy="158.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="215.2" y="162.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="101.8" cy="111.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="101.8" y="115.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="168.2" cy="205.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="168.2" y="209.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="135" cy="125" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="135" y="129" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="101.8" cy="205.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="101.8" y="209.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="54.8" cy="158.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="54.8" y="162.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="101.8" cy="138.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="101.8" y="142.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="135" cy="31" r="13" fill="#7c5cff" stroke="#7c5cff" stroke-width="2.4"/>
+<text x="135" y="35.8" font-size="13.5" font-weight="600" fill="#fff" text-anchor="middle">0</text>
+<circle cx="201.5" cy="58.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="201.5" y="63.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="229" cy="125" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="229" y="129.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="201.5" cy="191.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="201.5" y="196.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="135" cy="219" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="135" y="223.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="68.5" cy="191.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="68.5" y="196.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="41" cy="125" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="41" y="129.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="68.5" cy="58.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="68.5" y="63.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="135" y="253" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">start: the tree {0}</text>
+<line x1="415" y1="36" x2="457.5" y2="53.6" stroke="#e8590c" stroke-width="3.4"/>
+<line x1="408" y1="43" x2="464.5" y2="179.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="474.4" y1="70.5" x2="492" y2="113" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="469.5" y1="71.5" x2="469.5" y2="178.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="492" y1="137" x2="474.4" y2="179.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="398" y1="43" x2="341.5" y2="179.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="457.5" y1="196.4" x2="415" y2="214" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="460.3" y1="182.3" x2="345.7" y2="67.7" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="391" y1="214" x2="348.5" y2="196.4" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="331.6" y1="179.5" x2="314" y2="137" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="398" y1="207" x2="341.5" y2="70.5" stroke="#8a93a6" stroke-width="1.6"/>
+<circle cx="436.2" cy="44.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="436.2" y="48.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="436.2" cy="111.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="436.2" y="115.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="483.2" cy="91.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="483.2" y="95.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="469.5" cy="125" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="469.5" y="129" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="483.2" cy="158.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="483.2" y="162.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="369.8" cy="111.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="369.8" y="115.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="436.2" cy="205.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="436.2" y="209.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="403" cy="125" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="403" y="129" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="369.8" cy="205.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="369.8" y="209.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="322.8" cy="158.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="322.8" y="162.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="369.8" cy="138.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="369.8" y="142.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="403" cy="31" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="403" y="35.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="469.5" cy="58.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="469.5" y="63.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="497" cy="125" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="497" y="129.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="469.5" cy="191.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="469.5" y="196.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="403" cy="219" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="403" y="223.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="336.5" cy="191.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="336.5" y="196.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="309" cy="125" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="309" y="129.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="336.5" cy="58.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="336.5" y="63.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="403" y="253" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">add 0–1 (4): total 4</text>
+<line x1="683" y1="36" x2="725.5" y2="53.6" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="676" y1="43" x2="732.5" y2="179.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="742.4" y1="70.5" x2="760" y2="113" stroke="#e8590c" stroke-width="3.4"/>
+<line x1="737.5" y1="71.5" x2="737.5" y2="178.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="760" y1="137" x2="742.4" y2="179.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="666" y1="43" x2="609.5" y2="179.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="725.5" y1="196.4" x2="683" y2="214" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="728.3" y1="182.3" x2="613.7" y2="67.7" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="659" y1="214" x2="616.5" y2="196.4" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="599.6" y1="179.5" x2="582" y2="137" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="666" y1="207" x2="609.5" y2="70.5" stroke="#8a93a6" stroke-width="1.6"/>
+<circle cx="704.2" cy="44.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="704.2" y="48.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="704.2" cy="111.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="704.2" y="115.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="751.2" cy="91.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="751.2" y="95.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="737.5" cy="125" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="737.5" y="129" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="751.2" cy="158.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="751.2" y="162.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="637.8" cy="111.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="637.8" y="115.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="704.2" cy="205.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="704.2" y="209.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="671" cy="125" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="671" y="129" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="637.8" cy="205.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="637.8" y="209.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="590.8" cy="158.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="590.8" y="162.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="637.8" cy="138.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="637.8" y="142.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="671" cy="31" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="671" y="35.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="737.5" cy="58.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="737.5" y="63.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="765" cy="125" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="765" y="129.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">2</text>
+<circle cx="737.5" cy="191.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="737.5" y="196.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="671" cy="219" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="671" y="223.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="604.5" cy="191.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="604.5" y="196.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="577" cy="125" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="577" y="129.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="604.5" cy="58.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="604.5" y="63.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="671" y="253" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">add 1–2 (1): total 5</text>
+<line x1="147" y1="296" x2="189.5" y2="313.6" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="140" y1="303" x2="196.5" y2="439.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="206.4" y1="330.5" x2="224" y2="373" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="201.5" y1="331.5" x2="201.5" y2="438.5" stroke="#e8590c" stroke-width="3.4"/>
+<line x1="224" y1="397" x2="206.4" y2="439.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="130" y1="303" x2="73.5" y2="439.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="189.5" y1="456.4" x2="147" y2="474" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="192.3" y1="442.3" x2="77.7" y2="327.7" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="123" y1="474" x2="80.5" y2="456.4" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="63.6" y1="439.5" x2="46" y2="397" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="130" y1="467" x2="73.5" y2="330.5" stroke="#8a93a6" stroke-width="1.6"/>
+<circle cx="168.2" cy="304.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="168.2" y="308.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="168.2" cy="371.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="168.2" y="375.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="215.2" cy="351.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="215.2" y="355.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="201.5" cy="385" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="201.5" y="389" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="215.2" cy="418.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="215.2" y="422.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="101.8" cy="371.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="101.8" y="375.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="168.2" cy="465.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="168.2" y="469.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="135" cy="385" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="135" y="389" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="101.8" cy="465.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="101.8" y="469.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="54.8" cy="418.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="54.8" y="422.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="101.8" cy="398.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="101.8" y="402.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="135" cy="291" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="135" y="295.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="201.5" cy="318.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="201.5" y="323.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="229" cy="385" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="229" y="389.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">2</text>
+<circle cx="201.5" cy="451.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="201.5" y="456.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">3</text>
+<circle cx="135" cy="479" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="135" y="483.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="68.5" cy="451.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="68.5" y="456.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="41" cy="385" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="41" y="389.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="68.5" cy="318.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="68.5" y="323.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="135" y="513" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">add 1–3 (5): total 10</text>
+<line x1="415" y1="296" x2="457.5" y2="313.6" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="408" y1="303" x2="464.5" y2="439.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="474.4" y1="330.5" x2="492" y2="373" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="469.5" y1="331.5" x2="469.5" y2="438.5" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="492" y1="397" x2="474.4" y2="439.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="398" y1="303" x2="341.5" y2="439.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="457.5" y1="456.4" x2="415" y2="474" stroke="#e8590c" stroke-width="3.4"/>
+<line x1="460.3" y1="442.3" x2="345.7" y2="327.7" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="391" y1="474" x2="348.5" y2="456.4" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="331.6" y1="439.5" x2="314" y2="397" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="398" y1="467" x2="341.5" y2="330.5" stroke="#8a93a6" stroke-width="1.6"/>
+<circle cx="436.2" cy="304.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="436.2" y="308.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="436.2" cy="371.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="436.2" y="375.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="483.2" cy="351.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="483.2" y="355.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="469.5" cy="385" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="469.5" y="389" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="483.2" cy="418.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="483.2" y="422.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="369.8" cy="371.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="369.8" y="375.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="436.2" cy="465.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="436.2" y="469.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="403" cy="385" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="403" y="389" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="369.8" cy="465.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="369.8" y="469.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="322.8" cy="418.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="322.8" y="422.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="369.8" cy="398.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="369.8" y="402.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="403" cy="291" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="403" y="295.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="469.5" cy="318.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="469.5" y="323.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="497" cy="385" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="497" y="389.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">2</text>
+<circle cx="469.5" cy="451.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="469.5" y="456.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">3</text>
+<circle cx="403" cy="479" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="403" y="483.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">4</text>
+<circle cx="336.5" cy="451.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="336.5" y="456.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="309" cy="385" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="309" y="389.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="336.5" cy="318.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="336.5" y="323.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="403" y="513" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">add 3–4 (2): total 12</text>
+<line x1="683" y1="296" x2="725.5" y2="313.6" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="676" y1="303" x2="732.5" y2="439.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="742.4" y1="330.5" x2="760" y2="373" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="737.5" y1="331.5" x2="737.5" y2="438.5" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="760" y1="397" x2="742.4" y2="439.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="666" y1="303" x2="609.5" y2="439.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="725.5" y1="456.4" x2="683" y2="474" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="728.3" y1="442.3" x2="613.7" y2="327.7" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="659" y1="474" x2="616.5" y2="456.4" stroke="#e8590c" stroke-width="3.4"/>
+<line x1="599.6" y1="439.5" x2="582" y2="397" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="666" y1="467" x2="609.5" y2="330.5" stroke="#8a93a6" stroke-width="1.6"/>
+<circle cx="704.2" cy="304.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="704.2" y="308.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="704.2" cy="371.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="704.2" y="375.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="751.2" cy="351.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="751.2" y="355.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="737.5" cy="385" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="737.5" y="389" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="751.2" cy="418.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="751.2" y="422.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="637.8" cy="371.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="637.8" y="375.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="704.2" cy="465.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="704.2" y="469.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="671" cy="385" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="671" y="389" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="637.8" cy="465.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="637.8" y="469.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="590.8" cy="418.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="590.8" y="422.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="637.8" cy="398.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="637.8" y="402.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="671" cy="291" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="671" y="295.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="737.5" cy="318.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="737.5" y="323.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="765" cy="385" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="765" y="389.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">2</text>
+<circle cx="737.5" cy="451.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="737.5" y="456.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">3</text>
+<circle cx="671" cy="479" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="671" y="483.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">4</text>
+<circle cx="604.5" cy="451.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="604.5" y="456.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">5</text>
+<circle cx="577" cy="385" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="577" y="389.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="604.5" cy="318.5" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="604.5" y="323.3" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="671" y="513" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">add 4–5 (3): total 15</text>
+<line x1="281" y1="556" x2="323.5" y2="573.6" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="274" y1="563" x2="330.5" y2="699.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="340.4" y1="590.5" x2="358" y2="633" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="335.5" y1="591.5" x2="335.5" y2="698.5" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="358" y1="657" x2="340.4" y2="699.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="264" y1="563" x2="207.5" y2="699.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="323.5" y1="716.4" x2="281" y2="734" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="326.3" y1="702.3" x2="211.7" y2="587.7" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="257" y1="734" x2="214.5" y2="716.4" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="197.6" y1="699.5" x2="180" y2="657" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="264" y1="727" x2="207.5" y2="590.5" stroke="#e8590c" stroke-width="3.4"/>
+<circle cx="302.2" cy="564.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="302.2" y="568.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="302.2" cy="631.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="302.2" y="635.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="349.2" cy="611.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="349.2" y="615.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="335.5" cy="645" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="335.5" y="649" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="349.2" cy="678.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="349.2" y="682.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="235.8" cy="631.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="235.8" y="635.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="302.2" cy="725.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="302.2" y="729.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="269" cy="645" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="269" y="649" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="235.8" cy="725.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="235.8" y="729.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="188.8" cy="678.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="188.8" y="682.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="235.8" cy="658.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="235.8" y="662.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="269" cy="551" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="269" y="555.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="335.5" cy="578.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="335.5" y="583.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="363" cy="645" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="363" y="649.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">2</text>
+<circle cx="335.5" cy="711.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="335.5" y="716.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">3</text>
+<circle cx="269" cy="739" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="269" y="743.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">4</text>
+<circle cx="202.5" cy="711.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="202.5" y="716.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">5</text>
+<circle cx="175" cy="645" r="13" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="175" y="649.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="202.5" cy="578.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="202.5" y="583.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">7</text>
+<text x="269" y="773" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">add 4–7 (7): total 22</text>
+<line x1="549" y1="556" x2="591.5" y2="573.6" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="542" y1="563" x2="598.5" y2="699.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="608.4" y1="590.5" x2="626" y2="633" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="603.5" y1="591.5" x2="603.5" y2="698.5" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="626" y1="657" x2="608.4" y2="699.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="532" y1="563" x2="475.5" y2="699.5" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="591.5" y1="716.4" x2="549" y2="734" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="594.3" y1="702.3" x2="479.7" y2="587.7" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="525" y1="734" x2="482.5" y2="716.4" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="465.6" y1="699.5" x2="448" y2="657" stroke="#e8590c" stroke-width="3.4"/>
+<line x1="532" y1="727" x2="475.5" y2="590.5" stroke="#7c5cff" stroke-width="3.4"/>
+<circle cx="570.2" cy="564.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="570.2" y="568.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="570.2" cy="631.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="570.2" y="635.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">6</text>
+<circle cx="617.2" cy="611.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="617.2" y="615.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="603.5" cy="645" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="603.5" y="649" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="617.2" cy="678.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="617.2" y="682.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="503.8" cy="631.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="503.8" y="635.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">20</text>
+<circle cx="570.2" cy="725.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="570.2" y="729.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="537" cy="645" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="537" y="649" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">11</text>
+<circle cx="503.8" cy="725.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="503.8" y="729.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="456.8" cy="678.2" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="456.8" y="682.2" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="503.8" cy="658.8" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="503.8" y="662.8" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">7</text>
+<circle cx="537" cy="551" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="537" y="555.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="603.5" cy="578.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="603.5" y="583.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">1</text>
+<circle cx="631" cy="645" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="631" y="649.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">2</text>
+<circle cx="603.5" cy="711.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="603.5" y="716.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">3</text>
+<circle cx="537" cy="739" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="537" y="743.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">4</text>
+<circle cx="470.5" cy="711.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="470.5" y="716.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">5</text>
+<circle cx="443" cy="645" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="443" y="649.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">6</text>
+<circle cx="470.5" cy="578.5" r="13" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="470.5" y="583.3" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">7</text>
+<text x="537" y="773" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">add 5–6 (9): total 31</text>
+</svg>
+<!-- /gen:wg prim-steps -->
+          <figcaption>Prim from \(0\): each panel adds the lightest edge leaving the tree (orange); the tree so far is purple.</figcaption>
+        </figure>
         Prim adds vertices in the order \(1,2,3,4,5,7,6\) (different from
         Kruskal&rsquo;s edge order, which took the two lightest edges \(1\text{-}2\)
         and \(3\text{-}4\) first), yet the final edge set and the total,
@@ -518,18 +918,62 @@ fn prim(n: usize, adj: &amp;Vec&lt;Vec&lt;(usize, i64)&gt;&gt;, s: usize) -&gt; 
       <div class="ex">
         <span class="tag">Example (MST \(\ne\) shortest-path tree)</span>
         The triangle \(0\text{-}1\,(2)\), \(1\text{-}2\,(2)\), \(0\text{-}2\,(3)\):
-        <pre>  MST:  keep 0-1 and 1-2      total weight 4   (drop the 3-edge)
-  SPT from 0:  keep 0-1, 0-2  dist[1]=2, dist[2]=3
+        <figure>
+<!-- gen:wg prim-vs-spt -->
+<svg viewBox="0 0 516 166" role="img" style="max-width:619px" font-family="system-ui, sans-serif" aria-label="The triangle 0-1 (2), 1-2 (2), 0-2 (3). Its minimum spanning tree keeps 0-1 and 1-2, total 4, where the route from 0 to 2 costs 4. Its shortest-path tree from 0 keeps 0-1 and 0-2, total 5, with distances 0, 2, 3.">
+<text x="124" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">minimum spanning tree</text>
+<line x1="67.8" y1="106.6" x2="113.2" y2="63.4" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="134.8" y1="63.4" x2="180.2" y2="106.6" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="72" y1="117" x2="176" y2="117" stroke="#8a93a6" stroke-width="1.6"/>
+<circle cx="90.5" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="90.5" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="157.5" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="157.5" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="124" cy="117" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="124" y="121" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="57" cy="117" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="57" y="121.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="124" cy="53" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="124" y="57.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="191" cy="117" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="191" y="121.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="124" y="153" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">total weight 2 + 2 = 4; 0 to 2 costs 4</text>
 
-  in the MST, the route 0&rarr;2 costs 2+2 = 4, not the shortest 3;
-  the SPT's total weight is 2+3 = 5, not the minimum 4.</pre>
+<text x="392" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">shortest-path tree from 0</text>
+<line x1="335.8" y1="106.6" x2="381.2" y2="63.4" stroke="#7c5cff" stroke-width="3.4"/>
+<line x1="402.8" y1="63.4" x2="448.2" y2="106.6" stroke="#8a93a6" stroke-width="1.6"/>
+<line x1="340" y1="117" x2="444" y2="117" stroke="#7c5cff" stroke-width="3.4"/>
+<circle cx="358.5" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="358.5" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="425.5" cy="85" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="425.5" y="89" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">2</text>
+<circle cx="392" cy="117" r="9.5" fill="#fff" stroke="#9aa3b5" stroke-width="1.1"/>
+<text x="392" y="121" font-size="11.5" font-weight="700" font-family="ui-monospace, Menlo, monospace" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="325" cy="117" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="325" y="121.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">0</text>
+<circle cx="392" cy="53" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="392" y="57.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="459" cy="117" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="459" y="121.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="303" y="87.7" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="314" y="101.7" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">0</text>
+<rect x="402.2" y="31" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="413.2" y="45" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">2</text>
+<rect x="459" y="87.7" width="22" height="19" rx="9.5" fill="#fff" stroke="#c9bfff" stroke-width="1.3"/>
+<text x="470" y="101.7" font-size="12.5" font-weight="700" fill="#7c5cff" text-anchor="middle">3</text>
+<text x="392" y="153" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">total weight 2 + 3 = 5; 0 to 2 costs 3</text>
+</svg>
+<!-- /gen:wg prim-vs-spt -->
+        </figure>
+        In the MST, the route \(0 \to 2\) costs \(2 + 2 = 4\), not the shortest \(3\); the
+        shortest-path tree&rsquo;s total weight is \(2 + 3 = 5\), not the minimum \(4\).
         The MST minimizes <em>total</em> edge weight (\(4 &lt; 5\)); the shortest-path
         tree minimizes <em>each vertex&rsquo;s distance</em> from the source (the
         direct \(0\text{-}2\) at \(3\) beats the MST&rsquo;s \(4\)-cost detour).
-        Neither tree does the other&rsquo;s job. (On the eight-vertex running graph
-        the two happen to coincide, which is exactly why this three-vertex triangle is
-        the example to remember: it separates the concepts even when larger graphs do
-        not.)
+        Neither tree does the other&rsquo;s job. (The eight-vertex running graph shows
+        the same split in one edge: its MST uses \(1\text{-}3\,(5)\), while the
+        shortest-path tree from \(0\) uses the direct \(0\text{-}3\,(6)\), since
+        \(6 &lt; 4 + 5\).)
       </div>
 
       <!-- ============================================================ -->
@@ -609,7 +1053,7 @@ fn prim(n: usize, adj: &amp;Vec&lt;Vec&lt;(usize, i64)&gt;&gt;, s: usize) -&gt; 
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Prim&rsquo;s Algorithm v1.0 &middot;
+        Data Structures &amp; Algorithms &middot; Prim&rsquo;s Algorithm v1.1 &middot;
         prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive demos in
         the course library.
       </footer>

@@ -26,6 +26,16 @@
     .reveal pre code { border-radius: 8px; }
     .reveal img { background: #fff; border: 1px solid #eef0f4; border-radius: 8px; }
     .reveal blockquote { width: 92%; }
+    /* formulas: KaTeX's default 1.21em makes lines and displays too tall for this theme */
+    .reveal .katex { font-size: 1.05em; }
+    .reveal .katex-display { font-size: 0.95em; margin: 0.25em 0; }
+    /* the theme capitalizes headings; a variable in a title keeps its case */
+    .reveal h1 .katex, .reveal h2 .katex, .reveal h3 .katex { text-transform: none; }
+    /* a formula in a table cell stays on one line */
+    .reveal td .katex, .reveal th .katex { white-space: nowrap; }
+    /* math inside <small> keeps its subscripts (the theme top-aligns small's children) */
+    .reveal small .katex * { vertical-align: baseline; }
+    .reveal small .katex .vlist, .reveal small .katex .vlist-s { vertical-align: bottom; }
     /* run tables (lib .u-ttable): .reveal table's 0.78em would blow them up */
     .reveal .u-ttable { font-size: 14px; margin: 0 auto; }
     .reveal .u-ttable th { font-size: 10px; }

@@ -20,12 +20,11 @@
 
 **Breadth-first search** visits all vertices at distance 1, then all at distance 2, …: expanding in **rings** from the start.
 
-```text
+<div><img src="../../topics/figures/graphs/gr-bfs-layers.svg" style="height:235px" alt="
    layer 0: {start}
    layer 1: start's neighbors
    layer 2: their unseen neighbors
-   …
-```
+   …"></div>
 
 The frontier is a **queue** (FIFO) instead of a stack.
 
@@ -33,7 +32,7 @@ The frontier is a **queue** (FIFO) instead of a stack.
 
 ## BFS: the code
 
-```text
+```cpp
 void bfs(Graph& g, int s) {
     queue<int> q; q.push(s);
     vector<bool> seen(g.V, false); seen[s] = true;
@@ -52,7 +51,7 @@ void bfs(Graph& g, int s) {
 
 ## BFS: a worked trace
 
-The diamond again: `0 → [1,2] · 1 → [3] · 2 → [3] · 3 → []`: one row per step, from the engine's own run:
+The diamond again, lists $0 \to [1, 2]$, $1 \to [3]$, $2 \to [3]$, $3 \to []$: one row per step, from the engine's own run:
 
 <div id="bfs-worked" style="display:flex;justify-content:center"></div>
 
@@ -62,53 +61,55 @@ The diamond again: `0 → [1,2] · 1 → [3] · 2 → [3] · 3 → []`: one row 
 
 If you marked a vertex only when **dequeued**, two neighbors could both enqueue it → it enters the queue **twice** → re-processed, wrong distances.
 
-Mark the instant you **enqueue** → each vertex enters the queue **once** → Θ(V + E).
+Mark the instant you **enqueue**: each vertex enters the queue **once**, so BFS costs $\Theta(V + E)$.
 
 --
 
 ## Lemma: the queue is sorted by distance
 
-While distance-d vertices are dequeued, only distance-(d+1) vertices are **enqueued**:
+<div style="display:flex; align-items:center; justify-content:center; gap:30px">
+<img src="../../topics/figures/graphs/gr-bfs-queue.svg" style="height:250px" alt="
+   queue:  [ d  d  …  d | d+1  d+1  …  d+1 ]">
+<div style="text-align:left; max-width:300px; font-size:0.9em">
 
-```text
-   queue:  [ d  d  …  d | d+1  d+1  …  d+1 ]
-```
+While distance-$d$ vertices leave, only distance-$(d+1)$ vertices **join**.
 
-At most **two** values, never out of order → vertices are dequeued in **non-decreasing distance** order.
+At most **two** values, in order: vertices leave in **non-decreasing distance**.
+
+</div>
+</div>
 
 --
 
 ## Theorem: BFS distances are shortest
 
-```text
-   claim:  dist[v] = δ(v), the true fewest-edge distance
+**Claim:** $\text{dist}[v] = \delta(v)$, the true fewest-edge distance.
 
-   ≥  BFS reached v along REAL edges: a path with
-      dist[v] edges exists, and none is shorter than δ ✓
+- ($\ge$) BFS reached $v$ along **real** edges: a path with $\text{dist}[v]$ edges exists, and none is shorter than $\delta(v)$
+- ($\le$) take a shortest path $s = v\_0 \to v\_1 \to \cdots \to v\_k = v$. By induction each $v\_i$ is discovered by the time $v\_{i-1}$ is dequeued, so $\text{dist}[v\_i] \le \text{dist}[v\_{i-1}] + 1 \le i$
 
-   ≤  take a shortest path  s = v0 → v1 → … → vk = v.
-      induction: each vi is discovered by the time
-      v(i−1) is dequeued → dist[vi] ≤ dist[v(i−1)] + 1 ≤ i ✓
-```
-
-Both directions → **dist[v] = δ(v)**. ∎
+Both directions: $\boldsymbol{\text{dist}[v] = \delta(v)}$. ∎
 
 --
 
 ## Your turn: BFS on the course DAG
 
-```text
+<div style="display:flex; align-items:center; justify-content:center; gap:36px">
+<img src="../../topics/figures/graphs/gr-course.svg" style="height:250px" alt="
    0 → 1, 3, 5   2 → 3         4 → 5, 7
-   1 → 2, 3      3 → 4, 7      5 → 6
+   1 → 2, 3      3 → 4, 7      5 → 6">
+<div style="text-align:left; max-width:560px">
 
-   BFS from 0: what is dist[6]?
-```
+BFS from 0: what is `dist[6]`?
 
 <details class="answer"><summary>Answer:</summary>
 
-Layers: {0} → {1, 3, 5} → {2, 4, 6, 7}. So **dist[6] = 2** (via 0→5→6). Everything is within two edges of 0: this graph is shallow and wide from the source, the opposite of DFS's deep dive.
+Layers $\lbrace 0 \rbrace$, $\lbrace 1, 3, 5 \rbrace$, $\lbrace 2, 4, 6, 7 \rbrace$: **`dist[6]` = 2**, via $0 \to 5 \to 6$. Everything is within two edges of 0, the opposite of DFS's deep dive.
 
 </details>
+
+</div>
+</div>
 
 --
 
@@ -135,8 +136,8 @@ Layers: {0} → {1, 3, 5} → {2, 4, 6, 7}. So **dist[6] = 2** (via 0→5→6). 
 | frontier | **stack** / recursion | **queue** |
 | shape | deep, then backtrack | wide, in layers |
 | finds | reachability, cycles, topo | **shortest (unweighted)** |
-| memory | O(longest path) | O(widest layer) |
-| cost | Θ(V+E) | Θ(V+E) |
+| memory | $O(\text{longest path})$ | $O(\text{widest layer})$ |
+| cost | $\Theta(V + E)$ | $\Theta(V + E)$ |
 
 Same cost, one data-structure apart: different questions.
 
@@ -159,23 +160,26 @@ Same cost, one data-structure apart: different questions.
 
 ## One loop, four algorithms
 
-```text
-   FRONTIER f;  f.add(start);
-   while (!f.empty()) {
-       u = f.remove();
-       if (done[u]) continue;          // skip duplicates
-       done[u] = true;                 // visit u: final on REMOVE
-       for (v : adj[u])
-           if (!done[v]) f.add(v);     // may re-add: that's fine
-   }
+```cpp
+void search(Graph& g, int s, Frontier& f) {   // f: add, remove, empty
+    vector<bool> done(g.V, false);
+    f.add(s);
+    while (!f.empty()) {
+        int u = f.remove();
+        if (done[u]) continue;          // skip duplicates
+        done[u] = true;                 // visit u: final on REMOVE
+        for (int v : g.adj[u])
+            if (!done[v]) f.add(v);     // may re-add: that's fine
+    }
+}
 ```
 
 | frontier | explores | you get |
 |---|---|---|
-| stack (LIFO) | deepest first | **DFS** |
-| queue (FIFO) | oldest first | **BFS** |
-| PQ by path cost | cheapest first | **Dijkstra** |
-| PQ by "looks close" | most promising | **A\*** (games/AI) |
+| stack (last in, first out) | deepest first | **DFS** |
+| queue (first in, first out) | oldest first | **BFS** |
+| priority queue by path cost | cheapest first | **Dijkstra** |
+| priority queue by "looks close" | most promising | **A\*** (games, AI) |
 
 --
 
@@ -183,11 +187,17 @@ Same cost, one data-structure apart: different questions.
 
 A grid or maze is an **implicit** graph: each cell a vertex, edges to its 4 neighbors:
 
-```text
+<div style="display:flex; align-items:center; justify-content:center; gap:36px">
+<img src="../../topics/figures/graphs/gr-bfs-grid.svg" style="height:240px" alt="
    . . # .        BFS from S → fewest moves to every
    S . # .        reachable cell; '#' = wall (no edge)
-   . . . E
-```
+   . . . E">
+<div style="text-align:left; max-width:420px">
 
-Same BFS code: just compute neighbors `(r±1, c), (r, c±1)` on the fly.
+BFS from S: the fewest moves to every reachable cell (a wall has no edges); E is 4 moves away.
+
+</div>
+</div>
+
+Same BFS code: just compute neighbors $(r \pm 1, c)$, $(r, c \pm 1)$ on the fly.
 

@@ -12,8 +12,8 @@
 ## Recap
 
 - a **greedy** algorithm commits to the locally best choice; it needs a proof
-- **relaxation**: if dist[u] + w < dist[v], improve dist[v] and set edgeTo[v] = u
-- **Dijkstra** settles the nearest unsettled vertex: Θ((V + E) log V) with a binary heap
+- **relaxation**: if $\mathit{dist}[u] + w \lt \mathit{dist}[v]$, lower `dist[v]` and set `parent[v] = u`
+- **Dijkstra** settles the nearest unsettled vertex: $O((V + E) \log V)$ with a binary heap
 - the proof needs **nonnegative** weights; Bellman-Ford handles negative ones
 
 --

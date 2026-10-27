@@ -2,7 +2,7 @@
   TOPIC · The greedy method.
   Teaches: what a greedy algorithm is; making change with US coins; the same rule failing for coins {1, 3, 4}; when greedy is safe; when it fails.
   Needs:   nothing.
-  Demos:   none
+  Demos:   none; figure wg-coins (tools/gen-wgraph-figures.mjs)
   Program: none
   Budget:  ~10 min, 6 slides.
   Ported from Summer 2026 L09-graphs-dijkstra.md, parts 1.
@@ -20,41 +20,44 @@
 
 At each step, take the choice that looks **best right now**: commit, and **never reconsider**.
 
-```text
-   greedy(problem):
-       while not solved:
-           x = the locally BEST choice available
-           commit to x               // never undone
-           shrink the problem
-```
+1. take the locally **best** choice available
+2. **commit** to it: it is never undone
+3. **shrink** the problem, and repeat until it is solved
 
-No backtracking, no lookahead: **fast**. The catch: locally best ≠ globally best.
+No backtracking, no lookahead: **fast**. The catch: the locally best choice is not always globally best.
 
 --
 
-## Greedy that works: making change
+## Making change, greedily
 
-Make **41¢** with **US coins** {25, 10, 5, 1}: **fewest** coins:
+Make **41¢** from **US coins** {25, 10, 5, 1} with the **fewest** coins: take the **largest coin that fits**, repeat.
 
-```text
-   rule: take the LARGEST coin that fits; repeat
-
-   41¢ → 25 + 10 + 5 + 1  =  4 coins   ✓ optimal
+```cpp
+// coins sorted largest first: {25, 10, 5, 1}
+int greedyChange(const vector<int>& coins, int amount) {
+    int count = 0;
+    for (int c : coins)
+        while (c <= amount) {         // the largest coin that still fits
+            amount -= c;              // commit: never undone
+            count++;
+        }
+    return count;
+}
 ```
 
-For US denominations, this greedy rule is **provably optimal: always**.
+$41 = 25 + 10 + 5 + 1$: **4 coins**. For US coins this rule is **provably optimal, always**.
 
 --
 
 ## The SAME rule fails: coins {1, 3, 4}
 
-```text
-   make 6:
-   greedy:   4 + 1 + 1  =  3 coins
-   optimal:  3 + 3      =  2 coins    ✗ greedy loses!
-```
+Make **6**:
 
-Same rule, different denominations → **wrong**. Greedy is a **strategy**, not a guarantee: every greedy algorithm needs a **proof**.
+$$\text{greedy: } 6 = 4 + 1 + 1 \quad \text{(3 coins)}$$
+
+$$\text{optimal: } 6 = 3 + 3 \quad \text{(2 coins)}$$
+
+Same rule, different denominations: **wrong**. Greedy is a **strategy**, not a guarantee: every greedy algorithm needs a **proof**.
 
 --
 
@@ -71,15 +74,15 @@ Two ingredients: both needed, both **proved per problem**:
 
 ## When greedy fails
 
-`{1, 3, 4}` making n: solved **exactly**, in three lines:
+Coins {1, 3, 4}: $\mathit{best}[n]$ = the fewest coins making $n$, and $\mathit{best}[0] = 0$. The **last** coin is a 1, 3 or 4:
 
-```text
+$$\mathit{best}[n] = 1 + \min(\mathit{best}[n-1], \mathit{best}[n-3], \mathit{best}[n-4])$$
+
+<div><img src="../../topics/figures/wgraphs/wg-coins.svg" style="height:175px" alt="
    best[0] = 0
    best[n] = 1 + min( best[n−1], best[n−3], best[n−4] )
-
    n      0   1   2   3   4   5   6
-   best   0   1   2   1   1   2   2    best[6] = 2: 3+3 ✓
-```
+   best   0   1   2   1   1   2   2    best[6] = 2: 3+3"></div>
 
 Solve **every subproblem once**, build up: **dynamic programming**. Slower than greedy, needs no license.
 

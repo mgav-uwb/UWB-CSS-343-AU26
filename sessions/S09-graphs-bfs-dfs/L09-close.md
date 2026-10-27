@@ -11,10 +11,10 @@
 
 ## Recap
 
-- a graph is a set of vertices and a set of edges; Σ degree = 2E
-- **adjacency list** for sparse graphs: Θ(V + E) space; the matrix is Θ(V²)
+- a graph is a set of vertices and a set of edges; $\sum \deg(v) = 2E$
+- **adjacency list** for sparse graphs: $\Theta(V + E)$ space; the matrix is $\Theta(V^2)$
 - **DFS** dives with a stack (or recursion); **BFS** spreads in layers with a queue
-- both visit exactly the reachable vertices in **Θ(V + E)**
+- both visit exactly the reachable vertices in $\boldsymbol{\Theta(V + E)}$
 - **BFS distances** are shortest paths in edges; mark on enqueue
 
 --

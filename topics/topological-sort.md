@@ -20,10 +20,16 @@
 
 A **DAG** is a directed graph with **no cycles**:
 
-```text
-   0 → 1 → 3       "must come before" relationships
-   0 → 2 → 3       (no way to loop back)
-```
+<div style="display:flex; align-items:center; justify-content:center; gap:30px">
+<img src="../../topics/figures/graphs/gr-topo-dag.svg" style="height:220px" alt="
+   0 → 1 → 3       must come before relationships
+   0 → 2 → 3       (no way to loop back)">
+<div style="text-align:left; max-width:380px">
+
+"must come before" relationships, with no way to loop back
+
+</div>
+</div>
 
 DAGs model **dependencies**: course prerequisites, build order, spreadsheet formulas, package installs.
 
@@ -31,28 +37,32 @@ DAGs model **dependencies**: course prerequisites, build order, spreadsheet form
 
 ## Topological order
 
-A **topological order** lists the vertices so that **every edge points forward** (u before v for each u → v).
+A **topological order** lists the vertices so that **every edge points forward**: $u$ before $v$ for each $u \to v$.
 
-```text
+<div><img src="../../topics/figures/graphs/gr-topo-orders.svg" style="height:150px" alt="
    0 → 1 → 3,  0 → 2 → 3
-   valid orders:  0 1 2 3   or   0 2 1 3
-```
+   valid orders:  0 1 2 3   or   0 2 1 3"></div>
 
-The course DAG, lined up in topological order: **edges all point right**:
-
-<div id="topo-line" style="max-width:860px;margin:0 auto"></div>
+<div><img src="../../topics/figures/graphs/gr-topo-line.svg" style="height:170px" alt="
+   the course DAG on a line in the order 0 1 2 3 4 5 6 7: every edge an arc pointing right"></div>
 
 --
 
 ## A cycle kills it
 
-```text
+<div style="display:flex; align-items:center; justify-content:center; gap:30px">
+<img src="../../topics/figures/graphs/gr-topo-cycle.svg" style="height:260px" alt="
    a cycle  a → b → … → a  demands:
       a before b,  b before …,  … before a
-  : no linear order can satisfy that
-```
+   : no linear order can satisfy that">
+<div style="text-align:left; max-width:420px">
 
-So: topological order exists **⟹** the graph is a DAG.
+A cycle $a \to b \to \cdots \to a$ demands $a$ before $b$, $b$ before $\cdots$, $\cdots$ before $a$: no order satisfies that.
+
+</div>
+</div>
+
+So: topological order exists $\Rightarrow$ the graph is a DAG.
 
 The converse (every DAG **has** one) needs an algorithm. First, a lemma.
 
@@ -62,16 +72,21 @@ The converse (every DAG **has** one) needs an algorithm. First, a lemma.
 
 A **source** = a vertex with in-degree 0. Proof it exists:
 
-```text
+<div style="display:flex; align-items:center; justify-content:center; gap:30px">
+<img src="../../topics/figures/graphs/gr-topo-source.svg" style="height:230px" alt="
    start anywhere; while the current vertex has ANY
    incoming edge, step BACKWARD along one:
-        … → u → v      (v current → step to u)
+        … → u → v      (v current → step to u)">
+<div style="text-align:left; max-width:480px; font-size:0.8em">
 
-   if you could always step, after V steps you'd have
-   listed V+1 vertices → one REPEATS → a cycle. ✗ DAG!
-```
+Start anywhere; step **backward** along an incoming edge while one exists.
 
-So the walk gets stuck: at a vertex with **no incoming edge**. ∎
+Never stuck? After $V$ steps, $V + 1$ vertices listed: one **repeats**, a cycle.
+
+So the walk stops at a vertex with **no incoming edge**. ∎
+
+</div>
+</div>
 
 --
 
@@ -79,56 +94,70 @@ So the walk gets stuck: at a vertex with **no incoming edge**. ∎
 
 Repeatedly output a **source**, delete it, repeat:
 
-```text
-   compute in-degree of every vertex
-   queue all vertices with in-degree 0
-   repeat: dequeue u → OUTPUT u
-           for each edge u → v: in-degree(v)--
-                if v hits 0 → enqueue v
+```cpp
+vector<int> kahn(const Graph& g) {
+    vector<int> indeg(g.V, 0), order;
+    for (int u = 0; u < g.V; u++)
+        for (int v : g.adj[u]) indeg[v]++;
+    queue<int> q;
+    for (int u = 0; u < g.V; u++)
+        if (indeg[u] == 0) q.push(u);       // the sources
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        order.push_back(u);                 // output u
+        for (int v : g.adj[u])
+            if (--indeg[v] == 0) q.push(v); // v's last prerequisite is out
+    }
+    return order;                           // fewer than V: a cycle
+}
 ```
 
-Output order = a topological order. Θ(V + E).
+Output order = a topological order, in $\Theta(V + E)$.
 
 --
 
 ## Why Kahn works
 
 - a DAG **always has a source** (the lemma): no early stall
-- deleting a vertex → still a DAG → **induction** to the end
-- u → v is deleted only when u is **output** → u before v ✓
-- a cycle waits on itself → output stops **short** (< V)
+- deleting a vertex leaves a DAG: **induction** to the end
+- $u \to v$ is deleted only when $u$ is **output**, so $u$ comes before $v$ ✓
+- a cycle waits on itself: output stops **short**, fewer than $V$ vertices
 
 --
 
 ## Kahn: a worked run
 
-```text
+<div><img src="../../topics/figures/graphs/gr-kahn-run.svg" style="height:425px" alt="
    0 → 1  0 → 2  1 → 3  2 → 3    in-deg: 0:0 1:1 2:1 3:2
-
    queue [0]                 (only source: 0)
    out 0 → dec 1, 2 → both hit 0 → queue [1,2]
    out 1 → dec 3 → 3:1
    out 2 → dec 3 → 3:0 → queue [3]
    out 3
-   order: 0 1 2 3   ✓  (all 4 output → no cycle)
-```
+   order: 0 1 2 3   ✓  (all 4 output → no cycle)"></div>
+
+All 4 output: no cycle.
 
 --
 
 ## Your turn: Kahn on the course DAG
 
-```text
+<div style="display:flex; align-items:center; justify-content:center; gap:30px">
+<img src="../../topics/figures/graphs/gr-course.svg" style="height:220px" alt="
    0 → 1, 3, 5   2 → 3         4 → 5, 7
-   1 → 2, 3      3 → 4, 7      5 → 6
+   1 → 2, 3      3 → 4, 7      5 → 6">
+<div style="text-align:left; max-width:600px; font-size:0.9em">
 
-   in-degrees?  first three vertices output?
-```
+In-degrees? First three vertices output?
 
 <details class="answer"><summary>Answer:</summary>
 
-In-degrees: 0:0 · 1:1 · 2:1 · 3:3 · 4:1 · 5:2 · 6:1 · 7:2. Only source: 0. Output 0 frees 1; output 1 frees 2 (and drops 3 to 2): **0, 1, 2**: and the full run continues 3, 4, 5, 6, 7.
+In-degrees of 0 to 7: 0, 1, 1, 3, 1, 2, 1, 2. Output 0 frees 1; output 1 frees 2: **0, 1, 2**. A queue continues 3, 4, 5, 7, 6 (the demo, smallest ready vertex first: 3, 4, 5, 6, 7). Both are topological orders.
 
 </details>
+
+</div>
+</div>
 
 --
 
@@ -159,47 +188,50 @@ A digraph has a topological order **iff** it has no cycle. Both methods report c
 
 Run DFS; record each vertex's **post-order** (finish time); the answer is the **reverse** of post-order.
 
-```text
-   dfs(u): … recurse into all of u's neighbors …
-           on FINISHING u, push u onto a stack
-   answer = pop the stack (reverse finish order)
+```cpp
+void dfs(const Graph& g, int u, vector<bool>& seen, vector<int>& finished) {
+    seen[u] = true;
+    for (int v : g.adj[u])
+        if (!seen[v]) dfs(g, v, seen, finished);
+    finished.push_back(u);                  // u finishes: post-order
+}
+vector<int> topoOrder(const Graph& g) {
+    vector<bool> seen(g.V, false);  vector<int> finished;
+    for (int u = 0; u < g.V; u++)
+        if (!seen[u]) dfs(g, u, seen, finished);
+    reverse(finished.begin(), finished.end());
+    return finished;                        // reverse post-order
+}
 ```
 
-A vertex finishes only **after** everything reachable from it → it belongs **before** all of that.
+A vertex finishes only **after** everything reachable from it, so it belongs **before** all of that.
 
 --
 
 ## DFS post-order: worked
 
-```text
-   0 → 1  0 → 2  1 → 3  2 → 3
+The diamond $0 \to 1$, $0 \to 2$, $1 \to 3$, $2 \to 3$, from 0:
 
+<div><img src="../../topics/figures/graphs/gr-topo-post.svg" style="height:360px" alt="
    dfs(0) → dfs(1) → dfs(3): 3 finishes   (post #1)
             1 finishes                    (post #2)
             dfs(2): 3 seen → 2 finishes   (post #3)
             0 finishes                    (post #4)
-
    post-order: 3 1 2 0
-   REVERSE →   0 2 1 3   ✓ a topological order
-```
+   REVERSE →   0 2 1 3   ✓ a topological order"></div>
 
 --
 
 ## Proof: why reverse post-order works
 
-```text
-   claim: in a DAG, for EVERY edge u → v,
-          v finishes BEFORE u
+**Claim:** in a DAG, for **every** edge $u \to v$, $v$ finishes **before** $u$. When `dfs(u)` examines $u \to v$:
 
-   when dfs(u) examines the edge u → v, v is either
-   1. unvisited    → dfs(v) runs INSIDE dfs(u)
-                     → v finishes first            ✓
-   2. finished     → v already done                ✓
-   3. on the stack → v is an ancestor: v ⇝ u exists,
-                     plus u → v  ⇒ a CYCLE: not a DAG ✗
-```
+<div><img src="../../topics/figures/graphs/gr-topo-cases.svg" style="height:220px" alt="
+   1. unvisited    → dfs(v) runs INSIDE dfs(u) → v finishes first
+   2. finished     → v already done
+   3. on the stack → v is an ancestor: v ⇝ u exists, plus u → v ⇒ a CYCLE: not a DAG"></div>
 
-Reverse finish order ⇒ u before v, for every edge. ∎
+Reverse finish order $\Rightarrow$ $u$ before $v$, for every edge. ∎
 
 --
 
@@ -207,11 +239,10 @@ Reverse finish order ⇒ u before v, for every edge. ∎
 
 Independent tasks can go in **either** order:
 
-```text
+<div><img src="../../topics/figures/graphs/gr-topo-two.svg" style="height:190px" alt="
    0 → 1  0 → 2  1 → 3  2 → 3
    Kahn:              0 1 2 3
-   reverse post-order: 0 2 1 3    : both valid
-```
+   reverse post-order: 0 2 1 3    : both valid"></div>
 
 Unless the DAG is a single chain, the topological order is **not unique**.
 
@@ -225,7 +256,7 @@ Unless the DAG is a single chain, the topological order is **not unique**.
 | detects a cycle | output stops short | back edge |
 | feel | "peel off ready tasks" | "finish deep, reverse" |
 
-Both **Θ(V + E)**, both detect cycles: pick by taste.
+Both $\boldsymbol{\Theta(V + E)}$, both detect cycles: pick by taste.
 
 --
 

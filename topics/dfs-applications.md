@@ -22,59 +22,67 @@
 Give DFS one counter. Stamp each vertex **twice**: when its call starts and when it returns.
 
 ```cpp
-int clock = 0;
+int timer = 0;                              // the clock (clock() is taken by C)
 void dfs(const Graph& g, int u) {
-    color[u] = GRAY;  pre[u] = ++clock;     // discovered: on the stack
+    color[u] = GRAY;  pre[u] = ++timer;     // discovered: on the stack
     for (int v : g.adj[u])
         if (color[v] == WHITE) dfs(g, v);
-    color[u] = BLACK; post[u] = ++clock;    // finished: off the stack
+    color[u] = BLACK; post[u] = ++timer;    // finished: off the stack
 }
 // restart at every WHITE vertex, in index order, until none is left
 ```
 
-**white** = not yet discovered · **gray** = on the recursion stack · **black** = finished
+- **white**: not yet discovered
+- **gray**: on the recursion stack
+- **black**: finished
 
 --
 
 ## Worked: one DFS, two numbers per vertex
 
-Edges `0→1, 0→2, 1→2, 2→0, 3→1, 3→4, 4→5, 5→3`, neighbors in increasing order, starts at 0 then 3:
+Edges $0 \to 1$, $0 \to 2$, $1 \to 2$, $2 \to 0$, $3 \to 1$, $3 \to 4$, $4 \to 5$, $5 \to 3$; neighbors in increasing order; starts at 0, then 3:
 
-```text
+<div><img src="../../topics/figures/graphs/gr-dfs-clock.svg" style="height:250px" alt="
    vertex      0     1     2     3     4     5
    pre         1     2     3     7     8     9
    post        6     5     4    12    11    10
-
    intervals:  0 [1 ......................... 6]   3 [7 ................. 12]
                1    [2 .............. 5]           4    [8 ........ 11]
-               2       [3 ..... 4]                 5       [9 . 10]
-```
+               2       [3 ..... 4]                 5       [9 . 10]"></div>
 
 --
 
 ## The parenthesis property
 
-For any two vertices u and v, the intervals **[pre, post]** are either **nested** or **disjoint**, never overlapping:
+For any two vertices $u$ and $v$, the intervals $[\text{pre}, \text{post}]$ are either **nested** or **disjoint**, never overlapping:
 
-- nested, `[pre[u] ... [pre[v] ... post[v]] ... post[u]]`: v is a **descendant** of u in the DFS forest
+- nested, $\text{pre}[u] < \text{pre}[v] < \text{post}[v] < \text{post}[u]$: $v$ is a **descendant** of $u$ in the DFS forest
 - disjoint: neither is an ancestor of the other
 
-Why: the calls form a stack. If v is discovered while u is gray, v's call starts and returns **inside** u's call.
+Why: the calls form a stack. If $v$ is discovered while $u$ is gray, $v$'s call starts and returns **inside** $u$'s call.
 
 --
 
 ## Four kinds of edges
 
-When DFS examines an edge **u → v**, the color of **v** decides its type:
+When DFS examines an edge $u \to v$, the color of $v$ decides its type:
 
-| v is | type | meaning |
+<div style="display:flex; align-items:center; justify-content:center; gap:20px">
+<div style="white-space:nowrap; font-size:0.9em">
+
+| $v$ is | type | meaning |
 | --- | --- | --- |
-| white | **tree** | DFS recurses into v |
-| gray | **back** | v is an ancestor still on the stack |
-| black, pre[u] < pre[v] | **forward** | a finished descendant of u |
-| black, pre[v] < pre[u] | **cross** | finished earlier, elsewhere |
+| white | **tree** | recurse into $v$ |
+| gray | **back** | an ancestor on the stack |
+| black, $\text{pre}[u] < \text{pre}[v]$ | **forward** | a finished descendant |
+| black, $\text{pre}[v] < \text{pre}[u]$ | **cross** | finished, elsewhere |
 
-In the example: tree `0→1, 1→2, 3→4, 4→5` · back `2→0, 5→3` · forward `0→2` · cross `3→1`.
+</div>
+<img src="../../topics/figures/graphs/gr-dfs-kinds.svg" style="height:170px" alt="
+   In the example: tree 0→1, 1→2, 3→4, 4→5 · back 2→0, 5→3 · forward 0→2 · cross 3→1">
+</div>
+
+The example's edges, one style per type.
 
 --
 
@@ -82,20 +90,19 @@ In the example: tree `0→1, 1→2, 3→4, 4→5` · back `2→0, 5→3` · forw
 
 DFS classifies every edge it examines:
 
-- **tree edge**: leads to an **unvisited** vertex (we recurse) → forms the DFS tree
-- **back edge**: leads to a vertex **still on the recursion stack** (an ancestor) → a **cycle!**
+- **tree edge**: leads to an **unvisited** vertex (we recurse), and forms the DFS tree
+- **back edge**: leads to a vertex **still on the recursion stack** (an ancestor): a **cycle**
 
-```text
-   tree edge:  0 → 1 (new)      back edge: 2 → 0 (ancestor)
-```
+<div><img src="../../topics/figures/graphs/gr-dfs-tree-back.svg" style="height:230px" alt="
+   tree edge:  0 → 1 (new)      back edge: 2 → 0 (ancestor)"></div>
 
 --
 
 ## Theorem: a cycle exists if and only if DFS finds a back edge
 
-**Back edge ⇒ cycle.** v is an ancestor of u: tree edges lead from v down to u, and u → v closes the loop.
+**Back edge $\Rightarrow$ cycle.** $v$ is an ancestor of $u$: tree edges lead from $v$ down to $u$, and $u \to v$ closes the loop.
 
-**Cycle ⇒ back edge.** Let v be the **first** cycle vertex DFS discovers, u its predecessor on the cycle. When v turns gray, the rest of the cycle is white and reachable from v, so u is discovered **inside** v's call. When u examines u → v, v is still gray: a back edge.
+**Cycle $\Rightarrow$ back edge.** Let $v$ be the **first** cycle vertex DFS discovers, $u$ its predecessor on the cycle. When $v$ turns gray, the rest of the cycle is white and reachable from $v$, so $u$ is discovered **inside** $v$'s call. When $u$ examines $u \to v$, $v$ is still gray: a back edge.
 
 --
 
@@ -114,7 +121,7 @@ bool hasCycleFrom(const Graph& g, int u, vector<int>& color) {
 }
 ```
 
-Two colors are **not** enough: with a single visited flag, the forward edge `0→2` and the cross edge `3→1` look exactly like a back edge.
+Two colors are **not** enough: with a single visited flag, the forward edge $0 \to 2$ and the cross edge $3 \to 1$ look exactly like a back edge.
 
 --
 
@@ -132,15 +139,18 @@ DFS on 0→1, 0→2, 1→2, 2→0, 3→1, 3→4, 4→5, 5→3 (restart at 3):
 
 ## Undirected graphs: only two kinds
 
-In an undirected graph, every non-tree edge is a **back** edge; forward and cross edges cannot occur.
-
-But each edge appears **twice** in the adjacency list: the edge back to the vertex we just came from is the **tree edge seen from below**, not a cycle.
+In an undirected graph every non-tree edge is a **back** edge: no forward or cross edges. But each edge appears **twice** in the lists, so skip the edge back to the parent: the **tree edge seen from below**.
 
 ```cpp
-for (int v : g.adj[u]) {
-    if (v == parent) continue;          // the tree edge we arrived by
-    if (visited[v]) return true;        // any other visited neighbor: a cycle
-    ...
+// true if a cycle is reachable from u; parent: the vertex we came from
+bool hasCycleUndirected(const Graph& g, int u, int parent, vector<bool>& visited) {
+    visited[u] = true;
+    for (int v : g.adj[u]) {
+        if (v == parent) continue;          // the tree edge we arrived by
+        if (visited[v]) return true;        // any other visited neighbor: a cycle
+        if (hasCycleUndirected(g, v, u, visited)) return true;
+    }
+    return false;
 }
 ```
 
@@ -148,13 +158,20 @@ for (int v : g.adj[u]) {
 
 ## Your turn: classify the edges
 
-Edges `0→1, 0→4, 1→2, 2→3, 3→1, 4→3, 4→5, 5→0`, neighbors in increasing order, DFS from 0.
-
-Give pre and post for every vertex, then the type of each edge.
+Edges $0 \to 1$, $0 \to 4$, $1 \to 2$, $2 \to 3$, $3 \to 1$, $4 \to 3$, $4 \to 5$, $5 \to 0$; neighbors ascending; DFS from 0. Give pre and post for every vertex, then each edge's type.
 
 <details class="answer"><summary>Answer:</summary>
 
-pre/post: 0 [1,12] · 1 [2,7] · 2 [3,6] · 3 [4,5] · 4 [8,11] · 5 [9,10]. Tree 0→1, 1→2, 2→3, 0→4, 4→5 · back 3→1, 5→0 · cross 4→3 · no forward edges. Two back edges: two cycles found.
+<div style="display:flex; align-items:center; justify-content:center; gap:30px">
+<img src="../../topics/figures/graphs/gr-dfs-turn10.svg" style="height:190px" alt="
+   pre/post: 0 [1,12] · 1 [2,7] · 2 [3,6] · 3 [4,5] · 4 [8,11] · 5 [9,10]
+   tree 0→1, 1→2, 2→3, 0→4, 4→5 · back 3→1, 5→0 · cross 4→3 · no forward edges">
+<div style="text-align:left; max-width:300px">
+
+No forward edges. Two back edges: two cycles found.
+
+</div>
+</div>
 
 </details>
 

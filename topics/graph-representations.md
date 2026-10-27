@@ -20,15 +20,14 @@
 
 `a[u][v] = 1` if there's an edge `u–v`, else 0:
 
-```text
+<div><img src="../../topics/figures/graphs/gr-matrix.svg" style="height:240px" alt="
         0 1 2 3
      0 [0 1 1 0]      edge 0–1? → a[0][1] = 1
      1 [1 0 1 1]      Θ(1) lookup
      2 [1 1 0 0]
-     3 [0 1 0 0]      space: Θ(V²)
-```
+     3 [0 1 0 0]      space: Θ(V²)"></div>
 
-**Edge query O(1)**, but **Θ(V²) space**: wasteful for sparse graphs.
+**Edge query $O(1)$**, but **$\Theta(V^2)$ space**: wasteful for sparse graphs.
 
 --
 
@@ -36,14 +35,16 @@
 
 One list of neighbors per vertex:
 
-```text
+<div><img src="../../topics/figures/graphs/gr-list.svg" style="height:195px" alt="
    0 → [1, 2]        space: Θ(V + E)
    1 → [0, 2, 3]     iterate 1's neighbors: O(deg(1))
    2 → [0, 1]        edge query 0–2: scan 0's list
-   3 → [1]
-```
+   3 → [1]"></div>
 
-**Θ(V + E) space** and **fast neighbor iteration**: the default.
+- iterate 1's neighbors: $O(\deg(1))$
+- edge query $0\text{–}2$: scan 0's list
+
+**$\Theta(V + E)$ space** and **fast neighbor iteration**: the default.
 
 --
 
@@ -51,18 +52,18 @@ One list of neighbors per vertex:
 
 | | matrix | list |
 |---|---|---|
-| space | Θ(V²) | **Θ(V + E)** |
-| edge query u–v | **O(1)** | O(deg u) |
-| iterate neighbors | O(V) | **O(deg u)** |
+| space | $\Theta(V^2)$ | $\boldsymbol{\Theta(V + E)}$ |
+| edge query $u\text{–}v$ | $\boldsymbol{O(1)}$ | $O(\deg u)$ |
+| iterate neighbors | $O(V)$ | $\boldsymbol{O(\deg u)}$ |
 | best for | **dense** | **sparse** |
 
-Real graphs are sparse → **adjacency list** by default. <small>(A third form (a plain list of edges) returns for Kruskal's minimum spanning tree algorithm.)</small>
+Real graphs are sparse, so the **adjacency list** is the default. <small>(A third form (a plain list of edges) returns for Kruskal's minimum spanning tree algorithm.)</small>
 
 --
 
 ## Graph ADT in C++
 
-```text
+```cpp
 struct Graph {
     int V;                          // number of vertices
     vector<vector<int>> adj;        // adj[u] = u's neighbors
@@ -79,10 +80,9 @@ struct Graph {
 
 ## The course graph
 
-```text
+<div><img src="../../topics/figures/graphs/gr-course-adj.svg" style="height:95px" alt="
    0 → 1, 3, 5   2 → 3         4 → 5, 7      6 → -
-   1 → 2, 3      3 → 4, 7      5 → 6         7 → -
-```
+   1 → 2, 3      3 → 4, 7      5 → 6         7 → -"></div>
 
 <div class="algo-viz" data-algo="graph-tour">
 <pre class="viz-fallback">

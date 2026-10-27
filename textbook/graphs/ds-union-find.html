@@ -176,8 +176,52 @@
         each element; <code>connected</code> is a single comparison, but
         <code>unite</code> must sweep the whole array to relabel one component:
       </p>
-      <pre>  connected(p, q):  id[p] == id[q]              <span class="cm">// O(1)</span>
-  unite(p, q):      for every i with id[i]==id[p]: id[i] = id[q]   <span class="cm">// O(N)</span></pre>
+      <div class="code-tabs" data-snippet="graphs/uf-quick-find">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Quick-find: id[i] is the label of i&#x27;s component.
+bool connected(const vector&lt;int&gt;&amp; id, int p, int q) {
+    return id[p] == id[q];                   // O(1)
+}
+void unite(vector&lt;int&gt;&amp; id, int p, int q) {  // O(N): relabel p&#x27;s whole component
+    int from = id[p], to = id[q];            // read both first: id[p] changes below
+    for (int i = 0; i &lt; (int)id.size(); i++)
+        if (id[i] == from) id[i] = to;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Quick-find: id[i] is the label of i&#x27;s component.
+static boolean connected(int[] id, int p, int q) {
+    return id[p] == id[q];                   // O(1)
+}
+static void unite(int[] id, int p, int q) {  // O(N): relabel p&#x27;s whole component
+    int from = id[p], to = id[q];            // read both first: id[p] changes below
+    for (int i = 0; i &lt; id.length; i++)
+        if (id[i] == from) id[i] = to;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Quick-find: id_[i] is the label of i&#x27;s component.
+def connected(id_, p, q):
+    return id_[p] == id_[q]                  # O(1)
+
+def unite(id_, p, q):                        # O(N): relabel p&#x27;s whole component
+    frm, to = id_[p], id_[q]                 # read both first: id_[p] changes below
+    for i in range(len(id_)):
+        if id_[i] == frm:
+            id_[i] = to</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Quick-find: id[i] is the label of i&#x27;s component.
+fn connected(id: &amp;[usize], p: usize, q: usize) -&gt; bool {
+    id[p] == id[q]                           // O(1)
+}
+fn unite(id: &amp;mut [usize], p: usize, q: usize) {  // O(N): relabel p&#x27;s whole component
+    let (from, to) = (id[p], id[q]);         // read both first: id[p] changes below
+    for i in 0..id.len() {
+        if id[i] == from { id[i] = to; }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/graphs/uf-quick-find.cpp &middot; code/graphs/uf-quick-find.java &middot; code/graphs/uf-quick-find.py &middot; code/graphs/uf-quick-find.rs</code></p>
+<!--/ct--></div>
       <p>
         With \(O(N)\) per union, building the structure from \(N\) unions is
         \(O(N^2)\), unusable at scale. <strong>Quick-union</strong> inverts
@@ -186,8 +230,48 @@
         single link, but <code>find</code> walks to the root and can be \(O(N)\) if
         the tree degenerates into a path:
       </p>
-      <pre>  find(p):     follow parent[] to the root          <span class="cm">// O(tree height)</span>
-  unite(p, q): parent[ find(p) ] = find(q)          <span class="cm">// O(1) link, plus 2 finds</span></pre>
+      <div class="code-tabs" data-snippet="graphs/uf-quick-union">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Quick-union: parent[i] is i&#x27;s parent; a root is its own parent.
+int find(const vector&lt;int&gt;&amp; parent, int p) {     // O(tree height)
+    while (p != parent[p]) p = parent[p];        // follow parent[] to the root
+    return p;
+}
+void unite(vector&lt;int&gt;&amp; parent, int p, int q) {  // O(1) link, plus two finds
+    parent[find(parent, p)] = find(parent, q);
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Quick-union: parent[i] is i&#x27;s parent; a root is its own parent.
+static int find(int[] parent, int p) {           // O(tree height)
+    while (p != parent[p]) p = parent[p];        // follow parent[] to the root
+    return p;
+}
+static void unite(int[] parent, int p, int q) {  // O(1) link, plus two finds
+    parent[find(parent, p)] = find(parent, q);
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Quick-union: parent[i] is i&#x27;s parent; a root is its own parent.
+def find(parent, p):                         # O(tree height)
+    while p != parent[p]:                    # follow parent[] to the root
+        p = parent[p]
+    return p
+
+def unite(parent, p, q):                     # O(1) link, plus two finds
+    parent[find(parent, p)] = find(parent, q)</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Quick-union: parent[i] is i&#x27;s parent; a root is its own parent.
+fn find(parent: &amp;[usize], mut p: usize) -&gt; usize {  // O(tree height)
+    while p != parent[p] { p = parent[p]; }         // follow parent[] to the root
+    p
+}
+fn unite(parent: &amp;mut [usize], p: usize, q: usize) {  // O(1) link, plus two finds
+    let (rp, rq) = (find(parent, p), find(parent, q));
+    parent[rp] = rq;
+}</pre>
+<p class="ct-src">source: <code>code/graphs/uf-quick-union.cpp &middot; code/graphs/uf-quick-union.java &middot; code/graphs/uf-quick-union.py &middot; code/graphs/uf-quick-union.rs</code></p>
+<!--/ct--></div>
       <p>
         We have only moved the cost from union to find. Two refinements,
         applied together, drive both operations to near-constant.
@@ -263,12 +347,94 @@
         as a side effect of ordinary queries, so the structure gets faster the more
         it is used:
       </p>
-      <pre>  find(p):
-      while (p != parent[p]) {
-          parent[p] = parent[parent[p]];    <span class="cm">// halve the path</span>
-          p = parent[p];
-      }
-      return p;</pre>
+      <div class="code-tabs" data-snippet="graphs/uf-path-halving">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// find with path halving: point each node on the way at its grandparent.
+int find(vector&lt;int&gt;&amp; parent, int p) {
+    while (p != parent[p]) {
+        parent[p] = parent[parent[p]];    // halve the path
+        p = parent[p];
+    }
+    return p;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// find with path halving: point each node on the way at its grandparent.
+static int find(int[] parent, int p) {
+    while (p != parent[p]) {
+        parent[p] = parent[parent[p]];    // halve the path
+        p = parent[p];
+    }
+    return p;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># find with path halving: point each node on the way at its grandparent.
+def find(parent, p):
+    while p != parent[p]:
+        parent[p] = parent[parent[p]]     # halve the path
+        p = parent[p]
+    return p</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// find with path halving: point each node on the way at its grandparent.
+fn find(parent: &amp;mut [usize], mut p: usize) -&gt; usize {
+    while p != parent[p] {
+        parent[p] = parent[parent[p]];    // halve the path
+        p = parent[p];
+    }
+    p
+}</pre>
+<p class="ct-src">source: <code>code/graphs/uf-path-halving.cpp &middot; code/graphs/uf-path-halving.java &middot; code/graphs/uf-path-halving.py &middot; code/graphs/uf-path-halving.rs</code></p>
+<!--/ct--></div>
+      <figure>
+<!-- gen:wg uf-halving -->
+<svg viewBox="0 0 496 286" role="img" style="max-width:595px" font-family="system-ui, sans-serif" aria-label="Path halving on the chain 4 to 3 to 2 to 1 to 0 (root 0), height 4. find(4) points 4 at its grandparent 2, moves to 2, points 2 at its grandparent 0, and stops at the root. After: 1 and 2 under 0, 3 and 4 under 2, height 2.">
+<text x="70" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">before</text>
+<line x1="70" y1="84" x2="70" y2="76" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M70,69 L74.5,78 L65.5,78 Z" fill="#8a93a6"/>
+<line x1="70" y1="130" x2="70" y2="122" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M70,115 L74.5,124 L65.5,124 Z" fill="#8a93a6"/>
+<line x1="70" y1="176" x2="70" y2="168" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M70,161 L74.5,170 L65.5,170 Z" fill="#8a93a6"/>
+<line x1="70" y1="222" x2="70" y2="214" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M70,207 L74.5,216 L65.5,216 Z" fill="#8a93a6"/>
+<circle cx="70" cy="53" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="70" y="57.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="70" cy="99" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="70" y="103.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="70" cy="145" r="15" fill="#7c5cff" stroke="#7c5cff" stroke-width="2.4"/>
+<text x="70" y="149.8" font-size="13.5" font-weight="600" fill="#fff" text-anchor="middle">2</text>
+<circle cx="70" cy="191" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="70" y="195.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="70" cy="237" r="15" fill="#7c5cff" stroke="#7c5cff" stroke-width="2.4"/>
+<text x="70" y="241.8" font-size="13.5" font-weight="600" fill="#fff" text-anchor="middle">4</text>
+<text x="70" y="273" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">height 4</text>
+<text x="223" y="137" font-size="24" font-weight="400" fill="#5c6270" text-anchor="middle">→</text>
+<text x="223" y="153" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">4 → its grandparent 2</text>
+<text x="223" y="166" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">2 → its grandparent 0</text>
+<text x="401" y="68" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">after find(4)</text>
+<line x1="349.5" y1="134.3" x2="369.3" y2="114.4" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M374.2,109.4 L371.1,118.9 L364.7,112.6 Z" fill="#8a93a6"/>
+<line x1="421.5" y1="134.3" x2="401.7" y2="114.4" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M396.8,109.4 L408.7,113.4 L400.7,121.3 Z" fill="#e8590c"/>
+<line x1="409.3" y1="179.5" x2="419.3" y2="164.2" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M423.2,158.4 L422,168.3 L414.5,163.4 Z" fill="#8a93a6"/>
+<line x1="454.7" y1="179.5" x2="444.7" y2="164.2" stroke="#e8590c" stroke-width="3.4"/>
+<path d="M440.8,158.4 L451.7,164.7 L442.3,170.8 Z" fill="#e8590c"/>
+<circle cx="385.5" cy="98" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="385.5" y="102.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">0</text>
+<circle cx="339" cy="145" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="339" y="149.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="432" cy="145" r="15" fill="#7c5cff" stroke="#7c5cff" stroke-width="2.4"/>
+<text x="432" y="149.8" font-size="13.5" font-weight="600" fill="#fff" text-anchor="middle">2</text>
+<circle cx="401" cy="192" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="401" y="196.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="463" cy="192" r="15" fill="#7c5cff" stroke="#7c5cff" stroke-width="2.4"/>
+<text x="463" y="196.8" font-size="13.5" font-weight="600" fill="#fff" text-anchor="middle">4</text>
+<text x="401" y="228" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">height 2</text>
+</svg>
+<!-- /gen:wg uf-halving -->
+      </figure>
       <div class="ex">
         <span class="tag">Example (weighted vs. plain, then compression)</span>
         Apply <code>unite(4,3)</code>, <code>unite(3,8)</code>,
@@ -280,6 +446,45 @@
         <code>find</code> on any deep node repoints it straight toward the root, so
         the next <code>find</code> on it is one hop. Weighting prevents tall trees;
         compression removes the ones that form anyway.
+        <figure>
+<!-- gen:wg uf-weighting -->
+<svg viewBox="0 0 416 206" role="img" style="max-width:499px" font-family="system-ui, sans-serif" aria-label="After unite(4, 3), unite(3, 8), unite(9, 4) on elements 0 to 9 (shown: 3, 4, 8, 9; the rest stay alone). Plain quick-union: 4 under 3, 3 under 8, 9 under 8, height 2. Weighted quick-union: 3, 8 and 9 all under 4, height 1.">
+<text x="95" y="23" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">plain quick-union</text>
+<line x1="44.5" y1="95.4" x2="77.4" y2="67.8" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M82.7,63.3 L78.7,72.5 L73,65.6 Z" fill="#8a93a6"/>
+<line x1="33" y1="142" x2="33" y2="128" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M33,121 L37.5,130 L28.5,130 Z" fill="#8a93a6"/>
+<line x1="145.5" y1="95.4" x2="112.6" y2="67.8" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M107.3,63.3 L117,65.6 L111.3,72.5 Z" fill="#8a93a6"/>
+<circle cx="33" cy="105" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="33" y="109.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="33" cy="157" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="33" y="161.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<circle cx="95" cy="53" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="95" y="57.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">8</text>
+<circle cx="157" cy="105" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="157" y="109.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="95" y="193" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">height 2</text>
+
+<text x="321" y="53" font-size="12" font-weight="600" fill="#2a2d36" text-anchor="middle">weighted (by size)</text>
+<line x1="271.2" y1="118.3" x2="302.2" y2="96.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M308,92.3 L303.2,101.1 L298,93.8 Z" fill="#8a93a6"/>
+<line x1="321" y1="112" x2="321" y2="106" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M321,99 L325.5,108 L316.5,108 Z" fill="#8a93a6"/>
+<line x1="370.8" y1="118.3" x2="339.8" y2="96.3" stroke="#8a93a6" stroke-width="1.6"/>
+<path d="M334,92.3 L344,93.8 L338.8,101.1 Z" fill="#8a93a6"/>
+<circle cx="259" cy="127" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="259" y="131.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="321" cy="83" r="15" fill="#e7f7ee" stroke="#0a7d4d" stroke-width="2.4"/>
+<text x="321" y="87.8" font-size="13.5" font-weight="600" fill="#0a5c39" text-anchor="middle">4</text>
+<circle cx="321" cy="127" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="321" y="131.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="383" cy="127" r="15" fill="#fff" stroke="#5c6270" stroke-width="1.6"/>
+<text x="383" y="131.8" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">9</text>
+<text x="321" y="163" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">height 1</text>
+</svg>
+<!-- /gen:wg uf-weighting -->
+        </figure>
       </div>
       <p>
         Here is the whole structure, two arrays and three short methods:
@@ -503,7 +708,7 @@ impl UF {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Union-Find v1.0 &middot; prepared by
+        Data Structures &amp; Algorithms &middot; Union-Find v1.1 &middot; prepared by
         Dr. Marcel Gavriliu. Typeset with MathJax; interactive demos in the course
         library.
       </footer>

@@ -4,7 +4,7 @@
   Needs:   nothing beyond sets.
   Demos:   none
   Program: none
-  Budget:  ~16 min, 7 slides.
+  Budget:  ~17 min, 8 slides.
   Ported from Summer 2026 L08-graphs-bfs-dfs.md, parts 1.
 -->
 
@@ -18,14 +18,24 @@
 
 ## What is a graph?
 
-A **graph** `G = (V, E)`: a set of **vertices** V and a set of **edges** E connecting pairs of them.
+A **graph** $G = (V, E)$: a set of **vertices** $V$ and a set of **edges** $E$ connecting pairs of them.
 
-```text
+<div style="display:flex; align-items:center; justify-content:center; gap:36px">
+<img src="../../topics/figures/graphs/gr-ug4.svg" style="height:180px" alt="
    0 -- 1       V = { 0, 1, 2, 3 }
    |  / |       E = { 0–1, 0–2, 1–2, 1–3 }
    | /  |
-   2    3       4 vertices, 4 edges, a cycle 0–1–2–0
-```
+   2    3       4 vertices, 4 edges, a cycle 0–1–2–0">
+<div style="text-align:left">
+
+$V = \lbrace 0, 1, 2, 3 \rbrace$
+
+$E = \lbrace 0\text{–}1, 0\text{–}2, 1\text{–}2, 1\text{–}3 \rbrace$
+
+4 vertices, 4 edges
+
+</div>
+</div>
 
 The most general structure we've seen: and the data model for maps, social networks, the web, dependencies, circuits…
 
@@ -33,10 +43,9 @@ The most general structure we've seen: and the data model for maps, social netwo
 
 ## Undirected vs directed
 
-```text
+<div><img src="../../topics/figures/graphs/gr-directions.svg" style="height:170px" alt="
    undirected:  0 -- 1     edge goes both ways
-   directed:    0 --> 1    edge has a direction
-```
+   directed:    0 --> 1    edge has a direction"></div>
 
 - **undirected**: friendship, roads (two-way)
 - **directed (digraph)**: web links, task order, one-way streets
@@ -57,13 +66,21 @@ The most general structure we've seen: and the data model for maps, social netwo
 
 Each edge has exactly **2 endpoints**, so summing all degrees counts every edge **exactly twice**:
 
-```text
-   Σ deg(v) = 2·E
+<div style="display:flex; align-items:center; justify-content:center; gap:36px">
+<img src="../../topics/figures/graphs/gr-degrees.svg" style="height:165px" alt="
+   our graph: degrees 2, 3, 2, 1 → sum 8 = 2·4 ✓">
+<div style="text-align:left">
 
-   our graph: degrees 2, 3, 2, 1 → sum 8 = 2·4 ✓
-```
+$$\sum\_{v \in V} \deg(v) = 2E$$
 
-In a **digraph**: Σ in-deg = Σ out-deg = E. <br><small>Remember this: it drives the Θ(V + E) proofs for DFS and BFS.</small>
+here: $2 + 3 + 2 + 1 = 8 = 2 \cdot 4$ ✓
+
+</div>
+</div>
+
+In a **digraph**: $\sum \text{in-deg} = \sum \text{out-deg} = E$.
+
+<small>Remember this: it drives the $\Theta(V + E)$ proofs for DFS and BFS.</small>
 
 --
 
@@ -71,12 +88,10 @@ In a **digraph**: Σ in-deg = Σ out-deg = E. <br><small>Remember this: it drive
 
 Simple undirected graph (no self-loops, no repeats):
 
-```text
-   0  ≤  E  ≤  V(V−1)/2 = Θ(V²)      (every pair)
-```
+$$0 \le E \le \binom{V}{2} = \frac{V(V-1)}{2} = \Theta(V^2) \qquad \text{(every pair)}$$
 
-- **sparse**: E = O(V): roads, social networks, the web
-- **dense**: E = Θ(V²): an all-pairs mesh
+- **sparse**: $E = O(V)$: roads, social networks, the web
+- **dense**: $E = \Theta(V^2)$: an all-pairs mesh
 
 Real graphs are almost always **sparse**: that fact will pick our representation.
 
@@ -86,11 +101,21 @@ Real graphs are almost always **sparse**: that fact will pick our representation
 
 A **tree** = a connected **undirected** graph with **no cycles**:
 
-- every tree on V vertices has **exactly V − 1** edges
-- two of {connected, acyclic, E = V−1} force the third
-- +1 edge → a cycle · −1 edge → disconnected
-
-<small>**Undirected matters.** The directed diamond `1→2, 1→3, 2→4, 3→4` is connected with **no directed cycle**: yet it is **not** a tree: two paths reach 4, and E = V. Acyclic *digraphs* are **DAGs**, a strictly bigger family.</small>
+- every tree on $V$ vertices has **exactly $V - 1$** edges
+- two of connected, acyclic, $E = V - 1$ force the third
+- one more edge makes a cycle; one fewer disconnects it
 
 All our tree structures were special-case graphs; graphs remove the restrictions.
+
+--
+
+## Undirected matters
+
+<div><img src="../../topics/figures/graphs/gr-shadow.svg" style="height:200px" alt="
+   the directed diamond 1→2, 1→3, 2→4, 3→4: no directed cycle;
+   drop the directions: the cycle 1–2–4–3–1"></div>
+
+The directed diamond $1 \to 2$, $1 \to 3$, $2 \to 4$, $3 \to 4$ is connected with **no directed cycle**, yet it is **not** a tree: two paths reach 4, and $E = V$.
+
+Acyclic *digraphs* are **DAGs**: a strictly bigger family than trees.
 
