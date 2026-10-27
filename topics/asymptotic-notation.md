@@ -11,6 +11,7 @@
   Needs:   the cost-model topic (tilde, order of growth); the faster-3sum
            topic (sum and product rules, informally).
   Demos:   none.
+  Figures: an-big-o, an-theta (tools/gen-analysis-figures.mjs).
   Program: none.
   Budget:  ~38 min, 27 slides.
   Math:    marked runs before KaTeX. No \, \; \{ in math (use \lbrace,
@@ -19,31 +20,31 @@
   Matches: textbook/foundations/foundation-asymptotic-notation.html
 -->
 
-### Asymptotic notation: O, Ω, Θ as sets
+### Asymptotic notation: $O$, $\Omega$, $\Theta$ as sets
 
-> Paul Bachmann introduced the O notation in 1894; Donald Knuth proposed Ω and Θ with their present meanings in 1976.
+> Paul Bachmann introduced the $O$ notation in 1894; Donald Knuth proposed $\Omega$ and $\Theta$ with their present meanings in 1976.
 
 <small>D. E. Knuth, “Big Omicron and Big Omega and Big Theta,” SIGACT News, 1976</small>
 
 --
 
-## "Order of growth N³" was informal
+## "Order of growth $N^3$" was informal
 
-So far: "**about** N³/6", "**order of growth** N³", "grows **like** N²".
+So far: "**about** $N^3/6$", "**order of growth** $N^3$", "grows **like** $N^2$".
 
 To state guarantees we need a definition that
 
 - ignores constant factors (the machine)
-- ignores small n (start-up behavior)
+- ignores small $n$ (start-up behavior)
 - turns "grows like" into a **true or false question**
 
 --
 
 ## The key idea: a set of functions
 
-**O(g)** is a **set**: all the functions that grow no faster than g, up to a constant factor.
+$\boldsymbol{O(g)}$ is a **set**: all the functions that grow no faster than $g$, up to a constant factor.
 
-For any function f, exactly one holds:
+For any function $f$, exactly one holds:
 
 $$f \in O(g) \qquad \text{or} \qquad f \notin O(g)$$
 
@@ -57,71 +58,73 @@ $$O(g(n)) = \lbrace f(n) : \exists c, n_0 > 0 \text{ such that}$$
 
 $$0 \le f(n) \le c \cdot g(n) \text{ for all } n \ge n_0 \rbrace$$
 
-Read: f is in O(g) if **some constant multiple of g** stays **above f** from **some point n₀ on**.
+Read: $f$ is in $O(g)$ if **some constant multiple of** $\boldsymbol{g}$ stays **above** $\boldsymbol{f}$ from **some point** $\boldsymbol{n\_0}$ **on**.
 
-- **c** absorbs constant factors
-- **n₀** discards small inputs
+- $\boldsymbol{c}$ absorbs constant factors
+- $\boldsymbol{n\_0}$ discards small inputs
 
 --
 
 ## The picture
 
-<img src="../../topics/figures/big-o-bound.svg" style="width:58%">
+<div><img src="../../topics/figures/complexity/an-big-o.svg" style="height:360px" alt="
+   f(n) = 2n^2 + 8n + 5 and c g(n) = 3n^2, n = 0 .. 20:
+   f is above 3n^2 until n0 = 9, below it from n0 on (shaded)"></div>
 
-Past **n₀**, the curve **c·g(n)** stays above **f(n)**. Left of n₀, anything goes.
+Past $\boldsymbol{n\_0}$, the curve $\boldsymbol{c \cdot g(n)}$ stays above $\boldsymbol{f(n)}$. Left of $n\_0$, anything goes.
 
 --
 
 ## Proving membership
 
-**Claim:** 2n² + 8n + 5 ∈ O(n²).
+**Claim:** $2n^2 + 8n + 5 \in O(n^2)$.
 
-**Witnesses.** For n ≥ 1, each lower term is at most a multiple of n²: 8n ≤ 8n² and 5 ≤ 5n². So
+**Witnesses.** For $n \ge 1$, each lower term is at most a multiple of $n^2$: $8n \le 8n^2$ and $5 \le 5n^2$. So
 
 $$2n^2 + 8n + 5 \le 2n^2 + 8n^2 + 5n^2 = 15n^2$$
 
-With **c = 15, n₀ = 1** the definition holds, so the function **is a member**. ∎
+With $\boldsymbol{c = 15}$, $\boldsymbol{n\_0 = 1}$ the definition holds, so the function **is a member**. ∎
 
 --
 
 ## Witnesses are not unique
 
-For 2n² + 8n + 5 ≤ c·n², several pairs work:
+For $2n^2 + 8n + 5 \le c \cdot n^2$, several pairs work:
 
-| c | smallest n₀ | why |
+| $c$ | smallest $n\_0$ | why |
 | :-: | :-: | --- |
 | 15 | 1 | term-by-term bound |
-| 3 | 9 | n² − 8n − 5 ≥ 0 from n = 9 on |
-| 2.5 | 17 | 0.5n² ≥ 8n + 5 from n = 17 on |
-| 2 | none | 8n + 5 ≤ 0 never holds |
+| 3 | 9 | $n^2 - 8n - 5 \ge 0$ from $n = 9$ on |
+| 2.5 | 17 | $0.5n^2 \ge 8n + 5$ from $n = 17$ on |
+| 2 | none | $8n + 5 \le 0$ never holds |
 
-A smaller c needs a later n₀; any c **above the leading coefficient 2** works.
+A smaller $c$ needs a later $n\_0$; any $c$ **above the leading coefficient 2** works.
 
 --
 
 ## Proving non-membership
 
-**Claim:** 6n³ ∉ O(n²).
+**Claim:** $6n^3 \notin O(n^2)$.
 
-**Proof.** Suppose some c, n₀ > 0 had 6n³ ≤ c·n² for all n ≥ n₀. Divide by n²:
+**Proof.** Suppose some $c, n\_0 > 0$ had $6n^3 \le c \cdot n^2$ for all $n \ge n\_0$. Divide by $n^2$:
 
 $$n \le \frac{c}{6} \quad \text{for all } n \ge n_0$$
 
-But c/6 is a fixed number and n grows without bound: **contradiction**. No witnesses exist. ∎
+But $c/6$ is a fixed number and $n$ grows without bound: **contradiction**. No witnesses exist. ∎
 
 --
 
-## O(g) is an upper bound, not a tight one
+## $O(g)$ is an upper bound, not a tight one
 
-All of these are members of **O(n²)**:
+All of these are members of $\boldsymbol{O(n^2)}$:
 
 $$5n \in O(n^2)$$
 
 $$n \log\_2 n \in O(n^2) \qquad 3n^2 + 100n \in O(n^2)$$
 
-The sets are **nested**: O(n) ⊂ O(n log₂ n) ⊂ O(n²) ⊂ O(n³).
+The sets are **nested**: $O(n) \subset O(n \log\_2 n) \subset O(n^2) \subset O(n^3)$.
 
-Saying an algorithm's cost is in O(n²) says it is **at most** about n²; it could be linear.
+Saying an algorithm's cost is in $O(n^2)$ says it is **at most** about $n^2$; it could be linear.
 
 --
 
@@ -131,9 +134,9 @@ $$\Omega(g(n)) = \lbrace f(n) : \exists c, n_0 > 0 \text{ such that}$$
 
 $$0 \le c \cdot g(n) \le f(n) \text{ for all } n \ge n_0 \rbrace$$
 
-f is in Ω(g) if **some constant multiple of g** stays **below f** from n₀ on: f grows **at least as fast** as g.
+$f$ is in $\Omega(g)$ if **some constant multiple of** $\boldsymbol{g}$ stays **below** $\boldsymbol{f}$ from $n\_0$ on: $f$ grows **at least as fast** as $g$.
 
-**Example:** 2n² + 8n + 5 ∈ Ω(n²) with **c = 2, n₀ = 1**: the leading term alone is enough.
+**Example:** $2n^2 + 8n + 5 \in \Omega(n^2)$ with $\boldsymbol{c = 2}$, $\boldsymbol{n\_0 = 1}$: the leading term alone is enough.
 
 --
 
@@ -143,114 +146,116 @@ $$\Theta(g(n)) = \lbrace f(n) : \exists c\_1, c\_2, n\_0 > 0 \text{ such that}$$
 
 $$0 \le c\_1 g(n) \le f(n) \le c\_2 g(n) \text{ for all } n \ge n\_0 \rbrace$$
 
-f is **squeezed** between two constant multiples of g: the **tight** bound.
+$f$ is **squeezed** between two constant multiples of $g$: the **tight** bound.
 
 --
 
 ## The sandwich
 
-<img src="../../topics/figures/theta-sandwich.svg" style="width:58%">
+<div><img src="../../topics/figures/complexity/an-theta.svg" style="height:360px" alt="
+   f(n) = 2n^2 + 8n + 5 between 2n^2 and 3n^2, n = 0 .. 20:
+   below 3n^2 from n = 9, above 2n^2 from n = 1, squeezed from n0 = 9 on"></div>
 
-Past n₀: **c₁·g(n) ≤ f(n) ≤ c₂·g(n)**.
+Past $n\_0$: $\boldsymbol{c\_1 \cdot g(n) \le f(n) \le c\_2 \cdot g(n)}$.
 
 --
 
-## Proving Θ membership
+## Proving $\Theta$ membership
 
-**Claim:** ½n² − 3n ∈ Θ(n²).
+**Claim:** $\frac{1}{2}n^2 - 3n \in \Theta(n^2)$.
 
-Need c₁n² ≤ ½n² − 3n ≤ c₂n². Divide by n²:
+Need $c\_1 n^2 \le \frac{1}{2}n^2 - 3n \le c\_2 n^2$. Divide by $n^2$:
 
 $$c\_1 \le \frac{1}{2} - \frac{3}{n} \le c\_2$$
 
-- right side: holds for all n ≥ 1 with **c₂ = ½**
-- left side: at n = 7 the middle is 1/14, and it only grows, so **c₁ = 1/14**
+- right side: holds for all $n \ge 1$ with $\boldsymbol{c\_2 = \frac{1}{2}}$
+- left side: at $n = 7$ the middle is $\frac{1}{14}$, and it only grows, so $\boldsymbol{c\_1 = \frac{1}{14}}$
 
-**c₁ = 1/14, c₂ = ½, n₀ = 7.** ∎
-
---
-
-## A Θ proof, line by line
-
-**Claim:** 3n² − 5n + 2 ∈ Θ(n²). Find c₁, c₂, n₀ with c₁n² ≤ 3n² − 5n + 2 ≤ c₂n² for all n ≥ n₀.
-
-1. **Upper.** For n ≥ 1, −5n + 2 ≤ −3 < 0, so 3n² − 5n + 2 ≤ 3n². Take **c₂ = 3**.
-2. **Lower.** Try c₁ = 2: need 3n² − 5n + 2 ≥ 2n², that is n² − 5n + 2 ≥ 0.
-3. The roots of n² − 5n + 2 are (5 ± √17)/2, about 0.44 and **4.56**, so it holds for every n ≥ 5.
-4. **Witnesses:** c₁ = 2, c₂ = 3, n₀ = 5. Check n = 5: 2·25 = 50 ≤ 52 ≤ 75 = 3·25. ∎
+$\boldsymbol{c\_1 = \frac{1}{14}}$, $\boldsymbol{c\_2 = \frac{1}{2}}$, $\boldsymbol{n\_0 = 7}$. ∎
 
 --
 
-## Theorem: Θ = O ∩ Ω
+## A $\Theta$ proof, line by line
+
+**Claim:** $3n^2 - 5n + 2 \in \Theta(n^2)$. Find $c\_1, c\_2, n\_0$ with $c\_1 n^2 \le 3n^2 - 5n + 2 \le c\_2 n^2$ for all $n \ge n\_0$.
+
+1. **Upper.** For $n \ge 1$, $-5n + 2 \le -3 < 0$, so $3n^2 - 5n + 2 \le 3n^2$. Take $\boldsymbol{c\_2 = 3}$.
+2. **Lower.** Try $c\_1 = 2$: need $3n^2 - 5n + 2 \ge 2n^2$, that is $n^2 - 5n + 2 \ge 0$.
+3. The roots of $n^2 - 5n + 2$ are $(5 \pm \sqrt{17})/2$, about 0.44 and **4.56**, so it holds for every $n \ge 5$.
+4. **Witnesses:** $c\_1 = 2$, $c\_2 = 3$, $n\_0 = 5$. Check $n = 5$: $2 \cdot 25 = 50 \le 52 \le 75 = 3 \cdot 25$. ∎
+
+--
+
+## Theorem: $\Theta = O \cap \Omega$
 
 $$\Theta(g) = O(g) \cap \Omega(g)$$
 
-**⊆:** the right inequality of Θ is the O condition; the left is the Ω condition.
+$\boldsymbol{\subseteq}$: the right inequality of $\Theta$ is the $O$ condition; the left is the $\Omega$ condition.
 
-**⊇:** take f ∈ O(g) with witnesses (c₂, a) and f ∈ Ω(g) with (c₁, b). Then **c₁, c₂** and **n₀ = max(a, b)** witness Θ.
+$\boldsymbol{\supseteq}$: take $f \in O(g)$ with witnesses $(c\_2, a)$ and $f \in \Omega(g)$ with $(c\_1, b)$. Then $\boldsymbol{c\_1, c\_2}$ and $\boldsymbol{n\_0 = \max(a, b)}$ witness $\Theta$.
 
-A tight bound is **an upper bound and a lower bound for the same g**.
+A tight bound is **an upper bound and a lower bound for the same** $\boldsymbol{g}$.
 
 --
 
 ## Theorem: polynomials
 
-If p(n) = aₖnᵏ + … + a₁n + a₀ with **aₖ > 0**, then **p ∈ Θ(nᵏ)**.
+If $p(n) = a\_k n^k + \cdots + a\_1 n + a\_0$ with $\boldsymbol{a\_k > 0}$, then $\boldsymbol{p \in \Theta(n^k)}$.
 
-**Proof idea.** Let A = |a₀| + … + |aₖ₋₁|.
+**Proof idea.** Let $A = \lvert a\_0 \rvert + \cdots + \lvert a\_{k-1} \rvert$.
 
-- **upper:** for n ≥ 1 every nⁱ ≤ nᵏ, so p(n) ≤ (aₖ + A)nᵏ
-- **lower:** p(n) ≥ aₖnᵏ − Anᵏ⁻¹ ≥ (aₖ/2)nᵏ once n ≥ 2A/aₖ
+- **upper:** for $n \ge 1$ every $n^i \le n^k$, so $p(n) \le (a\_k + A) n^k$
+- **lower:** $p(n) \ge a\_k n^k - A n^{k-1} \ge (a\_k/2) n^k$ once $n \ge 2A/a\_k$
 
-**c₁ = aₖ/2, c₂ = aₖ + A, n₀ = max(1, 2A/aₖ).** ∎
+$\boldsymbol{c\_1 = a\_k/2}$, $\boldsymbol{c\_2 = a\_k + A}$, $\boldsymbol{n\_0 = \max(1, 2A/a\_k)}$. ∎
 
 --
 
-## ∈ or = ?
+## $\in$ or $=$ ?
 
-The precise statement is **membership**: n ∈ O(n²).
+The precise statement is **membership**: $n \in O(n^2)$.
 
-The common shorthand **n = O(n²)** means the same thing, but it is **not an equation**:
+The common shorthand $\boldsymbol{n = O(n^2)}$ means the same thing, but it is **not an equation**:
 
-- read **left to right only**: never "O(n²) = n"
-- **not transitive as an equality**: n = O(n²) and n² = O(n²), yet n ≠ n²
+- read **left to right only**: never "$O(n^2) = n$"
+- **not transitive as an equality**: $n = O(n^2)$ and $n^2 = O(n^2)$, yet $n \ne n^2$
 
-Inside a formula, a set stands for **some member**: 2n² + 3n + 1 = 2n² + Θ(n), where Θ(n) stands for 3n + 1.
+Inside a formula, a set stands for **some member**: $2n^2 + 3n + 1 = 2n^2 + \Theta(n)$, where $\Theta(n)$ stands for $3n + 1$.
 
 --
 
 ## Order of growth, precisely
 
-"The cost has order of growth g" means **cost ∈ Θ(g)**:
+"The cost has order of growth $g$" means $\boldsymbol{\text{cost} \in \Theta(g)}$:
 
 | count | membership |
 | --- | --- |
-| C(N, 3) = N(N − 1)(N − 2)/6 | ∈ Θ(N³) |
-| fast 3-sum's array accesses | ∈ Θ(N² log₂ N) |
-| mergesort's buffer, 4N bytes | ∈ Θ(N) |
+| $\binom{N}{3} = N(N - 1)(N - 2)/6$ | $\in \Theta(N^3)$ |
+| fast 3-sum's array accesses | $\in \Theta(N^2 \log\_2 N)$ |
+| mergesort's buffer, $4N$ bytes | $\in \Theta(N)$ |
 
-**Tilde is stronger:** f ~ g implies f ∈ Θ(g), but not the reverse. 2N³ ∈ Θ(N³), yet 2N³ is not ~ N³.
+**Tilde is stronger:** $f \sim g$ implies $f \in \Theta(g)$, but not the reverse. $2N^3 \in \Theta(N^3)$, yet $2N^3 \not\sim N^3$.
 
 --
 
 ## Sum and product rules, as set facts
 
-If **f₁ ∈ O(g₁)** and **f₂ ∈ O(g₂)**, then
+If $\boldsymbol{f\_1 \in O(g\_1)}$ and $\boldsymbol{f\_2 \in O(g\_2)}$, then
 
-- **sum:** f₁ + f₂ ∈ O(max(g₁, g₂))
-- **product:** f₁ · f₂ ∈ O(g₁ · g₂)
+- **sum:** $f\_1 + f\_2 \in O(\max(g\_1, g\_2))$
+- **product:** $f\_1 \cdot f\_2 \in O(g\_1 \cdot g\_2)$
 
-**Proof of the sum rule.** With witnesses (c₁, a) and (c₂, b), for n ≥ max(a, b):
+**Proof of the sum rule.** With witnesses $(c\_1, a)$ and $(c\_2, b)$, for $n \ge \max(a, b)$:
 
-f₁ + f₂ ≤ c₁g₁ + c₂g₂ ≤ (c₁ + c₂) · max(g₁, g₂). ∎
+$$f\_1 + f\_2 \le c\_1 g\_1 + c\_2 g\_2 \le (c\_1 + c\_2) \cdot \max(g\_1, g\_2) \qquad \blacksquare$$
 
-The same rules hold for Θ.
+The same rules hold for $\Theta$.
 
 --
 
 ## The hierarchy
 
-Each function is in **O** of the next, but **not in Ω** of it:
+Each function is in $\boldsymbol{O}$ of the next, but **not in** $\boldsymbol{\Omega}$ of it:
 
 <div style="font-size:0.88em">
 
@@ -258,54 +263,54 @@ $$1 \quad \log\_2 n \quad \sqrt{n} \quad n \quad n \log\_2 n \quad n^2 \quad n^3
 
 </div>
 
-**Limit test:** if f(n)/g(n) → 0, then f ∈ O(g) and f ∉ Ω(g).
+**Limit test:** if $f(n)/g(n) \to 0$, then $f \in O(g)$ and $f \notin \Omega(g)$.
 
-- log₂ n / nᵉ → 0 for every e > 0: a log loses to any positive power
-- nᵏ / 2ⁿ → 0 for every k: any polynomial loses to 2ⁿ
+- $\log\_2 n / n^e \to 0$ for every $e > 0$: a log loses to any positive power
+- $n^k / 2^n \to 0$ for every $k$: any polynomial loses to $2^n$
 
 --
 
 ## The limit test
 
-If the limit of f(n)/g(n) as n → ∞ **exists**, it settles the comparison:
+If the limit of $f(n)/g(n)$ as $n \to \infty$ **exists**, it settles the comparison:
 
-| limit of f/g | conclusion |
+| limit of $f/g$ | conclusion |
 | --- | --- |
-| 0 | f ∈ O(g), f ∉ Ω(g): g grows strictly faster |
-| a constant L > 0 | f ∈ Θ(g) |
-| ∞ | f ∈ Ω(g), f ∉ O(g): f grows strictly faster |
+| $0$ | $f \in O(g)$, $f \notin \Omega(g)$: $g$ grows strictly faster |
+| a constant $L > 0$ | $f \in \Theta(g)$ |
+| $\infty$ | $f \in \Omega(g)$, $f \notin O(g)$: $f$ grows strictly faster |
 
-**Example:** (3n² − 5n + 2)/n² = 3 − 5/n + 2/n² → 3, so the function is in Θ(n²) with no witnesses to hunt for.
+**Example:** $(3n^2 - 5n + 2)/n^2 = 3 - 5/n + 2/n^2 \to 3,$ so the function is in $\Theta(n^2)$ with no witnesses to hunt for.
 
 --
 
 ## Logarithm bases do not matter
 
-For bases a, b > 1: $$\log\_a n = \frac{1}{\log\_b a} \cdot \log\_b n$$
+For bases $a, b > 1$: $$\log\_a n = \frac{1}{\log\_b a} \cdot \log\_b n$$
 
-A **positive constant** factor, so it serves as c₁ and c₂. Example: log₂ n is about **1.443 · ln n**.
+A **positive constant** factor, so it serves as $c\_1$ and $c\_2$. Example: $\log\_2 n$ is about $\boldsymbol{1.443 \ln n}$.
 
-O(log₂ n), O(ln n), O(log₁₀ n) are **the same set**: write O(log n).
+$O(\log\_2 n)$, $O(\ln n)$, $O(\log\_{10} n)$ are **the same set**: write $O(\log n)$.
 
 --
 
 ## Exponentials beat every polynomial
 
-**Claim:** for every fixed k, 2ⁿ ∉ O(nᵏ).
+**Claim:** for every fixed $k$, $2^n \notin O(n^k)$.
 
-**Proof.** If 2ⁿ ≤ c·nᵏ for all n ≥ n₀, take log₂:
+**Proof.** If $2^n \le c \cdot n^k$ for all $n \ge n\_0$, take $\log\_2$:
 
 $$n \le \log\_2 c + k \log\_2 n$$
 
-n − k log₂ n is unbounded: **contradiction**. ∎
+$n - k \log\_2 n$ is unbounded: **contradiction**. ∎
 
-Crossovers: 2ⁿ ≥ n² from n = 4, ≥ n³ from 10, ≥ n¹⁰ from 59.
+Crossovers: $2^n \ge n^2$ from $n = 4$, $\ge n^3$ from 10, $\ge n^{10}$ from 59.
 
 --
 
 ## Rank these functions
 
-Order by growth, slowest first; mark any two in the same Θ:
+Order by growth, slowest first; mark any two in the same $\Theta$:
 
 $$n^2 \quad \sqrt{n} \quad n \log\_2 n \quad 2^{\log\_2 n}$$
 $$\frac{n^2}{\log\_2 n} \quad (\log\_2 n)^2 \quad n^{1.5} \quad \log\_2(n!)$$
@@ -321,10 +326,10 @@ $$\prec n^{1.5} \prec n^2 / \log\_2 n \prec n^2$$
 
 ## Common mistakes
 
-- **Constants that depend on n.** "n² ≤ c·n with c = n" proves nothing.
-- **Checking a few values.** The inequality must hold for **every** n ≥ n₀.
-- **Reading O as "the running time".** O is only an upper bound; 5n ∈ O(n³) is true.
-- **Writing lower bounds with O.** "At least n" is Ω(n).
+- **Constants that depend on** $\boldsymbol{n}$. "$n^2 \le c \cdot n$ with $c = n$" proves nothing.
+- **Checking a few values.** The inequality must hold for **every** $n \ge n\_0$.
+- **Reading** $\boldsymbol{O}$ **as "the running time".** $O$ is only an upper bound; $5n \in O(n^3)$ is true.
+- **Writing lower bounds with** $\boldsymbol{O}$. "At least $n$" is $\Omega(n).$
 
 --
 
@@ -332,13 +337,13 @@ $$\prec n^{1.5} \prec n^2 / \log\_2 n \prec n^2$$
 
 With a neighbor: **member or not?** Give witnesses or a contradiction.
 
-1. (n + 1)² ∈ Θ(n²)?
-2. log₂(n²) ∈ O(log₂ n)?
-3. 2²ⁿ ∈ O(2ⁿ)?
+1. $(n + 1)^2 \in \Theta(n^2)$?
+2. $\log\_2(n^2) \in O(\log\_2 n)$?
+3. $2^{2n} \in O(2^n)$?
 
 <details class="answer"><summary>Answer:</summary>
 
-(1) Yes: n² ≤ (n + 1)² ≤ 4n² for n ≥ 1. (2) Yes: log₂(n²) = 2 log₂ n, so c = 2. (3) No: 2²ⁿ/2ⁿ = 2ⁿ exceeds every constant c.
+(1) Yes: $n^2 \le (n + 1)^2 \le 4n^2$ for $n \ge 1$. (2) Yes: $\log\_2(n^2) = 2 \log\_2 n$, so $c = 2$. (3) No: $2^{2n}/2^n = 2^n$ exceeds every constant $c$.
 
 </details>
 
@@ -346,12 +351,12 @@ With a neighbor: **member or not?** Give witnesses or a contradiction.
 
 ## Your turn: two proofs
 
-1. Prove **5n³ + 2n ∈ Θ(n³)**: give c₁, c₂ and n₀.
-2. Prove **n² ∉ O(n log₂ n)**.
+1. Prove $\boldsymbol{5n^3 + 2n \in \Theta(n^3)}$: give $c\_1$, $c\_2$ and $n\_0$.
+2. Prove $\boldsymbol{n^2 \notin O(n \log\_2 n)}$.
 
 <details class="answer"><summary>Answer:</summary>
 
-**(1)** For n ≥ 1: 5n³ ≤ 5n³ + 2n ≤ 5n³ + 2n³ = 7n³, so c₁ = 5, c₂ = 7, n₀ = 1. **(2)** Suppose n² ≤ c·n log₂ n for all n ≥ n₀. Dividing by n log₂ n gives n / log₂ n ≤ c, but n / log₂ n grows without bound: contradiction.
+**(1)** For $n \ge 1$: $5n^3 \le 5n^3 + 2n \le 5n^3 + 2n^3 = 7n^3$, so $c\_1 = 5, c\_2 = 7, n\_0 = 1.$ **(2)** Suppose $n^2 \le c \cdot n \log\_2 n$ for all $n \ge n\_0$. Dividing by $n \log\_2 n$ gives $n / \log\_2 n \le c$, but $n / \log\_2 n$ grows without bound: contradiction.
 
 </details>
 

@@ -302,8 +302,8 @@
         order of the memory accesses differs.
       </p>
       <pre><span class="cm">// m is an 8192 x 8192 matrix of int (256 MiB), stored row by row</span>
-for (r = 0; r &lt; n; r++) for (c = 0; c &lt; n; c++) sum += m[r * n + c];   <span class="cm">// by rows</span>
-for (c = 0; c &lt; n; c++) for (r = 0; r &lt; n; r++) sum += m[r * n + c];   <span class="cm">// by columns</span></pre>
+for (int r = 0; r &lt; n; r++) for (int c = 0; c &lt; n; c++) sum += m[r * n + c];   <span class="cm">// by rows</span>
+for (int c = 0; c &lt; n; c++) for (int r = 0; r &lt; n; r++) sum += m[r * n + c];   <span class="cm">// by columns</span></pre>
       <p>
         By rows, consecutive reads are adjacent in memory: one miss per 16
         <code>int</code>s, and the prefetcher hides most of those. By columns,
@@ -412,19 +412,32 @@ for (c = 0; c &lt; n; c++) for (r = 0; r &lt; n; r++) sum += m[r * n + c];   <sp
         Within its address space, a C++ process&rsquo;s memory is laid out in
         regions with different lifetimes:
       </p>
-      <pre>high addresses   +--------------------+
-                 |  stack             |  frames of active function calls; grows down
-                 |        |           |
-                 |        v           |
-                 |                    |
-                 |        ^           |
-                 |        |           |
-                 |  heap              |  objects from new; grows up
-                 +--------------------+
-                 |  static data       |  global and static variables
-                 +--------------------+
-low addresses    |  code (text)       |  the machine instructions
-                 +--------------------+</pre>
+      <figure>
+<!-- gen:an address-space -->
+<svg viewBox="0 0 638 232" role="img" style="max-width:766px" font-family="system-ui, sans-serif" aria-label="A process's memory, high addresses at the top: the stack (frames of active function calls, growing down), free space, the heap (objects from new, growing up), static data (global and static variables), and the code (text), the machine instructions, at the low addresses.">
+<rect x="114" y="12" width="170" height="46" fill="#eaf1fb" stroke="#2f6db5" stroke-width="1.3"/>
+<text x="199" y="39.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">stack</text>
+<text x="298" y="39.5" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="start">frames of active function calls; grows down</text>
+<rect x="114" y="58" width="170" height="48" fill="#fafbfc" stroke="#9aa3b2" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text x="298" y="86.5" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start" font-style="italic">free: the stack and the heap grow toward each other</text>
+<rect x="114" y="106" width="170" height="46" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.3"/>
+<text x="199" y="133.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">heap</text>
+<text x="298" y="133.5" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="start">objects from new; grows up</text>
+<rect x="114" y="152" width="170" height="34" fill="#eef1f6" stroke="#2a2d36" stroke-width="1.3"/>
+<text x="199" y="173.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">static data</text>
+<text x="298" y="173.5" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="start">global and static variables</text>
+<rect x="114" y="186" width="170" height="34" fill="#eef1f6" stroke="#2a2d36" stroke-width="1.3"/>
+<text x="199" y="207.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">code (text)</text>
+<text x="298" y="207.5" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="start">the machine instructions</text>
+<line x1="199" y1="62" x2="199" y2="78" stroke="#2f6db5" stroke-width="1.8"/>
+<path d="M194,72 L199,78 L204,72" fill="none" stroke="#2f6db5" stroke-width="1.8"/>
+<line x1="199" y1="102" x2="199" y2="86" stroke="#0a7d4d" stroke-width="1.8"/>
+<path d="M194,92 L199,86 L204,92" fill="none" stroke="#0a7d4d" stroke-width="1.8"/>
+<text x="104" y="26" font-size="11" font-weight="400" fill="#5c6270" text-anchor="end">high addresses</text>
+<text x="104" y="212" font-size="11" font-weight="400" fill="#5c6270" text-anchor="end">low addresses</text>
+</svg>
+<!-- /gen:an address-space -->
+      </figure>
       <p>
         The stack has a fixed maximum size, commonly 8 MiB for the main thread on
         Linux and macOS (the shell command <code>ulimit -s</code> shows it in KiB).
@@ -717,7 +730,7 @@ low addresses    |  code (text)       |  the machine instructions
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Computer Systems Primer v1.0
+        Data Structures &amp; Algorithms &middot; Computer Systems Primer v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax.
       </footer>
     </div>

@@ -10,6 +10,8 @@
   Demos:   legacy canvas demos mergesort-memory and bfs-memory
            (topics/viz/; the lecture page loads viz.css, mergesort.js, bfs.js
            and calls initVizMergesort() and initVizBfs()).
+  Figures: an-node-layout, an-ab-layout, an-array-vs-list
+           (tools/gen-analysis-figures.mjs).
   Programs: topics/code/memory/sizeof_demo.cpp, vector_locality.cpp,
            mergesort.cpp, bfs_grid.cpp
   Budget:  ~31 min, 23 slides.
@@ -62,10 +64,9 @@ int is 4, a pointer is 8. **Vote: `sizeof(Node)` is 12 or 16?**
 
 `sizeof(Node)` is **16**, not 12:
 
-```text
+<div><img src="../../topics/figures/complexity/an-node-layout.svg" style="height:190px" alt="
 offset  0        4        8                16
-        [ data:4 ][ pad:4  ][ next:8          ]
-```
+        [ data:4 ][ pad:4  ][ next:8          ]"></div>
 
 An 8-byte pointer must start at a multiple of 8, so the compiler inserts **4 bytes of padding** after `data`.
 
@@ -82,9 +83,11 @@ struct B { int b; char a; char c; };
 
 <details class="answer"><summary>Answer:</summary>
 
-`A` is **12**: 3 bytes of padding after `a` to align `b`, and 3 after `c` to round the size up to 4. `B` is **8**: the two chars share the tail.
+<div><img src="../../topics/figures/complexity/an-ab-layout.svg" style="height:120px" alt="
+A: [a][pad:3][  b:4  ][c][pad:3]   12 bytes
+B: [  b:4  ][a][c][pad:2]           8 bytes"></div>
 
-Order fields from **largest to smallest** alignment to minimize padding.
+`A` is **12**: padding aligns `b` to 4 and rounds the size up to a multiple of 4. `B` is **8**: the two chars share the tail. Order fields from **largest to smallest** alignment.
 
 </details>
 
@@ -92,17 +95,22 @@ Order fields from **largest to smallest** alignment to minimize padding.
 
 ## Live: `sizeof_demo.cpp`
 
+<div style="font-size:0.84em">
+
 ```text
 PRIMITIVES (bytes)
   char   1      bool   1
   int    4      long   8
   double 8      ptr    8
-STRUCTS: int(4) + ptr(8) = 12 logically, sizeof(Node) = 16
-HEAP BYTES FOR N ELEMENTS (measured)
-       N     array B      list B    ratio
-    1000        4000       16000     4.0x
-   16000       64000      256000     4.0x
+STRUCTS (alignment / padding)
+  int(4) + ptr(8) = 12 logically, but sizeof(Node)   = 16
+MEMORY ACTUALLY ALLOCATED FOR N ELEMENTS (measured via operator new)
+       N     array heap B      list heap B    ratio   B / element
+    1000             4000            16000     4.0x   4 vs 16
+   16000            64000           256000     4.0x   4 vs 16
 ```
+
+</div>
 
 The bottom table is **measured**: every heap byte is counted as it is allocated.
 
@@ -133,16 +141,18 @@ Choosing a structure sets a memory price as well as a time price.
 
 --
 
-## N elements: array or list?
+## $N$ elements: array or list?
 
-| structure | bytes for N ints | order of growth |
+| structure | bytes for $N$ ints | order of growth |
 | --- | :-: | :-: |
-| array | 4N | N |
-| linked list | 16N | N |
+| array | $4N$ | $N$ |
+| linked list | $16N$ | $N$ |
 
-<img src="../../topics/figures/memory-array-vs-list.svg" style="width:44%">
+<div><img src="../../topics/figures/complexity/an-array-vs-list.svg" style="height:230px" alt="
+   heap bytes measured for N = 1000 .. 16000 ints:
+   array 4N and list 16N, two straight lines through the origin"></div>
 
-Same **order of growth**, a **4× constant**.
+Same **order of growth**, a **constant 4 times larger**.
 
 --
 
@@ -172,8 +182,8 @@ v.push_back(7);    // the data: a separate block on the heap
 ```
 
 - when size reaches capacity, a **new block twice as large** is allocated and **every element is copied**
-- at N = 1000 the block holds **1024**: up to about half the block can sit unused
-- total copies for all the regrowths: 1 + 2 + … + 512 = **1023**, fewer than **2N**
+- at $N = 1000$ the block holds **1024**: up to about half the block can sit unused
+- total copies for all the regrowths: $1 + 2 + \cdots + 512 = \boldsymbol{1023}$, fewer than $\boldsymbol{2N}$
 
 --
 
@@ -181,9 +191,9 @@ v.push_back(7);    // the data: a separate block on the heap
 
 | holds | memory | order of growth |
 | --- | --- | :-: |
-| a few variables | fixed | 1 |
-| an array or list of N | proportional to N | N |
-| an N × N table | proportional to N² | N² |
+| a few variables | fixed | $1$ |
+| an array or list of $N$ | proportional to $N$ | $N$ |
+| an $N \times N$ table | proportional to $N^2$ | $N^2$ |
 
 **Space is analyzed exactly like time**: count, then keep the order of growth.
 
@@ -201,7 +211,7 @@ long sum(const vector<int>& a) {
 }
 ```
 
-Order of growth **1** auxiliary space. Brute-force 3-sum: time **N³**, auxiliary space **1**, just loop counters.
+Order of growth $\boldsymbol{1}$ auxiliary space. Brute-force 3-sum: time $\boldsymbol{N^3}$, auxiliary space $\boldsymbol{1}$, just loop counters.
 
 --
 
@@ -215,15 +225,15 @@ long fact(long n) { return n <= 1 ? 1 : n * fact(n - 1); }
 
 | function | deepest recursion | auxiliary space |
 | --- | :-: | :-: |
-| `fact(n)` | n frames | Θ(n) |
-| binary search, recursive | ⌊log₂ N⌋ + 1 frames | Θ(log₂ N) |
-| mergesort | about log₂ N frames | Θ(log₂ N), plus the Θ(N) buffer |
+| `fact(n)` | $n$ frames | $\Theta(n)$ |
+| binary search, recursive | $\lfloor \log\_2 N \rfloor + 1$ frames | $\Theta(\log\_2 N)$ |
+| mergesort | about $\log\_2 N$ frames | $\Theta(\log\_2 N)$, plus the $\Theta(N)$ buffer |
 
 --
 
 ## Mergesort: the merge needs room
 
-**Problem:** sort N items. **Approach:** divide and conquer.
+**Problem:** sort $N$ items. **Approach:** divide and conquer.
 
 1. split the array into two halves
 2. sort each half recursively
@@ -236,6 +246,8 @@ Splitting is free; **merging** needs a scratch buffer, and that buffer is the me
 --
 
 ## Mergesort: the code
+
+<div style="font-size:0.84em">
 
 ```cpp [2]
 void merge(vector<int>& a, int lo, int mid, int hi) {
@@ -255,7 +267,9 @@ void mergesort(vector<int>& a, int lo, int hi) {
 }
 ```
 
-The top merge's buffer holds N ints: **4N bytes**, order **N**. The recursion adds only **log₂ N** stack frames.
+</div>
+
+The top merge's buffer holds $N$ ints: $\boldsymbol{4N}$ **bytes**, order $\boldsymbol{N}$. The recursion adds only $\boldsymbol{\log\_2 N}$ stack frames.
 
 --
 
@@ -278,7 +292,7 @@ The top merge's buffer holds N ints: **4N bytes**, order **N**. The recursion ad
 
 ## Grid BFS: memory per cell
 
-**Problem:** a shortest path through an **n × n** grid maze. **Approach:** breadth-first search:
+**Problem:** a shortest path through an $\boldsymbol{n \times n}$ grid maze. **Approach:** breadth-first search (BFS):
 
 1. a **queue** holds the frontier
 2. pop a cell; push each unvisited neighbor, recording **where it came from**
@@ -294,12 +308,12 @@ The memory is the table of predecessors, one per cell.
 
 | per cell | bytes | total | answers |
 | --- | :-: | :-: | --- |
-| visited flag (`char`) | 1 | n² | reachable? |
-| distance (`int`) | 4 | 4n² | how many steps? |
-| predecessor (`int`) | 4 | 4n² | which path? |
-| direction came from (`char`) | 1 | n² | which path, 4× cheaper |
+| visited flag (`char`) | 1 | $n^2$ | reachable? |
+| distance (`int`) | 4 | $4n^2$ | how many steps? |
+| predecessor (`int`) | 4 | $4n^2$ | which path? |
+| direction came from (`char`) | 1 | $n^2$ | which path, 4 times cheaper |
 
-All order **n²**: the **constant tracks what you store**.
+All order $\boldsymbol{n^2}$: the **constant tracks what you store**.
 
 --
 
@@ -308,7 +322,7 @@ All order **n²**: the **constant tracks what you store**.
 <div class="legacy-viz" data-viz="bfs-memory">
 <div class="viz-panels">
 <div class="panel"><div class="panel-label">progress: BFS through a maze (start to goal)</div><canvas class="viz-progress"></canvas></div>
-<div class="panel"><div class="panel-label">memory: visited array (n²) vs queue</div><canvas class="viz-memory"></canvas></div>
+<div class="panel"><div class="panel-label">memory: visited array ($n^2$) vs queue</div><canvas class="viz-memory"></canvas></div>
 </div>
 <div class="viz-controls">
 <button data-act="play">▶ Play</button>
@@ -342,10 +356,10 @@ The **fixed table is identical**; the cells **reached** follow the geometry.
 
 | algorithm | time | auxiliary space |
 | --- | :-: | :-: |
-| array sum | N | 1 |
-| brute-force 3-sum | N³ | **1** |
-| mergesort | N log₂ N | N |
-| BFS on an n × n grid | n² | n² |
+| array sum | $N$ | $1$ |
+| brute-force 3-sum | $N^3$ | $\boldsymbol{1}$ |
+| mergesort | $N \log\_2 N$ | $N$ |
+| BFS on an $n \times n$ grid | $n^2$ | $n^2$ |
 
 Often you can **spend memory to save time**: a hash table for fast lookup, a table of subproblem answers in dynamic programming.
 

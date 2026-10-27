@@ -5,6 +5,7 @@
            of growth; propositions under a cost model; model meets experiment.
   Needs:   the doubling-experiment topic; the counting-loops topic.
   Demos:   none.
+  Figures: an-leading-term (tools/gen-analysis-figures.mjs).
   Program: none (numbers from topics/code/analysis-doubling/threesum.cpp).
   Budget:  ~25 min, 18 slides.
 -->
@@ -32,10 +33,10 @@ The interesting part is always the **frequency**.
 
 | statement | frequency | tilde |
 | --- | --- | --- |
-| test `i < N` | N + 1 | ~ N |
-| test `j < N` | C(N, 2) + N | ~ N²/2 |
-| test `k < N` | C(N, 3) + C(N, 2) | ~ N³/6 |
-| the `if` | C(N, 3) | ~ N³/6 |
+| test `i < N` | $N + 1$ | $\sim N$ |
+| test `j < N` | $\binom{N}{2} + N$ | $\sim N^2/2$ |
+| test `k < N` | $\binom{N}{3} + \binom{N}{2}$ | $\sim N^3/6$ |
+| the `if` | $\binom{N}{3}$ | $\sim N^3/6$ |
 | `cnt++` | triples found | input-dependent |
 
 Only the **innermost** rows matter at scale.
@@ -44,7 +45,7 @@ Only the **innermost** rows matter at scale.
 
 ## How often does the inner test run?
 
-Once per triple i < j < k: the number of ways to choose **3 of N**.
+Once per triple $i < j < k$: the number of ways to choose **3 of** $\boldsymbol{N}$.
 
 $$\binom{N}{3} = \frac{N(N-1)(N-2)}{6}$$
 
@@ -56,7 +57,7 @@ Counted with the tools from the review: the dependent loops, or Pascal's rule on
 
 $$\binom{N}{3} = \frac{N^3}{6} - \frac{N^2}{2} + \frac{N}{3}$$
 
-At **N = 1000**:
+At $\boldsymbol{N = 1000}$:
 
 $$\frac{10^9}{6} - \frac{10^6}{2} + \frac{1000}{3} = 166{,}167{,}000$$
 
@@ -66,9 +67,11 @@ $$\frac{10^9}{6} - \frac{10^6}{2} + \frac{1000}{3} = 166{,}167{,}000$$
 
 ## Tilde: keep the leading term
 
-At N = 1000 the terms after N³/6 add up to about −499,667, tiny beside N³/6 ≈ 1.667 × 10⁸:
+At $N = 1000$ the terms after $N^3/6$ add up to about $-499{,}667$, tiny beside $N^3/6 \approx 1.667 \times 10^8$:
 
-<img src="../../topics/figures/leading-term.svg" style="width:40%">
+<div><img src="../../topics/figures/complexity/an-leading-term.svg" style="height:230px" alt="
+   N(N-1)(N-2)/6 and N^3/6 for N = 0 .. 1000: one curve on top of the other;
+   166,167,000 and 166,666,667 at N = 1000"></div>
 
 $$\frac{N(N-1)(N-2)}{6} \sim \frac{N^3}{6}$$
 
@@ -80,24 +83,28 @@ $$\frac{N^3/6 - N^2/2 + N/3}{N^3/6} = 1 - \frac{3}{N} + \frac{2}{N^2} \longright
 
 The dropped terms vanish **in proportion**.
 
-They even explain the printed ratios exactly: C(2N)/C(N) = 4(2N − 1)/(N − 2) = 8 + 12/(N − 2) = **8.048, 8.024, 8.012** at N = 250, 500, 1000.
+They even explain the printed ratios exactly:
+
+$$\frac{\binom{2N}{3}}{\binom{N}{3}} = \frac{4(2N - 1)}{N - 2} = 8 + \frac{12}{N - 2}$$
+
+which is **8.048, 8.024, 8.012** at $N = 250, 500, 1000$.
 
 --
 
 ## The sums you will meet
 
-| sum | exact | tilde | at N = 1024 |
+| sum | exact | tilde | at $N = 1024$ |
 | --- | --- | --- | --: |
-| 1 + 2 + … + N | N(N + 1)/2 | ~ N²/2 | 524,800 |
-| pairs i < j | N(N − 1)/2 | ~ N²/2 | 523,776 |
-| 1² + 2² + … + N² | N(N + 1)(2N + 1)/6 | ~ N³/3 | 358,438,400 |
-| triples i < j < k | N(N − 1)(N − 2)/6 | ~ N³/6 | 178,433,024 |
-| 1 + 2 + 4 + … + N, N = 2ᵏ | 2N − 1 | ~ 2N | 2,047 |
-| halvings of N to 1 | ⌊log₂ N⌋ | ~ log₂ N | 10 |
+| $1 + 2 + \cdots + N$ | $N(N + 1)/2$ | $\sim N^2/2$ | 524,800 |
+| pairs $i < j$ | $N(N - 1)/2$ | $\sim N^2/2$ | 523,776 |
+| $1^2 + 2^2 + \cdots + N^2$ | $N(N + 1)(2N + 1)/6$ | $\sim N^3/3$ | 358,438,400 |
+| triples $i < j < k$ | $N(N - 1)(N - 2)/6$ | $\sim N^3/6$ | 178,433,024 |
+| $1 + 2 + 4 + \cdots + N$ ($N = 2^k$) | $2N - 1$ | $\sim 2N$ | 2,047 |
+| halvings of $N$ to 1 | $\lfloor \log\_2 N \rfloor$ | $\sim \log\_2 N$ | 10 |
 
 --
 
-## Why pairs are ~ N²/2
+## Why pairs are $\sim N^2/2$
 
 ```cpp
 for (int i = 0; i < N; i++)
@@ -111,11 +118,11 @@ $$\sum_{i=0}^{N-1} i = 0 + 1 + \dots + (N-1) = \frac{N(N-1)}{2} \sim \frac{N^2}{
 
 </div>
 
-The pairs fill **half of the N × N square**, the triangle below its diagonal.
+The pairs fill **half of the** $\boldsymbol{N \times N}$ **square**, the triangle below its diagonal.
 
 --
 
-## An N log₂ N loop
+## An $N \log\_2 N$ loop
 
 ```cpp
 for (int i = 0; i < N; i++)          // N values of i
@@ -123,15 +130,15 @@ for (int i = 0; i < N; i++)          // N values of i
         op();
 ```
 
-Each i ≥ N/2 takes at least log₂ N − 1 steps; none takes more than log₂ N:
+Each $i \ge N/2$ takes at least $\log\_2 N - 1$ steps; none takes more than $\log\_2 N$:
 
 $$\frac{N}{2}(\log\_2 N - 1) \le \sum\_{i<N} \lceil \log\_2 i \rceil \le N \log\_2 N$$
 
-At N = 1024: **9,207** (N log₂ N = 10,240). Order **N log₂ N**.
+At $N = 1024$: **9,207** ($N \log\_2 N = 10{,}240$). Order $\boldsymbol{N \log\_2 N}$.
 
 --
 
-## Predict: is this N log₂ N too?
+## Predict: is this $N \log\_2 N$ too?
 
 ```cpp
 for (int i = 1; i < N; i *= 2)    // i = 1, 2, 4, …
@@ -139,11 +146,11 @@ for (int i = 1; i < N; i *= 2)    // i = 1, 2, 4, …
         op();
 ```
 
-Outer loop: log₂ N passes. Inner loop: up to N. How many calls at N = 1024? What order of growth?
+Outer loop: $\log\_2 N$ passes. Inner loop: up to $N$. How many calls at $N = 1024$? What order of growth?
 
 <details class="answer"><summary>Answer:</summary>
 
-**1023**, linear: the inner count changes with i, so it is a sum, not a product. 1 + 2 + 4 + … + N/2 = N − 1 ~ N, against 9,207 when the inner loop doubles instead.
+**1023**, linear: the inner count changes with $i$, so it is a sum, not a product. $1 + 2 + 4 + \cdots + N/2 = N - 1 \sim N$, against 9,207 when the inner loop doubles instead.
 
 </details>
 
@@ -162,7 +169,7 @@ How many calls to `op()`, exactly and in tilde notation?
 
 <details class="answer"><summary>Answer:</summary>
 
-For each i the j loop runs N − i times: N + (N − 1) + … + 1 = N(N + 1)/2, times 3. Exactly **3N(N + 1)/2**, so **~ 3N²/2**: order N². At N = 10: 165.
+For each $i$ the $j$ loop runs $N - i$ times: $N + (N - 1) + \cdots + 1 = N(N + 1)/2$, times 3. Exactly $\boldsymbol{3N(N + 1)/2}$, so $\boldsymbol{\sim 3N^2/2}$: order $N^2$. At $N = 10$: 165.
 
 </details>
 
@@ -174,11 +181,11 @@ Drop the constant too, and keep the **shape**:
 
 | exact frequency | tilde | order of growth |
 | --- | --- | --- |
-| N(N − 1)(N − 2)/6 | ~ N³/6 | **N³** |
-| N²/2 − N/2 | ~ N²/2 | **N²** |
-| ⌊log₂ N⌋ + 1 | ~ log₂ N | **log₂ N** |
+| $N(N - 1)(N - 2)/6$ | $\sim N^3/6$ | $\boldsymbol{N^3}$ |
+| $N^2/2 - N/2$ | $\sim N^2/2$ | $\boldsymbol{N^2}$ |
+| $\lfloor \log\_2 N \rfloor + 1$ | $\sim \log\_2 N$ | $\boldsymbol{\log\_2 N}$ |
 
-The order of growth is the function of N the cost is **proportional to**.
+The order of growth is the function of $N$ the cost is **proportional to**.
 
 --
 
@@ -186,7 +193,7 @@ The order of growth is the function of N the cost is **proportional to**.
 
 Counting **array accesses** instead of triples:
 
-> **Proposition.** Brute-force 3-sum makes ~ N³/2 array accesses: three (a[i], a[j], a[k]) for each of ~ N³/6 triples.
+> **Proposition.** Brute-force 3-sum makes $\sim N^3/2$ array accesses: three (`a[i]`, `a[j]`, `a[k]`) for each of $\sim N^3/6$ triples.
 
 A cost model lets us state a fact about the **algorithm**, not about one run on one machine.
 
@@ -201,11 +208,11 @@ A cost model lets us state a fact about the **algorithm**, not about one run on 
 
 | cost model | counts | example |
 | --- | --- | --- |
-| RAM model | every primitive operation, 1 each | behind O, Ω, Θ |
-| inner-loop executions | each pass through the inner body | 3-sum: N(N − 1)(N − 2)/6 |
-| array accesses | each array read or write | 3-sum: ~ N³/2 |
+| RAM model | every primitive operation, 1 each | behind $O$, $\Omega$, $\Theta$ |
+| inner-loop executions | each pass through the inner body | 3-sum: $N(N - 1)(N - 2)/6$ |
+| array accesses | each array read or write | 3-sum: $\sim N^3/2$ |
 | compares | each key comparison | searching and sorting |
-| compares and exchanges | both, separately | selection sort: ~ N²/2 and N − 1 |
+| compares and exchanges | both, separately | selection sort: $\sim N^2/2$ and $N - 1$ |
 
 </div>
 
@@ -217,9 +224,9 @@ A cost model lets us state a fact about the **algorithm**, not about one run on 
 
 | cost model | counts | example |
 | --- | --- | --- |
-| probes | each slot or element inspected | binary search: ⌊log₂ N⌋ + 1 |
-| vertices and edges | each visit, each adjacency entry | graph search: V + E |
-| bit operations | each operation on one bit | n-bit multiplication: Θ(n²) |
+| probes | each slot or element inspected | binary search: $\lfloor \log\_2 N \rfloor + 1$ |
+| vertices and edges | each visit, each adjacency entry | graph search: $V + E$ |
+| bit operations | each operation on one bit | $n$-bit multiplication: $\Theta(n^2)$ |
 | block transfers | each block moved between memories | external-memory model |
 
 </div>
@@ -232,9 +239,9 @@ A cost model lets us state a fact about the **algorithm**, not about one run on 
 
 | route | result |
 | --- | --- |
-| **model** (count from the code) | ~ N³/6 triples |
-| **experiment** (run, doubling N) | ratio → 8, log-log slope 3 |
-| **both** | order of growth **N³** |
+| **model** (count from the code) | $\sim N^3/6$ triples |
+| **experiment** (run, doubling $N$) | ratio tends to 8, log-log slope 3 |
+| **both** | order of growth $\boldsymbol{N^3}$ |
 
 Two independent routes, one answer.
 
@@ -242,7 +249,7 @@ Two independent routes, one answer.
 
 ## Separating algorithm from machine
 
-The order of growth N³ does **not** depend on:
+The order of growth $N^3$ does **not** depend on:
 
 - the language: C++, Java, Python
 - the machine: laptop, phone, server

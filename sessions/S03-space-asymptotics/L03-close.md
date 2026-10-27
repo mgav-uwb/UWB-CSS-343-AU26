@@ -12,7 +12,7 @@
 ## Recap
 
 - **Memory:** sizes, padding, stack and heap; space has an order of growth
-- **O, Ω, Θ** are **sets**; membership is proved by witnesses c and n₀; Θ = O ∩ Ω
+- $\boldsymbol{O}$, $\boldsymbol{\Omega}$, $\boldsymbol{\Theta}$ are **sets**; membership is proved by witnesses $c$ and $n\_0$; $\Theta = O \cap \Omega$
 - **Case and bound** are separate choices; a lower bound belongs to the problem
 - **Machine models:** a bounded cost per access changes the constant; swapping is a knee, not a new exponent
 

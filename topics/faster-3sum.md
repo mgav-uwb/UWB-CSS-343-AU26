@@ -6,13 +6,14 @@
            lower bound.
   Needs:   the recursion topic (binary search); the growth-classes topic.
   Demos:   threesum-fast (binary search; two pointers); lib/measure/doubling.html (race, embedded).
+  Figures: an-sum-costs (tools/gen-analysis-figures.mjs).
   Programs: topics/code/faster-3sum/faster.cpp, twopointer.cpp
   Budget:  ~31 min, 20 slides.
 -->
 
 ### Designing a faster 3-sum
 
-> For decades 3-sum was conjectured to need about n² time. In 2014 Allan Grønlund and Seth Pettie showed that slightly less suffices.
+> For decades 3-sum was conjectured to need about $n^2$ time. In 2014 Allan Grønlund and Seth Pettie showed that slightly less suffices.
 
 <small>A. Grønlund and S. Pettie, “Threesomes, Degenerates, and Love Triangles,” FOCS 2014</small>
 
@@ -20,7 +21,7 @@
 
 ## Can cubic be beaten?
 
-3-sum is N³. **Is that the best possible?**
+3-sum is $N^3$. **Is that the best possible?**
 
 The usual first reaction: "every triple has to be checked, so no."
 
@@ -42,35 +43,35 @@ long twoSum(const vector<int>& a) {        // N^2
 }
 ```
 
-About N²/2 pairs: order of growth **N²**.
+About $N^2/2$ pairs: order of growth $\boldsymbol{N^2}$.
 
 --
 
 ## How could 2-sum be faster?
 
-Read the inner loop as a question. For each a[i]:
+Read the inner loop as a question. For each `a[i]`:
 
-> Is **−a[i]** somewhere in the array?
+> Is `-a[i]` somewhere in the array?
 
-A scan answers it in N steps. If the array were **sorted**, binary search would answer it in about **log₂ N**.
+A scan answers it in $N$ steps. If the array were **sorted**, binary search would answer it in about $\boldsymbol{\log\_2 N}$.
 
 --
 
 ## 2-sum, fast
 
-**Sort once**, then **binary-search** for each −a[i]:
+**Sort once**, then **binary-search** for each `-a[i]`:
 
 ```cpp
-long twoSumFast(vector<int> a) {           // N log₂ N
-    sort(a.begin(), a.end());              // N log₂ N, once
+long twoSumFast(vector<int> a) {           // N log2 N
+    sort(a.begin(), a.end());              // N log2 N, once
     int N = a.size(); long cnt = 0;
     for (int i = 0; i < N; i++)            // N searches,
-        if (rankOf(-a[i], a) > i) cnt++;   // log₂ N each
+        if (rankOf(-a[i], a) > i) cnt++;   // log2 N each
     return cnt;
 }
 ```
 
-`rankOf(x, a)` is binary search: the index of x in sorted a, or −1. Testing `> i` counts each pair once.
+`rankOf(x, a)` is binary search: the index of `x` in sorted `a`, or $-1$. Testing `> i` counts each pair once.
 
 --
 
@@ -78,26 +79,26 @@ long twoSumFast(vector<int> a) {           // N log₂ N
 
 Step A, **then** step B: the costs **add**, and the larger one determines the order of growth.
 
-Sort (N log₂ N), then N searches of log₂ N each:
+Sort ($N \log\_2 N$), then $N$ searches of $\log\_2 N$ each:
 
 $$N \log\_2 N + N \log\_2 N = 2N \log\_2 N$$
 
 | sum | order of growth |
 | --- | --- |
-| N log₂ N + N log₂ N | N log₂ N |
-| N log₂ N + N² | N² |
-| N² + 100N + 5000 | N² |
+| $N \log\_2 N + N \log\_2 N$ | $N \log\_2 N$ |
+| $N \log\_2 N + N^2$ | $N^2$ |
+| $N^2 + 100N + 5000$ | $N^2$ |
 
 --
 
 ## The product rule
 
-Work **nested** inside a loop **multiplies**: iterations × work per iteration.
+Work **nested** inside a loop **multiplies**: iterations $\times$ work per iteration.
 
-- N iterations × log₂ N each = **N log₂ N**
-- N² iterations × log₂ N each = **N² log₂ N**
+- $N$ iterations $\times$ $\log\_2 N$ each $=$ $\boldsymbol{N \log\_2 N}$
+- $N^2$ iterations $\times$ $\log\_2 N$ each $=$ $\boldsymbol{N^2 \log\_2 N}$
 
-N iterations doing log₂ N work is N log₂ N, not N + log₂ N.
+$N$ iterations doing $\log\_2 N$ work is $N \log\_2 N$, not $N + \log\_2 N$.
 
 --
 
@@ -107,8 +108,8 @@ We **added** a sort to **remove** a loop:
 
 | 2-sum | order |
 | --- | --- |
-| brute force | N² |
-| sort + binary search | **N log₂ N** |
+| brute force | $N^2$ |
+| sort + binary search | $\boldsymbol{N \log\_2 N}$ |
 
 Spend a little up front so each lookup is cheap. Now lift the idea to 3-sum.
 
@@ -116,10 +117,10 @@ Spend a little up front so each lookup is cheap. Now lift the idea to 3-sum.
 
 ## Same idea: fast 3-sum
 
-Sort, then for each **pair** binary-search for −(a[i] + a[j]):
+Sort, then for each **pair** binary-search for `-(a[i] + a[j])`:
 
 ```cpp
-long threeSumFast(vector<int> a) {         // N^2 log₂ N
+long threeSumFast(vector<int> a) {         // N^2 log2 N
     sort(a.begin(), a.end());
     int N = a.size(); long cnt = 0;
     for (int i = 0; i < N; i++)
@@ -129,7 +130,7 @@ long threeSumFast(vector<int> a) {         // N^2 log₂ N
 }
 ```
 
-Sum rule and product rule: N log₂ N + N² · log₂ N ⇒ **N² log₂ N**, down from N³.
+Sum rule and product rule: $N \log\_2 N + N^2 \cdot \log\_2 N$ gives $\boldsymbol{N^2 \log\_2 N}$, down from $N^3$.
 
 --
 
@@ -150,7 +151,7 @@ pair (-5,  1): search for 4   probes a[3]=0, a[5]=2, a[6]=3, a[7]=4: found at 7 
 
 <div style="font-size:0.8em">
 
-| N | 2-sum N² | 2-sum N log₂ N | 3-sum N³ | 3-sum N² log₂ N |
+| $N$ | 2-sum $N^2$ | 2-sum $N \log\_2 N$ | 3-sum $N^3$ | 3-sum $N^2 \log\_2 N$ |
 | --: | --: | --: | --: | --: |
 | 1000 | 999,000 | 10,979 | 498,501,000 | 5,915,535 |
 | 2000 | 3,998,000 | 23,937 | 3,994,002,000 | 25,670,081 |
@@ -158,21 +159,23 @@ pair (-5,  1): search for 4   probes a[3]=0, a[5]=2, a[6]=3, a[7]=4: found at 7 
 
 </div>
 
-<img src="../../topics/figures/sum-costs.svg" style="width:62%">
+<div><img src="../../topics/figures/complexity/an-sum-costs.svg" style="height:250px" alt="
+   array accesses, N = 0 .. 4000: brute-force 2-sum climbs to 16 million and
+   3-sum to 32 billion; sort + binary search stays on the floor"></div>
 
 <small>Code: <a href="../../topics/code/faster-3sum/faster.cpp">faster.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 
 --
 
-## Can the log₂ N go too?
+## Can the $\log\_2 N$ go too?
 
-Fast 3-sum re-searches for every pair. On sorted data, fix a[i] and close **two pointers** in from the ends of the rest, with s = a[i] + a[lo] + a[hi]:
+Fast 3-sum re-searches for every pair. On sorted data, fix `a[i]` and close **two pointers** in from the ends of the rest, with $s$ = `a[i] + a[lo] + a[hi]`:
 
-- **s < 0**: a[lo] pairs with nothing that is left, so lo++
-- **s > 0**: a[hi] is finished, so hi--
-- **s = 0**: count it and retire both
+- $\boldsymbol{s < 0}$: `a[lo]` pairs with nothing that is left, so `lo++`
+- $\boldsymbol{s > 0}$: `a[hi]` is finished, so `hi--`
+- $\boldsymbol{s = 0}$: count it and retire both
 
-Each step **retires an index for good**, so at most N steps per i.
+Each step **retires an index for good**, so at most $N$ steps per $i$.
 
 --
 
@@ -180,15 +183,21 @@ Each step **retires an index for good**, so at most N steps per i.
 
 No move discards an index of an uncounted triple:
 
-- **s < 0**: a[lo] + a[h] ≤ a[lo] + a[hi] < −a[i] for all h ≤ hi; lo has no partner left
-- **s > 0**: a[h] + a[hi] ≥ a[lo] + a[hi] > −a[i] for all h ≥ lo; hi has no partner left
-- **s = 0**: distinct values: lo and hi are each other's only partner
+<div style="font-size:0.85em">
 
-Each test retires an index: **at most N − i − 2 tests** per i.
+- $\boldsymbol{s < 0}$: $a[lo] + a[h] \le a[lo] + a[hi] < -a[i]$ for all $h \le hi$; $lo$ has no partner left
+- $\boldsymbol{s > 0}$: $a[h] + a[hi] \ge a[lo] + a[hi] > -a[i]$ for all $h \ge lo$; $hi$ has no partner left
+- $\boldsymbol{s = 0}$: distinct values: $lo$ and $hi$ are each other's only partner
+
+</div>
+
+Each test retires an index: **at most** $\boldsymbol{N - i - 2}$ **tests** per $i$.
 
 --
 
 ## 3-sum with two pointers
+
+<div style="font-size:0.9em">
 
 ```cpp
 long threeSumTwoPointer(vector<int> a) {   // N^2
@@ -207,7 +216,9 @@ long threeSumTwoPointer(vector<int> a) {   // N^2
 }
 ```
 
-N log₂ N + N · N ⇒ **N²**: the log₂ N is gone.
+</div>
+
+$N \log\_2 N + N \cdot N$ gives $\boldsymbol{N^2}$: the $\log\_2 N$ is gone.
 
 --
 
@@ -225,13 +236,17 @@ i = -5: lo, hi close in: (-3, 4) = -4 lo++ ... (1, 4) = 0 counted ... (2, 3) = 0
 
 ## Your turn: two pointers
 
-Sorted: **−7 −3 −2 0 1 2 4 5 9**. Fix a[i] = −7: lo at −3, hi at 9.
-
-Trace every test. Which triples are counted, and how many tests run?
+Sorted: **−7 −3 −2 0 1 2 4 5 9**. Fix `a[i]` $= -7$; start `lo` at $-3$ and `hi` at $9$. Trace every test: which triples count, and how many tests run?
 
 <details class="answer"><summary>Answer:</summary>
 
-(−3, 9): −1, lo++ · (−2, 9): <b>0</b>, count (−7, −2, 9) · (0, 5): −2, lo++ · (1, 5): −1, lo++ · (2, 5): <b>0</b>, count (−7, 2, 5) · lo and hi meet. <b>5 tests, 2 triples</b>, within the bound N − i − 2 = 7.
+| test | 1 | 2 | 3 | 4 | 5 |
+| --- | :-: | :-: | :-: | :-: | :-: |
+| `a[lo]`, `a[hi]` | $-3$, $9$ | $-2$, $9$ | $0$, $5$ | $1$, $5$ | $2$, $5$ |
+| $s$ | $-1$ | **0** | $-2$ | $-1$ | **0** |
+| action | `lo++` | count | `lo++` | `lo++` | count |
+
+Counted: $(-7, -2, 9)$ and $(-7, 2, 5)$. **5 tests, 2 triples**, within the bound $N - i - 2 = 7$.
 
 </details>
 
@@ -239,13 +254,13 @@ Trace every test. Which triples are counted, and how many tests run?
 
 ## The whole ladder
 
-| algorithm | idea | order | doubling ratio |
+| algorithm | idea | order | ratio |
 | --- | --- | --- | --- |
-| threeSum | test every triple | N³ | 8 |
-| threeSumFast | sort; binary-search the third | N² log₂ N | a little over 4 |
-| threeSumTwoPointer | sort; retire an index per step | N² | 4 |
+| `threeSum` | every triple | $N^3$ | 8 |
+| `threeSumFast` | sort, binary search | $N^2 \log\_2 N$ | just over 4 |
+| `threeSumTwoPointer` | sort, two pointers | $N^2$ | 4 |
 
-```text
+```shell
 $ ./twopointer 16000
 ```
 
@@ -258,13 +273,13 @@ $ ./twopointer 16000
 
 The same arrays as before, now with the third rung (array accesses, from faster.cpp):
 
-| N | N³ | N² log₂ N | N² (two pointers) |
+| $N$ | $N^3$ | $N^2 \log\_2 N$ | $N^2$ (two pointers) |
 | --: | --: | --: | --: |
 | 1000 | 498,501,000 | 5,915,535 | 996,904 |
 | 2000 | 3,994,002,000 | 25,670,081 | 3,993,112 |
 | 4000 | 31,976,004,000 | 110,834,631 | 15,980,046 |
 
-At N = 4000 two pointers needs **7 times** fewer accesses than binary search and **2,000 times** fewer than brute force.
+At $N = 4000$ two pointers needs **7 times** fewer accesses than binary search and **2,000 times** fewer than brute force.
 
 --
 
@@ -278,9 +293,9 @@ At N = 4000 two pointers needs **7 times** fewer accesses than binary search and
 
 A **lower bound** is a cost **no** algorithm can beat.
 
-- 3-sum must at least read its input: **N**
-- our **N²** is essentially the best known: only logarithmic improvements exist (Grønlund and Pettie, 2014)
-- whether substantially less than N² is possible is **open**
+- 3-sum must at least read its input: $\boldsymbol{N}$
+- our $\boldsymbol{N^2}$ is essentially the best known: only logarithmic improvements exist (Grønlund and Pettie, 2014)
+- whether substantially less than $N^2$ is possible is **open**
 
 When an algorithm meets a proven lower bound, stop optimizing.
 

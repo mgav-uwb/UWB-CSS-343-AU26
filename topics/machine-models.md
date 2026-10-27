@@ -36,18 +36,18 @@ Every count so far used the **RAM model**: each instruction and **each memory ac
 
 A real read costs **1.4 ns** (L1 cache), **about 100 ns** (main memory), or **milliseconds** (disk).
 
-**Which machine changes turn Θ(N²) into something else?**
+**Which machine changes turn $\boldsymbol{\Theta(N^2)}$ into something else?**
 
 --
 
-## Fast instructions, slow memory: still Θ(N²)
+## Fast instructions, slow memory: still $\Theta(N^2)$
 
-Instructions **10⁶× faster**, every memory read **10⁶ cycles**:
+Instructions $\boldsymbol{10^6}$ **times faster**, every memory read $\boldsymbol{10^6}$ **cycles**:
 
 - each operation still costs **at most a constant**
-- so T(N) stays between two constant multiples of the count: **Θ(N²)**
+- so $T(N)$ stays between two constant multiples of the count: $\boldsymbol{\Theta(N^2)}$
 
-**Rule:** if every operation costs between two constants **independent of N**, the order of growth is the same on every machine.
+**Rule:** if every operation costs between two constants **independent of** $\boldsymbol{N}$, the order of growth is the same on every machine.
 
 --
 
@@ -58,31 +58,31 @@ Instructions **10⁶× faster**, every memory read **10⁶ cycles**:
 | L1 cache | 32 KiB | 1.4 ns | 1/70 |
 | L3 cache | 16 MiB | about 15 ns | 1/7 |
 | main memory | 32 GiB | about 100 ns | 1 |
-| SSD (swap) | 1 TB | about 50 µs | **500×** |
-| disk (swap) | TBs | about 5 ms | **50,000×** |
+| SSD (swap) | 1 TB | about 50 µs | **500 times** |
+| disk (swap) | TBs | about 5 ms | **50,000 times** |
 
 Cost per access is a **step function of the working set**.
 
 --
 
-## Swapping: does N² become N³?
+## Swapping: does $N^2$ become $N^3$?
 
 Past RAM, the OS pages part of the working set out; touching it **faults** and reads it back.
 
 - on a fixed machine, swap is the **last level**: every access costs at most about 5 ms
-- so T(N) is **still Θ(N²)**, with a constant up to 50,000× larger
+- so $T(N)$ is **still** $\boldsymbol{\Theta(N^2)}$, with a constant up to 50,000 times larger
 - **thrashing** is a constant-factor catastrophe, not a new exponent
 
 --
 
 ## The knee in a doubling experiment
 
-N² random reads over a working set W ∝ N; memory M; a fraction 1 − M/W fault to SSD:
+$N^2$ random reads over a working set $W \propto N$; memory $M$; a fraction $1 - M/W$ fault to SSD:
 
-| W / M | 0.3 → 0.6 | 0.6 → 1.2 | 1.2 → 2.4 | 2.4 → 4.8 | 4.8 → 9.6 |
+| $W/M$ | 0.3 to 0.6 | 0.6 to 1.2 | 1.2 to 2.4 | 2.4 to 4.8 | 4.8 to 9.6 |
 | --- | :-: | :-: | :-: | :-: | :-: |
-| T(2N) / T(N) | 4.0 | **336.7** | 13.9 | 5.4 | 4.5 |
-| b = log₂ ratio | 2.00 | **8.40** | 3.80 | 2.44 | 2.18 |
+| $T(2N)/T(N)$ | 4.0 | **336.7** | 13.9 | 5.4 | 4.5 |
+| $b = \log\_2(\text{ratio})$ | 2.00 | **8.40** | 3.80 | 2.44 | 2.18 |
 
 A spike at the boundary, then **back toward 2**. <a href="../../lib/measure/machine-model.html">Simulate it</a>
 
@@ -90,10 +90,10 @@ A spike at the boundary, then **back toward 2**. <a href="../../lib/measure/mach
 
 ## When the exponent does change
 
-When **one access costs more as N grows**:
+When **one access costs more as** $\boldsymbol{N}$ **grows**:
 
-- **physical distance:** N cells in 2-D lie about √N apart: Θ(N²) random accesses cost **Θ(N<sup>2.5</sup>)**
-- **hierarchical memory:** address x costs log x: a scan of N costs **Θ(N log N)**
+- **physical distance:** $N$ cells in 2-D lie about $\sqrt{N}$ apart: $\Theta(N^2)$ random accesses cost $\boldsymbol{\Theta(N^{2.5})}$
+- **hierarchical memory:** address $x$ costs $\log x$: a scan of $N$ costs $\boldsymbol{\Theta(N \log N)}$
 
 Different cost models, each a theorem about its own machine.
 
@@ -101,14 +101,14 @@ Different cost models, each a theorem about its own machine.
 
 ## The external-memory model
 
-Memory M, a slow level below, **blocks of B**; cost = block transfers (Aggarwal and Vitter, 1988).
+Memory $M$, a slow level below, **blocks of** $\boldsymbol{B}$; cost $=$ block transfers (Aggarwal and Vitter, 1988).
 
 | task | transfers |
 | --- | :-: |
-| scan N items | N / B |
-| matrix multiply, column-order inner loop | Θ(N³) |
-| the same, row order (i-k-j) | Θ(N³ / B) |
-| the same, √M × √M tiles | Θ(N³ / (B√M)) |
+| scan $N$ items | $N/B$ |
+| matrix multiply, column-order inner loop | $\Theta(N^3)$ |
+| the same, row order (i-k-j) | $\Theta(N^3/B)$ |
+| the same, $\sqrt{M} \times \sqrt{M}$ tiles | $\Theta(N^3/(B\sqrt{M}))$ |
 
 **Locality becomes part of the order of growth.**
 
@@ -116,13 +116,13 @@ Memory M, a slow level below, **blocks of B**; cost = block transfers (Aggarwal 
 
 ## Pipelines, prediction, caches: constants
 
-Same count, different order, Θ(N) both ways:
+Same count, different order, $\Theta(N)$ both ways:
 
 | second order vs first | measured |
 | --- | :-: |
-| sum a matrix: rows, then columns | **41×** slower |
-| walk a list: memory order, then scattered | **52×** slower |
-| `if (x >= 128)`: sorted data, then random | about **4×** slower |
+| sum a matrix: rows, then columns | **41 times** slower |
+| walk a list: memory order, then scattered | **52 times** slower |
+| `if (x >= 128)`: sorted data, then random | about **4 times** slower |
 
 <small>Code: <a href="../../topics/code/machine/branch_predict.cpp">branch_predict.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 
@@ -130,13 +130,13 @@ Same count, different order, Θ(N) both ways:
 
 ## Your turn: which wins, and when?
 
-Data far larger than the caches. **A:** N log₂ N random reads, 100 ns each. **B:** N² sequential reads, 0.3 ns each.
+Data far larger than the caches. **A:** $N \log\_2 N$ random reads, 100 ns each. **B:** $N^2$ sequential reads, 0.3 ns each.
 
-**Faster at N = 10³, 10⁴, 10⁶, 10⁹?**
+**Faster at** $\boldsymbol{N = 10^3, 10^4, 10^6, 10^9}$**?**
 
 <details class="answer"><summary>Answer:</summary>
 
-| N | 10³ | 10⁴ | 10⁶ | 10⁹ |
+| $N$ | $10^3$ | $10^4$ | $10^6$ | $10^9$ |
 | --- | :-: | :-: | :-: | :-: |
 | A | 1.0 ms | 13 ms | 2.0 s | 50 min |
 | B | 0.3 ms | 30 ms | 300 s | 9.5 years |
@@ -147,10 +147,10 @@ Data far larger than the caches. **A:** N log₂ N random reads, 100 ns each. **
 
 ## What "optimizing" means for a programmer
 
-1. **change the algorithm:** the only lever on the exponent (3-sum: N³ → N² log₂ N → N²)
+1. **change the algorithm:** the only lever on the exponent (3-sum: $N^3$, then $N^2 \log\_2 N$, then $N^2$)
 2. **change the data structure:** a hash table instead of a scan
 3. **lower the constant on the real machine:** locality, fewer allocations, predictable branches
-4. **choose for your N:** insertion sort below about 16 elements
+4. **choose for your** $\boldsymbol{N}$**:** insertion sort below about 16 elements
 
 --
 
@@ -169,9 +169,11 @@ Summing 4,000,000 ints (`vector_locality.cpp`): array **0.3 ns** per element, li
 
 ## Measure first: Amdahl's law
 
-Speed up a fraction f of the run by a factor s: overall speedup = 1 / ((1 − f) + f / s).
+Speed up a fraction $f$ of the run by a factor $s$:
 
-A function takes **80%** of the run and becomes **10×** faster: 1 / (0.2 + 0.08) ≈ **3.6×**. Infinitely fast: at most **5×**.
+$$\text{overall speedup} = \frac{1}{(1 - f) + f/s}$$
+
+A function takes **80%** of the run and becomes **10 times** faster: $1/(0.2 + 0.08) \approx \boldsymbol{3.6}$. Infinitely fast: at most $\boldsymbol{5}$.
 
 **Profile, find what dominates, optimize that.**
 
