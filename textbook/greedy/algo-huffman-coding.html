@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -331,11 +332,148 @@ fn build_huffman(freqs: &amp;[(char, u64)]) -&gt; Node {
         <span class="tag">Example (a worked build, the CLRS frequencies)</span>
         Symbols with frequencies \(a{:}5,\ b{:}9,\ c{:}12,\ d{:}13,\ e{:}16,\
         f{:}45\) (total \(100\)):
-        <pre>  merge a+b &rarr; 14        pool: 12 13 14 16 45
-  merge c+d &rarr; 25        pool: 14 16 25 45
-  merge 14+16 &rarr; 30      pool: 25 30 45
-  merge 25+30 &rarr; 55      pool: 45 55
-  merge 45+55 &rarr; 100     &rarr; the root</pre>
+        <figure>
+<!-- gen:gr hf-merges -->
+<svg viewBox="0 0 454 624" role="img" style="max-width:545px" font-family="system-ui, sans-serif" aria-label="The pool of trees after each of the first four merges; the tree each merge made is ringed. after merging a and b: c:12, d:13, 14(a:5, b:9), e:16, f:45. after merging c and d: 14(a:5, b:9), e:16, 25(c:12, d:13), f:45. after merging 14 and e: 25(c:12, d:13), 30(14(a:5, b:9), e:16), f:45. after merging 25 and 30: f:45, 55(25(c:12, d:13), 30(14(a:5, b:9), e:16)).">
+<text x="123.4" y="32" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">merge a + b → 14</text>
+<circle cx="155.4" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="155.4" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="155.4" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<circle cx="211.4" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="211.4" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="211.4" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<line x1="289.4" y1="28" x2="267.4" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="271.4" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="289.4" y1="28" x2="311.4" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="307.4" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="267.4" cy="78" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="267.4" y="83" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="267.4" y="106" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<circle cx="311.4" cy="78" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="311.4" y="83" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="311.4" y="106" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<circle cx="289.4" cy="28" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="289.4" y="32.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">14</text>
+<circle cx="367.4" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="367.4" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">e</text>
+<text x="367.4" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">16</text>
+<circle cx="423.4" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="423.4" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">f</text>
+<text x="423.4" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">45</text>
+<text x="123.4" y="150" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">merge c + d → 25</text>
+<line x1="177.4" y1="146" x2="155.4" y2="196" stroke="#8a9099" stroke-width="1.6"/>
+<text x="159.4" y="169" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="177.4" y1="146" x2="199.4" y2="196" stroke="#8a9099" stroke-width="1.6"/>
+<text x="195.4" y="169" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="155.4" cy="196" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="155.4" y="201" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="155.4" y="224" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<circle cx="199.4" cy="196" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="199.4" y="201" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="199.4" y="224" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<circle cx="177.4" cy="146" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="177.4" y="150.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">14</text>
+<circle cx="255.4" cy="146" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="255.4" y="151" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">e</text>
+<text x="255.4" y="174" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">16</text>
+<line x1="333.4" y1="146" x2="311.4" y2="196" stroke="#8a9099" stroke-width="1.6"/>
+<text x="315.4" y="169" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="333.4" y1="146" x2="355.4" y2="196" stroke="#8a9099" stroke-width="1.6"/>
+<text x="351.4" y="169" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="311.4" cy="196" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="311.4" y="201" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="311.4" y="224" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<circle cx="355.4" cy="196" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="355.4" y="201" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="355.4" y="224" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<circle cx="333.4" cy="146" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="333.4" y="150.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">25</text>
+<circle cx="411.4" cy="146" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="411.4" y="151" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">f</text>
+<text x="411.4" y="174" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">45</text>
+<text x="123.4" y="268" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">merge 14 + e → 30</text>
+<line x1="177.4" y1="264" x2="155.4" y2="314" stroke="#8a9099" stroke-width="1.6"/>
+<text x="159.4" y="287" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="177.4" y1="264" x2="199.4" y2="314" stroke="#8a9099" stroke-width="1.6"/>
+<text x="195.4" y="287" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="155.4" cy="314" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="155.4" y="319" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="155.4" y="342" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<circle cx="199.4" cy="314" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="199.4" y="319" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="199.4" y="342" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<circle cx="177.4" cy="264" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="177.4" y="268.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">25</text>
+<line x1="277.4" y1="314" x2="255.4" y2="364" stroke="#8a9099" stroke-width="1.6"/>
+<text x="259.4" y="337" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="277.4" y1="314" x2="299.4" y2="364" stroke="#8a9099" stroke-width="1.6"/>
+<text x="295.4" y="337" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="310.4" y1="264" x2="277.4" y2="314" stroke="#8a9099" stroke-width="1.6"/>
+<text x="286.9" y="287" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="310.4" y1="264" x2="343.4" y2="314" stroke="#8a9099" stroke-width="1.6"/>
+<text x="333.9" y="287" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="255.4" cy="364" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="255.4" y="369" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="255.4" y="392" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<circle cx="299.4" cy="364" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="299.4" y="369" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="299.4" y="392" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<circle cx="277.4" cy="314" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="277.4" y="318.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">14</text>
+<circle cx="343.4" cy="314" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="343.4" y="319" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">e</text>
+<text x="343.4" y="342" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">16</text>
+<circle cx="310.4" cy="264" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="310.4" y="268.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">30</text>
+<circle cx="399.4" cy="264" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="399.4" y="269" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">f</text>
+<text x="399.4" y="292" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">45</text>
+<text x="123.4" y="436" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">merge 25 + 30 → 55</text>
+<circle cx="155.4" cy="432" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="155.4" y="437" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">f</text>
+<text x="155.4" y="460" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">45</text>
+<line x1="233.4" y1="482" x2="211.4" y2="532" stroke="#8a9099" stroke-width="1.6"/>
+<text x="215.4" y="505" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="233.4" y1="482" x2="255.4" y2="532" stroke="#8a9099" stroke-width="1.6"/>
+<text x="251.4" y="505" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="321.4" y1="532" x2="299.4" y2="582" stroke="#8a9099" stroke-width="1.6"/>
+<text x="303.4" y="555" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="321.4" y1="532" x2="343.4" y2="582" stroke="#8a9099" stroke-width="1.6"/>
+<text x="339.4" y="555" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="354.4" y1="482" x2="321.4" y2="532" stroke="#8a9099" stroke-width="1.6"/>
+<text x="330.9" y="505" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="354.4" y1="482" x2="387.4" y2="532" stroke="#8a9099" stroke-width="1.6"/>
+<text x="377.9" y="505" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="293.9" y1="432" x2="233.4" y2="482" stroke="#8a9099" stroke-width="1.6"/>
+<text x="256.6" y="455" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="293.9" y1="432" x2="354.4" y2="482" stroke="#8a9099" stroke-width="1.6"/>
+<text x="331.1" y="455" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="211.4" cy="532" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="211.4" y="537" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="211.4" y="560" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<circle cx="255.4" cy="532" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="255.4" y="537" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="255.4" y="560" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<circle cx="233.4" cy="482" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="233.4" y="486.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">25</text>
+<circle cx="299.4" cy="582" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="299.4" y="587" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="299.4" y="610" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<circle cx="343.4" cy="582" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="343.4" y="587" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="343.4" y="610" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<circle cx="321.4" cy="532" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="321.4" y="536.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">14</text>
+<circle cx="387.4" cy="532" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="387.4" y="537" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">e</text>
+<text x="387.4" y="560" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">16</text>
+<circle cx="354.4" cy="482" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="354.4" y="486.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">30</text>
+<circle cx="293.9" cy="432" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="293.9" y="436.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">55</text>
+</svg>
+<!-- /gen:gr hf-merges -->
+        </figure>
         The rarest symbols \(a\) and \(b\) merge first and sink deepest; the most
         frequent, \(f\), waits until the final merge and lands one hop from the root.
         The internal-node sums \(14, 25, 30, 55, 100\) build up to the total character
@@ -365,60 +503,58 @@ fn build_huffman(freqs: &amp;[(char, u64)]) -&gt; Node {
         </figcaption>
       </figure>
       <figure>
-        <svg viewBox="0 0 420 288" role="img" aria-label="The Huffman trie for the CLRS frequencies. The root has frequency 100; its left child is the leaf f (45) and its right child is an internal node 55; the 55 node's children are internal nodes 25 and 30; 25 has leaf children c (12) and d (13); 30 has an internal child 14 and the leaf e (16); 14 has leaf children a (5) and b (9). Left edges are labeled 0, right edges 1, so the root-to-leaf paths give the codes f = 0, c = 100, d = 101, e = 111, a = 1100, and b = 1101.">
-          <g stroke="#8a9099" stroke-width="1.6" fill="none">
-            <line x1="141" y1="40" x2="45" y2="92"/>    <!-- root-f -->
-            <line x1="141" y1="40" x2="237" y2="92"/>   <!-- root-55 -->
-            <line x1="237" y1="92" x2="148" y2="144"/>  <!-- 55-25 -->
-            <line x1="237" y1="92" x2="326" y2="144"/>  <!-- 55-30 -->
-            <line x1="148" y1="144" x2="120" y2="196"/> <!-- 25-c -->
-            <line x1="148" y1="144" x2="175" y2="196"/> <!-- 25-d -->
-            <line x1="326" y1="144" x2="278" y2="196"/> <!-- 30-14 -->
-            <line x1="326" y1="144" x2="375" y2="196"/> <!-- 30-e -->
-            <line x1="278" y1="196" x2="250" y2="248"/> <!-- 14-a -->
-            <line x1="278" y1="196" x2="305" y2="248"/> <!-- 14-b -->
-          </g>
-          <g font-family="system-ui, sans-serif" font-size="12" font-weight="700"
-             fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke"
-             text-anchor="middle">
-            <text x="83" y="66">0</text>    <text x="199" y="66">1</text>
-            <text x="182" y="116">0</text>  <text x="291" y="116">1</text>
-            <text x="124" y="170">0</text>  <text x="171" y="170">1</text>
-            <text x="292" y="170">0</text>  <text x="359" y="170">1</text>
-            <text x="254" y="222">0</text>  <text x="301" y="222">1</text>
-          </g>
-          <!-- internal nodes: gray circles with the frequency -->
-          <g font-family="system-ui, sans-serif" font-size="12.5" font-weight="600" text-anchor="middle">
-            <g fill="#eef1f6" stroke="#8a9099" stroke-width="1.5">
-              <circle cx="141" cy="40" r="16"/>  <circle cx="237" cy="92" r="16"/>
-              <circle cx="148" cy="144" r="16"/> <circle cx="326" cy="144" r="16"/>
-              <circle cx="278" cy="196" r="16"/>
-            </g>
-            <g fill="#5c6270" stroke="none">
-              <text x="141" y="44">100</text>  <text x="237" y="96">55</text>
-              <text x="148" y="148">25</text>  <text x="326" y="148">30</text>
-              <text x="278" y="200">14</text>
-            </g>
-          </g>
-          <!-- leaves: green circles with the symbol, frequency below -->
-          <g font-family="system-ui, sans-serif" text-anchor="middle">
-            <g fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7">
-              <circle cx="45" cy="92" r="17"/>   <circle cx="120" cy="196" r="17"/>
-              <circle cx="175" cy="196" r="17"/> <circle cx="375" cy="196" r="17"/>
-              <circle cx="250" cy="248" r="17"/> <circle cx="305" cy="248" r="17"/>
-            </g>
-            <g fill="#0a7d4d" font-size="15" font-weight="700">
-              <text x="45" y="97">f</text>    <text x="120" y="201">c</text>
-              <text x="175" y="201">d</text>  <text x="375" y="201">e</text>
-              <text x="250" y="253">a</text>  <text x="305" y="253">b</text>
-            </g>
-            <g fill="#5c6270" font-size="10.5">
-              <text x="45" y="120">45</text>   <text x="120" y="224">12</text>
-              <text x="175" y="224">13</text>  <text x="375" y="224">16</text>
-              <text x="250" y="276">5</text>   <text x="305" y="276">9</text>
-            </g>
-          </g>
-        </svg>
+        <!-- gen:gr hf-trie -->
+<svg viewBox="0 0 306 270" role="img" style="max-width:367px" font-family="system-ui, sans-serif" aria-label="The Huffman tree for a:5, b:9, c:12, d:13, e:16, f:45, left edges labelled 0 and right edges 1. a node of weight 100 over the leaf f (45) and a node of weight 55 over a node of weight 25 over the leaf c (12) and the leaf d (13) and a node of weight 30 over a node of weight 14 over the leaf a (5) and the leaf b (9) and the leaf e (16). codes a = 1100, b = 1101, c = 100, d = 101, e = 111, f = 0.">
+<line x1="101" y1="128" x2="76" y2="178" stroke="#8a9099" stroke-width="1.6"/>
+<text x="81.5" y="151" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="101" y1="128" x2="126" y2="178" stroke="#8a9099" stroke-width="1.6"/>
+<text x="120.5" y="151" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="201" y1="178" x2="176" y2="228" stroke="#8a9099" stroke-width="1.6"/>
+<text x="181.5" y="201" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="201" y1="178" x2="226" y2="228" stroke="#8a9099" stroke-width="1.6"/>
+<text x="220.5" y="201" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="238.5" y1="128" x2="201" y2="178" stroke="#8a9099" stroke-width="1.6"/>
+<text x="212.8" y="151" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="238.5" y1="128" x2="276" y2="178" stroke="#8a9099" stroke-width="1.6"/>
+<text x="264.3" y="151" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="169.8" y1="78" x2="101" y2="128" stroke="#8a9099" stroke-width="1.6"/>
+<text x="128.4" y="101" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="169.8" y1="78" x2="238.5" y2="128" stroke="#8a9099" stroke-width="1.6"/>
+<text x="211.1" y="101" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="97.9" y1="28" x2="26" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="54.9" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="97.9" y1="28" x2="169.8" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="140.8" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="26" cy="78" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="26" y="83" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">f</text>
+<text x="26" y="106" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">45</text>
+<circle cx="76" cy="178" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="76" y="183" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="76" y="206" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<circle cx="126" cy="178" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="126" y="183" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="126" y="206" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<circle cx="101" cy="128" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="101" y="132.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">25</text>
+<circle cx="176" cy="228" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="176" y="233" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="176" y="256" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<circle cx="226" cy="228" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="226" y="233" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="226" y="256" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<circle cx="201" cy="178" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="201" y="182.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">14</text>
+<circle cx="276" cy="178" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="276" y="183" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">e</text>
+<text x="276" y="206" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">16</text>
+<circle cx="238.5" cy="128" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="238.5" y="132.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">30</text>
+<circle cx="169.8" cy="78" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="169.8" y="82.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">55</text>
+<circle cx="97.9" cy="28" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="97.9" y="32.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">100</text>
+</svg>
+<!-- /gen:gr hf-trie -->
         <figcaption>
           The finished Huffman trie for the CLRS frequencies. Reading each
           root-to-leaf path (left \(= 0\), right \(= 1\)) gives the codes
@@ -519,28 +655,167 @@ fn extract_codes(node: &amp;Node, path: String, code: &amp;mut HashMap&lt;char, 
         <span class="tag">Example (a tie, resolved both ways)</span>
         Frequencies \(a{:}1,\ b{:}1,\ c{:}2,\ d{:}2\), total \(6\). The first merge is
         forced, since \(a\) and \(b\) are the only \(1\)s, and it manufactures the tie:
-        <pre>  pool: 1&middot;a 1&middot;b 2&middot;c 2&middot;d       merge a+b &rarr; 2
-  pool: 2(ab) 2&middot;c 2&middot;d         three roots tie at 2, any two may be popped</pre>
-        Popping \(c\) and \(d\) gives one tree; popping \(ab\) and \(c\) gives another:
-        <pre>  choice A: pop c and d
-    merge c+d &rarr; 4, pool 2(ab) 4(cd); merge 2+4 &rarr; 6, the root
-
-          6
-         / \
-      2(ab) 4(cd)
-       / \   / \
-      a   b c   d
-
-  choice B: pop (ab) and c
-    merge (ab)+c &rarr; 4, pool 2&middot;d 4(ab,c); merge 2+4 &rarr; 6, the root
-
-          6
-         / \
-        d   4
-           / \
-          c  2(ab)
-             / \
-            a   b</pre>
+        three roots of weight \(2\), any two of which may be popped. Popping \(c\) and
+        \(d\) gives one tree; popping \(ab\) and \(c\) gives another:
+        <figure class="wide">
+<!-- gen:gr hf-tie -->
+<svg viewBox="0 0 691 514" role="img" style="max-width:829px;min-width:560px" font-family="system-ui, sans-serif" aria-label="Frequencies a:1, b:1, c:2, d:2. The first merge is forced; then three roots tie at 2. After a + b the pool is 2(a, b), c:2, d:2. Choice A pops c and d: the pool becomes 2(a, b) and 4(c, d), and the root 6 has children 2(a, b) and 4(c, d). Choice B pops ab and c: the pool becomes d:2 and 4(c, 2(a, b)), and the root 6 has children d and 4(c, 2(a, b)). both trees cost 12.">
+<text x="110.8" y="32" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">the forced merge</text>
+<circle cx="142.8" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="142.8" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="142.8" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="198.8" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="198.8" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="198.8" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="254.8" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="254.8" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="254.8" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="310.8" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="310.8" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="310.8" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<line x1="346.8" y1="28" x2="466.8" y2="28" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M474.8,28 L466.8,23.5 L466.8,32.5 Z" fill="#4a5163"/>
+<text x="409.8" y="44" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="middle">merge a + b → 2</text>
+<text x="409.8" y="57" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">three roots tie at 2</text>
+<line x1="526.8" y1="28" x2="504.8" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="508.8" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="526.8" y1="28" x2="548.8" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="544.8" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="504.8" cy="78" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="504.8" y="83" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="504.8" y="106" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="548.8" cy="78" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="548.8" y="83" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="548.8" y="106" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="526.8" cy="28" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="526.8" y="32.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="604.8" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="604.8" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="604.8" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="660.8" cy="28" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="660.8" y="33" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="660.8" y="56" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="110.8" y="147" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">choice A:</text>
+<text x="110.8" y="161" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">pop c and d</text>
+<line x1="164.8" y1="150" x2="142.8" y2="200" stroke="#8a9099" stroke-width="1.6"/>
+<text x="146.8" y="173" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="164.8" y1="150" x2="186.8" y2="200" stroke="#8a9099" stroke-width="1.6"/>
+<text x="182.8" y="173" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="142.8" cy="200" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="142.8" y="205" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="142.8" y="228" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="186.8" cy="200" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="186.8" y="205" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="186.8" y="228" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="164.8" cy="150" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="164.8" y="154.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<line x1="264.8" y1="150" x2="242.8" y2="200" stroke="#8a9099" stroke-width="1.6"/>
+<text x="246.8" y="173" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="264.8" y1="150" x2="286.8" y2="200" stroke="#8a9099" stroke-width="1.6"/>
+<text x="282.8" y="173" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="242.8" cy="200" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="242.8" y="205" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="242.8" y="228" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="286.8" cy="200" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="286.8" y="205" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="286.8" y="228" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="264.8" cy="150" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="264.8" y="154.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">4</text>
+<line x1="322.8" y1="150" x2="411.8" y2="150" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M419.8,150 L411.8,145.5 L411.8,154.5 Z" fill="#4a5163"/>
+<text x="370.3" y="166" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="middle">merge 2 + 4 → 6</text>
+<line x1="471.8" y1="200" x2="449.8" y2="250" stroke="#8a9099" stroke-width="1.6"/>
+<text x="453.8" y="223" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="471.8" y1="200" x2="493.8" y2="250" stroke="#8a9099" stroke-width="1.6"/>
+<text x="489.8" y="223" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="559.8" y1="200" x2="537.8" y2="250" stroke="#8a9099" stroke-width="1.6"/>
+<text x="541.8" y="223" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="559.8" y1="200" x2="581.8" y2="250" stroke="#8a9099" stroke-width="1.6"/>
+<text x="577.8" y="223" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="515.8" y1="150" x2="471.8" y2="200" stroke="#8a9099" stroke-width="1.6"/>
+<text x="486.8" y="173" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="515.8" y1="150" x2="559.8" y2="200" stroke="#8a9099" stroke-width="1.6"/>
+<text x="544.8" y="173" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="449.8" cy="250" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="449.8" y="255" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="449.8" y="278" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="493.8" cy="250" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="493.8" y="255" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="493.8" y="278" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="471.8" cy="200" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="471.8" y="204.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="537.8" cy="250" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="537.8" y="255" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="537.8" y="278" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="581.8" cy="250" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="581.8" y="255" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="581.8" y="278" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="559.8" cy="200" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="559.8" y="204.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">4</text>
+<circle cx="515.8" cy="150" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="515.8" y="154.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">6</text>
+<text x="110.8" y="319" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">choice B:</text>
+<text x="110.8" y="333" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">pop ab and c</text>
+<circle cx="142.8" cy="322" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="142.8" y="327" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="142.8" y="350" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<line x1="264.8" y1="372" x2="242.8" y2="422" stroke="#8a9099" stroke-width="1.6"/>
+<text x="246.8" y="395" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="264.8" y1="372" x2="286.8" y2="422" stroke="#8a9099" stroke-width="1.6"/>
+<text x="282.8" y="395" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="231.8" y1="322" x2="198.8" y2="372" stroke="#8a9099" stroke-width="1.6"/>
+<text x="208.3" y="345" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="231.8" y1="322" x2="264.8" y2="372" stroke="#8a9099" stroke-width="1.6"/>
+<text x="255.3" y="345" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="198.8" cy="372" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="198.8" y="377" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="198.8" y="400" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="242.8" cy="422" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="242.8" y="427" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="242.8" y="450" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="286.8" cy="422" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="286.8" y="427" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="286.8" y="450" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="264.8" cy="372" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="264.8" y="376.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="231.8" cy="322" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="231.8" y="326.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">4</text>
+<line x1="322.8" y1="322" x2="411.8" y2="322" stroke="#4a5163" stroke-width="1.6"/>
+<path d="M419.8,322 L411.8,317.5 L411.8,326.5 Z" fill="#4a5163"/>
+<text x="370.3" y="338" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="middle">merge 2 + 4 → 6</text>
+<line x1="559.8" y1="422" x2="537.8" y2="472" stroke="#8a9099" stroke-width="1.6"/>
+<text x="541.8" y="445" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="559.8" y1="422" x2="581.8" y2="472" stroke="#8a9099" stroke-width="1.6"/>
+<text x="577.8" y="445" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="526.8" y1="372" x2="493.8" y2="422" stroke="#8a9099" stroke-width="1.6"/>
+<text x="503.3" y="395" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="526.8" y1="372" x2="559.8" y2="422" stroke="#8a9099" stroke-width="1.6"/>
+<text x="550.3" y="395" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="488.3" y1="322" x2="449.8" y2="372" stroke="#8a9099" stroke-width="1.6"/>
+<text x="462.1" y="345" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="488.3" y1="322" x2="526.8" y2="372" stroke="#8a9099" stroke-width="1.6"/>
+<text x="514.5" y="345" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="449.8" cy="372" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="449.8" y="377" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">d</text>
+<text x="449.8" y="400" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="493.8" cy="422" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="493.8" y="427" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">c</text>
+<text x="493.8" y="450" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="537.8" cy="472" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="537.8" y="477" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="537.8" y="500" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="581.8" cy="472" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="581.8" y="477" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="581.8" y="500" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<circle cx="559.8" cy="422" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="559.8" y="426.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<circle cx="526.8" cy="372" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="526.8" y="376.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">4</text>
+<circle cx="488.3" cy="322" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="488.3" y="326.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">6</text>
+</svg>
+<!-- /gen:gr hf-tie -->
+        </figure>
         The two trees give different code lengths for every symbol except \(c\),
         and the same total:
         <table class="trace">
@@ -654,8 +929,56 @@ fn extract_codes(node: &amp;Node, path: String, code: &amp;mut HashMap&lt;char, 
         <span class="tag">Example (a round trip)</span>
         Using the codes \(f{=}0,\ c{=}100,\ d{=}101,\ e{=}111,\ a{=}1100,\
         b{=}1101\):
-        <pre>  encode "face":  f&middot;a&middot;c&middot;e = 0&middot;1100&middot;100&middot;111 = 01100100111   (11 bits)
-  decode 1010:    1,0,1 &rarr; leaf d;  restart;  0 &rarr; leaf f   &rArr; "df"</pre>
+        <figure>
+<!-- gen:gr hf-face -->
+<svg viewBox="0 0 573 146" role="img" style="max-width:688px" font-family="system-ui, sans-serif" aria-label="A round trip with the codes f = 0, c = 100, d = 101, e = 111, a = 1100, b = 1101. Encode &quot;face&quot;: f, a, c, e become 0, 1100, 100, 111, concatenated to 01100100111, 11 bits. Decode 1010: the bits 1, 0, 1 walk to the leaf d; restarting at the root, 0 is the leaf f; the result is df.">
+<text x="91.9" y="43" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">encode &quot;face&quot;</text>
+<text x="116.9" y="23" font-size="14" font-weight="700" fill="#4285f4" text-anchor="middle">f</text>
+<rect x="107.9" y="28" width="18" height="22" fill="#4285f41f" stroke="#4285f4" stroke-width="1.4"/>
+<text x="116.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">0</text>
+<text x="169.9" y="23" font-size="14" font-weight="700" fill="#a142f4" text-anchor="middle">a</text>
+<rect x="133.9" y="28" width="18" height="22" fill="#a142f41f" stroke="#a142f4" stroke-width="1.4"/>
+<text x="142.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="151.9" y="28" width="18" height="22" fill="#a142f41f" stroke="#a142f4" stroke-width="1.4"/>
+<text x="160.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="169.9" y="28" width="18" height="22" fill="#a142f41f" stroke="#a142f4" stroke-width="1.4"/>
+<text x="178.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">0</text>
+<rect x="187.9" y="28" width="18" height="22" fill="#a142f41f" stroke="#a142f4" stroke-width="1.4"/>
+<text x="196.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">0</text>
+<text x="240.9" y="23" font-size="14" font-weight="700" fill="#ea4335" text-anchor="middle">c</text>
+<rect x="213.9" y="28" width="18" height="22" fill="#ea43351f" stroke="#ea4335" stroke-width="1.4"/>
+<text x="222.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="231.9" y="28" width="18" height="22" fill="#ea43351f" stroke="#ea4335" stroke-width="1.4"/>
+<text x="240.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">0</text>
+<rect x="249.9" y="28" width="18" height="22" fill="#ea43351f" stroke="#ea4335" stroke-width="1.4"/>
+<text x="258.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">0</text>
+<text x="302.9" y="23" font-size="14" font-weight="700" fill="#1e8e3e" text-anchor="middle">e</text>
+<rect x="275.9" y="28" width="18" height="22" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.4"/>
+<text x="284.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="293.9" y="28" width="18" height="22" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.4"/>
+<text x="302.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="311.9" y="28" width="18" height="22" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.4"/>
+<text x="320.9" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<text x="345.9" y="36" font-size="11.5" font-weight="600" fill="#5c6270" text-anchor="start">11 bits</text>
+<text x="345.9" y="50" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">no separators</text>
+<text x="91.9" y="99" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">decode 1010</text>
+<rect x="107.9" y="84" width="18" height="22" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.4"/>
+<text x="116.9" y="100" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<rect x="125.9" y="84" width="18" height="22" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.4"/>
+<text x="134.9" y="100" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">0</text>
+<rect x="143.9" y="84" width="18" height="22" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.4"/>
+<text x="152.9" y="100" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">1</text>
+<path d="M109.9,111 L109.9,115 L159.9,115 L159.9,111" fill="none" stroke="#f9ab00" stroke-width="1.4"/>
+<text x="134.9" y="129" font-size="11.5" font-weight="700" fill="#f9ab00" text-anchor="middle">leaf d</text>
+<rect x="164.9" y="84" width="18" height="22" fill="#4285f41f" stroke="#4285f4" stroke-width="1.4"/>
+<text x="173.9" y="100" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">0</text>
+<path d="M166.9,111 L166.9,115 L180.9,115 L180.9,111" fill="none" stroke="#4285f4" stroke-width="1.4"/>
+<text x="173.9" y="129" font-size="11.5" font-weight="700" fill="#4285f4" text-anchor="middle">leaf f</text>
+<text x="345.9" y="92" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">&quot;df&quot;</text>
+<text x="345.9" y="106" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">restart at the root after each leaf</text>
+</svg>
+<!-- /gen:gr hf-face -->
+        </figure>
         The decode shows the crux: after emitting \(d\) you jump back to the root, and
         the lone remaining \(0\) is a complete code. No delimiter was needed;
         the tree&rsquo;s leaf boundaries <em>are</em> the delimiters, which is why
@@ -834,11 +1157,16 @@ fn extract_codes(node: &amp;Node, path: String, code: &amp;mut HashMap&lt;char, 
         <span class="tag">Example (the table is not free)</span>
         Spend \(8\) bits naming the symbol, \(4\) bits for its code length, and the
         codeword itself, per symbol:
-        <pre>  "mississippi"  11 chars, 4 symbols     "abracadabra"  11 chars, 5 symbols
-     ASCII                 88 bits        ASCII                 88 bits
-     Huffman body          21 bits        Huffman body          23 bits
-     + the table           78 bits        + the table           96 bits
-                    still a win                            now a LOSS</pre>
+        <!-- gen:gr hf-cost -->
+<table class="trace">
+<tr><th></th><th><code>mississippi</code></th><th><code>abracadabra</code></th></tr>
+<tr><td>characters, distinct symbols</td><td class="num">11, 4</td><td class="num">11, 5</td></tr>
+<tr><td>ASCII</td><td class="num">88 bits</td><td class="num">88 bits</td></tr>
+<tr><td>Huffman body</td><td class="num">21 bits</td><td class="num">23 bits</td></tr>
+<tr><td>body + the table</td><td class="num">78 bits</td><td class="num">96 bits</td></tr>
+<tr><td>against ASCII</td><td class="new">still a win</td><td class="num"><span class="two">now a loss</span></td></tr>
+</table>
+<!-- /gen:gr hf-cost -->
         The body is what the earlier sections counted; it is not what you transmit.
         A short message with many distinct symbols spends most of its budget
         introducing them.
@@ -899,20 +1227,414 @@ fn extract_codes(node: &amp;Node, path: String, code: &amp;mut HashMap&lt;char, 
         outweighs a same-weight node that sits higher in the numbering. Moving it into
         that node&rsquo;s slot first repairs it.
       </p>
-      <pre>  update(s):
-    node &larr; leaf(s)                       # a new symbol: split NYT first
-    while node &ne; null:
-        leader &larr; highest-numbered node of the SAME weight
-        if leader exists and outranks node:
-            swap(node, leader)            # positions swap, numbers stay behind
-        node.weight &larr; node.weight + 1
-        node &larr; node.parent</pre>
+      <div class="code-tabs" data-snippet="greedy/fgk-update">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Adaptive Huffman (FGK): the update the encoder and the decoder both run
+// after every symbol. Nodes are numbered bottom-up, left to right, the root
+// highest; a number belongs to a POSITION, so a swap trades numbers back.
+struct Node {
+    int weight = 0;
+    int number = 0;
+    char symbol = 0;                      // a leaf&#x27;s symbol; NYT, internal: 0
+    Node* parent = nullptr;
+    Node* left = nullptr;
+    Node* right = nullptr;
+};
+
+struct AdaptiveTree {
+    static const int TOP = 512;           // the root&#x27;s number
+    vector&lt;Node*&gt; byNumber = vector&lt;Node*&gt;(TOP + 1, nullptr);
+    map&lt;char, Node*&gt; leafOf;              // the leaf of each symbol seen
+    Node* nyt;                            // &quot;not yet transmitted&quot;, weight 0
+    Node* root;
+
+    AdaptiveTree() {
+        nyt = new Node();
+        nyt-&gt;number = TOP;
+        byNumber[TOP] = nyt;
+        root = nyt;
+    }
+    ~AdaptiveTree() {
+        for (Node* n : byNumber) delete n;
+    }
+
+    bool isAncestor(Node* a, Node* n) {   // is a above n?
+        for (Node* p = n-&gt;parent; p != nullptr; p = p-&gt;parent) {
+            if (p == a) return true;
+        }
+        return false;
+    }
+
+    // The highest-numbered node of node&#x27;s weight, if it outranks node. The
+    // weights never decrease with the number, so that block of equal weights
+    // is the run of numbers just above node&#x27;s.
+    Node* leader(Node* node) {
+        Node* lead = nullptr;
+        for (int k = node-&gt;number + 1; k &lt;= TOP; k++) {
+            if (byNumber[k]-&gt;weight != node-&gt;weight) break;
+            if (!isAncestor(byNumber[k], node)) lead = byNumber[k];
+        }
+        return lead;
+    }
+
+    // Exchange two positions, subtrees and all; the numbers stay put.
+    void swapNodes(Node* a, Node* b) {
+        Node* pa = a-&gt;parent;
+        Node* pb = b-&gt;parent;
+        bool aLeft = (pa-&gt;left == a);
+        bool bLeft = (pb-&gt;left == b);
+        if (aLeft) pa-&gt;left = b; else pa-&gt;right = b;
+        if (bLeft) pb-&gt;left = a; else pb-&gt;right = a;
+        a-&gt;parent = pb;
+        b-&gt;parent = pa;
+        swap(a-&gt;number, b-&gt;number);
+        byNumber[a-&gt;number] = a;
+        byNumber[b-&gt;number] = b;
+    }
+
+    // A new symbol: NYT becomes an internal node over a new NYT (left) and
+    // the symbol&#x27;s leaf (right), weight 1. The walk starts at the old NYT.
+    Node* splitNYT(char s) {
+        Node* old = nyt;
+        Node* leaf = new Node();
+        leaf-&gt;weight = 1;
+        leaf-&gt;symbol = s;
+        leaf-&gt;number = old-&gt;number - 1;
+        leaf-&gt;parent = old;
+        nyt = new Node();
+        nyt-&gt;number = old-&gt;number - 2;
+        nyt-&gt;parent = old;
+        old-&gt;left = nyt;
+        old-&gt;right = leaf;
+        byNumber[leaf-&gt;number] = leaf;
+        byNumber[nyt-&gt;number] = nyt;
+        leafOf[s] = leaf;
+        return old;
+    }
+
+    void update(char s) {
+        Node* node;
+        if (leafOf.count(s) == 0) {
+            node = splitNYT(s);           // a new symbol: split NYT first
+        } else {
+            node = leafOf[s];
+        }
+        while (node != nullptr) {
+            Node* lead = leader(node);
+            if (lead != nullptr) {        // a same-weight node outranks it
+                swapNodes(node, lead);    // positions swap, numbers stay
+            }
+            node-&gt;weight++;
+            node = node-&gt;parent;
+        }
+    }
+};</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Adaptive Huffman (FGK): the update the encoder and the decoder both run
+// after every symbol. Nodes are numbered bottom-up, left to right, the root
+// highest; a number belongs to a POSITION, so a swap trades numbers back.
+static class Node {
+    int weight = 0;
+    int number = 0;
+    char symbol = 0;                      // a leaf&#x27;s symbol; NYT, internal: 0
+    Node parent, left, right;
+}
+
+static class AdaptiveTree {
+    static final int TOP = 512;           // the root&#x27;s number
+    Node[] byNumber = new Node[TOP + 1];
+    Map&lt;Character, Node&gt; leafOf = new HashMap&lt;&gt;();   // each symbol&#x27;s leaf
+    Node nyt;                             // &quot;not yet transmitted&quot;, weight 0
+    Node root;
+
+    AdaptiveTree() {
+        nyt = new Node();
+        nyt.number = TOP;
+        byNumber[TOP] = nyt;
+        root = nyt;
+    }
+
+    boolean isAncestor(Node a, Node n) {  // is a above n?
+        for (Node p = n.parent; p != null; p = p.parent) {
+            if (p == a) return true;
+        }
+        return false;
+    }
+
+    // The highest-numbered node of node&#x27;s weight, if it outranks node. The
+    // weights never decrease with the number, so that block of equal weights
+    // is the run of numbers just above node&#x27;s.
+    Node leader(Node node) {
+        Node lead = null;
+        for (int k = node.number + 1; k &lt;= TOP; k++) {
+            if (byNumber[k].weight != node.weight) break;
+            if (!isAncestor(byNumber[k], node)) lead = byNumber[k];
+        }
+        return lead;
+    }
+
+    // Exchange two positions, subtrees and all; the numbers stay put.
+    void swapNodes(Node a, Node b) {
+        Node pa = a.parent;
+        Node pb = b.parent;
+        boolean aLeft = (pa.left == a);
+        boolean bLeft = (pb.left == b);
+        if (aLeft) pa.left = b; else pa.right = b;
+        if (bLeft) pb.left = a; else pb.right = a;
+        a.parent = pb;
+        b.parent = pa;
+        int t = a.number;
+        a.number = b.number;
+        b.number = t;
+        byNumber[a.number] = a;
+        byNumber[b.number] = b;
+    }
+
+    // A new symbol: NYT becomes an internal node over a new NYT (left) and
+    // the symbol&#x27;s leaf (right), weight 1. The walk starts at the old NYT.
+    Node splitNYT(char s) {
+        Node old = nyt;
+        Node leaf = new Node();
+        leaf.weight = 1;
+        leaf.symbol = s;
+        leaf.number = old.number - 1;
+        leaf.parent = old;
+        nyt = new Node();
+        nyt.number = old.number - 2;
+        nyt.parent = old;
+        old.left = nyt;
+        old.right = leaf;
+        byNumber[leaf.number] = leaf;
+        byNumber[nyt.number] = nyt;
+        leafOf.put(s, leaf);
+        return old;
+    }
+
+    void update(char s) {
+        Node node;
+        if (!leafOf.containsKey(s)) {
+            node = splitNYT(s);           // a new symbol: split NYT first
+        } else {
+            node = leafOf.get(s);
+        }
+        while (node != null) {
+            Node lead = leader(node);
+            if (lead != null) {           // a same-weight node outranks it
+                swapNodes(node, lead);    // positions swap, numbers stay
+            }
+            node.weight++;
+            node = node.parent;
+        }
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Adaptive Huffman (FGK): the update the encoder and the decoder both run
+# after every symbol. Nodes are numbered bottom-up, left to right, the root
+# highest; a number belongs to a POSITION, so a swap trades numbers back.
+class Node:
+    def __init__(self, number, parent=None, weight=0, symbol=None):
+        self.weight = weight
+        self.number = number
+        self.symbol = symbol              # a leaf&#x27;s symbol; NYT, internal: None
+        self.parent = parent
+        self.left = None
+        self.right = None
+
+class AdaptiveTree:
+    TOP = 512                             # the root&#x27;s number
+
+    def __init__(self):
+        self.nyt = Node(self.TOP)         # &quot;not yet transmitted&quot;, weight 0
+        self.root = self.nyt
+        self.by_number = {self.TOP: self.nyt}
+        self.leaf_of = {}                 # the leaf of each symbol seen
+
+    def is_ancestor(self, a, n):          # is a above n?
+        p = n.parent
+        while p is not None:
+            if p is a:
+                return True
+            p = p.parent
+        return False
+
+    # The highest-numbered node of node&#x27;s weight, if it outranks node. The
+    # weights never decrease with the number, so that block of equal weights
+    # is the run of numbers just above node&#x27;s.
+    def leader(self, node):
+        lead = None
+        for k in range(node.number + 1, self.TOP + 1):
+            if self.by_number[k].weight != node.weight:
+                break
+            if not self.is_ancestor(self.by_number[k], node):
+                lead = self.by_number[k]
+        return lead
+
+    # Exchange two positions, subtrees and all; the numbers stay put.
+    def swap_nodes(self, a, b):
+        pa, pb = a.parent, b.parent
+        a_left = pa.left is a
+        b_left = pb.left is b
+        if a_left:
+            pa.left = b
+        else:
+            pa.right = b
+        if b_left:
+            pb.left = a
+        else:
+            pb.right = a
+        a.parent, b.parent = pb, pa
+        a.number, b.number = b.number, a.number
+        self.by_number[a.number] = a
+        self.by_number[b.number] = b
+
+    # A new symbol: NYT becomes an internal node over a new NYT (left) and
+    # the symbol&#x27;s leaf (right), weight 1. The walk starts at the old NYT.
+    def split_nyt(self, s):
+        old = self.nyt
+        leaf = Node(old.number - 1, old, weight=1, symbol=s)
+        self.nyt = Node(old.number - 2, old)
+        old.left = self.nyt
+        old.right = leaf
+        self.by_number[leaf.number] = leaf
+        self.by_number[self.nyt.number] = self.nyt
+        self.leaf_of[s] = leaf
+        return old
+
+    def update(self, s):
+        if s not in self.leaf_of:
+            node = self.split_nyt(s)      # a new symbol: split NYT first
+        else:
+            node = self.leaf_of[s]
+        while node is not None:
+            lead = self.leader(node)
+            if lead is not None:          # a same-weight node outranks it
+                self.swap_nodes(node, lead)   # positions swap, numbers stay
+            node.weight += 1
+            node = node.parent</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Adaptive Huffman (FGK): the update the encoder and the decoder both run
+// after every symbol. Nodes are numbered bottom-up, left to right, the root
+// highest; a number belongs to a POSITION, so a swap trades numbers back.
+// Nodes live in one vector and refer to each other by index.
+const TOP: usize = 512;                   // the root&#x27;s number
+
+struct Node {
+    weight: u32,
+    number: usize,
+    symbol: Option&lt;u8&gt;,                   // a leaf&#x27;s symbol; NYT, internal: None
+    parent: Option&lt;usize&gt;,
+    left: Option&lt;usize&gt;,
+    right: Option&lt;usize&gt;,
+}
+
+struct AdaptiveTree {
+    nodes: Vec&lt;Node&gt;,
+    by_number: Vec&lt;usize&gt;,                // by_number[k] = the node numbered k
+    leaf_of: HashMap&lt;u8, usize&gt;,          // the leaf of each symbol seen
+    nyt: usize,                           // &quot;not yet transmitted&quot;, weight 0
+    root: usize,
+}
+
+impl AdaptiveTree {
+    fn new() -&gt; Self {
+        let nyt = Node { weight: 0, number: TOP, symbol: None,
+                         parent: None, left: None, right: None };
+        let mut by_number = vec![usize::MAX; TOP + 1];
+        by_number[TOP] = 0;
+        AdaptiveTree { nodes: vec![nyt], by_number, leaf_of: HashMap::new(),
+                       nyt: 0, root: 0 }
+    }
+
+    fn is_ancestor(&amp;self, a: usize, n: usize) -&gt; bool {   // is a above n?
+        let mut p = self.nodes[n].parent;
+        while let Some(i) = p {
+            if i == a { return true; }
+            p = self.nodes[i].parent;
+        }
+        false
+    }
+
+    // The highest-numbered node of node&#x27;s weight, if it outranks node. The
+    // weights never decrease with the number, so that block of equal weights
+    // is the run of numbers just above node&#x27;s.
+    fn leader(&amp;self, node: usize) -&gt; Option&lt;usize&gt; {
+        let mut lead = None;
+        for k in self.nodes[node].number + 1..=TOP {
+            let c = self.by_number[k];
+            if self.nodes[c].weight != self.nodes[node].weight { break; }
+            if !self.is_ancestor(c, node) { lead = Some(c); }
+        }
+        lead
+    }
+
+    // Exchange two positions, subtrees and all; the numbers stay put.
+    fn swap_nodes(&amp;mut self, a: usize, b: usize) {
+        let pa = self.nodes[a].parent.unwrap();
+        let pb = self.nodes[b].parent.unwrap();
+        let a_left = self.nodes[pa].left == Some(a);
+        let b_left = self.nodes[pb].left == Some(b);
+        if a_left { self.nodes[pa].left = Some(b); } else { self.nodes[pa].right = Some(b); }
+        if b_left { self.nodes[pb].left = Some(a); } else { self.nodes[pb].right = Some(a); }
+        self.nodes[a].parent = Some(pb);
+        self.nodes[b].parent = Some(pa);
+        let t = self.nodes[a].number;
+        self.nodes[a].number = self.nodes[b].number;
+        self.nodes[b].number = t;
+        self.by_number[self.nodes[a].number] = a;
+        self.by_number[self.nodes[b].number] = b;
+    }
+
+    // A new symbol: NYT becomes an internal node over a new NYT (left) and
+    // the symbol&#x27;s leaf (right), weight 1. The walk starts at the old NYT.
+    fn split_nyt(&amp;mut self, s: u8) -&gt; usize {
+        let old = self.nyt;
+        let number = self.nodes[old].number;
+        let leaf = self.nodes.len();
+        self.nodes.push(Node { weight: 1, number: number - 1, symbol: Some(s),
+                               parent: Some(old), left: None, right: None });
+        let fresh = self.nodes.len();
+        self.nodes.push(Node { weight: 0, number: number - 2, symbol: None,
+                               parent: Some(old), left: None, right: None });
+        self.nodes[old].left = Some(fresh);
+        self.nodes[old].right = Some(leaf);
+        self.by_number[number - 1] = leaf;
+        self.by_number[number - 2] = fresh;
+        self.leaf_of.insert(s, leaf);
+        self.nyt = fresh;
+        old
+    }
+
+    fn update(&amp;mut self, s: u8) {
+        let mut node = if self.leaf_of.contains_key(&amp;s) {
+            Some(self.leaf_of[&amp;s])
+        } else {
+            Some(self.split_nyt(s))           // a new symbol: split NYT first
+        };
+        while let Some(n) = node {
+            if let Some(lead) = self.leader(n) {   // a same-weight node outranks it
+                self.swap_nodes(n, lead);          // positions swap, numbers stay
+            }
+            self.nodes[n].weight += 1;
+            node = self.nodes[n].parent;
+        }
+    }
+}</pre>
+<p class="ct-src">source: <code>code/greedy/fgk-update.cpp &middot; code/greedy/fgk-update.java &middot; code/greedy/fgk-update.py &middot; code/greedy/fgk-update.rs</code></p>
+<!--/ct--></div>
       <p>
         Numbers belong to <em>positions</em>, not to nodes, so a swap exchanges them
         back; this is the detail implementations most often get wrong. Never swap with
         a parent or a descendant: that tangles the tree instead of reordering
-        equals. The cost is one increment and at most one swap per level, so
-        \(O(d)\) per symbol on both sides, with \(d\) the current depth.
+        equals. A new symbol first splits NYT: the old NYT becomes the internal
+        node over a new NYT and the symbol&rsquo;s leaf, which starts at weight
+        \(1\), and the walk starts at that internal node. The walk makes one
+        increment and at most one swap per level, \(d\) levels for a tree of
+        depth \(d\). The code above finds each leader by scanning the block
+        upward, which costs the block&rsquo;s size; an implementation that keeps a
+        pointer to every block&rsquo;s leader finds it in constant time, for
+        \(O(d)\) per symbol on both sides.
       </p>
 
       <h3>The update, run on the first four symbols</h3>
@@ -954,35 +1676,144 @@ fn extract_codes(node: &amp;Node, path: String, code: &amp;mut HashMap&lt;char, 
             weight 1, and no higher-numbered node has weight 1, so no swap:
             \(1 \to 2\). Root <span class="mono">#7</span>: \(3 \to 4\).</td></tr>
       </table>
-      <pre>  after 'a':  weights by number 0,1,1
-    #3 root w1
-    |-0- #1 NYT w0                    NYT: code 0
-    `-1- #2 a   w1                    a:   code 1
-
-  after 'b':  weights by number 0,1,1,1,2
-    #5 root w2
-    |-0- #3 int w1
-    |    |-0- #1 NYT w0               NYT: code 00
-    |    `-1- #2 b   w1               b:   code 01
-    `-1- #4 a   w1                    a:   code 1
-
-  after 'r' (the swap has already happened):  0,1,1,1,1,2,3
-    #7 root w3
-    |-0- #5 a   w1                    a:   code 0
-    `-1- #6 int w2
-         |-0- #3 int w1
-         |    |-0- #1 NYT w0          NYT: code 100
-         |    `-1- #2 r   w1          r:   code 101
-         `-1- #4 b   w1               b:   code 11
-
-  after the 4th symbol, 'a':  0,1,1,1,2,2,4  (shape unchanged)
-    #7 root w4
-    |-0- #5 a   w2                    a:   code 0
-    `-1- #6 int w2
-         |-0- #3 int w1
-         |    |-0- #1 NYT w0          NYT: code 100
-         |    `-1- #2 r   w1          r:   code 101
-         `-1- #4 b   w1               b:   code 11</pre>
+      <figure>
+<!-- gen:gr hf-adaptive -->
+<svg viewBox="0 0 544 494" role="img" style="max-width:653px" font-family="system-ui, sans-serif" aria-label="The adaptive Huffman tree after each of the first four symbols of abracadabra; each node shows its number, and leaves their symbol and weight. after symbol 1, a: a node of weight 1 over the leaf NYT (0) and the leaf a (1). after symbol 2, b: a node of weight 2 over a node of weight 1 over the leaf NYT (0) and the leaf b (1) and the leaf a (1). after symbol 3, r: a node of weight 3 over the leaf a (1) and a node of weight 2 over a node of weight 1 over the leaf NYT (0) and the leaf r (1) and the leaf b (1). after symbol 4, a: a node of weight 4 over the leaf a (2) and a node of weight 2 over a node of weight 1 over the leaf NYT (0) and the leaf r (1) and the leaf b (1).">
+<line x1="150.6" y1="28" x2="127.6" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="132.1" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="150.6" y1="28" x2="173.6" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="169.1" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="127.6" cy="78" r="16" fill="#fff" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="127.6" y="82" font-size="10" font-weight="700" fill="#5c6270" text-anchor="middle">NYT</text>
+<text x="127.6" y="106" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="108.6" y="69" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#1</text>
+<circle cx="173.6" cy="78" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="173.6" y="83" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="173.6" y="106" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="192.6" y="69" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="start">#2</text>
+<circle cx="150.6" cy="28" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="150.6" y="32.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="131.6" y="19" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#3</text>
+<text x="152.6" y="123" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">after 'a'</text>
+<text x="152.6" y="138" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">weights by number: 0, 1, 1</text>
+<text x="152.6" y="153" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">NYT 0 · a 1</text>
+<line x1="347.4" y1="78" x2="324.4" y2="128" stroke="#8a9099" stroke-width="1.6"/>
+<text x="328.9" y="101" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="347.4" y1="78" x2="370.4" y2="128" stroke="#8a9099" stroke-width="1.6"/>
+<text x="365.9" y="101" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="381.9" y1="28" x2="347.4" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="357.7" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="381.9" y1="28" x2="416.4" y2="78" stroke="#8a9099" stroke-width="1.6"/>
+<text x="406.2" y="51" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="324.4" cy="128" r="16" fill="#fff" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="324.4" y="132" font-size="10" font-weight="700" fill="#5c6270" text-anchor="middle">NYT</text>
+<text x="324.4" y="156" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="305.4" y="119" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#1</text>
+<circle cx="370.4" cy="128" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="370.4" y="133" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="370.4" y="156" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="389.4" y="119" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="start">#2</text>
+<circle cx="347.4" cy="78" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="347.4" y="82.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="328.4" y="69" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#3</text>
+<circle cx="416.4" cy="78" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="416.4" y="83" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="416.4" y="106" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="435.4" y="69" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="start">#4</text>
+<circle cx="381.9" cy="28" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="381.9" y="32.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<text x="362.9" y="19" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#5</text>
+<text x="372.4" y="173" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">after 'b'</text>
+<text x="372.4" y="188" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">weights by number: 0, 1, 1, 1, 2</text>
+<text x="372.4" y="203" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">NYT 00 · a 1 · b 01</text>
+<line x1="125.8" y1="351" x2="102.8" y2="401" stroke="#8a9099" stroke-width="1.6"/>
+<text x="107.3" y="374" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="125.8" y1="351" x2="148.8" y2="401" stroke="#8a9099" stroke-width="1.6"/>
+<text x="144.3" y="374" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="160.3" y1="301" x2="125.8" y2="351" stroke="#8a9099" stroke-width="1.6"/>
+<text x="136.1" y="324" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="160.3" y1="301" x2="194.8" y2="351" stroke="#8a9099" stroke-width="1.6"/>
+<text x="184.6" y="324" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="108.5" y1="251" x2="56.8" y2="301" stroke="#8a9099" stroke-width="1.6"/>
+<text x="75.7" y="274" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="108.5" y1="251" x2="160.3" y2="301" stroke="#8a9099" stroke-width="1.6"/>
+<text x="141.4" y="274" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="56.8" cy="301" r="16" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="56.8" y="306" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="56.8" y="329" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="37.8" y="292" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#5</text>
+<circle cx="102.8" cy="401" r="16" fill="#fff" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="102.8" y="405" font-size="10" font-weight="700" fill="#5c6270" text-anchor="middle">NYT</text>
+<text x="102.8" y="429" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="83.8" y="392" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#1</text>
+<circle cx="148.8" cy="401" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="148.8" y="406" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">r</text>
+<text x="148.8" y="429" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="167.8" y="392" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="start">#2</text>
+<circle cx="125.8" cy="351" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="125.8" y="355.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="106.8" y="342" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#3</text>
+<circle cx="194.8" cy="351" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="194.8" y="356" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="194.8" y="379" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="213.8" y="342" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="start">#4</text>
+<circle cx="160.3" cy="301" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.4"/>
+<text x="160.3" y="305.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<text x="179.3" y="292" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="start">#6</text>
+<circle cx="108.5" cy="251" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="108.5" y="255.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">3</text>
+<text x="89.5" y="242" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#7</text>
+<text x="127.8" y="446" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">after 'r' (the swap made, ringed)</text>
+<text x="127.8" y="461" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">weights by number: 0, 1, 1, 1, 1, 2, 3</text>
+<text x="127.8" y="476" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">NYT 100 · a 0 · b 11 · r 101</text>
+<line x1="407.6" y1="351" x2="384.6" y2="401" stroke="#8a9099" stroke-width="1.6"/>
+<text x="389.1" y="374" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="407.6" y1="351" x2="430.6" y2="401" stroke="#8a9099" stroke-width="1.6"/>
+<text x="426.1" y="374" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="442.1" y1="301" x2="407.6" y2="351" stroke="#8a9099" stroke-width="1.6"/>
+<text x="417.9" y="324" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="442.1" y1="301" x2="476.6" y2="351" stroke="#8a9099" stroke-width="1.6"/>
+<text x="466.4" y="324" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<line x1="390.4" y1="251" x2="338.6" y2="301" stroke="#8a9099" stroke-width="1.6"/>
+<text x="357.5" y="274" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">0</text>
+<line x1="390.4" y1="251" x2="442.1" y2="301" stroke="#8a9099" stroke-width="1.6"/>
+<text x="423.2" y="274" font-size="11.5" font-weight="700" fill="#6b40d8" stroke="#fff" stroke-width="2.5" paint-order="stroke" text-anchor="middle">1</text>
+<circle cx="338.6" cy="301" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="338.6" y="306" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">a</text>
+<text x="338.6" y="329" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="319.6" y="292" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#5</text>
+<circle cx="384.6" cy="401" r="16" fill="#fff" stroke="#5c6270" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="384.6" y="405" font-size="10" font-weight="700" fill="#5c6270" text-anchor="middle">NYT</text>
+<text x="384.6" y="429" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="365.6" y="392" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#1</text>
+<circle cx="430.6" cy="401" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="430.6" y="406" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">r</text>
+<text x="430.6" y="429" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="449.6" y="392" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="start">#2</text>
+<circle cx="407.6" cy="351" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="407.6" y="355.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">1</text>
+<text x="388.6" y="342" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#3</text>
+<circle cx="476.6" cy="351" r="16" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.7"/>
+<text x="476.6" y="356" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">b</text>
+<text x="476.6" y="379" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="495.6" y="342" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="start">#4</text>
+<circle cx="442.1" cy="301" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="442.1" y="305.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">2</text>
+<text x="461.1" y="292" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="start">#6</text>
+<circle cx="390.4" cy="251" r="15" fill="#eef1f6" stroke="#8a9099" stroke-width="1.5"/>
+<text x="390.4" y="255.5" font-size="12.5" font-weight="600" fill="#5c6270" text-anchor="middle">4</text>
+<text x="371.4" y="242" font-size="10.5" font-weight="700" fill="#6b40d8" text-anchor="end">#7</text>
+<text x="409.6" y="446" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="middle">after the 4th symbol, a: shape unchanged</text>
+<text x="409.6" y="461" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">weights by number: 0, 1, 1, 1, 2, 2, 4</text>
+<text x="409.6" y="476" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">NYT 100 · a 0 · b 11 · r 101</text>
+</svg>
+<!-- /gen:gr hf-adaptive -->
+        <figcaption>
+          The tree after each of the first four symbols. Purple numbers are the
+          node numbers; under each tree, its weights read in number order (never
+          decreasing: the sibling property), then every code.
+        </figcaption>
+      </figure>
       <p>
         The swap at step 3 is what makes step 4 cheap. Before it, \(a\) sat as an
         ordinary leaf; the swap lifts it to depth 1, so the next \(a\) costs a single
@@ -1008,18 +1839,22 @@ fn extract_codes(node: &amp;Node, path: String, code: &amp;mut HashMap&lt;char, 
 
       <div class="ex">
         <span class="tag">Example (&ldquo;abracadabra&rdquo;, adaptively)</span>
-        <pre>  symbol  in tree?  sent                       bits   total
-    a     new       (NYT is the root) + ASCII    8       8
-    b     new       0 + ASCII                    9      17
-    r     new       00 + ASCII                  10      27
-    a     yes       0                            1      28
-    c     new       100 + ASCII                 11      39
-    a     yes       0                            1      40
-    d     new       1100 + ASCII                12      52
-    a     yes       0                            1      53
-    b     yes       110                          3      56
-    r     yes       110                          3      59
-    a     yes       0                            1      60</pre>
+        <!-- gen:gr hf-sent -->
+<table class="trace">
+<tr><th>step</th><th>symbol</th><th>in the tree?</th><th>sent</th><th>bits</th><th>total</th></tr>
+<tr><td class="num">1</td><td class="num">a</td><td>new</td><td class="pq">(NYT is the root) + ASCII</td><td class="num">8</td><td class="num">8</td></tr>
+<tr><td class="num">2</td><td class="num">b</td><td>new</td><td class="pq">0 + ASCII</td><td class="num">9</td><td class="num">17</td></tr>
+<tr><td class="num">3</td><td class="num">r</td><td>new</td><td class="pq">00 + ASCII</td><td class="num">10</td><td class="num">27</td></tr>
+<tr><td class="num">4</td><td class="num">a</td><td>yes</td><td class="pq">0</td><td class="num">1</td><td class="num">28</td></tr>
+<tr><td class="num">5</td><td class="num">c</td><td>new</td><td class="pq">100 + ASCII</td><td class="num">11</td><td class="num">39</td></tr>
+<tr><td class="num">6</td><td class="num">a</td><td>yes</td><td class="pq">0</td><td class="num">1</td><td class="num">40</td></tr>
+<tr><td class="num">7</td><td class="num">d</td><td>new</td><td class="pq">1100 + ASCII</td><td class="num">12</td><td class="num">52</td></tr>
+<tr><td class="num">8</td><td class="num">a</td><td>yes</td><td class="pq">0</td><td class="num">1</td><td class="num">53</td></tr>
+<tr><td class="num">9</td><td class="num">b</td><td>yes</td><td class="pq">110</td><td class="num">3</td><td class="num">56</td></tr>
+<tr><td class="num">10</td><td class="num">r</td><td>yes</td><td class="pq">110</td><td class="num">3</td><td class="num">59</td></tr>
+<tr><td class="num">11</td><td class="num">a</td><td>yes</td><td class="pq">0</td><td class="num">1</td><td class="num">60</td></tr>
+</table>
+<!-- /gen:gr hf-sent -->
         Eleven characters in 60 bits with no table, against ASCII&rsquo;s 88 and static
         Huffman&rsquo;s 23-bit body plus 73-bit table. First appearances are expensive
         and everything after is cheap: <code>a</code> has been promoted to depth 1, so
@@ -1238,7 +2073,7 @@ fn extract_codes(node: &amp;Node, path: String, code: &amp;mut HashMap&lt;char, 
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Huffman Coding v1.0
+        Data Structures &amp; Algorithms &middot; Huffman Coding v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

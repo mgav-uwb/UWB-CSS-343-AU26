@@ -162,13 +162,16 @@
         some fixed rule, commits to it irrevocably, and reduces the
         problem by that choice. No backtracking, no lookahead.
       </div>
-      <pre>  greedy(problem):
-      while not solved:
-          x = the locally BEST choice available
-          commit to x               <span class="cm">// never undone</span>
-          shrink the problem</pre>
+      <p>Every greedy algorithm is the same loop:</p>
+      <ol>
+        <li>if the problem is solved, stop;</li>
+        <li>otherwise take the locally <em>best</em> choice available, by a
+          fixed rule;</li>
+        <li>commit to it: it is never undone;</li>
+        <li>shrink the problem by that choice, and repeat.</li>
+      </ol>
       <p>
-        Every greedy algorithm is this loop; the art is entirely in the
+        The art is entirely in the
         <em>choice rule</em> and its <em>proof</em>. The irrevocability is what
         makes greedy fast (one pass, no search tree) and also what
         makes it risky, because a locally best choice can foreclose a globally
@@ -186,8 +189,78 @@
       </p>
       <p>
         The state is a single number, the amount still owed. Each step subtracts
-        the largest denomination that does not exceed it. Run the rule on
-        \(41\)&cent; with US denominations \(\{25, 10, 5, 1\}\):
+        the largest denomination that does not exceed it, which is the loop of
+        &sect;1 with this rule:
+      </p>
+      <div class="code-tabs" data-snippet="greedy/change">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Greedy change-making: repeatedly take the largest coin that fits.
+// coins is sorted from largest to smallest and contains 1, so a coin
+// always fits.
+vector&lt;int&gt; greedyChange(int amount, const vector&lt;int&gt;&amp; coins) {
+    vector&lt;int&gt; taken;
+    while (amount &gt; 0) {                  // not solved yet
+        size_t i = 0;
+        while (coins[i] &gt; amount) {       // the locally best choice:
+            i++;                          // the largest coin that fits
+        }
+        taken.push_back(coins[i]);        // commit to it: never undone
+        amount -= coins[i];               // shrink the problem
+    }
+    return taken;
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Greedy change-making: repeatedly take the largest coin that fits.
+// coins is sorted from largest to smallest and contains 1, so a coin
+// always fits.
+static List&lt;Integer&gt; greedyChange(int amount, int[] coins) {
+    List&lt;Integer&gt; taken = new ArrayList&lt;&gt;();
+    while (amount &gt; 0) {                  // not solved yet
+        int i = 0;
+        while (coins[i] &gt; amount) {       // the locally best choice:
+            i++;                          // the largest coin that fits
+        }
+        taken.add(coins[i]);              // commit to it: never undone
+        amount -= coins[i];               // shrink the problem
+    }
+    return taken;
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Greedy change-making: repeatedly take the largest coin that fits.
+# coins is sorted from largest to smallest and contains 1, so a coin
+# always fits.
+def greedy_change(amount, coins):
+    taken = []
+    while amount &gt; 0:                     # not solved yet
+        i = 0
+        while coins[i] &gt; amount:          # the locally best choice:
+            i += 1                        # the largest coin that fits
+        taken.append(coins[i])            # commit to it: never undone
+        amount -= coins[i]                # shrink the problem
+    return taken</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Greedy change-making: repeatedly take the largest coin that fits.
+// coins is sorted from largest to smallest and contains 1, so a coin
+// always fits.
+fn greedy_change(mut amount: u32, coins: &amp;[u32]) -&gt; Vec&lt;u32&gt; {
+    let mut taken = Vec::new();
+    while amount &gt; 0 {                    // not solved yet
+        let mut i = 0;
+        while coins[i] &gt; amount {         // the locally best choice:
+            i += 1;                       // the largest coin that fits
+        }
+        taken.push(coins[i]);             // commit to it: never undone
+        amount -= coins[i];               // shrink the problem
+    }
+    taken
+}</pre>
+<p class="ct-src">source: <code>code/greedy/change.cpp &middot; code/greedy/change.java &middot; code/greedy/change.py &middot; code/greedy/change.rs</code></p>
+<!--/ct--></div>
+      <p>
+        Run the rule on \(41\)&cent; with US denominations
+        \(\{25, 10, 5, 1\}\):
       </p>
       <table class="trace">
         <tr><th>step</th><th>amount owed</th><th>largest coin that fits</th>
@@ -337,12 +410,66 @@
         intervals every number below changes. Five requests:
       </div>
 
-      <pre>   t     1  2  3  4  5  6  7  8  9  10 11
-   a     ============                    TAKE   (room free at 5)
-   b        ============                 skip   (starts 2 &lt; 5)
-   c           ============              skip   (starts 3 &lt; 5)
-   d                       ======        TAKE   (starts 7 &ge; 5)
-   e                          =========  skip   (starts 8 &lt; 9)</pre>
+      <figure>
+<!-- gen:gr gm-select5 -->
+<svg viewBox="0 0 446 154" role="img" style="max-width:535px" font-family="system-ui, sans-serif" aria-label="Five half-open requests on a time axis from 1 to 11, taken earliest finish first. a = [1, 5): take: room free at 5. b = [2, 6): skip: starts 2 &lt; 5. c = [3, 7): skip: starts 3 &lt; 5. d = [7, 9): take: starts 7 ≥ 5. e = [8, 11): skip: starts 8 &lt; 9.">
+<line x1="33.5" y1="26" x2="33.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="33.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<line x1="59.5" y1="26" x2="59.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="59.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<line x1="85.5" y1="26" x2="85.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="85.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<line x1="111.5" y1="26" x2="111.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="111.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<line x1="137.5" y1="26" x2="137.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="137.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<line x1="163.5" y1="26" x2="163.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="163.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<line x1="189.5" y1="26" x2="189.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="189.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<line x1="215.5" y1="26" x2="215.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="215.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<line x1="241.5" y1="26" x2="241.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="241.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<line x1="267.5" y1="26" x2="267.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="267.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<line x1="293.5" y1="26" x2="293.5" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="293.5" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<text x="23.5" y="21" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">t</text>
+<line x1="33.5" y1="26" x2="293.5" y2="26" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="33.5" y="35" width="104" height="12" rx="3" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<circle cx="33.5" cy="41" r="3.6" fill="#0a7d4d"/>
+<circle cx="137.5" cy="41" r="3.6" fill="#fff" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="23.5" y="45.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="end">a</text>
+<text x="309.5" y="45" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">take: room free at 5</text>
+<rect x="59.5" y="57" width="104" height="12" rx="3" fill="#fafbfc" stroke="#c8ccd6" stroke-width="1.3"/>
+<circle cx="59.5" cy="63" r="3.6" fill="#c8ccd6"/>
+<circle cx="163.5" cy="63" r="3.6" fill="#fff" stroke="#c8ccd6" stroke-width="1.6"/>
+<text x="23.5" y="67.5" font-size="13" font-weight="600" fill="#5c6270" text-anchor="end">b</text>
+<text x="309.5" y="67" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">skip: starts 2 &lt; 5</text>
+<rect x="85.5" y="79" width="104" height="12" rx="3" fill="#fafbfc" stroke="#c8ccd6" stroke-width="1.3"/>
+<circle cx="85.5" cy="85" r="3.6" fill="#c8ccd6"/>
+<circle cx="189.5" cy="85" r="3.6" fill="#fff" stroke="#c8ccd6" stroke-width="1.6"/>
+<text x="23.5" y="89.5" font-size="13" font-weight="600" fill="#5c6270" text-anchor="end">c</text>
+<text x="309.5" y="89" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">skip: starts 3 &lt; 5</text>
+<rect x="189.5" y="101" width="52" height="12" rx="3" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.8"/>
+<circle cx="189.5" cy="107" r="3.6" fill="#0a7d4d"/>
+<circle cx="241.5" cy="107" r="3.6" fill="#fff" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="23.5" y="111.5" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="end">d</text>
+<text x="309.5" y="111" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">take: starts 7 ≥ 5</text>
+<rect x="215.5" y="123" width="78" height="12" rx="3" fill="#fafbfc" stroke="#c8ccd6" stroke-width="1.3"/>
+<circle cx="215.5" cy="129" r="3.6" fill="#c8ccd6"/>
+<circle cx="293.5" cy="129" r="3.6" fill="#fff" stroke="#c8ccd6" stroke-width="1.6"/>
+<text x="23.5" y="133.5" font-size="13" font-weight="600" fill="#5c6270" text-anchor="end">e</text>
+<text x="309.5" y="133" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">skip: starts 8 &lt; 9</text>
+</svg>
+<!-- /gen:gr gm-select5 -->
+        <figcaption>
+          The five requests as half-open intervals, a filled dot at the start
+          and an open circle at the finish. Earliest finish first takes the
+          green ones; each row gives the test that decided it.
+        </figcaption>
+      </figure>
 
       <p>
         The greedy rule is <em>always take the compatible activity that finishes
@@ -387,16 +514,16 @@
           <th>still feasible?</th><th>size</th></tr>
         <tr><td>\(\{b, d\}\)</td><td>\(b = [2,6)\)</td><td>\(6 \ge 5\) &#10003;</td>
           <td>\(\{a, d\}\)</td><td>\(f(a) = 5 \le 7 = s(d)\) &#10003;</td>
-          <td class="num">2 &rarr; 2</td></tr>
+          <td class="num">\(2 \to 2\)</td></tr>
         <tr><td>\(\{b, e\}\)</td><td>\(b = [2,6)\)</td><td>\(6 \ge 5\) &#10003;</td>
           <td>\(\{a, e\}\)</td><td>\(f(a) = 5 \le 8 = s(e)\) &#10003;</td>
-          <td class="num">2 &rarr; 2</td></tr>
+          <td class="num">\(2 \to 2\)</td></tr>
         <tr><td>\(\{c, d\}\)</td><td>\(c = [3,7)\)</td><td>\(7 \ge 5\) &#10003;</td>
           <td>\(\{a, d\}\)</td><td>\(f(a) = 5 \le 7 = s(d)\) &#10003;</td>
-          <td class="num">2 &rarr; 2</td></tr>
+          <td class="num">\(2 \to 2\)</td></tr>
         <tr><td>\(\{c, e\}\)</td><td>\(c = [3,7)\)</td><td>\(7 \ge 5\) &#10003;</td>
           <td>\(\{a, e\}\)</td><td>\(f(a) = 5 \le 8 = s(e)\) &#10003;</td>
-          <td class="num">2 &rarr; 2</td></tr>
+          <td class="num">\(2 \to 2\)</td></tr>
       </table>
       <p>
         Every row is a legal swap that loses nothing, which is the
@@ -445,13 +572,73 @@
         intervals as above, and the answers differ:
       </p>
 
-      <pre>   t     1  2  3  4  5  6  7  8  9  10 11
-   a     ============
-   b        ============
-   c           ============
-   d                       ======
-   e                          =========
-   count 1  2  3  3  2  1  1  2  1  1</pre>
+      <figure>
+<!-- gen:gr gm-depth5 -->
+<svg viewBox="0 0 337 180" role="img" style="max-width:404px" font-family="system-ui, sans-serif" aria-label="The same five requests, with the number of requests live in each unit of time under the axis. a = [1, 5), b = [2, 6), c = [3, 7), d = [7, 9), e = [8, 11). counts from t = 1 to 10: 1, 2, 3, 3, 2, 1, 1, 2, 1, 1; the peak, 3, at t = 3 and t = 4.">
+<line x1="59" y1="26" x2="59" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="59" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<line x1="85" y1="26" x2="85" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="85" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<line x1="111" y1="26" x2="111" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="111" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<line x1="137" y1="26" x2="137" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="137" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<line x1="163" y1="26" x2="163" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="163" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<line x1="189" y1="26" x2="189" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<line x1="215" y1="26" x2="215" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="215" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<line x1="241" y1="26" x2="241" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="241" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<line x1="267" y1="26" x2="267" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="267" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<line x1="293" y1="26" x2="293" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="293" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<line x1="319" y1="26" x2="319" y2="140" stroke="#eef0f4" stroke-width="1"/>
+<text x="319" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<text x="49" y="21" font-size="10.5" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">t</text>
+<line x1="59" y1="26" x2="319" y2="26" stroke="#c8ccd6" stroke-width="1"/>
+<rect x="59" y="35" width="104" height="12" rx="3" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.3"/>
+<circle cx="59" cy="41" r="3.6" fill="#9aa3b2"/>
+<circle cx="163" cy="41" r="3.6" fill="#fff" stroke="#9aa3b2" stroke-width="1.6"/>
+<text x="49" y="45.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="end">a</text>
+<rect x="85" y="57" width="104" height="12" rx="3" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.3"/>
+<circle cx="85" cy="63" r="3.6" fill="#9aa3b2"/>
+<circle cx="189" cy="63" r="3.6" fill="#fff" stroke="#9aa3b2" stroke-width="1.6"/>
+<text x="49" y="67.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="end">b</text>
+<rect x="111" y="79" width="104" height="12" rx="3" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.3"/>
+<circle cx="111" cy="85" r="3.6" fill="#9aa3b2"/>
+<circle cx="215" cy="85" r="3.6" fill="#fff" stroke="#9aa3b2" stroke-width="1.6"/>
+<text x="49" y="89.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="end">c</text>
+<rect x="215" y="101" width="52" height="12" rx="3" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.3"/>
+<circle cx="215" cy="107" r="3.6" fill="#9aa3b2"/>
+<circle cx="267" cy="107" r="3.6" fill="#fff" stroke="#9aa3b2" stroke-width="1.6"/>
+<text x="49" y="111.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="end">d</text>
+<rect x="241" y="123" width="78" height="12" rx="3" fill="#eef1f6" stroke="#9aa3b2" stroke-width="1.3"/>
+<circle cx="241" cy="129" r="3.6" fill="#9aa3b2"/>
+<circle cx="319" cy="129" r="3.6" fill="#fff" stroke="#9aa3b2" stroke-width="1.6"/>
+<text x="49" y="133.5" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="end">e</text>
+<text x="49" y="163" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">count</text>
+<text x="72" y="163" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="98" y="163" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="113" y="150" width="22" height="18" rx="3" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.4"/>
+<text x="124" y="163" font-size="11.5" font-weight="700" fill="#7a4b00" text-anchor="middle">3</text>
+<rect x="139" y="150" width="22" height="18" rx="3" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.4"/>
+<text x="150" y="163" font-size="11.5" font-weight="700" fill="#7a4b00" text-anchor="middle">3</text>
+<text x="176" y="163" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="202" y="163" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="228" y="163" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="254" y="163" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="280" y="163" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="306" y="163" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+</svg>
+<!-- /gen:gr gm-depth5 -->
+        <figcaption>
+          The same five intervals. Under the axis, the number of intervals live
+          in each unit of time; the peak is boxed.
+        </figcaption>
+      </figure>
 
       <p>
         The <code>count</code> row is how many bars a vertical line crosses at
@@ -507,10 +694,40 @@
         knapsack lets it be any non-negative integer (unlimited copies). The
         natural greedy (take items by value-to-weight ratio, highest first)
         can be far from optimal. Three items and \(W = 50\) break it:
-        <pre>   item   value  weight  ratio
-     A      60      10     6      greedy: A, then B  &rarr; 160
-     B     100      20     5              20 capacity wasted
-     C     120      30     4      best:   B + C      &rarr; 220</pre>
+        <table class="trace">
+          <tr><th>item</th><th>value \(v_i\)</th><th>weight \(w_i\)</th><th>\(v_i / w_i\)</th></tr>
+          <tr><td>\(A\)</td><td class="num">60</td><td class="num">10</td><td class="num">6</td></tr>
+          <tr><td>\(B\)</td><td class="num">100</td><td class="num">20</td><td class="num">5</td></tr>
+          <tr><td>\(C\)</td><td class="num">120</td><td class="num">30</td><td class="num">4</td></tr>
+        </table>
+        <figure>
+<!-- gen:gr gm-knap -->
+<svg viewBox="0 0 671 118" role="img" style="max-width:805px" font-family="system-ui, sans-serif" aria-label="A bag of capacity 50 kg packed two ways. Greedy by value per kilo takes A (10 kg, value 60), then B (20 kg, value 100), and C (30 kg) no longer fits: value 160 with 20 kg unused. The optimum packs B and C, exactly 50 kg: value 220.">
+<text x="129.7" y="20" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">by value/weight</text>
+<text x="129.7" y="34" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">A (6), B (5), C (4)</text>
+<rect x="145.7" y="10" width="400" height="26" fill="#fff"/>
+<rect x="145.7" y="10" width="80" height="26" fill="#4285f41f" stroke="#4285f4" stroke-width="1.6"/>
+<text x="185.7" y="27.5" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">A: 10 kg, 60</text>
+<rect x="225.7" y="10" width="160" height="26" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.6"/>
+<text x="305.7" y="27.5" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">B: 20 kg, 100</text>
+<rect x="385.7" y="10" width="160" height="26" fill="#fff" stroke="#c0392b" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="465.7" y="27.5" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">20 kg unused</text>
+<text x="145.7" y="48" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="545.7" y="48" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">50</text>
+<text x="561.7" y="20" font-size="11.5" font-weight="600" fill="#5c6270" text-anchor="start">value 160</text>
+<text x="561.7" y="34" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">C no longer fits</text>
+<text x="129.7" y="83" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">the optimum</text>
+<rect x="145.7" y="66" width="400" height="26" fill="#fff"/>
+<rect x="145.7" y="66" width="160" height="26" fill="#1e8e3e1f" stroke="#1e8e3e" stroke-width="1.6"/>
+<text x="225.7" y="83.5" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">B: 20 kg, 100</text>
+<rect x="305.7" y="66" width="240" height="26" fill="#f9ab001f" stroke="#f9ab00" stroke-width="1.6"/>
+<text x="425.7" y="83.5" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">C: 30 kg, 120</text>
+<text x="145.7" y="104" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="545.7" y="104" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">50</text>
+<text x="561.7" y="83" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">value 220</text>
+</svg>
+<!-- /gen:gr gm-knap -->
+        </figure>
         Greedy takes \(A\) (the densest), then \(B\), filling \(30\) of the
         \(50\) units for value \(160\), and now \(C\) no longer fits.
         But \(B + C\) weighs exactly \(50\) and is worth \(220\). The
@@ -671,10 +888,36 @@
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; The Greedy Method v1.0
+        Data Structures &amp; Algorithms &middot; The Greedy Method v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>
     </div>
+    <script>
+      // code-tabs: per-snippet language selector, synced across the page (and
+      // across pages) via localStorage. Works offline: all languages inline.
+      (function () {
+        const KEY = "css343-lang";
+        function apply(lang) {
+          document.querySelectorAll(".code-tabs").forEach((ct) => {
+            const panes = [...ct.querySelectorAll(".ct-pane")];
+            const has = panes.some((p) => p.dataset.lang === lang);
+            const use = has ? lang : (panes[0] && panes[0].dataset.lang);
+            panes.forEach((p) => { p.hidden = p.dataset.lang !== use; });
+            ct.querySelectorAll(".ct-tab").forEach((t) =>
+              t.classList.toggle("on", t.dataset.lang === use));
+          });
+        }
+        document.addEventListener("click", (e) => {
+          const t = e.target.closest(".ct-tab");
+          if (!t) return;
+          localStorage.setItem(KEY, t.dataset.lang);
+          apply(t.dataset.lang);
+        });
+        const saved = localStorage.getItem(KEY) || "cpp";
+        if (document.readyState !== "loading") apply(saved);
+        else document.addEventListener("DOMContentLoaded", () => apply(saved));
+      })();
+    </script>
   </body>
 </html>

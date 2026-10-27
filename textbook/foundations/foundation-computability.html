@@ -253,7 +253,7 @@
         </svg>
         <figcaption>
           The three parts, caught mid-run: this is the configuration
-          <code>XXYYq3b</code>, the last one before the machine of
+          \(\texttt{XXYY}\,q_3\,\texttt{b}\), the last one before the machine of
           <a href="#trace">&sect;3</a> rejects <code>aabbb</code>. The tape is
           infinite to the right and starts out holding the input in its leftmost
           cells, blanks everywhere after. The head sees exactly one cell. The control is a finite state, which is the only memory that
@@ -320,7 +320,7 @@
         either.
       </div>
       <p>
-        So <code>XXYYq3b</code>, the configuration drawn above, means: the tape
+        So \(\texttt{XXYY}\,q_3\,\texttt{b}\), the configuration drawn above, means: the tape
         reads <code>XXYYb</code> then blanks, the head is on the <code>b</code>
         in cell 4, and the state is \(q_3\). Writing the state <em>inside</em> the tape string, just left of
         the scanned cell, is the standard trick: one line of text captures the
@@ -360,7 +360,7 @@
         \(Q = \{q_0, q_1, q_2, q_3, q_{\mathrm{acc}}, q_{\mathrm{rej}}\}\),
         \(\Sigma = \{\texttt{a}, \texttt{b}\}\),
         \(\Gamma = \{\texttt{a}, \texttt{b}, \texttt{X}, \texttt{Y},
-        \texttt{\_}\}\), start state \(q_0\). The marks mean:
+        \mathtt{\_}\}\), start state \(q_0\). The marks mean:
         <code>X</code> is &ldquo;an <code>a</code> already paired off,&rdquo;
         <code>Y</code> is &ldquo;a <code>b</code> already paired off.&rdquo; The
         four working states mean:
@@ -493,25 +493,25 @@
         Every configuration from start to halt, with the rule that produced the
         next line. The head is on the symbol immediately right of the state.
       </p>
-      <table class="trace">
-        <tr>
-          <th>#</th><th>configuration</th><th>rule applied</th><th>what it means</th>
-        </tr>
-        <tr><td>0</td><td class="cfg">q0 aabb</td><td class="cfg">q0,a &#8594; q1,X,R</td><td class="lab">round 1: mark the first a</td></tr>
-        <tr><td>1</td><td class="cfg">X q1 abb</td><td class="cfg">q1,a &#8594; q1,a,R</td><td class="lab">skip an unmarked a</td></tr>
-        <tr><td>2</td><td class="cfg">Xa q1 bb</td><td class="cfg">q1,b &#8594; q2,Y,L</td><td class="lab">found a b: mark it</td></tr>
-        <tr><td>3</td><td class="cfg">X q2 aYb</td><td class="cfg">q2,a &#8594; q2,a,L</td><td class="lab">rewind over an a</td></tr>
-        <tr><td>4</td><td class="cfg">q2 XaYb</td><td class="cfg">q2,X &#8594; q0,X,R</td><td class="lab">hit the mark: round over</td></tr>
-        <tr><td>5</td><td class="cfg">X q0 aYb</td><td class="cfg">q0,a &#8594; q1,X,R</td><td class="lab">round 2: mark the next a</td></tr>
-        <tr><td>6</td><td class="cfg">XX q1 Yb</td><td class="cfg">q1,Y &#8594; q1,Y,R</td><td class="lab">skip an already marked b</td></tr>
-        <tr><td>7</td><td class="cfg">XXY q1 b</td><td class="cfg">q1,b &#8594; q2,Y,L</td><td class="lab">found a b: mark it</td></tr>
-        <tr><td>8</td><td class="cfg">XX q2 YY</td><td class="cfg">q2,Y &#8594; q2,Y,L</td><td class="lab">rewind over a Y</td></tr>
-        <tr><td>9</td><td class="cfg">X q2 XYY</td><td class="cfg">q2,X &#8594; q0,X,R</td><td class="lab">hit the mark: round over</td></tr>
-        <tr><td>10</td><td class="cfg">XX q0 YY</td><td class="cfg">q0,Y &#8594; q3,Y,R</td><td class="lab">no unmarked a left: audit</td></tr>
-        <tr><td>11</td><td class="cfg">XXY q3 Y</td><td class="cfg">q3,Y &#8594; q3,Y,R</td><td class="lab">a marked b, fine</td></tr>
-        <tr><td>12</td><td class="cfg">XXYY q3 _</td><td class="cfg">q3,_ &#8594; qacc</td><td class="lab">end of tape, nothing left over</td></tr>
-        <tr><td>13</td><td class="cfg set">XXYY qacc</td><td class="cfg">halt</td><td class="lab">accept</td></tr>
-      </table>
+      <!-- gen:th tm-aabb -->
+<table class="trace">
+<tr><th>#</th><th>configuration</th><th>rule applied</th><th>what it means</th></tr>
+<tr><td>0</td><td class="cfg">\(q_0\,\texttt{aabb}\)</td><td class="cfg">\(q_0, \texttt{a} \to q_1, \texttt{X}, \mathrm{R}\)</td><td class="lab">round 1: mark the first a</td></tr>
+<tr><td>1</td><td class="cfg">\(\texttt{X}\,q_1\,\texttt{abb}\)</td><td class="cfg">\(q_1, \texttt{a} \to q_1, \texttt{a}, \mathrm{R}\)</td><td class="lab">skip an unmarked a</td></tr>
+<tr><td>2</td><td class="cfg">\(\texttt{Xa}\,q_1\,\texttt{bb}\)</td><td class="cfg">\(q_1, \texttt{b} \to q_2, \texttt{Y}, \mathrm{L}\)</td><td class="lab">found a b: mark it</td></tr>
+<tr><td>3</td><td class="cfg">\(\texttt{X}\,q_2\,\texttt{aYb}\)</td><td class="cfg">\(q_2, \texttt{a} \to q_2, \texttt{a}, \mathrm{L}\)</td><td class="lab">rewind over an a</td></tr>
+<tr><td>4</td><td class="cfg">\(q_2\,\texttt{XaYb}\)</td><td class="cfg">\(q_2, \texttt{X} \to q_0, \texttt{X}, \mathrm{R}\)</td><td class="lab">hit the mark: round over</td></tr>
+<tr><td>5</td><td class="cfg">\(\texttt{X}\,q_0\,\texttt{aYb}\)</td><td class="cfg">\(q_0, \texttt{a} \to q_1, \texttt{X}, \mathrm{R}\)</td><td class="lab">round 2: mark the next a</td></tr>
+<tr><td>6</td><td class="cfg">\(\texttt{XX}\,q_1\,\texttt{Yb}\)</td><td class="cfg">\(q_1, \texttt{Y} \to q_1, \texttt{Y}, \mathrm{R}\)</td><td class="lab">skip an already marked b</td></tr>
+<tr><td>7</td><td class="cfg">\(\texttt{XXY}\,q_1\,\texttt{b}\)</td><td class="cfg">\(q_1, \texttt{b} \to q_2, \texttt{Y}, \mathrm{L}\)</td><td class="lab">found a b: mark it</td></tr>
+<tr><td>8</td><td class="cfg">\(\texttt{XX}\,q_2\,\texttt{YY}\)</td><td class="cfg">\(q_2, \texttt{Y} \to q_2, \texttt{Y}, \mathrm{L}\)</td><td class="lab">rewind over a Y</td></tr>
+<tr><td>9</td><td class="cfg">\(\texttt{X}\,q_2\,\texttt{XYY}\)</td><td class="cfg">\(q_2, \texttt{X} \to q_0, \texttt{X}, \mathrm{R}\)</td><td class="lab">hit the mark: round over</td></tr>
+<tr><td>10</td><td class="cfg">\(\texttt{XX}\,q_0\,\texttt{YY}\)</td><td class="cfg">\(q_0, \texttt{Y} \to q_3, \texttt{Y}, \mathrm{R}\)</td><td class="lab">no unmarked a left: audit</td></tr>
+<tr><td>11</td><td class="cfg">\(\texttt{XXY}\,q_3\,\texttt{Y}\)</td><td class="cfg">\(q_3, \texttt{Y} \to q_3, \texttt{Y}, \mathrm{R}\)</td><td class="lab">a marked b, fine</td></tr>
+<tr><td>12</td><td class="cfg">\(\texttt{XXYY}\,q_3\,\mathtt{\_}\)</td><td class="cfg">\(q_3, \mathtt{\_} \to q_{\mathrm{acc}}\)</td><td class="lab">end of tape, nothing left over</td></tr>
+<tr><td>13</td><td class="cfg set">\(\texttt{XXYY}\,q_{\mathrm{acc}}\)</td><td class="cfg">halt</td><td class="lab">accept</td></tr>
+</table>
+<!-- /gen:th tm-aabb -->
       <p>
         Thirteen steps, fourteen configurations, and the tape ends as
         <code>XXYY</code>: two <code>a</code>s paired with two <code>b</code>s
@@ -528,20 +528,20 @@
         round and dies in the second, when the machine walks off the end of the
         tape looking for a <code>b</code> that is not there.
       </p>
-      <table class="trace">
-        <tr>
-          <th>#</th><th>configuration</th><th>rule applied</th><th>what it means</th>
-        </tr>
-        <tr><td>0</td><td class="cfg">q0 aab</td><td class="cfg">q0,a &#8594; q1,X,R</td><td class="lab">round 1: mark the first a</td></tr>
-        <tr><td>1</td><td class="cfg">X q1 ab</td><td class="cfg">q1,a &#8594; q1,a,R</td><td class="lab">skip an unmarked a</td></tr>
-        <tr><td>2</td><td class="cfg">Xa q1 b</td><td class="cfg">q1,b &#8594; q2,Y,L</td><td class="lab">found a b: mark it</td></tr>
-        <tr><td>3</td><td class="cfg">X q2 aY</td><td class="cfg">q2,a &#8594; q2,a,L</td><td class="lab">rewind over an a</td></tr>
-        <tr><td>4</td><td class="cfg">q2 XaY</td><td class="cfg">q2,X &#8594; q0,X,R</td><td class="lab">hit the mark: round over</td></tr>
-        <tr><td>5</td><td class="cfg">X q0 aY</td><td class="cfg">q0,a &#8594; q1,X,R</td><td class="lab">round 2: mark the next a</td></tr>
-        <tr><td>6</td><td class="cfg">XX q1 Y</td><td class="cfg">q1,Y &#8594; q1,Y,R</td><td class="lab">skip an already marked b</td></tr>
-        <tr><td>7</td><td class="cfg">XXY q1 _</td><td class="cfg">q1,_ &#8594; qrej</td><td class="lab">tape exhausted, no b to pair</td></tr>
-        <tr><td>8</td><td class="cfg upd">XXY qrej</td><td class="cfg">halt</td><td class="lab">reject: more a than b</td></tr>
-      </table>
+      <!-- gen:th tm-aab -->
+<table class="trace">
+<tr><th>#</th><th>configuration</th><th>rule applied</th><th>what it means</th></tr>
+<tr><td>0</td><td class="cfg">\(q_0\,\texttt{aab}\)</td><td class="cfg">\(q_0, \texttt{a} \to q_1, \texttt{X}, \mathrm{R}\)</td><td class="lab">round 1: mark the first a</td></tr>
+<tr><td>1</td><td class="cfg">\(\texttt{X}\,q_1\,\texttt{ab}\)</td><td class="cfg">\(q_1, \texttt{a} \to q_1, \texttt{a}, \mathrm{R}\)</td><td class="lab">skip an unmarked a</td></tr>
+<tr><td>2</td><td class="cfg">\(\texttt{Xa}\,q_1\,\texttt{b}\)</td><td class="cfg">\(q_1, \texttt{b} \to q_2, \texttt{Y}, \mathrm{L}\)</td><td class="lab">found a b: mark it</td></tr>
+<tr><td>3</td><td class="cfg">\(\texttt{X}\,q_2\,\texttt{aY}\)</td><td class="cfg">\(q_2, \texttt{a} \to q_2, \texttt{a}, \mathrm{L}\)</td><td class="lab">rewind over an a</td></tr>
+<tr><td>4</td><td class="cfg">\(q_2\,\texttt{XaY}\)</td><td class="cfg">\(q_2, \texttt{X} \to q_0, \texttt{X}, \mathrm{R}\)</td><td class="lab">hit the mark: round over</td></tr>
+<tr><td>5</td><td class="cfg">\(\texttt{X}\,q_0\,\texttt{aY}\)</td><td class="cfg">\(q_0, \texttt{a} \to q_1, \texttt{X}, \mathrm{R}\)</td><td class="lab">round 2: mark the next a</td></tr>
+<tr><td>6</td><td class="cfg">\(\texttt{XX}\,q_1\,\texttt{Y}\)</td><td class="cfg">\(q_1, \texttt{Y} \to q_1, \texttt{Y}, \mathrm{R}\)</td><td class="lab">skip an already marked b</td></tr>
+<tr><td>7</td><td class="cfg">\(\texttt{XXY}\,q_1\,\mathtt{\_}\)</td><td class="cfg">\(q_1, \mathtt{\_} \to q_{\mathrm{rej}}\)</td><td class="lab">tape exhausted, no b to pair</td></tr>
+<tr><td>8</td><td class="cfg upd">\(\texttt{XXY}\,q_{\mathrm{rej}}\)</td><td class="cfg">halt</td><td class="lab">reject: more a than b</td></tr>
+</table>
+<!-- /gen:th tm-aab -->
       <p>
         Eight steps. The machine halts, which is what makes it a
         <em>decider</em> rather than merely a recognizer: on the strings it does
@@ -551,21 +551,23 @@
       <h3>The remaining branches</h3>
       <p>
         Four more inputs exercise every rule the two traces above did not. Each
-        is written as its full configuration sequence.
+        is written as its full configuration sequence. A halting transition
+        writes nothing and does not move the head.
       </p>
-      <pre>  <span class="cm">too many b: q3 finds an unmarked b left over</span>
-  q0aabbb &#8866; Xq1abbb &#8866; Xaq1bbb &#8866; Xq2aYbb &#8866; q2XaYbb &#8866; Xq0aYbb &#8866; XXq1Ybb
-          &#8866; XXYq1bb &#8866; XXq2YYb &#8866; Xq2XYYb &#8866; XXq0YYb &#8866; XXYq3Yb
-          &#8866; XXYYq3b &#8866; XXYYb qrej            <span class="cm">13 steps, REJECT</span>
-
-  <span class="cm">out of order: q3 finds an unmarked a left over</span>
-  q0aba &#8866; Xq1ba &#8866; q2XYa &#8866; Xq0Ya &#8866; XYq3a &#8866; XYa qrej   <span class="cm">5 steps, REJECT</span>
-
-  <span class="cm">starts with b: rejected before anything is marked</span>
-  q0ba &#8866; b qrej a                                   <span class="cm">1 step,  REJECT</span>
-
-  <span class="cm">the empty string, which is a^0 b^0 and so in the language</span>
-  q0 &#8866; qacc                                          <span class="cm">1 step,  ACCEPT</span></pre>
+      <!-- gen:th tm-branches -->
+<p><strong>Too many <code>b</code>s.</strong> \(q_3\) finds an unmarked <code>b</code> left over: 13 steps, reject.</p>
+\[ \begin{aligned} & q_0\,\texttt{aabbb} \vdash \texttt{X}\,q_1\,\texttt{abbb} \vdash \texttt{Xa}\,q_1\,\texttt{bbb} \vdash \texttt{X}\,q_2\,\texttt{aYbb} \\
+  & \vdash q_2\,\texttt{XaYbb} \vdash \texttt{X}\,q_0\,\texttt{aYbb} \vdash \texttt{XX}\,q_1\,\texttt{Ybb} \vdash \texttt{XXY}\,q_1\,\texttt{bb} \\
+  & \vdash \texttt{XX}\,q_2\,\texttt{YYb} \vdash \texttt{X}\,q_2\,\texttt{XYYb} \vdash \texttt{XX}\,q_0\,\texttt{YYb} \vdash \texttt{XXY}\,q_3\,\texttt{Yb} \\
+  & \vdash \texttt{XXYY}\,q_3\,\texttt{b} \vdash \texttt{XXYY}\,q_{\mathrm{rej}}\,\texttt{b} \end{aligned} \]
+<p><strong>Out of order.</strong> \(q_3\) finds an unmarked <code>a</code> left over: 5 steps, reject.</p>
+\[ \begin{aligned} & q_0\,\texttt{aba} \vdash \texttt{X}\,q_1\,\texttt{ba} \vdash q_2\,\texttt{XYa} \vdash \texttt{X}\,q_0\,\texttt{Ya} \\
+  & \vdash \texttt{XY}\,q_3\,\texttt{a} \vdash \texttt{XY}\,q_{\mathrm{rej}}\,\texttt{a} \end{aligned} \]
+<p><strong>Starts with <code>b</code>.</strong> Rejected before anything is marked: 1 step, reject.</p>
+\[ \begin{aligned} & q_0\,\texttt{ba} \vdash q_{\mathrm{rej}}\,\texttt{ba} \end{aligned} \]
+<p><strong>The empty string,</strong> which is \(a^0 b^0\) and so in the language: 1 step, accept.</p>
+\[ \begin{aligned} & q_0 \vdash q_{\mathrm{acc}} \end{aligned} \]
+<!-- /gen:th tm-branches -->
       <p>
         With the two tables, that is all fifteen entries of \(\delta\) fired at
         least once: \(q_0\) on <code>a</code>, <code>b</code>, <code>Y</code>,
@@ -1074,12 +1076,68 @@ fn simulate(delta: &amp;HashMap&lt;(String, char), Act&gt;, w: &amp;str) -&gt; S
         halts on \(\langle M_i \rangle\). Such a \(D\) is a legitimate program
         <em>if \(H\) exists</em>, because \(H\) computes the diagonal entry:
       </p>
-      <pre>  <span class="cm">D takes one input x, which it treats as the encoding of a machine.</span>
-  D(x):
-      if H(x, x) says &quot;halts&quot;:      <span class="cm">ask the oracle about x running on itself</span>
-          loop forever                <span class="cm">e.g. while(true) {}</span>
-      else:
-          halt                        <span class="cm">return immediately</span></pre>
+      <div class="code-tabs" data-snippet="theory/diagonal">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// Assume, for contradiction, that this function exists: it returns true
+// exactly when the program with source code p halts on input x, and it
+// always returns.
+bool halts(const string&amp; p, const string&amp; x);
+
+// D takes one input x, which it treats as a program&#x27;s source code.
+void D(const string&amp; x) {
+    if (halts(x, x)) {                    // x halts on itself, so ...
+        volatile bool spin = true;        // ... loop forever (volatile: the
+        while (spin) { }                  //     compiler must keep the loop)
+    }
+    // x loops on itself, so halt: return immediately
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// Assume, for contradiction, that some subclass can implement halts: it
+// returns true exactly when the program with source code p halts on input
+// x, and it always returns.
+static abstract class Diagonal {
+    abstract boolean halts(String p, String x);
+
+    // D takes one input x, which it treats as a program&#x27;s source code.
+    void D(String x) {
+        if (halts(x, x)) {                // x halts on itself, so ...
+            while (true) { }              // ... loop forever
+        }
+        // x loops on itself, so halt: return immediately
+    }
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># Assume, for contradiction, that this function exists: it returns True
+# exactly when the program with source code p halts on input x, and it
+# always returns.
+def halts(p, x):
+    raise NotImplementedError(&quot;no such function can exist&quot;)
+
+# D takes one input x, which it treats as a program&#x27;s source code.
+def D(x):
+    if halts(x, x):                       # x halts on itself, so ...
+        while True:                       # ... loop forever
+            pass
+    # x loops on itself, so halt: return immediately</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// Assume, for contradiction, that a halting oracle exists: halts(p, x) is
+// true exactly when the program with source code p halts on input x, and
+// it always returns.
+trait HaltingOracle {
+    fn halts(&amp;self, p: &amp;str, x: &amp;str) -&gt; bool;
+}
+
+// D takes one input x, which it treats as a program&#x27;s source code.
+fn d(x: &amp;str, oracle: &amp;dyn HaltingOracle) {
+    if oracle.halts(x, x) {               // x halts on itself, so ...
+        loop {}                           // ... loop forever
+    }
+    // x loops on itself, so halt: return immediately
+}</pre>
+<p class="ct-src">source: <code>code/theory/diagonal.cpp &middot; code/theory/diagonal.java &middot; code/theory/diagonal.py &middot; code/theory/diagonal.rs</code></p>
+<!--/ct--></div>
       <div class="thm">
         <span class="tag">Theorem (Turing, 1936)</span>
         HALT is undecidable: no Turing machine decides it.
@@ -1185,9 +1243,56 @@ fn simulate(delta: &amp;HashMap&lt;(String, char), Act&gt;, w: &amp;str) -&gt; S
         We show \(\mathrm{HALT} \le_m \mathrm{REACH}\). Define \(f\) on input
         \(\langle M, w\rangle\) to output \(\langle P, \ell, w\rangle\) where
         \(P\) is this program and \(\ell\) is the line marked below:
-        <pre>  P(x):
-      simulate M on x            <span class="cm">the universal machine of &sect;5, inlined</span>
-      print(&quot;reached&quot;)           <span class="cm">line L</span></pre>
+        <div class="code-tabs" data-snippet="theory/reach">
+<div class="ct-tabs" role="tablist">
+  <button class="ct-tab" data-lang="cpp">C++</button>
+  <button class="ct-tab" data-lang="java">Java</button>
+  <button class="ct-tab" data-lang="py">Python</button>
+  <button class="ct-tab" data-lang="rs">Rust</button>
+</div>
+<pre class="ct-pane" data-lang="cpp">// The program P the reduction writes for one machine M: M&#x27;s transition
+// table is pasted in as data, and simulate is the universal simulator.
+const map&lt;pair&lt;string, char&gt;, Act&gt; M_DELTA = {
+    // M&#x27;s transition table, pasted in by the reduction
+};
+
+void P(const string&amp; x) {
+    simulate(M_DELTA, x);                 // returns only if M halts on x
+    cout &lt;&lt; &quot;reached&quot; &lt;&lt; endl;            // line L
+}</pre>
+<pre class="ct-pane" data-lang="java" hidden>// The program P the reduction writes for one machine M: M&#x27;s transition
+// table is pasted in as data, and simulate is the universal simulator.
+static final Map&lt;String, Act&gt; M_DELTA = Map.of(
+    // M&#x27;s transition table, pasted in by the reduction
+);
+
+static void P(String x) {
+    simulate(M_DELTA, x);                 // returns only if M halts on x
+    System.out.println(&quot;reached&quot;);        // line L
+}</pre>
+<pre class="ct-pane" data-lang="py" hidden># The program P the reduction writes for one machine M: M&#x27;s transition
+# table is pasted in as data, and simulate is the universal simulator.
+M_DELTA = {
+    # M&#x27;s transition table, pasted in by the reduction
+}
+
+def P(x):
+    simulate(M_DELTA, x)                  # returns only if M halts on x
+    print(&quot;reached&quot;)                      # line L</pre>
+<pre class="ct-pane" data-lang="rs" hidden>// The program P the reduction writes for one machine M: M&#x27;s transition
+// table is pasted in as data, and simulate is the universal simulator.
+fn m_delta() -&gt; HashMap&lt;(String, char), Act&gt; {
+    HashMap::from([
+        // M&#x27;s transition table, pasted in by the reduction
+    ])
+}
+
+fn p(x: &amp;str) {
+    simulate(&amp;m_delta(), x);              // returns only if M halts on x
+    println!(&quot;reached&quot;);                  // line L
+}</pre>
+<p class="ct-src">source: <code>code/theory/reach.cpp &middot; code/theory/reach.java &middot; code/theory/reach.py &middot; code/theory/reach.rs</code></p>
+<!--/ct--></div>
         <em>\(f\) is computable and total.</em> Building \(P\) is textual: paste
         \(\langle M \rangle\) into a fixed simulator template and append one
         line. No simulation is performed while computing \(f\); it only writes
@@ -1413,8 +1518,10 @@ fn simulate(delta: &amp;HashMap&lt;(String, char), Act&gt;, w: &amp;str) -&gt; S
           <code>abb</code>, and say which rule causes the halt.
           <details>
             <summary>solution</summary>
-            <code>q0abb &#8866; Xq1bb &#8866; q2XYb &#8866; Xq0Yb &#8866; XYq3b
-            &#8866; XYb&nbsp;qrej</code>. Five steps. Round 1 pairs the single
+<!-- gen:th tm-abb -->
+\[ \begin{aligned} & q_0\,\texttt{abb} \vdash \texttt{X}\,q_1\,\texttt{bb} \vdash q_2\,\texttt{XYb} \vdash \texttt{X}\,q_0\,\texttt{Yb} \vdash \texttt{XY}\,q_3\,\texttt{b} \vdash \texttt{XY}\,q_{\mathrm{rej}}\,\texttt{b} \end{aligned} \]
+<!-- /gen:th tm-abb -->
+            Five steps. Round 1 pairs the single
             <code>a</code> with the first <code>b</code>; \(q_0\) then reads
             <code>Y</code>, so there is no unmarked <code>a</code> left and the
             machine enters the audit state \(q_3\); \(q_3\) reads the unmarked
@@ -1426,8 +1533,8 @@ fn simulate(delta: &amp;HashMap&lt;(String, char), Act&gt;, w: &amp;str) -&gt; S
         </li>
         <li>
           What language does \(M_{ab}\) decide if the single rule
-          \(q_0, \texttt{\_} \to q_{\mathrm{acc}}\) is changed to
-          \(q_0, \texttt{\_} \to q_{\mathrm{rej}}\)? Justify using the
+          \(q_0, \mathtt{\_} \to q_{\mathrm{acc}}\) is changed to
+          \(q_0, \mathtt{\_} \to q_{\mathrm{rej}}\)? Justify using the
           correctness proof, not by re-tracing.
           <details>
             <summary>solution</summary>
@@ -1449,7 +1556,7 @@ fn simulate(delta: &amp;HashMap&lt;(String, char), Act&gt;, w: &amp;str) -&gt; S
           <details>
             <summary>solution</summary>
             \(n = 0\) is the empty input: \(T(0) = 1\), matching the one-step
-            run <code>q0 &#8866; qacc</code>. \(n = 2\) is <code>aabb</code>:
+            run \(q_0 \vdash q_{\mathrm{acc}}\). \(n = 2\) is <code>aabb</code>:
             \(T(2) = 8 + 4 + 1 = 13\), matching the thirteen steps of the
             accepting trace (fourteen configurations). \(T(10) = 200 + 20 + 1 =
             221\). A two-tape machine copies the \(a\)s to tape 2 in \(n\) steps
@@ -1582,7 +1689,7 @@ fn simulate(delta: &amp;HashMap&lt;(String, char), Act&gt;, w: &amp;str) -&gt; S
 
       <footer>
         Data Structures &amp; Algorithms &middot; Turing Machines &amp; Computability
-        v1.0 &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
+        v1.1 &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax;
         interactive demos in the course library.
       </footer>
     </div>

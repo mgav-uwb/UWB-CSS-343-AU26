@@ -401,34 +401,232 @@ impl BloomFilter {
       </p>
 
       <h3>Insert 42</h3>
-      <pre>  h1(42) = 42 mod 16 = 10        h2(42) = 1 + (42 mod 15) = 1 + 12 = 13
-
-  i=0:  (10 + 0*13) mod 16 = 10        set bit 10
-  i=1:  (10 + 1*13) mod 16 = 23 mod 16 =  7   set bit 7
-  i=2:  (10 + 2*13) mod 16 = 36 mod 16 =  4   set bit 4
-
-  index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-  bits:   0  0  0  0  1  0  0  1  0  0  1  0  0  0  0  0</pre>
+      <!-- gen:sk bl-math-42 -->
+\[ h_1(42) = 42 \bmod 16 = 10, \qquad h_2(42) = 1 + (42 \bmod 15) = 1 + 12 = 13 \]
+\[ \begin{aligned}
+  g_0(42) &= (10 + 0 \cdot 13) \bmod 16 = 10 \\
+  g_1(42) &= (10 + 1 \cdot 13) \bmod 16 = 23 \bmod 16 = 7 \\
+  g_2(42) &= (10 + 2 \cdot 13) \bmod 16 = 36 \bmod 16 = 4
+\end{aligned} \]
+<!-- /gen:sk bl-math-42 -->
+      <figure>
+<!-- gen:sk bl-insert-42 -->
+<svg viewBox="0 0 700 89" role="img" style="max-width:840px" font-family="system-ui, sans-serif" aria-label="Insert 42: positions 10, 7, 4. bits 10, 7, 4 set. the filter after the insert: bits 0 0 0 0 1 0 0 1 0 0 1 0 0 0 0 0.">
+<text x="104.5" y="57" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">after insert 42</text>
+<rect x="120.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="134.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="134.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="148.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="162.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="162.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="176.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="190.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="190.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="204.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="218.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="218.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="260.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="274.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="274.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="288.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="302.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="302.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="344.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="358.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="358.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="372.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="386.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="386.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="428.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="442.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="442.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="456.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="470.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="470.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="484.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="498.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="498.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<rect x="512.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="526.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="526.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="540.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="554.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="554.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<rect x="232.5" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="246.5" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="246.5" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">4</text>
+<text x="246.5" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">2</tspan></text>
+<line x1="246.5" y1="26" x2="246.5" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M246.5,39 L242,32 L251,32 Z" fill="#0a7d4d"/>
+<rect x="316.5" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="330.5" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="330.5" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">7</text>
+<text x="330.5" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">1</tspan></text>
+<line x1="330.5" y1="26" x2="330.5" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M330.5,39 L326,32 L335,32 Z" fill="#0a7d4d"/>
+<rect x="400.5" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="414.5" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="414.5" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">10</text>
+<text x="414.5" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">0</tspan></text>
+<line x1="414.5" y1="26" x2="414.5" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M414.5,39 L410,32 L419,32 Z" fill="#0a7d4d"/>
+<text x="584.5" y="57" font-size="11.5" font-weight="600" fill="#5c6270" text-anchor="start">bits 10, 7, 4 set</text>
+</svg>
+<!-- /gen:sk bl-insert-42 -->
+      </figure>
 
       <h3>Insert 77</h3>
-      <pre>  h1(77) = 77 mod 16 = 13        h2(77) = 1 + (77 mod 15) = 1 + 2 = 3
-
-  i=0:  (13 + 0*3) mod 16 = 13         set bit 13
-  i=1:  (13 + 1*3) mod 16 = 16 mod 16 =  0    set bit 0
-  i=2:  (13 + 2*3) mod 16 = 19 mod 16 =  3    set bit 3
-
-  index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-  bits:   1  0  0  1  1  0  0  1  0  0  1  0  0  1  0  0</pre>
+      <!-- gen:sk bl-math-77 -->
+\[ h_1(77) = 77 \bmod 16 = 13, \qquad h_2(77) = 1 + (77 \bmod 15) = 1 + 2 = 3 \]
+\[ \begin{aligned}
+  g_0(77) &= (13 + 0 \cdot 3) \bmod 16 = 13 \\
+  g_1(77) &= (13 + 1 \cdot 3) \bmod 16 = 16 \bmod 16 = 0 \\
+  g_2(77) &= (13 + 2 \cdot 3) \bmod 16 = 19 \bmod 16 = 3
+\end{aligned} \]
+<!-- /gen:sk bl-math-77 -->
+      <figure>
+<!-- gen:sk bl-insert-77 -->
+<svg viewBox="0 0 700 89" role="img" style="max-width:840px" font-family="system-ui, sans-serif" aria-label="Insert 77: positions 13, 0, 3. bits 13, 0, 3 set. the filter after the insert: bits 1 0 0 1 1 0 0 1 0 0 1 0 0 1 0 0.">
+<text x="104.5" y="57" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">after insert 77</text>
+<rect x="148.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="162.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="162.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="176.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="190.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="190.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="232.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="246.5" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="246.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="260.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="274.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="274.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="288.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="302.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="302.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="316.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="330.5" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="330.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="344.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="358.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="358.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="372.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="386.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="386.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="400.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="414.5" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="414.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<rect x="428.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="442.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="442.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="456.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="470.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="470.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="512.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="526.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="526.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="540.5" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="554.5" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="554.5" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<rect x="120.5" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="134.5" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="134.5" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">0</text>
+<text x="134.5" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">1</tspan></text>
+<line x1="134.5" y1="26" x2="134.5" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M134.5,39 L130,32 L139,32 Z" fill="#0a7d4d"/>
+<rect x="204.5" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="218.5" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="218.5" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">3</text>
+<text x="218.5" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">2</tspan></text>
+<line x1="218.5" y1="26" x2="218.5" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M218.5,39 L214,32 L223,32 Z" fill="#0a7d4d"/>
+<rect x="484.5" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="498.5" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="498.5" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">13</text>
+<text x="498.5" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">0</tspan></text>
+<line x1="498.5" y1="26" x2="498.5" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M498.5,39 L494,32 L503,32 Z" fill="#0a7d4d"/>
+<text x="584.5" y="57" font-size="11.5" font-weight="600" fill="#5c6270" text-anchor="start">bits 13, 0, 3 set</text>
+</svg>
+<!-- /gen:sk bl-insert-77 -->
+      </figure>
 
       <h3>Insert 103: setting a bit that is already set</h3>
-      <pre>  h1(103) = 103 mod 16 = 7       h2(103) = 1 + (103 mod 15) = 1 + 13 = 14
-
-  i=0:  (7 + 0*14) mod 16 = 7          bit 7 ALREADY 1 (42 set it); stays 1
-  i=1:  (7 + 1*14) mod 16 = 21 mod 16 = 5    set bit 5
-  i=2:  (7 + 2*14) mod 16 = 35 mod 16 = 3    bit 3 ALREADY 1 (77 set it); stays 1
-
-  index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-  bits:   1  0  0  1  1  1  0  1  0  0  1  0  0  1  0  0</pre>
+      <!-- gen:sk bl-math-103 -->
+\[ h_1(103) = 103 \bmod 16 = 7, \qquad h_2(103) = 1 + (103 \bmod 15) = 1 + 13 = 14 \]
+\[ \begin{aligned}
+  g_0(103) &= (7 + 0 \cdot 14) \bmod 16 = 7 \\
+  g_1(103) &= (7 + 1 \cdot 14) \bmod 16 = 21 \bmod 16 = 5 \\
+  g_2(103) &= (7 + 2 \cdot 14) \bmod 16 = 35 \bmod 16 = 3
+\end{aligned} \]
+<!-- /gen:sk bl-math-103 -->
+      <figure>
+<!-- gen:sk bl-insert-103 -->
+<svg viewBox="0 0 738 103" role="img" style="max-width:886px" font-family="system-ui, sans-serif" aria-label="Insert 103: positions 7, 5, 3. bit 5 set; bits 7 and 3 already 1. the filter after the insert: bits 1 0 0 1 1 1 0 1 0 0 1 0 0 1 0 0.">
+<text x="110.8" y="57" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">after insert 103</text>
+<rect x="126.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="140.8" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="140.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="154.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="168.8" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="168.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="182.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="196.8" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="196.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="238.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="252.8" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="252.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="294.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="308.8" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="308.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="350.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="364.8" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="364.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="378.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="392.8" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="392.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="406.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="420.8" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="420.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<rect x="434.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="448.8" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="448.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="462.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="476.8" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="476.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="490.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="504.8" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="504.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<rect x="518.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="532.8" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="532.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="546.8" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="560.8" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="560.8" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<rect x="210.8" y="40" width="28" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="224.8" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="224.8" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">3</text>
+<text x="224.8" y="22" font-size="12" font-weight="700" fill="#c98a1a" text-anchor="middle">g<tspan dy="4" font-size="8.6">2</tspan></text>
+<line x1="224.8" y1="26" x2="224.8" y2="33" stroke="#c98a1a" stroke-width="1.6"/>
+<path d="M224.8,39 L220.3,32 L229.3,32 Z" fill="#c98a1a"/>
+<text x="224.8" y="90" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle" font-style="italic">set by 77</text>
+<rect x="266.8" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="280.8" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="280.8" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">5</text>
+<text x="280.8" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">1</tspan></text>
+<line x1="280.8" y1="26" x2="280.8" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M280.8,39 L276.3,32 L285.3,32 Z" fill="#0a7d4d"/>
+<rect x="322.8" y="40" width="28" height="26" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="336.8" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="336.8" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">7</text>
+<text x="336.8" y="22" font-size="12" font-weight="700" fill="#c98a1a" text-anchor="middle">g<tspan dy="4" font-size="8.6">0</tspan></text>
+<line x1="336.8" y1="26" x2="336.8" y2="33" stroke="#c98a1a" stroke-width="1.6"/>
+<path d="M336.8,39 L332.3,32 L341.3,32 Z" fill="#c98a1a"/>
+<text x="336.8" y="90" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle" font-style="italic">set by 42</text>
+<text x="590.8" y="50" font-size="11.5" font-weight="600" fill="#5c6270" text-anchor="start">bit 5 set</text>
+<text x="590.8" y="64" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">bits 7 and 3 already 1</text>
+</svg>
+<!-- /gen:sk bl-insert-103 -->
+      </figure>
       <p>
         The third insert lands on two bits that other keys already set: bit
         \(7\) belongs to both \(42\) and \(103\) now, bit \(3\) to both \(77\)
@@ -441,20 +639,149 @@ impl BloomFilter {
       </p>
 
       <h3>Query 77: a true positive</h3>
-      <pre>  positions of 77: g = [13, 0, 3]     (computed above)
-
-  i=0:  bit 13 = 1   keep going
-  i=1:  bit  0 = 1   keep going
-  i=2:  bit  3 = 1   all three set
-
-  answer: MAYBE      (correct: 77 was inserted)</pre>
+      <p>Its positions, computed above, are \(g_0 = 13\), \(g_1 = 0\), \(g_2 = 3\).</p>
+      <figure>
+<!-- gen:sk bl-query-77 -->
+<svg viewBox="0 0 718 89" role="img" style="max-width:862px" font-family="system-ui, sans-serif" aria-label="Query 77 probes bits 13, 0 and 3; all three are 1. answer maybe, which is correct. the filter: bits 1 0 0 1 1 1 0 1 0 0 1 0 0 1 0 0.">
+<text x="60.4" y="57" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">query 77</text>
+<rect x="104.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="118.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="118.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="132.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="146.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="146.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="188.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="202.4" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="202.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="216.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="230.4" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="230.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="244.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="258.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="258.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="272.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="286.4" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="286.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="300.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="314.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="314.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="328.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="342.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="342.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="356.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="370.4" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="370.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<rect x="384.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="398.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="398.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="412.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="426.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="426.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="468.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="482.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="482.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="496.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="510.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="510.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<rect x="76.4" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="90.4" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="90.4" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">0</text>
+<text x="90.4" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">1</tspan></text>
+<line x1="90.4" y1="26" x2="90.4" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M90.4,39 L85.9,32 L94.9,32 Z" fill="#0a7d4d"/>
+<rect x="160.4" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="174.4" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="174.4" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">3</text>
+<text x="174.4" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">2</tspan></text>
+<line x1="174.4" y1="26" x2="174.4" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M174.4,39 L169.9,32 L178.9,32 Z" fill="#0a7d4d"/>
+<rect x="440.4" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="454.4" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="454.4" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">13</text>
+<text x="454.4" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">0</tspan></text>
+<line x1="454.4" y1="26" x2="454.4" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M454.4,39 L449.9,32 L458.9,32 Z" fill="#0a7d4d"/>
+<text x="540.4" y="50" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">maybe: all three bits are 1</text>
+<text x="540.4" y="64" font-size="11.5" font-weight="400" fill="#0a7d4d" text-anchor="start">correct: 77 was inserted</text>
+</svg>
+<!-- /gen:sk bl-query-77 -->
+      </figure>
 
       <h3>Query 6: a true negative, decided in one probe</h3>
-      <pre>  h1(6) = 6      h2(6) = 1 + 6 = 7      positions: [6, 13, 4]
-
-  i=0:  bit 6 = 0    STOP
-
-  answer: DEFINITELY NOT     (correct: 6 was never inserted)</pre>
+      <!-- gen:sk bl-math-6 -->
+\[ h_1(6) = 6 \bmod 16 = 6, \qquad h_2(6) = 1 + (6 \bmod 15) = 1 + 6 = 7 \]
+\[ \begin{aligned}
+  g_0(6) &= (6 + 0 \cdot 7) \bmod 16 = 6 \\
+  g_1(6) &= (6 + 1 \cdot 7) \bmod 16 = 13 \\
+  g_2(6) &= (6 + 2 \cdot 7) \bmod 16 = 20 \bmod 16 = 4
+\end{aligned} \]
+<!-- /gen:sk bl-math-6 -->
+      <figure>
+<!-- gen:sk bl-query-6 -->
+<svg viewBox="0 0 718 89" role="img" style="max-width:862px" font-family="system-ui, sans-serif" aria-label="Query 6 has positions 6, 13, 4; bit 6 is 0, so the query stops after one probe. answer definitely not, which is correct. the filter: bits 1 0 0 1 1 1 0 1 0 0 1 0 0 1 0 0.">
+<text x="54.1" y="57" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">query 6</text>
+<rect x="70.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="84.1" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="84.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="98.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="112.1" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="112.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="126.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="140.1" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="140.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="154.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="168.1" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="168.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="210.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="224.1" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="224.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="266.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="280.1" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="280.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="294.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="308.1" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="308.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="322.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="336.1" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="336.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="350.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="364.1" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="364.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<rect x="378.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="392.1" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="392.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="406.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="420.1" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="420.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="462.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="476.1" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="476.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="490.1" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="504.1" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="504.1" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<rect x="182.1" y="40" width="28" height="26" fill="#fff" stroke="#9aa3b2" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="196.1" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="196.1" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">4</text>
+<text x="196.1" y="22" font-size="12" font-weight="700" fill="#5c6270" text-anchor="middle">g<tspan dy="4" font-size="8.6">2</tspan></text>
+<line x1="196.1" y1="26" x2="196.1" y2="33" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="3 3"/>
+<path d="M196.1,39 L191.6,32 L200.6,32 Z" fill="#5c6270"/>
+<rect x="238.1" y="40" width="28" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="252.1" y="58" font-size="13.5" font-weight="400" fill="#c0392b" text-anchor="middle">0</text>
+<text x="252.1" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">6</text>
+<text x="252.1" y="22" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">g<tspan dy="4" font-size="8.6">0</tspan></text>
+<line x1="252.1" y1="26" x2="252.1" y2="33" stroke="#c0392b" stroke-width="1.6"/>
+<path d="M252.1,39 L247.6,32 L256.6,32 Z" fill="#c0392b"/>
+<rect x="434.1" y="40" width="28" height="26" fill="#fff" stroke="#9aa3b2" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="448.1" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="448.1" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">13</text>
+<text x="448.1" y="22" font-size="12" font-weight="700" fill="#5c6270" text-anchor="middle">g<tspan dy="4" font-size="8.6">1</tspan></text>
+<line x1="448.1" y1="26" x2="448.1" y2="33" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="3 3"/>
+<path d="M448.1,39 L443.6,32 L452.6,32 Z" fill="#5c6270"/>
+<text x="534.1" y="50" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">definitely not: bit 6 is 0</text>
+<text x="534.1" y="64" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="start">bits 13 and 4 are never read</text>
+</svg>
+<!-- /gen:sk bl-query-6 -->
+      </figure>
       <p>
         One zero bit is a proof: had \(6\) ever been inserted, bit \(6\) would
         be \(1\). The query never looks at positions \(13\) and \(4\) (both of
@@ -462,14 +789,83 @@ impl BloomFilter {
       </p>
 
       <h3>Query 20: a false positive, assembled from other keys&rsquo; bits</h3>
-      <pre>  h1(20) = 20 mod 16 = 4      h2(20) = 1 + (20 mod 15) = 1 + 5 = 6
-  positions: g0 = 4,  g1 = (4+6) mod 16 = 10,  g2 = (4+12) mod 16 = 0
-
-  i=0:  bit  4 = 1   ... set by insert 42   keep going
-  i=1:  bit 10 = 1   ... set by insert 42   keep going
-  i=2:  bit  0 = 1   ... set by insert 77   all three set
-
-  answer: MAYBE      (WRONG: 20 was never inserted)</pre>
+      <!-- gen:sk bl-math-20 -->
+\[ h_1(20) = 20 \bmod 16 = 4, \qquad h_2(20) = 1 + (20 \bmod 15) = 1 + 5 = 6 \]
+\[ \begin{aligned}
+  g_0(20) &= (4 + 0 \cdot 6) \bmod 16 = 4 \\
+  g_1(20) &= (4 + 1 \cdot 6) \bmod 16 = 10 \\
+  g_2(20) &= (4 + 2 \cdot 6) \bmod 16 = 16 \bmod 16 = 0
+\end{aligned} \]
+<!-- /gen:sk bl-math-20 -->
+      <figure>
+<!-- gen:sk bl-query-20 -->
+<svg viewBox="0 0 724 103" role="img" style="max-width:869px" font-family="system-ui, sans-serif" aria-label="Query 20 probes bits 4, 10 and 0; 42 set bits 4 and 10, and 77 set bit 0. answer maybe, which is wrong: a false positive. the filter: bits 1 0 0 1 1 1 0 1 0 0 1 0 0 1 0 0.">
+<text x="60.4" y="57" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">query 20</text>
+<rect x="104.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="118.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="118.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="132.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="146.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="146.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="160.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="174.4" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="174.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="216.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="230.4" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="230.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="244.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="258.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="258.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="272.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="286.4" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="286.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="300.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="314.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="314.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="328.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="342.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="342.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="384.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="398.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="398.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="412.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="426.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="426.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="440.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="454.4" y="58" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="454.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<rect x="468.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="482.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="482.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="496.4" y="40" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="510.4" y="58" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="510.4" y="77" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<rect x="76.4" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="90.4" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="90.4" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">0</text>
+<text x="90.4" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">2</tspan></text>
+<line x1="90.4" y1="26" x2="90.4" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M90.4,39 L85.9,32 L94.9,32 Z" fill="#0a7d4d"/>
+<text x="90.4" y="90" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle" font-style="italic">set by 77</text>
+<rect x="188.4" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="202.4" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="202.4" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">4</text>
+<text x="202.4" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">0</tspan></text>
+<line x1="202.4" y1="26" x2="202.4" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M202.4,39 L197.9,32 L206.9,32 Z" fill="#0a7d4d"/>
+<text x="202.4" y="90" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle" font-style="italic">set by 42</text>
+<rect x="356.4" y="40" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="370.4" y="58" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="370.4" y="77" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">10</text>
+<text x="370.4" y="22" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">1</tspan></text>
+<line x1="370.4" y1="26" x2="370.4" y2="33" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M370.4,39 L365.9,32 L374.9,32 Z" fill="#0a7d4d"/>
+<text x="370.4" y="90" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle" font-style="italic">set by 42</text>
+<text x="540.4" y="50" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">maybe: all three bits are 1</text>
+<text x="540.4" y="64" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="start">wrong: 20 was never inserted</text>
+</svg>
+<!-- /gen:sk bl-query-20 -->
+      </figure>
       <p>
         This is the false positive anatomized. No single inserted key covers
         \(20\)&rsquo;s signature; the accident is a collage, two bits borrowed
@@ -491,14 +887,242 @@ impl BloomFilter {
         fail on the running filter. Delete \(103\) by clearing its positions
         \(7, 5, 3\):
       </p>
-      <pre>  index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-  before: 1  0  0  1  1  1  0  1  0  0  1  0  0  1  0  0
-  after:  1  0  0  0  1  0  0  0  0  0  1  0  0  1  0  0
-                    ^        ^        ^
-                    cleared  cleared  cleared
-
-  query 42:  positions [10, 7, 4]:  bit 7 = 0  ->  "definitely not"   WRONG
-  query 77:  positions [13, 0, 3]:  bit 3 = 0  ->  "definitely not"   WRONG</pre>
+      <figure>
+<!-- gen:sk bl-delete -->
+<svg viewBox="0 0 788 312" role="img" style="max-width:946px" font-family="system-ui, sans-serif" aria-label="Deleting 103 by clearing its bits 7, 5 and 3. before: bits 1 0 0 1 1 1 0 1 0 0 1 0 0 1 0 0. after: bits 1 0 0 0 1 0 0 0 0 0 1 0 0 1 0 0. query 42 probes 10 (1), then 7 (0): definitely not, which is wrong. query 77 probes 13 and 0 (both 1), then 3 (0): definitely not, which is wrong.">
+<text x="136" y="31" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">before</text>
+<rect x="152" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="166" y="32" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="166" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="180" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="194" y="32" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="194" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="222" y="32" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="222" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="236" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="250" y="32" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="250" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="264" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="278" y="32" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="278" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="292" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="306" y="32" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="306" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="320" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="334" y="32" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="334" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="348" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="362" y="32" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="362" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="376" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="390" y="32" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="390" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="404" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="418" y="32" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="418" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="432" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="446" y="32" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="446" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<rect x="460" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="474" y="32" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="474" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="488" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="502" y="32" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="502" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="516" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="530" y="32" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="530" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<rect x="544" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="558" y="32" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="558" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="572" y="14" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="586" y="32" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="586" y="51" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<text x="616" y="31" font-size="11.5" font-weight="600" fill="#5c6270" text-anchor="start">42, 77 and 103 inserted</text>
+<text x="136" y="107" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">delete 103</text>
+<text x="136" y="121" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="end">by clearing its bits</text>
+<rect x="152" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="166" y="115" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="166" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="180" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="194" y="115" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="194" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="222" y="115" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="222" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="264" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="278" y="115" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="278" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="320" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="334" y="115" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="334" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="376" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="390" y="115" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="390" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="404" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="418" y="115" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="418" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="432" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="446" y="115" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="446" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<rect x="460" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="474" y="115" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="474" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="488" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="502" y="115" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="502" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="516" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="530" y="115" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="530" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<rect x="544" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="558" y="115" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="558" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="572" y="97" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="586" y="115" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="586" y="134" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<rect x="236" y="97" width="28" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="250" y="115" font-size="13.5" font-weight="400" fill="#c0392b" text-anchor="middle">0</text>
+<text x="250" y="134" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">3</text>
+<text x="250" y="79" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">g<tspan dy="4" font-size="8.6">2</tspan></text>
+<line x1="250" y1="83" x2="250" y2="90" stroke="#c0392b" stroke-width="1.6"/>
+<path d="M250,96 L245.5,89 L254.5,89 Z" fill="#c0392b"/>
+<rect x="292" y="97" width="28" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="306" y="115" font-size="13.5" font-weight="400" fill="#c0392b" text-anchor="middle">0</text>
+<text x="306" y="134" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">5</text>
+<text x="306" y="79" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">g<tspan dy="4" font-size="8.6">1</tspan></text>
+<line x1="306" y1="83" x2="306" y2="90" stroke="#c0392b" stroke-width="1.6"/>
+<path d="M306,96 L301.5,89 L310.5,89 Z" fill="#c0392b"/>
+<rect x="348" y="97" width="28" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="362" y="115" font-size="13.5" font-weight="400" fill="#c0392b" text-anchor="middle">0</text>
+<text x="362" y="134" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">7</text>
+<text x="362" y="79" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">g<tspan dy="4" font-size="8.6">0</tspan></text>
+<line x1="362" y1="83" x2="362" y2="90" stroke="#c0392b" stroke-width="1.6"/>
+<path d="M362,96 L357.5,89 L366.5,89 Z" fill="#c0392b"/>
+<text x="616" y="114" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">bits 7, 5, 3 cleared</text>
+<text x="136" y="197" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">query 42</text>
+<rect x="152" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="166" y="198" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="166" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="180" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="194" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="194" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="222" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="222" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="236" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="250" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="250" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<rect x="292" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="306" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="320" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="334" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="334" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="376" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="390" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="390" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="404" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="418" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="418" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="460" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="474" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="474" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="488" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="502" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="502" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="516" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="530" y="198" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="530" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">13</text>
+<rect x="544" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="558" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="558" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="572" y="180" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="586" y="198" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="586" y="217" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<rect x="264" y="180" width="28" height="26" fill="#fff" stroke="#9aa3b2" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="278" y="198" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="278" y="217" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">4</text>
+<text x="278" y="162" font-size="12" font-weight="700" fill="#5c6270" text-anchor="middle">g<tspan dy="4" font-size="8.6">2</tspan></text>
+<line x1="278" y1="166" x2="278" y2="173" stroke="#5c6270" stroke-width="1.6" stroke-dasharray="3 3"/>
+<path d="M278,179 L273.5,172 L282.5,172 Z" fill="#5c6270"/>
+<rect x="348" y="180" width="28" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="362" y="198" font-size="13.5" font-weight="400" fill="#c0392b" text-anchor="middle">0</text>
+<text x="362" y="217" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">7</text>
+<text x="362" y="162" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">g<tspan dy="4" font-size="8.6">1</tspan></text>
+<line x1="362" y1="166" x2="362" y2="173" stroke="#c0392b" stroke-width="1.6"/>
+<path d="M362,179 L357.5,172 L366.5,172 Z" fill="#c0392b"/>
+<rect x="432" y="180" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="446" y="198" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="446" y="217" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">10</text>
+<text x="446" y="162" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">0</tspan></text>
+<line x1="446" y1="166" x2="446" y2="173" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M446,179 L441.5,172 L450.5,172 Z" fill="#0a7d4d"/>
+<text x="616" y="190" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">bit 7 is 0: definitely not</text>
+<text x="616" y="204" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="start">wrong: 42 was inserted</text>
+<text x="136" y="280" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="end">query 77</text>
+<rect x="180" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="194" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="194" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<rect x="208" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="222" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="222" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<rect x="264" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="278" y="281" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="278" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<rect x="292" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="306" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<rect x="320" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="334" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="334" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<rect x="348" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="362" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="362" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<rect x="376" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="390" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="390" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">8</text>
+<rect x="404" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="418" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="418" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">9</text>
+<rect x="432" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="446" y="281" font-size="13.5" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="446" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">10</text>
+<rect x="460" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="474" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="474" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">11</text>
+<rect x="488" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="502" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="502" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">12</text>
+<rect x="544" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="558" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="558" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">14</text>
+<rect x="572" y="263" width="28" height="26" fill="#fff" stroke="#2a2d36" stroke-width="1.2"/>
+<text x="586" y="281" font-size="13.5" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="586" y="300" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">15</text>
+<rect x="152" y="263" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="166" y="281" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="166" y="300" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">0</text>
+<text x="166" y="245" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">1</tspan></text>
+<line x1="166" y1="249" x2="166" y2="256" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M166,262 L161.5,255 L170.5,255 Z" fill="#0a7d4d"/>
+<rect x="236" y="263" width="28" height="26" fill="#fbeaea" stroke="#c0392b" stroke-width="2.2"/>
+<text x="250" y="281" font-size="13.5" font-weight="400" fill="#c0392b" text-anchor="middle">0</text>
+<text x="250" y="300" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">3</text>
+<text x="250" y="245" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">g<tspan dy="4" font-size="8.6">2</tspan></text>
+<line x1="250" y1="249" x2="250" y2="256" stroke="#c0392b" stroke-width="1.6"/>
+<path d="M250,262 L245.5,255 L254.5,255 Z" fill="#c0392b"/>
+<rect x="516" y="263" width="28" height="26" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="530" y="281" font-size="13.5" font-weight="700" fill="#0a7d4d" text-anchor="middle">1</text>
+<text x="530" y="300" font-size="10" font-weight="700" fill="#2a2d36" text-anchor="middle">13</text>
+<text x="530" y="245" font-size="12" font-weight="700" fill="#0a7d4d" text-anchor="middle">g<tspan dy="4" font-size="8.6">0</tspan></text>
+<line x1="530" y1="249" x2="530" y2="256" stroke="#0a7d4d" stroke-width="1.6"/>
+<path d="M530,262 L525.5,255 L534.5,255 Z" fill="#0a7d4d"/>
+<text x="616" y="273" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">bit 3 is 0: definitely not</text>
+<text x="616" y="287" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="start">wrong: 77 was inserted</text>
+</svg>
+<!-- /gen:sk bl-delete -->
+      </figure>
       <p>
         Bits \(7\) and \(3\) were <em>shared</em>: \(42\) needs bit \(7\) and
         \(77\) needs bit \(3\), and clearing them manufactures two false
@@ -892,7 +1516,7 @@ impl BloomFilter {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Bloom Filters v1.0 &middot;
+        Data Structures &amp; Algorithms &middot; Bloom Filters v1.1 &middot;
         prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

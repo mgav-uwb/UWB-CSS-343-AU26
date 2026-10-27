@@ -459,10 +459,13 @@ impl CountMinSketch {
       <p>
         The stream has \(N = 12\) arrivals over four distinct items:
       </p>
-      <pre>  t :   1   2   3   4   5   6   7   8   9  10  11  12
-  x :  19  33  44  19  58  19  33  44  19  19  33  19
-
-  true counts:   a[19] = 6    a[33] = 3    a[44] = 2    a[58] = 1</pre>
+      <!-- gen:sk cm-stream -->
+<table class="trace">
+<tr><th>\(t\)</th><td class="num">1</td><td class="num">2</td><td class="num">3</td><td class="num">4</td><td class="num">5</td><td class="num">6</td><td class="num">7</td><td class="num">8</td><td class="num">9</td><td class="num">10</td><td class="num">11</td><td class="num">12</td></tr>
+<tr><th>\(x_t\)</th><td class="num">19</td><td class="num">33</td><td class="num">44</td><td class="num">19</td><td class="num">58</td><td class="num">19</td><td class="num">33</td><td class="num">44</td><td class="num">19</td><td class="num">19</td><td class="num">33</td><td class="num">19</td></tr>
+<tr><td colspan="13">true counts: \(a_{19} = 6,\ a_{33} = 3,\ a_{44} = 2,\ a_{58} = 1\)</td></tr>
+</table>
+<!-- /gen:sk cm-stream -->
       <p>
         Each item touches one cell per row; compute those cells once, since
         they never change:
@@ -488,18 +491,23 @@ impl CountMinSketch {
         Each line shows the three cells the arrival increments and their values
         after the increment.
       </p>
-      <pre>  t=1   x=19    C[0][0] -> 1    C[1][1] -> 1    C[2][4] -> 1     three fresh cells
-  t=2   x=33    C[0][5] -> 1    C[1][2] -> 1    C[2][1] -> 1     three fresh cells
-  t=3   x=44    C[0][6] -> 1    C[1][4] -> 1    C[2][5] -> 1     three fresh cells
-  t=4   x=19    C[0][0] -> 2    C[1][1] -> 2    C[2][4] -> 2     repeat item: its own cells
-  t=5   x=58    C[0][0] -> 3    C[1][2] -> 2    C[2][5] -> 2     COLLIDES in all 3 rows
-  t=6   x=19    C[0][0] -> 4    C[1][1] -> 3    C[2][4] -> 3
-  t=7   x=33    C[0][5] -> 2    C[1][2] -> 3    C[2][1] -> 2
-  t=8   x=44    C[0][6] -> 2    C[1][4] -> 2    C[2][5] -> 3
-  t=9   x=19    C[0][0] -> 5    C[1][1] -> 4    C[2][4] -> 4
-  t=10  x=19    C[0][0] -> 6    C[1][1] -> 5    C[2][4] -> 5
-  t=11  x=33    C[0][5] -> 3    C[1][2] -> 4    C[2][1] -> 3
-  t=12  x=19    C[0][0] -> 7    C[1][1] -> 6    C[2][4] -> 6</pre>
+      <!-- gen:sk cm-updates -->
+<table class="trace">
+<tr><th>\(t\)</th><th>\(x_t\)</th><th>row 0</th><th>row 1</th><th>row 2</th><th></th></tr>
+<tr><td class="num">1</td><td class="num">19</td><td>\(C[0][0] \to 1\)</td><td>\(C[1][1] \to 1\)</td><td>\(C[2][4] \to 1\)</td><td>three fresh cells</td></tr>
+<tr><td class="num">2</td><td class="num">33</td><td>\(C[0][5] \to 1\)</td><td>\(C[1][2] \to 1\)</td><td>\(C[2][1] \to 1\)</td><td>three fresh cells</td></tr>
+<tr><td class="num">3</td><td class="num">44</td><td>\(C[0][6] \to 1\)</td><td>\(C[1][4] \to 1\)</td><td>\(C[2][5] \to 1\)</td><td>three fresh cells</td></tr>
+<tr><td class="num">4</td><td class="num">19</td><td>\(C[0][0] \to 2\)</td><td>\(C[1][1] \to 2\)</td><td>\(C[2][4] \to 2\)</td><td>repeat item: its own cells</td></tr>
+<tr><td class="num">5</td><td class="num">58</td><td>\(C[0][0] \to 3\)</td><td>\(C[1][2] \to 2\)</td><td>\(C[2][5] \to 2\)</td><td>collides in all 3 rows</td></tr>
+<tr><td class="num">6</td><td class="num">19</td><td>\(C[0][0] \to 4\)</td><td>\(C[1][1] \to 3\)</td><td>\(C[2][4] \to 3\)</td><td></td></tr>
+<tr><td class="num">7</td><td class="num">33</td><td>\(C[0][5] \to 2\)</td><td>\(C[1][2] \to 3\)</td><td>\(C[2][1] \to 2\)</td><td></td></tr>
+<tr><td class="num">8</td><td class="num">44</td><td>\(C[0][6] \to 2\)</td><td>\(C[1][4] \to 2\)</td><td>\(C[2][5] \to 3\)</td><td></td></tr>
+<tr><td class="num">9</td><td class="num">19</td><td>\(C[0][0] \to 5\)</td><td>\(C[1][1] \to 4\)</td><td>\(C[2][4] \to 4\)</td><td></td></tr>
+<tr><td class="num">10</td><td class="num">19</td><td>\(C[0][0] \to 6\)</td><td>\(C[1][1] \to 5\)</td><td>\(C[2][4] \to 5\)</td><td></td></tr>
+<tr><td class="num">11</td><td class="num">33</td><td>\(C[0][5] \to 3\)</td><td>\(C[1][2] \to 4\)</td><td>\(C[2][1] \to 3\)</td><td></td></tr>
+<tr><td class="num">12</td><td class="num">19</td><td>\(C[0][0] \to 7\)</td><td>\(C[1][1] \to 6\)</td><td>\(C[2][4] \to 6\)</td><td></td></tr>
+</table>
+<!-- /gen:sk cm-updates -->
       <p>
         Three kinds of update appear, and they exhaust the cases. At \(t = 1,
         2, 3\) an item arrives for the first time and finds all three of its
@@ -515,17 +523,212 @@ impl CountMinSketch {
       </p>
 
       <h3>Snapshots of the grid</h3>
-      <pre>  after t=4 (19,33,44,19 seen)             after t=5 (58 has arrived)
-        col: 0  1  2  3  4  5  6  7             col: 0  1  2  3  4  5  6  7
-  row 0:     2  0  0  0  0  1  1  0       row 0:     3  0  0  0  0  1  1  0
-  row 1:     0  2  1  0  1  0  0  0       row 1:     0  2  2  0  1  0  0  0
-  row 2:     0  1  0  0  2  1  0  0       row 2:     0  1  0  0  2  2  0  0
-  row sums:  4  4  4                      row sums:  5  5  5</pre>
-      <pre>  final grid, after all 12 updates
-        col:  0  1  2  3  4  5  6  7
-  row 0:      7  0  0  0  0  3  2  0        sum = 12
-  row 1:      0  6  4  0  2  0  0  0        sum = 12
-  row 2:      0  3  0  0  6  3  0  0        sum = 12</pre>
+      <figure>
+<!-- gen:sk cm-snap45 -->
+<svg viewBox="0 0 366 290" role="img" style="max-width:439px" font-family="system-ui, sans-serif" aria-label="The sketch before and after the fifth arrival, 58. after t = 4: row 0: 2 0 0 0 0 1 1 0; row 1: 0 2 1 0 1 0 0 0; row 2: 0 1 0 0 2 1 0 0; every row sums to 4. after t = 5: row 0: 3 0 0 0 0 1 1 0; row 1: 0 2 2 0 1 0 0 0; row 2: 0 1 0 0 2 2 0 0; 58 incremented C[0][0], C[1][2] and C[2][5], each already holding another item's arrivals; every row sums to 5.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="234" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="43" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 4</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="114" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="67" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 4</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="204" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 4</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">after t = 4</text>
+<text x="54" y="130" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">19, 33, 44, 19 seen</text>
+<text x="69" y="164" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="164" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="164" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="164" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="164" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="164" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="164" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="164" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="164" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="186" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="84" y="170" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="187" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="170" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="187" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="170" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="187" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="170" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="187" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="170" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="187" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="234" y="170" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="187" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="264" y="170" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="187" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="54" y="170" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="69" y="187" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="306" y="186" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 5</text>
+<text x="46" y="210" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="194" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="211" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="194" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="211" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="144" y="194" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="211" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="194" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="211" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="204" y="194" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="211" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="194" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="211" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="194" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="211" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="194" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="129" y="211" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="306" y="210" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 5</text>
+<text x="46" y="234" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="218" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="235" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="218" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="235" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="114" y="218" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="235" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="218" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="235" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="218" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="235" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="234" y="218" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="235" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="218" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="235" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="218" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="219" y="235" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="306" y="234" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 5</text>
+<text x="54" y="257" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">after t = 5</text>
+<text x="54" y="273" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">58 lands on three cells in use</text>
+</svg>
+<!-- /gen:sk cm-snap45 -->
+      </figure>
+      <figure>
+<!-- gen:sk cm-final -->
+<svg viewBox="0 0 366 131" role="img" style="max-width:439px" font-family="system-ui, sans-serif" aria-label="The sketch after all twelve updates. row 0: 7 0 0 0 0 3 2 0; row 1: 0 6 4 0 2 0 0 0; row 2: 0 3 0 0 6 3 0 0. every row sums to 12.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="43" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 12</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="114" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="67" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 12</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="204" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 12</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#2a2d36" text-anchor="start">after all 12 updates</text>
+</svg>
+<!-- /gen:sk cm-final -->
+      </figure>
       <div class="aside">
         <span class="tag">An invariant worth checking</span>
         Every row sums to \(N\), the number of arrivals, because each arrival
@@ -544,11 +747,76 @@ impl CountMinSketch {
       </p>
 
       <h3>A heavy hitter: \(x = 19\), true count \(6\)</h3>
-      <pre>  cells:  C[0][0] = 7    C[1][1] = 6    C[2][4] = 6
-  estimate = min(7, 6, 6) = 6                      EXACT
-
-  why row 0 is inflated: 58 also hashes to C[0][0], contributing its 1 arrival
-  rows 1 and 2 hold 19's arrivals and nothing else</pre>
+      <figure>
+<!-- gen:sk cm-est-19 -->
+<svg viewBox="0 0 504 131" role="img" style="max-width:605px" font-family="system-ui, sans-serif" aria-label="Estimating item 19 (true count 6). C[0][0] = 7: 6 of 19 + 1 of 58. C[1][1] = 6: 6 of 19. C[2][4] = 6: 6 of 19. estimate = min(7, 6, 6) = 6: exact.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="308" y="43" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[0][0] = 7: 6 of 19 + 1 of 58</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="99" y="68" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">6</text>
+<text x="308" y="67" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[1][1] = 6: 6 of 19</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="189" y="92" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">6</text>
+<text x="308" y="91" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[2][4] = 6: 6 of 19</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">estimate = min(7, 6, 6) = 6: exact</text>
+</svg>
+<!-- /gen:sk cm-est-19 -->
+      </figure>
       <p>
         This is the minimum doing its job. One row is polluted and reports
         \(7\); two rows are clean and report \(6\). Taking the minimum ignores
@@ -558,21 +826,220 @@ impl CountMinSketch {
       </p>
 
       <h3>A mid-frequency item: \(x = 33\), true count \(3\)</h3>
-      <pre>  cells:  C[0][5] = 3    C[1][2] = 4    C[2][1] = 3
-  estimate = min(3, 4, 3) = 3                      EXACT
-
-  row 1 is inflated by 58's single arrival at C[1][2]</pre>
+      <figure>
+<!-- gen:sk cm-est-33 -->
+<svg viewBox="0 0 504 131" role="img" style="max-width:605px" font-family="system-ui, sans-serif" aria-label="Estimating item 33 (true count 3). C[0][5] = 3: 3 of 33. C[1][2] = 4: 3 of 33 + 1 of 58. C[2][1] = 3: 3 of 33. estimate = min(3, 4, 3) = 3: exact.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="308" y="43" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[0][5] = 3: 3 of 33</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="51" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="308" y="67" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[1][2] = 4: 3 of 33 + 1 of 58</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="204" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="308" y="91" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[2][1] = 3: 3 of 33</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">estimate = min(3, 4, 3) = 3: exact</text>
+</svg>
+<!-- /gen:sk cm-est-33 -->
+      </figure>
 
       <h3>A low-frequency item: \(x = 44\), true count \(2\)</h3>
-      <pre>  cells:  C[0][6] = 2    C[1][4] = 2    C[2][5] = 3
-  estimate = min(2, 2, 3) = 2                      EXACT
-
-  row 2 is inflated: C[2][5] holds 44's 2 arrivals plus 58's 1</pre>
+      <figure>
+<!-- gen:sk cm-est-44 -->
+<svg viewBox="0 0 504 131" role="img" style="max-width:605px" font-family="system-ui, sans-serif" aria-label="Estimating item 44 (true count 2). C[0][6] = 2: 2 of 44. C[1][4] = 2: 2 of 44. C[2][5] = 3: 2 of 44 + 1 of 58. estimate = min(2, 2, 3) = 2: exact.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="27" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<text x="308" y="43" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[0][6] = 2: 2 of 44</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="114" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">2</text>
+<text x="308" y="67" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[1][4] = 2: 2 of 44</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="75" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<text x="308" y="91" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[2][5] = 3: 2 of 44 + 1 of 58</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">estimate = min(2, 2, 3) = 2: exact</text>
+</svg>
+<!-- /gen:sk cm-est-44 -->
+      </figure>
 
       <h3>A rare item drowned by collisions: \(x = 58\), true count \(1\)</h3>
-      <pre>  cells:  C[0][0] = 7    C[1][2] = 4    C[2][5] = 3
-                (1+6)         (1+3)         (1+2)
-  estimate = min(7, 4, 3) = 3                      OVERESTIMATE by 2</pre>
+      <figure>
+<!-- gen:sk cm-est-58 -->
+<svg viewBox="0 0 504 131" role="img" style="max-width:605px" font-family="system-ui, sans-serif" aria-label="Estimating item 58 (true count 1). C[0][0] = 7: 1 of 58 + 6 of 19. C[1][2] = 4: 1 of 58 + 3 of 33. C[2][5] = 3: 1 of 58 + 2 of 44. estimate = min(7, 4, 3) = 3: overestimate by 2.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="308" y="43" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[0][0] = 7: 1 of 58 + 6 of 19</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="51" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<text x="308" y="67" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[1][2] = 4: 1 of 58 + 3 of 33</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="75" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="308" y="91" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[2][5] = 3: 1 of 58 + 2 of 44</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">estimate = min(7, 4, 3) = 3: overestimate by 2</text>
+</svg>
+<!-- /gen:sk cm-est-58 -->
+      </figure>
       <p>
         No row is clean, because \(58\) collides with some other item in every
         row: with \(19\) (count \(6\)) in row \(0\), with \(33\) (count \(3\))
@@ -598,11 +1065,144 @@ impl CountMinSketch {
       </p>
 
       <h3>Items never in the stream</h3>
-      <pre>  x = 20:  h = (3, 1, 7)    cells:  C[0][3] = 0   C[1][1] = 6   C[2][7] = 0
-           estimate = min(0, 6, 0) = 0                 CORRECT (a[20] = 0)
-
-  x = 11:  h = (0, 1, 1)    cells:  C[0][0] = 7   C[1][1] = 6   C[2][1] = 3
-           estimate = min(7, 6, 3) = 3                 PHANTOM (a[11] = 0)</pre>
+      <figure>
+<!-- gen:sk cm-est-20 -->
+<svg viewBox="0 0 442 131" role="img" style="max-width:530px" font-family="system-ui, sans-serif" aria-label="Estimating item 20 (true count 0). C[0][3] = 0: empty. C[1][1] = 6: 6 of 19. C[2][7] = 0: empty. estimate = min(0, 6, 0) = 0: correct, never in the stream.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#0a7d4d" text-anchor="middle">0</text>
+<text x="308" y="43" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[0][3] = 0: empty</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="99" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="308" y="67" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[1][1] = 6: 6 of 19</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="204" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#0a7d4d" text-anchor="middle">0</text>
+<text x="308" y="91" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[2][7] = 0: empty</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="start">estimate = min(0, 6, 0) = 0: correct, never in the stream</text>
+</svg>
+<!-- /gen:sk cm-est-20 -->
+<!-- gen:sk cm-est-11 -->
+<svg viewBox="0 0 504 131" role="img" style="max-width:605px" font-family="system-ui, sans-serif" aria-label="Estimating item 11 (true count 0). C[0][0] = 7: 6 of 19 + 1 of 58. C[1][1] = 6: 6 of 19. C[2][1] = 3: 3 of 33. estimate = min(7, 6, 3) = 3: a phantom count, never in the stream.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="308" y="43" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[0][0] = 7: 6 of 19 + 1 of 58</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="99" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="308" y="67" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[1][1] = 6: 6 of 19</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="204" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2.2"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#0a7d4d" text-anchor="middle">3</text>
+<text x="308" y="91" font-size="11.5" font-weight="400" fill="#2a2d36" text-anchor="start">C[2][1] = 3: 3 of 33</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="start">estimate = min(7, 6, 3) = 3: a phantom count, never in the stream</text>
+</svg>
+<!-- /gen:sk cm-est-11 -->
+      </figure>
       <p>
         Two absent items, two different answers. Item \(20\) has a zero cell in
         rows \(0\) and \(2\), and one zero cell is a proof of absence, exactly
@@ -615,11 +1215,6 @@ impl CountMinSketch {
         Sweeping all \(97\) items of \(U\) that are absent from this stream,
         \(94\) estimate to \(0\) and exactly three (\(11, 18, 27\)) return a
         phantom count, of \(3, 2, 2\) respectively.
-      </p>
-      <p class="note">
-        Every counter, estimate, and sweep in &sect;4 and &sect;5 was produced
-        by executing the definition of &sect;2 on the stated hash functions and
-        stream, not by hand arithmetic.
       </p>
 
       <!-- ============================================================ -->
@@ -1018,10 +1613,77 @@ impl CountMinSketch {
             <summary>solution</summary>
             Item \(58\) touches \(C[0][0], C[1][2], C[2][5]\), so those three
             cells each gain \(3\):
-            <pre>        col:  0  1  2  3  4  5  6  7
-  row 0:     10  0  0  0  0  3  2  0     sum = 15
-  row 1:      0  6  7  0  2  0  0  0     sum = 15
-  row 2:      0  3  0  0  6  6  0  0     sum = 15</pre>
+            <figure>
+<!-- gen:sk cm-ex1 -->
+<svg viewBox="0 0 366 147" role="img" style="max-width:439px" font-family="system-ui, sans-serif" aria-label="The sketch after three more arrivals of 58. row 0: 10 0 0 0 0 3 2 0; row 1: 0 6 7 0 2 0 0 0; row 2: 0 3 0 0 6 6 0 0. every row sums to 15.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">10</text>
+<text x="306" y="43" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 15</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="51" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">7</text>
+<text x="306" y="67" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 15</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="75" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">6</text>
+<text x="306" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 15</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">three more arrivals of 58</text>
+<text x="54" y="130" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">C[0][0], C[1][2], C[2][5] each gain 3</text>
+</svg>
+<!-- /gen:sk cm-ex1 -->
+      </figure>
             Estimates: \(\hat a_{19} = \min(10, 6, 6) = 6\) (true \(6\),
             unchanged); \(\hat a_{33} = \min(3, 7, 3) = 3\) (true \(3\),
             unchanged); \(\hat a_{44} = \min(2, 2, 6) = 2\) (true \(2\),
@@ -1141,10 +1803,77 @@ impl CountMinSketch {
             <summary>solution</summary>
             Item \(19\) touches \(C[0][0], C[1][1], C[2][4]\); subtract \(6\)
             from each:
-            <pre>        col:  0  1  2  3  4  5  6  7
-  row 0:      1  0  0  0  0  3  2  0     sum = 6
-  row 1:      0  0  4  0  2  0  0  0     sum = 6
-  row 2:      0  3  0  0  0  3  0  0     sum = 6</pre>
+            <figure>
+<!-- gen:sk cm-ex4 -->
+<svg viewBox="0 0 366 147" role="img" style="max-width:439px" font-family="system-ui, sans-serif" aria-label="The sketch after removing every arrival of 19. row 0: 1 0 0 0 0 3 2 0; row 1: 0 0 4 0 2 0 0 0; row 2: 0 3 0 0 0 3 0 0. every row sums to 6.">
+<text x="69" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="99" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="129" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="159" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="189" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="219" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="249" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">6</text>
+<text x="279" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="middle">7</text>
+<text x="46" y="21" font-size="10" font-weight="400" fill="#5c6270" text-anchor="end" font-style="italic">col</text>
+<text x="46" y="43" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 0</text>
+<rect x="84" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="264" y="27" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="44" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="54" y="27" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="69" y="44" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">1</text>
+<text x="306" y="43" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 6</text>
+<text x="46" y="67" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 1</text>
+<rect x="54" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="114" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="144" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="189" y="68" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="204" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="234" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="51" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="51" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="99" y="68" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="67" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 6</text>
+<text x="46" y="91" font-size="11" font-weight="600" fill="#2a2d36" text-anchor="end">row 2</text>
+<rect x="54" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="69" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="84" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="99" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="114" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="129" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="144" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="159" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="204" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="219" y="92" font-size="13" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="234" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="249" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="264" y="75" width="30" height="24" fill="#fff" stroke="#2a2d36" stroke-width="1.1"/>
+<text x="279" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<rect x="174" y="75" width="30" height="24" fill="#fde7bf" stroke="#c98a1a" stroke-width="2.2"/>
+<text x="189" y="92" font-size="13" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="306" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">sum = 6</text>
+<text x="54" y="114" font-size="11.5" font-weight="600" fill="#c98a1a" text-anchor="start">after update(19, -6)</text>
+<text x="54" y="130" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">C[0][0], C[1][1], C[2][4] each lose 6</text>
+</svg>
+<!-- /gen:sk cm-ex4 -->
+      </figure>
             Estimates: \(\hat a_{19} = \min(1, 0, 0) = 0\) (true \(0\));
             \(\hat a_{33} = \min(3, 4, 3) = 3\) (true \(3\));
             \(\hat a_{44} = \min(2, 2, 3) = 2\) (true \(2\));
@@ -1217,7 +1946,7 @@ impl CountMinSketch {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Count-Min Sketch v1.0 &middot;
+        Data Structures &amp; Algorithms &middot; Count-Min Sketch v1.1 &middot;
         prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

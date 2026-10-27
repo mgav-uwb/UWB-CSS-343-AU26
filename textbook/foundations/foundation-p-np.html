@@ -83,6 +83,7 @@
       th { background: #f0f2f6; }
       figure { margin: 18px 0 6px; text-align: center; }
       figure svg { max-width: 100%; height: auto; }
+      figure.wide { overflow-x: auto; }
       figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
       details { margin: 8px 0 8px 2px; font-size: 15px; }
       summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
@@ -387,12 +388,12 @@
           <th>step</th><th>arc tested</th><th>in \(E\)?</th>
           <th>vertex arrived at</th><th>seen before?</th><th>verdict</th>
         </tr>
-        <tr><td>1</td><td class="cell">1 &rarr; 2</td><td class="ok">yes</td><td class="cell">2</td><td>no</td><td>continue</td></tr>
-        <tr><td>2</td><td class="cell">2 &rarr; 3</td><td class="ok">yes</td><td class="cell">3</td><td>no</td><td>continue</td></tr>
-        <tr><td>3</td><td class="cell">3 &rarr; 4</td><td class="ok">yes</td><td class="cell">4</td><td>no</td><td>continue</td></tr>
-        <tr><td>4</td><td class="cell">4 &rarr; 5</td><td class="ok">yes</td><td class="cell">5</td><td>no</td><td>continue</td></tr>
-        <tr><td>5</td><td class="cell">5 &rarr; 6</td><td class="ok">yes</td><td class="cell">6</td><td>no</td><td>continue</td></tr>
-        <tr><td>6</td><td class="cell">6 &rarr; 1</td><td class="ok">yes</td><td class="cell">1 (wrap)</td><td>start vertex</td><td class="ok">accept</td></tr>
+        <tr><td>1</td><td class="cell">\(1 \to 2\)</td><td class="ok">yes</td><td class="cell">2</td><td>no</td><td>continue</td></tr>
+        <tr><td>2</td><td class="cell">\(2 \to 3\)</td><td class="ok">yes</td><td class="cell">3</td><td>no</td><td>continue</td></tr>
+        <tr><td>3</td><td class="cell">\(3 \to 4\)</td><td class="ok">yes</td><td class="cell">4</td><td>no</td><td>continue</td></tr>
+        <tr><td>4</td><td class="cell">\(4 \to 5\)</td><td class="ok">yes</td><td class="cell">5</td><td>no</td><td>continue</td></tr>
+        <tr><td>5</td><td class="cell">\(5 \to 6\)</td><td class="ok">yes</td><td class="cell">6</td><td>no</td><td>continue</td></tr>
+        <tr><td>6</td><td class="cell">\(6 \to 1\)</td><td class="ok">yes</td><td class="cell">1 (wrap)</td><td>start vertex</td><td class="ok">accept</td></tr>
       </table>
       <p>
         Six vertices listed, all distinct, six arcs all present: accept. The
@@ -404,11 +405,11 @@
           <th>step</th><th>arc tested</th><th>in \(E\)?</th>
           <th>vertex arrived at</th><th>seen before?</th><th>verdict</th>
         </tr>
-        <tr><td>1</td><td class="cell">1 &rarr; 2</td><td class="ok">yes</td><td class="cell">2</td><td>no</td><td>continue</td></tr>
-        <tr><td>2</td><td class="cell">2 &rarr; 5</td><td class="ok">yes</td><td class="cell">5</td><td>no</td><td>continue</td></tr>
-        <tr><td>3</td><td class="cell">5 &rarr; 4</td><td class="ok">yes</td><td class="cell">4</td><td>no</td><td>continue</td></tr>
-        <tr><td>4</td><td class="cell">4 &rarr; 3</td><td class="ok">yes</td><td class="cell">3</td><td>no</td><td>continue</td></tr>
-        <tr><td>5</td><td class="cell">3 &rarr; 6</td><td class="no">no</td><td class="cell">not reached</td><td>not reached</td><td class="no">reject</td></tr>
+        <tr><td>1</td><td class="cell">\(1 \to 2\)</td><td class="ok">yes</td><td class="cell">2</td><td>no</td><td>continue</td></tr>
+        <tr><td>2</td><td class="cell">\(2 \to 5\)</td><td class="ok">yes</td><td class="cell">5</td><td>no</td><td>continue</td></tr>
+        <tr><td>3</td><td class="cell">\(5 \to 4\)</td><td class="ok">yes</td><td class="cell">4</td><td>no</td><td>continue</td></tr>
+        <tr><td>4</td><td class="cell">\(4 \to 3\)</td><td class="ok">yes</td><td class="cell">3</td><td>no</td><td>continue</td></tr>
+        <tr><td>5</td><td class="cell">\(3 \to 6\)</td><td class="no">no</td><td class="cell">not reached</td><td>not reached</td><td class="no">reject</td></tr>
       </table>
       <p>
         All six vertices are distinct here too, so the permutation test passes;
@@ -1180,20 +1181,73 @@ fn cover(edges: &amp;[(usize, usize)], k: usize, out: &amp;mut Vec&lt;usize&gt;)
       </p>
       <div class="ex">
         <span class="tag">The search tree on \(G\) with \(k = 3\)</span>
-        Edges are scanned in the order \(ab, bc, ca, ad, be, cf, dg\); each line
-        shows the branch vertex and what remains.
-        <pre>edge (a,b), k=3
-  put a: edge (b,c), k=2
-    put b: edge (c,f), k=1
-      put c: k=0, edge (d,g) remains        FAIL
-      put f: k=0, edge (d,g) remains        FAIL
-    put c: edge (b,e), k=1
-      put b: k=0, edge (d,g) remains        FAIL
-      put e: k=0, edge (d,g) remains        FAIL
-  put b: edge (c,a), k=2
-    put c: edge (a,d), k=1
-      put a: k=0, edge (d,g) remains        FAIL
-      put d: no edges left                  COVER {b, c, d}</pre>
+        Edges are scanned in the order \(ab, bc, ca, ad, be, cf, dg\); each box
+        shows the edge a call branches on and its budget \(k\), each link the
+        endpoint that branch puts in the cover.
+        <figure class="wide">
+<!-- gen:th vc-tree -->
+<svg viewBox="0 0 632 278" role="img" style="max-width:758px;min-width:560px" font-family="system-ui, sans-serif" aria-label="The bounded search tree for a vertex cover of G with k = 3, edges scanned in the order ab, bc, ca, ad, be, cf, dg. branch on edge ab with k = 3. put a: branch on edge bc with k = 2. put b: branch on edge cf with k = 1. put c: k = 0 with dg uncovered, fail. put f: k = 0 with dg uncovered, fail. put c: branch on edge be with k = 1. put b: k = 0 with dg uncovered, fail. put e: k = 0 with dg uncovered, fail. put b: branch on edge ca with k = 2. put c: branch on edge ad with k = 1. put a: k = 0 with dg uncovered, fail. put d: no edges left, cover {b, c, d}.">
+<line x1="108" y1="194" x2="56" y2="232" stroke="#4a5163" stroke-width="1.5"/>
+<text x="76" y="217" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="end">put c</text>
+<line x1="108" y1="194" x2="160" y2="232" stroke="#4a5163" stroke-width="1.5"/>
+<text x="140" y="217" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="start">put f</text>
+<line x1="316" y1="194" x2="264" y2="232" stroke="#4a5163" stroke-width="1.5"/>
+<text x="284" y="217" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="end">put b</text>
+<line x1="316" y1="194" x2="368" y2="232" stroke="#4a5163" stroke-width="1.5"/>
+<text x="348" y="217" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="start">put e</text>
+<line x1="212" y1="120" x2="108" y2="158" stroke="#4a5163" stroke-width="1.5"/>
+<text x="154" y="143" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="end">put b</text>
+<line x1="212" y1="120" x2="316" y2="158" stroke="#4a5163" stroke-width="1.5"/>
+<text x="270" y="143" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="start">put c</text>
+<line x1="524" y1="194" x2="472" y2="232" stroke="#4a5163" stroke-width="1.5"/>
+<text x="492" y="217" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="end">put a</text>
+<line x1="524" y1="194" x2="576" y2="232" stroke="#4a5163" stroke-width="1.5"/>
+<text x="556" y="217" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="start">put d</text>
+<line x1="524" y1="120" x2="524" y2="158" stroke="#4a5163" stroke-width="1.5"/>
+<text x="530" y="143" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="start">put c</text>
+<line x1="368" y1="46" x2="212" y2="84" stroke="#4a5163" stroke-width="1.5"/>
+<text x="284" y="69" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="end">put a</text>
+<line x1="368" y1="46" x2="524" y2="84" stroke="#4a5163" stroke-width="1.5"/>
+<text x="452" y="69" font-size="11.5" font-weight="600" fill="#2a2d36" stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="start">put b</text>
+<rect x="10" y="232" width="92" height="36" rx="6" fill="#fbeaea" stroke="#c0392b" stroke-width="2"/>
+<text x="56" y="247" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">k = 0</text>
+<text x="56" y="261" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="middle">dg uncovered</text>
+<rect x="114" y="232" width="92" height="36" rx="6" fill="#fbeaea" stroke="#c0392b" stroke-width="2"/>
+<text x="160" y="247" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">k = 0</text>
+<text x="160" y="261" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="middle">dg uncovered</text>
+<rect x="62" y="158" width="92" height="36" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="108" y="173" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">edge cf</text>
+<text x="108" y="187" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="middle">k = 1</text>
+<rect x="218" y="232" width="92" height="36" rx="6" fill="#fbeaea" stroke="#c0392b" stroke-width="2"/>
+<text x="264" y="247" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">k = 0</text>
+<text x="264" y="261" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="middle">dg uncovered</text>
+<rect x="322" y="232" width="92" height="36" rx="6" fill="#fbeaea" stroke="#c0392b" stroke-width="2"/>
+<text x="368" y="247" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">k = 0</text>
+<text x="368" y="261" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="middle">dg uncovered</text>
+<rect x="270" y="158" width="92" height="36" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="316" y="173" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">edge be</text>
+<text x="316" y="187" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="middle">k = 1</text>
+<rect x="166" y="84" width="92" height="36" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="212" y="99" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">edge bc</text>
+<text x="212" y="113" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="middle">k = 2</text>
+<rect x="426" y="232" width="92" height="36" rx="6" fill="#fbeaea" stroke="#c0392b" stroke-width="2"/>
+<text x="472" y="247" font-size="11.5" font-weight="600" fill="#c0392b" text-anchor="middle">k = 0</text>
+<text x="472" y="261" font-size="11.5" font-weight="400" fill="#c0392b" text-anchor="middle">dg uncovered</text>
+<rect x="530" y="232" width="92" height="36" rx="6" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="2"/>
+<text x="576" y="247" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">no edges left</text>
+<text x="576" y="261" font-size="11.5" font-weight="400" fill="#0a7d4d" text-anchor="middle">cover {b, c, d}</text>
+<rect x="478" y="158" width="92" height="36" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="524" y="173" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">edge ad</text>
+<text x="524" y="187" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="middle">k = 1</text>
+<rect x="478" y="84" width="92" height="36" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="524" y="99" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">edge ca</text>
+<text x="524" y="113" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="middle">k = 2</text>
+<rect x="322" y="10" width="92" height="36" rx="6" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<text x="368" y="25" font-size="11.5" font-weight="600" fill="#1a1c22" text-anchor="middle">edge ab</text>
+<text x="368" y="39" font-size="11.5" font-weight="400" fill="#1a1c22" text-anchor="middle">k = 3</text>
+</svg>
+<!-- /gen:th vc-tree -->
+        </figure>
         Twelve recursive calls in all, against the bound
         \(T(3) \le 2^{4}-1 = 15\); six of them are leaves, five failing and one
         succeeding, and the cover found is the unique minimum one. All five
@@ -1534,7 +1588,7 @@ fn cover(edges: &amp;[(usize, usize)], k: usize, out: &amp;mut Vec&lt;usize&gt;)
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; P, NP &amp; Reductions v1.0
+        Data Structures &amp; Algorithms &middot; P, NP &amp; Reductions v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax.
       </footer>
     </div>
