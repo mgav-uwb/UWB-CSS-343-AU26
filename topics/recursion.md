@@ -35,12 +35,12 @@ long factorial(int n) {
 
 ## The call stack
 
-```text
+<div><img src="../../topics/figures/intro/in-factorial-stack.svg" style="height:245px" alt="
 factorial(4)                  returns 4 * 6 = 24
   factorial(3)                returns 3 * 2 = 6
     factorial(2)              returns 2 * 1 = 2
       factorial(1)            returns 1
-```
+"></div>
 
 - each call gets its own frame, with its own `n`
 - at the deepest point **4 frames** are on the stack
@@ -130,7 +130,7 @@ int height(const TNode* t) {
 
 ## Trace: height
 
-```text
+<div><img src="../../topics/figures/intro/in-height.svg" style="height:270px" alt="
                50 (4)
              /        \
         30 (3)        70 (2)
@@ -138,13 +138,11 @@ int height(const TNode* t) {
    20 (1)    40 (2)       80 (1)
                  \
                  45 (1)
-```
-
-In parentheses: the height of the subtree rooted at that node.
+"></div>
 
 - size = **7**
 - height = **4** nodes, along 50, 30, 40, 45
-- counted in **links**, as the textbook does: **3** (empty −1, one node 0)
+- in **links**, as the textbook counts: **3** (empty $-1$, one node $0$)
 
 --
 
@@ -191,17 +189,14 @@ int bsearch(const vector<int>& a, int lo, int hi, int key) {
 
 ## Trace: find 63
 
-```text
+<div><img src="../../topics/figures/intro/in-bsearch.svg" style="height:280px" alt="
 index  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
 key    3  7 12 18 21 26 30 34 41 47 52 58 63 69 75
-```
-
-| Call | lo | hi | mid | a[mid] | Decision |
-| ---: | ---: | ---: | ---: | ---: | --- |
-| 1 | 0 | 14 | 7 | 34 | go right |
-| 2 | 8 | 14 | 11 | 58 | go right |
-| 3 | 12 | 14 | 13 | 69 | go left |
-| 4 | 12 | 12 | 12 | 63 | found at 12 |
+call 1: lo 0,  hi 14, mid 7,  a[mid] 34, go right
+call 2: lo 8,  hi 14, mid 11, a[mid] 58, go right
+call 3: lo 12, hi 14, mid 13, a[mid] 69, go left
+call 4: lo 12, hi 12, mid 12, a[mid] 63, found at 12
+"></div>
 
 <details class="answer"><summary>Answer:</summary>
 
@@ -231,7 +226,7 @@ long fib(int n) {
 }
 ```
 
-| n | fib(n) | Calls |
+| $n$ | `fib(n)` | Calls |
 | ---: | ---: | ---: |
 | 10 | 55 | 177 |
 | 20 | 6,765 | 21,891 |

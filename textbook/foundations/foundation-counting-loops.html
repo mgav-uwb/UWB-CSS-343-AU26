@@ -195,13 +195,13 @@ for (int i = 0; i &lt; n; i++)
       \]
       <div style="overflow-x:auto"><table>
         <tr><th>loop header</th><th>values of <code>i</code></th><th>trip count</th><th>at \(n = 10\)</th></tr>
-        <tr><td><code>for (i = 0; i &lt; n; i++)</code></td><td>0, 1, &hellip;, n &minus; 1</td><td>\(n\)</td><td>10</td></tr>
-        <tr><td><code>for (i = 1; i &lt;= n; i++)</code></td><td>1, 2, &hellip;, n</td><td>\(n\)</td><td>10</td></tr>
-        <tr><td><code>for (i = 0; i &lt;= n; i++)</code></td><td>0, 1, &hellip;, n</td><td>\(n + 1\)</td><td>11</td></tr>
-        <tr><td><code>for (i = 1; i &lt; n; i++)</code></td><td>1, 2, &hellip;, n &minus; 1</td><td>\(n - 1\)</td><td>9</td></tr>
-        <tr><td><code>for (i = 0; i &lt; n; i += 2)</code></td><td>0, 2, 4, &hellip;</td><td>\(\lceil n/2 \rceil\)</td><td>5</td></tr>
-        <tr><td><code>for (i = 0; i &lt; n; i += 3)</code></td><td>0, 3, 6, &hellip;</td><td>\(\lceil n/3 \rceil\)</td><td>4</td></tr>
-        <tr><td><code>for (i = n; i &gt; 0; i--)</code></td><td>n, n &minus; 1, &hellip;, 1</td><td>\(n\)</td><td>10</td></tr>
+        <tr><td><code>for (i = 0; i &lt; n; i++)</code></td><td>\(0, 1, \ldots, n - 1\)</td><td>\(n\)</td><td>10</td></tr>
+        <tr><td><code>for (i = 1; i &lt;= n; i++)</code></td><td>\(1, 2, \ldots, n\)</td><td>\(n\)</td><td>10</td></tr>
+        <tr><td><code>for (i = 0; i &lt;= n; i++)</code></td><td>\(0, 1, \ldots, n\)</td><td>\(n + 1\)</td><td>11</td></tr>
+        <tr><td><code>for (i = 1; i &lt; n; i++)</code></td><td>\(1, 2, \ldots, n - 1\)</td><td>\(n - 1\)</td><td>9</td></tr>
+        <tr><td><code>for (i = 0; i &lt; n; i += 2)</code></td><td>\(0, 2, 4, \ldots\)</td><td>\(\lceil n/2 \rceil\)</td><td>5</td></tr>
+        <tr><td><code>for (i = 0; i &lt; n; i += 3)</code></td><td>\(0, 3, 6, \ldots\)</td><td>\(\lceil n/3 \rceil\)</td><td>4</td></tr>
+        <tr><td><code>for (i = n; i &gt; 0; i--)</code></td><td>\(n, n - 1, \ldots, 1\)</td><td>\(n\)</td><td>10</td></tr>
       </table></div>
       <div class="aside">
         <span class="tag">Off by one</span>
@@ -303,11 +303,16 @@ for (int i = 0; i &lt; n; i++)
         Four sums cover nearly every dependent loop in the course. The first is
         found by writing the sum forwards and backwards and adding the columns:
       </p>
-      <pre>   S = 1       + 2       + ... + n
-   S = n       + (n - 1) + ... + 1
-  -----------------------------------------
-  2S = (n + 1) + (n + 1) + ... + (n + 1)    (n columns)
-   S = n(n + 1) / 2</pre>
+      \[
+        \begin{array}{rcccccccl}
+          S &amp;=&amp; 1 &amp;+&amp; 2 &amp;+&amp; \cdots &amp;+&amp; n \\
+          S &amp;=&amp; n &amp;+&amp; (n - 1) &amp;+&amp; \cdots &amp;+&amp; 1 \\ \hline
+          2S &amp;=&amp; (n + 1) &amp;+&amp; (n + 1) &amp;+&amp; \cdots &amp;+&amp; (n + 1)
+        \end{array}
+      \]
+      \[
+        S = \frac{n(n + 1)}{2} \qquad (n \text{ columns, each summing to } n + 1)
+      \]
       <div style="overflow-x:auto"><table>
         <tr><th>sum</th><th>closed form</th><th>at \(n = 10\)</th><th>where it appears</th></tr>
         <tr><td>\(\sum_{i=1}^{n} 1\)</td><td>\(n\)</td><td>10</td><td>a single loop</td></tr>
@@ -647,7 +652,7 @@ for (k = 0; k &lt; n; k++) for (m = 0; m &lt; 3; m++) ops++;</pre>
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Counting Loop Iterations v1.0
+        Data Structures &amp; Algorithms &middot; Counting Loop Iterations v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax.
       </footer>
     </div>

@@ -20,10 +20,10 @@ TOPIC · k-sum: from three nested loops to one recursive function.
 
 ## The 3-sum problem
 
-> Given *n* integers, how many **triples** sum to exactly **0**?
+> Given $n$ integers, how many **triples** sum to exactly **0**?
 
 - input: an array of integers
-- output: the number of triples *i < j < k* whose elements sum to 0
+- output: the number of triples $i < j < k$ whose elements sum to 0
 
 **How would you compute this?** Discuss with a neighbor for 60 seconds.
 
@@ -31,14 +31,15 @@ TOPIC · k-sum: from three nested loops to one recursive function.
 
 ## A small instance
 
-<div style="font-family:monospace;font-size:1.05em">−40&nbsp;&nbsp;−20&nbsp;&nbsp;−10&nbsp;&nbsp;0&nbsp;&nbsp;5&nbsp;&nbsp;10&nbsp;&nbsp;30&nbsp;&nbsp;40</div>
-
 Four triples sum to zero:
 
-- (−40, 10, 30)
-- (−40, 0, 40)
-- (−20, −10, 30)
-- (−10, 0, 10)
+<div><img src="../../topics/figures/intro/in-triples.svg" style="height:250px" alt="
+-40  -20  -10  0  5  10  30  40
+(-40, 0, 40)
+(-40, 10, 30)
+(-20, -10, 30)
+(-10, 0, 10)
+"></div>
 
 For this input the answer is **4**.
 
@@ -60,19 +61,19 @@ long count3(const vector<int>& a) {
 }
 ```
 
-The bounds `i + 1` and `j + 1` visit each triple *i < j < k* once.
+The bounds `i + 1` and `j + 1` visit each triple $i < j < k$ once.
 
 --
 
 ## How many checks?
 
-One check per triple *i < j < k*: the number of ways to choose **3 of *n***.
+One check per triple $i < j < k$: the number of ways to choose **3 of $n$**.
 
 $$\binom{n}{3} = \frac{n(n-1)(n-2)}{6}$$
 
-- *n* = 8: **56** checks, to find 4 triples
-- *n* = 10: **120** checks
-- *n* = 40: **9,880** checks
+- $n = 8$: **56** checks, to find 4 triples
+- $n = 10$: **120** checks
+- $n = 40$: **9,880** checks
 
 --
 
@@ -80,9 +81,9 @@ $$\binom{n}{3} = \frac{n(n-1)(n-2)}{6}$$
 
 - **4-sum:** add a fourth nested loop
 - **5-sum:** add a fifth
-- ***k*-sum, with *k* read at run time:** ?
+- **$\boldsymbol{k}$-sum, with $k$ read at run time:** ?
 
-The number of nested loops is fixed when the code is written. The value of *k* is not known until the program runs.
+The number of nested loops is fixed when the code is written. The value of $k$ is not known until the program runs.
 
 **How would you write it?**
 
@@ -90,13 +91,13 @@ The number of nested loops is fixed when the code is written. The value of *k* i
 
 ## The idea
 
-To count the ways to choose ***k*** elements from `a[start..]` that sum to **target**:
+To count the ways to choose $\boldsymbol{k}$ elements from `a[start..]` that sum to **target**:
 
-- pick one element `a[i]`, with *i* ≥ start, as the first of the *k*
-- count the ways to choose ***k* − 1** elements from `a[i+1..]` that sum to **target − a[i]**
-- add the counts over every choice of *i*
+- pick one element `a[i]`, with $i \ge \text{start}$, as the first of the $k$
+- count the ways to choose $\boldsymbol{k - 1}$ elements from `a[i+1..]` that sum to $\boldsymbol{\text{target} - a[i]}$
+- add the counts over every choice of $i$
 
-When *k* = 0 nothing is left to pick: the choice works exactly when target = 0.
+When $k = 0$ nothing is left to pick: the choice works exactly when $\text{target} = 0$.
 
 --
 
@@ -164,27 +165,28 @@ both find (-1, 0, 1)
 
 ## Counting the checks
 
-`L(m, k)`: the checks made when *m* elements remain and *k* are still to be picked.
+$L(m, k)$: the checks made when $m$ elements remain and $k$ are still to be picked.
 
-```text
+$$
 L(m, 0) = 1
-L(m, k) = L(m-1, k-1)  +  L(m-1, k)
-          first             all later
-          iteration         iterations
-```
+$$
+
+$$
+L(m, k) = \underbrace{L(m - 1, k - 1)}\_{\text{first iteration}} + \underbrace{L(m - 1, k)}\_{\text{all later iterations}}
+$$
 
 - the first iteration **picks** `a[start]`
 - the later iterations, together, never pick it
 
-This is Pascal's rule: `L(m, k)` is the number of ways to choose *k* of *m*.
+This is Pascal's rule: $L(m, k) = \binom{m}{k}$, the number of ways to choose $k$ of $m$.
 
 --
 
 ## Run it
 
-*k* = 3, the same data for both versions:
+$k = 3$, the same data for both versions:
 
-| n | Triples | Loop checks | Recursive checks | Recursive calls |
+| $n$ | Triples | Loop checks | Recursive checks | Recursive calls |
 | ---: | ---: | ---: | ---: | ---: |
 | 10 | 0 | 120 | 120 | 176 |
 | 20 | 2 | 1,140 | 1,140 | 1,351 |
@@ -193,22 +195,21 @@ This is Pascal's rule: `L(m, k)` is the number of ways to choose *k* of *m*.
 
 Same answers, same number of checks.
 
-<small>Calls at *n* = 20: one per partial choice of 0, 1, 2 or 3 elements, 1 + 20 + 190 + 1,140 = 1,351.</small>
-
+<small>Calls at $n = 20$: one per choice of up to 3 elements, $1 + 20 + 190 + 1140 = 1351$.</small><br>
 <small>Code: <a href="../../topics/code/k-sum/ksum.cpp">ksum.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 
 --
 
 ## What k costs
 
-*n* = 40, measured on the lecture laptop:
+$n = 40$, measured on the lecture laptop:
 
-| k | Checks | Seconds |
+| $k$ | Checks | Seconds |
 | ---: | ---: | ---: |
 | 4 | 91,390 | 0.001 |
 | 6 | 3,838,380 | 0.040 |
 | 8 | 76,904,685 | 0.805 |
 | 10 | 847,660,528 | 10.208 |
 
-*k* = 20 needs **137,846,528,820** checks: at the measured rate, close to half an hour.
+$k = 20$ needs **137,846,528,820** checks: at the measured rate, close to half an hour.
 

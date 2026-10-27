@@ -47,7 +47,7 @@ Quizzes and exams are **multiple choice, on paper**.
 
 ## Grading
 
-1000 points in all: **points ÷ 10 = percent**.
+1000 points in all: $\textbf{percent} = \textbf{points} / 10$.
 
 | Component | Points each | Counted | Points |
 | --- | ---: | --- | ---: |

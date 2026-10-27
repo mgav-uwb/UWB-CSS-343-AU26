@@ -335,10 +335,42 @@ Node* head = nullptr;
 head = new Node(8, head);     <span class="cm">// list: 8</span>
 head = new Node(5, head);     <span class="cm">// list: 5 8</span>
 head = new Node(3, head);     <span class="cm">// list: 3 5 8</span></pre>
-      <pre>head
- |
- v
-[3 | *]--&gt;[5 | *]--&gt;[8 | null]</pre>
+      <figure>
+<!-- gen:in chain -->
+<svg viewBox="0 0 436 48" role="img" style="max-width:523px" font-family="system-ui, sans-serif" aria-label="A singly linked list after pushFront(8), pushFront(5), pushFront(3): head points at the node holding 3; node 3's next points at node 5, node 5's next points at node 8, node 8's next points to nullptr.">
+<text x="40" y="29" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="end" font-family="ui-monospace, Menlo, Consolas, monospace">head</text>
+<rect x="46" y="10" width="22" height="28" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<circle cx="57" cy="24" r="3.2" fill="#4a5163"/>
+<line x1="57" y1="24" x2="101" y2="24" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M107,24 L100,28 L100,20 Z" fill="#4a5163"/>
+<rect x="108" y="10" width="56" height="28" rx="5" fill="none" stroke="#2a2d36" stroke-width="1.4"/>
+<line x1="142" y1="10" x2="142" y2="38" stroke="#c8ccd6" stroke-width="1.2"/>
+<text x="125" y="29" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="153" cy="24" r="3.2" fill="#4a5163"/>
+<line x1="153" y1="24" x2="192" y2="24" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M198,24 L191,28 L191,20 Z" fill="#4a5163"/>
+<rect x="198" y="10" width="56" height="28" rx="5" fill="none" stroke="#2a2d36" stroke-width="1.4"/>
+<line x1="232" y1="10" x2="232" y2="38" stroke="#c8ccd6" stroke-width="1.2"/>
+<text x="215" y="29" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="243" cy="24" r="3.2" fill="#4a5163"/>
+<line x1="243" y1="24" x2="282" y2="24" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M288,24 L281,28 L281,20 Z" fill="#4a5163"/>
+<rect x="288" y="10" width="56" height="28" rx="5" fill="none" stroke="#2a2d36" stroke-width="1.4"/>
+<line x1="322" y1="10" x2="322" y2="38" stroke="#c8ccd6" stroke-width="1.2"/>
+<text x="305" y="29" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="333" cy="24" r="3.2" fill="#4a5163"/>
+<line x1="333" y1="24" x2="353" y2="24" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M359,24 L352,28 L352,20 Z" fill="#4a5163"/>
+<text x="363" y="28.5" font-size="12" fill="#5c6270" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">nullptr</text>
+</svg>
+<!-- /gen:in chain -->
+        <figcaption>
+          The list after the three calls: <code>head</code> holds the address of
+          the node with 3, and each node&rsquo;s <code>next</code> holds the
+          address of the one after it. The last <code>next</code> is
+          <code>nullptr</code>.
+        </figcaption>
+      </figure>
       <p>
         <code>new Node(3, head)</code> allocates space for one <code>Node</code> on
         the heap, runs its constructor, and returns the address. The node lives
@@ -417,6 +449,46 @@ private:
     b.setFirst(99);            <span class="cm">// changes a's first node too</span>
 }                              <span class="cm">// b's destructor frees the 3 nodes, then</span>
                                <span class="cm">// a's destructor walks and frees them again</span></pre>
+      <figure>
+<!-- gen:in shared -->
+<svg viewBox="0 0 450 104" role="img" style="max-width:540px" font-family="system-ui, sans-serif" aria-label="Two lists sharing one chain after the generated (shallow) copy b = a and b.setFirst(99): a.head and b.head both point at the node holding 99; node 99's next points at node 5, node 5's next points at node 8, node 8's next points to nullptr.">
+<text x="54" y="29" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="end" font-family="ui-monospace, Menlo, Consolas, monospace">a.head</text>
+<rect x="60" y="10" width="22" height="28" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<circle cx="71" cy="24" r="3.2" fill="#4a5163"/>
+<line x1="71" y1="24" x2="115" y2="46" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M121,46 L113,46.8 L116.2,39.5 Z" fill="#4a5163"/>
+<text x="54" y="85" font-size="12.5" font-weight="600" fill="#2a2d36" text-anchor="end" font-family="ui-monospace, Menlo, Consolas, monospace">b.head</text>
+<rect x="60" y="66" width="22" height="28" rx="4" fill="#fff" stroke="#2a2d36" stroke-width="1.4"/>
+<circle cx="71" cy="80" r="3.2" fill="#4a5163"/>
+<line x1="71" y1="80" x2="115" y2="58" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M121,58 L116.2,64.5 L113,57.2 Z" fill="#4a5163"/>
+<rect x="122" y="38" width="34" height="28" fill="#fde7bf"/>
+<rect x="122" y="38" width="56" height="28" rx="5" fill="none" stroke="#c98a1a" stroke-width="1.8"/>
+<line x1="156" y1="38" x2="156" y2="66" stroke="#c8ccd6" stroke-width="1.2"/>
+<text x="139" y="57" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">99</text>
+<circle cx="167" cy="52" r="3.2" fill="#4a5163"/>
+<line x1="167" y1="52" x2="206" y2="52" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M212,52 L205,56 L205,48 Z" fill="#4a5163"/>
+<rect x="212" y="38" width="56" height="28" rx="5" fill="none" stroke="#2a2d36" stroke-width="1.4"/>
+<line x1="246" y1="38" x2="246" y2="66" stroke="#c8ccd6" stroke-width="1.2"/>
+<text x="229" y="57" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="257" cy="52" r="3.2" fill="#4a5163"/>
+<line x1="257" y1="52" x2="296" y2="52" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M302,52 L295,56 L295,48 Z" fill="#4a5163"/>
+<rect x="302" y="38" width="56" height="28" rx="5" fill="none" stroke="#2a2d36" stroke-width="1.4"/>
+<line x1="336" y1="38" x2="336" y2="66" stroke="#c8ccd6" stroke-width="1.2"/>
+<text x="319" y="57" font-size="13.5" font-weight="600" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="347" cy="52" r="3.2" fill="#4a5163"/>
+<line x1="347" y1="52" x2="367" y2="52" stroke="#4a5163" stroke-width="1.5"/>
+<path d="M373,52 L366,56 L366,48 Z" fill="#4a5163"/>
+<text x="377" y="56.5" font-size="12" fill="#5c6270" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">nullptr</text>
+</svg>
+<!-- /gen:in shared -->
+        <figcaption>
+          After <code>IntList b = a; b.setFirst(99);</code> the two heads hold
+          the same address: one chain, two owners.
+        </figcaption>
+      </figure>
       <div class="def">
         <span class="tag">Definition (shallow and deep copy)</span>
         A <strong>shallow copy</strong> copies the pointers an object holds, so the
@@ -690,7 +762,7 @@ int main() { int x = 1, y = 1, z = 1; f(x, y, &amp;z); cout &lt;&lt; x &lt;&lt; 
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; C++ for Data Structures v1.0
+        Data Structures &amp; Algorithms &middot; C++ for Data Structures v1.1
         &middot; prepared by Dr. Marcel Gavriliu.
       </footer>
     </div>

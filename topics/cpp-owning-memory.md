@@ -43,6 +43,7 @@ int* makeB() { return new int(7); }
 struct Node {
     int   key;
     Node* next;
+    Node(int k, Node* n) : key(k), next(n) {}
 };
 
 void pushFront(int key) { head = new Node(key, head); }
@@ -50,12 +51,12 @@ void pushFront(int key) { head = new Node(key, head); }
 
 After pushing 8, then 5, then 3:
 
-```text
+<div><img src="../../topics/figures/intro/in-chain.svg" style="height:90px" alt="
 head
  │
  ▼
 [3 | •]──►[5 | •]──►[8 | null]
-```
+"></div>
 
 --
 
@@ -98,13 +99,13 @@ Output: `99 -> 5 -> 8`. The default copy duplicated the head **pointer**, so `a`
 
 ## Two owners, one chain
 
-```text
+<div><img src="../../topics/figures/intro/in-shared.svg" style="height:175px" alt="
 a.head ──┐
          ▼
         [99 | •]──►[5 | •]──►[8 | null]
          ▲
 b.head ──┘
-```
+"></div>
 
 At the end of the scope **both destructors run**.
 
@@ -183,7 +184,7 @@ Three lists of three nodes: **9** allocated, **0** left.
 
 ## Checking for leaks
 
-```text
+```bash
 g++ -std=c++17 -g intlist.cpp -o intlist
 valgrind --leak-check=full ./intlist
 ```

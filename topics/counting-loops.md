@@ -58,7 +58,7 @@ for (long i = 0; i < n; i++)
         ops++;
 ```
 
-For *n* = 5, how many times does `ops++` run?
+For $n = 5$, how many times does `ops++` run?
 
 <details class="answer"><summary>Answer:</summary>
 
@@ -68,19 +68,22 @@ For *n* = 5, how many times does `ops++` run?
 
 --
 
-## The sum 1 + 2 + ... + (n − 1)
+## The Gauss sum
 
-```text
-   S = 1       + 2       + ... + (n - 1)
-   S = (n - 1) + (n - 2) + ... + 1
-  ─────────────────────────────────────────
-  2S = n       + n       + ... + n          (n - 1 terms)
+$$
+\begin{array}{rcccccccl}
+S &=& 1 &+& 2 &+& \cdots &+& (n - 1) \\\\
+S &=& (n - 1) &+& (n - 2) &+& \cdots &+& 1 \\\\ \hline
+2S &=& n &+& n &+& \cdots &+& n
+\end{array}
+$$
 
-   S = n(n - 1) / 2
-```
+$$
+S = \frac{n(n - 1)}{2} \qquad (n - 1 \text{ columns, each summing to } n)
+$$
 
-- *n* = 5: **10**
-- *n* = 1000: **499,500**
+- $n = 5$: **10**
+- $n = 1000$: **499,500**
 
 --
 
@@ -91,11 +94,11 @@ for (long i = n; i >= 1; i /= 2)
     ops++;
 ```
 
-For *n* = 16, how many times does `ops++` run?
+For $n = 16$, how many times does `ops++` run?
 
 <details class="answer"><summary>Answer:</summary>
 
-**5**: *i* takes the values 16, 8, 4, 2, 1. In general ⌊log₂ *n*⌋ + 1, which is 10 for *n* = 1000 and 20 for *n* = 1,000,000.
+**5**: $i$ takes the values 16, 8, 4, 2, 1. In general $\lfloor \log\_2 n \rfloor + 1$, which is 10 for $n = 1000$ and 20 for $n = 1{,}000{,}000$.
 
 </details>
 
@@ -116,7 +119,7 @@ for (long i = 0; i < n; i++)
     for (long j = n; j >= 1; j /= 2) ops++;
 ```
 
-| n | Sequence | Halving nest |
+| $n$ | Sequence | Halving nest |
 | ---: | ---: | ---: |
 | 16 | 272 | 80 |
 | 1000 | 1,001,000 | 10,000 |

@@ -11,7 +11,7 @@ TOPIC · Counting what a recursive function does.
 
 ### Counting recursion
 
-> Édouard Lucas published the Tower of Hanoi in 1883 with a legend of 64 golden disks; moving them all takes 2<sup>64</sup> − 1 moves.
+> Édouard Lucas published the Tower of Hanoi in 1883 with a legend of 64 golden disks; moving them all takes $2^{64} - 1$ moves.
 
 <small>É. Lucas (as N. Claus de Siam), La Tour d'Hanoï, 1883</small>
 
@@ -26,12 +26,14 @@ int length(const Node* p) {
 }
 ```
 
-Let `T(n)` be the number of **calls** for a list of *n* nodes.
+Let $T(n)$ be the number of **calls** for a list of $n$ nodes.
 
-```text
-T(0) = 1                the call that sees nullptr
-T(n) = 1 + T(n - 1)     this call, plus the rest of the list
-```
+$$
+\begin{aligned}
+T(0) &= 1 && \text{the call that sees } \texttt{nullptr} \\\\
+T(n) &= 1 + T(n - 1) && \text{this call, plus the rest of the list}
+\end{aligned}
+$$
 
 A **recurrence** defines a count in terms of the count for a smaller input.
 
@@ -39,34 +41,38 @@ A **recurrence** defines a count in terms of the count for a smaller input.
 
 ## Solve it by unrolling
 
-```text
-T(n) = 1 + T(n - 1)
-     = 1 + 1 + T(n - 2)
-     = 1 + 1 + 1 + T(n - 3)
-       ...
-     = n + T(0)
-     = n + 1
-```
+$$
+\begin{aligned}
+T(n) &= 1 + T(n - 1) \\\\
+&= 1 + 1 + T(n - 2) \\\\
+&= 1 + 1 + 1 + T(n - 3) \\\\
+&\enspace \vdots \\\\
+&= n + T(0) \\\\
+&= n + 1
+\end{aligned}
+$$
 
-Replace `T` by its own definition until the base case appears.
+Replace $T$ by its own definition until the base case appears.
 
 --
 
 ## Binary search, counted
 
-Worst-case **probes** of `a[mid]`, for *n* = 2<sup>*k*</sup> − 1 keys.
+Worst-case **probes** of `a[mid]`, for $n = 2^k - 1$ keys.
 
-One probe leaves a half of 2<sup>*k*−1</sup> − 1 keys:
+One probe leaves a half of $2^{k-1} - 1$ keys:
 
-```text
-T(2^k - 1) = 1 + T(2^(k-1) - 1)
-           = 1 + 1 + T(2^(k-2) - 1)
-             ...
-           = k + T(0)
-           = k
-```
+$$
+\begin{aligned}
+T(2^k - 1) &= 1 + T(2^{k-1} - 1) \\\\
+&= 1 + 1 + T(2^{k-2} - 1) \\\\
+&\enspace \vdots \\\\
+&= k + T(0) \\\\
+&= k
+\end{aligned}
+$$
 
-That is *k* = log₂(*n* + 1) probes.
+That is $k = \log\_2(n + 1)$ probes.
 
 --
 
@@ -74,14 +80,14 @@ That is *k* = log₂(*n* + 1) probes.
 
 Worst case over every present and absent key, measured:
 
-| n | Worst-case probes |
+| $n$ | Worst-case probes |
 | ---: | ---: |
 | 15 | 4 |
 | 16 | 5 |
 | 1000 | 10 |
 | 1,000,000 | 20 |
 
-For any *n*: ⌊log₂ *n*⌋ + 1.
+For any $n$: $\lfloor \log\_2 n \rfloor + 1$.
 
 <small>Code: <a href="../../topics/code/recursion/recursion.cpp">recursion.cpp</a> (also in the <a href="../../code/index.html">code library</a>)</small>
 
@@ -98,38 +104,42 @@ void hanoi(int n, char from, char to, char via) {
 }
 ```
 
-Let `T(n)` be the number of moves:
+Let $T(n)$ be the number of moves:
 
-```text
-T(0) = 0
-T(n) = 1 + 2 T(n - 1)
-```
+$$
+\begin{aligned}
+T(0) &= 0 \\\\
+T(n) &= 1 + 2T(n - 1)
+\end{aligned}
+$$
 
 --
 
 ## Unrolling Hanoi
 
-```text
-T(n) = 1 + 2 T(n - 1)
-     = 1 + 2 + 4 T(n - 2)
-     = 1 + 2 + 4 + 8 T(n - 3)
-       ...
-     = 1 + 2 + 4 + ... + 2^(n-1) + 2^n T(0)
-     = 2^n - 1
-```
+$$
+\begin{aligned}
+T(n) &= 1 + 2T(n - 1) \\\\
+&= 1 + 2 + 4T(n - 2) \\\\
+&= 1 + 2 + 4 + 8T(n - 3) \\\\
+&\enspace \vdots \\\\
+&= 1 + 2 + 4 + \cdots + 2^{n-1} + 2^nT(0) \\\\
+&= 2^n - 1
+\end{aligned}
+$$
 
-- *n* = 10: **1,023** moves
-- *n* = 20: **1,048,575** moves
+- $n = 10$: **1,023** moves
+- $n = 20$: **1,048,575** moves
 
 --
 
 ## Three recurrences
 
-| Function | `T(n)` | Count | *n* = 20 |
+| Function | $T(n)$ | Count | $n = 20$ |
 | --- | --- | ---: | ---: |
-| `length` | `1 + T(n-1)` | *n* + 1 | 21 |
-| `bsearch` | `1 + T(n/2)` | ⌊log₂ *n*⌋ + 1 | 5 |
-| `hanoi` | `1 + 2T(n-1)` | 2<sup>*n*</sup> − 1 | 1,048,575 |
+| `length` | $1 + T(n - 1)$ | $n + 1$ | 21 |
+| `bsearch` | $1 + T(n/2)$ | $\lfloor \log\_2 n \rfloor + 1$ | 5 |
+| `hanoi` | $1 + 2T(n - 1)$ | $2^n - 1$ | 1,048,575 |
 
 How many recursive calls, and how large an input each receives, decide the count.
 
