@@ -1,10 +1,10 @@
 <!--
   TOPIC · Depth-first search.
-  Teaches: the search problem; DFS recursive and iterative; DFS visits exactly the reachable set; the Θ(V + E) cost by the handshake lemma; recursion depth; connected components; reachability.
+  Teaches: the search problem; DFS recursive and iterative; one call reaches only the start's reachable set, so a whole-graph traversal restarts at every unvisited vertex; DFS visits exactly the reachable set; the Θ(V + E) cost by the handshake lemma; recursion depth; connected components; reachability.
   Needs:   graph representations, recursion.
   Demos:   graph-dfs (slide spec)
   Program: none
-  Budget:  ~34 min, 13 slides.
+  Budget:  ~39 min, 15 slides.
   Ported from Summer 2026 L08-graphs-bfs-dfs.md, parts 2.
 -->
 
@@ -93,6 +93,54 @@ Dive $0 \to 2 \to 3$, backtrack, then 1 (its edge to 3 is skipped): order **0 2 
 
 --
 
+## Your turn: is this correct?
+
+```cpp
+void dfs(Graph& g, int u, vector<bool>& seen) {
+    seen[u] = true;                 // visit u
+    for (int v : g.adj[u])          // each neighbor
+        if (!seen[v])
+            dfs(g, v, seen);        // recurse (backtrack on return)
+}
+```
+
+Does one call, `dfs(g, 0, seen)`, visit every vertex?
+
+<details class="answer"><summary>Answer:</summary>
+<div style="display:flex; align-items:center; gap:24px">
+<img src="../../topics/figures/graphs/gr-dfs-partial.svg" style="height:120px" alt="
+   0–1, 1–2, 0–2 | 3–4 | 5–6, 6–7
+   dfs(g, 0, seen): visits 0 1 2; 3 4 5 6 7 never reached">
+<div style="text-align:left; font-size:0.8em">
+
+Only if every vertex is **reachable** from 0. A disconnected graph: it stops after 0's component.
+
+A digraph can fail even when connected: on the diamond, `dfs(g, 1, seen)` visits only 1 and 3.
+
+</div>
+</div>
+</details>
+
+--
+
+## The fix: a restart loop
+
+```cpp
+// Visits every vertex of g, connected or not.
+void dfsTraversal(Graph& g) {
+    vector<bool> seen(g.V, false);  // shared by every call
+    for (int i = 0; i < g.V; i++)
+        if (!seen[i])               // i not reached yet:
+            dfs(g, i, seen);        //   start a new search at i
+}
+```
+
+`seen` lives in the wrapper, so no vertex is visited twice across calls: that is why `dfs` takes it as a parameter.
+
+On the previous slide's graph, searches start at 0, 3 and 5, visiting 0 1 2, then 3 4, then 5 6 7.
+
+--
+
 ## DFS visits exactly the reachable set
 
 **Claim:** `dfs(s)` marks $v$ $\iff$ a path $s \rightsquigarrow v$ exists.
@@ -172,7 +220,7 @@ The **iterative** version keeps the stack on the **heap**: no such limit. Prefer
 
 ## Connected components
 
-Restart DFS from every **unvisited** vertex; each restart discovers one **component**:
+The fix's loop, counting its restarts: on an undirected graph each restart discovers one **component**:
 
 ```cpp
 int countComponents(Graph& g) {
