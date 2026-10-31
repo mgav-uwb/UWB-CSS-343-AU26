@@ -1201,6 +1201,8 @@ struct NFA {
     bool matches(const string&amp; text) const {
         set&lt;int&gt; pc = closure({0});               // states reachable on &quot;&quot;
         for (char c : text) {
+            if (c == &#x27;(&#x27; || c == &#x27;)&#x27; || c == &#x27;|&#x27; || c == &#x27;*&#x27;)
+                return false;                     // no letter state reads it
             set&lt;int&gt; next;
             for (int u : pc)                      // advance every letter state
                 if (u &lt; m &amp;&amp; re[u] == c) next.insert(u + 1);
@@ -1259,6 +1261,8 @@ class NFA {
     boolean matches(String text) {
         Set&lt;Integer&gt; pc = closure(new TreeSet&lt;&gt;(Set.of(0)));
         for (char c : text.toCharArray()) {
+            if (c == &#x27;(&#x27; || c == &#x27;)&#x27; || c == &#x27;|&#x27; || c == &#x27;*&#x27;)
+                return false;                     // no letter state reads it
             Set&lt;Integer&gt; next = new TreeSet&lt;&gt;();
             for (int u : pc)                      // advance every letter state
                 if (u &lt; m &amp;&amp; re.charAt(u) == c) next.add(u + 1);
@@ -1309,6 +1313,8 @@ class NFA:
         &quot;&quot;&quot;Does the NFA accept text? Track the reachable-state set: O(mn).&quot;&quot;&quot;
         pc = self.closure({0})                     # states reachable on &quot;&quot;
         for c in text:
+            if c in &quot;()|*&quot;:
+                return False                       # no letter state reads it
             nxt = {u + 1 for u in pc               # advance every letter state
                    if u &lt; self.m and self.re[u] == c}
             pc = self.closure(nxt)                 # then close over e-edges
@@ -1370,6 +1376,7 @@ impl Nfa {
     fn matches(&amp;self, text: &amp;str) -&gt; bool {
         let mut pc = self.closure(&amp;BTreeSet::from([0]));
         for c in text.chars() {
+            if &quot;()|*&quot;.contains(c) { return false; }  // no letter state reads it
             let next: BTreeSet&lt;usize&gt; = pc.iter()
                 .filter(|&amp;&amp;u| u &lt; self.m &amp;&amp; self.re[u] == c)  // letter states
                 .map(|&amp;u| u + 1)                             // ... advance
@@ -2258,7 +2265,7 @@ impl Nfa {
       </ol>
 
       <footer>
-        Data Structures &amp; Algorithms &middot; Regular Expressions &amp; Automata v1.1
+        Data Structures &amp; Algorithms &middot; Regular Expressions &amp; Automata v1.2
         &middot; prepared by Dr. Marcel Gavriliu. Typeset with MathJax; interactive
         demos in the course library.
       </footer>

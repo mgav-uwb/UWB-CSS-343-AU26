@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!-- CANVAS NOTE: relative links only resolve on the course site; when pasting
+     into Canvas, swap hrefs for the Canvas URLs. -->
+<!-- CSS 343 · Homework 9 instructions. Student-facing: NO solutions. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 9: Knapsack, Edit Distance and Matrix Chains · CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:46px clamp(20px,6vw,60px) 60px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:25px;line-height:1.25;margin:0 0 4px}
+  .epigraph{margin:6px 0 20px;padding:4px 0 4px 16px;border-left:3px solid #b9c0d0;color:#33363f;font-style:italic;font-size:17px}
+  .epigraph.fact{font-style:normal;font-size:16px}
+  .epigraph cite{display:block;font-style:normal;font-size:13.5px;color:#5c6270;margin-top:4px}
+  h2{font-size:19px;margin:30px 0 8px;border-bottom:1px solid #edf0f4;padding-bottom:4px}
+  p{margin:10px 0} a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  .def,.aside{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .aside .tag{color:var(--warn)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:system-ui,sans-serif;font-size:15px}
+  .meta b{color:var(--accent)}
+  ol,ul{margin:8px 0;padding-left:24px} li{margin:7px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-family:system-ui,sans-serif;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#f0f2f6}
+  table.pts td:nth-child(2){text-align:center;font-weight:700;white-space:nowrap}
+  footer{margin-top:38px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px;font-family:system-ui,sans-serif}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Homework 9: Knapsack, Edit Distance and Matrix Chains</h1>
+  <blockquote class="epigraph fact">
+    In 1978 Ralph Merkle and Martin Hellman built a public-key cryptosystem on the knapsack problem. Adi Shamir broke it in 1982.
+    <cite>A. Shamir, &ldquo;A Polynomial Time Algorithm for Breaking the Basic Merkle-Hellman Cryptosystem,&rdquo; FOCS 1982</cite>
+  </blockquote>
+  <div class="def"><span class="tag">At a glance</span>
+    <div class="meta">
+      <span><b>Covers:</b> Lecture 17 (Dynamic Programming II) and Lecture 18 (Dynamic Programming III)</span>
+      <span><b>Format:</b> individual</span>
+      <span><b>Language:</b> C++17</span>
+      <span><b>Starter:</b> <a href="hw09.cpp"><code>hw09.cpp</code></a></span>
+      <span><b>Submit:</b> a <code>.zip</code> with your <code>hw09.cpp</code></span>
+      <span><b>Due:</b> Sun Dec 6, 11:59 PM</span>
+    </div>
+  </div>
+  <p>Five functions: the full 0/1 knapsack table, the items an optimal knapsack takes (found by walking the table back from its answer cell), the edit distance between two strings, the knapsack's optimal value computed in a single row of memory, and the cheapest way to parenthesize a chain of matrix multiplications. The starter has a <strong>self-running test battery</strong>; you fill in five <code>TODO</code>s. Quiz 8 (Monday Dec 7) covers this material too.</p>
+
+  <h2>Tasks</h2>
+  <table>
+    <tr><th>TODO</th><th>Function</th><th>What it must do</th></tr>
+    <tr><td>1</td><td><code>knapsackTable</code></td><td>Fill the whole 0/1 knapsack table: one row per item added, one column per capacity from 0 to <em>W</em>.</td></tr>
+    <tr><td>2</td><td><code>knapsackItems</code></td><td>Recover which items an optimal knapsack takes, by comparing each cell with the one above it on a walk back from the answer cell.</td></tr>
+    <tr><td>3</td><td><code>editDistance</code></td><td>The fewest single-character inserts, deletes and replaces that turn one string into another.</td></tr>
+    <tr><td>4</td><td><code>knapsackOneRow</code></td><td>The knapsack's optimal value in one row of <em>W</em> + 1 entries, swept from high capacities to low.</td></tr>
+    <tr><td>5</td><td><code>matrixChain</code></td><td>The fewest scalar multiplications needed to multiply a chain of matrices, by an interval DP filled in order of range length.</td></tr>
+  </table>
+  <p>The full contract of each function, with examples, is in the comment above it in the starter. Every function is also tested on large inputs with a time limit (a table of 10 million cells, strings of 3,000 characters, 400 matrices), and <code>knapsackOneRow</code> with a memory limit as well: write each one with the running time and memory its contract states.</p>
+
+  <h2>The tests run themselves</h2>
+  <pre>g++ -std=c++17 -O2 hw09.cpp -o hw09 &amp;&amp; ./hw09</pre>
+  <p>Each check prints <code>[PASS]</code> or <code>[FAIL]</code>. The unmodified starter compiles and fails
+  all of them.</p>
+
+  <div class="aside"><span class="tag">Build on the lab</span>
+    Code is graded on the CSS Linux lab with <code>g++ -std=c++17</code>. Build and run there at least once
+    before you submit; the
+    <a href="../../../guides/guide-computing-environment.html"><strong>Computing Environment</strong></a>
+    guide has the login and file-transfer commands. Code that does not compile on the lab receives no points.
+  </div>
+
+  <h2>Grading (10 pts)</h2>
+  <table class="pts">
+    <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
+    <tr><td>Compiles (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>does not compile: 0</td></tr>
+    <tr><td><code>knapsackTable</code> (TODO 1)</td><td>1</td><td rowspan="5">checked by our own test harness, on random inputs different from the battery's, and on large inputs with a time limit (and, for <code>knapsackOneRow</code>, a memory limit)</td></tr>
+    <tr><td><code>knapsackItems</code> (TODO 2)</td><td>2</td></tr>
+    <tr><td><code>editDistance</code> (TODO 3)</td><td>2</td></tr>
+    <tr><td><code>knapsackOneRow</code> (TODO 4)</td><td>2</td></tr>
+    <tr><td><code>matrixChain</code> (TODO 5)</td><td>1</td></tr>
+    <tr><td>Your test battery passes</td><td>2</td><td>all: 2 · most: 1</td></tr>
+  </table>
+  <p>Homework is 8% of the course grade, with the lowest two homework scores dropped.</p>
+
+  <h2>Reading</h2>
+  <ul>
+    <li><a href="../../../textbook/dp/algo-knapsack.html">0/1 Knapsack</a> and <a href="../../../textbook/dp/algo-edit-distance.html">Edit Distance</a>.</li>
+    <li><a href="../../../textbook/dp/algo-dp-patterns.html">DP Patterns: Grid, Interval, Coin Change and LIS</a> and <a href="../../../textbook/dp/algo-traceback-space-saving.html">Traceback and Space-Saving</a>.</li>
+    <li>The demos: <a href="../../../lib/demo.html?ds=knapsack">knapsack</a>, <a href="../../../lib/demo.html?ds=edit-distance">edit distance</a> and <a href="../../../lib/demo.html?ds=grid-dp">grid DP</a>.</li>
+  </ul>
+
+  <h2>Submit</h2>
+  <p>One <code>.zip</code> file on Canvas, containing your finished <code>hw09.cpp</code> and anything else you
+  want to include. Keep the file name <code>hw09.cpp</code>. Resubmissions are allowed until the deadline; the
+  last one is graded. To make the zip on the lab: <code>zip hw09.zip hw09.cpp</code>.
+  <strong>Due Sun Dec 6, 11:59 PM.</strong> A late token extends this deadline by 48 hours.</p>
+  <footer>CSS 343 · Autumn 2026 · Homework 9 · prepared by Dr. Marcel Gavriliu.</footer>
+</div>
+</body>
+</html>

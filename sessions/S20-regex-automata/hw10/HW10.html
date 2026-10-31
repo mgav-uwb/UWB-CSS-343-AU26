@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!-- CANVAS NOTE: relative links only resolve on the course site; when pasting
+     into Canvas, swap hrefs for the Canvas URLs. -->
+<!-- CSS 343 · Homework 10 instructions. Student-facing: NO solutions. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework 10: Tries, Substring Search and Regular Expressions · CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:46px clamp(20px,6vw,60px) 60px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:25px;line-height:1.25;margin:0 0 4px}
+  .epigraph{margin:6px 0 20px;padding:4px 0 4px 16px;border-left:3px solid #b9c0d0;color:#33363f;font-style:italic;font-size:17px}
+  .epigraph.fact{font-style:normal;font-size:16px}
+  .epigraph cite{display:block;font-style:normal;font-size:13.5px;color:#5c6270;margin-top:4px}
+  h2{font-size:19px;margin:30px 0 8px;border-bottom:1px solid #edf0f4;padding-bottom:4px}
+  p{margin:10px 0} a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  .def,.aside{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .aside .tag{color:var(--warn)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:system-ui,sans-serif;font-size:15px}
+  .meta b{color:var(--accent)}
+  ol,ul{margin:8px 0;padding-left:24px} li{margin:7px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-family:system-ui,sans-serif;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#f0f2f6}
+  table.pts td:nth-child(2){text-align:center;font-weight:700;white-space:nowrap}
+  footer{margin-top:38px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px;font-family:system-ui,sans-serif}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Homework 10: Tries, Substring Search and Regular Expressions</h1>
+  <blockquote class="epigraph fact">
+    grep is named after the ed editor command g/re/p: globally search for a regular expression and print the matching lines.
+    <cite>Brian Kernighan, UNIX: A History and a Memoir, 2019</cite>
+  </blockquote>
+  <div class="def"><span class="tag">At a glance</span>
+    <div class="meta">
+      <span><b>Covers:</b> Lecture 19 (Strings: Tries and Substring Search) and Lecture 20 (Regular Expressions and Finite Automata)</span>
+      <span><b>Format:</b> individual</span>
+      <span><b>Language:</b> C++17</span>
+      <span><b>Starter:</b> <a href="hw10.cpp"><code>hw10.cpp</code></a></span>
+      <span><b>Submit:</b> a <code>.zip</code> with your <code>hw10.cpp</code></span>
+      <span><b>Due:</b> Fri Dec 11, 11:59 PM (no late tokens)</span>
+    </div>
+  </div>
+  <p>Seven functions: insertion into an R-way trie that reports how many nodes it allocated, the longest stored key that is a prefix of a query, the Knuth-Morris-Pratt (KMP) failure function, a KMP search that reports every occurrence and counts its comparisons, a Boyer-Moore search with the bad-character rule, and the two halves of running a nondeterministic finite automaton (NFA): the epsilon-closure of a set of states, and the set of states after reading a text. The starter has a <strong>self-running test battery</strong>; you fill in seven <code>TODO</code>s. The final exam (Wednesday Dec 16) covers this material.</p>
+
+  <h2>Tasks</h2>
+  <table>
+    <tr><th>TODO</th><th>Function</th><th>What it must do</th></tr>
+    <tr><td>1</td><td><code>insert</code></td><td>Store a key in the trie, creating only the missing nodes, and return how many nodes it created.</td></tr>
+    <tr><td>2</td><td><code>longestPrefixOf</code></td><td>The length of the longest stored key that is a prefix of a query, in one walk down the trie; -1 if there is none.</td></tr>
+    <tr><td>3</td><td><code>failure</code></td><td>The KMP failure function of a pattern, built by matching the pattern against itself.</td></tr>
+    <tr><td>4</td><td><code>kmpAll</code></td><td>Every occurrence of a pattern in a text, overlapping ones included, by the KMP scan, counting its character comparisons.</td></tr>
+    <tr><td>5</td><td><code>bmSearch</code></td><td>The first occurrence by Boyer-Moore with the bad-character rule, counting its character comparisons.</td></tr>
+    <tr><td>6</td><td><code>epsClosure</code></td><td>Every NFA state reachable from a set of states by epsilon-edges alone.</td></tr>
+    <tr><td>7</td><td><code>statesAfter</code></td><td>The set of states the NFA of a regular expression can be in after reading a text.</td></tr>
+  </table>
+  <p>The full contract of each function, with examples, is in the comment above it in the starter. The trie, the regular-expression construction (<code>buildNFA</code>) and <code>accepts</code> are given. The comparison counts in TODOs 4 and 5 must match the contract exactly. Every function is also tested on large inputs (texts of up to two million characters, a 300,000-state machine) with a time limit: write each one with the running time its contract states.</p>
+
+  <h2>The tests run themselves</h2>
+  <pre>g++ -std=c++17 -O2 hw10.cpp -o hw10 &amp;&amp; ./hw10</pre>
+  <p>Each check prints <code>[PASS]</code> or <code>[FAIL]</code>. The unmodified starter compiles and fails
+  most of them. The tries allocate memory: <code>valgrind --leak-check=full ./hw10</code> should report no leaks
+  (not graded).</p>
+
+  <div class="aside"><span class="tag">Build on the lab</span>
+    Code is graded on the CSS Linux lab with <code>g++ -std=c++17</code>. Build and run there at least once
+    before you submit; the
+    <a href="../../../guides/guide-computing-environment.html"><strong>Computing Environment</strong></a>
+    guide has the login and file-transfer commands. Code that does not compile on the lab receives no points.
+  </div>
+
+  <h2>Grading (10 pts)</h2>
+  <table class="pts">
+    <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
+    <tr><td>Compiles (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>does not compile: 0</td></tr>
+    <tr><td><code>insert</code> (TODO 1)</td><td>1</td><td rowspan="7">checked by our own test harness, on random inputs different from the battery's, and on large inputs with a time limit</td></tr>
+    <tr><td><code>longestPrefixOf</code> (TODO 2)</td><td>1</td></tr>
+    <tr><td><code>failure</code> (TODO 3)</td><td>1</td></tr>
+    <tr><td><code>kmpAll</code> (TODO 4)</td><td>2</td></tr>
+    <tr><td><code>bmSearch</code> (TODO 5)</td><td>1</td></tr>
+    <tr><td><code>epsClosure</code> (TODO 6)</td><td>1</td></tr>
+    <tr><td><code>statesAfter</code> (TODO 7)</td><td>1</td></tr>
+    <tr><td>Your test battery passes</td><td>2</td><td>all: 2 · most: 1</td></tr>
+  </table>
+  <p>Homework is 8% of the course grade, with the lowest two homework scores dropped.</p>
+
+  <h2>Reading</h2>
+  <ul>
+    <li><a href="../../../textbook/strings/ds-tries.html">Tries and Ternary Search Trees</a>, sections 2 and 4.</li>
+    <li><a href="../../../textbook/strings/foundation-substring-search.html">Substring Search: The Problem and Baselines</a>, <a href="../../../textbook/strings/algo-kmp.html">Knuth-Morris-Pratt</a> and <a href="../../../textbook/strings/algo-boyer-moore.html">Boyer-Moore</a>.</li>
+    <li><a href="../../../textbook/strings/algo-regex-automata.html">Regular Expressions and Automata</a>, sections 3 and 4.</li>
+    <li>The demos: <a href="../../../lib/demo.html?ds=trie">trie</a>, <a href="../../../lib/demo.html?ds=kmp-fail">KMP failure function</a>, <a href="../../../lib/demo.html?ds=string-search">substring-search race</a>, <a href="../../../lib/demo.html?ds=nfa-build">regex to NFA</a> and <a href="../../../lib/demo.html?ds=nfa-sim">NFA simulation</a>.</li>
+  </ul>
+
+  <h2>Submit</h2>
+  <p>One <code>.zip</code> file on Canvas, containing your finished <code>hw10.cpp</code> and anything else you
+  want to include. Keep the file name <code>hw10.cpp</code>. Resubmissions are allowed until the deadline; the
+  last one is graded. To make the zip on the lab: <code>zip hw10.zip hw10.cpp</code>.
+  <strong>Due Fri Dec 11, 11:59 PM.</strong> Late tokens do not apply: Friday, December 11 is the last day of
+  instruction, and nothing is accepted after it.</p>
+  <footer>CSS 343 · Autumn 2026 · Homework 10 · prepared by Dr. Marcel Gavriliu.</footer>
+</div>
+</body>
+</html>
