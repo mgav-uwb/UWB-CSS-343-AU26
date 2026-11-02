@@ -19,7 +19,7 @@
 
 ## A clock for DFS
 
-Give DFS one counter. Stamp each vertex **twice**: when its call starts and when it returns.
+Give DFS one counter, `timer`. Stamp each vertex **twice**: its **discovery time** $\text{pre}[u]$ when its call starts, and its **finish time** $\text{post}[u]$ when the call returns.
 
 ```cpp
 int timer = 0;                              // the clock (clock() is taken by C)
