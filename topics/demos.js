@@ -23,7 +23,7 @@ import { DEMOS } from "../lib/demos/registry.js";
 
 // ── 2. slide specs (from the Summer lecture pages, unchanged in behavior) ──
 const heapViews = () => [
-  (c) => new ArrayRenderer(c, { mode: "cells" }),
+  (c) => new ArrayRenderer(c, { mode: "cells", pointerRows: 1 }),  // one pointer, k
   (c) => new HeapTreeRenderer(c),
 ];
 // a buildAll that honours the box's METHOD(keys) wrapper, limited to some methods
@@ -160,7 +160,7 @@ const HASH_SPECS = {
   "probe-delete-pitfalls": { use: "probe-delete-pitfalls", width: 1000 },
   // the registry race, with shorter panels so three fit on a 620-px slide
   "probe-race": { ...DEMOS["probe-race"], width: 1000,
-                  panels: DEMOS["probe-race"].panels.map((p) => ({ ...p, height: 50 })) },
+                  panels: DEMOS["probe-race"].panels.map((p) => ({ ...p, height: 74 })) },
   // 2→2, 8→8, 14→3, 20→9; inserting 25: home 3 is taken, probes to 4
   "hash-probe": {
     title: "probing table (M = 11, fixed)",
@@ -233,12 +233,12 @@ const outputView = (inner) => ({ draw: (snap, hl) => inner.draw(hl?.nodes?.done 
 const graphDual = (h) => ({
   renderer: [
     (c) => new GraphRenderer(c, { directed: true }),
-    (c) => frontierView(new ArrayRenderer(c, { mode: "cells", pointers: false })),
-    (c) => outputView(new ArrayRenderer(c, { mode: "cells", pointers: false })),
+    (c) => frontierView(new ArrayRenderer(c, { mode: "cells", pointers: false, indices: false })),
+    (c) => outputView(new ArrayRenderer(c, { mode: "cells", pointers: false, indices: false })),
   ],
   labels: ["", "the frontier: BFS the queue · DFS the recursion stack · topo the ready set",
                "the OUTPUT so far: BFS visit order · DFS finish order (reverse → topo) · Kahn the topological order"],
-  height: [h, 34, 34],
+  height: [h, 40, 40],
 });
 const dfsOp = { name: "DFS from", arg: "number", desc: "dive along unvisited edges, backtrack at dead ends; a back edge to a stack ancestor = a CYCLE", run: (s, v) => s.dfs(v) };
 const bfsOp = { name: "BFS from", arg: "number", desc: "explore in layers via the queue; each label = fewest edges from the start", run: (s, v) => s.bfs(v) };
@@ -292,9 +292,9 @@ const GRAPH_SPECS = {
   "dijkstra": wgraphBase(),
   "dijkstra-neg": wgraphBase(),
   // Lecture 10 and 11 graph algorithms (lib/demos/graph-algos.js), sized for 1280x620
-  "dfs-edges": { use: "dfs-edges", width: 960, height: [215, 34] },
-  "scc": { use: "scc", width: 960, height: [215, 34] },
-  "bellman-ford": { use: "bellman-ford", width: 960, height: [200, 34] },
+  "dfs-edges": { use: "dfs-edges", width: 960, height: [215, 40] },
+  "scc": { use: "scc", width: 960, height: [215, 40] },
+  "bellman-ford": { use: "bellman-ford", width: 960, height: [200, 40] },
 };
 
 // static figures drawn from the engines (they cannot drift from the demos)

@@ -86,7 +86,7 @@ Yet real libraries mostly use **linear** probing: with a strong hash and **low $
 
 --
 
-## Demo: The probe family, racing
+## Demo: the probe race
 
 <div class="algo-viz" data-algo="probe-race">
 <pre class="viz-fallback">
