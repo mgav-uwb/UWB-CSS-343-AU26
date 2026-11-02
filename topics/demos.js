@@ -293,7 +293,7 @@ const GRAPH_SPECS = {
   "dijkstra-neg": wgraphBase(),
   // Lecture 10 and 11 graph algorithms (lib/demos/graph-algos.js), sized for 1280x620
   "dfs-edges": { use: "dfs-edges", width: 960, height: [215, 40] },
-  "scc": { use: "scc", width: 960, height: [215, 40] },
+  "scc": { use: "scc", width: 960, height: [285, 40] },
   "bellman-ford": { use: "bellman-ford", width: 960, height: [200, 40] },
 };
 
