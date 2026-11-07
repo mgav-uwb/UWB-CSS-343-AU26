@@ -111,6 +111,7 @@
   .marks:empty{display:none}
   .qm{font:600 12px "Outfit",sans-serif;border:1px solid var(--line);border-radius:8px;padding:3px 10px;background:var(--sky);color:var(--sky-d)}
   .qm.exam{border-color:#e0a9bd;color:var(--rose-d);background:var(--rose)}
+  a.qm{text-decoration:none}
   .marks .pa{margin:0}
   .marks .hwc{font:600 12px "Outfit",sans-serif;border-radius:8px;padding:3px 10px;background:var(--lemon);color:var(--lemon-d);text-decoration:none;border:1px solid #e6d8a8}
   .marks .hwc.off{background:#fff;color:var(--dim);border-style:dashed}
@@ -412,6 +413,9 @@ const DEMOS = {
   "nfa2dfa":                { title:"NFA → DFA", desc:"subset construction, then the race" },
 };
 
+// on the week before the exam and on the exam's week: the exam's week is collapsed until that Monday
+const PRACTICE_MIDTERM = { exam:"sessions/S12-midterm/practice-midterm.pdf", key:"sessions/S12-midterm/practice-midterm-key.pdf", label:"Practice midterm" };
+
 // ───────── one row per week: its two meetings, homework, quiz, milestones, reading, demos ─────────
 const WEEKS = [
   { id:"W1",
@@ -473,6 +477,7 @@ const WEEKS = [
     wed:{ id:"L11", date:"Wed Nov 4", title:"Graphs III: Dijkstra Shortest Paths", topics:"weighted digraphs · edge relaxation · Dijkstra with a priority queue · the greedy method, first contact", dir:"sessions/S11-dijkstra" },
     hw:{"n": 6, "href": "sessions/S11-dijkstra/hw06/HW06.html", "due": "due Sun Nov 8, 11:59 PM"},
     quiz:"Q5 Mon",
+    practice:PRACTICE_MIDTERM,
     handouts:["dfs", "topological-sort", "strongly-connected-components", "greedy-method", "dijkstra", "bellman-ford"],
     demos:["graph", "dfs-edges", "scc", "dijkstra", "bellman-ford"] },
   { id:"W7",
@@ -482,6 +487,7 @@ const WEEKS = [
     mon:{ id:"MT", date:"Mon Nov 9", title:"Midterm Exam", topics:"in class, on paper, 120 minutes · covers Lectures 1 to 11", exam:true },
     wed:null,
     quiz:"Midterm Mon",
+    practice:PRACTICE_MIDTERM,
     handouts:[],
     demos:[] },
   { id:"W8",
@@ -553,6 +559,7 @@ const marks = w => {
   if (w.hw) out.push(w.hw.href ? `<a class="hwc" href="${w.hw.href}">✏️ Homework ${w.hw.n}${w.hw.due ? " · " + w.hw.due : ""}</a>`
                               : `<span class="hwc off">✏️ Homework ${w.hw.n}</span>`);
   if (w.quiz) out.push(`<span class="qm${isExam(w.quiz) ? " exam" : ""}">${isExam(w.quiz) ? "🎓 " : "📝 "}${w.quiz}</span>`);
+  if (w.practice) out.push(`<a class="qm exam" href="${w.practice.exam}">📄 ${w.practice.label}</a><a class="qm exam" href="${w.practice.key}">Answer key</a>`);
   if (w.pa) out.push(`<span class="pa">${w.pa}</span>`);
   return out.length ? `<div class="marks">${out.join("")}</div>` : "";
 };
