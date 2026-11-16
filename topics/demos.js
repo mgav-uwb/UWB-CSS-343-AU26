@@ -18,7 +18,8 @@
 
 import { initDeckDemos, AVL, BST, TwoThree, RedBlack, MaxHeap, TreeRenderer, MultiwayTreeRenderer, ArrayRenderer, HeapTreeRenderer,
   LinearProbing, SeparateChaining, ChainRenderer, chainingInfo, openAddressingInfo,
-  Graph, graphInfo, GraphRenderer, renderTraceTable, WeightedGraph } from "../lib/deck.js";
+  Graph, graphInfo, GraphRenderer, renderTraceTable, WeightedGraph,
+  Intervals, IntervalRenderer, Huffman, codecSpec, adaptiveCodecSpec } from "../lib/deck.js";
 import { DEMOS } from "../lib/demos/registry.js";
 
 // ── 2. slide specs (from the Summer lecture pages, unchanged in behavior) ──
@@ -329,8 +330,67 @@ function mountStatic() {
   }
 }
 
+// ── greedy algorithms and Huffman coding (Lecture 14) ──
+// One interval instance, both greedies: a[1,5) b[2,6) c[3,7) d[7,9) e[8,11).
+// Rooms gives 3 (the depth), Select gives 2 (a, d): same picture, different
+// question, different answer.
+const FIVE_REQUESTS = "1 5, 2 6, 3 7, 7 9, 8 11";
+const CLRS_FREQS = "5, 9, 12, 13, 16, 45";     // a:5 b:9 c:12 d:13 e:16 f:45, 224 bits
+const GREEDY_SPECS = {
+  "intervals": {
+    make: () => new Intervals(),
+    initial: FIVE_REQUESTS,
+    initialPlaceholder: "start finish, …",
+    initialTitle: "half-open intervals \"start finish\", comma-separated",
+    loadRaw: true,            // Build just shows the requests; the OPS are the algorithms
+    renderer: (c) => new IntervalRenderer(c, { rowH: 26 }),
+    stateMsg: (s) => `${s.iv.length} requests: ${s.inorder()}; depth ${s.peakOverlap()}`,
+    ops: [
+      { name: "Rooms", desc: "interval partitioning: the fewest rooms that host them all", run: (s) => s.rooms() },
+      { name: "Select", desc: "activity selection: the most requests in one room", run: (s) => s.select() },
+    ],
+    costs: ["compare", "write"], chrome: { showCosts: true },
+    width: 860, height: 210,
+  },
+  // the build: the pool (smallest first) above the forest it is folded into
+  "huffman-build": {
+    make: () => new Huffman(),
+    initial: CLRS_FREQS,
+    initialPlaceholder: "TEXT(…) · SYM-FRQ(a:20, b:17) · SYM-RAND(a..h) · 5, 9, 12",
+    initialTitle: "TEXT(real text) · SYM-FRQ(a:20, b:17) · SYM-RAND(a..h) · or plain frequencies for a, b, c, …",
+    initialWidth: 250,
+    presets: [
+      { name: "CLRS (5,9,12,13,16,45)", initial: CLRS_FREQS },
+      { name: "real text, spaces and all", initial: "TEXT(the white fox jumped over the white fence by the white house)" },
+      { name: "average English (26 letters + space)", initial: "ENGLISH" },
+      { name: "equal frequencies: no saving", initial: "8, 8, 8, 8" },
+    ],
+    buildAll: (s, keys, vals, method, raw) => s.buildInput(raw, keys),
+    renderer: [
+      (c) => new ArrayRenderer(c, { mode: "cells", pointers: false }),
+      (c) => new TreeRenderer(c, { labels: "sym" }),
+    ],
+    stateMsg: (s) => s.statsLine() || `Huffman tree: ${s.inorder()}`,
+    costs: ["compare", "link", "alloc"], chrome: { showCosts: true },
+    width: 900, height: [66, 250],
+  },
+  // the code USED: the tree on top, then text · bits · decoded text; Decode
+  // consumes exactly the bits Encode produced
+  "huffman-codes": {
+    ...codecSpec(),
+    width: 900, height: [180, 104],
+    chrome: { showValue: false, showOps: false, showCosts: false },
+  },
+  // the tree is built BY THE TEXT; Decode starts from an empty tree
+  "adaptive-huffman": {
+    ...adaptiveCodecSpec(),
+    width: 900, height: [186, 100],
+    chrome: { showValue: false, showOps: false, showClear: false, showCosts: false },
+  },
+};
+
 const slots = Object.fromEntries(Object.keys(DEMOS).map((slug) => [slug, { use: slug }]));
-initDeckDemos({ ...slots, ...SLIDE_SPECS, ...HASH_SPECS, ...GRAPH_SPECS });
+initDeckDemos({ ...slots, ...SLIDE_SPECS, ...HASH_SPECS, ...GRAPH_SPECS, ...GREEDY_SPECS });
 
 // ── 3. Summer canvas demos, loaded on demand ──
 const here = new URL(".", import.meta.url);
