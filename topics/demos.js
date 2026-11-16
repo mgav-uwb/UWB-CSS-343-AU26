@@ -296,9 +296,10 @@ const GRAPH_SPECS = {
   "dfs-edges": { use: "dfs-edges", width: 960, height: [215, 40] },
   "scc": { use: "scc", width: 960, height: [285, 40] },
   "bellman-ford": { use: "bellman-ford", width: 960, height: [200, 40] },
-  // Lecture 13 MST demos (lib/demos/mst.js) on the library's hand layout: a slide's graph
-  // canvas is short and wide, where the round ring would leave the eight vertices cramped
-  "kruskal": { use: "kruskal", make: () => new WeightedGraph({ directed: false }) },
+  // Lecture 13 MST demos (lib/demos/mst.js). Kruskal: the ring, as in the slides' figures;
+  // the topic lays the graph and the union-find forest side by side, so the graph gets the
+  // full height. Prim: the hand layout, since its heap row sits under a short graph canvas
+  "kruskal": { use: "kruskal", make: () => new WeightedGraph({ directed: false, layout: "circle" }) },
   "prim": { use: "prim", make: () => new WeightedGraph({ directed: false }) },
 };
 

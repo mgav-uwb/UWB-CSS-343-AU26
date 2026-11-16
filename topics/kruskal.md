@@ -116,11 +116,11 @@ The edges run out after $V - c$ additions, for $c$ components: one MST **per com
 
 ## Demo: Kruskal
 
-<div class="algo-viz" data-algo="kruskal" data-config='{"width":960,"height":[130,190],"chrome":{"costsInline":true}}'>
+<div class="algo-viz" data-algo="kruskal" data-config='{"width":960,"layout":"row","cols":[580,380],"height":300,"labels":["the graph: accent edges = the MST so far","the union-find forest: same root, so skip"],"chrome":{"costsInline":true}}'>
 <pre class="viz-fallback">
    edges cheapest-first: ADD an edge if its ends have
    different union-find roots, SKIP it if they share one
-   (a cycle). the second row is that union-find forest,
+   (a cycle). the right panel is that union-find forest,
    merging as edges are added. MST weight 31.
 [ interactive demo: open this deck on the course site ]
 </pre>
