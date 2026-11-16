@@ -2,9 +2,9 @@
   TOPIC · Union-find.
   Teaches: disjoint sets and dynamic connectivity; the two-array structure; quick-find and quick-union and the trade they make; weighting (union by size) and the doubling proof of the log₂ n height; path compression, full and halving; the cost table and the inverse Ackermann function; connected components online; what union-find cannot do.
   Needs:   trees (parent links, height), amortized cost.
-  Demos:   union-find (registry); figures uf-quick-find, uf-quick-union, uf-forest, uf-weighting, uf-full, uf-halving (tools/gen-wgraph-figures.mjs)
+  Demos:   union-find (registry); figures uf-quick-find, uf-quick-union, uf-forest, uf-weighting, uf-full, uf-halving, uf-components (tools/gen-wgraph-figures.mjs)
   Program: code/union-find/uf.cpp (every slide's code, compiled and run on the slide examples)
-  Budget:  ~34 min, 19 slides.
+  Budget:  ~34 min, 20 slides.
   Ported from Summer 2026 L11-mst-union-find.md, part 1.
 -->
 
@@ -287,19 +287,33 @@ $A\_4(1)$ is far larger than $10^{80}$, the estimated number of atoms in the obs
 
 --
 
-## Components, online
+## Connected components
+
+An **undirected** graph arrives as a list of edges. How many **connected components** does it have, and are $u$ and $v$ in the same one?
 
 ```cpp
 UF uf(V);
-for (const Edge& e : edges) uf.unite(e.u, e.v);   // each set: a component
+for (const Edge& e : edges) uf.unite(e.u, e.v);   // u and v: one component
 int components = 0;
 for (int v = 0; v < V; v++)
-    if (uf.find(v) == v) components++;            // one root per set
+    if (uf.find(v) == v) components++;            // one root per component
 ```
 
-Unlike a DFS, union-find takes the edges **one at a time, in any order**, and answers `connected` between arrivals.
+When the edges are all in, each **set** is one **component**: two vertices share a set iff a path joins them.
 
-Also: Kruskal's cycle test, image segmentation (merge neighbouring pixels of one colour), percolation, type inference.
+--
+
+## Components, worked
+
+<div><img src="../../topics/figures/wgraphs/wg-uf-components.svg" style="height:220px" alt="
+   edges in arrival order: 0-1, 2-3, 4-5, 1-2, 6-7, 0-3
+   after all six: {0, 1, 2, 3}, {4, 5}, {6, 7}
+   0-3 joins two vertices already in one set: unite returns false
+   parent = 0 0 0 0 4 4 6 6, roots 0, 4, 6: 3 components"></div>
+
+Edge 6, 0–3, closes a **cycle**: `unite` returns `false` and nothing changes. Kruskal's algorithm skips exactly these edges.
+
+<small>Unlike a DFS, union-find takes the edges **one at a time, in any order**, and answers `connected` between arrivals. On a **directed** graph it ignores direction: these are not the strongly connected components.</small>
 
 --
 

@@ -91,15 +91,15 @@ int find(int x) {
 }
 }  // namespace halving
 
-// ---- slide "Connected components, online" -----------------------------------------
+// ---- slide "Connected components" ---------------------------------------------------
 struct Edge { int u, v, w; };
 int countComponents(int V, const vector<Edge>& edges) {
     using full::UF;
 UF uf(V);
-for (const Edge& e : edges) uf.unite(e.u, e.v);   // each set: a component
+for (const Edge& e : edges) uf.unite(e.u, e.v);   // u and v: one component
 int components = 0;
 for (int v = 0; v < V; v++)
-    if (uf.find(v) == v) components++;            // one root per set
+    if (uf.find(v) == v) components++;            // one root per component
     return components;
 }
 
@@ -178,5 +178,14 @@ int main() {
     int comps = countComponents(10, course);
     cout << "components of the course graph on 10 vertices: " << comps << "\n";
     assert(comps == 3);
+
+    // Components, worked: edges 0-1, 2-3, 4-5, 1-2, 6-7, 0-3 on 0..7; only 0-3 finds one set
+    full::UF cw(8);
+    string merged;
+    for (auto [u, v] : vector<pair<int, int>>{{0, 1}, {2, 3}, {4, 5}, {1, 2}, {6, 7}, {0, 3}}) merged += cw.unite(u, v) ? "T" : "F";
+    cout << "components, worked: merges " << merged << ", parent " << str(cw.parent) << "\n";
+    assert(merged == "TTTTTF" && str(cw.parent) == "0 0 0 0 4 4 6 6");
+    vector<Edge> worked = {{0, 1, 0}, {2, 3, 0}, {4, 5, 0}, {1, 2, 0}, {6, 7, 0}, {0, 3, 0}};
+    assert(countComponents(8, worked) == 3);
     cout << "uf: all slide numbers check\n";
 }
