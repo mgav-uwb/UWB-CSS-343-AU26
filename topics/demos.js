@@ -295,6 +295,10 @@ const GRAPH_SPECS = {
   "dfs-edges": { use: "dfs-edges", width: 960, height: [215, 40] },
   "scc": { use: "scc", width: 960, height: [285, 40] },
   "bellman-ford": { use: "bellman-ford", width: 960, height: [200, 40] },
+  // Lecture 13 MST demos (lib/demos/mst.js) on the library's hand layout: a slide's graph
+  // canvas is short and wide, where the round ring would leave the eight vertices cramped
+  "kruskal": { use: "kruskal", make: () => new WeightedGraph({ directed: false }) },
+  "prim": { use: "prim", make: () => new WeightedGraph({ directed: false }) },
 };
 
 // static figures drawn from the engines (they cannot drift from the demos)
