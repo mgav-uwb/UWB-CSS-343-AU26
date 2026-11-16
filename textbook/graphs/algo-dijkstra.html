@@ -876,20 +876,33 @@ fn relax(dist: &amp;mut [i64], parent: &amp;mut [Option&lt;usize&gt;], u: usize,
   <button class="ct-tab" data-lang="py">Python</button>
   <button class="ct-tab" data-lang="rs">Rust</button>
 </div>
-<pre class="ct-pane" data-lang="cpp">// Lazy Dijkstra: a min-heap of (dist, vertex) pairs. Settle a vertex the moment
+<pre class="ct-pane" data-lang="cpp">// Lazy Dijkstra: a min-heap of (dist, vertex) entries. Settle a vertex the moment
 // it POPS as the minimum; skip stale pops; relax its out-edges and push any
 // improved neighbor. Needs all weights &gt;= 0.
+struct Entry {
+    long d;    // the distance to v when the entry was pushed
+    int  v;    // the vertex
+};
+
+struct Greater {                           // makes priority_queue a min-heap
+    bool operator()(const Entry&amp; a, const Entry&amp; b) const {
+        if (a.d != b.d) return a.d &gt; b.d;  // farther compares greater
+        return a.v &gt; b.v;                  // equal distances: by vertex
+    }
+};
+
 vector&lt;long&gt; dijkstra(WGraph&amp; g, int s) {
     vector&lt;long&gt; dist(g.V, LONG_MAX);      // dist[v] = best-known cost s-&gt;v
     vector&lt;bool&gt; settled(g.V, false);      // settled[v] = dist[v] is final
-    priority_queue&lt;pair&lt;long,int&gt;, vector&lt;pair&lt;long,int&gt;&gt;,
-                   greater&lt;&gt;&gt; pq;              // min-heap keyed by distance
+    priority_queue&lt;Entry, vector&lt;Entry&gt;, Greater&gt; pq;   // nearest on top
     dist[s] = 0;
     pq.push({0, s});
     while (!pq.empty()) {
-        int u = pq.top().second; pq.pop();     // nearest unsettled
-        if (settled[u]) continue;              // stale entry: skip
-        settled[u] = true;                     // dist[u] is now FINAL
+        Entry top = pq.top();              // nearest unsettled
+        pq.pop();
+        int u = top.v;
+        if (settled[u]) continue;          // stale entry: skip
+        settled[u] = true;                 // dist[u] is now FINAL
         for (Edge e : g.adj[u])
             if (!settled[e.to] &amp;&amp; dist[u] + e.w &lt; dist[e.to]) {
                 dist[e.to] = dist[u] + e.w;     // relax: a cheaper route to e.to
@@ -1091,10 +1104,13 @@ fn dijkstra(g: &amp;WGraph, s: usize) -&gt; Vec&lt;i64&gt; {
         (the <a href="../heaps/ds-heaps-pq.html">Heaps &amp; Priority Queues</a>
         handout) answers
         it in \(O(\log V)\). This is the payoff for building heaps first: the
-        heap is the engine that makes Dijkstra fast. In C++ a
-        <code>priority_queue&lt;pair&lt;long,int&gt;, &hellip;, greater&lt;&gt;&gt;</code>
-        is a min-heap of \(\{\text{distance},\text{vertex}\}\) pairs, which compare
-        lexicographically, distance first, exactly as wanted.
+        heap is the engine that makes Dijkstra fast. In C++ the heap holds
+        <code>Entry</code> records \(\{\text{distance},\text{vertex}\}\). A
+        <code>priority_queue</code> keeps on top the entry that is
+        <em>greatest</em> by the comparison it is given, so the code gives it
+        <code>Greater</code>, which calls the farther entry the greater: the
+        nearest entry is then on top, a min-heap. Equal distances fall back to the
+        vertex number, which makes every run reproducible.
       </p>
       <p>
         A textbook heap cannot cheaply lower the key of an entry already inside it,

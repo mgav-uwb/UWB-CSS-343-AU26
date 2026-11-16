@@ -1,10 +1,10 @@
 <!--
   TOPIC · Dijkstra's algorithm.
-  Teaches: the greedy idea; why the nearest unsettled vertex is safe; settled and frontier vertices; the algorithm and a worked run; Dijkstra with a binary heap and lazy deletion; the cost; the O(V²) array-scan version; common bugs.
+  Teaches: the greedy idea; why the nearest unsettled vertex is safe; settled and frontier vertices; the heap's entries and their order (Greater); the algorithm and a worked run; Dijkstra with a binary heap and lazy deletion; the cost; the O(V²) array-scan version; common bugs.
   Needs:   edge relaxation, binary heaps.
   Demos:   dijkstra (slide spec); figures wg-zones, wg-worked, wg-practice, wg-course (tools/gen-wgraph-figures.mjs)
-  Program: none
-  Budget:  ~32 min, 15 slides.
+  Program: topics/code/dijkstra/dijkstra.cpp (every C++ block, compiled and run on the slide examples)
+  Budget:  ~32 min, 16 slides.
   Ported from Summer 2026 L09-graphs-dijkstra.md, parts 4.
 -->
 
@@ -51,18 +51,39 @@ Correctness of the greedy step is what **buys the speed**.
 
 --
 
+## The heap's entries
+
+```cpp
+struct Entry {
+    long d;     // the distance to v when pushed
+    int v;      // the vertex
+};
+
+struct Greater {                               // the heap's comparison
+    bool operator()(const Entry& a, const Entry& b) const {
+        if (a.d != b.d) return a.d > b.d;      // farther compares greater
+        return a.v > b.v;                      // equal distances: by vertex
+    }
+};
+
+priority_queue<Entry, vector<Entry>, Greater> pq;   // nearest on top
+```
+
+`priority_queue` keeps on top the entry that is **greatest** by its comparison. `Greater` reverses the comparison, so the **nearest** entry is on top: a min-heap.
+
+--
+
 ## Dijkstra: the algorithm
 
 ```cpp
-using Entry = pair<long, int>;                // (dist, vertex)
-
 void dijkstra(int s) {
     dist.assign(V, INF);  settled.assign(V, false);
     dist[s] = 0;
-    priority_queue<Entry, vector<Entry>, greater<Entry>> pq;   // a min-heap
+    priority_queue<Entry, vector<Entry>, Greater> pq;   // a min-heap
     pq.push({0, s});
     while (!pq.empty()) {
-        int u = pq.top().second;  pq.pop();   // the nearest unsettled
+        Entry top = pq.top();  pq.pop();      // the nearest unsettled
+        int u = top.v;
         if (settled[u]) continue;             // a stale entry: skip it
         settled[u] = true;                    // dist[u] is now final
         for (Edge e : adj[u])                 // relax the out-edges
@@ -163,7 +184,7 @@ The bottleneck is "which unsettled vertex is nearest?": a **min-heap priority qu
 - `push` is a heap insert (swim): $O(\log V)$
 - `top` and `pop` are a delete-min (sink): $O(\log V)$
 
-In C++, `priority_queue` with `greater` is a min-heap. **This is why we built heaps first.**
+In C++, `priority_queue` with the `Greater` comparison is that min-heap. **This is why we built heaps first.**
 
 --
 
@@ -172,7 +193,8 @@ In C++, `priority_queue` with `greater` is a min-heap. **This is why we built he
 When we relax $v$, we **push a new** (smaller) entry: we don't update the old one. Old entries go **stale**, and the pop skips them:
 
 ```cpp
-int u = pq.top().second;  pq.pop();
+Entry top = pq.top();  pq.pop();
+int u = top.v;
 if (settled[u]) continue;             // a stale entry: skip it
 ```
 

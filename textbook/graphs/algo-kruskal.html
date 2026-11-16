@@ -171,9 +171,10 @@
 // yet connected (union-find is the cycle check). Stop after V-1 edges.
 struct Edge { int u, v; long w; };
 
+bool lighter(const Edge&amp; a, const Edge&amp; b) { return a.w &lt; b.w; }
+
 vector&lt;Edge&gt; kruskal(int V, vector&lt;Edge&gt; edges) {
-    sort(edges.begin(), edges.end(),
-         [](const Edge&amp; a, const Edge&amp; b) { return a.w &lt; b.w; });
+    sort(edges.begin(), edges.end(), lighter);   // cheapest first
     UF uf(V);                                    // from union-find.cpp
     vector&lt;Edge&gt; mst;
     for (const Edge&amp; e : edges) {

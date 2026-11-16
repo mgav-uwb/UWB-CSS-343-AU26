@@ -180,17 +180,32 @@
 // otherwise take it. adj[u] = u&#x27;s weighted edges. Returns the MST total weight.
 struct Edge { int to; long w; };
 
+struct Entry {
+    long w;    // the weight of the edge into v
+    int  v;    // the vertex it reaches
+};
+
+struct Greater {                           // makes priority_queue a min-heap
+    bool operator()(const Entry&amp; a, const Entry&amp; b) const {
+        if (a.w != b.w) return a.w &gt; b.w;  // heavier compares greater
+        return a.v &gt; b.v;                  // equal weights: by vertex
+    }
+};
+
 long prim(int V, vector&lt;vector&lt;Edge&gt;&gt;&amp; adj, int s) {
     vector&lt;bool&gt; inTree(V, false);
-    priority_queue&lt;pair&lt;long,int&gt;, vector&lt;pair&lt;long,int&gt;&gt;,
-                   greater&lt;&gt;&gt; pq;                 // min-heap keyed by edge weight
+    priority_queue&lt;Entry, vector&lt;Entry&gt;, Greater&gt; pq;   // lightest on top
     long total = 0; int picked = 0;
     inTree[s] = true;
     for (Edge e : adj[s]) pq.push({e.w, e.to});   // edges leaving the start
     while (picked &lt; V - 1 &amp;&amp; !pq.empty()) {
-        auto [w, u] = pq.top(); pq.pop();
+        Entry top = pq.top();                     // the lightest candidate
+        pq.pop();
+        int u = top.v;
         if (inTree[u]) continue;                  // stale: both ends already in
-        inTree[u] = true; total += w; picked++;   // take the crossing edge
+        inTree[u] = true;                         // take the crossing edge
+        total += top.w;
+        picked++;
         for (Edge e : adj[u])
             if (!inTree[e.to]) pq.push({e.w, e.to});
     }
