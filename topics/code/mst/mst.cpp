@@ -57,7 +57,8 @@ vector<Edge> kruskal(int V, vector<Edge> edges) {
 }
 }  // namespace kr
 
-// ---- slide "Prim: the code" (the weighted adjacency list of the shortest-paths topic)
+// ---- slides "The entries and their order" and "Prim: the code" (the weighted adjacency
+//      list of the shortest-paths topic)
 namespace pr {
 struct Edge {
     int to;   // the neighbor this edge leads to
@@ -66,43 +67,66 @@ struct Edge {
 int V;
 vector<vector<Edge>> adj;
 
-using Entry = pair<int, int>;                  // (weight, vertex)
+struct Entry {
+    int w;      // the weight of the edge into v
+    int v;      // the vertex it reaches
+};
+
+struct Greater {                               // the heap's comparison
+    bool operator()(const Entry& a, const Entry& b) const {
+        if (a.w != b.w) return a.w > b.w;      // heavier compares greater
+        return a.v > b.v;                      // equal weights: by vertex
+    }
+};
+
+priority_queue<Entry, vector<Entry>, Greater> pq;   // lightest on top
 
 long prim(int s) {                             // adj: the weighted lists
     vector<bool> inTree(V, false);
-    priority_queue<Entry, vector<Entry>, greater<Entry>> pq;   // a min-heap
+    priority_queue<Entry, vector<Entry>, Greater> pq;
     long total = 0;
     pq.push({0, s});                           // s joins at no cost
     while (!pq.empty()) {
-        auto [w, u] = pq.top();  pq.pop();     // the lightest candidate
+        Entry top = pq.top();                  // the lightest candidate
+        pq.pop();
+        int u = top.v;
         if (inTree[u]) continue;               // stale: u is already in
-        inTree[u] = true;  total += w;         // take the edge into u
+        inTree[u] = true;                      // take the edge into u
+        total += top.w;
         for (Edge e : adj[u])
             if (!inTree[e.to]) pq.push({e.w, e.to});
     }
     return total;
 }
 
+// the slide's heap declaration (the global pq above), and its tie rule
+void declareHeap() {
+    pq.push({5, 3}); pq.push({4, 1}); pq.push({6, 3}); pq.push({4, 0});
+    assert(pq.top().w == 4 && pq.top().v == 0);   // equal weights: the smaller vertex first
+}
+
 // the same loop, printing each pop and the heap after it, and the join order
 long primTraced(int s, vector<int>& order, vector<string>& rows) {
     vector<bool> inTree(V, false);
-    priority_queue<Entry, vector<Entry>, greater<Entry>> pq;
+    priority_queue<Entry, vector<Entry>, Greater> pq;
     long total = 0;
     pq.push({0, s});
     while (!pq.empty()) {
-        auto [w, u] = pq.top();  pq.pop();
-        string row = "(" + to_string(w) + ", " + to_string(u) + ") | ";
+        Entry top = pq.top();
+        pq.pop();
+        int u = top.v;
+        string row = "(" + to_string(top.w) + ", " + to_string(u) + ") | ";
         if (inTree[u]) row += "stale: skip";
         else {
-            inTree[u] = true;  total += w;  order.push_back(u);
+            inTree[u] = true;  total += top.w;  order.push_back(u);
             for (Edge e : adj[u])
                 if (!inTree[e.to]) pq.push({e.w, e.to});
             row += to_string(u) + " joins";
         }
         row += " | " + to_string(total) + " |";
-        auto copy = pq;
+        priority_queue<Entry, vector<Entry>, Greater> copy = pq;
         if (copy.empty()) row += " empty";
-        while (!copy.empty()) { row += " (" + to_string(copy.top().first) + ", " + to_string(copy.top().second) + ")"; copy.pop(); }
+        while (!copy.empty()) { row += " (" + to_string(copy.top().w) + ", " + to_string(copy.top().v) + ")"; copy.pop(); }
         rows.push_back(row);
     }
     return total;
@@ -128,7 +152,7 @@ void load(int n, const vector<vector<int>>& triples) {
 }
 }  // namespace pr
 
-// ---- slide "Prim without a heap" --------------------------------------------------
+// ---- slide "Prim with an array" (the appendix topic prim-array) ----------------------
 long primArray(const vector<vector<int>>& w, int s) {  // w[u][v], INF: none
     int n = w.size();
     vector<int> best(n, INF);  vector<bool> inTree(n, false);
@@ -185,6 +209,7 @@ int main() {
     }
 
     // Prim from 0: the slide's code, the traced copy, and the join order
+    pr::declareHeap();
     pr::load(8, COURSE);
     long p = pr::prim(0);
     vector<int> order; vector<string> rows;

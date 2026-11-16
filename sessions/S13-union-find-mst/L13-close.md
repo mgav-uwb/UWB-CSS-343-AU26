@@ -14,7 +14,7 @@
 - **union-find**: weighting keeps every tree at most $\log\_2 n$ tall; path compression flattens it; together $O(\alpha(n))$ amortized per operation
 - the **cut property**: the lightest edge across any cut is in some MST (the exchange proof)
 - **Kruskal**: sort, then union-find as the cycle test: $O(E \log V)$
-- **Prim**: one tree and a min-heap: $O(E \log V)$; $O(V^2)$ with an array scan
+- **Prim**: one tree and a min-heap: $O(E \log V)$; $O(V^2)$ with an array scan (appendix)
 
 --
 

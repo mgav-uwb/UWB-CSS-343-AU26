@@ -296,11 +296,20 @@ const GRAPH_SPECS = {
   "dfs-edges": { use: "dfs-edges", width: 960, height: [215, 40] },
   "scc": { use: "scc", width: 960, height: [285, 40] },
   "bellman-ford": { use: "bellman-ford", width: 960, height: [200, 40] },
-  // Lecture 13 MST demos (lib/demos/mst.js). Kruskal: the ring, as in the slides' figures;
-  // the topic lays the graph and the union-find forest side by side, so the graph gets the
-  // full height. Prim: the hand layout, since its heap row sits under a short graph canvas
+  // Lecture 13 MST demos (lib/demos/mst.js), on the ring the slides' figures use. Each topic
+  // lays the graph beside its second canvas (Kruskal's union-find forest, Prim's heap), so
+  // the graph keeps the full height; Prim's heap wraps onto several rows in its narrow column
   "kruskal": { use: "kruskal", make: () => new WeightedGraph({ directed: false, layout: "circle" }) },
-  "prim": { use: "prim", make: () => new WeightedGraph({ directed: false }) },
+  "prim": {
+    use: "prim", make: () => new WeightedGraph({ directed: false, layout: "circle" }),
+    renderer: [
+      (c) => new GraphRenderer(c, { directed: false }),
+      (c) => {
+        const heap = new ArrayRenderer(c, { mode: "cells", pointers: false, wrapCell: 40 });
+        return { draw: (snap, hl) => heap.draw(snap?.pq ?? [], hl?.pq ?? {}) };
+      },
+    ],
+  },
 };
 
 // static figures drawn from the engines (they cannot drift from the demos)

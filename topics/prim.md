@@ -1,6 +1,6 @@
 <!--
   TOPIC · Prim's algorithm.
-  Teaches: grow one tree by its lightest exit (the tree-against-the-rest cut); the lazy min-heap of candidate edges and stale entries; the code; the run on the course graph and its heap, traced; the MST is not the shortest-path tree; Prim against Dijkstra and against Kruskal; the O(V²) array-scan version for dense graphs.
+  Teaches: grow one tree by its lightest exit (the tree-against-the-rest cut); the lazy min-heap of candidate edges and stale entries; the heap's entries and their order (Greater); the code; the run on the course graph and its heap, traced; the MST is not the shortest-path tree; Prim against Dijkstra and against Kruskal. The O(V²) array version is the appendix topic prim-array.md.
   Needs:   minimum spanning trees (the cut property), binary heaps, Dijkstra's algorithm (lazy deletion), the weighted adjacency list.
   Demos:   prim (slide spec); figures prim-run-a, prim-run-b, prim-vs-spt (tools/gen-wgraph-figures.mjs)
   Program: code/mst/mst.cpp (the slides' code, compiled and run on the course graph; prints the heap trace)
@@ -56,20 +56,43 @@ A **min-heap** of (weight, vertex) entries:
 
 --
 
+## The entries and their order
+
+```cpp
+struct Entry {
+    int w;      // the weight of the edge into v
+    int v;      // the vertex it reaches
+};
+
+struct Greater {                               // the heap's comparison
+    bool operator()(const Entry& a, const Entry& b) const {
+        if (a.w != b.w) return a.w > b.w;      // heavier compares greater
+        return a.v > b.v;                      // equal weights: by vertex
+    }
+};
+
+priority_queue<Entry, vector<Entry>, Greater> pq;   // lightest on top
+```
+
+`priority_queue` keeps on top the entry that is **greatest** by its comparison. `Greater` reverses the comparison, so the **lightest** entry is on top: a min-heap.
+
+--
+
 ## Prim: the code
 
-```cpp [9-13]
-using Entry = pair<int, int>;                  // (weight, vertex)
-
+```cpp [7-14]
 long prim(int s) {                             // adj: the weighted lists
     vector<bool> inTree(V, false);
-    priority_queue<Entry, vector<Entry>, greater<Entry>> pq;   // a min-heap
+    priority_queue<Entry, vector<Entry>, Greater> pq;
     long total = 0;
     pq.push({0, s});                           // s joins at no cost
     while (!pq.empty()) {
-        auto [w, u] = pq.top();  pq.pop();     // the lightest candidate
+        Entry top = pq.top();                  // the lightest candidate
+        pq.pop();
+        int u = top.v;
         if (inTree[u]) continue;               // stale: u is already in
-        inTree[u] = true;  total += w;         // take the edge into u
+        inTree[u] = true;                      // take the edge into u
+        total += top.w;
         for (Edge e : adj[u])
             if (!inTree[e.to]) pq.push({e.w, e.to});
     }
@@ -137,10 +160,10 @@ Three entries for vertex 3: **(5, 3)** wins; **(6, 3)** and **(8, 3)** are now s
 
 <small>Run **Prim from** 0: red heap entries are stale. From 6: the same tree, in another order.</small>
 
-<div class="algo-viz" data-algo="prim" data-config='{"width":960,"height":[180,62],"chrome":{"costsInline":true}}'>
+<div class="algo-viz" data-algo="prim" data-config='{"width":960,"layout":"row","cols":[580,380],"height":300,"labels":["the graph: accent edges = the MST so far","the heap, lightest first: weight, edge below; red = stale"],"chrome":{"costsInline":true}}'>
 <pre class="viz-fallback">
    grow ONE tree from the start: each step adds the lightest
-   edge from the tree to a new vertex. the second row is the
+   edge from the tree to a new vertex. the right panel is the
    min-heap of candidate edges, lightest first; red entries
    are stale (their far end is already in the tree).
 [ interactive demo: open this deck on the course site ]
@@ -182,33 +205,7 @@ The same skeleton: a min-heap, a set of finished vertices, lazy deletion. **One 
 | takes | the globally lightest safe edge | the lightest edge leaving the tree |
 | needs | a sort + **union-find** | a **min-heap** |
 | input | an edge list | adjacency lists |
-| cost | $O(E \log V)$ | $O(E \log V)$; $O(V^2)$ with an array |
+| cost | $O(E \log V)$ | $O(E \log V)$; $O(V^2)$ with an array (see appendix) |
 
 Same theorem underneath; both are greedy.
-
---
-
-## Prim with an array: $O(V^2)$
-
-<small>`best[v]`: the lightest edge from the tree to outside vertex $v$. Each round **scans** for the minimum.</small>
-
-```cpp [6-8]
-long primArray(const vector<vector<int>>& w, int s) {  // w[u][v], INF: none
-    int n = w.size();
-    vector<int> best(n, INF);  vector<bool> inTree(n, false);
-    best[s] = 0;  long total = 0;
-    for (int round = 0; round < n; round++) {
-        int u = -1;                           // the nearest outside vertex
-        for (int v = 0; v < n; v++)
-            if (!inTree[v] && (u == -1 || best[v] < best[u])) u = v;
-        if (best[u] == INF) break;            // the rest is unreachable
-        inTree[u] = true;  total += best[u];
-        for (int v = 0; v < n; v++)           // cheaper ways in through u
-            if (!inTree[v] && w[u][v] < best[v]) best[v] = w[u][v];
-    }
-    return total;
-}
-```
-
-<small>$n$ rounds of $O(n)$ scans: $O(V^2)$, better than $O(E \log V)$ when $E$ is near $V^2$.</small>
 
