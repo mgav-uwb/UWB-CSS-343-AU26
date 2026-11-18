@@ -1,10 +1,10 @@
 <!--
   TOPIC · Interval partitioning: the same events, a different question.
-  Teaches: interval partitioning (host every request in as few rooms as possible); the depth as a lower bound; the greedy (start order, reuse a free room) on the five requests; its C++ with a min-heap of free times; why it never exceeds the depth (a matching bound, not an exchange); the intervals demo running both greedies; the ten-request practice.
+  Teaches: interval partitioning (host every request in as few rooms as possible); the depth as a lower bound; the greedy (start order, reuse a free room) on the five requests; std::priority_queue with a written-out comparison; its C++ with a min-heap of free times; why it never exceeds the depth (a matching bound, not an exchange); the intervals demo running both greedies; the ten-request practice.
   Needs:   activity selection.
   Demos:   intervals (slide spec in topics/demos.js); figures gm-depth5, gm-rooms5, is-ten (tools/gen-greedy-figures.mjs)
   Program: code/interval-partitioning/rooms.cpp
-  Budget:  ~12 min, 8 slides.
+  Budget:  ~13 min, 9 slides.
   Ported from Summer 2026 L12-greedy-huffman.md, part 2.
 -->
 
@@ -59,6 +59,28 @@ In **start** order, put each request in a room that is free; open a new room **o
 
 --
 
+## `std::priority_queue`
+
+```cpp
+struct Greater {                         // reverses the comparison
+    bool operator()(int a, int b) const { return a > b; }
+};
+```
+
+```cpp
+priority_queue<int, vector<int>, Greater> freeAt;
+```
+
+| call | does | cost |
+| --- | --- | --: |
+| `push(x)`, `pop()` | insert `x`; remove the top | $O(\log n)$ |
+| `top()` | the top element, left in place | $O(1)$ |
+| `size()`, `empty()` | how many; are there none? | $O(1)$ |
+
+`<queue>`: a binary heap; the **largest** is on top, so `Greater` puts the **smallest** there.
+
+--
+
 ## Rooms, in C++
 
 ```cpp
@@ -69,7 +91,7 @@ bool startsFirst(const Request& a, const Request& b) {
 int minRooms(vector<Request> reqs) {
     sort(reqs.begin(), reqs.end(), startsFirst);
     // the times the open rooms come free, soonest on top
-    priority_queue<int, vector<int>, greater<int>> freeAt;
+    priority_queue<int, vector<int>, Greater> freeAt;
     for (const Request& r : reqs) {
         if (!freeAt.empty() && freeAt.top() <= r.start)
             freeAt.pop();                    // reuse the soonest-free room

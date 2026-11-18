@@ -1,10 +1,10 @@
 <!--
   TOPIC · Huffman's algorithm.
-  Teaches: the greedy idea (merge the two lightest trees); the CLRS build merge by merge; the finished tree, its codes and its 224 bits; the min-heap of nodes and its tie rule; the build in C++; the build counted (n - 1 merges, a full tree of 2n - 1 nodes, O(n log n)); the huffman-build demo; reading the codes off the tree in C++; a practice build; ties change the tree, never the cost.
+  Teaches: the greedy idea (merge the two lightest trees); the CLRS build merge by merge; the finished tree, its codes and its 224 bits; the min-heap of nodes and its tie rule; the build in C++; the build counted (n - 1 merges, a full tree of 2n - 1 nodes, O(n log n)); the huffman-build demo; std::map (the code table); reading the codes off the tree in C++; a practice build; ties change the tree, never the cost.
   Needs:   prefix-free codes, priority queues (binary heaps).
   Demos:   huffman-build (slide spec in topics/demos.js); figures hf-merges-a, hf-merges-b, hf-trie, hf-turn, hf-tie (tools/gen-greedy-figures.mjs)
   Program: code/huffman-build/huffman.cpp
-  Budget:  ~22 min, 12 slides.
+  Budget:  ~23 min, 13 slides.
   Ported from Summer 2026 L12-greedy-huffman.md, part 3.
 -->
 
@@ -98,12 +98,14 @@ struct HigherFreq {              // the SMALLEST frequency on top
 ## The build, in C++
 
 ```cpp
+struct Symbol { char sym; long freq; };     // one input symbol and its count
+
 // Merge the two lightest trees until one is left.
-Node* buildHuffman(const vector<pair<char, long>>& freqs) {
+Node* buildHuffman(const vector<Symbol>& symbols) {
     priority_queue<Node*, vector<Node*>, HigherFreq> pq;
     long nextId = 0;
-    for (const pair<char, long>& p : freqs)
-        pq.push(new Node{p.second, p.first, nextId++, nullptr, nullptr});
+    for (const Symbol& s : symbols)
+        pq.push(new Node{s.freq, s.sym, nextId++, nullptr, nullptr});
     while (pq.size() > 1) {
         Node* x = pq.top(); pq.pop();       // the two smallest frequencies
         Node* y = pq.top(); pq.pop();
@@ -141,6 +143,24 @@ $$\text{build} = O(n \log n) \qquad \text{read the codes} = O(n)$$
 </div>
 
 <small>The row above the tree is the pool, smallest first. Try `TEXT(…)` with a sentence, and `8, 8, 8, 8`.</small>
+
+--
+
+## `std::map`
+
+`<map>`: key → value pairs, **sorted** by key in a red-black tree; every call is $O(\log n)$.
+
+```cpp
+map<char, string> code;
+```
+
+| call | does |
+| --- | --- |
+| `code[k] = v` | insert `k`, or overwrite its value |
+| `code[k]` | `k`'s value; a **missing** `k` is inserted with `""` |
+| `code.count(k)` | 1 if `k` is a key, else 0 |
+
+`unordered_map`, a hash table: the same calls, $O(1)$ on average.
 
 --
 

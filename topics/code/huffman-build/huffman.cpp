@@ -9,7 +9,6 @@
 #include <map>
 #include <queue>
 #include <string>
-#include <utility>
 #include <vector>
 using namespace std;
 
@@ -28,12 +27,14 @@ struct HigherFreq {              // the SMALLEST frequency on top
     }
 };
 
+struct Symbol { char sym; long freq; };     // one input symbol and its count
+
 // Merge the two lightest trees until one is left.
-Node* buildHuffman(const vector<pair<char, long>>& freqs) {
+Node* buildHuffman(const vector<Symbol>& symbols) {
     priority_queue<Node*, vector<Node*>, HigherFreq> pq;
     long nextId = 0;
-    for (const pair<char, long>& p : freqs)
-        pq.push(new Node{p.second, p.first, nextId++, nullptr, nullptr});
+    for (const Symbol& s : symbols)
+        pq.push(new Node{s.freq, s.sym, nextId++, nullptr, nullptr});
     while (pq.size() > 1) {
         Node* x = pq.top(); pq.pop();       // the two smallest frequencies
         Node* y = pq.top(); pq.pop();
@@ -79,23 +80,23 @@ void destroy(Node* node) {
     delete node;
 }
 
-void report(const string& label, const vector<pair<char, long>>& freqs) {
-    Node* root = buildHuffman(freqs);
+void report(const string& label, const vector<Symbol>& symbols) {
+    Node* root = buildHuffman(symbols);
     map<char, string> code;
     extractCodes(root, "", code);
     long total = 0, chars = 0;
     cout << label << ":";
-    for (const pair<char, long>& p : freqs) {
-        cout << " " << p.first << "=" << code[p.first];
-        total += p.second * code[p.first].size();
-        chars += p.second;
+    for (const Symbol& s : symbols) {
+        cout << " " << s.sym << "=" << code[s.sym];
+        total += s.freq * code[s.sym].size();
+        chars += s.freq;
     }
     cout << "; " << total << " bits for " << chars << " symbols\n";
     destroy(root);
 }
 
 int main() {
-    vector<pair<char, long>> clrs = {{'a', 5}, {'b', 9}, {'c', 12}, {'d', 13}, {'e', 16}, {'f', 45}};
+    vector<Symbol> clrs = {{'a', 5}, {'b', 9}, {'c', 12}, {'d', 13}, {'e', 16}, {'f', 45}};
     report("CLRS", clrs);
     Node* root = buildHuffman(clrs);
     map<char, string> code;

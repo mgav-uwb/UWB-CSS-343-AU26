@@ -1,10 +1,10 @@
 <!--
   TOPIC · Proving a greedy rule: activity selection.
-  Teaches: the greedy method recalled; the greedy algorithms met so far and what proved them; the greedy-choice property and optimal substructure stated precisely; the exchange argument as a proof template; activity selection: the problem, three plausible rules and the instances that break them, earliest finish first, its C++, its exchange proof, the exchange carried out on the five requests, the optimal substructure that finishes the proof; a ten-request practice.
+  Teaches: the greedy method recalled; the greedy algorithms met so far and what proved them; the greedy-choice property and optimal substructure stated precisely; the exchange argument as a proof template; activity selection: the problem, three plausible rules and the instances that break them, earliest finish first, std::sort and its comparison, its C++, its exchange proof, the exchange carried out on the five requests, the optimal substructure that finishes the proof; a ten-request practice.
   Needs:   the greedy method (making change), sorting.
   Demos:   figures gm-five, is-shortest, is-earliest, is-conflicts, gm-select5, is-ten (tools/gen-greedy-figures.mjs)
   Program: code/activity-selection/activities.cpp
-  Budget:  ~26 min, 15 slides.
+  Budget:  ~27 min, 16 slides.
   Ported from Summer 2026 L12-greedy-huffman.md, parts 1 and 2.
 -->
 
@@ -130,13 +130,29 @@ Sort by finish: $a(5)$, $b(6)$, $c(7)$, $d(9)$, $e(11)$. Take a request when it 
 
 --
 
-## Earliest finish, in C++
+## `std::sort`
 
 ```cpp
+struct Request { string name; int start, finish; };     // [start, finish)
+
 bool finishesFirst(const Request& a, const Request& b) {
     return a.finish < b.finish;
 }
+```
 
+```cpp
+sort(reqs.begin(), reqs.end(), finishesFirst);
+```
+
+- `<algorithm>`: sorts `[begin, end)` in place, $O(n \log n)$
+- `finishesFirst(a, b)`: must `a` go **before** `b`? **Strict**: `<`, never `<=`
+- ties come out in **any** order; `stable_sort` keeps input order
+
+--
+
+## Earliest finish, in C++
+
+```cpp
 vector<Request> selectRequests(vector<Request> reqs) {    // a copy: sorted here
     sort(reqs.begin(), reqs.end(), finishesFirst);
     vector<Request> taken;
@@ -151,7 +167,7 @@ vector<Request> selectRequests(vector<Request> reqs) {    // a copy: sorted here
 }
 ```
 
-`Request` holds a name and $[s, f)$. The sort costs $O(n \log n)$; the pass $O(n)$.
+The sort costs $O(n \log n)$; the pass $O(n)$.
 
 --
 

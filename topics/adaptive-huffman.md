@@ -1,10 +1,10 @@
 <!--
   TOPIC · Adaptive Huffman (FGK).
-  Teaches: the two costs of static Huffman (two passes, the table); encoder and decoder updating one tree in lockstep; NYT, the escape for a new symbol; the sibling property and Gallager's theorem; the update rule in C++ (swap with the block leader, then increment); the first four symbols of abracadabra drawn; abracadabra sent in 60 bits with no table; the adaptive-huffman demo; static against adaptive, counted; where the idea survives.
+  Teaches: the two costs of static Huffman (two passes, the table); encoder and decoder updating one tree in lockstep; NYT, the escape for a new symbol; the sibling property and Gallager's theorem; std::map and the tree's fields (leafOf); the update rule in C++ (swap with the block leader, then increment); the first four symbols of abracadabra drawn; abracadabra sent in 60 bits with no table; the adaptive-huffman demo; static against adaptive, counted; where the idea survives.
   Needs:   Huffman's algorithm; encoding, decoding, and where Huffman loses.
   Demos:   adaptive-huffman (slide spec in topics/demos.js); figure hf-adaptive (tools/gen-greedy-figures.mjs)
   Program: tools/snippets/greedy/fgk-update.cpp (the chapter's FGK update, compiled and matched against lib/structures/adaptive-huffman.js); the bit counts from that library
-  Budget:  ~16 min, 11 slides. Mounted in Lecture 14 as an appendix, after the close.
+  Budget:  ~17 min, 12 slides. Mounted in Lecture 14 as an appendix, after the close.
   Ported from Summer 2026 L12-greedy-huffman.md, part 5.
 -->
 
@@ -62,6 +62,26 @@ Number the nodes bottom up, left to right; the root gets the highest number. A t
 - the weights **never decrease** as the number grows
 
 **Gallager's theorem**: a binary tree is a Huffman tree for its leaf weights **exactly when** it has the sibling property.
+
+--
+
+## `std::map`: `leafOf`
+
+The fields of `AdaptiveTree`:
+
+```cpp
+static const int TOP = 512;           // the root's number
+vector<Node*> byNumber = vector<Node*>(TOP + 1, nullptr);
+map<char, Node*> leafOf;              // the leaf of each symbol seen
+Node* nyt;                            // "not yet transmitted", weight 0
+Node* root;
+```
+
+`map<K, V>` (`<map>`): key → value pairs **sorted** by key in a red-black tree; each call $O(\log n)$.
+
+- `leafOf.count(s)`: 1 if $s$ has a leaf, 0 if $s$ is **new**
+- `leafOf[s] = leaf`: `splitNYT` adds a leaf
+- `leafOf[s]` on a **missing** $s$ inserts `nullptr`: `update` asks `count` first
 
 --
 

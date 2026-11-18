@@ -1,10 +1,10 @@
 <!--
   TOPIC · Codes and prefix-free codes.
-  Teaches: alphabet, code, codeword, encoding and decoding; the cost of a code on a text; the compression problem on the a..f frequencies (a fixed 3-bit code spends 300 bits); why variable-length codes can be ambiguous; prefix-free codes as binary trees with symbols at the leaves; cost as the sum of frequency times depth; fullness.
+  Teaches: alphabet, code, codeword, encoding and decoding; the cost of a code on a text; the compression problem on the a..f frequencies (a fixed 3-bit code spends 300 bits, 135 of them on f); variable-length codes, a first try at 265 bits; why variable-length codes can be ambiguous; prefix-free codes as binary trees with symbols at the leaves; cost as the sum of frequency times depth; fullness.
   Needs:   tree basics.
   Demos:   figures pc-ambig, pc-fixed (tools/gen-greedy-figures.mjs)
   Program: none
-  Budget:  ~10 min, 7 slides.
+  Budget:  ~11 min, 8 slides.
   Ported from Summer 2026 L12-greedy-huffman.md, part 3.
 -->
 
@@ -32,13 +32,31 @@ Text is stored as **bits**. A **code** gives each symbol of the **alphabet** a *
 
 ## The compression problem
 
-A text of 100 symbols: $a{:}5$, $b{:}9$, $c{:}12$, $d{:}13$, $e{:}16$, $f{:}45$.
+**Given** each symbol's count $f\_s$, **find** a decodable code of least cost $\sum\_s f\_s \cdot \lvert \text{codeword}(s) \rvert$.
 
-- fixed length: $\lceil \log\_2 6 \rceil = 3$ bits each, $100 \cdot 3 = 300$ bits
-- $f$ is 45% of the text and pays as much per symbol as $a$
-- **variable length**: short codewords for frequent symbols, long ones for rare symbols
+The fixed code, $\lceil \log\_2 6 \rceil = 3$ bits per symbol, on a text of 100:
 
-**Minimize** the cost over every code that can be decoded.
+| symbol | a | b | c | d | e | f |
+| --- | --: | --: | --: | --: | --: | --: |
+| count | 5 | 9 | 12 | 13 | 16 | 45 |
+| bits | 15 | 27 | 36 | 39 | 48 | **135** |
+
+300 bits; $f$, 45% of the text, spends **135** of them.
+
+--
+
+## Variable-length codes
+
+**Short** codewords for **frequent** symbols, **long** ones for rare symbols. A first try: $f$ gets one bit, every other symbol four.
+
+| symbol | a | b | c | d | e | f |
+| --- | --- | --- | --- | --- | --- | --- |
+| count | 5 | 9 | 12 | 13 | 16 | 45 |
+| codeword | `1000` | `1001` | `1010` | `1011` | `1100` | `0` |
+
+$45 \cdot 1 + 55 \cdot 4 = 265$ bits, against **300**: $f$ saves 90, the other 55 symbols pay 55.
+
+To decode: a `0` is $f$; a `1` starts a four-bit codeword.
 
 --
 

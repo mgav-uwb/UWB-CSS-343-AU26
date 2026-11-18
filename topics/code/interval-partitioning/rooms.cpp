@@ -5,7 +5,6 @@
 //   build:  g++ -std=c++17 -Wall -Wextra -O2 rooms.cpp -o rooms
 //   run:    ./rooms
 #include <algorithm>
-#include <functional>
 #include <iostream>
 #include <queue>
 #include <string>
@@ -14,6 +13,10 @@ using namespace std;
 
 struct Request { string name; int start, finish; };     // [start, finish)
 
+struct Greater {                         // reverses the comparison
+    bool operator()(int a, int b) const { return a > b; }
+};
+
 bool startsFirst(const Request& a, const Request& b) {
     return a.start < b.start;
 }
@@ -21,7 +24,7 @@ bool startsFirst(const Request& a, const Request& b) {
 int minRooms(vector<Request> reqs) {
     sort(reqs.begin(), reqs.end(), startsFirst);
     // the times the open rooms come free, soonest on top
-    priority_queue<int, vector<int>, greater<int>> freeAt;
+    priority_queue<int, vector<int>, Greater> freeAt;
     for (const Request& r : reqs) {
         if (!freeAt.empty() && freeAt.top() <= r.start)
             freeAt.pop();                    // reuse the soonest-free room
