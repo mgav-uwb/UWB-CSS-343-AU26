@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!-- CANVAS NOTE: relative links only resolve on the course site; when pasting
+     into Canvas, swap hrefs for the Canvas URLs. -->
+<!-- CSS 343 · Programming Assignment 3. Student-facing: NO solutions. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PA3: mydiff · CSS 343</title>
+<style>
+  :root{ --ink:#1a1c22; --dim:#5c6270; --line:#d7dbe3; --bg:#ffffff;
+         --accent:#0a7d4d; --accentbg:#eaf6ef; --box:#f6f8fb; --warn:#9a5b00; --warnbg:#fff5e6; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0f4;color:var(--ink);
+       font:16px/1.62 "Charter","Iowan Old Style","Palatino",Georgia,serif}
+  .page{max-width:820px;margin:28px auto;background:var(--bg);padding:46px clamp(20px,6vw,60px) 60px;
+        box-shadow:0 1px 4px #0002;border-radius:4px}
+  h1{font-size:25px;line-height:1.25;margin:0 0 4px}
+  .epigraph{margin:6px 0 20px;padding:4px 0 4px 16px;border-left:3px solid #b9c0d0;color:#33363f;font-style:italic;font-size:17px}
+  .epigraph.fact{font-style:normal;font-size:16px}
+  .epigraph cite{display:block;font-style:normal;font-size:13.5px;color:#5c6270;margin-top:4px}
+  h2{font-size:19px;margin:30px 0 8px;border-bottom:1px solid #edf0f4;padding-bottom:4px}
+  p{margin:10px 0} a{color:var(--accent)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:#f1f3f7;border-radius:4px;padding:.5px 4px}
+  pre{background:#f1f3f7;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+      padding:11px 14px;overflow-x:auto;margin:12px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+  .def,.aside{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box)}
+  .def{border-left:4px solid var(--accent);background:var(--accentbg)}
+  .aside{border-left:4px solid var(--warn);background:var(--warnbg)}
+  .tag{font-variant:small-caps;letter-spacing:.4px;font-weight:700;font-family:system-ui,sans-serif;font-size:13px;margin-right:8px}
+  .def .tag{color:var(--accent)} .aside .tag{color:var(--warn)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:system-ui,sans-serif;font-size:15px}
+  .meta b{color:var(--accent)}
+  ol,ul{margin:8px 0;padding-left:24px} li{margin:7px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-family:system-ui,sans-serif;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#f0f2f6}
+  table.pts td:nth-child(2){text-align:center;font-weight:700;white-space:nowrap}
+  blockquote{margin:14px 0;padding:10px 16px;border-left:4px solid var(--line);background:var(--box);border-radius:6px}
+  footer{margin-top:38px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px;font-family:system-ui,sans-serif}
+  @media print{ body{background:#fff} .page{box-shadow:none;margin:0;max-width:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Programming Assignment 3: <code>mydiff</code></h1>
+  <blockquote class="epigraph">
+    The Unix <code>diff</code> program, released with the Fifth Edition of Unix in 1974, finds a longest common subsequence of the two files&rsquo; lines; its authors published the method in 1976.
+    <cite>J. W. Hunt and M. D. McIlroy, &ldquo;An Algorithm for Differential File Comparison,&rdquo; Computing Science Technical Report 41, Bell Laboratories, 1976</cite>
+  </blockquote>
+  <div class="def"><span class="tag">At a glance</span>
+    <div class="meta">
+      <span><b>Covers:</b> Dynamic programming: the LCS table, the traceback, rolling rows; Lectures 16 to 18</span>
+      <span><b>Format:</b> individual</span>
+      <span><b>Language:</b> C++17</span>
+      <span><b>Points:</b> 70 (+5 extra credit): a design worth 10, then the program worth 60</span>
+      <span><b>Starter:</b> <a href="starter/diff.h"><code>diff.h</code></a>, <a href="starter/diff.cpp"><code>diff.cpp</code></a>, <a href="starter/mydiff.cpp"><code>mydiff.cpp</code></a>, <a href="starter/sampleA.txt"><code>sampleA.txt</code></a>, <a href="starter/sampleB.txt"><code>sampleB.txt</code></a>, <a href="starter/expected-unified.txt"><code>expected-unified.txt</code></a>, <a href="starter/expected-stat.txt"><code>expected-stat.txt</code></a>, <a href="starter/gen_corpus.cpp"><code>gen_corpus.cpp</code></a></span>
+      <span><b>Out:</b> Wed Nov 18</span>
+      <span><b>Design due:</b> Mon Nov 30, 11:59 PM</span>
+      <span><b>Program due:</b> Wed Dec 9, 11:59 PM</span>
+    </div>
+  </div>
+
+  <p>Comparing two files is the longest-common-subsequence problem with lines in place of characters: the lines
+  the files share, in order, are an LCS, and every other line was deleted from the first file or inserted into the
+  second. The diff you read is the LCS table&rsquo;s traceback. You build the tool, <code>mydiff</code>, on the DP
+  from Lectures 16 to 18 and Homework 8:</p>
+  <pre>./mydiff fileA fileB              unified diff, 3 context lines
+./mydiff -u N fileA fileB         unified diff, N context lines
+./mydiff --stat fileA fileB       counts only: two rolling rows, any size
+./mydiff --word i j fileA fileB   changes within line i of A and line j of B</pre>
+  <p>The command-line tool <code>mydiff.cpp</code> is given. You write the four functions behind it, declared in the
+  given <code>diff.h</code>, in <code>diff.cpp</code>:</p>
+  <ol>
+    <li><code>lcsLines</code>: the LCS <em>length</em> over the files&rsquo; lines, with <strong>two rolling rows</strong>,
+      so O(min(n, m)) memory. This is what <code>--stat</code> runs, and it must handle the generated 30,000-line pair,
+      whose full table would need about 3.6 GB.</li>
+    <li><code>diffLines</code>: the full edit script, one <code>Edit</code> per line, each marked <code>' '</code> (in
+      both files), <code>'-'</code> (only in A) or <code>'+'</code> (only in B). Trim the common <strong>prefix and
+      suffix</strong> first: they are common lines, and trimming them is what keeps real inputs small enough for the full
+      table. Then build the LCS table over the rest and <strong>trace back</strong> from its last cell. Within a run of
+      changes, deletions come before insertions. A traceback walks from the end, so it meets them in the opposite order:
+      choose your tie-break accordingly.</li>
+    <li><code>unifiedDiff</code>: the script as hunks. Each run of changes, with up to <code>context</code> common lines
+      before and after it, becomes a hunk headed <code>@@ -start,count +start,count @@</code>; two runs whose context
+      lines would touch or overlap share one hunk. Compare your output with <code>expected-unified.txt</code>.</li>
+    <li><code>markLine</code>: the same DP one level down, over the characters of one line from each file. Deleted
+      characters are wrapped <code>[-&hellip;-]</code> and inserted ones <code>{+&hellip;+}</code>, one bracket pair per
+      run, so <code>jumps</code> against <code>leaps</code> gives <code>[-jum-]{+lea+}ps</code>.</li>
+  </ol>
+  <p>The LCS table and its recurrence are Lecture 16 (Wed Nov 25). The traceback and the rolling rows are Lecture 18
+  (Wed Dec 2), after the design is due; the <a href="../../textbook/dp/algo-traceback-space-saving.html">Traceback &amp;
+  Space-Saving</a> chapter covers both now.</p>
+
+  <h2>Part 1: the design (due Mon Nov 30, 10 points)</h2>
+  <p>One page, PDF, graded on its own terms: you may change course while you build, and the report says what changed.</p>
+  <ol>
+    <li><strong>Tables and memory.</strong> Which table each function builds, its dimensions and what a cell means.
+      Why two rolling rows give the length but cannot give the traceback, and how trimming the prefix and suffix
+      bounds the table <code>diffLines</code> builds.</li>
+    <li><strong>Recurrence and traceback.</strong> The recurrence with its base cases, and the tie-break your traceback
+      uses, with the reason it puts deletions before insertions.</li>
+    <li><strong>Test plan.</strong> The cases your <code>driver.cpp</code> will check: at least an empty file, identical
+      files, one-line files, files with no line in common, and context 0.</li>
+    <li><strong>Greedy fails.</strong> A pair of small files on which <em>greedy</em> matching (keep each line of A that
+      occurs later in B, matched to its next occurrence) gives a diff with more changes than the minimum, and the minimal
+      diff. Lecture 14 showed why a greedy rule needs a proof; this is a rule without one.</li>
+  </ol>
+
+  <h2>Part 2: the program (due Wed Dec 9)</h2>
+  <p>Fill in the four <code>TODO</code>s in <code>diff.cpp</code>. Do not change <code>diff.h</code> or
+  <code>mydiff.cpp</code>. Verify as you go:</p>
+  <pre>g++ -std=c++17 -O2 diff.cpp mydiff.cpp -o mydiff
+./mydiff sampleA.txt sampleB.txt | diff - expected-unified.txt
+./mydiff --stat sampleA.txt sampleB.txt        # line 1 of expected-stat.txt
+./mydiff --word 2 2 sampleA.txt sampleB.txt    # line 2 of expected-stat.txt
+valgrind --leak-check=full ./mydiff sampleA.txt sampleB.txt   # CSS lab
+g++ -std=c++17 -O2 gen_corpus.cpp -o gen &amp;&amp; ./gen     # benchmark pairs
+./mydiff --stat big_A_30000.txt big_B_30000.txt  # seconds, a few MB</pre>
+  <p>The <code>diff</code> line prints nothing when your output matches exactly.</p>
+  <p>If <code>--stat</code> on the big pair takes gigabytes or is killed, <code>lcsLines</code> is building the full table.</p>
+
+  <h3>Your testing (<code>driver.cpp</code>)</h3>
+  <p>A <code>main()</code> of your own that calls the four functions directly on the cases in your test plan and
+  prints whether each result is right. Check an edit script the way the grader does: its <code>' '</code> and
+  <code>'-'</code> lines must spell A, its <code>' '</code> and <code>'+'</code> lines must spell B, and it must have
+  exactly <em>n</em> + <em>m</em> &minus; 2&middot;LCS changes.</p>
+
+  <h3>Report (one page)</h3>
+  <ul>
+    <li><strong>Prediction.</strong> Before you measure, the time and the memory of the full diff as functions of the
+      line counts, and the ratio each should show when both files double.</li>
+    <li><strong>Measurement.</strong> One table over the <code>bench_*</code> pairs (1000 to 8000 lines): time and peak
+      memory of <code>./mydiff</code>, with both doubling ratios, plus the <code>--stat</code> run on the 30,000-line
+      pair. Peak memory: <code>/usr/bin/time -v</code> on the lab (&ldquo;Maximum resident set size&rdquo;),
+      <code>/usr/bin/time -l</code> on macOS.</li>
+    <li><strong>Explanation.</strong> A few sentences: where the ratios match the prediction, where they do not, and why.</li>
+    <li><strong>Greedy, revisited.</strong> Your design&rsquo;s counterexample run through your <code>mydiff</code>.</li>
+    <li><strong>Design against build.</strong> What changed from the design, and why.</li>
+  </ul>
+
+  <div class="aside"><span class="tag">How it is graded</span>
+    We compile your <code>diff.cpp</code> against our own <code>main()</code>. No particular alignment is required: an
+    edit script is checked by rebuilding both files from it and counting its changes, a unified diff by patching A into
+    B, and a <code>markLine</code> by stripping it back to both lines. Any correct tie-break passes, except the two
+    conventions above (deletions before insertions in a run; the sample&rsquo;s output exactly as in
+    <code>expected-unified.txt</code>). A <code>diff.cpp</code> that does not compile scores 0 for correctness. The final
+    exam has questions on PA3: the design, and what a function returns on a given input.</div>
+
+  <h2>Grading (70 points)</h2>
+  <table class="pts">
+    <tr><th>Criterion</th><th>Pts</th><th>Notes</th></tr>
+    <tr><td>Design: tables and memory 3 &middot; recurrence and tie-break 3 &middot; test plan 2 &middot; greedy counterexample 2</td><td>10</td><td>Part 1, due Mon Nov 30</td></tr>
+    <tr><td>Compiles against our driver (<code>g++ -std=c++17</code>, CSS lab)</td><td>gate</td><td>keep <code>diff.h</code> exactly as given</td></tr>
+    <tr><td>Correctness: <code>lcsLines</code></td><td>5</td><td rowspan="5">our test harness, on inputs different from the provided ones</td></tr>
+    <tr><td>Correctness: <code>lcsLines</code> on a 30,000-line pair, under 64 MB of memory</td><td>4</td></tr>
+    <tr><td>Correctness: <code>diffLines</code>, including a 40,000-line pair with one change (trimming)</td><td>10</td></tr>
+    <tr><td>Correctness: <code>unifiedDiff</code></td><td>8</td></tr>
+    <tr><td>Correctness: <code>markLine</code></td><td>5</td></tr>
+    <tr><td>Memory: Valgrind reports 0 leaks and 0 errors</td><td>6</td><td>all or nothing; see the <a href="../../guides/guide-valgrind.html">Valgrind guide</a></td></tr>
+    <tr><td>Your testing (<code>driver.cpp</code>: every function, every case in the test plan)</td><td>6</td><td></td></tr>
+    <tr><td>Report</td><td>12</td><td>prediction 3 &middot; measurement 4 &middot; explanation 3 &middot; greedy revisited 1 &middot; design against build 1</td></tr>
+    <tr><td>Coding standards (the recurrence commented at its loops, helpers, naming)</td><td>4</td><td></td></tr>
+    <tr><td><em>Extra credit:</em> <code>diffLinesLinearSpace</code>, Hirschberg&rsquo;s algorithm</td><td>+5</td><td>all or nothing, by our harness: an optimal script for a 20,000-line pair in under 64 MB, where the full table would need 1.6 GB. It splits A in half and finds where B splits with two rolling rows, one forward and one backward: divide and conquer (Lecture 15) on top of DP</td></tr>
+  </table>
+
+  <h2>Reading</h2>
+  <ul>
+    <li><a href="../../textbook/dp/algo-longest-common-subsequence.html">Longest Common Subsequence</a>: the table and the recurrence.</li>
+    <li><a href="../../textbook/dp/algo-traceback-space-saving.html">Traceback &amp; Space-Saving</a>: the traceback, rolling rows, and Hirschberg&rsquo;s algorithm.</li>
+    <li><a href="../../textbook/greedy/paradigm-greedy-method.html">The Greedy Method</a>: why a greedy rule needs a proof.</li>
+    <li><a href="../../textbook/foundations/foundation-stl-primer.html">STL Primer</a>: <code>vector</code>, <code>string</code> and <code>reverse</code>.</li>
+    <li><a href="../../guides/guide-valgrind.html">Valgrind guide</a> and <a href="../../guides/guide-computing-environment.html">Computing environment guide</a>.</li>
+  </ul>
+
+  <h2>Submit</h2>
+  <p><strong>Design</strong> (Mon Nov 30, 11:59 PM): one PDF on Canvas, at most one page.<br>
+  <strong>Program</strong> (Wed Dec 9, 11:59 PM): one <code>.zip</code> on Canvas holding <code>diff.cpp</code>, your
+  <code>driver.cpp</code> (with any test files it reads) and your one-page report (PDF or Markdown).
+  Resubmissions are allowed until each deadline; the last one is graded. A late token extends either deadline by 48
+  hours; nothing is accepted after Fri Dec 11.</p>
+  <footer>CSS 343 · Autumn 2026 · Programming Assignment 3 · prepared by Dr. Marcel Gavriliu.</footer>
+</div>
+</body>
+</html>
