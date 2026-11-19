@@ -561,7 +561,8 @@ string w = code['z'];             <span class="cm">// "", and 'z' is now a key</
 bool found = code.find('q') != code.end();   <span class="cm">// false, and nothing inserted</span></pre>
       <pre>set&lt;int&gt; seen = {5, 1, 8};
 seen.insert(1);                   <span class="cm">// already there: no change</span>
-bool in = seen.count(8) == 1;     <span class="cm">// true</span></pre>
+bool in = seen.count(8) == 1;     <span class="cm">// true</span>
+bool added = seen.insert(4).second;   <span class="cm">// true: 4 was new; a second insert(4) gives false</span></pre>
       <table>
         <tr><th>call</th><th>does</th><th>cost</th></tr>
         <tr><td><code>m[k] = v</code></td><td>insert \(k\), or overwrite its value</td><td>\(O(\log n)\)</td></tr>
@@ -570,6 +571,7 @@ bool in = seen.count(8) == 1;     <span class="cm">// true</span></pre>
         <tr><td><code>m.find(k)</code></td><td>an iterator to \(k\), or <code>m.end()</code>; inserts nothing</td><td>\(O(\log n)\)</td></tr>
         <tr><td><code>m.erase(k)</code></td><td>remove \(k\)</td><td>\(O(\log n)\)</td></tr>
         <tr><td><code>s.insert(k)</code>, <code>s.count(k)</code></td><td>add \(k\) (no effect if present); is \(k\) in?</td><td>\(O(\log n)\)</td></tr>
+        <tr><td><code>s.insert(k).second</code></td><td><code>true</code> if \(k\) was new: <code>insert</code> returns a <a href="#pair"><code>pair</code></a> of an iterator to \(k\) and that flag</td><td>\(O(\log n)\)</td></tr>
         <tr><td><code>m.lower_bound(k)</code></td><td>the first key \(\ge k\): an ordered query a hash table cannot answer</td><td>\(O(\log n)\)</td></tr>
       </table>
       <div class="aside">
