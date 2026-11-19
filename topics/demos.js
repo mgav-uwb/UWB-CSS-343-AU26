@@ -399,8 +399,17 @@ const GREEDY_SPECS = {
   },
 };
 
+// Lecture 15: the registry's sorting demos, opened on the lecture's arrays
+const LECTURE_ARRAY = "3, 7, 1, 9, 4, 8, 6, 2, 5";
+const SORT_SPECS = {
+  "mergesort-lecture": { use: "mergesort", initial: "38, 27, 43, 3, 9, 82, 10" },
+  "quicksort-lecture": { use: "quicksort", initial: LECTURE_ARRAY },
+  "quickselect-lecture": { use: "quickselect", initial: "7, 2, 9, 4, 1, 6, 3" },
+  "lomuto-vs-hoare-lecture": { use: "lomuto-vs-hoare", initial: LECTURE_ARRAY },
+};
+
 const slots = Object.fromEntries(Object.keys(DEMOS).map((slug) => [slug, { use: slug }]));
-initDeckDemos({ ...slots, ...SLIDE_SPECS, ...HASH_SPECS, ...GRAPH_SPECS, ...GREEDY_SPECS });
+initDeckDemos({ ...slots, ...SLIDE_SPECS, ...HASH_SPECS, ...GRAPH_SPECS, ...GREEDY_SPECS, ...SORT_SPECS });
 
 // ── 3. Summer canvas demos, loaded on demand ──
 const here = new URL(".", import.meta.url);
