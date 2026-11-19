@@ -408,8 +408,24 @@ const SORT_SPECS = {
   "lomuto-vs-hoare-lecture": { use: "lomuto-vs-hoare", initial: LECTURE_ARRAY },
 };
 
+// Lecture 16: the LCS demo opened on the lecture's pair
+const DP_SPECS = {
+  "lcs-lecture": {
+    use: "lcs",
+    inputs: [
+      { key: "a", label: "a", value: "AGCAT", width: 100 },
+      { key: "b", label: "b", value: "GAC", width: 100 },
+    ],
+    presets: [
+      { name: "AGCAT / GAC (the lecture)", values: { a: "AGCAT", b: "GAC" } },
+      { name: "SUNDAY / SATURDAY", values: { a: "SUNDAY", b: "SATURDAY" } },
+      { name: "ABCBDAB / BDCABA (CLRS)", values: { a: "ABCBDAB", b: "BDCABA" } },
+    ],
+  },
+};
+
 const slots = Object.fromEntries(Object.keys(DEMOS).map((slug) => [slug, { use: slug }]));
-initDeckDemos({ ...slots, ...SLIDE_SPECS, ...HASH_SPECS, ...GRAPH_SPECS, ...GREEDY_SPECS, ...SORT_SPECS });
+initDeckDemos({ ...slots, ...SLIDE_SPECS, ...HASH_SPECS, ...GRAPH_SPECS, ...GREEDY_SPECS, ...SORT_SPECS, ...DP_SPECS });
 
 // ── 3. Summer canvas demos, loaded on demand ──
 const here = new URL(".", import.meta.url);
