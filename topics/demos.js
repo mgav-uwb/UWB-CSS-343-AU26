@@ -424,8 +424,24 @@ const DP_SPECS = {
   },
 };
 
+const STRING_SPECS = {
+  "kmp-fail-lecture": {
+    use: "kmp-fail",
+    stateMsg: () => 'ready: fail("ABAABA"), the lecture\'s pattern',
+    inputs: [{ key: "p", label: "pattern", value: "ABAABA", width: 130 }],
+    presets: [   // the registry's presets name other slides: hide them, then list the lecture's
+      ...["ABABAC (the your-turn)", "AABAA (the worked slide)", "AABAAC (the search trace)",
+        "AABAAABAAAABAAAB (two partial fall-backs: the handout's diagram)", "AAAB (the adversarial pattern)",
+        "ABCDE (no self-overlap at all)"].map((name) => ({ name, enabled: false })),
+      { name: "ABAABA (the lecture)", values: { p: "ABAABA" } },
+      { name: "AABAAABAAAABAAAB (chained fall-backs)", values: { p: "AABAAABAAAABAAAB" } },
+      { name: "ABCDE (no border at all)", values: { p: "ABCDE" } },
+    ],
+  },
+};
+
 const slots = Object.fromEntries(Object.keys(DEMOS).map((slug) => [slug, { use: slug }]));
-initDeckDemos({ ...slots, ...SLIDE_SPECS, ...HASH_SPECS, ...GRAPH_SPECS, ...GREEDY_SPECS, ...SORT_SPECS, ...DP_SPECS });
+initDeckDemos({ ...slots, ...SLIDE_SPECS, ...HASH_SPECS, ...GRAPH_SPECS, ...GREEDY_SPECS, ...SORT_SPECS, ...DP_SPECS, ...STRING_SPECS });
 
 // ── 3. Summer canvas demos, loaded on demand ──
 const here = new URL(".", import.meta.url);
