@@ -130,7 +130,7 @@ Sort by finish: $a(5)$, $b(6)$, $c(7)$, $d(9)$, $e(11)$. Take a request when it 
 
 --
 
-## `std::sort`
+## [`std::sort`](../../textbook/foundations/foundation-stl-primer.html#sort)
 
 ```cpp
 struct Request { string name; int start, finish; };     // [start, finish)

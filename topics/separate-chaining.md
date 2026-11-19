@@ -1,10 +1,10 @@
 <!--
   TOPIC · Separate chaining.
-  Teaches: a list per slot; insert, search and delete; the load factor and the expected chain length; what happens when M is fixed and n grows; resizing.
+  Teaches: a list per slot; insert, search and delete; the load factor and the expected chain length; what happens when M is fixed and n grows; resizing; std::list (a slide of its own, before the first code that uses it).
   Needs:   hashing basics.
   Demos:   hash-chain, hash-chain-resize (slide specs); figures hs-chain-table, hs-chain-insert, hs-chain-odd (tools/gen-hash-figures.mjs)
   Program: none
-  Budget:  ~16 min, 9 slides.
+  Budget:  ~17 min, 10 slides.
   Ported from Summer 2026 L07-hashing.md, parts 3.
 -->
 
@@ -31,6 +31,24 @@ $M = 5$, $h(k) = k \bmod 5$, keys 12, 17, 22, 5:
    [4]"></div>
 
 Colliders simply **join the same bucket's chain**. No key is ever turned away: the array never "fills up."
+
+--
+
+## [`std::list`](../../textbook/foundations/foundation-stl-primer.html#list)
+
+`<list>`: a **doubly linked list**, one heap node per element.
+
+```cpp
+std::vector<std::list<int>> table;     // one chain per bucket
+```
+
+| call | does | cost |
+| --- | --- | --: |
+| `push_back(x)` | link `x` at the tail | $O(1)$ |
+| `remove(x)` | unlink every `x` | $O(\text{length})$ |
+| `for (int x : chain)` | walk the chain | $O(\text{length})$ |
+
+No indexing: `chain[i]` does not exist.
 
 --
 

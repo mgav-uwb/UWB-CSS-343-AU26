@@ -1,10 +1,10 @@
 <!--
   TOPIC · Traversals and expression trees.
-  Teaches: pre-, in-, post- and level-order; one recursion with the visit moved; expression trees and post-order evaluation.
+  Teaches: pre-, in-, post- and level-order; one recursion with the visit moved; expression trees and post-order evaluation; std::queue (a slide of its own, before the first code that uses it).
   Needs:   tree basics.
   Demos:   traversals, expr-tree (Summer canvas demos)
   Program: none
-  Budget:  ~12 min, 8 slides.
+  Budget:  ~13 min, 9 slides.
   Ported from Summer 2026 L03-trees-bst.md, parts 3, 4.
 -->
 
@@ -43,6 +43,23 @@ void traverse(Node* t) {
     // visit(t);   ← POST: after the subtrees
 }
 ```
+
+--
+
+## [`std::queue`](../../textbook/foundations/foundation-stl-primer.html#queue)
+
+`<queue>`: **first in, first out**.
+
+```cpp
+queue<Node*> q;  q.push(t);
+```
+
+| call | does | cost |
+| --- | --- | --: |
+| `push(x)` | add `x` at the back | $O(1)$ |
+| `front()` | the front element, left in place | $O(1)$ |
+| `pop()` | remove the front; returns **nothing** | $O(1)$ |
+| `empty()` | none left? Test it before `front`, `pop` | $O(1)$ |
 
 --
 

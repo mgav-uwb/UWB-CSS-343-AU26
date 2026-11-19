@@ -1,10 +1,10 @@
 <!--
   TOPIC · Prim's algorithm.
-  Teaches: grow one tree by its lightest exit (the tree-against-the-rest cut); the lazy min-heap of candidate edges and stale entries; the heap's entries and their order (Greater); the code; the run on the course graph and its heap, traced; the MST is not the shortest-path tree; Prim against Dijkstra and against Kruskal. The O(V²) array version is the appendix topic prim-array.md.
+  Teaches: grow one tree by its lightest exit (the tree-against-the-rest cut); the lazy min-heap of candidate edges and stale entries; the heap's entries and their order (Greater); the code; the run on the course graph and its heap, traced; the MST is not the shortest-path tree; Prim against Dijkstra and against Kruskal. The O(V²) array version is the appendix topic prim-array.md; std::priority_queue (a slide of its own, before the first code that uses it).
   Needs:   minimum spanning trees (the cut property), binary heaps, Dijkstra's algorithm (lazy deletion), the weighted adjacency list.
   Demos:   prim (slide spec); figures prim-run-a, prim-run-b, prim-vs-spt (tools/gen-wgraph-figures.mjs)
   Program: code/mst/mst.cpp (the slides' code, compiled and run on the course graph; prints the heap trace)
-  Budget:  ~24 min, 13 slides.
+  Budget:  ~25 min, 14 slides.
   Ported from Summer 2026 L11-mst-union-find.md, part 4.
 -->
 
@@ -53,6 +53,21 @@ A **min-heap** of (weight, vertex) entries:
 **Lazy deletion**, as in Dijkstra's algorithm.
 
 <small>**Eager** Prim keeps one entry per outside vertex and lowers its key: also $O(E \log V)$.</small>
+
+--
+
+## [`std::priority_queue`](../../textbook/foundations/foundation-stl-primer.html#priority-queue)
+
+`<queue>`: a **binary heap** in a `vector`, the **largest** on top.
+
+| call | does | cost |
+| --- | --- | --: |
+| `push(x)` | insert `x` (swim) | $O(\log n)$ |
+| `top()` | the top, left in place | $O(1)$ |
+| `pop()` | remove the top (sink) | $O(\log n)$ |
+| `empty()` | are there none? | $O(1)$ |
+
+No decrease-key: a lowered key is pushed **again**; the stale entry is skipped.
 
 --
 

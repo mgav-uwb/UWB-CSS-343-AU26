@@ -1,10 +1,10 @@
 <!--
   TOPIC · Balance and the AVL invariant.
-  Teaches: sorted input makes a BST a path; what balanced means; the AVL invariant (balance factor -1, 0 or +1 at every node); the node stores its height; only the insertion path can become unbalanced.
+  Teaches: sorted input makes a BST a path; what balanced means; the AVL invariant (balance factor -1, 0 or +1 at every node); the node stores its height; only the insertion path can become unbalanced; std::max and std::min (a slide of its own, before the first code that uses it).
   Needs:   bst search and insert, bst analysis.
   Demos:   avl-vs-bst (slide spec), avl-path (Summer canvas demo)
   Program: none
-  Budget:  ~22 min, 13 slides.
+  Budget:  ~23 min, 14 slides.
   Ported from Summer 2026 L04-avl-trees.md, parts 1, 2.
 -->
 
@@ -119,6 +119,24 @@ Height convention: $\mathrm{height}(\text{null}) = -1$, so a leaf has height $0$
 - **balanced (AVL)**: subtree heights differ by at most 1 at every node; a little slack → cheap to maintain
 
 AVL is **not** perfectly balanced: just **balanced**, which is _close enough_ that height stays $\Theta(\log n)$.
+
+--
+
+## [`std::max`, `std::min`](../../textbook/foundations/foundation-stl-primer.html#algorithms)
+
+`<algorithm>`: the larger, or the smaller, of two values of the **same type**.
+
+```cpp
+t->height = 1 + max(height(t->left), height(t->right));
+```
+
+| call | gives | cost |
+| --- | --- | --: |
+| `max(a, b)` | the larger of `a` and `b` | $O(1)$ |
+| `min(a, b)` | the smaller | $O(1)$ |
+| `max({a, b, c})` | the largest in a list | $O(k)$ |
+
+`max(1, 2L)` does not compile: `int` and `long` differ.
 
 --
 

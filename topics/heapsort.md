@@ -1,7 +1,7 @@
 <!--
   TOPIC · Heapsort and priority queues in practice.
   Teaches: heapsort as selection sort with a heap; sorting down in place (C++); a worked trace; heapsort among the n log n sorts; library priority queues; common heap bugs.
-  Needs:   heapify.
+  Needs:   heapify; heap swim and sink (std::swap).
   Demos:   heap-sort (slide spec); figure hp-sort-down (tools/gen-heap-figures.mjs)
   Program: none
   Budget:  ~20 min, 8 slides.

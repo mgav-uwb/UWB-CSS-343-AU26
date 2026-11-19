@@ -1,10 +1,10 @@
 <!--
   TOPIC · Union-find.
-  Teaches: disjoint sets and dynamic connectivity; the two-array structure; quick-find and quick-union and the trade they make; weighting (union by size) and the doubling proof of the log₂ n height; path compression, full and halving; the cost table and the inverse Ackermann function; connected components online; what union-find cannot do.
+  Teaches: disjoint sets and dynamic connectivity; the two-array structure; quick-find and quick-union and the trade they make; weighting (union by size) and the doubling proof of the log₂ n height; path compression, full and halving; the cost table and the inverse Ackermann function; connected components online; what union-find cannot do; std::swap (a slide of its own, before the first code that uses it).
   Needs:   trees (parent links, height), amortized cost.
   Demos:   union-find (registry); figures uf-quick-find, uf-quick-union, uf-forest, uf-weighting, uf-full, uf-halving, uf-components (tools/gen-wgraph-figures.mjs)
   Program: code/union-find/uf.cpp (every slide's code, compiled and run on the slide examples)
-  Budget:  ~34 min, 20 slides.
+  Budget:  ~35 min, 21 slides.
   Ported from Summer 2026 L11-mst-union-find.md, part 1.
 -->
 
@@ -149,6 +149,20 @@ On 10 singletons, what do `unite(0, 1)`, `unite(1, 2)`, …, `unite(8, 9)` build
 A **path**: each unite puts the old root under the new element, so $0 \to 1 \to \cdots \to 9$, height 9, and `find(0)` walks 9 links. In general $n - 1$ unites can build height $n - 1$: `find` is $O(n)$.
 
 </details>
+
+--
+
+## [`std::swap`](../../textbook/foundations/foundation-stl-primer.html#algorithms)
+
+`<utility>`: exchange two values.
+
+```cpp
+if (size[ra] < size[rb]) swap(ra, rb);     // ra: the larger root
+```
+
+- afterwards `x` holds `y`'s old value and `y` holds `x`'s
+- $O(1)$ for numbers and pointers; two `vector`s swap their internal pointers, also $O(1)$
+- both arguments are **variables** of the same type, passed by reference
 
 --
 

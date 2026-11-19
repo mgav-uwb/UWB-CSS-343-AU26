@@ -1,10 +1,10 @@
 <!--
   TOPIC · Kruskal's algorithm.
-  Teaches: cheapest edge first, skip cycles; union-find as the cycle test; the code; the full run on the course graph with its two skips and early stop; why each added edge is safe (the component cut); a disconnected graph gives a spanning forest; the cost.
+  Teaches: cheapest edge first, skip cycles; union-find as the cycle test; the code; the full run on the course graph with its two skips and early stop; why each added edge is safe (the component cut); a disconnected graph gives a spanning forest; the cost; std::sort (a slide of its own, before the first code that uses it).
   Needs:   union-find, minimum spanning trees (the cut and cycle properties), sorting.
   Demos:   kruskal (slide spec); figures kruskal-sorted, kruskal-run-a, kruskal-run-b, kruskal-forest (tools/gen-wgraph-figures.mjs)
   Program: code/mst/mst.cpp (the slide's code, compiled and run on the course graph)
-  Budget:  ~22 min, 9 slides.
+  Budget:  ~23 min, 10 slides.
   Ported from Summer 2026 L11-mst-union-find.md, part 3.
 -->
 
@@ -27,6 +27,22 @@ Sort the edges by weight. Take each one **unless it closes a cycle**. Stop at $V
 
 - an edge closes a cycle **iff** its ends are **already connected**
 - "already connected?" is union-find's `connected`
+
+--
+
+## [`std::sort`](../../textbook/foundations/foundation-stl-primer.html#sort)
+
+```cpp
+bool lighter(const Edge& a, const Edge& b) { return a.w < b.w; }
+```
+
+```cpp
+sort(edges.begin(), edges.end(), lighter);  // cheapest first
+```
+
+- `<algorithm>`: sorts `[begin, end)` in place, $O(E \log\_2 E)$ comparisons
+- `lighter(a, b)`: must `a` go **before** `b`? **Strict**: `<`, never `<=`
+- equal weights come out in **any** order; `stable_sort` keeps input order
 
 --
 

@@ -1,10 +1,10 @@
 <!--
   TOPIC · Depth-first search.
-  Teaches: the search problem; DFS recursive and iterative; one call reaches only the start's reachable set, so a whole-graph traversal restarts at every unvisited vertex; DFS visits exactly the reachable set; the Θ(V + E) cost by the handshake lemma; recursion depth; connected components; reachability.
+  Teaches: the search problem; DFS recursive and iterative; one call reaches only the start's reachable set, so a whole-graph traversal restarts at every unvisited vertex; DFS visits exactly the reachable set; the Θ(V + E) cost by the handshake lemma; recursion depth; connected components; reachability; std::stack (a slide of its own, before the first code that uses it).
   Needs:   graph representations, recursion.
   Demos:   graph-dfs (slide spec)
   Program: none
-  Budget:  ~39 min, 15 slides.
+  Budget:  ~40 min, 16 slides.
   Ported from Summer 2026 L08-graphs-bfs-dfs.md, parts 2.
 -->
 
@@ -185,6 +185,23 @@ Linear in the size of the graph, and optimal: any search must at least **look** 
 </pre>
 </div>
 
+
+--
+
+## [`std::stack`](../../textbook/foundations/foundation-stl-primer.html#stack)
+
+`<stack>`: **last in, first out**.
+
+```cpp
+stack<int> st; st.push(s);
+```
+
+| call | does | cost |
+| --- | --- | --: |
+| `push(x)` | put `x` on top | $O(1)$ |
+| `top()` | the top element, left in place | $O(1)$ |
+| `pop()` | remove the top; returns **nothing** | $O(1)$ |
+| `empty()` | none left? Test it before `top`, `pop` | $O(1)$ |
 
 --
 

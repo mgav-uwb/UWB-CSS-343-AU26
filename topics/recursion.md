@@ -1,13 +1,13 @@
 <!--
 TOPIC · Recursion.
-  Teaches: base case and recursive case; the call stack; work before and after
+  Teaches: base case and recursive case; the call stack; work before and after; std::max and std::min (a slide of its own, before the first code that uses it).
            the call; structural recursion on a list and on a tree; the
            induction argument for correctness; binary search; four ways a
            recursion fails; recomputation measured on Fibonacci.
   Needs:   the owning-memory topic (Node, pointers).
   Demos:   factorial (the recursion tree and the call stack, side by side).
   Program: topics/code/recursion/recursion.cpp
-  Budget:  ~28 min, 14 slides.
+  Budget:  ~29 min, 15 slides.
 -->
 
 ### Recursion
@@ -105,6 +105,24 @@ int length(const Node* p) {
 ```
 
 The code has the same two cases as the data.
+
+--
+
+## [`std::max`, `std::min`](../../textbook/foundations/foundation-stl-primer.html#algorithms)
+
+`<algorithm>`: the larger, or the smaller, of two values of the **same type**.
+
+```cpp
+return 1 + max(height(t->left), height(t->right));
+```
+
+| call | gives | cost |
+| --- | --- | --: |
+| `max(a, b)` | the larger of `a` and `b` | $O(1)$ |
+| `min(a, b)` | the smaller | $O(1)$ |
+| `max({a, b, c})` | the largest in a list | $O(k)$ |
+
+`max(1, 2L)` does not compile: `int` and `long` differ.
 
 --
 

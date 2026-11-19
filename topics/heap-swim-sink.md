@@ -1,10 +1,10 @@
 <!--
   TOPIC · Insert and delete-max: swim and sink.
-  Teaches: insert by appending and swimming up; delete-max by swapping with the last element and sinking down; swim, sink and the two MaxHeap members in C++; worked examples and your-turn exercises; the whole API.
+  Teaches: insert by appending and swimming up; delete-max by swapping with the last element and sinking down; swim, sink and the two MaxHeap members in C++; worked examples and your-turn exercises; the whole API; std::swap (a slide of its own, before the first code that uses it).
   Needs:   priority queues.
   Demos:   heap-insert, heap-ops (slide specs); figures hp-swim, hp-sink (tools/gen-heap-figures.mjs)
   Program: none
-  Budget:  ~24 min, 12 slides.
+  Budget:  ~25 min, 13 slides.
   Ported from Summer 2026 L06-heaps-pq.md, parts 4, 5; figures and class-style code 2026-10-21.
 -->
 
@@ -24,6 +24,20 @@ To insert a key:
 2. it may exceed its parent, so **swim** it up: while it is bigger than its parent, **swap**
 
 Only the new node's **path to the root** can be out of order, so repairing that one path is enough.
+
+--
+
+## [`std::swap`](../../textbook/foundations/foundation-stl-primer.html#algorithms)
+
+`<utility>`: exchange two values.
+
+```cpp
+std::swap(a[k/2], a[k]);       // the larger key moves up
+```
+
+- afterwards `x` holds `y`'s old value and `y` holds `x`'s
+- $O(1)$ for numbers and pointers; two `vector`s swap their internal pointers, also $O(1)$
+- both arguments are **variables** of the same type, passed by reference
 
 --
 

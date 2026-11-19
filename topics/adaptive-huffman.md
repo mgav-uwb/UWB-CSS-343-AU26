@@ -65,7 +65,7 @@ Number the nodes bottom up, left to right; the root gets the highest number. A t
 
 --
 
-## `std::map`: `leafOf`
+## [`std::map`: `leafOf`](../../textbook/foundations/foundation-stl-primer.html#map)
 
 The fields of `AdaptiveTree`:
 

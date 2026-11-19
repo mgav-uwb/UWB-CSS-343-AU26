@@ -630,6 +630,7 @@ key.hash(&amp;mut hasher);
 let index = (hasher.finish() % m as u64) as usize;</pre>
 <p class="ct-src">source: <code>code/hashing/compress.cpp &middot; code/hashing/compress.java &middot; code/hashing/compress.py &middot; code/hashing/compress.rs</code></p>
 <!--/ct--></div>
+      <p class="note stl-ref">Standard library in this code: <a href="../foundations/foundation-stl-primer.html#hash"><code>hash</code></a> (<a href="../foundations/foundation-stl-primer.html">STL Primer</a>).</p>
       <p>
         Java&rsquo;s <code>hashCode</code> may be negative, and so would its
         remainder, so the mask <code>&amp; 0x7fffffff</code> clears the sign bit
@@ -684,6 +685,7 @@ struct Point { x: i32, y: i32 }
 let mut m: HashMap&lt;Point, i32&gt; = HashMap::new();</pre>
 <p class="ct-src">source: <code>code/hashing/custom-hash.cpp &middot; code/hashing/custom-hash.java &middot; code/hashing/custom-hash.py &middot; code/hashing/custom-hash.rs</code></p>
 <!--/ct--></div>
+      <p class="note stl-ref">Standard library in this code: <a href="../foundations/foundation-stl-primer.html#unordered"><code>unordered_map</code></a> (<a href="../foundations/foundation-stl-primer.html">STL Primer</a>).</p>
       <div class="aside">
         <span class="tag">The hashCode contract</span>
         Equal keys <strong>must</strong> have equal hashes: if
@@ -1036,6 +1038,7 @@ impl ChainedTable {
 }</pre>
 <p class="ct-src">source: <code>code/hashing/chain-ops.cpp &middot; code/hashing/chain-ops.java &middot; code/hashing/chain-ops.py &middot; code/hashing/chain-ops.rs</code></p>
 <!--/ct--></div>
+      <p class="note stl-ref">Standard library in this code: <a href="../foundations/foundation-stl-primer.html#list"><code>list</code></a> (<a href="../foundations/foundation-stl-primer.html">STL Primer</a>).</p>
       <p>
         Deletion is a plain splice: find the node and remove it, and no other key
         moves. Hold that thought: open addressing will make deletion
@@ -3811,6 +3814,7 @@ void LinearProbing::resize(int newM) {
 }</pre>
 <p class="ct-src">source: <code>code/hashing/resize.cpp &middot; code/hashing/resize.java &middot; code/hashing/resize.py &middot; code/hashing/resize.rs</code></p>
 <!--/ct--></div>
+      <p class="note stl-ref">Standard library in this code: <a href="../foundations/foundation-stl-primer.html#vector"><code>vector::assign</code></a> (<a href="../foundations/foundation-stl-primer.html">STL Primer</a>).</p>
       <p>
         A resize cannot copy slots, because each key&rsquo;s index is
         \(h(k) \bmod M\) and \(M\) has changed; every key must be hashed anew into

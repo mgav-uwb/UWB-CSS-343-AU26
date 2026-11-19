@@ -1,7 +1,7 @@
 <!--
   TOPIC · Ordered operations.
   Teaches: min and max, floor and ceiling, select and rank with the size field, range queries as a pruned in-order walk; where order matters.
-  Needs:   bst search and insert.
+  Needs:   bst search and insert; tree traversals (std::queue).
   Demos:   bst-ordered (Summer canvas demo)
   Program: none
   Budget:  ~12 min, 8 slides.

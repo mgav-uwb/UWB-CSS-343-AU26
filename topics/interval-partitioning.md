@@ -59,7 +59,7 @@ In **start** order, put each request in a room that is free; open a new room **o
 
 --
 
-## `std::priority_queue`
+## [`std::priority_queue`](../../textbook/foundations/foundation-stl-primer.html#priority-queue)
 
 ```cpp
 struct Greater {                         // reverses the comparison

@@ -1,0 +1,908 @@
+<!doctype html>
+<!-- Data Structures & Algorithms: STL Primer.
+     Self-contained chapter. Math renders via MathJax (CDN). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>STL Primer - Data Structures & Algorithms</title>
+    <script>
+      MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        chtml: { scale: 1.0 },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d4d; --accentbg: #eaf6ef; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+      .epigraph.fact { font-style: normal; font-size: 16px; }
+      .epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      pre .cm { color: #7a8296; }
+      .code-tabs { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .ct-tabs { display: flex; flex-wrap: wrap; background: #eef1f6; border-bottom: 1px solid var(--line); }
+      .ct-tab { font-family: system-ui, sans-serif; font-size: 12.5px; padding: 6px 13px; border: none; background: transparent; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; }
+      .ct-tab.on { color: var(--ink); background: #fff; border-bottom-color: var(--demo); font-weight: 600; }
+      .code-tabs pre { margin: 0; border: none; border-radius: 0; border-left: none; }
+      .code-tabs pre[hidden] { display: none; }
+      .ct-src { font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--dim); margin: 0; padding: 5px 13px; border-top: 1px solid var(--line); background: #fafbfc; }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      .proof { margin: 10px 0 4px; padding-left: 14px; border-left: 2px solid var(--line); color: #2c2f37; }
+      .proof .qed { float: right; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg { max-width: 100%; height: auto; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      table.trace { font-size: 13.5px; }
+      table.trace td, table.trace th { text-align: center; padding: 5px 8px; font-variant-numeric: tabular-nums; }
+      table.trace td.lab { text-align: left; white-space: nowrap; color: var(--dim); }
+      table.trace td.set { background: var(--accentbg); color: var(--accent); font-weight: 700; }
+      table.trace td.upd { background: var(--warnbg); font-weight: 700; }
+      table.trace td.inf { color: #b8bec9; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+      .upnav { font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+        margin: 0 0 20px; }
+      .upnav a { color: var(--dim, #5c6270); text-decoration: none; }
+      .upnav a:hover { color: var(--accent, #0a7d4d); text-decoration: underline; }
+      @media (max-width: 520px) { table { font-size: 13px; } th, td { padding: 5px 6px; } td code { word-break: break-all; } }
+    </style>
+  <body>
+    <div class="page">
+      <p class="upnav"><a href="../index.html">&#8592; Contents</a></p>
+
+      <h1>STL Primer</h1>
+      <blockquote class="epigraph fact">
+        Alexander Stepanov and Meng Lee wrote the Standard Template Library at
+        Hewlett-Packard; in July 1994 the C++ standards committee voted it into the
+        draft standard.
+        <cite>B. Stroustrup, &ldquo;Evolving a language in and for the real world: C++ 1991&ndash;2006,&rdquo; HOPL III, 2007</cite>
+      </blockquote>
+
+      <p class="lead">
+        Most chapters of this text build a data structure from nodes and arrays, and
+        then use the standard library&rsquo;s version of it in later code: Dijkstra&rsquo;s
+        algorithm takes its heap from <code>std::priority_queue</code>, breadth-first
+        search its queue from <code>std::queue</code>, Huffman coding its code table
+        from <code>std::map</code>. This primer covers each library structure and
+        algorithm that the chapters and lecture slides use: its header, what it is
+        underneath, the calls the code makes and what they cost, and the mistake it
+        invites. Each section ends with the chapters whose code uses it.
+      </p>
+      <p>
+        Every code block below is copied from
+        <a href="../../code/stl/primer.cpp"><code>code/stl/primer.cpp</code></a>,
+        which checks every value a comment states. The code follows the
+        conventions of this text: <code>using namespace std;</code>, named functions
+        and comparison structs rather than lambdas, and declared types rather than
+        <code>auto</code>. The mechanisms underneath (templates, references, the
+        heap) are in <a href="foundation-cpp-essentials.html">C++ for Data
+        Structures</a>.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#ranges">Ranges and iterators</a></li>
+          <li><a href="#vector"><code>vector</code> and <code>string</code></a></li>
+          <li><a href="#pair"><code>pair</code></a></li>
+          <li><a href="#stack"><code>stack</code></a></li>
+          <li><a href="#queue"><code>queue</code></a></li>
+          <li><a href="#list"><code>list</code></a></li>
+          <li><a href="#priority-queue"><code>priority_queue</code></a></li>
+          <li><a href="#map"><code>map</code> and <code>set</code></a></li>
+          <li><a href="#unordered"><code>unordered_map</code> and <code>unordered_set</code></a></li>
+          <li><a href="#hash"><code>hash</code></a></li>
+          <li><a href="#sort"><code>sort</code> and <code>stable_sort</code></a></li>
+          <li><a href="#algorithms"><code>swap</code>, <code>min</code>, <code>max</code>, <code>reverse</code>, <code>iota</code>, <code>abs</code></a></li>
+          <li><a href="#limits"><code>INT_MAX</code> and <code>numeric_limits</code></a></li>
+          <li><a href="#costs">Costs at a glance</a></li>
+          <li><a href="#other">The same structures in Java, Python and Rust</a></li>
+          <li><a href="#ex">Exercises (with solutions)</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="ranges">1. Ranges and iterators</h2>
+      <p>
+        A library algorithm does not take a container; it takes a <strong>range</strong>:
+        two <strong>iterators</strong>, one at the first element and one
+        <em>one past the last</em>. An iterator is a position in a container; for a
+        <code>vector</code> it behaves like a pointer into the array. The range
+        \([\text{first}, \text{last})\) is half-open, so <code>v.begin()</code> and
+        <code>v.end()</code> together name every element, <code>v.end() - v.begin()</code>
+        is the size, and an empty range has <code>first == last</code>.
+        <code>end()</code> is never dereferenced: there is no element there.
+      </p>
+      <pre>vector&lt;int&gt; v = {7, 3, 9, 4, 1};
+sort(v.begin(), v.begin() + 3);   <span class="cm">// sorts v[0..3): 3 7 9 4 1</span></pre>
+      <figure>
+<!-- gen:stl stl-range -->
+<svg viewBox="0 0 498 260" role="img" style="max-width:598px" font-family="system-ui, sans-serif" aria-label="v holds 7, 3, 9, 4, 1 at indices 0 to 4. begin() points at index 0; end() points one past the last element, at index 5, which is never dereferenced. sort(v.begin(), v.begin() + 3) sorts only the half-open range [begin, begin + 3), the first three elements, giving 3, 7, 9, 4, 1; the 4 and the 1 are untouched.">
+<text x="62" y="63" font-size="15" font-weight="600" fill="#1a1c22" text-anchor="end" font-family="SF Mono, Menlo, Consolas, monospace">v</text>
+<rect x="74" y="40" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="96" y="63" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">7</text>
+<rect x="118" y="40" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="140" y="63" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="162" y="40" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="184" y="63" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="206" y="40" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="228" y="63" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="250" y="40" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="272" y="63" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="294" y="40" width="44" height="36" rx="3" fill="#fff" stroke="#c8ccd6" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="96" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">0</text>
+<text x="140" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">1</text>
+<text x="184" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">2</text>
+<text x="228" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">3</text>
+<text x="272" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">4</text>
+<text x="316" y="91" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">5</text>
+<text x="96" y="21" font-size="12.5" font-weight="600" fill="#6b40d8" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">begin()</text>
+<line x1="96" y1="25" x2="96" y2="31" stroke="#6b40d8" stroke-width="1.8"/>
+<path d="M91 30 L101 30 L96 38 Z" fill="#6b40d8"/>
+<text x="316" y="21" font-size="12.5" font-weight="600" fill="#6b40d8" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">end()</text>
+<line x1="316" y1="25" x2="316" y2="31" stroke="#6b40d8" stroke-width="1.8"/>
+<path d="M311 30 L321 30 L316 38 Z" fill="#6b40d8"/>
+<text x="348" y="62" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">one past the last:</text>
+<text x="348" y="77" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">never dereferenced</text>
+<text x="10" y="134" font-size="12.5" font-weight="500" fill="#1a1c22" text-anchor="start" font-family="SF Mono, Menlo, Consolas, monospace">sort(v.begin(), v.begin() + 3);</text>
+<text x="62" y="191" font-size="15" font-weight="600" fill="#1a1c22" text-anchor="end" font-family="SF Mono, Menlo, Consolas, monospace">v</text>
+<rect x="74" y="168" width="44" height="36" rx="3" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="96" y="191" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">3</text>
+<rect x="118" y="168" width="44" height="36" rx="3" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="140" y="191" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">7</text>
+<rect x="162" y="168" width="44" height="36" rx="3" fill="#eaf6ef" stroke="#0a7d4d" stroke-width="1.4"/>
+<text x="184" y="191" font-size="15" font-weight="700" fill="#0a7d4d" text-anchor="middle">9</text>
+<rect x="206" y="168" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="228" y="191" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">4</text>
+<rect x="250" y="168" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="272" y="191" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">1</text>
+<path d="M76 212 L76 219 L204 219 L204 212" fill="none" stroke="#0a7d4d" stroke-width="1.6"/>
+<text x="140" y="236" font-size="11.5" font-weight="600" fill="#0a7d4d" text-anchor="middle">[begin, begin + 3): sorted</text>
+<text x="250" y="236" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="middle">untouched</text>
+</svg>
+<!-- /gen:stl stl-range -->
+        <figcaption>A half-open range. <code>end()</code> is the position after the last element; <code>v.begin() + 3</code> is the position after the third, so the call sorts exactly three elements.</figcaption>
+      </figure>
+      <p>
+        The range-based <code>for</code> loop walks the same range, from
+        <code>begin()</code> up to but not including <code>end()</code>:
+      </p>
+      <pre>for (const int&amp; x : v) sum += x;  <span class="cm">// visits begin() up to, not including, end()</span></pre>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        An iterator can be <em>invalidated</em> by a change to its container. A
+        <code>push_back</code> that makes a <code>vector</code> reallocate moves every
+        element, and every iterator, pointer and reference into the old array then
+        dangles. Take iterators after the container stops growing.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="vector">2. <code>vector</code> and <code>string</code></h2>
+      <p>
+        <code>vector&lt;T&gt;</code> (<code>&lt;vector&gt;</code>) is a dynamic array:
+        the elements sit contiguously in one heap block, and when the block is full
+        <code>push_back</code> allocates one twice as large and moves the elements
+        over. The occasional move is paid for by the cheap appends before it, so an
+        append costs \(O(1)\) amortized; the
+        <a href="foundation-amortized-analysis.html">Amortized Analysis</a> chapter
+        proves it. A <code>vector</code> keeps its <em>size</em> (elements in use)
+        apart from its <em>capacity</em> (elements allocated).
+      </p>
+      <pre>vector&lt;int&gt; dist;
+dist.assign(5, INT_MAX);          <span class="cm">// five elements, each INT_MAX</span>
+dist.push_back(0);                <span class="cm">// amortized O(1): size 6</span>
+dist.resize(3);                   <span class="cm">// keeps the first three</span>
+int last = dist.back();           <span class="cm">// INT_MAX</span></pre>
+      <table>
+        <tr><th>call</th><th>does</th><th>cost</th></tr>
+        <tr><td><code>v[i]</code>, <code>v.at(i)</code></td><td>element \(i\); <code>at</code> checks the index and throws when it is out of range</td><td>\(O(1)\)</td></tr>
+        <tr><td><code>v.push_back(x)</code>, <code>v.pop_back()</code></td><td>add or remove at the end</td><td>\(O(1)\) amortized</td></tr>
+        <tr><td><code>v.back()</code>, <code>v.size()</code>, <code>v.empty()</code></td><td>the last element; how many; none?</td><td>\(O(1)\)</td></tr>
+        <tr><td><code>v.assign(n, x)</code></td><td>replace the contents with \(n\) copies of \(x\)</td><td>\(O(n)\)</td></tr>
+        <tr><td><code>v.resize(n)</code></td><td>keep the first \(n\), or pad with default values</td><td>\(O(\lvert n - \text{size}\rvert)\)</td></tr>
+        <tr><td><code>v.insert(it, x)</code>, <code>v.erase(it)</code></td><td>insert or remove in the middle; every later element shifts</td><td>\(O(n)\)</td></tr>
+      </table>
+      <p>
+        <code>string</code> (<code>&lt;string&gt;</code>) is a <code>vector</code> of
+        <code>char</code> with text operations added. Appending is amortized
+        \(O(1)\) per character; <code>substr</code> and <code>+</code> build a new
+        string, so they cost the length of the result.
+      </p>
+      <pre>string path = "10";
+path += "1";                      <span class="cm">// "101": amortized O(1) per character</span>
+string tail = path.substr(1);     <span class="cm">// "01": a copy, O(length)</span></pre>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        <code>v[i]</code> does not check \(i\): an index past the end reads or
+        writes whatever memory is there, which is undefined behaviour, and the
+        program may run on with corrupted data. Use <code>at</code> while debugging,
+        or compile with the address sanitizer.
+      </div>
+      <p class="note">Every chapter&rsquo;s code uses <code>vector</code>; <code>assign</code> or <code>resize</code> appear in:
+<!-- stl:used vector -->
+<a href="../dp/algo-knapsack.html#knap">0/1 Knapsack</a>, <a href="../graphs/algo-dijkstra.html#negative">Dijkstra’s Algorithm</a>, <a href="../dp/algo-edit-distance.html#edit">Edit Distance</a>, <a href="../hashing/ds-hashing.html#load">Hashing</a>, <a href="../dp/algo-longest-common-subsequence.html#lcs">Longest Common Subsequence</a>, <a href="../dp/algo-matrix-chain.html#code">Matrix-Chain Multiplication</a>, <a href="../graphs/algo-max-flow.html#ff">Maximum Flow &amp; Minimum Cut</a>, <a href="../strings/algo-regex-automata.html#simulate">Regular Expressions &amp; Automata</a>, <a href="../dp/algo-rod-cutting.html#rod">Rod Cutting</a>.
+<!-- /stl:used vector -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="pair">3. <code>pair</code></h2>
+      <p>
+        <code>pair&lt;A, B&gt;</code> (<code>&lt;utility&gt;</code>) holds two values
+        named <code>first</code> and <code>second</code>. Pairs compare
+        <strong>lexicographically</strong>: by <code>first</code>, and by
+        <code>second</code> when the firsts are equal. That order is why a heap of
+        <code>(distance, vertex)</code> pairs pops the nearest vertex first.
+      </p>
+      <pre>pair&lt;int, int&gt; e = {4, 2};        <span class="cm">// (weight, vertex)</span>
+int w = e.first, u = e.second;    <span class="cm">// 4, 2</span>
+bool before = pair&lt;int, int&gt;{4, 2} &lt; pair&lt;int, int&gt;{4, 7};   <span class="cm">// true</span></pre>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        <code>first</code> and <code>second</code> say nothing about what they hold,
+        and a pair of two <code>int</code>s accepts them in either order. The code in
+        this text prefers a small <code>struct</code> with named fields, such as
+        <code>struct Entry { long dist; int vertex; };</code> in
+        <a href="../graphs/algo-dijkstra.html">Dijkstra&rsquo;s Algorithm</a>, and
+        writes its order out in a comparison struct.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used pair -->
+<a href="../strings/foundation-context-free-grammars.html#cyk">Context-Free Grammars &amp; Parsing</a>, <a href="../greedy/algo-interval-scheduling.html#partition">Interval Scheduling</a>, <a href="../foundations/foundation-p-np.html#practice">P, NP &amp; Reductions</a>, <a href="../foundations/foundation-space-complexity.html#aux">Space Complexity</a>, <a href="../trees/ds-treaps.html#splitmerge">Treaps</a>, <a href="../strings/ds-tries.html#space">Tries &amp; Ternary Search Trees</a>, <a href="../foundations/foundation-computability.html#universal">Turing Machines &amp; Computability</a>.
+<!-- /stl:used pair -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="stack">4. <code>stack</code></h2>
+      <p>
+        <code>stack&lt;T&gt;</code> (<code>&lt;stack&gt;</code>) is last in, first out:
+        it adds and removes at one end, the top. It is an <em>adapter</em>: a thin
+        wrapper that exposes only the top of another container (a
+        <code>deque</code> by default). The call stack of a recursion is the same
+        structure, which is why an explicit <code>stack</code> turns a recursion
+        into a loop.
+      </p>
+      <pre>stack&lt;int&gt; st;
+st.push(1); st.push(2); st.push(3);
+int t = st.top();                 <span class="cm">// 3: the last one pushed</span>
+st.pop();                         <span class="cm">// removes the 3; returns nothing</span></pre>
+      <figure>
+<!-- gen:stl stl-adapters -->
+<svg viewBox="0 0 762 252" role="img" style="max-width:914px" font-family="system-ui, sans-serif" aria-label="Three containers after their pushes. stack&lt;int&gt; after pushing 1, 2, 3: 3 is on top, and push, top and pop all work at the top. queue&lt;int&gt; after pushing 1, 2, 3: front() and pop() work at the front, where 1 is, and push() adds at the back, after 3. priority_queue&lt;int&gt; after pushing 5, 1, 8, 3, 9, 2: a binary heap with 9 on top, stored in a vector as 9, 8, 5, 1, 3, 2; top() and pop() work at the root.">
+<text x="10" y="24" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="start" font-family="SF Mono, Menlo, Consolas, monospace">stack&lt;int&gt;</text>
+<text x="10" y="41" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">last in, first out</text>
+<rect x="30" y="84" width="44" height="36" rx="3" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.4"/>
+<text x="52" y="107" font-size="15" font-weight="700" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="30" y="120" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="52" y="143" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="30" y="156" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="52" y="179" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">1</text>
+<line x1="24" y1="196" x2="80" y2="196" stroke="#2a2d36" stroke-width="2"/>
+<text x="52" y="212" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">bottom</text>
+<line x1="108" y1="102" x2="73" y2="102" stroke="#6b40d8" stroke-width="1.8"/>
+<path d="M72 97 L72 107 L80 102 Z" fill="#6b40d8"/>
+<text x="114" y="98" font-size="12.5" font-weight="600" fill="#6b40d8" text-anchor="start" font-family="SF Mono, Menlo, Consolas, monospace">top()</text>
+<text x="114" y="114" font-size="12.5" font-weight="600" fill="#6b40d8" text-anchor="start" font-family="SF Mono, Menlo, Consolas, monospace">push() pop()</text>
+<text x="226" y="24" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="start" font-family="SF Mono, Menlo, Consolas, monospace">queue&lt;int&gt;</text>
+<text x="226" y="41" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">first in, first out</text>
+<rect x="286" y="120" width="44" height="36" rx="3" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.4"/>
+<text x="308" y="143" font-size="15" font-weight="700" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="330" y="120" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="352" y="143" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">2</text>
+<rect x="374" y="120" width="44" height="36" rx="3" fill="#fff" stroke="#9aa3b2" stroke-width="1.4"/>
+<text x="396" y="143" font-size="15" font-weight="500" fill="#1a1c22" text-anchor="middle">3</text>
+<line x1="280" y1="138" x2="242" y2="138" stroke="#6b40d8" stroke-width="1.8"/>
+<path d="M243 133 L243 143 L235 138 Z" fill="#6b40d8"/>
+<text x="258" y="94" font-size="12.5" font-weight="600" fill="#6b40d8" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">front()</text>
+<text x="258" y="110" font-size="12.5" font-weight="600" fill="#6b40d8" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">pop()</text>
+<line x1="458" y1="138" x2="417" y2="138" stroke="#6b40d8" stroke-width="1.8"/>
+<path d="M416 133 L416 143 L424 138 Z" fill="#6b40d8"/>
+<text x="442" y="110" font-size="12.5" font-weight="600" fill="#6b40d8" text-anchor="middle" font-family="SF Mono, Menlo, Consolas, monospace">push()</text>
+<text x="308" y="172" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">front</text>
+<text x="396" y="172" font-size="11" font-weight="400" fill="#5c6270" text-anchor="middle">back</text>
+<text x="502" y="24" font-size="12.5" font-weight="600" fill="#1a1c22" text-anchor="start" font-family="SF Mono, Menlo, Consolas, monospace">priority_queue&lt;int&gt;</text>
+<text x="502" y="41" font-size="11.5" font-weight="400" fill="#5c6270" text-anchor="start">the largest on top</text>
+<line x1="627" y1="78" x2="571" y2="122" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="627" y1="78" x2="683" y2="122" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="571" y1="122" x2="543" y2="166" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="571" y1="122" x2="599" y2="166" stroke="#4a5163" stroke-width="1.6"/>
+<line x1="683" y1="122" x2="655" y2="166" stroke="#4a5163" stroke-width="1.6"/>
+<circle cx="627" cy="78" r="15" fill="#fde7bf" stroke="#c98a1a" stroke-width="1.7"/>
+<text x="627" y="83" font-size="14" font-weight="700" fill="#1a1c22" text-anchor="middle">9</text>
+<circle cx="571" cy="122" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.7"/>
+<text x="571" y="127" font-size="14" font-weight="500" fill="#1a1c22" text-anchor="middle">8</text>
+<circle cx="683" cy="122" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.7"/>
+<text x="683" y="127" font-size="14" font-weight="500" fill="#1a1c22" text-anchor="middle">5</text>
+<circle cx="543" cy="166" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.7"/>
+<text x="543" y="171" font-size="14" font-weight="500" fill="#1a1c22" text-anchor="middle">1</text>
+<circle cx="599" cy="166" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.7"/>
+<text x="599" y="171" font-size="14" font-weight="500" fill="#1a1c22" text-anchor="middle">3</text>
+<circle cx="655" cy="166" r="15" fill="#fff" stroke="#2a2d36" stroke-width="1.7"/>
+<text x="655" y="171" font-size="14" font-weight="500" fill="#1a1c22" text-anchor="middle">2</text>
+<text x="650" y="74" font-size="12.5" font-weight="600" fill="#6b40d8" text-anchor="start" font-family="SF Mono, Menlo, Consolas, monospace">top()</text>
+<text x="650" y="90" font-size="12.5" font-weight="600" fill="#6b40d8" text-anchor="start" font-family="SF Mono, Menlo, Consolas, monospace">pop()</text>
+<text x="502" y="215" font-size="11" font-weight="400" fill="#5c6270" text-anchor="start">the vector:</text>
+<rect x="566" y="200" width="28" height="24" rx="2" fill="#fff" stroke="#9aa3b2" stroke-width="1.2"/>
+<text x="580" y="217" font-size="13" fill="#1a1c22" text-anchor="middle">9</text>
+<rect x="594" y="200" width="28" height="24" rx="2" fill="#fff" stroke="#9aa3b2" stroke-width="1.2"/>
+<text x="608" y="217" font-size="13" fill="#1a1c22" text-anchor="middle">8</text>
+<rect x="622" y="200" width="28" height="24" rx="2" fill="#fff" stroke="#9aa3b2" stroke-width="1.2"/>
+<text x="636" y="217" font-size="13" fill="#1a1c22" text-anchor="middle">5</text>
+<rect x="650" y="200" width="28" height="24" rx="2" fill="#fff" stroke="#9aa3b2" stroke-width="1.2"/>
+<text x="664" y="217" font-size="13" fill="#1a1c22" text-anchor="middle">1</text>
+<rect x="678" y="200" width="28" height="24" rx="2" fill="#fff" stroke="#9aa3b2" stroke-width="1.2"/>
+<text x="692" y="217" font-size="13" fill="#1a1c22" text-anchor="middle">3</text>
+<rect x="706" y="200" width="28" height="24" rx="2" fill="#fff" stroke="#9aa3b2" stroke-width="1.2"/>
+<text x="720" y="217" font-size="13" fill="#1a1c22" text-anchor="middle">2</text>
+</svg>
+<!-- /gen:stl stl-adapters -->
+        <figcaption>Where each adapter adds and removes. A <code>stack</code> works at its top, a <code>queue</code> takes from the front and adds at the back, and a <code>priority_queue</code> keeps a binary heap in a <code>vector</code> with the largest element at the root.</figcaption>
+      </figure>
+      <table>
+        <tr><th>call</th><th>does</th><th>cost</th></tr>
+        <tr><td><code>push(x)</code></td><td>put \(x\) on top</td><td>\(O(1)\) amortized</td></tr>
+        <tr><td><code>top()</code></td><td>the top element, left in place</td><td>\(O(1)\)</td></tr>
+        <tr><td><code>pop()</code></td><td>remove the top element</td><td>\(O(1)\)</td></tr>
+        <tr><td><code>size()</code>, <code>empty()</code></td><td>how many; none?</td><td>\(O(1)\)</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        <code>pop()</code> returns nothing: read <code>top()</code> first, then pop.
+        <code>top()</code> and <code>pop()</code> on an empty stack are undefined
+        behaviour, so a loop tests <code>!st.empty()</code> before each one.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used stack -->
+<a href="../graphs/algo-dfs.html#iter">Depth-First Search</a>, <a href="../foundations/foundation-recursion.html#iterate">Recursion &amp; Induction</a>.
+<!-- /stl:used stack -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="queue">5. <code>queue</code></h2>
+      <p>
+        <code>queue&lt;T&gt;</code> (<code>&lt;queue&gt;</code>) is first in, first out:
+        <code>push</code> adds at the back, <code>front</code> and <code>pop</code>
+        work at the front. Like <code>stack</code> it is an adapter over a
+        <code>deque</code>. Breadth-first search keeps its frontier in one: the
+        vertices come out in the order they were found, which is the order of
+        their distance from the start.
+      </p>
+      <pre>queue&lt;int&gt; q;
+q.push(1); q.push(2); q.push(3);
+int f = q.front();                <span class="cm">// 1: the first one pushed</span>
+q.pop();                          <span class="cm">// removes the 1; returns nothing</span></pre>
+      <table>
+        <tr><th>call</th><th>does</th><th>cost</th></tr>
+        <tr><td><code>push(x)</code></td><td>add \(x\) at the back</td><td>\(O(1)\) amortized</td></tr>
+        <tr><td><code>front()</code>, <code>back()</code></td><td>the first and the last element, left in place</td><td>\(O(1)\)</td></tr>
+        <tr><td><code>pop()</code></td><td>remove the front element</td><td>\(O(1)\)</td></tr>
+        <tr><td><code>size()</code>, <code>empty()</code></td><td>how many; none?</td><td>\(O(1)\)</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        As with <code>stack</code>, <code>pop()</code> returns nothing and
+        <code>front()</code> on an empty queue is undefined behaviour. A queue
+        cannot be searched or indexed; a search that also needs &ldquo;is
+        \(v\) waiting?&rdquo; keeps a separate <code>visited</code> array.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used queue -->
+<a href="../graphs/algo-bfs.html#bfs">Breadth-First Search</a>, <a href="../graphs/algo-max-flow.html#ff">Maximum Flow &amp; Minimum Cut</a>, <a href="../foundations/foundation-space-complexity.html#aux">Space Complexity</a>, <a href="../graphs/algo-topological-sort.html#kahn">Topological Sort</a>.
+<!-- /stl:used queue -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="list">6. <code>list</code></h2>
+      <p>
+        <code>list&lt;T&gt;</code> (<code>&lt;list&gt;</code>) is a doubly linked
+        list: each element is a separate heap node with links to its neighbours.
+        Inserting or removing at a known position is \(O(1)\), and it never moves
+        the other elements, so iterators to them stay valid. There is no indexing:
+        reaching the \(i\)-th element walks \(i\) links.
+      </p>
+      <pre>list&lt;int&gt; chain = {4, 9};
+chain.push_front(1);              <span class="cm">// 1 4 9: O(1)</span>
+chain.remove(4);                  <span class="cm">// 1 9: O(n) to find, O(1) to unlink</span></pre>
+      <table>
+        <tr><th>call</th><th>does</th><th>cost</th></tr>
+        <tr><td><code>push_front(x)</code>, <code>push_back(x)</code></td><td>add at either end</td><td>\(O(1)\)</td></tr>
+        <tr><td><code>insert(it, x)</code>, <code>erase(it)</code></td><td>add before, or remove at, an iterator</td><td>\(O(1)\)</td></tr>
+        <tr><td><code>remove(x)</code></td><td>remove every element equal to \(x\)</td><td>\(O(n)\)</td></tr>
+        <tr><td><code>front()</code>, <code>back()</code>, <code>size()</code></td><td>the ends; how many</td><td>\(O(1)\)</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        The nodes are scattered in memory, so walking a list misses the cache far
+        more often than walking a <code>vector</code>, and at the same order of
+        growth the <code>vector</code> is usually several times faster. A
+        <code>list</code> pays off only when elements are inserted and removed in
+        the middle while iterators to the others must stay valid. It also cannot
+        be passed to <code>sort</code>; it has its own member <code>sort()</code>.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used list -->
+<a href="../hashing/ds-hashing.html#chaining">Hashing</a>.
+<!-- /stl:used list -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="priority-queue">7. <code>priority_queue</code></h2>
+      <p>
+        <code>priority_queue&lt;T, Container, Compare&gt;</code> (<code>&lt;queue&gt;</code>)
+        is a binary heap stored in a <code>vector</code>, the structure built in
+        <a href="../heaps/ds-heaps-pq.html">Heaps &amp; Priority Queues</a>.
+        <code>top()</code> is the element that is <strong>largest</strong> under the
+        comparison, which by default is <code>&lt;</code>, so the plain form is a
+        max-heap. To pop the <em>smallest</em> first, pass a comparison that
+        answers &ldquo;is <code>a</code> greater than <code>b</code>?&rdquo;:
+      </p>
+      <pre>struct Greater {                      <span class="cm">// reverses the comparison</span>
+    bool operator()(int a, int b) const { return a &gt; b; }
+};</pre>
+      <pre>priority_queue&lt;int&gt; maxPQ;                          <span class="cm">// the largest on top</span>
+for (int x : {5, 1, 8, 3, 9, 2}) maxPQ.push(x);
+int top = maxPQ.top();                              <span class="cm">// 9</span>
+priority_queue&lt;int, vector&lt;int&gt;, Greater&gt; minPQ;    <span class="cm">// the smallest on top</span>
+for (int x : {5, 1, 8, 3, 9, 2}) minPQ.push(x);
+int low = minPQ.top();                              <span class="cm">// 1</span></pre>
+      <p>
+        The three template arguments are the element type, the container the heap
+        lives in (always <code>vector&lt;T&gt;</code> here), and the comparison. The
+        library&rsquo;s own <code>greater&lt;int&gt;</code> (<code>&lt;functional&gt;</code>)
+        does what <code>Greater</code> does; this text writes the comparison out so
+        that its rule, including how ties are broken, is on the page. The heaps of
+        <a href="../graphs/algo-dijkstra.html">Dijkstra</a>,
+        <a href="../graphs/algo-prim.html">Prim</a> and
+        <a href="../greedy/algo-huffman-coding.html">Huffman</a> are written this way.
+      </p>
+      <table>
+        <tr><th>call</th><th>does</th><th>cost</th></tr>
+        <tr><td><code>push(x)</code></td><td>insert \(x\): append, then swim it up</td><td>\(O(\log n)\)</td></tr>
+        <tr><td><code>top()</code></td><td>the top element, left in place</td><td>\(O(1)\)</td></tr>
+        <tr><td><code>pop()</code></td><td>remove the top: move the last element to the root, then sink it</td><td>\(O(\log n)\)</td></tr>
+        <tr><td><code>size()</code>, <code>empty()</code></td><td>how many; none?</td><td>\(O(1)\)</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        The direction trips everyone once: the comparison names what goes
+        <em>below</em>, so <code>a &gt; b</code> produces a min-heap. There is no
+        decrease-key and no way to look inside, so an algorithm that would lower
+        a key (Dijkstra, Prim) pushes a new entry instead and skips the stale one
+        when it surfaces. <code>top()</code> and <code>pop()</code> on an empty
+        queue are undefined behaviour.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used priority-queue -->
+<a href="../graphs/algo-dijkstra.html#dijkstra">Dijkstra’s Algorithm</a>, <a href="../heaps/ds-heaps-pq.html#adt">Heaps &amp; Priority Queues</a>, <a href="../greedy/algo-huffman-coding.html#huffman">Huffman Coding</a>, <a href="../greedy/algo-interval-scheduling.html#partition">Interval Scheduling</a>, <a href="../graphs/algo-prim.html#algo">Prim’s Algorithm</a>.
+<!-- /stl:used priority-queue -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="map">8. <code>map</code> and <code>set</code></h2>
+      <p>
+        <code>map&lt;K, V&gt;</code> (<code>&lt;map&gt;</code>) stores key &rarr; value
+        pairs <strong>sorted by key</strong>, in a balanced search tree; in the
+        common libraries it is the red-black tree of
+        <a href="../trees/ds-red-black-trees.html">Red-Black Trees</a>. Every lookup,
+        insertion and removal is \(O(\log n)\), and a loop over a map visits the keys
+        in increasing order. <code>set&lt;K&gt;</code> (<code>&lt;set&gt;</code>) is
+        the same tree with keys and no values. The key type needs <code>&lt;</code>.
+      </p>
+      <pre>map&lt;char, string&gt; code;
+code['f'] = "0";                  <span class="cm">// insert</span>
+code['a'] = "1100";
+bool has = code.count('z') == 1;  <span class="cm">// false</span>
+string w = code['z'];             <span class="cm">// "", and 'z' is now a key</span></pre>
+      <pre>for (const pair&lt;const char, string&gt;&amp; kv : code)
+    keys += kv.first;             <span class="cm">// "afz": sorted by key</span>
+bool found = code.find('q') != code.end();   <span class="cm">// false, and nothing inserted</span></pre>
+      <pre>set&lt;int&gt; seen = {5, 1, 8};
+seen.insert(1);                   <span class="cm">// already there: no change</span>
+bool in = seen.count(8) == 1;     <span class="cm">// true</span></pre>
+      <table>
+        <tr><th>call</th><th>does</th><th>cost</th></tr>
+        <tr><td><code>m[k] = v</code></td><td>insert \(k\), or overwrite its value</td><td>\(O(\log n)\)</td></tr>
+        <tr><td><code>m[k]</code></td><td>\(k\)&rsquo;s value; a missing \(k\) is <strong>inserted</strong> with a default value</td><td>\(O(\log n)\)</td></tr>
+        <tr><td><code>m.count(k)</code></td><td>1 if \(k\) is a key, else 0</td><td>\(O(\log n)\)</td></tr>
+        <tr><td><code>m.find(k)</code></td><td>an iterator to \(k\), or <code>m.end()</code>; inserts nothing</td><td>\(O(\log n)\)</td></tr>
+        <tr><td><code>m.erase(k)</code></td><td>remove \(k\)</td><td>\(O(\log n)\)</td></tr>
+        <tr><td><code>s.insert(k)</code>, <code>s.count(k)</code></td><td>add \(k\) (no effect if present); is \(k\) in?</td><td>\(O(\log n)\)</td></tr>
+        <tr><td><code>m.lower_bound(k)</code></td><td>the first key \(\ge k\): an ordered query a hash table cannot answer</td><td>\(O(\log n)\)</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        Reading <code>m[k]</code> never fails: a missing key is inserted with a
+        default value (<code>""</code>, <code>0</code>, <code>nullptr</code>) and that
+        value is returned. A test written as <code>if (m[k] == ...)</code> therefore
+        grows the map. To ask whether a key is present, use <code>count</code> or
+        <code>find</code>; adaptive Huffman&rsquo;s update asks <code>count</code>
+        before it reads <code>leafOf[s]</code> for exactly this reason.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used map -->
+<a href="../strings/foundation-context-free-grammars.html#cyk">Context-Free Grammars &amp; Parsing</a>, <a href="../greedy/algo-huffman-coding.html#huffman">Huffman Coding</a>, <a href="../strings/algo-regex-automata.html#simulate">Regular Expressions &amp; Automata</a>, <a href="../dp/paradigm-dp-method.html#styles">The Dynamic Programming Method</a>, <a href="../strings/ds-tries.html#space">Tries &amp; Ternary Search Trees</a>, <a href="../foundations/foundation-computability.html#universal">Turing Machines &amp; Computability</a>.
+<!-- /stl:used map -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="unordered">9. <code>unordered_map</code> and <code>unordered_set</code></h2>
+      <p>
+        <code>unordered_map&lt;K, V&gt;</code> (<code>&lt;unordered_map&gt;</code>) has
+        the same calls as <code>map</code> but is a <strong>hash table</strong> with
+        separate chaining, the structure of
+        <a href="../hashing/ds-hashing.html">Hashing</a>. A call costs \(O(1)\) on
+        average and \(O(n)\) in the worst case, and the keys come out of a loop in
+        no particular order. When the load factor (keys per bucket) passes its
+        maximum, 1 by default, the table about doubles its buckets and rehashes. <code>unordered_set&lt;K&gt;</code> is the set version. The
+        key type needs <code>std::hash</code> and <code>==</code>.
+      </p>
+      <pre>unordered_map&lt;string, int&gt; index;
+index["the"] = 0;                 <span class="cm">// average O(1)</span>
+index["cat"] = 1;
+bool has = index.count("dog") == 1;   <span class="cm">// false</span>
+unordered_set&lt;int&gt; visited = {3, 7};
+visited.insert(3);                <span class="cm">// already there: no change</span></pre>
+      <table>
+        <tr><th>need</th><th>use</th><th>why</th></tr>
+        <tr><td>lookups only, as fast as possible</td><td><code>unordered_map</code></td><td>\(O(1)\) average</td></tr>
+        <tr><td>keys in order, ranges, smallest key \(\ge k\)</td><td><code>map</code></td><td>sorted; \(O(\log n)\) guaranteed</td></tr>
+        <tr><td>a bound that holds on every input</td><td><code>map</code></td><td>a hash table&rsquo;s worst case is \(O(n)\)</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        The iteration order is unspecified and changes when the table grows, so
+        output that loops over an <code>unordered_map</code> can differ between
+        runs, libraries and input sizes. Growing also invalidates every iterator.
+        The <code>[]</code> trap of <code>map</code> applies here too.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used unordered -->
+<a href="../hashing/ds-hashing.html#hashfns">Hashing</a>, <a href="../strings/algo-lzw-compression.html#encode">LZW Compression</a>.
+<!-- /stl:used unordered -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="hash">10. <code>hash</code></h2>
+      <p>
+        <code>hash&lt;T&gt;</code> (<code>&lt;functional&gt;</code>) is the function
+        object an <code>unordered_map</code> uses to turn a key into a
+        <code>size_t</code>. Construct one and call it; a table of \(M\) slots then
+        reduces the result with <code>% M</code>:
+      </p>
+      <pre>size_t h = hash&lt;string&gt;()("cat");     <span class="cm">// the value depends on the library</span>
+size_t bucket = h % 13;               <span class="cm">// one of 13 slots</span></pre>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        The standard fixes only that equal keys hash equally within one run. The
+        values themselves differ between libraries (and for integers are often the
+        integer itself), so a program must not print them or store them as data.
+        <code>std::hash</code> is not a cryptographic hash, and an adversary who
+        knows it can choose keys that collide.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used hash -->
+<a href="../hashing/ds-hashing.html#hashfns">Hashing</a>.
+<!-- /stl:used hash -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="sort">11. <code>sort</code> and <code>stable_sort</code></h2>
+      <p>
+        <code>sort(first, last)</code> (<code>&lt;algorithm&gt;</code>) sorts a range
+        in place with <code>&lt;</code>, in \(O(n \log n)\) comparisons on every
+        input. It is <em>introsort</em>: quicksort that switches to heapsort when
+        the recursion grows too deep, as described in
+        <a href="../sorting/algo-quicksort.html">Quicksort</a>. A third argument
+        replaces <code>&lt;</code>: a function that answers &ldquo;does <code>a</code>
+        go before <code>b</code>?&rdquo;
+      </p>
+      <pre>struct Edge { int u, v, w; };
+
+bool lighter(const Edge&amp; a, const Edge&amp; b) {
+    return a.w &lt; b.w;                 <span class="cm">// strict: false when the weights tie</span>
+}</pre>
+      <pre>vector&lt;Edge&gt; edges = {{0, 1, 4}, {1, 2, 1}, {0, 2, 4}};
+stable_sort(edges.begin(), edges.end(), lighter);   <span class="cm">// 1-2, then 0-1, 0-2</span></pre>
+      <p>
+        <code>sort</code> may put equal elements in any order: the two weight-4
+        edges above can come out either way round. <code>stable_sort</code> keeps
+        equal elements in their input order, which is what makes radix-style
+        multi-pass sorting and &ldquo;sort by finish, ties by index&rdquo; work; it
+        is a mergesort, \(O(n \log n)\) with a buffer of up to \(n\) elements
+        (\(O(n \log^2 n)\) when no buffer can be allocated).
+      </p>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        The comparison must be <strong>strict</strong>: it answers
+        <code>false</code> for equal elements. A comparison written with
+        <code>&lt;=</code> breaks the assumptions <code>sort</code> relies on, and
+        the result is undefined behaviour, which in practice can be a crash rather
+        than a wrong order. <code>sort</code> needs random-access iterators, so it
+        works on <code>vector</code>, <code>string</code> and arrays but not on
+        <code>list</code>.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used sort -->
+<a href="../foundations/foundation-time-analysis.html#faster">Analysis of Algorithms: Time</a>, <a href="../greedy/algo-interval-scheduling.html#algo">Interval Scheduling</a>, <a href="../graphs/algo-kruskal.html#algo">Kruskal’s Algorithm</a>, <a href="../strings/ds-suffix-arrays.html#build">Suffix Arrays</a>.
+<!-- /stl:used sort -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="algorithms">12. <code>swap</code>, <code>min</code>, <code>max</code>, <code>reverse</code>, <code>iota</code>, <code>abs</code></h2>
+      <p>
+        A few small functions appear throughout the chapters&rsquo; code. All are in
+        <code>&lt;algorithm&gt;</code> except <code>iota</code>
+        (<code>&lt;numeric&gt;</code>) and <code>abs</code>
+        (<code>&lt;cstdlib&gt;</code>).
+      </p>
+      <pre>int a = 3, b = 8;
+swap(a, b);                           <span class="cm">// a = 8, b = 3</span>
+int hi = max(a, b), lo = min(a, b);   <span class="cm">// 8, 3</span>
+vector&lt;int&gt; path = {3, 2, 0};
+reverse(path.begin(), path.end());    <span class="cm">// 0 2 3</span>
+vector&lt;int&gt; idx(5);
+iota(idx.begin(), idx.end(), 0);      <span class="cm">// 0 1 2 3 4</span>
+int d = abs(-7);                      <span class="cm">// 7</span></pre>
+      <table>
+        <tr><th>call</th><th>does</th><th>cost</th><th>typical use</th></tr>
+        <tr><td><code>swap(a, b)</code></td><td>exchange two values</td><td>\(O(1)\)</td><td>heaps, sorting, union by size</td></tr>
+        <tr><td><code>min(a, b)</code>, <code>max(a, b)</code></td><td>the smaller or larger; <code>min({a, b, c})</code> takes a list</td><td>\(O(1)\)</td><td>DP recurrences, tree heights</td></tr>
+        <tr><td><code>reverse(first, last)</code></td><td>reverse a range in place</td><td>\(O(n)\)</td><td>a path or traceback collected backwards</td></tr>
+        <tr><td><code>iota(first, last, x)</code></td><td>fill with \(x, x+1, x+2, \ldots\)</td><td>\(O(n)\)</td><td>a vector of indices to sort</td></tr>
+        <tr><td><code>abs(x)</code></td><td>\(\lvert x \rvert\)</td><td>\(O(1)\)</td><td>balance factors, differences</td></tr>
+      </table>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        <code>min</code> and <code>max</code> need both arguments of the same type:
+        <code>max(1, 2L)</code> does not compile, and <code>max(x, 0)</code> with
+        a <code>long x</code> needs <code>0L</code>. A path built by following
+        parent links from the end comes out backwards; one <code>reverse</code> at
+        the end is \(O(n)\), while inserting each step at the front of a
+        <code>vector</code> would be \(O(n^2)\).
+      </div>
+      <p class="note">Used in:
+<!-- stl:used algorithms -->
+<a href="../dp/algo-knapsack.html#knap">0/1 Knapsack</a>, <a href="../foundations/foundation-amortized-analysis.html#array">Amortized Analysis</a>, <a href="../trees/ds-avl-trees.html#invariant">AVL Trees</a>, <a href="../hashing/ds-count-min-sketch.html#ops">Count-Min Sketch</a>, <a href="../dp/algo-dp-patterns.html#grid">DP Patterns: Grid, Interval, Coin Change &amp; LIS</a>, <a href="../dp/algo-edit-distance.html#edit">Edit Distance</a>, <a href="../sorting/algo-elementary-sorts.html#selection">Elementary Sorts</a>, <a href="../heaps/ds-heaps-pq.html#swimsink">Heaps &amp; Priority Queues</a>, <a href="../heaps/algo-heapsort.html#heapsort">Heapsort</a>, <a href="../greedy/algo-huffman-coding.html#adaptive">Huffman Coding</a>, <a href="../dp/algo-longest-common-subsequence.html#lcs">Longest Common Subsequence</a>, <a href="../graphs/algo-max-flow.html#ff">Maximum Flow &amp; Minimum Cut</a>, <a href="../sorting/algo-quicksort.html#quick">Quicksort</a>, <a href="../strings/ds-suffix-arrays.html#build">Suffix Arrays</a>, <a href="../graphs/algo-topological-sort.html#postorder">Topological Sort</a>, <a href="../dp/algo-traceback-space-saving.html#trace">Traceback &amp; Space-Saving</a>, <a href="../graphs/ds-union-find.html#compress">Union-Find</a>.
+<!-- /stl:used algorithms -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="limits">13. <code>INT_MAX</code> and <code>numeric_limits</code></h2>
+      <p>
+        Shortest-path and DP code needs a value that stands for &ldquo;infinity&rdquo;
+        or &ldquo;nothing yet&rdquo;. <code>&lt;climits&gt;</code> names the extremes
+        of the built-in types (<code>INT_MAX</code>, <code>INT_MIN</code>,
+        <code>LONG_MAX</code>); <code>&lt;limits&gt;</code> gives the same for any type
+        as <code>numeric_limits&lt;T&gt;::max()</code>.
+      </p>
+      <pre>int INF = INT_MAX;                       <span class="cm">// 2147483647: "no path yet"</span>
+long big = numeric_limits&lt;long&gt;::max();  <span class="cm">// 9223372036854775807 (64-bit)</span>
+vector&lt;int&gt; dist = {7, INF};
+int w = 5;
+if (dist[1] != INF &amp;&amp; dist[1] + w &lt; dist[0])   <span class="cm">// test INF before adding</span>
+    dist[0] = dist[1] + w;</pre>
+      <div class="aside">
+        <span class="tag">Pitfall</span>
+        <code>INT_MAX + 1</code> overflows, which for a signed integer is undefined
+        behaviour; in practice it wraps to a large negative number, and a
+        relaxation then &ldquo;improves&rdquo; a distance to something negative.
+        Test for the sentinel before adding to it, as above, or keep distances in
+        a wider type such as <code>long</code>.
+      </div>
+      <p class="note">Used in:
+<!-- stl:used limits -->
+<a href="../graphs/algo-bellman-ford.html#problem">Bellman-Ford</a>, <a href="../graphs/algo-dijkstra.html#relax">Dijkstra’s Algorithm</a>, <a href="../greedy/algo-interval-scheduling.html#algo">Interval Scheduling</a>, <a href="../dp/algo-matrix-chain.html#code">Matrix-Chain Multiplication</a>, <a href="../graphs/algo-max-flow.html#ff">Maximum Flow &amp; Minimum Cut</a>, <a href="../graphs/algo-floyd-warshall.html#algo">The Floyd–Warshall Algorithm</a>.
+<!-- /stl:used limits -->
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="costs">14. Costs at a glance</h2>
+      <table>
+        <tr><th>structure</th><th>underneath</th><th>add</th><th>remove</th><th>find a key</th><th>order</th></tr>
+        <tr><td><code>vector</code></td><td>dynamic array</td><td>\(O(1)\) am. at the end</td><td>\(O(1)\) at the end</td><td>\(O(n)\) scan</td><td>insertion</td></tr>
+        <tr><td><code>list</code></td><td>doubly linked list</td><td>\(O(1)\) at an iterator</td><td>\(O(1)\) at an iterator</td><td>\(O(n)\)</td><td>insertion</td></tr>
+        <tr><td><code>stack</code></td><td>adapter (<code>deque</code>)</td><td>\(O(1)\) top</td><td>\(O(1)\) top</td><td>none</td><td>last in, first out</td></tr>
+        <tr><td><code>queue</code></td><td>adapter (<code>deque</code>)</td><td>\(O(1)\) back</td><td>\(O(1)\) front</td><td>none</td><td>first in, first out</td></tr>
+        <tr><td><code>priority_queue</code></td><td>binary heap in a <code>vector</code></td><td>\(O(\log n)\)</td><td>\(O(\log n)\) top</td><td>none</td><td>largest first</td></tr>
+        <tr><td><code>map</code>, <code>set</code></td><td>red-black tree</td><td>\(O(\log n)\)</td><td>\(O(\log n)\)</td><td>\(O(\log n)\)</td><td>sorted</td></tr>
+        <tr><td><code>unordered_map</code>, <code>unordered_set</code></td><td>hash table, chaining</td><td>\(O(1)\) avg.</td><td>\(O(1)\) avg.</td><td>\(O(1)\) avg., \(O(n)\) worst</td><td>none</td></tr>
+      </table>
+
+      <!-- ============================================================ -->
+      <h2 id="other">15. The same structures in Java, Python and Rust</h2>
+      <p>
+        The chapters&rsquo; code tabs use these equivalents. Two differences matter
+        most: Java&rsquo;s and Python&rsquo;s priority queues are <em>min</em>-heaps
+        where C++&rsquo;s and Rust&rsquo;s are max-heaps, and Python has no sorted
+        map in its standard library.
+      </p>
+      <table>
+        <tr><th>C++</th><th>Java</th><th>Python</th><th>Rust</th></tr>
+        <tr><td><code>vector</code></td><td><code>ArrayList</code></td><td><code>list</code></td><td><code>Vec</code></td></tr>
+        <tr><td><code>pair</code></td><td>a small class or <code>record</code></td><td><code>tuple</code></td><td>a tuple <code>(A, B)</code></td></tr>
+        <tr><td><code>stack</code></td><td><code>ArrayDeque</code> (<code>push</code>, <code>pop</code>)</td><td><code>list</code> (<code>append</code>, <code>pop</code>)</td><td><code>Vec</code> (<code>push</code>, <code>pop</code>)</td></tr>
+        <tr><td><code>queue</code></td><td><code>ArrayDeque</code> (<code>offer</code>, <code>poll</code>)</td><td><code>collections.deque</code> (<code>append</code>, <code>popleft</code>)</td><td><code>VecDeque</code></td></tr>
+        <tr><td><code>list</code></td><td><code>LinkedList</code></td><td>none (<code>deque</code> for the ends)</td><td><code>LinkedList</code></td></tr>
+        <tr><td><code>priority_queue</code> (max)</td><td><code>PriorityQueue</code> (min)</td><td><code>heapq</code> on a <code>list</code> (min)</td><td><code>BinaryHeap</code> (max)</td></tr>
+        <tr><td><code>map</code>, <code>set</code></td><td><code>TreeMap</code>, <code>TreeSet</code></td><td>none built in</td><td><code>BTreeMap</code>, <code>BTreeSet</code></td></tr>
+        <tr><td><code>unordered_map</code>, <code>unordered_set</code></td><td><code>HashMap</code>, <code>HashSet</code></td><td><code>dict</code>, <code>set</code></td><td><code>HashMap</code>, <code>HashSet</code></td></tr>
+        <tr><td><code>sort</code> (not stable)</td><td><code>Arrays.sort</code> on primitives</td><td>none: its sorts are stable</td><td><code>sort_unstable</code></td></tr>
+        <tr><td><code>stable_sort</code></td><td><code>Collections.sort</code>, <code>List.sort</code></td><td><code>sorted</code>, <code>list.sort</code></td><td><code>sort</code></td></tr>
+      </table>
+
+      <!-- ============================================================ -->
+      <h2 id="ex">16. Exercises (with solutions)</h2>
+      <ol>
+        <li>
+          After <code>stack&lt;int&gt; s; queue&lt;int&gt; q;</code> and pushing
+          4, 1, 3 into both, and into a <code>priority_queue&lt;int&gt; p</code>,
+          what does each return from its first <code>top()</code> or
+          <code>front()</code>? And from a <code>priority_queue</code> with the
+          <code>Greater</code> comparison?
+          <details>
+            <summary>solution</summary>
+            The stack gives 3 (the last pushed), the queue 4 (the first pushed), the
+            default <code>priority_queue</code> 4 (the largest), and the one with
+            <code>Greater</code> 1 (the smallest).
+          </details>
+        </li>
+        <li>
+          This loop is meant to print and empty a stack. What is wrong with it?
+          <pre>while (!st.empty()) cout &lt;&lt; st.pop() &lt;&lt; " ";</pre>
+          <details>
+            <summary>solution</summary>
+            It does not compile: <code>pop()</code> returns <code>void</code>.
+            Read the top, then remove it:
+            <code>while (!st.empty()) { cout &lt;&lt; st.top() &lt;&lt; " "; st.pop(); }</code>.
+          </details>
+        </li>
+        <li>
+          A program counts words with <code>map&lt;string, int&gt; freq;</code> and
+          <code>freq[w]++;</code>. Why does this work for a word seen for the first
+          time? A later function reports whether a word was seen with
+          <code>return freq[w] &gt; 0;</code>. What does that function do to the map,
+          and how should it be written?
+          <details>
+            <summary>solution</summary>
+            <code>freq[w]</code> on a new word inserts it with the value
+            <code>0</code>, and <code>++</code> makes it 1. The same insertion
+            happens in the query: every unseen word asked about is added with
+            count 0, so the map grows and a later loop over it prints words that
+            never occurred. Write <code>return freq.count(w) == 1;</code>, which
+            inserts nothing.
+          </details>
+        </li>
+        <li>
+          Write a comparison struct for a <code>priority_queue</code> of
+          <code>struct Entry { long dist; int vertex; };</code> that pops the
+          smallest <code>dist</code> first and, on equal distances, the smaller
+          vertex.
+          <details>
+            <summary>solution</summary>
+            The struct answers &ldquo;does <code>a</code> go below
+            <code>b</code>?&rdquo;, which is &ldquo;is <code>a</code> greater?&rdquo;:
+            <pre>struct Greater {
+    bool operator()(const Entry&amp; a, const Entry&amp; b) const {
+        if (a.dist != b.dist) return a.dist &gt; b.dist;
+        return a.vertex &gt; b.vertex;
+    }
+};</pre>
+            Declared as <code>priority_queue&lt;Entry, vector&lt;Entry&gt;, Greater&gt; pq;</code>.
+          </details>
+        </li>
+        <li>
+          Why is <code>bool atMost(int a, int b) { return a &lt;= b; }</code> wrong as
+          the comparison for <code>sort</code>, and what does
+          <code>sort(v.begin() + 1, v.end() - 1)</code> sort?
+          <details>
+            <summary>solution</summary>
+            <code>sort</code> requires a strict comparison, false for equal
+            elements; <code>atMost(x, x)</code> is true, which is undefined
+            behaviour and can make <code>sort</code> read past the end of the
+            range. Use <code>a &lt; b</code>. The second call sorts every element
+            except the first and the last: the range starts one after
+            <code>begin()</code> and stops one before <code>end()</code>.
+          </details>
+        </li>
+        <li>
+          Choose a container for each and give the cost of its main operation:
+          (a) word counts printed in alphabetical order; (b) a membership test that
+          must be as fast as possible; (c) the next event by time in a simulation;
+          (d) an undo history.
+          <details>
+            <summary>solution</summary>
+            (a) <code>map&lt;string, int&gt;</code>: \(O(\log n)\) per update, and the
+            loop over it is already alphabetical. (b) <code>unordered_set</code>:
+            \(O(1)\) average per test. (c) <code>priority_queue</code> with a
+            comparison that puts the earliest time on top: \(O(\log n)\) per push and
+            pop. (d) <code>stack</code>: \(O(1)\) per push and pop, and the most recent
+            action comes off first.
+          </details>
+        </li>
+        <li>
+          A shortest-path program sets <code>dist[v] = INT_MAX</code> for every
+          unreached vertex and relaxes with
+          <code>if (dist[u] + w &lt; dist[v]) dist[v] = dist[u] + w;</code>.
+          What goes wrong, and on which vertices?
+          <details>
+            <summary>solution</summary>
+            When <code>u</code> is itself unreached, <code>dist[u] + w</code> is
+            <code>INT_MAX + w</code>, which overflows (undefined behaviour; in
+            practice a large negative number), so the test succeeds and
+            <code>v</code> gets a negative distance. Test
+            <code>dist[u] != INT_MAX</code> first, as in section 13, or only relax
+            edges out of vertices taken from the queue, which are always reached.
+          </details>
+        </li>
+      </ol>
+
+      <footer>
+        Data Structures &amp; Algorithms &middot; STL Primer v1.0
+        &middot; prepared by Dr. Marcel Gavriliu.
+      </footer>
+    </div>
+  </body>
+</html>

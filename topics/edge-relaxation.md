@@ -1,10 +1,10 @@
 <!--
   TOPIC · Edge relaxation.
-  Teaches: tentative distances; relaxing an edge; the invariant that dist never lies low; one primitive behind several algorithms; the order of relaxation matters; reconstructing a path from edgeTo.
+  Teaches: tentative distances; relaxing an edge; the invariant that dist never lies low; one primitive behind several algorithms; the order of relaxation matters; reconstructing a path from edgeTo; std::reverse (a slide of its own, before the first code that uses it).
   Needs:   shortest paths.
   Demos:   relax (slide spec); figure wg-relax-step (tools/gen-wgraph-figures.mjs)
   Program: none
-  Budget:  ~16 min, 9 slides.
+  Budget:  ~17 min, 10 slides.
   Ported from Summer 2026 L09-graphs-dijkstra.md, parts 3.
 -->
 
@@ -90,6 +90,20 @@ All shortest-path algorithms just relax edges: differing only in the **order**:
 - **right order**: process vertices **nearest-first**: each vertex is finished when its turn comes, each edge relaxes **once**
 
 That "nearest-first" ordering **is Dijkstra**.
+
+--
+
+## [`std::reverse`](../../textbook/foundations/foundation-stl-primer.html#algorithms)
+
+`<algorithm>`: reverse a range **in place**.
+
+```cpp
+reverse(path.begin(), path.end());        // s ... t
+```
+
+- the range `[begin, end)`: the whole vector here; a sub-range works the same way
+- $O(n)$: $n/2$ swaps, no extra memory
+- a sequence built **backwards** costs one `reverse` at the end; inserting each element at the front of a `vector` would cost $O(n^2)$
 
 --
 

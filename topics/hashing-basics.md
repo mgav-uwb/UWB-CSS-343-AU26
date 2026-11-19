@@ -1,10 +1,10 @@
 <!--
   TOPIC · Hash tables and hash functions.
-  Teaches: computing an index instead of comparing keys; the hash function and the hash table; collisions are unavoidable (the birthday bound); chaining and probing in one sentence each; good hash functions; modular hashing with a prime M; hashing strings by Horner's rule; hash code then compress; the uniform hashing assumption.
+  Teaches: computing an index instead of comparing keys; the hash function and the hash table; collisions are unavoidable (the birthday bound); chaining and probing in one sentence each; good hash functions; modular hashing with a prime M; hashing strings by Horner's rule; hash code then compress; the uniform hashing assumption; std::hash (a slide of its own, before the first code that uses it).
   Needs:   the asymptotic notation topic.
   Demos:   none; figures hs-bet, hs-table, hs-two-ways (tools/gen-hash-figures.mjs)
   Program: none
-  Budget:  ~24 min, 14 slides.
+  Budget:  ~25 min, 15 slides.
   Ported from Summer 2026 L07-hashing.md, parts 1, 2.
 -->
 
@@ -167,6 +167,17 @@ $$
 $$
 
 Slot 86, in one left-to-right pass; the mod at each step prevents overflow.
+
+--
+
+## [`std::hash`](../../textbook/foundations/foundation-stl-primer.html#hash)
+
+`<functional>`: a **function object** that turns a key into a `size_t`.
+
+- `std::hash<std::string>()` builds one; a second `(key)` calls it
+- equal keys give equal hashes, within one run of one program
+- the values differ between libraries: never store or print them
+- `unordered_map` calls it on every key
 
 --
 

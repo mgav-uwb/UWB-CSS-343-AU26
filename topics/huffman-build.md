@@ -1,7 +1,7 @@
 <!--
   TOPIC · Huffman's algorithm.
   Teaches: the greedy idea (merge the two lightest trees); the CLRS build merge by merge; the finished tree, its codes and its 224 bits; the min-heap of nodes and its tie rule; the build in C++; the build counted (n - 1 merges, a full tree of 2n - 1 nodes, O(n log n)); the huffman-build demo; std::map (the code table); reading the codes off the tree in C++; a practice build; ties change the tree, never the cost.
-  Needs:   prefix-free codes, priority queues (binary heaps).
+  Needs:   prefix-free codes, priority queues (binary heaps); interval partitioning (std::priority_queue).
   Demos:   huffman-build (slide spec in topics/demos.js); figures hf-merges-a, hf-merges-b, hf-trie, hf-turn, hf-tie (tools/gen-greedy-figures.mjs)
   Program: code/huffman-build/huffman.cpp
   Budget:  ~23 min, 13 slides.
@@ -146,7 +146,7 @@ $$\text{build} = O(n \log n) \qquad \text{read the codes} = O(n)$$
 
 --
 
-## `std::map`
+## [`std::map`](../../textbook/foundations/foundation-stl-primer.html#map)
 
 `<map>`: key → value pairs, **sorted** by key in a red-black tree; every call is $O(\log n)$.
 

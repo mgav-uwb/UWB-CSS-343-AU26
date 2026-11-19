@@ -1,10 +1,10 @@
 <!--
   TOPIC · Breadth-first search.
-  Teaches: BFS layer by layer with a queue; marking on enqueue; the queue is sorted by distance; BFS distances are shortest (fewest edges); BFS against DFS; one loop with four containers; BFS on grids.
+  Teaches: BFS layer by layer with a queue; marking on enqueue; the queue is sorted by distance; BFS distances are shortest (fewest edges); BFS against DFS; one loop with four containers; BFS on grids; std::queue (a slide of its own, before the first code that uses it).
   Needs:   DFS, queues.
   Demos:   graph-bfs, search-race (slide specs); the bfs-worked trace table
   Program: none
-  Budget:  ~32 min, 13 slides.
+  Budget:  ~33 min, 14 slides.
   Ported from Summer 2026 L08-graphs-bfs-dfs.md, parts 3.
 -->
 
@@ -27,6 +27,23 @@
    …"></div>
 
 The frontier is a **queue** (FIFO) instead of a stack.
+
+--
+
+## [`std::queue`](../../textbook/foundations/foundation-stl-primer.html#queue)
+
+`<queue>`: **first in, first out**.
+
+```cpp
+queue<int> q; q.push(s);
+```
+
+| call | does | cost |
+| --- | --- | --: |
+| `push(x)` | add `x` at the back | $O(1)$ |
+| `front()` | the front element, left in place | $O(1)$ |
+| `pop()` | remove the front; returns **nothing** | $O(1)$ |
+| `empty()` | none left? Test it before `front`, `pop` | $O(1)$ |
 
 --
 

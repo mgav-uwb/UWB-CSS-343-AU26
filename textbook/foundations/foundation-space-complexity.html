@@ -785,6 +785,7 @@ fn mergesort(a: &amp;mut [i32], lo: usize, hi: usize, aux: &amp;mut [i32]) {
       </p>
       <pre>  vector&lt;vector&lt;char&gt;&gt; visited(n, vector&lt;char&gt;(n, 0));  <span class="cm">// n*n bytes: Theta(n^2)</span>
   queue&lt;pair&lt;int,int&gt;&gt; frontier;                       <span class="cm">// O(n) wavefront</span></pre>
+      <p class="note stl-ref">Standard library in this code: <a href="foundation-stl-primer.html#pair"><code>pair</code></a>, <a href="foundation-stl-primer.html#queue"><code>queue</code></a> (<a href="foundation-stl-primer.html">STL Primer</a>).</p>
       <p>
         A deliberate choice here is <code>char</code> per cell rather than
         <code>vector&lt;bool&gt;</code>, which would bit-pack to \(n^2/8\) bytes and

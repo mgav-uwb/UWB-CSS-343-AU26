@@ -1,6 +1,6 @@
 <!--
   TOPIC · Designing a faster 3-sum.
-  Teaches: analysis guiding design; 2-sum by sorting and binary search; the
+  Teaches: analysis guiding design; 2-sum by sorting and binary search; the; std::sort (a slide of its own, before the first code that uses it).
            sum and product rules for orders of growth; the preprocessing
            trade; 3-sum in N² log₂ N and in N² with two pointers; the idea of a
            lower bound.
@@ -8,7 +8,7 @@
   Demos:   threesum-fast (binary search; two pointers); lib/measure/doubling.html (race, embedded).
   Figures: an-sum-costs (tools/gen-analysis-figures.mjs).
   Programs: topics/code/faster-3sum/faster.cpp, twopointer.cpp
-  Budget:  ~31 min, 20 slides.
+  Budget:  ~32 min, 21 slides.
 -->
 
 ### Designing a faster 3-sum
@@ -54,6 +54,19 @@ Read the inner loop as a question. For each `a[i]`:
 > Is `-a[i]` somewhere in the array?
 
 A scan answers it in $N$ steps. If the array were **sorted**, binary search would answer it in about $\boldsymbol{\log\_2 N}$.
+
+--
+
+## [`std::sort`](../../textbook/foundations/foundation-stl-primer.html#sort)
+
+```cpp
+sort(a.begin(), a.end());              // N log2 N, once
+```
+
+- `<algorithm>`: sorts the range `[begin, end)` in place, comparing with `<`
+- $O(N \log\_2 N)$ comparisons on **every** input: quicksort that falls back to heapsort
+- a third argument replaces `<`: a function answering "does `a` go **before** `b`?"
+- equal elements may come out in **any** order; `stable_sort` keeps their order
 
 --
 

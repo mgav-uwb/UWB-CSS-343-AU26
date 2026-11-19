@@ -1,10 +1,10 @@
 <!--
   TOPIC · Topological sort.
-  Teaches: DAGs; topological order; a cycle rules it out; every DAG has a source; Kahn's algorithm and why it works; topological sort by DFS reverse post-order and its proof; many valid orders; Kahn against DFS; applications.
+  Teaches: DAGs; topological order; a cycle rules it out; every DAG has a source; Kahn's algorithm and why it works; topological sort by DFS reverse post-order and its proof; many valid orders; Kahn against DFS; applications; std::queue, std::reverse (a slide of its own, before the first code that uses it).
   Needs:   DFS numbering and edge types.
   Demos:   graph-topo (slide spec); the topo-line figure
   Program: none
-  Budget:  ~38 min, 17 slides.
+  Budget:  ~40 min, 19 slides.
   Ported from Summer 2026 L08-graphs-bfs-dfs.md, parts 4.
 -->
 
@@ -87,6 +87,23 @@ So the walk stops at a vertex with **no incoming edge**. ∎
 
 </div>
 </div>
+
+--
+
+## [`std::queue`](../../textbook/foundations/foundation-stl-primer.html#queue)
+
+`<queue>`: **first in, first out**.
+
+```cpp
+queue<int> q;
+```
+
+| call | does | cost |
+| --- | --- | --: |
+| `push(x)` | add `x` at the back | $O(1)$ |
+| `front()` | the front element, left in place | $O(1)$ |
+| `pop()` | remove the front; returns **nothing** | $O(1)$ |
+| `empty()` | none left? Test it before `front`, `pop` | $O(1)$ |
 
 --
 
@@ -181,6 +198,20 @@ A digraph has a topological order **iff** it has no cycle. Both methods report c
 
 - **Kahn**: fewer than V vertices come out; the leftovers contain the cycle
 - **DFS**: an edge to a vertex **still on the recursion stack** = a back edge = a cycle
+
+--
+
+## [`std::reverse`](../../textbook/foundations/foundation-stl-primer.html#algorithms)
+
+`<algorithm>`: reverse a range **in place**.
+
+```cpp
+reverse(finished.begin(), finished.end());
+```
+
+- the range `[begin, end)`: the whole vector here; a sub-range works the same way
+- $O(n)$: $n/2$ swaps, no extra memory
+- a sequence built **backwards** costs one `reverse` at the end; inserting each element at the front of a `vector` would cost $O(n^2)$
 
 --
 

@@ -1,10 +1,10 @@
 <!--
   TOPIC · Dijkstra's algorithm.
-  Teaches: the greedy idea; why the nearest unsettled vertex is safe; settled and frontier vertices; the heap's entries and their order (Greater); the algorithm and a worked run; Dijkstra with a binary heap and lazy deletion; the cost; the O(V²) array-scan version; common bugs.
+  Teaches: the greedy idea; why the nearest unsettled vertex is safe; settled and frontier vertices; the heap's entries and their order (Greater); the algorithm and a worked run; Dijkstra with a binary heap and lazy deletion; the cost; the O(V²) array-scan version; common bugs; std::priority_queue (a slide of its own, before the first code that uses it).
   Needs:   edge relaxation, binary heaps.
   Demos:   dijkstra (slide spec); figures wg-zones, wg-worked, wg-practice, wg-course (tools/gen-wgraph-figures.mjs)
   Program: topics/code/dijkstra/dijkstra.cpp (every C++ block, compiled and run on the slide examples)
-  Budget:  ~32 min, 16 slides.
+  Budget:  ~33 min, 17 slides.
   Ported from Summer 2026 L09-graphs-dijkstra.md, parts 4.
 -->
 
@@ -48,6 +48,21 @@ Because settling the nearest vertex makes its distance **final**:
 - one pass: not Bellman-Ford's $V - 1$ rounds
 
 Correctness of the greedy step is what **buys the speed**.
+
+--
+
+## [`std::priority_queue`](../../textbook/foundations/foundation-stl-primer.html#priority-queue)
+
+`<queue>`: a **binary heap** in a `vector`, the **largest** on top.
+
+| call | does | cost |
+| --- | --- | --: |
+| `push(x)` | insert `x` (swim) | $O(\log n)$ |
+| `top()` | the top, left in place | $O(1)$ |
+| `pop()` | remove the top (sink) | $O(\log n)$ |
+| `empty()` | are there none? | $O(1)$ |
+
+No decrease-key: a lowered key is pushed **again**; the stale entry is skipped.
 
 --
 
