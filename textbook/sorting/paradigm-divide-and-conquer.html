@@ -173,8 +173,11 @@
       <h3>The master theorem</h3>
       <div class="thm">
         <span class="tag">Theorem (master theorem)</span>
-        For \(T(n) = a\,T(n/b) + f(n)\) with \(a \ge 1\), \(b &gt; 1\), compare
-        \(f(n)\) with \(n^{\log_b a}\):
+        For \(T(n) = a\,T(n/b) + f(n)\), where \(n\) is the input size,
+        \(a \ge 1\) is the number of subproblems, \(b &gt; 1\) is the factor by
+        which the input size shrinks, and \(f(n)\) is the cost of dividing the
+        problem and combining the results, compare \(f(n)\) with
+        \(n^{\log_b a}\):
         <ol>
           <li>if \(f(n) = O(n^{\log_b a - \varepsilon})\) for some
             \(\varepsilon &gt; 0\) (leaf work dominates), then

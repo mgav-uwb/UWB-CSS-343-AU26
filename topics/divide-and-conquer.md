@@ -1,10 +1,10 @@
 <!--
   TOPIC · Divide and conquer, and the master theorem.
-  Teaches: divide, conquer, combine, and the base case; the recurrence T(n) = aT(n/b) + f(n); the recursion tree and its level sums as a geometric series; the master theorem's three cases as the three behaviours of that series; the recurrence demo; mergesort and binary search worked; cases 1 and 3 worked; the gap the theorem does not cover; a practice; divide and conquer beyond sorting; why balanced splits matter.
+  Teaches: divide, conquer, combine, and the base case; the recurrence T(n) = aT(n/b) + f(n); the recursion tree and its level sums as a geometric series; the master theorem's terms (n, a ≥ 1, b > 1, f(n)) and its three cases as the three behaviours of that series; the recurrence demo; mergesort and binary search worked; cases 1 and 3 worked; the gap the theorem does not cover; a practice; divide and conquer beyond sorting; why balanced splits matter.
   Needs:   recursion, counting recurrences (unrolling), asymptotic notation.
   Demos:   recurrence (registry slug)
   Program: none (every number is arithmetic on the slide)
-  Budget:  ~16 min, 12 slides.
+  Budget:  ~16 min, 13 slides.
   Ported from Summer 2026 L13-sorting-dc.md, part 1.
 -->
 
@@ -86,7 +86,20 @@ With $f(n) = n^c$, level $i$ costs $n^c \cdot (a / b^c)^i$, a geometric series w
 
 ## The master theorem
 
-For $T(n) = a\\,T(n/b) + f(n)$, compare $f(n)$ with $n^{\log\_b a}$:
+For $T(n) = a\\,T(n/b) + f(n)$, where
+
+- $n$ is the input size
+- $a \ge 1$ is the number of subproblems
+- $b > 1$ is the factor by which the input size shrinks
+- $f(n)$ is the cost of dividing the problem and combining the results
+
+The cases compare $f(n)$, the work at the root, with $n^{\log\_b a}$, the number of leaves.
+
+--
+
+## Three cases
+
+Compare $f(n)$ with $n^{\log\_b a}$:
 
 1. $f(n) = O(n^{\log\_b a - \varepsilon})$ for some $\varepsilon > 0$: $\\;T(n) = \Theta(n^{\log\_b a})$
 2. $f(n) = \Theta(n^{\log\_b a})$: $\\;T(n) = \Theta(n^{\log\_b a} \log n)$
