@@ -150,7 +150,7 @@ vector<int> pieces(const vector<int>& cut, int n) {
 
 --
 
-## Your turn: rod cutting
+## Worksheet: rod cutting
 
 Prices `2 4 7 8` for lengths 1 to 4. Fill `best[1..4]` and `cut[1..4]`, keeping the **first** winner on a tie. What pieces does the traceback give?
 

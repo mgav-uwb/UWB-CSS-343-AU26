@@ -190,7 +190,7 @@ A table that breaks one of these has a bug.
 
 --
 
-## Your turn: fill the table
+## Worksheet: fill the table
 
 `A = ABCB`, `B = BDCB`. Fill the table. What is the LCS length, and one LCS?
 
