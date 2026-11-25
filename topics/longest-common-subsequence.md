@@ -1,10 +1,10 @@
 <!--
   TOPIC · Longest common subsequence.
-  Teaches: subsequences and the problem (AGCAT, GAC: 2); subsequence against substring; brute force; the table of prefixes and the question how to extend it; last characters equal and last characters differ, each worked on AGCAT and GAC; the recurrence with its table directions; why pairing a match is safe (an exchange); the lcs-tree demo; the table drawn and its four kinds of cell; std::max; the table in C++; the lcs demo; reading an LCS back (the traceback, in words); the table's invariants; a practice (ABCB, BDCB: 3); the cost and the two-row length; where LCS is used.
+  Teaches: subsequences and the problem (AGCAT, GAC: 2); subsequence against substring; brute force; the table of prefixes and the question how to extend it; last characters equal and last characters differ, each worked on AGCAT and GAC (different last characters can each be in an LCS, matched earlier; never to each other); dropped, not lost (an earlier match is counted already, a later one at the cell that reaches it); the recurrence with its table directions; why pairing a match is safe (an exchange); the lcs-tree demo; the table drawn and its four kinds of cell; std::max; the table in C++; the lcs demo; reading an LCS back (the traceback, in words); the table's invariants; a practice (ABCB, BDCB: 3); the cost and the two-row length; where LCS is used.
   Needs:   the dynamic-programming method, rod cutting.
   Demos:   lcs-tree (registry slug), lcs-lecture (the registry's LCS on AGCAT and GAC, slide spec in topics/demos.js); figures dp-lcs-table, dp-lcs-cases, dp-lcs-abcb (tools/gen-dp-figures.mjs)
   Program: code/lcs/lcs.cpp
-  Budget:  ~38 min, 20 slides.
+  Budget:  ~40 min, 21 slides.
   Ported from Summer 2026 L14-dp-i.md, part 3.
 -->
 
@@ -79,14 +79,27 @@ $$L[4][2] = L[3][1] + 1 = 1 + 1 = 2$$
 
 ## Last characters differ
 
-`AGCAT` ends in `T`, `GAC` in `C`. A common subsequence cannot use both: each would have to be its last character, and `T` ≠ `C`. So one of them is **unused**: drop it.
+`AGCA` ends in `A`, `GAC` in `C`. Each can be **in** an LCS:
 
-| drop | what is left | an LCS | length |
-| --- | --- | --- | --: |
-| `T`, `A`'s last | `AGCA`, `GAC` | `AC` | 2 |
-| `C`, `B`'s last | `AGCAT`, `GA` | `GA` | 2 |
+| LCS | uses the last | matched to | so it fits in |
+| --- | --- | --- | --- |
+| `GA` | `A` of `AGCA` | an **earlier** `A` of `GAC` | $L[4][2]$: drop `C` |
+| `AC` | `C` of `GAC` | an **earlier** `C` of `AGCA` | $L[3][3]$: drop `A` |
 
-We do not know which is unused, so try both and keep the better: $L[5][3] = \max(2, 2) = 2$.
+They never match **each other** (`A` ≠ `C`), so every LCS leaves at least one of them out:
+
+$$L[4][3] = \max(L[3][3],\\ L[4][2]) = \max(2, 2) = 2$$
+
+--
+
+## Dropped, not lost
+
+Dropping a last character at one cell does not throw it away. If it is matched at all, it is matched to
+
+- an **earlier** character of the other string: counted already, in the smaller cell
+- a **later** character, past this prefix: counted at the cell that reaches it
+
+`AGC` and `GA` end in `C` and `A`. The `C` matches the `C` of `GAC`, one column **later**: at $L[3][3]$ the last characters are equal, and it counts there, $L[2][2] + 1 = 2$.
 
 --
 
