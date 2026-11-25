@@ -1,10 +1,10 @@
 <!--
   TOPIC · Longest common subsequence.
-  Teaches: subsequences and the problem (AGCAT, GAC: 2); subsequence against substring; brute force; the table of prefixes and the question how to extend it; last characters equal and last characters differ, each worked on AGCAT and GAC (different last characters can each be in an LCS, matched earlier; never to each other); dropped, not lost (an earlier match is counted already, a later one at the cell that reaches it); the recurrence with its table directions; why pairing a match is safe (an exchange); the lcs-tree demo; the table drawn and its four kinds of cell; std::max; the table in C++; the lcs demo; reading an LCS back (the traceback, in words); ties: which LCS comes out (up gives AC, left gives GA); the table's invariants; a practice (ABCB, BDCB: 3); the cost and the two-row length; where LCS is used.
+  Teaches: subsequences and the problem (AGCAT, GAC: 2); subsequence against substring; brute force; the table of prefixes and the question how to extend it; last characters equal and last characters differ, each worked on AGCAT and GAC (different last characters can each be in an LCS, matched earlier; never to each other); dropped, not lost (an earlier match is counted already, a later one at the cell that reaches it); the recurrence with its table directions; growing the table (a whole row or column, never a lone corner; the code keeps all n + 1 columns and adds rows); why pairing a match is safe (an exchange); the lcs-tree demo; the table drawn and its four kinds of cell; std::max; the table in C++; the lcs demo; reading an LCS back (the traceback, in words); ties: which LCS comes out (up gives AC, left gives GA); the table's invariants; a practice (ABCB, BDCB: 3); the cost and the two-row length; where LCS is used.
   Needs:   the dynamic-programming method, rod cutting.
-  Demos:   lcs-tree (registry slug), lcs-lecture (the registry's LCS on AGCAT and GAC, slide spec in topics/demos.js); figures dp-lcs-table, dp-lcs-cases, dp-lcs-ties, dp-lcs-abcb (tools/gen-dp-figures.mjs)
+  Demos:   lcs-tree (registry slug), lcs-lecture (the registry's LCS on AGCAT and GAC, slide spec in topics/demos.js); figures dp-lcs-grow, dp-lcs-table, dp-lcs-cases, dp-lcs-ties, dp-lcs-abcb (tools/gen-dp-figures.mjs)
   Program: code/lcs/lcs.cpp
-  Budget:  ~42 min, 22 slides.
+  Budget:  ~44 min, 23 slides.
   Ported from Summer 2026 L14-dp-i.md, part 3.
 -->
 
@@ -114,6 +114,18 @@ $$L[i][j] = \begin{cases} 0 & i = 0 \text{ or } j = 0 \\\\ L[i-1][j-1] + 1 & A[i
 | $L[i][j-1]$ | **left** | `B`'s last character |
 
 Character $i$ of `A` is `A[i-1]`: strings count from 0.
+
+--
+
+## Growing the table
+
+<div><img src="../../topics/figures/dp/dp-lcs-grow.svg" style="height:270px" alt="
+   white: the table for AGC and GA, rows 0..3, columns 0..2
+   add a row (A):    0 1 2, each cell reads the row above and its left
+   add a column (C): 0 1 1 2
+   a lone corner (4, 3): no, (3, 3) and (4, 2) are missing"></div>
+
+A new cell reads only cells **above** it and to its **left**: the table grows by a whole **row** or a whole **column**, never by a lone corner. The code keeps all $n + 1$ columns and adds one row per character of `A`.
 
 --
 
