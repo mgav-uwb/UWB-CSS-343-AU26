@@ -1,5 +1,5 @@
-// CSS 343 - topic program: the LCS table exactly as on the slides (and in the
-// Longest Common Subsequence chapter and Homework 8), printed for the lecture's
+// CSS 343 - topic program: the LCS table exactly as on the slides (the function
+// Homework 8 asks for), printed for the lecture's
 // pair and the practice, with the invariants the sanity-check slide states
 // checked on random pairs.
 //
@@ -16,13 +16,13 @@ using namespace std;
 // Fill row by row -- up, left, and diagonal are ready when a cell needs them.
 // Theta(mn) time and space.
 int lcsLength(const string& A, const string& B, vector<vector<int>>& L) {
-    int m = A.size(), n = B.size();
-    L.assign(m + 1, vector<int>(n + 1, 0)); // row 0 / col 0 = 0: empty prefix
-    for (int i = 1; i <= m; i++)
-        for (int j = 1; j <= n; j++)
-            if (A[i - 1] == B[j - 1])
+    int m = A.size(), n = B.size();         // the two lengths
+    L.assign(m + 1, vector<int>(n + 1, 0)); // m + 1 rows of n + 1 zeros
+    for (int i = 1; i <= m; i++)            // row 0 stays 0: A's empty prefix
+        for (int j = 1; j <= n; j++)        // col 0 stays 0: B's empty prefix
+            if (A[i - 1] == B[j - 1])       // the prefixes' last chars match?
                 L[i][j] = L[i - 1][j - 1] + 1;             // match: diagonal + 1
-            else
+            else                            // the last chars differ
                 L[i][j] = max(L[i - 1][j], L[i][j - 1]);   // drop one: up / left
     return L[m][n];                         // bottom-right = the answer
 }

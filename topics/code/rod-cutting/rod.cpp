@@ -1,7 +1,7 @@
 // CSS 343 - topic program: rod cutting. The table and the traceback exactly as
-// on the slides (and in the Rod Cutting chapter and Homework 8: the FIRST
-// winning cut is kept on a tie), the plain recursion with its 2^n calls, the
-// ratio-greedy that fails, and every number the slides quote.
+// on the slides (the tie rule of the Rod Cutting chapter and Homework 8: the
+// FIRST winning cut is kept on a tie), the plain recursion with its 2^n calls,
+// the ratio-greedy that fails, and every number the slides quote.
 //
 //   build:  g++ -std=c++17 -Wall -Wextra -O2 rod.cpp -o rod
 //   run:    ./rod
@@ -13,29 +13,31 @@ using namespace std;
 // Rod cutting, tabulated: best[len] = max over first cuts i of
 // price[i] + best[len-i], recording the winning i in cut[len] for the
 // traceback. n subproblems x O(n) choices each = Theta(n^2) time, Theta(n) space.
+// price[i] = price of a piece of length i (price[0] unused); returns the
+// best revenue for length n and sets cut[len] = the winning first cut.
 int rodCut(const vector<int>& price, int n, vector<int>& cut) {
-    vector<int> best(n + 1, 0);           // base case: best[0] = 0 (empty rod)
-    cut.assign(n + 1, 0);
-    for (int len = 1; len <= n; len++) {
-        int m = -1;
+    vector<int> best(n + 1, 0);           // n + 1 zeros; best[0] = 0: empty rod
+    cut.assign(n + 1, 0);                 // resize cut to n + 1 elements, all 0
+    for (int len = 1; len <= n; len++) {  // each length, smallest first
+        int m = -1;                       // best so far; any real cut beats it
         for (int i = 1; i <= len; i++)    // try every first cut
-            if (price[i] + best[len - i] > m) {
-                m = price[i] + best[len - i];
+            if (price[i] + best[len - i] > m) {   // strict >: ties keep first i
+                m = price[i] + best[len - i];     // piece i + best of the rest
                 cut[len] = i;             // remember the choice that won
             }
         best[len] = m;                    // reuses smaller best[] -- the overlap
     }
-    return best[n];
+    return best[n];                       // the whole rod's best revenue
 }
 
 // Traceback: repeatedly take the recorded first cut until nothing is left.
-vector<int> pieces(const vector<int>& cut, int n) {
-    vector<int> out;
-    while (n > 0) {
-        out.push_back(cut[n]);            // the winning first cut at length n
+vector<int> pieces(const vector<int>& cut, int n) {   // cut: filled by rodCut
+    vector<int> out;                      // empty; the pieces, in cut order
+    while (n > 0) {                       // until the rod is used up
+        out.push_back(cut[n]);            // append the winning first cut at n
         n -= cut[n];                      // cut it off, continue on the rest
     }
-    return out;
+    return out;                           // the pieces of an optimal cut
 }
 
 // The plain recursion: try every first cut, solve the rest from scratch.

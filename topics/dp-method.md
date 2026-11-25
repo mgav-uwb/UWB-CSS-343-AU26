@@ -23,7 +23,7 @@ $$F(0) = 0, \qquad F(1) = 1, \qquad F(n) = F(n-1) + F(n-2)$$
 ```cpp
 // Naive Fibonacci, straight from the definition: correct, but every call
 // solves its subproblems from scratch. 2 fib(n+1) - 1 calls, Theta(phi^n).
-long fibNaive(int n) {
+long fibNaive(int n) {                    // returns fib(n), for n >= 0
     if (n < 2) return n;                  // base cases: fib(0)=0, fib(1)=1
     return fibNaive(n - 1) + fibNaive(n - 2);   // both solved again, every time
 }
@@ -64,12 +64,12 @@ $\Theta(\varphi^n)$, $\varphi \approx 1.618$: forty billion calls for fifty addi
 ```cpp
 // Memoized Fibonacci: the natural recursion plus a cache. Each fib(k) is
 // computed once; every later request is an O(1) hit. Theta(n) time and space.
-long fibMemo(int n, vector<long>& memo) {
+long fibMemo(int n, vector<long>& memo) { // by reference: all calls share memo
     if (n < 2) return n;                  // base cases: fib(0)=0, fib(1)=1
-    if (memo[n] != 0) return memo[n];     // remember: cache hit, subtree skipped
-    memo[n] = fibMemo(n - 1, memo)        // computed at most once per n ...
-            + fibMemo(n - 2, memo);
-    return memo[n];                       // ... then stored for every caller
+    if (memo[n] != 0) return memo[n];     // 0 = not computed yet; else a hit
+    memo[n] = fibMemo(n - 1, memo)        // computed at most once per n:
+            + fibMemo(n - 2, memo);       // O(1): the call above cached it
+    return memo[n];                       // later calls for n return the cache
 }
 ```
 
@@ -82,12 +82,12 @@ long fibMemo(int n, vector<long>& memo) {
 ```cpp
 // Tabulated Fibonacci: fill fib(0..n) smallest-first -- every dependency is
 // already in the table when a cell needs it. Theta(n) time, Theta(n) space.
-long fibTab(int n) {
-    vector<long> t(n + 2);
+long fibTab(int n) {                      // returns fib(n), for n >= 0
+    vector<long> t(n + 2);                // n + 2 zeros: t[1] exists at n = 0
     t[0] = 0; t[1] = 1;                   // base cases seed the table
-    for (int i = 2; i <= n; i++)
+    for (int i = 2; i <= n; i++)          // smallest first: 2, 3, ..., n
         t[i] = t[i - 1] + t[i - 2];       // dependencies already filled
-    return t[n];
+    return t[n];                          // the last cell is the answer
 }
 ```
 
@@ -100,9 +100,9 @@ long fibTab(int n) {
 ```cpp
 // Two variables: each value needs only the previous TWO, so keep just those.
 // Theta(n) time, Theta(1) space -- the optimization tabulation makes natural.
-long fibTwoVar(int n) {
+long fibTwoVar(int n) {                   // returns fib(n), for n >= 0
     long a = 0, b = 1;                    // invariant: a = fib(i), b = fib(i+1)
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {         // n steps: i = 0, 1, ..., n - 1
         long c = a + b;                   // one addition per step
         a = b; b = c;                     // slide the two-cell window right
     }
