@@ -173,9 +173,9 @@ Pieces **1 + 3**, value 9.
 
 ## The cost
 
-$$\sum\_{\text{len}=1}^{n} \text{len} = \frac{n(n+1)}{2} \text{ candidates} = \Theta(n^2) \text{ time}, \qquad \Theta(n) \text{ space}$$
+$$\begin{aligned} \text{time:}\quad & \sum\_{\text{len}=1}^{n} \text{len} = \frac{n(n+1)}{2} \text{ candidates} = \Theta(n^2) \\\\ \text{space:}\quad & \texttt{best} \text{ and } \texttt{cut} \text{, } n + 1 \text{ entries each} = \Theta(n) \end{aligned}$$
 
-| $n$ | plain recursion | table candidates |
+| $n$ | plain recursion: $2^n$ calls | table: $n(n+1)/2$ candidates |
 | --: | --: | --: |
 | 4 | 16 | 10 |
 | 10 | 1,024 | 55 |
