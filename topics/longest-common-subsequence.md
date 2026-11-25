@@ -1,10 +1,10 @@
 <!--
   TOPIC · Longest common subsequence.
-  Teaches: subsequences and the problem (AGCAT, GAC: 2); subsequence against substring; brute force; the table of prefixes and the question how to extend it; last characters equal and last characters differ, each worked on AGCAT and GAC (different last characters can each be in an LCS, matched earlier; never to each other); dropped, not lost (an earlier match is counted already, a later one at the cell that reaches it); the recurrence with its table directions; why pairing a match is safe (an exchange); the lcs-tree demo; the table drawn and its four kinds of cell; std::max; the table in C++; the lcs demo; reading an LCS back (the traceback, in words); the table's invariants; a practice (ABCB, BDCB: 3); the cost and the two-row length; where LCS is used.
+  Teaches: subsequences and the problem (AGCAT, GAC: 2); subsequence against substring; brute force; the table of prefixes and the question how to extend it; last characters equal and last characters differ, each worked on AGCAT and GAC (different last characters can each be in an LCS, matched earlier; never to each other); dropped, not lost (an earlier match is counted already, a later one at the cell that reaches it); the recurrence with its table directions; why pairing a match is safe (an exchange); the lcs-tree demo; the table drawn and its four kinds of cell; std::max; the table in C++; the lcs demo; reading an LCS back (the traceback, in words); ties: which LCS comes out (up gives AC, left gives GA); the table's invariants; a practice (ABCB, BDCB: 3); the cost and the two-row length; where LCS is used.
   Needs:   the dynamic-programming method, rod cutting.
-  Demos:   lcs-tree (registry slug), lcs-lecture (the registry's LCS on AGCAT and GAC, slide spec in topics/demos.js); figures dp-lcs-table, dp-lcs-cases, dp-lcs-abcb (tools/gen-dp-figures.mjs)
+  Demos:   lcs-tree (registry slug), lcs-lecture (the registry's LCS on AGCAT and GAC, slide spec in topics/demos.js); figures dp-lcs-table, dp-lcs-cases, dp-lcs-ties, dp-lcs-abcb (tools/gen-dp-figures.mjs)
   Program: code/lcs/lcs.cpp
-  Budget:  ~40 min, 21 slides.
+  Budget:  ~42 min, 22 slides.
   Ported from Summer 2026 L14-dp-i.md, part 3.
 -->
 
@@ -235,10 +235,21 @@ The recurrence, line for line: $\Theta(mn)$ time and space.
 The table holds lengths. To recover a subsequence, walk from `L[m][n]` toward `L[0][0]`:
 
 - characters equal: it is in the LCS; step **diagonally**
-- otherwise: step to the **larger** of up and left
+- otherwise: step to the **larger** of up and left; on a **tie**, either
 - the characters collected, reversed, spell an LCS
 
 $O(m + n)$ steps, but it needs the **whole** table. Lecture 18 and PA3 build on this walk.
+
+--
+
+## Ties: which LCS?
+
+<div><img src="../../topics/figures/dp/dp-lcs-ties.svg" style="height:320px" alt="
+   AGCAT against GAC, walked back twice; amber: a tie, up = left
+   on a tie, go up:   ties at (5,3), (4,3), (2,2); spells AC
+   on a tie, go left: tie at (5,3) only;        spells GA"></div>
+
+A tie means up and left hold the **same** length, so an LCS lies down either step. The rule picks **which** LCS comes out; the demo goes up.
 
 --
 
