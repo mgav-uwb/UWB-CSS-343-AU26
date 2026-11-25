@@ -1,10 +1,10 @@
 <!--
   TOPIC · Longest common subsequence.
-  Teaches: subsequences and the problem (AGCAT, GAC: 2); subsequence against substring; brute force; the recurrence derived from the last characters; why pairing a match is safe (an exchange); the lcs-tree demo; the table drawn and its four kinds of cell; std::max; the table in C++; the lcs demo; reading an LCS back (the traceback, in words); the table's invariants; a practice (ABCB, BDCB: 3); the cost and the two-row length; where LCS is used.
+  Teaches: subsequences and the problem (AGCAT, GAC: 2); subsequence against substring; brute force; the table of prefixes and the question how to extend it; last characters equal and last characters differ, each worked on AGCAT and GAC; the recurrence with its table directions; why pairing a match is safe (an exchange); the lcs-tree demo; the table drawn and its four kinds of cell; std::max; the table in C++; the lcs demo; reading an LCS back (the traceback, in words); the table's invariants; a practice (ABCB, BDCB: 3); the cost and the two-row length; where LCS is used.
   Needs:   the dynamic-programming method, rod cutting.
   Demos:   lcs-tree (registry slug), lcs-lecture (the registry's LCS on AGCAT and GAC, slide spec in topics/demos.js); figures dp-lcs-table, dp-lcs-cases, dp-lcs-abcb (tools/gen-dp-figures.mjs)
   Program: code/lcs/lcs.cpp
-  Budget:  ~34 min, 17 slides.
+  Budget:  ~38 min, 20 slides.
   Ported from Summer 2026 L14-dp-i.md, part 3.
 -->
 
@@ -49,25 +49,73 @@ $O(n \cdot 2^m)$: for two 30-character strings, about $3 \times 10^{10}$ steps.
 
 --
 
-## The last characters
+## A table of prefixes
 
-Compare the **last** characters of the prefixes `A[0..i)` and `B[0..j)`:
+Let's build a table: cell $L[i][j]$ is the length of the LCS of the first $i$ characters of `A` and the first $j$ of `B`.
 
-- **equal**: pair them; add 1 to the LCS of the shorter prefixes
-- **different**: one of them is unused: drop either, keep the better
+| $i$ | $j$ | prefixes | an LCS | $L[i][j]$ |
+| --: | --: | --- | --- | --: |
+| 5 | 3 | `AGCAT`, `GAC` | `AC` | 2 |
+| 4 | 2 | `AGCA`, `GA` | `GA` | 2 |
+| 3 | 1 | `AGC`, `G` | `G` | 1 |
+| 0 | 3 | empty, `GAC` | empty | 0 |
+
+The answer is $L[m][n]$. **How do we extend it**: knowing the cells for shorter prefixes, what is $L[i][j]$?
+
+--
+
+## Last characters equal
+
+Extend by looking at the **last** characters. `AGCA` and `GA` both end in `A`.
+
+- pair the two `A`s: they end an LCS
+- before them: an LCS of `AGC` and `G`, which is `G`
+
+LCS = `G` then `A` = `GA`, so
+
+$$L[4][2] = L[3][1] + 1 = 1 + 1 = 2$$
+
+--
+
+## Last characters differ
+
+`AGCAT` ends in `T`, `GAC` in `C`. A common subsequence cannot use both: each would have to be its last character, and `T` ≠ `C`. So one of them is **unused**: drop it.
+
+| drop | what is left | an LCS | length |
+| --- | --- | --- | --: |
+| `T`, `A`'s last | `AGCA`, `GAC` | `AC` | 2 |
+| `C`, `B`'s last | `AGCAT`, `GA` | `GA` | 2 |
+
+We do not know which is unused, so try both and keep the better: $L[5][3] = \max(2, 2) = 2$.
+
+--
+
+## The recurrence
 
 $$L[i][j] = \begin{cases} 0 & i = 0 \text{ or } j = 0 \\\\ L[i-1][j-1] + 1 & A[i-1] = B[j-1] \\\\ \max(L[i-1][j],\\ L[i][j-1]) & \text{otherwise} \end{cases}$$
+
+| cell | in the table | drops |
+| --- | --- | --- |
+| $L[i-1][j-1]$ | **up-left** | both last characters |
+| $L[i-1][j]$ | **up** | `A`'s last character |
+| $L[i][j-1]$ | **left** | `B`'s last character |
+
+Character $i$ of `A` is `A[i-1]`: strings count from 0.
 
 --
 
 ## Why pairing a match is safe
 
-Suppose `A[i-1] == B[j-1]` and some LCS of the two prefixes does **not** end with that pair.
+`BAA` and `BA` end in `A`. The LCS `BA` may use the **middle** `A` of `BAA`; matching the **last** `A` instead still gives `BA`.
 
-- its last character is matched somewhere earlier in `A` or in `B`
-- swap that match for the pair of last characters: still a common subsequence, same length
+In general, if both prefixes end in `c`, any LCS
 
-So some LCS uses the pair, and the rest of it is an LCS of the shorter prefixes: $L[i-1][j-1] + 1$.
+- uses at least one last `c`: else appending `c` makes it longer
+- if it uses only one, rematch its final `c` to the other: same length
+
+So some LCS ends with the pair:
+
+$$L[i][j] = L[i-1][j-1] + 1$$
 
 --
 
