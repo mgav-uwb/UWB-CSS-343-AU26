@@ -90,7 +90,10 @@ const SLIDE_SPECS = {
     title: "heap", make: () => new MaxHeap(),
     initial: "INSERT(90,80,70,30,60,50)",
     renderer: heapViews(), buildAll: heapBuild("insert", "heapify"), initialBuilt: true,
-    ops: [{ name: "Insert", arg: "number", run: (s, v) => s.insert(v) }],
+    ops: [
+      { name: "Insert", arg: "number", run: (s, v) => s.insert(v) },
+      { name: "Heapify", run: (s) => s.heapify() },
+    ],
     costs: ["compare", "swap"], chrome: { showCosts: true },
     width: 1000, height: [75, 130],
   },
@@ -101,6 +104,7 @@ const SLIDE_SPECS = {
     ops: [
       { name: "Insert", arg: "number", run: (s, v) => s.insert(v) },
       { name: "Delete Max", run: (s) => s.delMax() },
+      { name: "Heapify", run: (s) => s.heapify() },
     ],
     costs: ["compare", "swap"], chrome: { showCosts: true },
     width: 1000, height: [75, 130],
